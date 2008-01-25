@@ -50,6 +50,7 @@ made subject to such option by the copyright holder.
         <folder name="Project">
             <folder name="Samples">
                 <folder name="JavaFX">
+                    <attr name="position" intvalue="180"/>
                     <file name="JavaFX Weather Application" url="resources/zip/WeatherFXApplicationProject.zip">
                         <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
                         <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.weather2.Bundle"/>
