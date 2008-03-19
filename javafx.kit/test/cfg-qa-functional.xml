@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
 Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
 
 The contents of this file are subject to the terms of either the GNU
 General Public License Version 2 only ("GPL") or the Common
@@ -40,12 +40,20 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<project name="org.netbeans.modules.javafx.lib" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project javafx.</description>
-    <import file="../../nbbuild/templates/projectized.xml"/>
-    <target name="netbeans-extra" depends="init">
-        <get src="${jfxcompiler.jar.url}" dest="${jfxcompiler.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${jfxrt.jar.url}" dest="${jfxrt.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${Scenario.jar.url}" dest="${Scenario.jar}" usetimestamp="true" verbose="true"/>
-    </target>
-</project>
+<!-- Configation file to group tests into testbags. For details see
+     http://xtest.netbeans.org/xtest_config.html.
+-->
+<mconfig name="qa-functional config">
+
+    <testbag testattribs="validation,stable" executor="ide" name="qa-functional tests">
+        <testset dir="qa-functional/src">
+            <patternset>
+                <include name="**/*Test.class"/>
+            </patternset>
+        </testset>
+    </testbag>
+
+    <compiler name="qa-functional-compiler" antfile="build-qa-functional.xml"
+              target="qa-functional-compiler" default="true"/>
+    <executor name="ide" antfile="build-qa-functional.xml" target="runidetest" default="true"/>
+</mconfig>

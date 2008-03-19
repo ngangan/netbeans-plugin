@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
 Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
 
 The contents of this file are subject to the terms of either the GNU
 General Public License Version 2 only ("GPL") or the Common
@@ -26,7 +26,7 @@ your own identifying information:
 Contributor(s):
 
 The Original Software is NetBeans. The Initial Developer of the Original
-Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
 Microsystems, Inc. All Rights Reserved.
 
 If you wish your version of this file to be governed by only the CDDL
@@ -40,12 +40,33 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<project name="org.netbeans.modules.javafx.lib" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project javafx.</description>
-    <import file="../../nbbuild/templates/projectized.xml"/>
-    <target name="netbeans-extra" depends="init">
-        <get src="${jfxcompiler.jar.url}" dest="${jfxcompiler.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${jfxrt.jar.url}" dest="${jfxrt.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${Scenario.jar.url}" dest="${Scenario.jar}" usetimestamp="true" verbose="true"/>
-    </target>
-</project>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Navigator">
+        <folder name="Panels">
+            <folder name="text">
+                <folder name="x-fx">
+                    <file name="TreeNavigatorProviderImpl.instance">
+                        <attr name="position" intvalue="200"/>
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                    </file>
+                    <file name="ElementNavigatorProviderImpl.instance">
+                        <attr name="position" intvalue="300"/>
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                    </file>
+                    <file name="ErrorNavigatorProviderImpl.instance">
+                        <attr name="position" intvalue="400"/>
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                    </file>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+    <folder name="Editors">
+        <folder name="text">
+            <folder name="x-fx">
+                <file name="org-netbeans-modules-javafx-debug-HighlightsLayerFactoryImpl.instance" />
+            </folder>
+        </folder>
+    </folder>
+</filesystem>
