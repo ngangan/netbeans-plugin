@@ -38,55 +38,48 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.api.javafx.source;
 
-package org.netbeans.modules.javafx.project;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.logging.Logger;
-import org.netbeans.api.java.classpath.ClassPath;
-import org.openide.filesystems.FileObject;
-import org.openide.loaders.CreateFromTemplateAttributesProvider;
-import org.openide.loaders.DataFolder;
-import org.openide.loaders.DataObject;
+import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
+import org.openide.util.RequestProcessor;
 
 /**
- * Provides attributes that can be used inside scripting templates.
- * <dl><dt><code>project.license</code></dt>
- * <dd>attribute containing license name.
- * The provider reads <code>project.license</code> property from build.properties
- * and returns it as the template attribute. In case the property is not available
- * the attribute is filled with <code>"default"</code> value.</dd>
- * </dl>
  *
- * @author Jan Pokorsky
+ * @author Jan Lahoda
  */
-public final class JavaFXTemplateAttributesProvider implements CreateFromTemplateAttributesProvider {
+final class JavaFXSourceTaskFactoryManager {
     
-    public Map<String,? extends Object> attributesFor(DataObject template, DataFolder target, String name) {
-        FileObject templateFO = template.getPrimaryFile();
-        if (!"fx".equals(templateFO.getExt()) || templateFO.isFolder()) {
-            return null;
-        }
-        
-        FileObject targetFO = target.getPrimaryFile();
-        ClassPath cp = ClassPath.getClassPath(targetFO, ClassPath.SOURCE);
-        if (cp == null) {
-            Logger.getLogger(JavaFXTemplateAttributesProvider.class.getName()).warning("No classpath was found for folder: " + target.getPrimaryFile()); // NOI18N
-            return Collections.emptyMap();
-        }
-        return Collections.<String, Object>singletonMap("package", cp.getResourceName(targetFO, '.', false)); // NOI18N
-        
-/*        
-        
-        EditableProperties props = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-        String license = props.getProperty("project.license"); // NOI18N
-        if (license == null) {
-            return null;
-        } else {
-            return Collections.singletonMap("project", Collections.singletonMap("license", license)); // NOI18N
-        }
- */ 
+    private static JavaFXSourceTaskFactoryManager INSTANCE;
+    
+    public static synchronized void register() {
+        INSTANCE = new JavaFXSourceTaskFactoryManager();
     }
-
+    
+    private Lookup.Result<JavaFXSourceTaskFactory> factories;
+    
+    /** Creates a new instance of JavaSourceTaskFactoryManager */
+    private JavaFXSourceTaskFactoryManager() {
+        final RequestProcessor.Task updateTask = new RequestProcessor("JavaSourceTaskFactoryManager Worker", 1).create(new Runnable() {
+            public void run() {
+                update();
+            }
+        });
+        
+        factories = Lookup.getDefault().lookupResult(JavaFXSourceTaskFactory.class);
+        factories.addLookupListener(new LookupListener() {
+            public void resultChanged(LookupEvent ev) {
+                updateTask.schedule(0);
+            }
+        });
+        
+        update();
+    }
+    
+    private void update() {
+        for (JavaFXSourceTaskFactory f : factories.allInstances()) {
+            f.fileObjectsChanged();
+        }
+    }
 }
