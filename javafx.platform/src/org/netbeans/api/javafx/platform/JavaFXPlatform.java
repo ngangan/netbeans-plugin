@@ -37,72 +37,24 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.preview;
+package org.netbeans.api.javafx.platform;
 
-import java.io.IOException;
-import java.net.URI;
-import javax.swing.text.Document;
-import javax.tools.SimpleJavaFileObject;
-import org.netbeans.modules.editor.NbEditorUtilities;
+import java.net.URL;
+import org.netbeans.api.java.platform.JavaPlatform;
+import org.netbeans.api.java.platform.JavaPlatformManager;
+import org.netbeans.modules.javafx.platform.platformdefinition.DefaultPlatformImpl;
 
-class MemoryFileObject extends SimpleJavaFileObject {
-
-    CharSequence code;
-    String className;
-    Document referredDoc;
-
-    public MemoryFileObject(String className, CharSequence code, Kind kind, Document doc) {
-        super(toURI(className), kind);
-        this.code = code;
-        this.className = className;
-        this.referredDoc = doc;
-    }
+/**
+ *
+ * @author answer
+ */
+public abstract class JavaFXPlatform extends JavaPlatform{
     
-    Document getDocument() {
-        return referredDoc;
-    }
-
-    @Override
-    public boolean isNameCompatible(String simpleName, Kind kind) {
-        return true;
-    }
-
-    @Override
-    public URI toUri() {
-        return toURI(className);
-    }
-
-    @Override
-    public String getName() {
-        return getFileName(className);
-    }
+    public abstract URL getJavaFXFolder();
     
-    public String getClassName() {
-        return className;
+    public static JavaFXPlatform getDefaultFXPlatform() {
+        for (JavaPlatform p : JavaPlatformManager.getDefault().getInstalledPlatforms())
+            if (p instanceof DefaultPlatformImpl) return (JavaFXPlatform)p;
+        return null;
     }
-    
-    public String getFilePath(){
-        return NbEditorUtilities.getFileObject(referredDoc).getPath();
-    }
-
-    @Override
-    public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-        return code;
-    }
-
-    private static URI toURI(String className) {
-        return URI.create("./" + getFilePath(className));
-    }
-    
-    private static String getFileName(String className){
-        return className.substring(className.lastIndexOf('.') + 1) + ".fx";
-    }
-    
-    private static String getFilePath(String className){
-        return className.replace('.','/') + ".fx";
-    }
-
-    private void print(String text) {
-        System.out.println("[file object] " + text);
-    }    
 }
