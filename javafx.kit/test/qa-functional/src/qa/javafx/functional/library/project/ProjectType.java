@@ -37,64 +37,45 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package qa.javafx.functional.library.project;
 
-import com.sun.tools.javafx.tree.JFXForExpressionInClause;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import qa.javafx.functional.library.Constant;
 
-/**
- *
- * @author David Strupl
- */
-public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironment<JFXForExpressionInClause> {
+public enum ProjectType {
+
+    JAVA_APPLICATION(Constant.PROJECT_CATEGORY_JAVA, Constant.PROJECT_JAVA_APPLICATION),
+    JAVAFX_APPLICATION(Constant.PROJECT_CATEGORY_JAVAFX, Constant.PROJECT_JAVAFX_APPLICATION);
     
-    private static final Logger logger = Logger.getLogger(ForExpressionInClauseEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
-
-    @Override
-    protected void inside(JFXForExpressionInClause feic) throws IOException {
-        log("inside JFXForExpressionInClause " + feic);
-        log("  prefix: " + prefix);
-        int start = (int)sourcePositions.getStartPosition(root, feic);
-        log("  offset: " + offset);
-        log("  start: " + start);
-        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-        ts.move(start);
-        boolean afterLBracket = false;
-        loop: while (ts.moveNext()) {
-            if (ts.offset() >= offset) {
-                break;
-            }
-            switch (ts.token().id()) {
-                case WS:
-                case LINE_COMMENT:
-                case COMMENT:
-                case DOC_COMMENT:
-                    continue;
-                case LBRACKET:
-                    afterLBracket = true;
-                    break loop;
-                default:
-                    // TODO:
-            }
-        }
-        log("  afterLBracket: " + afterLBracket);
-        if (afterLBracket) {
-            // numbers here
-        } else {
-            // sequences here
-        }
-
+    private String categoryName;
+    private String projectName;
+    
+    
+    /**
+     * 
+     * @param typeName 
+     */
+    ProjectType(String categoryName, String typeName){
+        this.categoryName = categoryName;
+        this.projectName = projectName;
+        
     }
 
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
+    public String getCategoryName(){
+        return categoryName;
     }
+    
+    public String getProjectName(){
+        return projectName;
+    }
+    /**
+     * 
+     * @return 
+     */
+    public String toString() {
+        return categoryName + "|" + projectName;
+    }
+    
+    
+    
+    
 }

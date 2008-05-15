@@ -37,64 +37,18 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
-
-import com.sun.tools.javafx.tree.JFXForExpressionInClause;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+package qa.javafx.functional.library;
 
 /**
  *
- * @author David Strupl
+ * @author andromeda
  */
-public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironment<JFXForExpressionInClause> {
+public interface Constant {
     
-    private static final Logger logger = Logger.getLogger(ForExpressionInClauseEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
-
-    @Override
-    protected void inside(JFXForExpressionInClause feic) throws IOException {
-        log("inside JFXForExpressionInClause " + feic);
-        log("  prefix: " + prefix);
-        int start = (int)sourcePositions.getStartPosition(root, feic);
-        log("  offset: " + offset);
-        log("  start: " + start);
-        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-        ts.move(start);
-        boolean afterLBracket = false;
-        loop: while (ts.moveNext()) {
-            if (ts.offset() >= offset) {
-                break;
-            }
-            switch (ts.token().id()) {
-                case WS:
-                case LINE_COMMENT:
-                case COMMENT:
-                case DOC_COMMENT:
-                    continue;
-                case LBRACKET:
-                    afterLBracket = true;
-                    break loop;
-                default:
-                    // TODO:
-            }
-        }
-        log("  afterLBracket: " + afterLBracket);
-        if (afterLBracket) {
-            // numbers here
-        } else {
-            // sequences here
-        }
-
-    }
-
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
-    }
+    String PROJECT_JAVA_APPLICATION = "Java Application";
+    String PROJECT_JAVAFX_APPLICATION = "JavaFX Script Application";
+    
+    
+    String PROJECT_CATEGORY_JAVA = "Java";
+    String PROJECT_CATEGORY_JAVAFX = "JavaFX";
 }

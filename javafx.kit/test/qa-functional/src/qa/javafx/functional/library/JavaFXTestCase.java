@@ -36,65 +36,46 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package qa.javafx.functional.library;
 
-package org.netbeans.modules.javafx.editor.completion.environment;
-
-import com.sun.tools.javafx.tree.JFXForExpressionInClause;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import java.awt.Component;
+import org.netbeans.jellytools.JellyTestCase;
+import org.netbeans.jemmy.ComponentChooser;
 
 /**
  *
- * @author David Strupl
+ * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironment<JFXForExpressionInClause> {
-    
-    private static final Logger logger = Logger.getLogger(ForExpressionInClauseEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+public class JavaFXTestCase extends JellyTestCase {
 
-    @Override
-    protected void inside(JFXForExpressionInClause feic) throws IOException {
-        log("inside JFXForExpressionInClause " + feic);
-        log("  prefix: " + prefix);
-        int start = (int)sourcePositions.getStartPosition(root, feic);
-        log("  offset: " + offset);
-        log("  start: " + start);
-        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-        ts.move(start);
-        boolean afterLBracket = false;
-        loop: while (ts.moveNext()) {
-            if (ts.offset() >= offset) {
-                break;
-            }
-            switch (ts.token().id()) {
-                case WS:
-                case LINE_COMMENT:
-                case COMMENT:
-                case DOC_COMMENT:
-                    continue;
-                case LBRACKET:
-                    afterLBracket = true;
-                    break loop;
-                default:
-                    // TODO:
-            }
-        }
-        log("  afterLBracket: " + afterLBracket);
-        if (afterLBracket) {
-            // numbers here
-        } else {
-            // sequences here
-        }
+    public static final String PROJECT_NAME_HELLO_WORLD = "HelloWorld";
+    public static final String PREVIEW_FRAME_TITLE = "Hello World JavaFX";
+    public static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
+    public static final String BUILD_FAILED = "BUILD FAILED";
 
+    public JavaFXTestCase(String name) {
+        super(name);
     }
 
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
+    @Override
+    protected void setUp() throws Exception {
+        System.out.println("[fx test case] setup");
+    }
+
+    public class ClassNameComponentChooser implements ComponentChooser {
+
+        String text;
+
+        public ClassNameComponentChooser(String text) {
+            this.text = text;
+        }
+
+        public boolean checkComponent(Component component) {
+            return component.toString().contains(text);
+        }
+
+        public String getDescription() {
+            return "ButtonComponentChooser: \"" + text + "\"";
         }
     }
 }
