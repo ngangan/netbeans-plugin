@@ -36,53 +36,24 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package qa.javafx.functional.library.project;
 
-package qa.javafx.functional.library;
+import org.netbeans.jemmy.operators.JTextComponentOperator;
 
 /**
  *
  * @author andromeda
  */
-public interface Constant {
-    
-    // ================   User Data  ========================
-    
-    String USER_DATA_REPRISE = "gui";
-    String USER_DATA_COMPILER = "ui";
-    
-    String USER_DATA_PATH = USER_DATA_REPRISE;
-    
+public class EditorOperator extends org.netbeans.jellytools.EditorOperator {
 
-    // ================   Project  ========================
-    
-    String PROJECT_JAVA_APPLICATION = "Java Application";
-    String PROJECT_JAVAFX_APPLICATION = "JavaFX Script Application";
-    
-    
-    String PROJECT_CATEGORY_JAVA = "Java";
-    String PROJECT_CATEGORY_JAVAFX = "JavaFX";
-    
-    // ================   Buttons  ========================
-    String BUTTON_OK = "OK";
-    String BUTTON_RUN = "Run";
+    JTextComponentOperator textComponent;
 
-    // ================   Tabs  ========================
-    String TAB_PROFILER = "Profiler";
-
-    // ================   Menu items  ========================
-
-    String POPUP_MENU_ITEM_PROFILE = "Profile";
+    public EditorOperator(String name) {
+        super(name);
+        textComponent = new JTextComponentOperator(this);
+    }
     
-
-    // ================   Dialogs  ========================
-
-    String DIALOG_TITLE_ENABLE_PROFILING = "Enable Profiling";
-    
-    
-    // ================   Tests  ========================
-    // ============    Smoke  ===========================
-    
-    String SMOKE_PROFILER_FILE_PATH = "profiler/smoke/Profiler.fx";
-    
-    
+    public void setText(String text){
+        textComponent.setText(text);
+    }
 }
