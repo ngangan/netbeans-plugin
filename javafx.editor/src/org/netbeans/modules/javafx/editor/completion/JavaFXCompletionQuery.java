@@ -515,7 +515,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
                     break;
                 case BLOCK:
-                    //insideBlock(env);
+                    result = new BlockEnvironment();
                     break;
                 case MEMBER_SELECT:
                     result = new MemberSelectTreeEnvironment();
