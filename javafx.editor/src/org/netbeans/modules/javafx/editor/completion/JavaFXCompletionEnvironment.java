@@ -45,6 +45,7 @@ import com.sun.javafx.api.tree.ForExpressionInClauseTree;
 import com.sun.javafx.api.tree.ForExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTree;
 import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
+import com.sun.javafx.api.tree.OnReplaceTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ErroneousTree;
 import com.sun.source.tree.IdentifierTree;
@@ -266,7 +267,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addLocalMembersAndVars() throws IOException {
-        log("addLocalMembersAndVars: " + getPrefix());
+        log("addLocalMembersAndVars: " + prefix);
         getController().toPhase(Phase.ANALYZED);
         
         for (TreePath tp = getPath(); tp != null; tp = tp.getParentPath()) {
@@ -296,9 +297,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                     log("    type.getKind() == " + type.getKind());
                     if (type.getKind() == ElementKind.LOCAL_VARIABLE) {
-                        log("    adding " + type.getSimpleName());
-                        addResult(JavaFXCompletionItem.createVariableItem(
-                            type.getSimpleName().toString(), offset, false));
+                        String s = type.getSimpleName().toString();
+                        log("    adding(1) " + s + " with prefix " + prefix);
+                        if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                            addResult(JavaFXCompletionItem.createVariableItem(
+                                s, offset, false));
+                        }
                     }
                 }
             }
@@ -307,8 +311,29 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 log("  for expression: " + fet + "\n");
                 for (ForExpressionInClauseTree fetic : fet.getInClauses()) {
                     log("  fetic: " + fetic + "\n");
+                    String s = fetic.getVariable().getName().toString();
+                    log("    adding(2) " + s + " with prefix " + prefix);
+                    if (JavaFXCompletionProvider.startsWith(s, prefix)) {
                         addResult(JavaFXCompletionItem.createVariableItem(
-                            fetic.getVariable().getName().toString(), offset, false));
+                            s, offset, false));
+                    }
+                }
+            }
+            if (k == JavaFXKind.ON_REPLACE) {
+                OnReplaceTree ort = (OnReplaceTree)jfxt;
+                log("  for expression: " + ort + "\n");
+                String s1 = ort.getNewElements().getName().toString();
+                log("    adding(3) " + s1 + " with prefix " + prefix);
+                if (JavaFXCompletionProvider.startsWith(s1, prefix)) {
+                    addResult(JavaFXCompletionItem.createVariableItem(
+                        s1 , offset, false));
+                }
+                String s2 = ort.getOldValue().getName().toString();
+                log("    adding(4) " + s2 + " with prefix " + prefix);
+                if (JavaFXCompletionProvider.startsWith(s2, prefix
+                        )) {
+                    addResult(JavaFXCompletionItem.createVariableItem(
+                        s2, offset, false));
                 }
             }
         }
