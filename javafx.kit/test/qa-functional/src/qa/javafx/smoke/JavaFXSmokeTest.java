@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileFilter;
 import javax.swing.JToggleButton;
 import org.netbeans.jellytools.Bundle;
+import org.netbeans.jellytools.EditorOperator;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputTabOperator;
@@ -28,8 +29,10 @@ import org.netbeans.jemmy.operators.JToggleButtonOperator;
 import org.netbeans.junit.NbTestSuite;
 
 //import org.junit.Test;
+import qa.javafx.functional.library.Constant;
 import qa.javafx.functional.library.JavaFXTestCase;
 //import static org.junit.Assert.*;
+import qa.javafx.functional.library.project.JavaFXProject;
 
 //import org.junit.Test;
 //import org.junit.Before;
@@ -58,6 +61,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase{
         suite.addTest(new JavaFXSmokeTest("testEditor"));
         suite.addTest(new JavaFXSmokeTest("testProjectBuilding"));
         suite.addTest(new JavaFXSmokeTest("testPreview"));
+        //suite.addTest(new JavaFXSmokeTest("testProfiler"));
         return suite;
     }
 
@@ -254,5 +258,14 @@ public class JavaFXSmokeTest extends JavaFXTestCase{
         //Util.showComponents(new TopComponentOperator("Main.fx"));
         //Util.showComponents(main);
     }
+    
+//    public void testProfiler() {
+//        JavaFXProject profiler  = JavaFXProject.createProject("SmokeProfiler");
+//        EditorOperator main = profiler.openMainFile();
+//        String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
+//        main.insert(code);
+//        Util.sleep(4000);
+//        
+//    }
     
 }

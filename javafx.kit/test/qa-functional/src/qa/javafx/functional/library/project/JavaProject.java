@@ -36,13 +36,16 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package qa.javafx.functional.library.project;
 
-import org.netbeans.insane.impl.Utils;
+import javax.swing.JDialog;
+import org.netbeans.jellytools.NbDialogOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputTabOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
+import org.netbeans.jellytools.TopComponentOperator;
+import org.netbeans.jellytools.actions.Action;
+import org.netbeans.jellytools.actions.OpenAction;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jellytools.nodes.ProjectRootNode;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -56,43 +59,34 @@ import qa.javafx.functional.library.Util;
  *
  * @author Alexandr Scherbatiy
  */
-
 public class JavaProject extends Project {
-    
+
     /** Creates a new instance of JavaProject */
     private static long TIME_WAIT = 1000;
-    
-    
-    public static final String  BUILD_FAILED = "BUILD FAILED";
-    public static final String  BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
-    
-    
-    
+    public static final String BUILD_FAILED = "BUILD FAILED";
+    public static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
     String mainClass;
     ProjectRootNode rootNode;
-    
-    
+
     //JavaClassLoader classLoader;
-    
     /**
      *
      * @param name
      * @param type
      */
     public JavaProject(String name) {
-	this(name, ProjectType.JAVA_APPLICATION);
+        this(name, ProjectType.JAVA_APPLICATION);
     }
-    
+
     /**
      *
      * @param name
      * @param type
      */
     public JavaProject(String name, ProjectType type) {
-	this(name, type, Util.WORK_DIR);
+        this(name, type, Util.WORK_DIR);
     }
-    
-    
+
     /**
      *
      * @param name
@@ -100,9 +94,9 @@ public class JavaProject extends Project {
      * @param location
      */
     public JavaProject(String name, ProjectType type, String location) {
-	this(name, type, location, null);
+        this(name, type, location, null);
     }
-    
+
     /**
      *
      * @param name
@@ -111,31 +105,27 @@ public class JavaProject extends Project {
      * @param mainClass
      */
     public JavaProject(String name, ProjectType type, String location, String mainClass) {
-	super(name, type, location);
-	this.mainClass = mainClass;
-	rootNode = new ProjectRootNode( ProjectsTabOperator.invoke().tree(), name);
+        super(name, type, location);
+        this.mainClass = mainClass;
+        rootNode = new ProjectRootNode(ProjectsTabOperator.invoke().tree(), name);
     }
-    
-    
-    
-    
+
     /**
      *
      * @return
      */
-    public String  getMainClass(){
-	return mainClass;
+    public String getMainClass() {
+        return mainClass;
     }
-    
+
     /**
      *
      * @return
      */
-    public ProjectRootNode getProjectNode(){
-	return rootNode;
+    public ProjectRootNode getProjectNode() {
+        return rootNode;
     }
-    
-    
+
     /**
      *
      * @param name
@@ -143,9 +133,9 @@ public class JavaProject extends Project {
      * @return
      */
     public static JavaProject createProject(String name, ProjectType type) {
-	return createProject(name, type, Util.WORK_DIR);
+        return createProject(name, type, Util.WORK_DIR);
     }
-    
+
     /**
      *
      * @param name
@@ -154,14 +144,13 @@ public class JavaProject extends Project {
      * @return
      */
     public static JavaProject createProject(String name, ProjectType type, String location) {
-	return createProject(name, type, location, true);
+        return createProject(name, type, location, true);
     }
-    
-    
+
     public static JavaProject createProject(String name, ProjectType type, boolean setAsMain, boolean createMainClass) {
-	return createProject(name, type, Util.WORK_DIR, setAsMain, createMainClass, null);
+        return createProject(name, type, Util.WORK_DIR, setAsMain, createMainClass, null);
     }
-    
+
     /**
      *
      * @param name
@@ -171,9 +160,9 @@ public class JavaProject extends Project {
      * @return
      */
     public static JavaProject createProject(String name, ProjectType type, String location, boolean setAsMain) {
-	return createProject(name, type, location, setAsMain, true, null);
+        return createProject(name, type, location, setAsMain, true, null);
     }
-    
+
     /**
      *
      * @param name
@@ -183,12 +172,10 @@ public class JavaProject extends Project {
      * @param createMainClass
      * @return
      */
-    
-    
     public static JavaProject createProject(String name, ProjectType type, String location, boolean setAsMain, boolean createMainClass) {
-	return createProject(name, type, location, setAsMain, createMainClass, null);
+        return createProject(name, type, location, setAsMain, createMainClass, null);
     }
-    
+
     /**
      *
      * @param name
@@ -200,114 +187,124 @@ public class JavaProject extends Project {
      * @return
      */
     public static JavaProject createProject(String name, ProjectType type, String location, boolean setAsMain, boolean createMainClass, String mainClass) {
-	
-	location = (location == null) ?  Util.WORK_DIR : location;
-	
-	
-	NewProjectWizardOperator newProject = NewProjectWizardOperator.invoke();
-	//try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
-	
-	newProject.selectCategory(type.getCategoryName());
-	newProject.selectProject(type.getProjectName());
-	
-	newProject.next();
-	
-	//try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
-	
-	//newProject.setName(name);
-	
-	new JTextFieldOperator(newProject, 0).setText(name);
-	
-	//try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
-	
-	JTextFieldOperator projectLocation = new JTextFieldOperator(newProject, 1);
-	
-	projectLocation.setText(location);
-	
-	
-	new JCheckBoxOperator(newProject,0).setSelected(setAsMain);
-	new JCheckBoxOperator(newProject,1).setSelected(createMainClass);
-	
-	JTextFieldOperator mainClassTextField = new JTextFieldOperator(newProject, 3);
-	
-	if(mainClass != null){
-	    mainClassTextField.setText(mainClass);
-	}else{
-	    mainClass = mainClassTextField.getText();
-	}
-	try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
-	
-	//this.location = location;
-	//this.mainClass = mainClass;
-	
-	
-	new JButtonOperator(newProject, "Finish").push();
-	try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
-	
-	//Utils.waitScanningClassPath();
-	
-	return new JavaProject(name, type, location, mainClass);
-	
+
+        location = (location == null) ? Util.WORK_DIR : location;
+
+
+        NewProjectWizardOperator newProject = NewProjectWizardOperator.invoke();
+        //try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
+
+        newProject.selectCategory(type.getCategoryName());
+        newProject.selectProject(type.getProjectName());
+
+        newProject.next();
+
+        //try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
+
+        //newProject.setName(name);
+
+        new JTextFieldOperator(newProject, 0).setText(name);
+
+        //try{ Thread.sleep(TIME_WAIT); } catch(Exception e){}
+
+        JTextFieldOperator projectLocation = new JTextFieldOperator(newProject, 1);
+
+        projectLocation.setText(location);
+
+
+        new JCheckBoxOperator(newProject, 0).setSelected(setAsMain);
+        new JCheckBoxOperator(newProject, 1).setSelected(createMainClass);
+
+        JTextFieldOperator mainClassTextField = new JTextFieldOperator(newProject, 3);
+
+        if (mainClass != null) {
+            mainClassTextField.setText(mainClass);
+        } else {
+            mainClass = mainClassTextField.getText();
+        }
+        try {
+            Thread.sleep(TIME_WAIT);
+        } catch (Exception e) {
+        }
+
+        //this.location = location;
+        //this.mainClass = mainClass;
+
+
+        new JButtonOperator(newProject, "Finish").push();
+        try {
+            Thread.sleep(TIME_WAIT);
+        } catch (Exception e) {
+        }
+
+        //Utils.waitScanningClassPath();
+
+        return new JavaProject(name, type, location, mainClass);
+
     }
-    
-    
-    
-    public Node getSrcNode(){
-        return new Node(getProjectNode(),"Source Packages");
+
+    public Node getSrcNode() {
+        return new Node(getProjectNode(), "Source Packages");
     }
-    
-//    public Class getJavaClass(String fullName){
-//	
-//	if( classLoader == null ){
-//	    classLoader = new JavaClassLoader(getLocation() + "/" + getName() + "/build/classes");
-//	}
-//	
-//	
-//	try {
-//	    return classLoader.loadClass(fullName);
-//	} catch (ClassNotFoundException ex) {
-//	    ex.printStackTrace();
-//	}
-//	
-//	return null;
-//	
-//    }
-    
-    
-    
-    
-    
-    
-    public void build(){
-	rootNode.buildProject();
+
+    public EditorOperator openMainFile() {
+        String pack = getName().toLowerCase();
+        String mainFile = pack.replace('.', '|') + "|Main.fx";
+        Node mainFileNode = new Node(getSrcNode(), mainFile);
+        new OpenAction().performPopup(mainFileNode);
+
+        return new EditorOperator("Main.fx");
+
+
     }
-    
-    public void close(){
+
+    public void profile() {
+        rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_PROFILE);
+        JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_ENABLE_PROFILING, false, true);
+
+        System.out.println("[profiler] dialog: " + dialog);
+        if (dialog != null) {
+            new JButtonOperator(new JDialogOperator(dialog), Constant.BUTTON_OK).pushNoBlock();
+        }
+
+        NbDialogOperator profileOper = new NbDialogOperator("Profile " + getName());
+        new JButtonOperator(profileOper, Constant.BUTTON_RUN).push();
+        profileOper.waitClosed();
+        //waitProgressDialog("Progress", 5000);
+        new TopComponentOperator(Constant.TAB_PROFILER);
+        new OutputTabOperator(getName()).waitText("Established local connection with the tool");
+        Util.sleep(2000);
+        new Action("Profile|Stop Profiling Session", null).perform();
+
+
+    }
+
+    public void build() {
+        rootNode.buildProject();
+    }
+
+    public void close() {
         rootNode.performPopupActionNoBlock("Close");
     }
-    
-    public Output getOutput(){
-	return new Output();
+
+    public Output getOutput() {
+        return new Output();
     }
-    
-    public class Output{
-	
-	OutputTabOperator output = new OutputTabOperator(getName() + " (jar) ");
-	
-	public boolean isCompiled(){
-	    return getText().contains(BUILD_SUCCESSFUL);
-	}
-	
-	public String getText(){
-	    return output.getText();
-	}
-	
-	public OutputTabOperator getOutputOperator(){
-	    return output;
-	}
-	
+
+    public class Output {
+
+        OutputTabOperator output = new OutputTabOperator(getName() + " (jar) ");
+
+        public boolean isCompiled() {
+            return getText().contains(BUILD_SUCCESSFUL);
+        }
+
+        public String getText() {
+            return output.getText();
+        }
+
+        public OutputTabOperator getOutputOperator() {
+            return output;
+        }
     }
-        
- 
-    
 }

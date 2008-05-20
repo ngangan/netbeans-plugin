@@ -58,7 +58,7 @@ public class Util {
 
     public static String getSampleText(String example) {
 
-        String examplePath = getXtestDataPath() + "/" + example;
+        String examplePath = getXtestDataPath() + "/data/" + Constant.USER_DATA_PATH + "/" + example;
 
         //File file = new File(examplePath);
         try {

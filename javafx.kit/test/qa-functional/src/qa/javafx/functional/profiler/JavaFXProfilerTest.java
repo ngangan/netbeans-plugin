@@ -36,53 +36,34 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package qa.javafx.functional.profiler;
 
-package qa.javafx.functional.library;
+import qa.javafx.functional.library.Constant;
+import qa.javafx.functional.library.JavaFXTestCase;
+import qa.javafx.functional.library.Util;
+import qa.javafx.functional.library.project.EditorOperator;
+import qa.javafx.functional.library.project.JavaFXProject;
 
 /**
  *
  * @author andromeda
  */
-public interface Constant {
-    
-    // ================   User Data  ========================
-    
-    String USER_DATA_REPRISE = "gui";
-    String USER_DATA_COMPILER = "ui";
-    
-    String USER_DATA_PATH = USER_DATA_REPRISE;
-    
+public class JavaFXProfilerTest extends JavaFXTestCase {
 
-    // ================   Project  ========================
-    
-    String PROJECT_JAVA_APPLICATION = "Java Application";
-    String PROJECT_JAVAFX_APPLICATION = "JavaFX Script Application";
-    
-    
-    String PROJECT_CATEGORY_JAVA = "Java";
-    String PROJECT_CATEGORY_JAVAFX = "JavaFX";
-    
-    // ================   Buttons  ========================
-    String BUTTON_OK = "OK";
-    String BUTTON_RUN = "Run";
+    public JavaFXProfilerTest(String name) {
+        super(name);
+    }
 
-    // ================   Tabs  ========================
-    String TAB_PROFILER = "Profiler";
-
-    // ================   Menu items  ========================
-
-    String POPUP_MENU_ITEM_PROFILE = "Profile";
-    
-
-    // ================   Dialogs  ========================
-
-    String DIALOG_TITLE_ENABLE_PROFILING = "Enable Profiling";
-    
-    
-    // ================   Tests  ========================
-    // ============    Smoke  ===========================
-    
-    String SMOKE_PROFILER_FILE_PATH = "profiler/smoke/Profiler.fx";
-    
-    
+    public void testProfiler() {
+        
+        JavaFXProject profilerProject  = JavaFXProject.createProject("SmokeProfiler");
+        EditorOperator main = profilerProject.openMainFile();
+        String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
+        main.setText(code);
+        profilerProject.profile();
+        
+        
+        Util.sleep(4000);
+        
+    }
 }
