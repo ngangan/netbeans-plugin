@@ -56,6 +56,8 @@ made subject to such option by the copyright holder.
 
     <!-- default testtypes, attributes used when no value is supplied from command line -->
     <!--property name="xtest.testtype" value="unit"/-->
+
+    <property name="xtest.ide.commandline.suffix" value="-J-Djavafx.sdk.version=${javafx.sdk.version}"/>
     <property name="xtest.attribs" value="stable"/>
     <property name="xtest.testtype" value="qa-functional"/>
     <!--
