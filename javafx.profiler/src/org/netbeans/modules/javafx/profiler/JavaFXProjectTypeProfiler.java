@@ -57,7 +57,9 @@ import org.netbeans.lib.profiler.results.cpu.marking.Mark;
 import org.netbeans.modules.profiler.AbstractProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.AppletSupport;
+// import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
+import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
@@ -88,6 +90,8 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Properties;
 import javax.swing.event.ChangeListener;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 
 /**
  * @author Tomas Hurka
@@ -497,22 +501,14 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                                                                                      profiledClassFile), profiledClassFile);
                     props.setProperty("javac.includes", clazz); //NOI18N
                 } else {
-                    // XXX TBD:  single file profiling temporary switched off
-                    // due to #132598 
-                    /* 
                     if (project instanceof JavaFXProject) {
                         JavaFXProject projectJFX = (JavaFXProject)project;
-                        String clazz = FileUtil.getRelativePath(getRoot(projectJFX.getSourceRoots().getRoots(),profiledClassFile), profiledClassFile);
+                        String clazz = FileUtil.getRelativePath(JavaFXProjectUtilities.getRoot(projectJFX.getSourceRoots().getRoots(),profiledClassFile), profiledClassFile);
                         props.setProperty("javac.includes", clazz); // NOI18N
                         clazz = clazz.substring(0, clazz.length() - 3);
                         clazz = clazz.replace('/','.');
                         props.setProperty("profile.class", clazz); //NOI18N
-                    }
-                     */
-                    // temporary solution to avoid profile-single build target failure
-                    // TBD
-                    props.setProperty("profile.class", projectProps.getProperty("main.class"));
-                    props.setProperty("javac.includes", projectProps.getProperty("main.class")); 
+                    }                    
                 }
             }
         }
@@ -653,17 +649,6 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         return pe;
     }
 
-    private FileObject getRoot(FileObject[] roots, FileObject file) {
-        FileObject srcDir = null;
-        for (int i=0; i< roots.length; i++) {
-            if (FileUtil.isParentOf(roots[i],file) || roots[i].equals(file)) {
-                srcDir = roots[i];
-                break;
-            }
-        }
-        return srcDir;
-    }
-
     private void setupMarks(final Project project) {
         PackageMarker pMarker = new PackageMarker();
         MethodMarker mMarker = new MethodMarker();
@@ -762,4 +747,31 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         ((CompositeMarker) marker).addMarker(mMarker);
         ((CompositeMarker) marker).addMarker(pMarker);
     }
+    
+    @Override
+    public org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection[] getDefaultRootMethods(Project project,
+                                                                                                    FileObject profiledClassFile,
+                                                                                                    boolean profileUnderlyingFramework,
+                                                                                                    String[][] projectPackagesDescr) {
+        if (profileUnderlyingFramework) {
+            // No root method should be specified, first executed method will be treated as root method
+            return new ClientUtils.SourceCodeSelection[0];
+        } else {
+            // Profile Project or Profile Single
+            if (profiledClassFile == null) {
+                // Profile Project, extract root methods from the project
+                return JavaFXProjectUtilities.getProjectDefaultRoots(project, projectPackagesDescr);
+            } else {
+                // Profile Single, provide correct root methods
+                String profiledClass = JavaFXProjectUtilities.getToplevelClassName(project, profiledClassFile);
+                return new ClientUtils.SourceCodeSelection[] { new ClientUtils.SourceCodeSelection(profiledClass, "<all>", "") }; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
+            }
+        }
+    }    
+    
+    @Override
+    public SimpleFilter computePredefinedInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
+                                                               String[][] projectPackagesDescr) {
+        return JavaFXProjectUtilities.computeProjectOnlyInstrumentationFilter(project, predefinedInstrFilter, projectPackagesDescr);
+    }    
 }
