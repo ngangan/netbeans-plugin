@@ -56,10 +56,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
@@ -137,7 +139,7 @@ System.err.println("not an identifier");
                     if (el == null) return;
  
                     if (tooltip) {
-                        result[0] = getElementTooltip(el);
+                        result[0] = getElementTooltip(controller, el);
                         return;
                     } else {
                         if (goToSource && el instanceof VariableElement) {
@@ -176,13 +178,22 @@ System.err.println("not an identifier");
     }
     
     
-    private static String getElementTooltip (Element elem) {
+    private static String getElementTooltip (CompilationInfo info, Element elem) {
         if (elem instanceof VariableElement) {
-            String ret = "";
+            String prefix = "<html>";
+            String suffix = "";
             VariableElement var = (VariableElement)elem;
             ElementKind kind = var.getKind();
-            if (kind == ElementKind.FIELD) ret = ret + var.getEnclosingElement() + ".";
-            return ret + var + " : " + var.asType();
+            if (kind == ElementKind.FIELD) prefix = prefix + var.getEnclosingElement() + ".";
+            
+            JavafxTypes types = info.getJavafxTypes();
+            Symbol sym = (Symbol)elem;
+            Type type = sym.asType();
+            if (types.isSequence(type)) {
+                suffix = "[ ]";
+                type = types.elementType(type);
+            }
+            return prefix + "<b>" + var + "</b> : " + type + suffix;
         }
         
         if (elem instanceof TypeElement) {
