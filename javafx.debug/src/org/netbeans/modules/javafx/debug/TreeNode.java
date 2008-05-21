@@ -130,6 +130,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -162,8 +164,8 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         StringWriter s = new StringWriter();
         try {
             new JavafxPretty(s, false).printExpr((JCTree)t);
-        } catch (IOException e) {
-            throw new AssertionError(e);
+        } catch (Exception e) {
+            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Unable to pretty print " + t.getKind(), e); // NOI18N
         }
         if (t instanceof JavaFXTree && t.getKind() == Kind.OTHER) {
             JavaFXTree jfxt = (JavaFXTree)t;
@@ -1237,11 +1239,17 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
         
         private void addCorrespondingElement(List<Node> below) {
-            Element el = info.getTrees().getElement(getCurrentPath());
-            
-            if (el != null) {
-                below.add(new ElementNode(info, el, Collections.EMPTY_LIST));
-            } else {
+            TreePath tp = getCurrentPath();
+            try {
+                Element el = info.getTrees().getElement(tp);
+
+                if (el != null) {
+                    below.add(new ElementNode(info, el, Collections.EMPTY_LIST));
+                } else {
+                    below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element")));
+                }
+            } catch (Exception e) {
+                Logger.getLogger(TreeNode.class.getName()).log(Level.WARNING, treeToString(info, tp), e);
                 below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element")));
             }
         }
