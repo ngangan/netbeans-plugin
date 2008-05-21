@@ -58,7 +58,25 @@ public class Util {
 
     public static String getSampleText(String example) {
 
-        String examplePath = getXtestDataPath() + "/data/" + Constant.USER_DATA_PATH + "/" + example;
+        
+        String sdkVersion = System.getProperty(Constant.JAVAFX_SDK_VERSION_PROPERTY);
+        System.out.println("[util] sdk version: " + sdkVersion);
+        
+        String userDataPath = "";
+        
+        if(Constant.JAVAFX_SDK_REPRISE.equalsIgnoreCase(sdkVersion)){
+            userDataPath = Constant.USER_DATA_REPRISE;
+        } else if(Constant.JAVAFX_SDK_REPRISE.equalsIgnoreCase(sdkVersion)){
+            userDataPath = Constant.USER_DATA_COMPILER;
+        }else{
+            userDataPath = Constant.USER_DATA_PATH_DEFAULT;
+        }
+
+        System.out.println("[util] user data path : " + userDataPath);
+        
+        String examplePath = getXtestDataPath() + "/data/" + userDataPath + "/" + example;
+
+        System.out.println("[util] example path : " + examplePath);
 
         //File file = new File(examplePath);
         try {

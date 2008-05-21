@@ -16,3 +16,4 @@ derby\.log
 ^hs_err_pid[0-9]*\.log
 ^javafx.lib/external$
 ^javafx.sdk.win/external$
+^javafx.graphicssample/src/org/netbeans/modules/javafx/graphicssample/resources/zip/JavaFX2DTutorialProject.zip

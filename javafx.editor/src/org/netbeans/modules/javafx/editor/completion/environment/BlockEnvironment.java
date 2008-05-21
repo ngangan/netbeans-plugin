@@ -36,47 +36,56 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library;
 
-import java.awt.Component;
-import org.netbeans.jellytools.JellyTestCase;
-import org.netbeans.jemmy.ComponentChooser;
+package org.netbeans.modules.javafx.editor.completion.environment;
+
+import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.StatementTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.TryTree;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.tools.Diagnostic;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
  *
- * @author Alexandr Scherbatiy sunflower@netbeans.org
+ * @author David Strupl
  */
-public class JavaFXTestCase extends JellyTestCase {
-
-    public static final String PROJECT_NAME_HELLO_WORLD = "HelloWorld";
-    public static final String PREVIEW_FRAME_TITLE = "Hello World JavaFX";
-    public static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
-    public static final String BUILD_FAILED = "BUILD FAILED";
-
-    public JavaFXTestCase(String name) {
-        super(name);
-    }
+public class BlockEnvironment extends JavaFXCompletionEnvironment<BlockTree> {
+    
+    private static final Logger logger = Logger.getLogger(BlockEnvironment.class.getName());
+    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void setUp() throws Exception {
-        System.setOut(getLog());
-        System.out.println("[fx test case] setup");
+    protected void inside(BlockTree bl) throws IOException {
+        log("inside BlockTree " + bl);
+        StatementTree last = null;
+        for (StatementTree stat : bl.getStatements()) {
+            int pos = (int) sourcePositions.getStartPosition(root, stat);
+            if (pos == Diagnostic.NOPOS || offset <= pos) {
+                break;
+            }
+            last = stat;
+        }
+        if (last != null && last.getKind() == Tree.Kind.TRY) {
+            if (((TryTree) last).getFinallyBlock() == null) {
+                addKeyword(CATCH_KEYWORD, null, false);
+                addKeyword(FINALLY_KEYWORD, null, false);
+                if (((TryTree) last).getCatches().size() == 0) {
+                    return;
+                }
+            }
+        }
+        localResult();
+        addKeywordsForStatement();
     }
 
-    public class ClassNameComponentChooser implements ComponentChooser {
-
-        String text;
-
-        public ClassNameComponentChooser(String text) {
-            this.text = text;
-        }
-
-        public boolean checkComponent(Component component) {
-            return component.toString().contains(text);
-        }
-
-        public String getDescription() {
-            return "ButtonComponentChooser: \"" + text + "\"";
+    private static void log(String s) {
+        if (LOGGABLE) {
+            logger.fine(s);
         }
     }
 }

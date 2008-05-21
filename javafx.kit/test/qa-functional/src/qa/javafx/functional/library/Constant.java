@@ -44,13 +44,22 @@ package qa.javafx.functional.library;
  * @author andromeda
  */
 public interface Constant {
+
+    
+    // ================   SDK Version  ========================
+    
+    String JAVAFX_SDK_COMPILER = "compiler";
+    String JAVAFX_SDK_REPRISE = "reprise";
+    
+    String JAVAFX_SDK_VERSION_PROPERTY = "javafx.sdk.version";
+    
     
     // ================   User Data  ========================
     
     String USER_DATA_REPRISE = "gui";
     String USER_DATA_COMPILER = "ui";
     
-    String USER_DATA_PATH = USER_DATA_REPRISE;
+    String USER_DATA_PATH_DEFAULT = USER_DATA_REPRISE;
     
 
     // ================   Project  ========================
@@ -72,17 +81,20 @@ public interface Constant {
     // ================   Menu items  ========================
 
     String POPUP_MENU_ITEM_PROFILE = "Profile";
+    String POPUP_MENU_ITEM_DEBUG = "Debug Project";
     
 
     // ================   Dialogs  ========================
 
     String DIALOG_TITLE_ENABLE_PROFILING = "Enable Profiling";
+    String DIALOG_TITLE_DEBUG_PROJECT = "Debug Project";
     
     
     // ================   Tests  ========================
     // ============    Smoke  ===========================
     
     String SMOKE_PROFILER_FILE_PATH = "profiler/smoke/Profiler.fx";
+    String SMOKE_DEBUGGER_FILE_PATH = "debugger/smoke/Debugger.fx";
     
     
 }

@@ -127,6 +127,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         switch (elem.getKind()) {
             case CLASS:
                 return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
+            case INTERFACE:
+                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
             default:
                 throw new IllegalArgumentException("kind=" + elem.getKind());
         }

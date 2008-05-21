@@ -43,8 +43,11 @@ package org.netbeans.modules.javafx.editor.completion;
 import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ForExpressionInClauseTree;
 import com.sun.javafx.api.tree.ForExpressionTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.FunctionValueTree;
 import com.sun.javafx.api.tree.JavaFXTree;
 import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
+import com.sun.javafx.api.tree.JavaFXVariableTree;
 import com.sun.javafx.api.tree.OnReplaceTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ErroneousTree;
@@ -56,6 +59,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javafx.api.JavafxcTrees;
@@ -319,21 +323,40 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                 }
             }
+            if (k == JavaFXKind.FUNCTION_VALUE) {
+                FunctionValueTree fvt = (FunctionValueTree)jfxt;
+                for (VariableTree var : fvt.getParameters()) {
+                    log("  var: " + var + "\n");
+                    String s = var.getName().toString();
+                    log("    adding(3) " + s + " with prefix " + prefix);
+                    if (JavaFXCompletionProvider.startsWith(s, prefix)) {
+                        addResult(JavaFXCompletionItem.createVariableItem(
+                            s, offset, false));
+                    }
+                }
+            }
             if (k == JavaFXKind.ON_REPLACE) {
                 OnReplaceTree ort = (OnReplaceTree)jfxt;
-                log("  for expression: " + ort + "\n");
-                String s1 = ort.getNewElements().getName().toString();
-                log("    adding(3) " + s1 + " with prefix " + prefix);
-                if (JavaFXCompletionProvider.startsWith(s1, prefix)) {
-                    addResult(JavaFXCompletionItem.createVariableItem(
-                        s1 , offset, false));
+                // commented out log because of JFXC-1205
+                // log("  OnReplaceTree: " + ort + "\n");
+                JavaFXVariableTree varTree = ort.getNewElements();
+                if (varTree != null) {
+                    String s1 = varTree.getName().toString();
+                    log("    adding(4) " + s1 + " with prefix " + prefix);
+                    if (JavaFXCompletionProvider.startsWith(s1, prefix)) {
+                        addResult(JavaFXCompletionItem.createVariableItem(
+                            s1 , offset, false));
+                    }
                 }
-                String s2 = ort.getOldValue().getName().toString();
-                log("    adding(4) " + s2 + " with prefix " + prefix);
-                if (JavaFXCompletionProvider.startsWith(s2, prefix
-                        )) {
-                    addResult(JavaFXCompletionItem.createVariableItem(
-                        s2, offset, false));
+                JavaFXVariableTree varTree2 = ort.getOldValue();
+                if (varTree2 != null) {
+                    String s2 = varTree2.getName().toString();
+                    log("    adding(5) " + s2 + " with prefix " + prefix);
+                    if (JavaFXCompletionProvider.startsWith(s2, prefix
+                            )) {
+                        addResult(JavaFXCompletionItem.createVariableItem(
+                            s2, offset, false));
+                    }
                 }
             }
         }
@@ -506,9 +529,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             Types types = controller.getTypes();
             JavafxcTrees trees = controller.getTrees();
             for(Element e : pe.getEnclosedElements()) {
-                if (e.getKind().isClass() || e.getKind().isInterface()) {
+                if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                     String name = e.getSimpleName().toString();
-                        if (JavaFXCompletionProvider.startsWith(name, prefix)) {
+                        if (JavaFXCompletionProvider.startsWith(name, prefix) &&
+                        ! name.contains("$")) {
                             addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), getOffset(), elements.isDeprecated(e), insideNew, false));
                     }
                 }

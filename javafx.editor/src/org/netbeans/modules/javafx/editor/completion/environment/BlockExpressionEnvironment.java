@@ -44,12 +44,10 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.TryTree;
 import com.sun.tools.javafx.tree.JFXBlockExpression;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static javax.lang.model.element.Modifier.*;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
@@ -62,16 +60,8 @@ public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXB
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXBlockExpression t) throws IOException {
-        log("inside JFXBlockExpression " + t);
-        JFXBlockExpression bl = t;
-        int blockPos = (int) sourcePositions.getStartPosition(root, bl);
-        String text = getController().getText().substring(blockPos, offset);
-        if (text.indexOf('{') < 0) {
-            //NOI18N
-            addMemberModifiers(Collections.singleton(STATIC), false);
-            return;
-        }
+    protected void inside(JFXBlockExpression bl) throws IOException {
+        log("inside JFXBlockExpression " + bl);
         StatementTree last = null;
         for (StatementTree stat : bl.getStatements()) {
             int pos = (int) sourcePositions.getStartPosition(root, stat);
@@ -80,8 +70,7 @@ public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXB
             }
             last = stat;
         }
-        if (last == null) {
-        } else if (last.getKind() == Tree.Kind.TRY) {
+        if (last != null && last.getKind() == Tree.Kind.TRY) {
             if (((TryTree) last).getFinallyBlock() == null) {
                 addKeyword(CATCH_KEYWORD, null, false);
                 addKeyword(FINALLY_KEYWORD, null, false);
