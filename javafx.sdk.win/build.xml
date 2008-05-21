@@ -52,7 +52,7 @@ made subject to such option by the copyright holder.
 	<target name="init-release-external" depends="basic-init">
 		<taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="lib/FXSDKAntTask.jar"/>
 		<mkdir dir="external"/>
-		<get src="${javafx-sdk.url}" dest="${javafx-sdk.win.zip}" usetimestamp="true" verbose="true"/>
+		<get src="${javafx-sdk.win.url}" dest="${javafx-sdk.win.zip}" usetimestamp="true" verbose="true"/>
 		<SetReleaseExternal propertynameprefix="release.${javafx-sdk.win.zip}!/">
 			<zipfileset src="${javafx-sdk.win.zip}"/>
 		</SetReleaseExternal>
