@@ -348,12 +348,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             s1 , offset, false));
                     }
                 }
-                String s2 = ort.getOldValue().getName().toString();
-                log("    adding(5) " + s2 + " with prefix " + prefix);
-                if (JavaFXCompletionProvider.startsWith(s2, prefix
-                        )) {
-                    addResult(JavaFXCompletionItem.createVariableItem(
-                        s2, offset, false));
+                JavaFXVariableTree varTree2 = ort.getOldValue();
+                if (varTree2 != null) {
+                    String s2 = varTree2.getName().toString();
+                    log("    adding(5) " + s2 + " with prefix " + prefix);
+                    if (JavaFXCompletionProvider.startsWith(s2, prefix
+                            )) {
+                        addResult(JavaFXCompletionItem.createVariableItem(
+                            s2, offset, false));
+                    }
                 }
             }
         }
