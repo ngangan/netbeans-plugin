@@ -36,47 +36,36 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library;
+package qa.javafx.functional.debugger;
 
-import java.awt.Component;
-import org.netbeans.jellytools.JellyTestCase;
-import org.netbeans.jemmy.ComponentChooser;
+import qa.javafx.functional.library.Constant;
+import qa.javafx.functional.library.JavaFXTestCase;
+import qa.javafx.functional.library.Util;
+import qa.javafx.functional.library.project.EditorOperator;
+import qa.javafx.functional.library.project.JavaFXProject;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXTestCase extends JellyTestCase {
 
-    public static final String PROJECT_NAME_HELLO_WORLD = "HelloWorld";
-    public static final String PREVIEW_FRAME_TITLE = "Hello World JavaFX";
-    public static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
-    public static final String BUILD_FAILED = "BUILD FAILED";
+public class JavaFXDebuggerTest extends JavaFXTestCase {
 
-    public JavaFXTestCase(String name) {
+    public JavaFXDebuggerTest(String name) {
         super(name);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        System.setOut(getLog());
-        System.out.println("[fx test case] setup");
-    }
-
-    public class ClassNameComponentChooser implements ComponentChooser {
-
-        String text;
-
-        public ClassNameComponentChooser(String text) {
-            this.text = text;
-        }
-
-        public boolean checkComponent(Component component) {
-            return component.toString().contains(text);
-        }
-
-        public String getDescription() {
-            return "ButtonComponentChooser: \"" + text + "\"";
-        }
+    public void testDebugger() {
+        JavaFXProject project  = JavaFXProject.createProject("SmokeDebugger");
+        
+        EditorOperator main = project.openMainFile();
+        String code = Util.getSampleText(Constant.SMOKE_DEBUGGER_FILE_PATH);
+        main.setText(code);
+        project.debug();
+        
+        Util.sleep(3000);
+        
+        project.finishDebugger();
+        
     }
 }
