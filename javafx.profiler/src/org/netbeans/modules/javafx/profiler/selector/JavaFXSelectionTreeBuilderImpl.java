@@ -51,13 +51,14 @@ import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.List;
+import org.netbeans.modules.javafx.project.JavaFXProject;
 
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class SelectionTreeBuilderImpl implements SelectionTreeBuilder {
+public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private class Children extends SelectorChildren<ProjectNode> {
@@ -126,16 +127,16 @@ public class SelectionTreeBuilderImpl implements SelectionTreeBuilder {
 
     // -----
     // I18N String constants
-    private static final String SOURCES_STRING = NbBundle.getMessage(SelectionTreeBuilderImpl.class,
+    private static final String SOURCES_STRING = NbBundle.getMessage(JavaFXSelectionTreeBuilderImpl.class,
                                                                      "SelectionTreeBuilderImpl_SourcesString"); // NOI18N
-    private static final String LIBRARIES_STRING = NbBundle.getMessage(SelectionTreeBuilderImpl.class,
+    private static final String LIBRARIES_STRING = NbBundle.getMessage(JavaFXSelectionTreeBuilderImpl.class,
                                                                        "SelectionTreeBuilderImpl_LibrariesString"); // NOI18N
                                                                                                                     // -----
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
     public boolean isDefault() {
-        return true;
+        return false;
     }
 
     public String getDisplayName() {
@@ -147,7 +148,7 @@ public class SelectionTreeBuilderImpl implements SelectionTreeBuilder {
     }
 
     public boolean isPreferred(Project project) {
-        return false;
+        return project instanceof JavaFXProject;
     }
 
     // </editor-fold>
@@ -166,7 +167,7 @@ public class SelectionTreeBuilderImpl implements SelectionTreeBuilder {
     }
 
     public boolean supports(Project project) {
-        return true;
+        return project instanceof JavaFXProject;
     }
 
     @Override
