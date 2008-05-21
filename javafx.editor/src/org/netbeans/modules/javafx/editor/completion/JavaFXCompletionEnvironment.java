@@ -531,7 +531,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             for(Element e : pe.getEnclosedElements()) {
                 if (e.getKind().isClass() || e.getKind().isInterface()) {
                     String name = e.getSimpleName().toString();
-                        if (JavaFXCompletionProvider.startsWith(name, prefix)) {
+                        if (JavaFXCompletionProvider.startsWith(name, prefix) &&
+                        ! name.contains("$")) {
                             addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), getOffset(), elements.isDeprecated(e), insideNew, false));
                     }
                 }
