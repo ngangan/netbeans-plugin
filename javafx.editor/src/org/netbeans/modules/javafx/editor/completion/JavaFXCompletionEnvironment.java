@@ -529,7 +529,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             Types types = controller.getTypes();
             JavafxcTrees trees = controller.getTrees();
             for(Element e : pe.getEnclosedElements()) {
-                if (e.getKind().isClass() || e.getKind().isInterface()) {
+                if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                     String name = e.getSimpleName().toString();
                         if (JavaFXCompletionProvider.startsWith(name, prefix) &&
                         ! name.contains("$")) {
