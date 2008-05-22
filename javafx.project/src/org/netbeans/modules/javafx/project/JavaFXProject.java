@@ -334,6 +334,9 @@ public final class JavaFXProject implements Project, AntProjectListener {
         return this.sourceRoots;
     }
     
+    public FileObject[] getFOSourceRoots() {
+        return getSourceRoots().getRoots();
+    }    
     public synchronized SourceRoots getTestSourceRoots() {
         if (this.testRoots == null) { //Local caching, no project metadata access
             this.testRoots = SourceRoots.create(updateHelper, evaluator(), getReferenceHelper(),

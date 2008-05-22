@@ -503,7 +503,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 } else {
                     if (project instanceof JavaFXProject) {
                         JavaFXProject projectJFX = (JavaFXProject)project;
-                        String clazz = FileUtil.getRelativePath(JavaFXProjectUtilities.getRoot(projectJFX.getSourceRoots().getRoots(),profiledClassFile), profiledClassFile);
+                        String clazz = FileUtil.getRelativePath(JavaFXProjectUtilities.getRoot(projectJFX.getFOSourceRoots(),profiledClassFile), profiledClassFile);
                         props.setProperty("javac.includes", clazz); // NOI18N
                         clazz = clazz.substring(0, clazz.length() - 3);
                         clazz = clazz.replace('/','.');

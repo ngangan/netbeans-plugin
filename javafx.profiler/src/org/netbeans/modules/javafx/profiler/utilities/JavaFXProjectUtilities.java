@@ -181,7 +181,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
             return SourceUtils.getToplevelClassName(profiledClassFile);
         } else if (isJavaFXFile(profiledClassFile)) {
             JavaFXProject projectJFX = (JavaFXProject)project;
-            String clazz = FileUtil.getRelativePath(getRoot(projectJFX.getSourceRoots().getRoots(),profiledClassFile), profiledClassFile);
+            String clazz = FileUtil.getRelativePath(getRoot(projectJFX.getFOSourceRoots(),profiledClassFile), profiledClassFile);
             return (clazz.substring(0, clazz.length() - 3)).replace('/','.');           
         }
         return ""; //NOI18N // won't be here: other file types are not supported
