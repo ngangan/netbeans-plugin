@@ -205,7 +205,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
                 String fxRT = new File(installFolders.get(1).toURI()).getAbsolutePath();
                 pathSpec = pathSpec + File.pathSeparator + fxRT;
                 fxRT = Util.getExtensions(fxRT);
-                if (fxRT != null) pathSpec = pathSpec + File.pathSeparator + fxRT;
+                if (fxRT != null) pathSpec = fxRT + File.pathSeparator + pathSpec;
             } catch (URISyntaxException e) {
                 Exceptions.printStackTrace(e);
             }
