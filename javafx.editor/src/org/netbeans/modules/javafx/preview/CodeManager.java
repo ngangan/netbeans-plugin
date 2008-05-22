@@ -271,9 +271,15 @@ public class CodeManager {
         frame.setVisible(false);
         JInternalFrame intFrame = new JInternalFrame();
         intFrame.setSize(frame.getSize());
-        intFrame.setContentPane(frame instanceof JFrame ? ((JFrame)frame).getContentPane() : ((JDialog)frame).getContentPane());
-        intFrame.setTitle(frame instanceof JFrame ? ((JFrame)frame).getTitle() : ((JDialog)frame).getTitle());
-        intFrame.setJMenuBar(frame instanceof JFrame ? ((JFrame)frame).getJMenuBar() : ((JDialog)frame).getJMenuBar());
+        if (frame instanceof JFrame) {
+            intFrame.setContentPane(((JFrame)frame).getContentPane());
+            intFrame.setTitle(((JFrame)frame).getTitle());
+            intFrame.setJMenuBar(((JFrame)frame).getJMenuBar());
+        } else {
+            intFrame.setContentPane(((JDialog)frame).getContentPane());
+            intFrame.setTitle(((JDialog)frame).getTitle());
+            intFrame.setJMenuBar(((JDialog)frame).getJMenuBar());
+        }
         intFrame.setBackground(frame.getBackground());
         intFrame.getContentPane().setBackground(frame.getBackground());
         intFrame.setForeground(frame.getForeground());
@@ -282,7 +288,7 @@ public class CodeManager {
         intFrame.setMaximizable(true);
         intFrame.setIconifiable(true);
         intFrame.setVisible(true);
-        frame.dispose();
+        //frame.dispose();
         AutoResizableDesktopPane jdp = new AutoResizableDesktopPane();
         jdp.setBackground(Color.WHITE);
         jdp.add(intFrame);

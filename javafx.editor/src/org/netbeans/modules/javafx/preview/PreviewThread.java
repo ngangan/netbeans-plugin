@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.preview;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Window;
 import java.io.File;
@@ -55,25 +56,21 @@ import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
 //import sun.awt.AppContext;
 //import sun.awt.SunToolkit;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
-import org.openide.execution.ExecutionEngine;
-import org.openide.execution.ExecutorTask;
-import org.openide.execution.NbClassPath;
 import org.openide.util.Exceptions;
-import org.openide.util.Task;
-import org.openide.util.TaskListener;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
-import org.openide.util.RequestProcessor;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.netbeans.modules.editor.NbEditorUtilities;
@@ -89,6 +86,7 @@ public class PreviewThread extends Thread {
     
     static final String nothingToShow = "Nothing to show...";                                                                   //NOI18
     private static final String vrongJavaVersion = "Please, use version 1.6 of Java to enable Preview. Current version is: ";   // NOI18N
+    JPanel contentPanel = null;
     
     private class Hyperlink implements HyperlinkListener {
         private Vector<Object> foMap = new Vector<Object>();
@@ -140,221 +138,146 @@ public class PreviewThread extends Thread {
     private FXDocument doc;
     private JComponent comp = null;
 
-    class EE extends ExecutionEngine {
-        
-        public EE() {}
+                   
+    public void compile() {
+        List <Window> initialList = getOwnerlessWindowsList();
 
-        protected NbClassPath createLibraryPath() {
-            return new NbClassPath(new String[0]);
+        if (!checkJavaVersion()) {
+            comp = getVrongVersion();
+            return;
+        }
+        Object obj = null;
+        try {
+            obj = CodeManager.execute(doc);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
         }
 
-        protected PermissionCollection createPermissions(CodeSource cs, InputOutput io) {
-            PermissionCollection allPerms = new Permissions();
-            //allPerms.add(new AllPermission());
-            //allPerms.setReadOnly();
-            return allPerms;
-        }
+        List <Window> suspectedList = getOwnerlessWindowsList();
+        suspectedList.removeAll(initialList);
 
-        public ExecutorTask execute(String name, Runnable run, InputOutput io) {
-            return new ET(run, name, io);
+        if (obj != null) {
+            comp = CodeManager.parseObj(obj);
+        } else {
+            if (!suspectedList.isEmpty()) {
+                comp = CodeManager.parseObj(suspectedList.get(0));
+                suspectedList.remove(0);
+            } else
+                comp = null;
         }
-        
-        private class ET extends ExecutorTask {
-            private RequestProcessor.Task task;
-            private int resultValue;
-            private final String name;
-            private InputOutput io;
-            
-            public ET(Runnable run, String name, InputOutput io) {
-                super(run);
-                this.name = name;
-                task = RequestProcessor.getDefault().post(this);
+        for (Window frame : suspectedList) {
+            frame.dispose();
+        }
+        List <Diagnostic> diagnostics = CodeManager.getDiagnostics();
+        if (!diagnostics.isEmpty()) {
+            comp = processDiagnostic(diagnostics);
+        }
+        else {
+            if (comp == null) {
+                comp = JavaFXDocument.getNothingPane();
             }
-            
-            public void stop() {
-                task.cancel();
-            }
-            
-            public int result() {
-                waitFinished();
-                return resultValue;
-            }
-            
-            public InputOutput getInputOutput() {
-                return io;
-            }
-            
-            public void run() {
-                try {
-                    super.run();
-                } catch (RuntimeException x) {
-                    x.printStackTrace();
-                    resultValue = 1;
-                }
-            }
-        }      
+        }
+        JPanel pane = new JPanel();
+        pane.setLayout(new BorderLayout());
+        pane.add(comp);
+        comp = (JComponent) pane;
     }
-    
-    class R implements Runnable {
-                
-        public void run() {
-            List <Window> initialList = getOwnerlessWindowsList();
-            
-            if (!checkJavaVersion()) {
-                comp = getVrongVersion();
-                return;
-            }
-            Object obj = null;
-            try {
-                obj = CodeManager.execute(doc);
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
-            }
 
-            List <Window> suspectedList = getOwnerlessWindowsList();
-            suspectedList.removeAll(initialList);
-            
-            if (obj != null) {
-                comp = CodeManager.parseObj(obj);
-            } else {
-                if (!suspectedList.isEmpty()) {
-                    comp = CodeManager.parseObj(suspectedList.get(0));
-                    suspectedList.remove(0);
-                } else
-                    comp = null;
-            }
-            for (Window frame : suspectedList) {
-                frame.dispose();
-            }
-            List <Diagnostic> diagnostics = CodeManager.getDiagnostics();
-            if (!diagnostics.isEmpty()) {
-                comp = processDiagnostic(diagnostics);
-            }
-            else {
-                if (comp == null) {
-                    comp = JavaFXDocument.getNothingPane();
-                }
-            }
-        }
-        
-    
-        private List <Window> getOwnerlessWindowsList() {
-            List <Window> list = new ArrayList<Window>();
+    private List <Window> getOwnerlessWindowsList() {
+        List <Window> list = new ArrayList<Window>();
 
-            Method getOwnerlessWindows = null;
-            Window windows[] = null;
-            try {
-                // to compille under JDK 1.5
-                //windows = Window.getOwnerlessWindows();
-                getOwnerlessWindows = Window.class.getDeclaredMethod("getOwnerlessWindows");
-                windows = (Window[])getOwnerlessWindows.invoke(null);
-            } catch (Exception ex) {
+        Method getOwnerlessWindows = null;
+        Window windows[] = null;
+        try {
+            // to compille under JDK 1.5
+            //windows = Window.getOwnerlessWindows();
+            getOwnerlessWindows = Window.class.getDeclaredMethod("getOwnerlessWindows");
+            windows = (Window[])getOwnerlessWindows.invoke(null);
+        } catch (Exception ex) {
+        }
+        if (windows != null)
+            for (Window window : windows) {
+                if (window instanceof JFrame)
+                    list.add((JFrame)window);
             }
-            if (windows != null)
-                for (Window window : windows) {
-                    if (window instanceof JFrame)
-                        list.add((JFrame)window);
-                }
-            return list;
-        }
-                
-        private boolean checkJavaVersion() {
-            String version = System.getProperty("java.runtime.version");
-            if (!version.startsWith("1.6"))
-                return false;
-            else
-                return true;
-        }
-
-        private JComponent processDiagnostic(List <Diagnostic> diagnostics) {
-            JEditorPane pane = new JEditorPane();
-            pane.setEditable(false);
-            pane.setEditorKit(new HTMLEditorKit());
-            Hyperlink hl = new Hyperlink();
-            pane.addHyperlinkListener(hl);
-            //pane.setFont(new FontUIResource("Monospaced", FontUIResource.PLAIN, 20));
-            String text = "";
-            int i = 0;
-            Vector<Object> foMap = new Vector<Object>();
-            Vector<Long> offsetMap = new Vector<Long>();
-            for (Diagnostic diagnostic : diagnostics) {
-                Object source = diagnostic.getSource();
-                String name = "";
-                if (diagnostic.getSource() != null)
-                {
-                    if (diagnostic.getSource() instanceof MemoryFileObject) {
-                        MemoryFileObject mfo = (MemoryFileObject)source;
-                        name = mfo.getFilePath();
-                    } else {
-                        JavaFileObject jFO = (JavaFileObject) source;
-                        File file = new File(jFO.toUri());
-                        FileObject regularFO = FileUtil.toFileObject(file);
-                        name = regularFO.getPath();
-                        source = regularFO;
-                    }
-                    foMap.add(source);
-                    offsetMap.add(diagnostic.getPosition());
-                    if (diagnostic.getKind() == Kind.WARNING) {
-                        text+= "<a href=" + i + ">" + name + " : " + diagnostic.getLineNumber() + "</a>\n" + " " + "<font color=#540000>: warning: " + diagnostic.getMessage(null) + "</font>" + "<br>";
-                    }else{
-                        text+= "<a href=" + i + ">" + name + " : " + diagnostic.getLineNumber() + "</a>\n" + " " + "<font color=#a40000>" + diagnostic.getMessage(null) + "</font>" + "<br>";
-                    }
-                    i++;
-                }
-            }
-            pane.setText(text);
-            hl.setMaps(foMap, offsetMap);
-            return pane;
-        }
-        
-        private JComponent getNothig() {
-            JTextArea jta = new JTextArea();
-            jta.append(nothingToShow);
-            return jta;
-        }
-        
-        private JComponent getVrongVersion() {
-            JTextArea jta = new JTextArea();
-            jta.setForeground(Color.decode("#a40000"));
-            jta.append(vrongJavaVersion + System.getProperty("java.runtime.version"));
-            return jta;
-        }
+        return list;
     }
+
+    private boolean checkJavaVersion() {
+        String version = System.getProperty("java.runtime.version");
+        if (!version.startsWith("1.6"))
+            return false;
+        else
+            return true;
+    }
+
+    private JComponent processDiagnostic(List <Diagnostic> diagnostics) {
+        JEditorPane pane = new JEditorPane();
+        pane.setEditable(false);
+        pane.setEditorKit(new HTMLEditorKit());
+        Hyperlink hl = new Hyperlink();
+        pane.addHyperlinkListener(hl);
+        //pane.setFont(new FontUIResource("Monospaced", FontUIResource.PLAIN, 20));
+        String text = "";
+        int i = 0;
+        Vector<Object> foMap = new Vector<Object>();
+        Vector<Long> offsetMap = new Vector<Long>();
+        for (Diagnostic diagnostic : diagnostics) {
+            Object source = diagnostic.getSource();
+            String name = "";
+            if (diagnostic.getSource() != null)
+            {
+                if (diagnostic.getSource() instanceof MemoryFileObject) {
+                    MemoryFileObject mfo = (MemoryFileObject)source;
+                    name = mfo.getFilePath();
+                } else {
+                    JavaFileObject jFO = (JavaFileObject) source;
+                    File file = new File(jFO.toUri());
+                    FileObject regularFO = FileUtil.toFileObject(file);
+                    name = regularFO.getPath();
+                    source = regularFO;
+                }
+                foMap.add(source);
+                offsetMap.add(diagnostic.getPosition());
+                if (diagnostic.getKind() == Kind.WARNING) {
+                    text+= "<a href=" + i + ">" + name + " : " + diagnostic.getLineNumber() + "</a>\n" + " " + "<font color=#540000>: warning: " + diagnostic.getMessage(null) + "</font>" + "<br>";
+                }else{
+                    text+= "<a href=" + i + ">" + name + " : " + diagnostic.getLineNumber() + "</a>\n" + " " + "<font color=#a40000>" + diagnostic.getMessage(null) + "</font>" + "<br>";
+                }
+                i++;
+            }
+        }
+        pane.setText(text);
+        hl.setMaps(foMap, offsetMap);
+        return pane;
+    }
+
+
+    private JComponent getVrongVersion() {
+        JTextArea jta = new JTextArea();
+        jta.setForeground(Color.decode("#a40000"));
+        jta.append(vrongJavaVersion + System.getProperty("java.runtime.version"));
+        return jta;
+    }
+
 
     public PreviewThread(FXDocument doc) {
-        super(new ThreadGroup("SACG"), "SACT");
+        super();
         this.doc = doc;
     }
 
-    private ExecutionEngine ee = new EE();
-    private ExecutorTask task = null;
-    
-    synchronized public void stopTask() {
-        if (task != null) {
-            task.stop();
-        }
-    }
-    
-    synchronized public void joinTask() {
-        if (task != null) {
-            task.result();
-        }
-    }
-            
     @Override
     synchronized public void run() {
         try {
-            //SunToolkit.createNewAppContext();
-            //System.out.println("Current app context " + AppContext.getAppContext());
-            
             ((JavaFXDocument)doc).setCompile();
-            task = ee.execute("prim", new R(), IOProvider.getDefault().getIO("JavaFX preview", false));
-
-            task.addTaskListener(new TaskListener() {
-                public void taskFinished(Task task) {
-                    ((JavaFXDocument)doc).renderPreview(comp);
+            MirroringPanel mirroringPanel = new MirroringPanel(UIManager.getLookAndFeel()) {
+                @Override
+                protected JPanel createMirroredPanel() {
+                    compile();
+                    return (JPanel)comp;
                 }
-            });
+            };
+            ((JavaFXDocument)doc).renderPreview(mirroringPanel);
         } catch(Exception ex) {
             ex.printStackTrace();
         }

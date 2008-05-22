@@ -55,6 +55,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -70,17 +71,17 @@ public class JavaFXEditorKit extends LexerEditorKit{
     public JavaFXEditorKit() {
         super(FX_MIME_TYPE);
         
-            Settings.addInitializer (new Settings.Initializer () {
-                public String getName() {
-                    return FX_MIME_TYPE;
-                }
+        Settings.addInitializer (new Settings.Initializer () {
+            public String getName() {
+                return FX_MIME_TYPE;
+            }
 
-                @SuppressWarnings("unchecked")
-                public void updateSettingsMap (Class kitClass, Map settingsMap) {
-                        settingsMap.put (SettingsNames.CODE_FOLDING_ENABLE, Boolean.TRUE);
-                }
+            @SuppressWarnings("unchecked")
+            public void updateSettingsMap (Class kitClass, Map settingsMap) {
+                    settingsMap.put (SettingsNames.CODE_FOLDING_ENABLE, Boolean.TRUE);
+            }
 
-            });
+        });
     }
     
     @Override
@@ -119,8 +120,12 @@ public class JavaFXEditorKit extends LexerEditorKit{
     
     
     public static class ToggleFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
-        PreviewButton b = null;
         ResetFXPreviewExecution resetAction = null;
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
         
         public ToggleFXPreviewExecution(ResetFXPreviewExecution resetAction) {
             super(toggleFXPreviewExecution);
@@ -132,25 +137,21 @@ public class JavaFXEditorKit extends LexerEditorKit{
         
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
             JavaFXDocument doc = getJavaFXDocument(target);
-            if (doc != null){
+            if (doc != null) {
                 if(doc.executionAllowed()) {
-                    resetAction.setActionButtonEnabled(false);
                     doc.enableExecution(false);
                     putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
-                }else {
-                    resetAction.setActionButtonEnabled(true);
+                } else {
                     doc.enableExecution(true);
                     putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("disable-fx-preview-execution"));
                     JavaFXModel.previewReq(doc, false);
                 }
-            }else{
-                b.setSelected(!b.isSelected());
             }
         }
         
         private JavaFXDocument getJavaFXDocument(JTextComponent comp){
             Component c = comp;
-            while(c != null){
+            while (c != null) {
                 if (c instanceof JavaFXDocument.PreviewSplitPane){
                     return ((JavaFXDocument.PreviewSplitPane)c).getDocument();
                 }
@@ -160,7 +161,7 @@ public class JavaFXEditorKit extends LexerEditorKit{
         }
         
         public java.awt.Component getToolbarPresenter() {
-            b = new PreviewButton();
+            PreviewButton b = new PreviewButton();
             b.setSelected(false);
             b.setAction(this);
             b.putClientProperty("hideActionText", Boolean.TRUE); //NOI18N
@@ -190,7 +191,6 @@ public class JavaFXEditorKit extends LexerEditorKit{
                     super.setContentAreaFilled(arg0);
                 }
             }
-
          }
     }
     
@@ -223,9 +223,7 @@ public class JavaFXEditorKit extends LexerEditorKit{
       
     }
     
-    
     public static class ResetFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
-        JButton b = null;
         
         public ResetFXPreviewExecution() {
             super(buttonResetFXPreviewExecution);
@@ -241,7 +239,7 @@ public class JavaFXEditorKit extends LexerEditorKit{
         
         private JavaFXDocument getJavaFXDocument(JTextComponent comp){
             Component c = comp;
-            while(c != null){
+            while (c != null) {
                 if (c instanceof JavaFXDocument.PreviewSplitPane){
                     return ((JavaFXDocument.PreviewSplitPane)c).getDocument();
                 }
@@ -250,15 +248,11 @@ public class JavaFXEditorKit extends LexerEditorKit{
             return null;
         }
         
-        public void setActionButtonEnabled(boolean enabled){
-            b.setEnabled(enabled);
-            b.validate();
-        }
-        
         public java.awt.Component getToolbarPresenter() {
-            b = new JButton();
+            JButton b = new JButton(this);
             b.setAction(this);
-            b.putClientProperty("hideActionText", Boolean.TRUE); //NOI18N
+            b.putClientProperty("hideActionText", Boolean.TRUE);             //NOI18N
+            b.putClientProperty("resetPreviewMark", Boolean.TRUE);                  //NOI18N
             b.setText("");
             b.setEnabled(false);
             return b;

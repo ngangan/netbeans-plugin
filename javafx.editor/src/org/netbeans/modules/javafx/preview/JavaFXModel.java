@@ -255,11 +255,9 @@ public class JavaFXModel {
     synchronized private static void renderPreview(final FXDocument doc) {
         try {
             if (tPreview != null)
-                tPreview.joinTask();
+                tPreview.join();
             tPreview = new PreviewThread(doc);
-        
             tPreview.start();
-
         }catch(Exception e){
             e.printStackTrace();
         }

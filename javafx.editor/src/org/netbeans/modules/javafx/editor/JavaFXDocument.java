@@ -53,6 +53,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -69,13 +70,14 @@ import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.javafx.preview.AutoResizableDesktopPane;
 import org.netbeans.modules.javafx.preview.JavaFXModel;
+import org.netbeans.modules.javafx.preview.MirroringPanel;
 import org.openide.loaders.DataObject;
 
 /**
  *
  * @author answer
  */
-public class JavaFXDocument extends NbEditorDocument implements FXDocument{
+public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     
     private JPanel panel = null;
      private JEditorPane pane = null;
@@ -246,8 +248,12 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument{
         JavaFXModel.setResultComponent(this, comp);
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){
-                if (panel!=null){
+                if (panel != null){
                     if (panel.getComponentCount() > 0){
+                        for (Component component: panel.getComponents()) {
+                            if (component instanceof MirroringPanel)
+                                ((MirroringPanel)component).cleanup();
+                        }
                         panel.remove(0);
                     }else{
                         panel.setLayout(new BorderLayout());
@@ -276,15 +282,26 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument{
         return errorAndSyntaxEnabled;
     }
             
-    public void enableExecution(boolean enabled){
+    public void enableExecution(boolean enabled) {
         executionEnabled = enabled;
-        if (enabled){
-            
+        for (Component component : createToolbar(pane).getComponents()) {
+            if (component instanceof JButton)
+                if (((JButton)component).getClientProperty("resetPreviewMark") == Boolean.TRUE) {                  //NOI18N
+                    component.setEnabled(enabled);
+                }
+        }
+        if (enabled) {
             split.setTopComponent(scroll);
             split.setDividerSize(divSize);
             split.setDividerLocation(divLoc);
-        }else{
-            
+        } else {
+            if (panel != null)
+                if (panel.getComponentCount() > 0) {
+                    for (Component component: panel.getComponents()) {
+                        if (component instanceof MirroringPanel)
+                            ((MirroringPanel)component).cleanup();
+                        }
+                }
             divLoc = split.getDividerLocation();
             split.setDividerSize(0);
             split.setDividerLocation(0);

@@ -48,7 +48,7 @@ public class AutoResizableDesktopPane extends JDesktopPane {
     public AutoResizableDesktopPane() {
         manager = new DesktopManager(this);
         setDesktopManager(manager);
-        setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+        setDragMode(JDesktopPane.LIVE_DRAG_MODE);
     }
 
     public Component add(JInternalFrame frame) {
@@ -95,7 +95,7 @@ class DesktopManager extends DefaultDesktopManager {
     }
 
     public void setNormalSize() {
-        JScrollPane scrollPane=getScrollPane();
+        JScrollPane scrollPane = getScrollPane();
         int x = 0;
         int y = 0;
         Insets scrollInsets = getScrollPaneInsets();
