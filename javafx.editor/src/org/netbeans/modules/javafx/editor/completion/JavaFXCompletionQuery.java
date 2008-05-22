@@ -435,6 +435,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case INIT_DEFINITION:
                     break;
                 case INSTANTIATE:
+                    result = new InstantiateEnvironment();
                     break;
                 case INTERPOLATE:
                     break;

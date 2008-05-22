@@ -62,6 +62,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -264,6 +265,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void localResult() throws IOException {
         addLocalMembersAndVars();
+        addLocalAndImportedTypes(null, null, null, false);
     }
     
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
@@ -533,7 +535,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     String name = e.getSimpleName().toString();
                         if (JavaFXCompletionProvider.startsWith(name, prefix) &&
                         ! name.contains("$")) {
-                            addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), getOffset(), elements.isDeprecated(e), insideNew, false));
+                            addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), offset, elements.isDeprecated(e), insideNew, false));
                     }
                 }
             }
@@ -541,6 +543,57 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (prefix != null && prefix.length() > 0)
                 pkgName += prefix;
             addPackages(pkgName);
+        }
+    
+        private void addTypes(EnumSet<ElementKind> kinds, DeclaredType baseType, Set<? extends Element> toExclude, boolean insideNew) throws IOException {
+            if (baseType == null) {
+                addAllTypes(kinds, insideNew);
+            } else {
+                Elements elements = controller.getElements();
+                for(DeclaredType subtype : getSubtypesOf(baseType)) {
+                    TypeElement elem = (TypeElement)subtype.asElement();
+                    addResult(JavaFXCompletionItem.createTypeItem(elem, subtype, offset, elements.isDeprecated(elem), insideNew, true));
+                }
+            }
+            addLocalAndImportedTypes(kinds, baseType, toExclude, insideNew);
+            addPackages(prefix);
+        }
+        
+        protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew) throws IOException {
+            log("addLocalAndImportedTypes");
+            final Elements elements = controller.getElements();
+            final Types types = controller.getTypes();
+            JavafxcTrees trees = controller.getTrees();
+            TreePath p = new TreePath(root);
+            JavafxcScope scope = trees.getScope(p);
+            while (scope != null) {
+                log("  scope == " + scope);
+                for (Element local : scope.getLocalElements()) {
+                    log("    local == " + local);
+                    if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                        if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                            continue;
+                        }
+                        DeclaredType dt = (DeclaredType)local.asType();
+                        String name = local.getSimpleName().toString();
+                        if (JavaFXCompletionProvider.startsWith(name, prefix) &&
+                            ! name.contains("$")) {
+                            addResult(JavaFXCompletionItem.createTypeItem((TypeElement)local, dt, offset, elements.isDeprecated(local), insideNew, false));
+                        }
+                    }
+                }
+                scope = scope.getEnclosingScope();
+            }
+        }
+        
+        private void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
+            log("NOT IMPLEMENTED addAllTypes ");
+//            for(ElementHandle<TypeElement> name : controller.getJavaSource().getClasspathInfo().getClassIndex().getDeclaredTypes(prefix != null ? prefix : EMPTY, kind, EnumSet.allOf(ClassIndex.SearchScope.class))) {
+//                LazyTypeCompletionItem item = LazyTypeCompletionItem.create(name, kinds, anchorOffset, controller.getJavaSource(), insideNew);
+//                if (item.isAnnonInner())
+//                    continue;
+//                results.add(item);
+//            }
         }
     
     protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(Tree tree, int position) {
