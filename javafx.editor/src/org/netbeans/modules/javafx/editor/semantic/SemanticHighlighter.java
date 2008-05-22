@@ -46,7 +46,6 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import java.awt.Color;

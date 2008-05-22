@@ -424,7 +424,12 @@ public class Utilities {
 //        CompilationUnitTree cu = info.getCompilationUnit();
         
         //XXX: do not use instanceof:
-        if (leaf instanceof MethodTree || leaf instanceof VariableTree || leaf instanceof ClassTree || leaf instanceof JFXClassDeclaration || leaf instanceof MemberSelectTree) {
+        if (leaf instanceof MethodTree || 
+                leaf instanceof VariableTree || 
+                leaf instanceof ClassTree || 
+                leaf instanceof JFXClassDeclaration || 
+                leaf instanceof JFXFunctionDefinition || 
+                leaf instanceof MemberSelectTree) {
 //        Element element = info.getTrees().getElement(tree);
 //        ElementKind kind = element.getKind();
 //        if (kind == ElementKind.METHOD || kind == ElementKind.FIELD || kind == ElementKind.LOCAL_VARIABLE || kind == ElementKind.PARAMETER || kind == ElementKind.CLASS) {

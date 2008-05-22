@@ -40,6 +40,7 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.source.tree.CatchTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.IfTree;
@@ -352,6 +353,13 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
             return Boolean.TRUE;
         
         return null;
+    }
+
+    @Override
+    public Boolean visitFunctionDefinition(FunctionDefinitionTree node, Stack<Tree> p) {
+        scan(node.getModifiers(), p);
+        scan(node.getFunctionValue(), p);
+        return super.visitFunctionDefinition(node, p);
     }
     
 }
