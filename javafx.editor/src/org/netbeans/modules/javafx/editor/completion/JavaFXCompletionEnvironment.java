@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.editor.completion;
 import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ForExpressionInClauseTree;
 import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionValueTree;
 import com.sun.javafx.api.tree.JavaFXTree;
 import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
@@ -585,6 +584,32 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 scope = scope.getEnclosingScope();
             }
         }
+
+        protected TypeElement findTypeElement(String simpleName) throws IOException {
+            log("findTypeElement: " + simpleName);
+            JavafxcTrees trees = controller.getTrees();
+            TreePath p = new TreePath(root);
+            JavafxcScope scope = trees.getScope(p);
+            while (scope != null) {
+                log("  scope == " + scope);
+                for (Element local : scope.getLocalElements()) {
+                    log("    local == " + local);
+                    if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                        if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                            continue;
+                        }
+                        String name = local.getSimpleName().toString();
+                        if (name != null && name.equals(simpleName) && 
+                                local instanceof TypeElement) {
+                            return (TypeElement)local;
+                        }
+                    }
+                }
+                scope = scope.getEnclosingScope();
+            }
+            return null;
+        }
+
         
         private void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
             log("NOT IMPLEMENTED addAllTypes ");
