@@ -39,15 +39,12 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.ErroneousTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.TreePath;
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -62,9 +59,31 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXInstanciate t) throws IOException {
-        log("inside JFXInstanciate " + t);
-        addLocalAndImportedTypes(null, null, null, false);
+    protected void inside(JFXInstanciate it) throws IOException {
+        int pos = (int) sourcePositions.getStartPosition(root, it);
+        log("inside JFXInstanciate " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n");
+        if (pos < 0) {
+            return;
+        }
+        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
+        log("  last == " + last.token().id());
+        if (last != null && last.token().id() == JFXTokenId.NEW) {
+            addLocalAndImportedTypes(null, null, null, false);            
+        } else {
+            String s = it.getIdentifier().toString();
+            log("  s == " + s);
+            TypeElement te = findTypeElement(s);
+            log("  te == " + te);
+            if (te == null) {
+                return;
+            }
+            TypeMirror tm = te.asType();
+            log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind()));
+            if (tm == null) {
+                return;
+            }
+            addMembers(tm, false, true);
+        }
     }
 
     private static void log(String s) {

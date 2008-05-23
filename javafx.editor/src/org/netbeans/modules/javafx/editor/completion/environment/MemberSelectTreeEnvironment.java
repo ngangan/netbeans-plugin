@@ -253,7 +253,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                                         }
                                     }
                             } else {
-                                addMembers(type);
+                                addMembers(type,true, true);
                             }
                             break;
                         default:

@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.editor.completion;
 import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ForExpressionInClauseTree;
 import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionValueTree;
 import com.sun.javafx.api.tree.JavaFXTree;
 import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
@@ -225,7 +224,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         query.results.add(i);
     }
     
-    protected void addMembers(final TypeMirror type) throws IOException {
+    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
         log("addMembers: " + type);
         getController().toPhase(Phase.ANALYZED);
         
@@ -239,12 +238,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (dt.asElement().getKind() != ElementKind.CLASS) {
             return;
         }
-        Elements elements = getController().getElements();
+        Elements elements = controller.getElements();
         for (Element member : elements.getAllMembers((TypeElement) dt.asElement())) {
             log("    member == " + member + " member.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
             if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
-                if (member.getKind() == ElementKind.METHOD) {
+                if (methods && member.getKind() == ElementKind.METHOD) {
                     addResult(
                         JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement)member,
@@ -252,7 +251,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             offset, false, false, false, false)
                     );
                 }
-                if (member.getKind() == ElementKind.FIELD) {
+                if (fields && member.getKind() == ElementKind.FIELD) {
                     addResult(
                         JavaFXCompletionItem.createVariableItem(
                             member.getSimpleName().toString(),
@@ -288,7 +287,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (k == JavaFXKind.CLASS_DECLARATION) {
                 TypeMirror tm = getController().getTrees().getTypeMirror(tp);
                 log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind()));
-                addMembers(tm);
+                addMembers(tm,true, true);
             }
             if (k == JavaFXKind.BLOCK_EXPRESSION) {
                 BlockExpressionTree bet = (BlockExpressionTree)jfxt;
@@ -585,6 +584,32 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 scope = scope.getEnclosingScope();
             }
         }
+
+        protected TypeElement findTypeElement(String simpleName) throws IOException {
+            log("findTypeElement: " + simpleName);
+            JavafxcTrees trees = controller.getTrees();
+            TreePath p = new TreePath(root);
+            JavafxcScope scope = trees.getScope(p);
+            while (scope != null) {
+                log("  scope == " + scope);
+                for (Element local : scope.getLocalElements()) {
+                    log("    local == " + local);
+                    if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                        if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                            continue;
+                        }
+                        String name = local.getSimpleName().toString();
+                        if (name != null && name.equals(simpleName) && 
+                                local instanceof TypeElement) {
+                            return (TypeElement)local;
+                        }
+                    }
+                }
+                scope = scope.getEnclosingScope();
+            }
+            return null;
+        }
+
         
         private void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
             log("NOT IMPLEMENTED addAllTypes ");
