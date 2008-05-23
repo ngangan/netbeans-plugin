@@ -6,6 +6,7 @@ package org.netbeans.modules.javafx.editor;
 
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
 import org.netbeans.modules.editor.indent.spi.Context;
+import org.netbeans.modules.javafx.editor.format.JFXIndentTask;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;

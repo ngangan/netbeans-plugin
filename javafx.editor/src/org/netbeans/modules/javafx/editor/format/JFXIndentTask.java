@@ -39,9 +39,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.javafx.editor.format;
 
+import com.sun.source.util.TreePath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
@@ -51,28 +53,30 @@ import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
+import org.netbeans.modules.javafx.editor.format.Visitor;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import com.sun.source.tree.Tree;
-
 /**
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  */
-class JFXIndentTask implements IndentTask, ReformatTask {
+public class JFXIndentTask implements IndentTask, ReformatTask {
     private static Logger log = Logger.getLogger(JFXIndentTask.class.getName());
     private static final Pattern KEEP_LEVEL_PTRN = Pattern.compile("\\s*(}|\\)|\\])\\s*(;|,)?\\s*");
 
     private final Context context;
     private TokenSequence<JFXTokenId> ts = null;
 
-    JFXIndentTask(Context context) {
+
+    public JFXIndentTask(Context context) {
         this.context = context;
     }
 
@@ -130,7 +134,7 @@ class JFXIndentTask implements IndentTask, ReformatTask {
     }
 
     private int adjustOffsetToNewLine(int offset, int lso) throws BadLocationException {
-        while (lso == context.lineStartOffset(offset) 
+        while (lso == context.lineStartOffset(offset)
                 && offset < context.endOffset()) {
             offset++;
         }
@@ -145,9 +149,12 @@ class JFXIndentTask implements IndentTask, ReformatTask {
     }
 
     private int getIndentStepLevel() {
-        //TODO: [RKo] Load indel level in spaces from settings.
         return 4;
     }
+
+//    private <T> T getSetting(String settingName, Object defVal) {
+//        return (T) SettingsUtil.getValue(JavaFXEditorKit.class, settingName, defVal);
+//    }
 
     /**
      * Get an extra locking or null if no extra locking is necessary.
@@ -175,7 +182,8 @@ class JFXIndentTask implements IndentTask, ReformatTask {
             while (t != null && ts.offset() < lso) {
                 if (t.id() == JFXTokenId.LBRACE || t.id() == JFXTokenId.LPAREN || t.id() == JFXTokenId.LBRACKET) {
                     level += getIndentStepLevel();
-                } else if (t.id() == JFXTokenId.RBRACE || t.id() == JFXTokenId.RPAREN || t.id() == JFXTokenId.RBRACKET) {
+                } else
+                if (t.id() == JFXTokenId.RBRACE || t.id() == JFXTokenId.RPAREN || t.id() == JFXTokenId.RBRACKET) {
                     level -= getIndentStepLevel();
                 }
                 t = ts.moveNext() ? ts.token() : null;
@@ -198,9 +206,10 @@ class JFXIndentTask implements IndentTask, ReformatTask {
 
     /**
      * Escaping single newline lines.
+     *
      * @param lso start of the origin line
      * @return new nonempty line
-     * @throws BadLocationException  if something goes wrong.
+     * @throws BadLocationException if something goes wrong.
      */
     private int getPreviousLine(int lso) throws BadLocationException {
         while (lso > 0) {
@@ -241,12 +250,12 @@ class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reformat() throws BadLocationException {
-        /*if (context == null) throw new IllegalStateException("The context of task is null!");
+        if (context == null) throw new IllegalStateException("The context of task is null!");
         if (context.isIndent()) {
             reindent();
             return;
         }
-        JavaFXSource s = JavaFXSource.forDocument(context.document());
+        final JavaFXSource s = JavaFXSource.forDocument(context.document());
         try {
             s.runUserActionTask(new Task<CompilationController>() {
 
@@ -256,31 +265,27 @@ class JFXIndentTask implements IndentTask, ReformatTask {
                     if (log.isLoggable(Level.INFO)) log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
                     if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
                         if (log.isLoggable(Level.INFO)) log.info("The " + phase + " phase has been reached ... OK!");
+                        int dot = context.lineStartOffset(context.startOffset());
                         final TreeUtilities tu = controller.getTreeUtilities();
                         final TreePath path = tu.pathFor(context.startOffset());
-                        reformat(path.getLeaf());
+                        Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
+                        final List<Adjustment> list = visitor.scan(path, new ArrayList<Adjustment>(20));
+                        applyAdjustments(list);
                     }
                 }
             }, true);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
-        reindent();
-    }
-
-    private void reformat(Tree leaf) {
-        if (leaf == null) return;
-        if (log.isLoggable(Level.FINE)) log.fine("LeafKind: " + leaf.getKind());
-        switch (leaf.getKind()) {
-            case BLOCK:
-                reformatBlock(leaf);
-                break;
-            default:
-
         }
+//        reindent();
+
+
     }
 
-    private void reformatBlock(Tree tree) {
+    private void applyAdjustments(List<Adjustment> adjustments) throws BadLocationException {
+        for (Adjustment adjustment : adjustments) {
+            adjustment.apply(context);
+        }
     }
 
     /**
@@ -288,5 +293,6 @@ class JFXIndentTask implements IndentTask, ReformatTask {
      */
     public ExtraLock reformatLock() {
         return null;
-    }
+    }       
+
 }
