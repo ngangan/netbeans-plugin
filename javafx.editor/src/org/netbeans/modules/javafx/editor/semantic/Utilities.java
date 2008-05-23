@@ -167,17 +167,16 @@ public class Utilities {
             return null;
         }
 
-        ts.moveNext();
-
-        while (ts.offset() >= start) {
-            Token<JFXTokenId> t = ts.token();
-
-            if (member.equals(t.text().toString())) {
-                return t;
+        if (ts.moveNext()) {
+            while (ts.offset() >= start) {
+                Token<JFXTokenId> t = ts.token();
+                if (member.equals(t.text().toString())) {
+                    return t;
+                }
+                if (!ts.movePrevious()) {
+                    break;
+                }
             }
-
-            if (!ts.movePrevious())
-                break;
         }
         return null;
     }
