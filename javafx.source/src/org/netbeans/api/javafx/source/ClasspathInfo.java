@@ -78,11 +78,11 @@ public class ClasspathInfo {
         return create (bootPath, compilePath, srcPath);
     }
 
-    private static ClasspathInfo create(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
+    public static ClasspathInfo create(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
         return new ClasspathInfo(bootPath, compilePath, srcPath);
     }
 
-    public ClasspathInfo(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
+    private ClasspathInfo(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
         this.bootPath = bootPath;
         this.compilePath = compilePath;
         this.srcPath = srcPath;
