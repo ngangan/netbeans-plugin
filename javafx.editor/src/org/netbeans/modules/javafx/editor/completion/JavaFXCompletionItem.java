@@ -129,6 +129,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
             case INTERFACE:
                 return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
+            case ENUM:
+                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
             default:
                 throw new IllegalArgumentException("kind=" + elem.getKind());
         }
