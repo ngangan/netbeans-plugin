@@ -238,12 +238,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (dt.asElement().getKind() != ElementKind.CLASS) {
             return;
         }
+        HashSet<String> fieldNames = new HashSet<String>();
         Elements elements = controller.getElements();
         for (Element member : elements.getAllMembers((TypeElement) dt.asElement())) {
             log("    member == " + member + " member.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
             if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                 if (methods && member.getKind() == ElementKind.METHOD) {
+                    if (s.contains("$")) {
+                        continue;
+                    }
                     addResult(
                         JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement)member,
@@ -252,10 +256,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     );
                 }
                 if (fields && member.getKind() == ElementKind.FIELD) {
+                    if (fieldNames.contains(s)) {
+                        continue;
+                    }
+                    fieldNames.add(s);
                     addResult(
-                        JavaFXCompletionItem.createVariableItem(
-                            member.getSimpleName().toString(),
-                            offset, false)
+                        JavaFXCompletionItem.createVariableItem(s, offset, false)
                     );
                 }
             }
