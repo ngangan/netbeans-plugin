@@ -66,7 +66,8 @@ public class MirroringPanel extends JPanel {
             mirroredEventQueue = SunToolkit.getDefaultToolkit().getSystemEventQueue();
             
             KeyboardFocusManager.setCurrentKeyboardFocusManager(new DefaultKeyboardFocusManager(){
-                @Override
+
+              @Override
                 public Window getFocusedWindow() {
                     synchronized (KeyboardFocusManager.class) {
                         return (mirroredFrame);
@@ -75,10 +76,10 @@ public class MirroringPanel extends JPanel {
             });
 
             mirroredFrame = new JDialog() {
-                @Override
-                public boolean getFocusableWindowState() {
+                //@Override
+                /*public boolean getFocusableWindowState() {
                     return false;
-                }
+                }*/
             };
             mirroredFrame.setLayout(new BorderLayout());
             JScrollPane jsp = new JScrollPane();
@@ -146,6 +147,14 @@ public class MirroringPanel extends JPanel {
     }
         
     void onMouseEvent(MouseEvent ev) {
+        switch (ev.getID()) {
+            case MouseEvent.MOUSE_ENTERED:
+                SwingUtilities.getWindowAncestor(this).setFocusableWindowState(false);
+                break;
+            case MouseEvent.MOUSE_EXITED:
+                SwingUtilities.getWindowAncestor(this).setFocusableWindowState(true);
+                break;
+        }
         if (mirroredEventQueue != null && mirroredFrame != null) {
             Point point =  SwingUtilities.convertPoint(ev.getComponent(), ev.getPoint(), this);
             point =  SwingUtilities.convertPoint(mirroredFrame.getLayeredPane(), point, mirroredFrame);
