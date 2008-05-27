@@ -41,9 +41,13 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
@@ -84,6 +88,32 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
             }
             addMembers(tm, false, true);
         }
+    }
+
+    @Override
+    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
+        final JFXInstanciate it = (JFXInstanciate) path.getLeaf();
+//        final TreePath treePath = new TreePath(path, it.getTree());
+//        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
+
+        String s = it.getIdentifier().toString();
+        TypeElement te = findTypeElement(s);
+        TypeMirror type = te != null ? te.asType() : null;
+        
+        if (type == null) {
+            return null;
+        }
+        
+        int dim = 0;
+        while (dim-- > 0) {
+            if (type.getKind() == TypeKind.ARRAY) {
+                type = ((ArrayType) type).getComponentType();
+            } else {
+                return null;
+            }
+        }
+        
+        return type != null ? Collections.singleton(type) : null;
     }
 
     private static void log(String s) {

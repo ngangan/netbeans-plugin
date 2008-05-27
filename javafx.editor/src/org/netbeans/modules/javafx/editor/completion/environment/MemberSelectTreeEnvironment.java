@@ -55,6 +55,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -64,6 +65,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -302,6 +304,27 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         addPackageContent(pe, EnumSet.of(ElementKind.PACKAGE), null, false);
                 }
             }
+    }
+
+    @Override
+    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
+        final MemberSelectTree t = (MemberSelectTree) path.getLeaf();
+        final TreePath treePath = new TreePath(path, t.getExpression());
+        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
+        if (type == null) {
+            return null;
+        }
+        
+        int dim = 0;
+        while (dim-- > 0) {
+            if (type.getKind() == TypeKind.ARRAY) {
+                type = ((ArrayType) type).getComponentType();
+            } else {
+                return null;
+            }
+        }
+        
+        return type != null ? Collections.singleton(type) : null;
     }
 
     private static void log(String s) {

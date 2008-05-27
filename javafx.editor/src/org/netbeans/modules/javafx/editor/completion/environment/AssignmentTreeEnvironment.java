@@ -53,7 +53,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  * @author David Strupl
  */
 public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<AssignmentTree> {
-    
+
     private static final Logger logger = Logger.getLogger(AssignmentTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
