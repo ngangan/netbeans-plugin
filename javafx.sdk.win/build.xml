@@ -54,7 +54,7 @@ made subject to such option by the copyright holder.
 		<mkdir dir="external"/>
 		<get src="${javafx-sdk.win.url}" dest="${javafx-sdk.win.zip}" usetimestamp="true" verbose="true"/>
 		<SetReleaseExternal propertynameprefix="release.${javafx-sdk.win.zip}!/">
-			<zipfileset src="${javafx-sdk.win.zip}"/>
+			<zipfileset src="${javafx-sdk.win.zip}" excludes="**/lib/*.jar.pack.gz"/>
 		</SetReleaseExternal>
 	</target>
 
