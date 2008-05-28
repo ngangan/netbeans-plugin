@@ -37,48 +37,34 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.javafx.palette;
 
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import org.openide.text.ActiveEditorDrop;
 
 /**
  *
- * @author David Strupl
+ * @author Michal Skvor
  */
-public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<AssignmentTree> {
+public class JavaFXEditorDropDefault implements ActiveEditorDrop {
 
-    private static final Logger logger = Logger.getLogger(AssignmentTreeEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
-
-    @Override
-    protected void inside(AssignmentTree as) throws IOException {
-        log("inside AssignmentTree " + as);
-        int asTextStart = (int) sourcePositions.getEndPosition(root, as.getVariable());
-        if (asTextStart != Diagnostic.NOPOS) {
-            Tree expr = unwrapErrTree(as.getExpression());
-            if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
-                String asText = getController().getText().substring(asTextStart, offset);
-                int eqPos = asText.indexOf('=');
-                if (eqPos > -1) {
-                    localResult();
-                    addValueKeywords();
-                }
-            } else {
-                insideExpression(new TreePath(path, expr));
-            }
-        }
+    private String body;
+    
+    public JavaFXEditorDropDefault( String body ) {
+        this.body = body;
     }
+    
+    public boolean handleTransfer(JTextComponent targetComponent) {
+        if( targetComponent == null )
+            return false;
 
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
+        try {
+            JavaFXPaletteUtilities.insert( body, (JTextComponent)targetComponent );
+        } catch( BadLocationException ble ) {
+            return false;
         }
+        
+        return true;
     }
 }

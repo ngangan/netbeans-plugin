@@ -55,7 +55,7 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  * @author David Strupl
  */
 public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXBlockExpression> {
-    
+
     private static final Logger logger = Logger.getLogger(BlockExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 

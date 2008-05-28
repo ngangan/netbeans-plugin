@@ -45,8 +45,13 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -56,7 +61,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  * @author David Strupl
  */
 public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<VariableTree> {
-    
+
     private static final Logger logger = Logger.getLogger(VariableTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
@@ -76,7 +81,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         if (init == null) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
             if (last == null) {
-                 insideExpression(new TreePath(path, type));
+                insideExpression(new TreePath(path, type));
             } else if (last.token().id() == JFXTokenId.EQ) {
                 localResult();
                 addValueKeywords();
@@ -98,6 +103,27 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
                 insideExpression(new TreePath(path, init));
             }
         }
+    }
+
+    @Override
+    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
+        final VariableTree t = (VariableTree) path.getLeaf();
+        final TreePath treePath = new TreePath(path, t.getType());
+        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
+        if (type == null) {
+            return null;
+        }
+        
+        int dim = 0;
+        while (dim-- > 0) {
+            if (type.getKind() == TypeKind.ARRAY) {
+                type = ((ArrayType) type).getComponentType();
+            } else {
+                return null;
+            }
+        }
+        
+        return type != null ? Collections.singleton(type) : null;
     }
 
     private static void log(String s) {

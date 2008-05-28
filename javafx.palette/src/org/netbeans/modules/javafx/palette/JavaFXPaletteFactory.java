@@ -37,48 +37,27 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.javafx.palette;
 
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.spi.palette.PaletteController;
+import org.netbeans.spi.palette.PaletteFactory;
 
 /**
  *
- * @author David Strupl
+ * @author Michal Skvor
  */
-public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<AssignmentTree> {
+public class JavaFXPaletteFactory {
+    
+    public static final String JAVAFX_PALETTE_FOLDER = "JavaFXPalette";
+    
+    static private PaletteController palette = null;
 
-    private static final Logger logger = Logger.getLogger(AssignmentTreeEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
-
-    @Override
-    protected void inside(AssignmentTree as) throws IOException {
-        log("inside AssignmentTree " + as);
-        int asTextStart = (int) sourcePositions.getEndPosition(root, as.getVariable());
-        if (asTextStart != Diagnostic.NOPOS) {
-            Tree expr = unwrapErrTree(as.getExpression());
-            if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
-                String asText = getController().getText().substring(asTextStart, offset);
-                int eqPos = asText.indexOf('=');
-                if (eqPos > -1) {
-                    localResult();
-                    addValueKeywords();
-                }
-            } else {
-                insideExpression(new TreePath(path, expr));
-            }
+    public static PaletteController getPalette() throws IOException {
+        if( palette == null ) {
+            palette = PaletteFactory.createPalette( JAVAFX_PALETTE_FOLDER, 
+                    new JavaFXPaletteActions());
         }
-    }
-
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
-    }
+        return palette;
+    } 
 }

@@ -273,6 +273,27 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addLocalAndImportedTypes(null, null, null, false);
     }
     
+    // TODO
+    protected void addSmartTypes() throws IOException {
+        Set<? extends TypeMirror> smarts = getSmartTypes();
+        if (smarts != null) {
+            for (TypeMirror smart : smarts) {
+                if (smart != null) {
+                    if (smart.getKind() == TypeKind.DECLARED) {
+//                        for (DeclaredType subtype : getSubtypesOf((DeclaredType) smart)) {
+//                            TypeElement elem = (TypeElement) subtype.asElement();
+                            DeclaredType dt = (DeclaredType) smart;
+                            TypeElement elem = (TypeElement) dt.asElement();
+                            addResult(JavaFXCompletionItem.createTypeItem(elem, dt, offset, false, false, true));
+//                            TypeElement elem = (TypeElement) dt.asElement();
+//                            addResult(JavaFXCompletionItem.createTypeItem(elem, subtype, offset, false, false, true));
+//                        }
+                    }
+                }
+            }
+        }
+    }
+    
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
         log("addMemberConstantsAndTypes: " + type + " elem: " + elem);
     }
@@ -549,7 +570,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 pkgName += prefix;
             addPackages(pkgName);
         }
-    
+
         private void addTypes(EnumSet<ElementKind> kinds, DeclaredType baseType, Set<? extends Element> toExclude, boolean insideNew) throws IOException {
             if (baseType == null) {
                 addAllTypes(kinds, insideNew);
