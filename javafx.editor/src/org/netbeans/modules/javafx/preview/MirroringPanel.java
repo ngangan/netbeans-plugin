@@ -96,13 +96,13 @@ public class MirroringPanel extends JPanel {
                     super.paintDirtyRegions();
                     if (offscreenBuffer != null) {
                         mirroredFrame.getLayeredPane().paintAll(offscreenBuffer.getGraphics());
-                        mirroringEventQueue.invokeLater(new Runnable() {
+                        mirroringEventQueue.postEvent(new InvocationEvent(SunToolkit.getDefaultToolkit(), new Runnable() {
                             public void run() {
                                 if (offscreenBuffer != null) {
                                     repaint();
                                 }
                             }
-                        });
+                        }));
                     }
                 }
             });
