@@ -265,49 +265,8 @@ public final class TreeUtilities {
     /**Computes {@link Scope} for the given position.
      */
     public Scope scopeFor(int pos) {
-        List<? extends StatementTree> stmts = null;
-        SourcePositions sourcePositions = info.getTrees().getSourcePositions();
         TreePath path = pathFor(pos);
-        CompilationUnitTree root = path.getCompilationUnit();
-        switch (path.getLeaf().getKind()) {
-            case BLOCK:
-                stmts = ((BlockTree)path.getLeaf()).getStatements();
-                break;
-            case FOR_LOOP:
-                stmts = ((ForLoopTree)path.getLeaf()).getInitializer();
-                break;
-            case ENHANCED_FOR_LOOP:
-                stmts = Collections.singletonList(((EnhancedForLoopTree)path.getLeaf()).getStatement());
-                break;
-            case METHOD:
-                stmts = ((MethodTree)path.getLeaf()).getParameters();
-                break;
-        }
-        if (stmts != null) {
-            Tree tree = null;
-            for (StatementTree st : stmts) {
-                if (sourcePositions.getStartPosition(root, st) < pos)
-                    tree = st;
-            }
-            if (tree != null)
-                path = new TreePath(path, tree);
-        }
         Scope scope = info.getTrees().getScope(path);
-        if (path.getLeaf().getKind() == Tree.Kind.CLASS) {
-            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-            ts.move(pos);
-            while(ts.movePrevious()) {
-                switch (ts.token().id()) {
-                    case WS:
-                    case LINE_COMMENT:
-                    case COMMENT:
-                    case DOC_COMMENT:
-                        break;
-                    default:
-                        return scope;
-                }
-            }
-        }
         return scope;
     }
     
