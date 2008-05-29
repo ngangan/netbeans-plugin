@@ -49,13 +49,13 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class Circle implements ActiveEditorDrop {
-    
+public class Ellipse implements ActiveEditorDrop {
+
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Circle" );
+        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Ellipse" );
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         return true;
-    }    
+    }
 }

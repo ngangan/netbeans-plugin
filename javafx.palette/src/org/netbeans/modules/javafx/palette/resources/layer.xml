@@ -77,14 +77,32 @@
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
 
             <attr name="position" intvalue="300"/>
-            <file name="Line.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Line.xml">
+            <file name="Arc.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Arc.xml">
                 <attr name="position" intvalue="100"/>
             </file>
             <file name="Circle.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Circle.xml">
                 <attr name="position" intvalue="200"/>
             </file>
-            <file name="Rectangle.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Rectangle.xml">
+            <file name="Ellipse.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Ellipse.xml">
                 <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Image.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Image.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Line.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Line.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Poygon.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Polygon.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="Polyline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Polyline.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="Rectangle.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Rectangle.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="Text.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Text.xml">
+                <attr name="position" intvalue="900"/>
             </file>
         </folder>
         <folder name="Colors">
