@@ -82,7 +82,7 @@ public class MirroringPanel extends JPanel {
             mirroredPanel = createMirroredPanel();
             jsp.setViewportView(mirroredPanel);
             mirroredFrame.add(jsp);
-            //mirroredFrame.setLocation(-2000, -2000);
+            mirroredFrame.setLocation(-2000, -2000);
             mirroredFrame.setVisible(true);
             mirroredFrame.setSize(getSize().width + mirroredFrame.getInsets().left + mirroredFrame.getInsets().right, getSize().height + mirroredFrame.getInsets().top + mirroredFrame.getInsets().bottom);
             mirroredFrame.setFocusableWindowState(true);
