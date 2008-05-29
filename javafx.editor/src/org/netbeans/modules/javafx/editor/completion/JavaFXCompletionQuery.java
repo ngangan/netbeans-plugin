@@ -65,10 +65,10 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.environment.*;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
-import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.openide.util.Exceptions;
@@ -364,14 +364,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         return true;
     }
 
-    private Collection getFilteredData(Collection<JavaFXCompletionItem> data, String prefix) {
+    private Collection<JavaFXCompletionItem> getFilteredData(Collection<JavaFXCompletionItem> data, String prefix) {
         if (prefix.length() == 0) {
             return data;
         }
-        List ret = new ArrayList();
+        List<JavaFXCompletionItem> ret = new ArrayList<JavaFXCompletionItem>();
         boolean camelCase = prefix.length() > 1 && camelCasePattern.matcher(prefix).matches();
         for (Iterator<JavaFXCompletionItem> it = data.iterator(); it.hasNext();) {
-            CompletionItem itm = it.next();
+            JavaFXCompletionItem itm = it.next();
             if (JavaFXCompletionProvider.startsWith(itm.getInsertPrefix().toString(), prefix)) {
                 ret.add(itm);
             }
@@ -396,7 +396,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         int offset = caretOffset;
         String prefix = null;
         if (offset > 0) {
-            TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
             // When right at the token end move to previous token; otherwise move to the token that "contains" the offset
             if (ts.move(offset) == 0 || !ts.moveNext()) {
                 ts.movePrevious();

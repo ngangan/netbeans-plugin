@@ -74,6 +74,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
@@ -98,7 +99,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             boolean afterLt = false;
             int openLtNum = 0;
             JFXTokenId lastNonWhitespaceTokenId = null;
-            TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
             ts.move(expEndPos);
             while (ts.moveNext()) {
                 if (ts.offset() >= offset) {

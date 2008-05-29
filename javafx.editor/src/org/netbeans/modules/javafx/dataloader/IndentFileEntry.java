@@ -68,7 +68,7 @@ public abstract class IndentFileEntry extends FileEntry.Format {
     private static final String NEWLINE = "\n"; // NOI18N
     private static final String EA_PREFORMATTED = "org-netbeans-modules-javafx-preformattedSource"; // NOI18N
 
-    private ThreadLocal indentEngine;
+    private ThreadLocal<IndentEngine> indentEngine;
     
     /** Creates new JavaFileEntry */
     IndentFileEntry(MultiDataObject dobj, FileObject file) {
@@ -88,7 +88,7 @@ public abstract class IndentFileEntry extends FileEntry.Format {
     /* package private */ final void setIndentEngine(IndentEngine engine) {
         synchronized (this) {
             if (indentEngine == null)
-                indentEngine = new ThreadLocal();
+                indentEngine = new ThreadLocal<IndentEngine>();
         }
         indentEngine.set(engine);
     }
@@ -124,7 +124,7 @@ public abstract class IndentFileEntry extends FileEntry.Format {
         Reader reader = new InputStreamReader(is,encoding);
         BufferedReader r = new BufferedReader (reader);
         StyledDocument doc = createDocument(createEditorKit(fo.getMIMEType()));
-        IndentEngine eng = (IndentEngine)indentEngine.get();
+        IndentEngine eng = indentEngine.get();
         if (eng == null) eng = IndentEngine.find(doc);
         Object attr = getFile().getAttribute(EA_PREFORMATTED);
         boolean preformatted = false;

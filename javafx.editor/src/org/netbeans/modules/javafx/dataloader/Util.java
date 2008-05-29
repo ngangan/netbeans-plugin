@@ -159,7 +159,7 @@ public final class Util extends Object {
         int total = 0;
         int offset;
         char[] buffer;
-        List buflist = new LinkedList();
+        List<char[]> buflist = new LinkedList<char[]>();
 
         do {
             buffer = new char[2048];
@@ -175,10 +175,10 @@ public final class Util extends Object {
         r.close();
 
         buffer = new char[total];
-        Iterator it = buflist.iterator();
+        Iterator<char[]> it = buflist.iterator();
         int offset2 = 0;
         while (it.hasNext()) {
-            char[] buf = (char[])it.next();
+            char[] buf = it.next();
             int size = (it.hasNext()) ? buf.length : total - offset2;
             System.arraycopy(buf, 0, buffer, offset2, size);
             offset2 += size;
@@ -191,7 +191,7 @@ public final class Util extends Object {
         EditorCookie editor = null;
 
         if (obj instanceof JavaFXDataObject)
-            editor = (EditorCookie) ((JavaFXDataObject) obj).getCookie (EditorCookie.class);
+            editor = ((JavaFXDataObject) obj).getCookie (EditorCookie.class);
 
 	final Document doc;
         if ((editor != null) && (doc = editor.getDocument()) != null) {
@@ -209,7 +209,7 @@ public final class Util extends Object {
                                }
                            };
             if (save) {
-                SaveCookie cookie = (SaveCookie) obj.getCookie(SaveCookie.class);
+                SaveCookie cookie = obj.getCookie(SaveCookie.class);
                 if (cookie != null) {
                     cookie.save();
                 }

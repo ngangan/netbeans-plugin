@@ -54,6 +54,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
@@ -76,7 +77,7 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
             if (it.hasNext()) {
                 t = it.next();
             } else {
-                TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+                TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
                 ts.move((int) getSourcePositions().getStartPosition(root, est));
                 ts.movePrevious();
                 switch (ts.token().id()) {
