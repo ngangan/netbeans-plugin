@@ -88,8 +88,44 @@
             </file>
         </folder>
         <folder name="Colors">
-            <file name="Blue.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Blue.xml">
+            <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Blue.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Blue.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Cyan.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Cyan.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="DarkGray.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DarkGray.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Gray.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Gray.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Green.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Green.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="LightGray.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LightGray.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="Magenta.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Magenta.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="Orange.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Orange.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="Pink.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Pink.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="Red.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Red.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="White.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/White.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>
+            <file name="Yellow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Yellow.xml">
+                <attr name="position" intvalue="1300"/>
             </file>
         </folder>
         <folder name="Timeline">
