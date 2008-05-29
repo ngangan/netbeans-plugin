@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
@@ -65,7 +66,7 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
         int start = (int)sourcePositions.getStartPosition(root, foe);
         log("  offset: " + offset);
         log("  start: " + start);
-        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterFor = false;

@@ -90,6 +90,7 @@ import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
@@ -451,7 +452,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
     }
-
+    
+    @SuppressWarnings("fallthrough")
     protected void addKeywordsForStatement() {
         for (String kw : STATEMENT_KEYWORDS) {
             if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
@@ -484,6 +486,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (JavaFXCompletionProvider.startsWith(CONTINUE_KEYWORD, prefix)) {
                         addResult(JavaFXCompletionItem.createKeywordItem(CONTINUE_KEYWORD, SEMI, query.anchorOffset, false));
                     }
+                    
                 case SWITCH:
                     if (JavaFXCompletionProvider.startsWith(BREAK_KEYWORD, prefix)) {
                         addResult(JavaFXCompletionItem.createKeywordItem(BREAK_KEYWORD, SEMI, query.anchorOffset, false));
@@ -654,7 +657,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = getController().getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)getController().getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(endPos);
         ts = previousNonWhitespaceToken(ts);
         if (ts == null || ts.offset() < startPos) {
@@ -669,7 +672,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected TokenSequence<JFXTokenId> findFirstNonWhitespaceToken(int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = getController().getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)getController().getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(startPos);
         ts = nextNonWhitespaceToken(ts);
         if (ts == null || ts.offset() >= endPos) {
