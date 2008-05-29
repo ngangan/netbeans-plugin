@@ -50,7 +50,6 @@ import com.sun.source.tree.ThrowTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.Trees;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.awt.Font;
@@ -58,8 +57,6 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -317,6 +314,24 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.smartType = smartType;
         }
         
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof KeywordItem)) {
+                return false;
+            }
+            
+            KeywordItem ki = (KeywordItem) obj;
+            return ki.kwd.equals(this.kwd) && ki.postfix.equals(this.postfix);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 83 * hash + (this.kwd != null ? this.kwd.hashCode() : 0);
+            hash = 83 * hash + (this.postfix != null ? this.postfix.hashCode() : 0);
+            return hash;
+        }
+
         public int getSortPriority() {
             return smartType ? 600 - SMART_TYPE : 600;
         }
@@ -329,11 +344,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return kwd;
         }
         
+        @Override
         protected ImageIcon getIcon(){
             if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(JAVA_KEYWORD));
             return icon;            
         }
         
+        @Override
         protected String getLeftHtmlText() {
             if (leftText == null) {
                 StringBuilder sb = new StringBuilder();
@@ -349,6 +366,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return leftText;
         }
         
+        @Override
         protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
             if (dim == 0) {
                 super.substituteText(c, offset, len, toAdd != null ? toAdd : postfix);
@@ -416,6 +434,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
         }
     
+        @Override
         public String toString() {
             return kwd;
         }        
@@ -440,6 +459,24 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.sortText = this.simpleName + "#" + pkgFQN; //NOI18N
         }
         
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof PackageItem)) {
+                return false;
+            }
+            
+            PackageItem pi = (PackageItem) obj;
+            return pi.simpleName.equals(this.simpleName) && pi.sortText.equals(this.sortText);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 67 * hash + (this.simpleName != null ? this.simpleName.hashCode() : 0);
+            hash = 67 * hash + (this.sortText != null ? this.sortText.hashCode() : 0);
+            return hash;
+        }
+
         public int getSortPriority() {
             return 900;
         }
@@ -452,11 +489,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return simpleName;
         }
         
+        @Override
         protected ImageIcon getIcon(){
             if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(PACKAGE));
             return icon;            
         }
         
+        @Override
         protected String getLeftHtmlText() {
             if (leftText == null) {
                 StringBuilder sb = new StringBuilder();
@@ -472,6 +511,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return leftText;
         }
         
+        @Override
         public String toString() {
             return simpleName;
         }        
@@ -495,7 +535,24 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.smartType = smartType;
             this.typeName = type != null ? type.toString() : null;
         }
-        
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof VariableItem)) {
+                return false;
+            }
+            VariableItem vi = (VariableItem) obj;
+            return vi.varName.equals(this.varName) && vi.typeName.equals(this.typeName);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 97 * hash + (this.varName != null ? this.varName.hashCode() : 0);
+            hash = 97 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+            return hash;
+        }
+
         public int getSortPriority() {
             return smartType ? 200 - SMART_TYPE : 200;
         }
@@ -508,23 +565,27 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return varName;
         }
 
+        @Override
         protected String getLeftHtmlText() {
             if (leftText == null)
                 leftText = PARAMETER_COLOR + BOLD + varName + BOLD_END + COLOR_END;
             return leftText;
         }
         
+        @Override
         protected String getRightHtmlText() {
             if (rightText == null)
                 rightText = escape(typeName);
             return rightText;
         }
         
+        @Override
         protected ImageIcon getIcon(){
             if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(LOCAL_VARIABLE));
             return icon;            
         }
 
+        @Override
         public String toString() {
             return (typeName != null ? typeName + " " : "") + varName; //NOI18N
         }
@@ -576,6 +637,26 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.isPrimitive = retType.getKind().isPrimitive() || retType.getKind() == TypeKind.VOID;
         }
         
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof MethodItem)) {
+                return false;
+            }
+            
+            MethodItem mi = (MethodItem) obj;
+            return mi.simpleName.equals(this.simpleName) && mi.modifiers.equals(this.modifiers) && mi.params.equals(this.params) && mi.typeName.equals(this.typeName);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 53 * hash + (this.simpleName != null ? this.simpleName.hashCode() : 0);
+            hash = 53 * hash + (this.modifiers != null ? this.modifiers.hashCode() : 0);
+            hash = 53 * hash + (this.params != null ? this.params.hashCode() : 0);
+            hash = 53 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+            return hash;
+        }
+
         public int getSortPriority() {
             return smartType ? 500 - SMART_TYPE : 500;
         }
@@ -603,6 +684,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return simpleName;
         }
         
+        @Override
         protected String getLeftHtmlText() {
             if (leftText == null) {
                 StringBuilder lText = new StringBuilder();
@@ -635,6 +717,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return leftText;
         }
         
+        @Override
         protected String getRightHtmlText() {
             if (rightText == null)
                 rightText = escape(typeName);
@@ -645,6 +728,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 //            return JavaFXCompletionProvider.createDocTask(elementHandle);
 //        }
 
+        @Override
         protected ImageIcon getIcon() {
             int level = getProtectionLevel(modifiers);
             boolean isStatic = modifiers.contains(Modifier.STATIC);
@@ -695,6 +779,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return newIcon;            
         }
         
+        @Override
         protected void substituteText(final JTextComponent c, int offset, int len, String toAdd) {
             if (toAdd == null) {
                 if (isPrimitive) {
@@ -856,6 +941,24 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.type = type;
             this.sortText = this.simpleName;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ClassItem)) {
+                return false;
+            }
+            
+            ClassItem ci = (ClassItem) obj;
+            return ci.simpleName.equals(this.simpleName) && ci.type.equals(this.type);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 53 * hash + (this.simpleName != null ? this.simpleName.hashCode() : 0);
+            hash = 53 * hash + (this.type != null ? this.type.hashCode() : 0);
+            return hash;
+        }
         
         public int getSortPriority() {
             return smartType ? 800 - SMART_TYPE : 800;
@@ -869,6 +972,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return simpleName;
         }
 
+        @Override
         public boolean instantSubstitution(JTextComponent component) {
             return false;
         }
@@ -877,11 +981,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 //            return typeHandle.getKind() == TypeKind.DECLARED ? JavaCompletionProvider.createDocTask(ElementHandle.from(typeHandle)) : null;
 //        }
 
+        @Override
         protected ImageIcon getIcon(){
             if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(CLASS));
             return icon;            
         }
 
+        @Override
         protected String getLeftHtmlText() {
             if (leftText == null) {
                 StringBuilder sb = new StringBuilder();
@@ -903,6 +1009,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return CLASS_COLOR;
         }
 
+        @Override
         protected void substituteText(final JTextComponent c, final int offset, int len, String toAdd) {
             final BaseDocument doc = (BaseDocument)c.getDocument();
             final StringBuilder text = new StringBuilder();
@@ -1107,6 +1214,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
         }
         
+        @Override
         public String toString() {
             return simpleName;
         }        
@@ -1215,5 +1323,25 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.typeName = typeName;
             this.name = name;
         }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ParamDesc)) {
+                return false;
+            }
+            
+            ParamDesc pd = (ParamDesc) obj;
+            return pd.fullTypeName.equals(this.fullTypeName) && pd.typeName.equals(this.typeName) && pd.name.equals(this.name);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 37 * hash + (this.fullTypeName != null ? this.fullTypeName.hashCode() : 0);
+            hash = 37 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+            hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
+            return hash;
+        }
+        
     }
 }

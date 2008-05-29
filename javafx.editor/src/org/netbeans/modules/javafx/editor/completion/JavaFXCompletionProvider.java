@@ -161,7 +161,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         return null;
     }
     
-    public static List<? extends CompletionItem> query(JavaFXSource source, int queryType, int offset, int substitutionOffset) throws IOException {
+    public static Set<? extends CompletionItem> query(JavaFXSource source, int queryType, int offset, int substitutionOffset) throws IOException {
         assert source != null;
         assert (queryType & COMPLETION_QUERY_TYPE) != 0;
         JavaFXCompletionQuery query = new JavaFXCompletionQuery(queryType, offset, false);
