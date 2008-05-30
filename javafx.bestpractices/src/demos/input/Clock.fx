@@ -3,8 +3,6 @@ package input;
 import javafx.gui.*;
 import javafx.animation.*;
 
-import java.lang.Math;
-import java.lang.System;
 import java.util.Calendar;
 import java.lang.System;
 
@@ -49,7 +47,6 @@ public class ClockWork extends CustomNode {
             content : [
                 Circle {
                     transform : [ Translate { y : 100 }]
-                    centerX : 100
                     centerX : 100
                     radius : 80
                     fill : Color.GRAY

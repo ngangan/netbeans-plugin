@@ -16,8 +16,6 @@ var C6 = Color.rgb(  25, 255, 200 );
 var Y_AXIS = false;
 var X_AXIS = true;
         
-var l1  =         
-        
 Frame {
     content : Canvas {
         content: [
