@@ -49,8 +49,10 @@ import com.sun.source.util.TreePath;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -172,7 +174,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}");
     
-    List<JavaFXCompletionItem> results;
+    Set<JavaFXCompletionItem> results;
     private boolean hasAdditionalItems;
     private JToolTip toolTip;
     private CompletionDocumentation documentation;
@@ -337,7 +339,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     private void resolveCompletion(CompilationController controller) throws IOException {
         JavaFXCompletionEnvironment env = getCompletionEnvironment(controller);
-        results = new ArrayList<JavaFXCompletionItem>();
+        results = new HashSet<JavaFXCompletionItem>();
         anchorOffset = env.getOffset();
         
         // make sure the init method was called
@@ -345,10 +347,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             throw new IllegalStateException("init method not called before resolveCompletion");
         }
         
-        env.inside(env.getPath().getLeaf());
-        
-        // Anton: I am not sure whether this invocation should be here
         env.addSmartTypes();
+        env.inside(env.getPath().getLeaf());
         
         if (LOGGABLE) {
             log("Results: " + results);
