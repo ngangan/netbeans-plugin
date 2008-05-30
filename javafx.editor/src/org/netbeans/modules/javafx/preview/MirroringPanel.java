@@ -76,6 +76,7 @@ public class MirroringPanel extends JPanel {
             });
 
             mirroredFrame = new JDialog();
+            mirroredFrame.setUndecorated(true);
             mirroredFrame.setFocusableWindowState(false);
             mirroredFrame.setLayout(new BorderLayout());
             JScrollPane jsp = new JScrollPane();
