@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -58,6 +59,7 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
 /**
  *
@@ -104,9 +106,10 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             ArrayList<ErrorDescription> c = new ArrayList<ErrorDescription>();
             
             for (Diagnostic d : diag) {
+                int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
                 c.add(ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR, d.getMessage(Locale.getDefault()),
-                        doc, (int)d.getLineNumber()));
+                        doc, (d.getLineNumber() >= lastLine) ? lastLine -1 : (int)d.getLineNumber()));
             }
             HintsController.setErrors(doc, "semantic-highlighter", c);
             
