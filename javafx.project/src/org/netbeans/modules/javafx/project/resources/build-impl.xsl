@@ -303,6 +303,10 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                         <xsl:attribute name="name">debug</xsl:attribute>
                         <xsl:attribute name="default">${javac.debug}</xsl:attribute>
                     </attribute>
+                    <attribute>
+                        <xsl:attribute name="name">sourcepath</xsl:attribute>
+                        <xsl:attribute name="default"/>
+                    </attribute>
                     <element>
                         <xsl:attribute name="name">customize</xsl:attribute>
                         <xsl:attribute name="optional">true</xsl:attribute>
@@ -310,7 +314,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                     <sequential>
                         <javac>
                             <xsl:attribute name="srcdir">@{srcdir}</xsl:attribute>
-                            <xsl:attribute name="sourcepath"/>
+                            <xsl:attribute name="sourcepath">@{sourcepath}</xsl:attribute>
                             <xsl:attribute name="destdir">@{destdir}</xsl:attribute>
                             <xsl:attribute name="debug">@{debug}</xsl:attribute>
                             <xsl:attribute name="deprecation">${javac.deprecation}</xsl:attribute>
@@ -723,7 +727,16 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 <xsl:attribute name="depends">init,deps-jar,-pre-pre-compile</xsl:attribute>
                 <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
                 <javafxproject3:force-recompile/>
-                <javafxproject3:javac includes="${{javac.includes}}" excludes=""/>
+                <xsl:element name="javafxproject3:javac">
+                    <xsl:attribute name="includes">${javac.includes}</xsl:attribute>
+                    <xsl:attribute name="excludes"/>
+                    <xsl:attribute name="sourcepath"> <!-- #115918 -->
+                        <xsl:call-template name="createPath">
+                            <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                        </xsl:call-template>
+                    </xsl:attribute>
+                </xsl:element>
+                
             </target>
             
             <target name="-post-compile-single">
@@ -845,7 +858,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
             </target>
             
             <target name="run-single">
-                <xsl:attribute name="depends">init,compile</xsl:attribute>
+                <xsl:attribute name="depends">init,compile-single</xsl:attribute>
                 <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
                 <javafxproject1:java-run classname="${{run.class}}"/>
             </target>
@@ -1055,6 +1068,11 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 </xsl:element>
                 <xsl:element name="javafxproject3:javac">
                     <xsl:attribute name="srcdir">
+                        <xsl:call-template name="createPath">
+                            <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:test-roots"/>
+                        </xsl:call-template>
+                    </xsl:attribute>
+                    <xsl:attribute name="sourcepath">
                         <xsl:call-template name="createPath">
                             <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:test-roots"/>
                         </xsl:call-template>
