@@ -92,6 +92,7 @@ public class CodeManager {
         diagnostics.clear();
         
         JavafxcTool tool = JavafxcTool.create();
+        @SuppressWarnings("unchecked")
         JavacFileManager standardManager = tool.getStandardFileManager(diagnostics, null, null);
         Project project = JavaFXModel.getProject(doc);
         List <JavaFileObject> javaFileObjects = getProjectJFOList(doc, project, sourceCP, standardManager);
@@ -168,6 +169,7 @@ public class CodeManager {
         
         options.add("-implicit:class");      // NOI18N
         
+        @SuppressWarnings("unchecked")
         JavafxcTask task = tool.getTask(err, manager, diagnostics, options, javaFileObjects);
         
         if (!task.call()) {
@@ -191,9 +193,9 @@ public class CodeManager {
     }
     
     private static Object run(String name, ClassLoader classLoader) throws Exception {
-        Class mainClass = classLoader.loadClass(name); 
-        Class paramClass = classLoader.loadClass(secuenceClassName); 
-        Class sequencesClass = classLoader.loadClass(secuencesClassName); 
+        Class<?> mainClass = classLoader.loadClass(name); 
+        Class<?> paramClass = classLoader.loadClass(secuenceClassName); 
+        Class<?> sequencesClass = classLoader.loadClass(secuencesClassName); 
         Method runMethod = mainClass.getDeclaredMethod(runMethodName, paramClass);
         Object commandLineArgs = new String[]{};
         Method makeMethod = sequencesClass.getDeclaredMethod(makeMethodName, Class.class, Object[].class);
@@ -311,8 +313,8 @@ public class CodeManager {
             if (getVisualNode != null) {
                 Object sgNode = getVisualNode.invoke(obj);
                 if (sgNode != null) {
-                    Class jsgPanelClass = obj.getClass().getClassLoader().loadClass(jsgPanelClassName);
-                    Class sgNodeClass = obj.getClass().getClassLoader().loadClass(sgNodeClassName);
+                    Class<?> jsgPanelClass = obj.getClass().getClassLoader().loadClass(jsgPanelClassName);
+                    Class<?> sgNodeClass = obj.getClass().getClassLoader().loadClass(sgNodeClassName);
                     Object panel = jsgPanelClass.newInstance();
                     Method setSceneMethod = jsgPanelClass.getDeclaredMethod(setSceneMethodName, sgNodeClass);
                     setSceneMethod.invoke(panel, sgNode);
@@ -349,7 +351,7 @@ public class CodeManager {
             //FileObject rootFileObject = srcGrupp.getRootFolder();
             FileObject rootFileObject = srcGrupp.getRoot();
             if (rootFileObject == null) continue;
-            Enumeration <FileObject> fileObjectEnum = (Enumeration<FileObject>) rootFileObject.getChildren(true);
+            Enumeration <? extends FileObject> fileObjectEnum = rootFileObject.getChildren(true);
             while (fileObjectEnum.hasMoreElements()) {
                 FileObject fileObject = fileObjectEnum.nextElement();
                 if (!fo.equals(fileObject)) {

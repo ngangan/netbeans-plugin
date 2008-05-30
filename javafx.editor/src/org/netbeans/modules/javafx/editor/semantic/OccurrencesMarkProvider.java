@@ -73,7 +73,7 @@ public class OccurrencesMarkProvider extends MarkProvider {
         OccurrencesMarkProvider p = ref != null ? ref.get() : null;
         
         if (p == null) {
-            providers.put(doc, new WeakReference(p = new OccurrencesMarkProvider()));
+            providers.put(doc, new WeakReference<OccurrencesMarkProvider>(p = new OccurrencesMarkProvider()));
         }
         
         return p;
@@ -90,7 +90,7 @@ public class OccurrencesMarkProvider extends MarkProvider {
         joint = Collections.emptyList();
     }
     
-    public synchronized List getMarks() {
+    public synchronized List<Mark> getMarks() {
         return joint;
     }
     

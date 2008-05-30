@@ -132,9 +132,10 @@ class BracketCompletion {
 
     private static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
-        TokenSequence<?> seq = th.tokenSequence();
+        @SuppressWarnings("unchecked")
+        TokenSequence<T> seq = (TokenSequence<T>)th.tokenSequence();
         seq.move(dotPos);
-        return (TokenSequence<T>) seq;
+        return seq;
     }
 
     private static void moveSemicolon(BaseDocument doc, int dotPos, Caret caret) throws BadLocationException {

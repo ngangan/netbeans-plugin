@@ -1259,8 +1259,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         switch(tp.getLeaf().getKind()) {
                             case EXPRESSION_STATEMENT:
                                 ExpressionTree expr = ((ExpressionStatementTree)tp.getLeaf()).getExpression();
-                                if (expr != null && expr.getKind() == Tree.Kind.ERRONEOUS)
-                                    break;
+                                if (expr != null && expr.getKind() == Tree.Kind.ERRONEOUS) {
+                                    // TODO:
+                                }
+                                break;
                             case IMPORT:                                
                                 t = tp.getLeaf();
                                 break;

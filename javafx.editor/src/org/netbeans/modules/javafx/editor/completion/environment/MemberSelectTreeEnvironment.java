@@ -91,6 +91,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
     private static final Logger logger = Logger.getLogger(MemberSelectTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
+    @SuppressWarnings("fallthrough")
     @Override
     protected void inside(MemberSelectTree fa) throws IOException {
         log("inside MemberSelectTree " + fa);

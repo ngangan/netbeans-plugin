@@ -42,6 +42,8 @@
 package org.netbeans.modules.javafx.editor;
 
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.editor.BaseTokenCategory;
 import org.netbeans.editor.BaseTokenID;
 import org.netbeans.editor.TokenID;
@@ -636,7 +638,7 @@ public class JavaFXTokenContext extends TokenContext {
 
     public static final TokenContextPath contextPath = context.getContextPath();
 
-    private static final HashMap str2kwd = new HashMap();
+    private static final HashMap<String, BaseImageTokenID> str2kwd = new HashMap<String, BaseImageTokenID>();
 
     static {
         /*BaseImageTokenID[] kwds = new BaseImageTokenID[] {
@@ -699,7 +701,7 @@ public class JavaFXTokenContext extends TokenContext {
         try {
             addDeclaredTokenIDs();
         } catch (Exception e) {
-            Utilities.annotateLoggable(e);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, null, e);
         }
     }
 }

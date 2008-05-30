@@ -98,7 +98,7 @@ public class PreviewThread extends Thread {
         }
     
         private void goTo(final Document doc, int offset) {
-            LineCookie lc = (LineCookie) NbEditorUtilities.getDataObject(doc).getCookie(LineCookie.class);
+            LineCookie lc = NbEditorUtilities.getDataObject(doc).getCookie(LineCookie.class);
             int line = NbDocument.findLineNumber((StyledDocument) doc,offset);
             int lineOffset = NbDocument.findLineOffset((StyledDocument) doc,line);
             int column = offset - lineOffset;
@@ -123,7 +123,7 @@ public class PreviewThread extends Thread {
             } else {
                 try {
                     DataObject od = DataObject.find((FileObject)fo);
-                    EditorCookie ec = (EditorCookie) od.getCookie(EditorCookie.class);
+                    EditorCookie ec = od.getCookie(EditorCookie.class);
                     doc = ec.openDocument();                
                 } catch (Exception ex) {
                     return;

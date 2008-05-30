@@ -81,6 +81,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.filesystems.FileObject;
@@ -201,7 +202,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return sp.getStartPosition(cu, tree) <= position && position <= sp.getEndPosition(cu, tree);
     }
     
-    private boolean isIn(int caretPosition, Token span) {
+    private boolean isIn(int caretPosition, Token<?> span) {
 //        System.err.println("caretPosition = " + caretPosition );
 //        System.err.println("span[0]= " + span[0]);
 //        System.err.println("span[1]= " + span[1]);
@@ -293,7 +294,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             if (isCancelled())
                 return null;
             
-            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
             
             if (ts != null && tp.getLeaf().getKind() == Kind.CLASS) {
                 int bodyStart = Utilities.findBodyStart(tp.getLeaf(), cu, info.getTrees().getSourcePositions(), doc);
@@ -379,7 +380,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             
             try {
                 List<int[]> bag = new ArrayList<int[]>();
-                for (Token t : fluq.findUsages(el, info, doc)) {
+                for (Token<?> t : fluq.findUsages(el, info, doc)) {
                     bag.add(new int[] {t.offset(null), t.offset(null) + t.length()});
                 }
                 
@@ -495,7 +496,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                     for (TypeElement superType : superTypes) {
                         for (ExecutableElement ee : ElementFilter.methodsIn(info.getElements().getAllMembers(superType))) {
                             if (info.getElements().overrides((ExecutableElement) el, ee, thisType) && (superType.getKind().isClass() || !ee.getEnclosingElement().equals(jlObject))) {
-                                Token t = Utilities.getToken(info, document, path);
+                                Token<JFXTokenId> t = Utilities.getToken(info, document, path);
                                 
                                 if (t != null) {
                                     highlights.add(new int[] {t.offset(null), t.offset(null) + t.length()});
@@ -519,7 +520,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         if (target == null)
             return null;
         
-        TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         
         ts.move((int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), target));
         

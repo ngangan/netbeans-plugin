@@ -68,6 +68,7 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
     private static final Logger logger = Logger.getLogger(ExpressionStatementTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
+    @SuppressWarnings("fallthrough")
     @Override
     protected void inside(ExpressionStatementTree est) throws IOException {
         log("inside ExpressionStatementTree " + est);

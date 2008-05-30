@@ -102,6 +102,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         return null;        
     }        
 
+    @SuppressWarnings("fallthrough")
     public static boolean isJavaFXContext(final JTextComponent component, final int offset) {
         Document doc = component.getDocument();
         if (doc instanceof AbstractDocument) {
@@ -137,6 +138,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset) {
         if (hierarchy != null) {
             TokenSequence<?> ts = hierarchy.tokenSequence();

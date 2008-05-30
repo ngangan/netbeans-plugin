@@ -337,6 +337,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void resolveCompletion(CompilationController controller) throws IOException {
         JavaFXCompletionEnvironment env = getCompletionEnvironment(controller);
         results = new HashSet<JavaFXCompletionItem>();

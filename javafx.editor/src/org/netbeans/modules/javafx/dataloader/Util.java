@@ -225,6 +225,7 @@ public final class Util extends Object {
      * @deprecated The class doesn't process character data in the stream and
      * is not very usable in I18N environments.
      */
+    @Deprecated
     static class ParserInputStream extends InputStream {
         
         /** The underlaying stream.  */

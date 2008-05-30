@@ -68,7 +68,7 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
         ModifiersTree mods = t;
         Set<Modifier> m = EnumSet.noneOf(Modifier.class);
         final TokenSequence<JFXTokenId> idTokenSequence = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
-        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) idTokenSequence;
+        TokenSequence<JFXTokenId> ts = idTokenSequence;
         JFXTokenId lastNonWhitespaceTokenId = null;
         while (ts.moveNext() && ts.offset() < offset) {
             lastNonWhitespaceTokenId = ts.token().id();

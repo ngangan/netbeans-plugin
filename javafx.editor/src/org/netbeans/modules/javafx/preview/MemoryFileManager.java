@@ -26,6 +26,7 @@
 package org.netbeans.modules.javafx.preview;
 
 import com.sun.tools.javac.util.BaseFileObject;
+import com.sun.tools.javac.util.JavacFileManager;
 import com.sun.tools.javafx.util.JavafxFileManager;
 import java.io.*;
 import java.nio.CharBuffer;
@@ -44,7 +45,7 @@ import java.util.Map.Entry;
  *
  * @author A. Sundararajan
  */
-public final class MemoryFileManager extends ForwardingJavaFileManager {                 
+public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFileManager> {                 
     private ClassLoader parentClassLoader;
     List<SimpleJavaFileObject> buffers = new ArrayList<SimpleJavaFileObject>();
 
@@ -62,7 +63,7 @@ public final class MemoryFileManager extends ForwardingJavaFileManager {
             return super.isSameFile(arg0, arg1);
     }
     
-    public MemoryFileManager(JavaFileManager fileManager, ClassLoader cl) {
+    public MemoryFileManager(JavacFileManager fileManager, ClassLoader cl) {
         super(fileManager);
         classBytes = new HashMap<String, byte[]>();
 	parentClassLoader = cl;
@@ -278,16 +279,16 @@ public final class MemoryFileManager extends ForwardingJavaFileManager {
         }
     }
     @Override
-    public Iterable list(JavaFileManager.Location location,
+    public Iterable<JavaFileObject> list(JavaFileManager.Location location,
 			 String packageName,
-			 Set kinds,
+			 Set<JavaFileObject.Kind> kinds,
 			 boolean recurse)
         throws IOException
     {
-	Iterable <BaseFileObject> result = super.list(location, packageName, kinds, recurse);
+	Iterable <JavaFileObject> result = super.list(location, packageName, kinds, recurse);
         
-	List results = new LinkedList();
-	for (Object o : result) {
+	List<JavaFileObject> results = new LinkedList<JavaFileObject>();
+	for (JavaFileObject o : result) {
 	    results.add(o);
 	}
         

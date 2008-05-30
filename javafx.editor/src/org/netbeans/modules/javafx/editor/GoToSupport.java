@@ -122,6 +122,7 @@ public class GoToSupport {
                     if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED))
                         return;
 
+                    @SuppressWarnings("unchecked")
                     Token<JFXTokenId>[] token = new Token[1];
                     int[] span = getIdentifierSpan(doc, off, token);
 
@@ -262,6 +263,7 @@ System.err.println("not an identifier");
         }
         
         TokenHierarchy th = TokenHierarchy.get(doc);
+        @SuppressWarnings("unchecked")
         TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) th.tokenSequence();
 
         if (ts == null)
@@ -291,8 +293,8 @@ System.err.println("not an identifier");
     private static boolean doOpen(FileObject fo, int offset) {
         try {
             DataObject od = DataObject.find(fo);
-            EditorCookie ec = (EditorCookie) od.getCookie(EditorCookie.class);
-            LineCookie lc = (LineCookie) od.getCookie(LineCookie.class);
+            EditorCookie ec = od.getCookie(EditorCookie.class);
+            LineCookie lc = od.getCookie(LineCookie.class);
             
             if (ec != null && lc != null && offset != -1) {                
                 StyledDocument doc = ec.openDocument();                
@@ -312,7 +314,7 @@ System.err.println("not an identifier");
                 }
             }
             
-            OpenCookie oc = (OpenCookie) od.getCookie(OpenCookie.class);
+            OpenCookie oc = od.getCookie(OpenCookie.class);
             
             if (oc != null) {
                 oc.open();                
