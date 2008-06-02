@@ -209,7 +209,7 @@ public final class TreeUtilities {
                     super.scan(tree, p);
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
-                    if (start < pos && end >= pos) {
+                    if (start != -1 && start < pos && end >= pos) {
                         if (tree.getKind() == Tree.Kind.ERRONEOUS) {
                             tree.accept(this, p);
                             throw new Result(getCurrentPath());
