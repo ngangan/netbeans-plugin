@@ -77,7 +77,7 @@ abstract class Adjustment {
         }
 
         void apply(Context ctx) throws BadLocationException {
-            ctx.modifyIndent(pos.getOffset(), numberOfSpaces);
+            ctx.modifyIndent(ctx.lineStartOffset(pos.getOffset()), numberOfSpaces);
         }
     }
 }

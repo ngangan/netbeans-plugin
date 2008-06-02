@@ -256,6 +256,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             reindent();
             return;
         }
+//TODO: [RKo] UNCOMMENT!        
+/*
         final JavaFXSource s = JavaFXSource.forDocument(context.document());
         try {
             s.runUserActionTask(new Task<CompilationController>() {
@@ -278,12 +280,13 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        reindent();
-
+*/
+        reindent();
 
     }
 
     private void applyAdjustments(List<Adjustment> adjustments) throws BadLocationException {
+        if (adjustments == null) return;
         for (Adjustment adjustment : adjustments) {
             adjustment.apply(context);
         }
