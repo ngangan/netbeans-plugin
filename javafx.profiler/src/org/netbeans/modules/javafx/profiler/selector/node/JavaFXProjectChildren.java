@@ -38,74 +38,36 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector;
+package org.netbeans.modules.javafx.profiler.selector.node; 
 
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import org.netbeans.modules.profiler.selector.spi.nodes.ProjectNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
-import org.openide.util.NbBundle;
-import java.util.ArrayList;
-import java.util.List;
-import org.netbeans.modules.javafx.profiler.selector.node.JavaFXProjectChildren;
-import org.netbeans.modules.javafx.project.JavaFXProject;
 
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author cms
  */
-public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
+public class JavaFXProjectChildren extends SelectorChildren<ProjectNode> {
 
-    // -----
-    // I18N String constants
-    private static final String SOURCES_STRING = NbBundle.getMessage(JavaFXSelectionTreeBuilderImpl.class,
-                                                                     "SelectionTreeBuilderImpl_SourcesString"); // NOI18N
-    private static final String LIBRARIES_STRING = NbBundle.getMessage(JavaFXSelectionTreeBuilderImpl.class,
-                                                                       "SelectionTreeBuilderImpl_LibrariesString"); // NOI18N
-                                                                                                                    // -----
+    private final Project project;
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isDefault() {
-        return false;
+    public JavaFXProjectChildren(final Project project) {
+        this.project = project;
     }
 
-    public String getDisplayName() {
-        return NbBundle.getMessage(this.getClass(), "BuilderDisplayName"); // NOI18N
-    }
+    protected List<SelectorNode> prepareChildren(ProjectNode parent) {
+        List<SelectorNode> contents = new ArrayList<SelectorNode>();
+        SelectorNode content = new JavaFXSourcesNode(parent);
 
-    public String getID() {
-        return "PACKAGE"; // NOI18N
-    }
+        if (!content.isLeaf()) {
+            contents.add(content);
+        }
 
-    public boolean isPreferred(Project project) {
-        return project instanceof JavaFXProject;
-    }
-
-    // </editor-fold>
-    public List<SelectorNode> buildSelectionTree(final Project project, final boolean includeSubprojects) {
-        List<SelectorNode> roots = new ArrayList<SelectorNode>();
-
-        ProjectNode projectRoot = new ProjectNode(project, includeSubprojects) {
-            protected SelectorChildren getChildren() {
-                return new JavaFXProjectChildren(project);
-            }
-        };
-
-        roots.add(projectRoot);
-
-        return roots;
-    }
-
-    public boolean supports(Project project) {
-        return project instanceof JavaFXProject;
-    }
-
-    @Override
-    public String toString() {
-        return getDisplayName();
+        return contents;
     }
 }

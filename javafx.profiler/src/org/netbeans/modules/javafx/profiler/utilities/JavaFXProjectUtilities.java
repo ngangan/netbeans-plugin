@@ -42,7 +42,13 @@ package org.netbeans.modules.javafx.profiler.utilities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
@@ -55,6 +61,9 @@ import org.openide.filesystems.FileObject;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.openide.filesystems.FileUtil;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.lib.profiler.ProfilerLogger;
+import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
 
 
 /**
@@ -234,4 +243,97 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
 
         return null;
     }    
+    
+    public static JavaFXSource getSources(JavaFXProject project) {
+        ClassPath srcPath = null;
+        ClassPath bootPath = null;
+        ClassPath compilePath = null;
+        
+        FileObject[] roots = project.getFOSourceRoots();
+
+        if (roots == null) {
+            ClassPathProviderImpl cpProvider = project.getClassPathProvider();
+            if (cpProvider != null) {
+                bootPath = cpProvider.getProjectSourcesClassPath(ClassPath.BOOT);
+                compilePath = cpProvider.getProjectSourcesClassPath(ClassPath.EXECUTE);
+                srcPath = cpProvider.getProjectSourcesClassPath(ClassPath.SOURCE);   //Empty ClassPath
+            }
+        } else {
+            bootPath = ClassPath.getClassPath (roots[0], ClassPath.BOOT);        //Single compilation unit
+            compilePath = ClassPath.getClassPath (roots[0], ClassPath.EXECUTE);
+            srcPath = ClassPath.getClassPath(roots[0], ClassPath.SOURCE);            
+        }
+
+        // create ClassPathInfo for JavaSources only -> (bootPath, classPath, sourcePath)
+        final ClasspathInfo cpInfo = ClasspathInfo.create(bootPath, compilePath, srcPath);
+
+        return JavaFXSource.create(cpInfo, getSourceFiles(project));
+    }
+    
+    /**
+     * Resolves a class by its name
+     * @param className The name of the class to be resolved
+     * @param c ontroller The compilation controller to be used to resolve the class
+     * @return Returns a TypeElement representing the resolved class or NULL
+     */
+    public static TypeElement resolveClassByName(String className, final CompilationController controller) {
+        if ((className == null) || (controller == null)) {
+            return null;
+        }
+
+        TypeElement mainClass = controller.getElements().getTypeElement(className.replace('$', '.')); // NOI18N
+
+        if (mainClass != null) {
+            ProfilerLogger.debug("Resolved: " + mainClass); // NOI18N
+        } else {
+            ProfilerLogger.debug("Could not resolve: " + className); // NOI18N
+        }
+
+        return mainClass;
+    }
+
+    /**
+     * Resolves a method by its name, signature and parent class
+     * @param parentClass The parent class
+     * @param methodName The method name
+     * @param signature The VM signature of the method
+     * @return Returns an ExecutableElement representing the method or null
+     */
+    public static ExecutableElement resolveMethodByName(TypeElement parentClass, String methodName, String signature) {
+        // TODO: static initializer
+        if ((parentClass == null) || (methodName == null) || (signature == null)) {
+            return null;
+        }
+
+        ExecutableElement foundMethod = null;
+        boolean found = false;
+
+        List<ExecutableElement> methods = null;
+        return foundMethod;
+    }
+    
+    private static List<FileObject> getSourceFiles(JavaFXProject project) {
+        FileObject[] roots = project.getFOSourceRoots();
+
+        List<FileObject> result = new ArrayList<FileObject>();
+        // call recursive method
+        return getSourceFiles(roots, result);
+    }    
+    
+    private static List<FileObject> getSourceFiles(FileObject[] roots, List<FileObject> result) {        
+        for(FileObject fo: roots) {
+            FileObject[] children = fo.getChildren();
+            for(FileObject child : children) {
+                if(child.isFolder()) {
+                    // call recursively
+                    getSourceFiles(new FileObject[] {child}, result);
+                }
+                if (child.getMIMEType().equals(JAVAFX_MIME_TYPE)) {
+                    result.add(child);
+                }
+            }
+        }
+        return result;
+    }
+    
 }
