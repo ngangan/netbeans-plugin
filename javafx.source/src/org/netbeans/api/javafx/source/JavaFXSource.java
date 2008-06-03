@@ -326,7 +326,7 @@ public final class JavaFXSource {
         return source;
     }
 
-    private static JavaFXSource create(final ClasspathInfo cpInfo, final Collection<? extends FileObject> files) throws IllegalArgumentException {
+    public static JavaFXSource create(final ClasspathInfo cpInfo, final Collection<? extends FileObject> files) throws IllegalArgumentException {
         try {
             return new JavaFXSource(cpInfo, files);
         } catch (DataObjectNotFoundException donf) {

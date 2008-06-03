@@ -37,14 +37,22 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.profiler;
+package org.netbeans.modules.javafx.profiler.selector.node;
 
-import org.netbeans.api.project.Project;
-import org.netbeans.modules.profiler.spi.GoToSourceProvider;
-        
-public class GoToJavaFXSourceProvider implements GoToSourceProvider {
-    public boolean openSource(final Project project, final String className, final String methodName, final String signature) {
-        // not implemented yet. Need to have support from JavaFX Source
-        return false;
+import javax.lang.model.element.TypeElement;
+import javax.swing.Icon;
+import org.netbeans.api.java.source.ClasspathInfo;
+import org.netbeans.modules.profiler.selector.spi.nodes.ClassNode;
+import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
+
+/**
+ *
+ * @author cms
+ */
+class JavaFXSourceNode extends ClassNode {
+
+    /** Creates a new instance of EntityBeanNode */
+    public JavaFXSourceNode(final ClasspathInfo cpInfo, final Icon icon, final TypeElement classElement, final ContainerNode parent) {
+        super(cpInfo, icon, classElement, parent);
     }
 }
