@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.spi.editor.errorstripe.UpToDateStatus;
@@ -70,11 +71,9 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     private static final Logger LOGGER = Logger.getLogger(UpToDateStatusTask.class.getName());
     private static final boolean LOGGABLE = LOGGER.isLoggable(Level.FINE);
     
-    private FileObject file;
     private AtomicBoolean cancel = new AtomicBoolean();
 
     UpToDateStatusTask(FileObject file) {
-        this.file = file;
     }
     
     private UpToDateStatusTask() {
@@ -90,35 +89,42 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private void process(CompilationInfo info) {
-        try {
-            DataObject od = DataObject.find(file);
-            EditorCookie ec = od.getLookup().lookup(EditorCookie.class);
-            if (ec == null) {
-                return;
-            }
-            Document doc = ec.getDocument();
-            if (doc == null) {
-                return;
-            }
-
-            List<Diagnostic> diag = info.getDiagnostics();
-            
-            ArrayList<ErrorDescription> c = new ArrayList<ErrorDescription>();
-            
-            for (Diagnostic d : diag) {
-                int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
-                c.add(ErrorDescriptionFactory.createErrorDescription(
-                        Severity.ERROR, d.getMessage(Locale.getDefault()),
-                        doc, (d.getLineNumber() >= lastLine) ? lastLine -1 : (int)d.getLineNumber()));
-            }
-            HintsController.setErrors(doc, "semantic-highlighter", c);
-            
-            UpToDateStatusProviderImpl p = UpToDateStatusProviderImpl.forDocument(doc);
-            p.refresh(diag, UpToDateStatus.UP_TO_DATE_OK);
-            
-        } catch (DataObjectNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+        log("process: " + info.getJavaFXSource().getFileObject());
+        
+        Document doc = info.getJavaFXSource().getDocument();
+        if (doc == null) {
+            log("  no document for: " + info.getJavaFXSource());
+            return;
         }
+
+        List<Diagnostic> diag = info.getDiagnostics();
+
+        ArrayList<ErrorDescription> c = new ArrayList<ErrorDescription>();
+
+        for (Diagnostic d : diag) {
+            int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
+            log("    diagnostics: " + d);
+            if (d.getSource() instanceof JavaFileObject) {
+                JavaFileObject jfo = (JavaFileObject)d.getSource();
+                if (! jfo.getName().equals(info.getJavaFXSource().getFileObject().getNameExt())) {
+                    log("    in different file: " + jfo.getName() + " vs.: " + info.getJavaFXSource().getFileObject().getNameExt());
+                    continue;
+                }
+            } else {
+                log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null"));
+            }
+            if (d.getLineNumber() < lastLine) {
+                c.add(ErrorDescriptionFactory.createErrorDescription(
+                    Severity.ERROR, d.getMessage(Locale.getDefault()),
+                    doc, (int)d.getLineNumber()));
+            } else {
+                log("   after last line: " + d);
+            }
+        }
+        HintsController.setErrors(doc, "semantic-highlighter", c);
+
+        UpToDateStatusProviderImpl p = UpToDateStatusProviderImpl.forDocument(doc);
+        p.refresh(diag, UpToDateStatus.UP_TO_DATE_OK);
     }
 
     private static void log(String s) {
