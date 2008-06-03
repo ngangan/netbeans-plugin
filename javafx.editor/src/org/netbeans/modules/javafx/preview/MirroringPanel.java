@@ -75,12 +75,14 @@ public class MirroringPanel extends JPanel {
                 }
             });
 
+            mirroredPanel = createMirroredPanel();
+            if (mirroredPanel == null) return;
+            
             mirroredFrame = new JDialog();
             mirroredFrame.setUndecorated(true);
             mirroredFrame.setFocusableWindowState(false);
             mirroredFrame.setLayout(new BorderLayout());
             JScrollPane jsp = new JScrollPane();
-            mirroredPanel = createMirroredPanel();
             jsp.setViewportView(mirroredPanel);
             mirroredFrame.add(jsp);
             mirroredFrame.setLocation(-2000, -2000);
@@ -141,7 +143,7 @@ public class MirroringPanel extends JPanel {
     public void paint(Graphics g) {
         g.drawImage(offscreenBuffer, 0, 0, null);
     }
-        
+    
     void onMouseEvent(MouseEvent ev) {
         switch (ev.getID()) {
             case MouseEvent.MOUSE_ENTERED:
@@ -167,7 +169,7 @@ public class MirroringPanel extends JPanel {
         if (mirroredEventQueue != null)
             mirroredEventQueue.postEvent(new InvocationEvent(SunToolkit.getDefaultToolkit(), new Runnable() {
                 public void run() {
-                    mirroredFrame.dispose();
+                    if (mirroredFrame!= null) mirroredFrame.dispose();
                     threadGroup.stop();
                     while (threadGroup.activeCount() > 0) {
                         try {

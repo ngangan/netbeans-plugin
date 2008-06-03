@@ -43,20 +43,18 @@ package org.netbeans.modules.javafx.preview;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Window;
+import java.awt.event.InvocationEvent;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.security.CodeSource;
-import java.security.PermissionCollection;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic.Kind;
 import org.netbeans.modules.javafx.editor.*;
-import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 
 //import sun.awt.AppContext;
@@ -64,8 +62,8 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
@@ -81,6 +79,7 @@ import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.text.Line;
 import org.openide.text.NbDocument;
+import sun.awt.SunToolkit;
         
 public class PreviewThread extends Thread {
     
@@ -97,9 +96,9 @@ public class PreviewThread extends Thread {
             this.offsetMap = offsetMap;
         }
     
-        private void goTo(final Document doc, int offset) {
+        private void goTo(final Document doc, final int offset) {
             LineCookie lc = NbEditorUtilities.getDataObject(doc).getCookie(LineCookie.class);
-            int line = NbDocument.findLineNumber((StyledDocument) doc,offset);
+            int line = NbDocument.findLineNumber((StyledDocument) doc, offset);
             int lineOffset = NbDocument.findLineOffset((StyledDocument) doc,line);
             int column = offset - lineOffset;
 
@@ -137,8 +136,10 @@ public class PreviewThread extends Thread {
         
     private FXDocument doc;
     private JComponent comp = null;
-
-                   
+    private boolean internalPanel = false;
+    
+    boolean finished = false;
+    
     public void compile() {
         List <Window> initialList = getOwnerlessWindowsList();
 
@@ -168,19 +169,33 @@ public class PreviewThread extends Thread {
         for (Window frame : suspectedList) {
             frame.dispose();
         }
-        List <Diagnostic> diagnostics = CodeManager.getDiagnostics();
+        final List <Diagnostic> diagnostics = CodeManager.getDiagnostics();
         if (!diagnostics.isEmpty()) {
-            comp = processDiagnostic(diagnostics);
+            internalPanel = true;
+            mainEventQueue.postEvent(new InvocationEvent(SunToolkit.getDefaultToolkit(), new Runnable() {
+                public void run() {
+                    comp = processDiagnostic(diagnostics);
+                }
+            }));
+            while (comp == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
         }
         else {
             if (comp == null) {
                 comp = JavaFXDocument.getNothingPane();
             }
         }
-        JPanel pane = new JPanel();
-        pane.setLayout(new BorderLayout());
-        pane.add(comp);
-        comp = (JComponent) pane;
+        if (!internalPanel) {
+            JPanel pane = new JPanel();
+            pane.setLayout(new BorderLayout());
+            pane.add(comp);
+            comp = (JComponent) pane;
+        }
     }
 
     private List <Window> getOwnerlessWindowsList() {
@@ -252,7 +267,6 @@ public class PreviewThread extends Thread {
         return pane;
     }
 
-
     private JComponent getVrongVersion() {
         JTextArea jta = new JTextArea();
         jta.setForeground(Color.decode("#a40000"));
@@ -260,27 +274,37 @@ public class PreviewThread extends Thread {
         return jta;
     }
 
-
     public PreviewThread(FXDocument doc) {
         super();
         this.doc = doc;
     }
 
+    EventQueue mainEventQueue = null;
+
     @Override
     synchronized public void run() {
         try {
             ((JavaFXDocument)doc).setCompile();
+            mainEventQueue = SunToolkit.getDefaultToolkit().getSystemEventQueue();
             MirroringPanel mirroringPanel = new MirroringPanel(UIManager.getLookAndFeel()) {
                 @Override
                 protected JPanel createMirroredPanel() {
                     compile();
-                    return (JPanel)comp;
+                    if (!internalPanel)
+                        return (JPanel)comp;
+                    else
+                        return null;
                 }
             };
-            ((JavaFXDocument)doc).renderPreview(mirroringPanel);
+            if (!internalPanel)
+                ((JavaFXDocument)doc).renderPreview(mirroringPanel);
+            else {
+                mirroringPanel.cleanup();
+                ((JavaFXDocument)doc).renderPreview(comp);
+            }
+            
         } catch(Exception ex) {
             ex.printStackTrace();
         }
     }
-    
 }
