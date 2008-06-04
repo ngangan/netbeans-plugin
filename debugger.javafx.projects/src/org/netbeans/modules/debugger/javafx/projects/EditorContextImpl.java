@@ -1541,6 +1541,11 @@ public class EditorContextImpl extends EditorContext {
      *
      * @return the visitor value or <code>null</code>.
      */
+    public <R,D> R parseExpression(final String expression, String url, final int line,
+                                   final TreePathScanner<R,D> visitor, final D context,
+                                   final SourcePathProvider sp) {
+        return null;
+    }
 /* TODO XXX
     public <R,D> R parseExpression(final String expression, String url, final int line,
                                    final TreePathScanner<R,D> visitor, final D context,
