@@ -68,7 +68,7 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
             js.runUserActionTask(new Task<CompilationController>() {
                     public void run(CompilationController controller)
                              throws Exception {
-                        controller.toPhase(JavaFXSource.Phase.ELEMENTS_RESOLVED);
+                        controller.toPhase(JavaFXSource.Phase.ANALYZED);
 
                         Element destinationElement = null;
 
