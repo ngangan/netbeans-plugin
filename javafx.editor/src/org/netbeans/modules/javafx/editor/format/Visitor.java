@@ -45,8 +45,8 @@ package org.netbeans.modules.javafx.editor.format;
 import com.sun.javafx.api.tree.*;
 import com.sun.source.tree.*;
 import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
 import org.netbeans.api.java.source.CodeStyle;
+import static org.netbeans.api.java.source.CodeStyle.BracePlacement;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.TreeUtilities;
@@ -60,6 +60,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -68,16 +69,20 @@ import java.util.regex.Pattern;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
-class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> {
+class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>> {
     private static Logger log = Logger.getLogger(Visitor.class.getName());
     private final TreeUtilities tu;
     private final CompilationInfo info;
     private final Context ctx;
     private int indentOffset = 0;
     private final CodeStyle cs;
-    private static final String NEW_LINE_STRING = System.getProperty("line.separator", "\n");
+    private static final String NEW_LINE_STRING = "\n";
+    //    private static final String NEW_LINE_STRING = System.getProperty("line.separator", "\n");
     protected final DocumentLinesIterator li;
-    protected static final String ONE_SPACE = " ";
+    private static final String STRING_EMPTY_LENGTH_ONE = " ";
+    protected static final String ONE_SPACE = STRING_EMPTY_LENGTH_ONE;
+    private TokenSequence<TokenId> ts;
+    private static final String STRING_ZERO_LENGTH = "";
 
 
     Visitor(CompilationInfo info, Context ctx, int startOffset, Project project) {
@@ -94,35 +99,91 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
     }
 
     private int getIndentStepLevel() {
-        return 4;
+        return cs.getIndentSize();
     }
 
     @Override
-    public List<Adjustment> visitClass(ClassTree classTree, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitClass(ClassTree classTree, Queue<Adjustment> adjustments) {
         return super.visitClass(classTree, adjustments);
     }
 
-    private void indentLine(Element line, List<Adjustment> adjustments) throws BadLocationException {
+    @Override
+    public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
+        try {
+            final int start = (int) sp().getStartPosition(cu(), node);
+            indentLine(start, adjustments);
+            if (isMultiline(node)) {
+                li.moveTo(start);
+                if (li.hasNext()) {
+                    indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
+                }
+            }
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        return super.visitVariable(node, adjustments);
+    }
+
+    private void indentLine(Element line, Queue<Adjustment> adjustments) throws BadLocationException {
         final int ls = ctx.lineStartOffset(line.getStartOffset());
         indentLine(ls, adjustments);
     }
 
-    private void indentLine(int ls, List<Adjustment> adjustments) throws BadLocationException {
+    private void indentLine(int ls, Queue<Adjustment> adjustments) throws BadLocationException {
         if (ctx.lineIndent(ctx.lineStartOffset(ls)) != indentOffset) {
-            adjustments.add(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
+            adjustments.offer(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
         }
     }
 
+    @Override
+    public Queue<Adjustment> visitExpressionStatement(ExpressionStatementTree node, Queue<Adjustment> adjustments) {
+        try {
+            final int position = (int) sp().getStartPosition(cu(), node);
+            if (isFirstOnLine(position)) {
+                indentLine(position, adjustments);
+                if (isMultiline(node)) {
+                    li.moveTo(position);
+                    if (li.hasNext()) {
+                        indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
+                    }
+                }
+            } else {
+                adjustments.offer(Adjustment.add(ctx.document().createPosition(position), NEW_LINE_STRING));
+                adjustments.offer(Adjustment.indent(ctx.document().createPosition(position + 1), indentOffset));
+                if (isMultiline(node)) {
+                    li.moveTo(position);
+                    if (li.hasNext()) {
+                        indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
+                    }
+                }
+            }
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        return super.visitExpressionStatement(node, adjustments);
+    }
 
     @Override
-    public List<Adjustment> visitUnary(UnaryTree node, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitIdentifier(IdentifierTree node, Queue<Adjustment> adjustments) {
+        try {
+            final long position = sp().getStartPosition(cu(), node);
+            if (isFirstOnLine((int) position))
+                indentLine((int) position, adjustments);
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        return super.visitIdentifier(node, adjustments);
+    }
+
+    @Override
+    public Queue<Adjustment> visitUnary(UnaryTree node, Queue<Adjustment> adjustments) {
         return super.visitUnary(node, adjustments);
     }
 
     @Override
-    public List<Adjustment> visitBinary(BinaryTree node, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitBinary(BinaryTree node, Queue<Adjustment> adjustments) {
         try {
-            SourcePositions sps = info.getTrees().getSourcePositions();
+            SourcePositions sps = sp();
             final int offset = (int) sps.getStartPosition(cu(), node);
             final int end = (int) sps.getEndPosition(cu(), node);
             if (isMultiline(node)) {
@@ -139,7 +200,7 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
                 if ("operator".equals(ts.token().id().primaryCategory())) {
                     if (cs.spaceAroundBinaryOps()) {
                         if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
-
+                            //TODO: [RKo]
                         }
                     }
                 }
@@ -152,9 +213,9 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
     }
 
     @Override
-    public List<Adjustment> visitObjectLiteralPart(ObjectLiteralPartTree objectLiteralPartTree, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitObjectLiteralPart(ObjectLiteralPartTree objectLiteralPartTree, Queue<Adjustment> adjustments) {
         try {
-            SourcePositions sps = info.getTrees().getSourcePositions();
+            SourcePositions sps = sp();
             final int offset = (int) sps.getStartPosition(cu(), objectLiteralPartTree);
             if (isMultiline(objectLiteralPartTree)) {
                 li.moveTo(offset);
@@ -174,9 +235,10 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
         return super.visitObjectLiteralPart(objectLiteralPartTree, adjustments);
     }
 
-    private void indentMultiline(LineIterator<Element> li, int endOffset, List<Adjustment> adjustments) throws BadLocationException {
+    private void indentMultiline(LineIterator<Element> li, int endOffset, Queue<Adjustment> adjustments) throws BadLocationException {
+        final int ci = getCi();
         if (li.hasNext()) {
-            indentOffset = indentOffset + cs.getContinuationIndentSize();
+            indentOffset = indentOffset + ci;
             while (li.hasNext()) {
                 final Element element = li.next();
                 if (element.getStartOffset() > endOffset) {
@@ -184,20 +246,20 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
                 }
                 indentLine(element, adjustments);
             }
-            indentOffset = indentOffset - cs.getContinuationIndentSize();
+            indentOffset = indentOffset - ci;
         }
     }
 
     private boolean isMultiline(Tree tree) throws BadLocationException {
-        SourcePositions sps = info.getTrees().getSourcePositions();
+        SourcePositions sps = sp();
         return ctx.lineStartOffset((int) sps.getStartPosition(cu(), tree))
                 != ctx.lineStartOffset((int) sps.getEndPosition(cu(), tree));
     }
 
     @Override
-    public List<Adjustment> visitFunctionDefinition(FunctionDefinitionTree node, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitFunctionDefinition(FunctionDefinitionTree node, Queue<Adjustment> adjustments) {
         final TokenSequence<JFXTokenId> ts = ts();
-        SourcePositions sps = info.getTrees().getSourcePositions();
+        SourcePositions sps = sp();
         try {
             ts.move((int) sps.getStartPosition(cu(), node));
             while (ts.moveNext()) {
@@ -222,11 +284,11 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
         return adjustments;
     }
 
-    private void verifyFunctionDefSpaces(TokenSequence<JFXTokenId> ts, FunctionDefinitionTree node, List<Adjustment> adjustments) throws BadLocationException {
+    private void verifyFunctionDefSpaces(TokenSequence<JFXTokenId> ts, FunctionDefinitionTree node, Queue<Adjustment> adjustments) throws BadLocationException {
         if (ts.moveNext() && ts.token().id() == JFXTokenId.IDENTIFIER) {
             if (cs.spaceBeforeMethodDeclLeftBrace()) {
                 if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
-                    adjustments.add(Adjustment.add(ctx.document().createPosition(ts.offset()), ONE_SPACE));
+                    adjustments.offer(Adjustment.add(ctx.document().createPosition(ts.offset()), ONE_SPACE));
                 } else {
                     verifyNextIs(JFXTokenId.LPAREN, ts, adjustments, true);
                 }
@@ -234,15 +296,15 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
                 verifyNextIs(JFXTokenId.LPAREN, ts, adjustments, true);
             }
         }
-        verifyBracesAndSpaces(node, adjustments);
+        verifyBraces(node, adjustments, cs.getMethodDeclBracePlacement());
     }
 
-    private void verifyNextIs(JFXTokenId id, TokenSequence<JFXTokenId> ts, List<Adjustment> adjustments, boolean moveNext) throws BadLocationException {
+    private void verifyNextIs(JFXTokenId id, TokenSequence<JFXTokenId> ts, Queue<Adjustment> adjustments, boolean moveNext) throws BadLocationException {
         if ((moveNext ? ts.moveNext() : ts.movePrevious()) && ts.token().id() != id) {
             int startOffset = ts.offset() + (moveNext ? 0 : ts.token().length());
             while (moveNext ? ts.moveNext() : ts.movePrevious()) {
                 if (ts.token().id() == id) {
-                    adjustments.add(
+                    adjustments.offer(
                             Adjustment.delete(ctx.document().createPosition(startOffset),
                                     ctx.document().createPosition(ts.offset() + (moveNext ? 0 : ts.token().length()))));
                 }
@@ -250,53 +312,96 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
         }
     }
 
-    private void verifyBracesAndSpaces(Tree tree, List<Adjustment> adjustments) throws BadLocationException {
-        final TokenSequence<JFXTokenId> ts = ts();
-        SourcePositions sps = info.getTrees().getSourcePositions();
-        ts.move((int) sps.getStartPosition(cu(), tree));
-        final long end = sps.getEndPosition(cu(), tree);
-        while (ts.moveNext() && ts.offset() <= end) {
-            final JFXTokenId id = ts.token().id();
-            switch (id) {
-                case LBRACE:
-                case QUOTE_LBRACE_STRING_LITERAL:
-                    processOpeningBrace(ts, ts.offset() + ts.token().length(), adjustments);
+    private void verifyBraces(Tree node, Queue<Adjustment> adjustments, BracePlacement bp) throws BadLocationException {
+        final TokenSequence<JFXTokenId> ts = tu.tokensFor(node);
+        Token<JFXTokenId> obrace = moveTo(ts, JFXTokenId.LBRACE);
+        int obraceTokenStart = ts.offset();
+        if (obrace != null) {
+            boolean nlFound = false;
+            while (ts.movePrevious()) {
+
+                if (ts.token().id() != JFXTokenId.WS) {
                     break;
-                case RBRACE:
-                case RBRACE_QUOTE_STRING_LITERAL:
-                    processClosingBrace(ts, ts.offset(), adjustments);
+                } else {
+                    final CharSequence cs = ts.token().text();
+                    if ("\n".equals(cs.toString())) {
+                        nlFound = true;
+                    }
+                }
+
+            }
+
+            final Document doc = ctx.document();
+            int oldIndent = indentOffset;
+            switch (bp) {
+                case SAME_LINE:
+                    if (nlFound || (obraceTokenStart - (ts.offset() + ts.token().length()) > 1)) {
+                        adjustments.offer(Adjustment.replace(doc.createPosition(ts.offset() + ts.token().length()),
+                                doc.createPosition(obraceTokenStart),
+                                cs.spaceBeforeClassDeclLeftBrace() ? ONE_SPACE : STRING_ZERO_LENGTH));
+                    }
                     break;
+                case NEW_LINE:
+                    verifyNL(adjustments, ts, obraceTokenStart, nlFound);
+                    break;
+                case NEW_LINE_HALF_INDENTED:
+                    verifyNL(adjustments, ts, obraceTokenStart, nlFound);
+                    indentOffset = indentOffset + (getIndentStepLevel() / 2);
+                    adjustments.offer(Adjustment.indent(doc.createPosition(obraceTokenStart), indentOffset));
+                    break;
+                case NEW_LINE_INDENTED:
+                    verifyNL(adjustments, ts, obraceTokenStart, nlFound);
+                    indentOffset = indentOffset + getIndentStepLevel();
+                    adjustments.offer(Adjustment.indent(doc.createPosition(obraceTokenStart), indentOffset));
+                    break;
+
+            }
+
+            checkEndBrace(node, adjustments, ts, obraceTokenStart);
+            indentOffset = oldIndent;
+        }
+
+    }
+
+    private void checkEndBrace(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts, int obraceTokenStart) throws BadLocationException {
+        Document doc = ctx.document();
+        final int end = (int) sp().getEndPosition(cu(), node);
+        ts.move(end - 1); //getting into last token...
+        if (ts.moveNext()) {
+            //we are @the end.
+            do {
+                if (ts.token().id() == JFXTokenId.RBRACE) {
+                    li.moveTo(obraceTokenStart);
+                    Element st = li.get();
+                    li.moveTo(end);
+                    if (st.equals(li.get())) {
+                        adjustments.offer(Adjustment.add(doc.createPosition(ts.offset()), NEW_LINE_STRING));
+                        break;
+                    }
+                }
+            } while (ts.movePrevious());
+            indentLine(ts.offset(), adjustments);
+        }
+    }
+
+    private SourcePositions sp() {
+        return info.getTrees().getSourcePositions();
+    }
+
+    private void verifyNL(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts, int originTokenStart, boolean nlFound) throws BadLocationException {
+        if (!nlFound || (originTokenStart - (ts.offset() + ts.token().length()) > 1)) {
+            adjustments.offer(Adjustment.replace(ctx.document().createPosition(ts.offset() + ts.token().length()),
+                    ctx.document().createPosition(originTokenStart), NEW_LINE_STRING));
+        }
+    }
+
+    private Token<JFXTokenId> moveTo(TokenSequence<JFXTokenId> ts, JFXTokenId id) {
+        while (ts.moveNext()) {
+            if (ts.token().id() == id) {
+                return ts.token();
             }
         }
-    }
-
-    private void processClosingBrace(TokenSequence<JFXTokenId> ts, int pos, List<Adjustment> adjustments) throws BadLocationException {
-        final CodeStyle.BracePlacement bpl = cs.getOtherBracePlacement();
-        switch (bpl) {
-            case NEW_LINE:
-            case NEW_LINE_HALF_INDENTED:
-                while (ts.movePrevious() && ts.token().id() == JFXTokenId.WS) {
-                    if ("\n".equals(ts.token().text())) {
-                        return;
-                    }
-                }
-                adjustments.add(Adjustment.add(ctx.document().createPosition(pos), NEW_LINE_STRING));
-        }
-    }
-
-    private void processOpeningBrace(TokenSequence<JFXTokenId> ts, int pos, List<Adjustment> adjustments) throws BadLocationException {
-        final CodeStyle.BracePlacement bpl = cs.getOtherBracePlacement();
-        switch (bpl) {
-            case NEW_LINE:
-            case NEW_LINE_HALF_INDENTED:
-                while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
-                    if ("\n".equals(ts.token().text())) {
-                        return;
-                    }
-                }
-                adjustments.add(Adjustment.add(ctx.document().createPosition(pos), NEW_LINE_STRING));
-
-        }
+        return null;
     }
 
     private CompilationUnitTree cu() {
@@ -305,29 +410,32 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
 
     @SuppressWarnings({"unchecked"})
     private <T extends TokenId> TokenSequence<T> ts() {
-        return info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        if (ts != null && ts.isValid()) {
+            return (TokenSequence<T>) ts;
+        }
+        this.ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        return (TokenSequence<T>) this.ts;
     }
 
     @Override
-    public List<Adjustment> visitInstantiate(InstantiateTree instantiateTree, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitInstantiate(InstantiateTree instantiateTree, Queue<Adjustment> adjustments) {
         indentOffset = indentOffset + getIndentStepLevel();
-        final List<Adjustment> list = super.visitInstantiate(instantiateTree, adjustments);
+        final Queue<Adjustment> list = super.visitInstantiate(instantiateTree, adjustments);
         indentOffset = indentOffset - getIndentStepLevel();
         return list;
     }
 
     @Override
-    public List<Adjustment> visitClassDeclaration(ClassDeclarationTree cdt, List<Adjustment> adj) {
+    public Queue<Adjustment> visitClassDeclaration(ClassDeclarationTree node, Queue<Adjustment> adjustments) {
         if (tu.isSynthetic(getCurrentPath())) {
-            return super.visitClassDeclaration(cdt, adj);
+            return super.visitClassDeclaration(node, adjustments);
         }
-        SourcePositions sps = info.getTrees().getSourcePositions();
+        SourcePositions sps = sp();
         final Document doc = ctx.document();
         try {
             int pos = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
-            if (indentOffset != ctx.lineIndent(pos)) {
-                adj.add(Adjustment.indent(doc.createPosition(pos), indentOffset));
-            }
+            indentLine(pos, adjustments);
+            pos = skipPreviousComment(pos);
             int elc = cs.getBlankLinesBeforeClass();
 
             int emptyLines = getEmptyLinesBefore(li, pos);
@@ -337,42 +445,39 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
             if (elc < 0) {
                 Element nth = getNthElement(Math.abs(elc), li);
                 if (nth != null) {
-                    adj.add(Adjustment.delete(doc.createPosition(nth.getStartOffset()), doc.createPosition(pos)));
+                    adjustments.offer(Adjustment.delete(doc.createPosition(nth.getStartOffset()), doc.createPosition(pos)));
                 }
             } else if (elc > 0) {
                 StringBuilder sb = buildString(elc, NEW_LINE_STRING);
-                adj.add(Adjustment.add(doc.createPosition(pos), sb.toString()));
+                adjustments.offer(Adjustment.add(doc.createPosition(pos), sb.toString()));
             }
 
             indentOffset = indentOffset + getIndentStepLevel();
-
-            final List<Adjustment> add = super.visitClassDeclaration(cdt, adj);
-            if (add != null) {
-                adj.addAll(add);
-            }
+            super.visitClassDeclaration(node, adjustments);
             indentOffset = indentOffset - getIndentStepLevel();
-            pos = ctx.lineStartOffset((int) sps.getEndPosition(cu(), getCurrentPath().getLeaf()));
-            if (indentOffset != ctx.lineIndent(pos)) {
-                adj.add(Adjustment.indent(doc.createPosition(pos), indentOffset));
-            }
 
+//            pos = ctx.lineStartOffset((int) sps.getEndPosition(cu(), getCurrentPath().getLeaf()));
+//            indentLine(pos, adjustments);
+
+//            verifyBracesAndSpaces(node, adjustments);
+            verifyBraces(node, adjustments, cs.getClassDeclBracePlacement());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return adj;
+        return adjustments;
     }
 
     private Tree firstImport;
     private Tree lastImport;
 
     @Override
-    public List<Adjustment> visitImport(ImportTree importTree, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitImport(ImportTree importTree, Queue<Adjustment> adjustments) {
         if (log.isLoggable(Level.FINE)) log.fine("Visiting import" + importTree);
-        SourcePositions sps = info.getTrees().getSourcePositions();
+        SourcePositions sps = sp();
         try {
             final int ls = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
             if (indentOffset != ctx.lineIndent(ls)) {
-                adjustments.add(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
+                adjustments.offer(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
             }
             if (firstImport == null) {
                 firstImport = getFirstImport();
@@ -414,7 +519,7 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
         return null;
     }
 
-    private void adjustLinesBefore(int realLines, int linesRequired, List<Adjustment> list, LineIterator<Element> li, int pos) throws BadLocationException {
+    private void adjustLinesBefore(int realLines, int linesRequired, Queue<Adjustment> list, LineIterator<Element> li, int pos) throws BadLocationException {
         linesRequired = linesRequired - realLines;
 
         if (linesRequired < 0) {
@@ -437,8 +542,8 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
     }
 
     @Override
-    public List<Adjustment> visitReturn(ReturnTree returnTree, List<Adjustment> adjustments) {
-        SourcePositions sps = info.getTrees().getSourcePositions();
+    public Queue<Adjustment> visitReturn(ReturnTree returnTree, Queue<Adjustment> adjustments) {
+        SourcePositions sps = sp();
         final int offset = (int) sps.getStartPosition(cu(), getCurrentPath().getLeaf());
         try {
             indentLine(ctx.lineStartOffset(offset), adjustments);
@@ -449,8 +554,8 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
     }
 
     @Override
-    public List<Adjustment> visitLiteral(LiteralTree literalTree, List<Adjustment> adjustments) {
-        SourcePositions sps = info.getTrees().getSourcePositions();
+    public Queue<Adjustment> visitLiteral(LiteralTree literalTree, Queue<Adjustment> adjustments) {
+        SourcePositions sps = sp();
         final int offset = (int) sps.getStartPosition(cu(), getCurrentPath().getLeaf());
         try {
             final int ls = ctx.lineStartOffset(offset);
@@ -458,7 +563,7 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
             final String s = doc.getText(ls, offset - ls);
             // we work only with literal which stands alone as "return statement"
             if (isEmpty(s) && ctx.lineIndent(ls) != indentOffset) {
-                adjustments.add(Adjustment.indent(doc.createPosition(ls), indentOffset));
+                adjustments.offer(Adjustment.indent(doc.createPosition(ls), indentOffset));
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
@@ -467,52 +572,63 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
     }
 
     @Override
-    public List<Adjustment> visitBlock(BlockTree blockTree, List<Adjustment> adjustments) {
-        return super.visitBlock(blockTree, adjustments);
-    }
+    public Queue<Adjustment> visitBlock(BlockTree blockTree, Queue<Adjustment> adjustments) {
 
-    @Override
-    //TODO: [RKo] normalize!
-    public List<Adjustment> visitStringExpression(StringExpressionTree stringExpressionTree, List<Adjustment> adjustments) {
-        SourcePositions sps = info.getTrees().getSourcePositions();
-        try {
-            final int offset = (int) sps.getStartPosition(cu(), getCurrentPath().getLeaf());
-            final int endOffset = (int) sps.getEndPosition(cu(), getCurrentPath().getLeaf());
-            final int start = ctx.lineStartOffset(offset);
-            final Document doc = ctx.document();
-            if (ctx.lineIndent(start) != indentOffset) {
-                adjustments.add(Adjustment.indent(doc.createPosition(start), indentOffset));
+        if (!tu.isSynthetic(getCurrentPath())) {
+            try {
+                SourcePositions sps = sp();
+                final int start = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
+                indentLine(start, adjustments);
+                indentOffset = indentOffset + getIndentStepLevel();
+                super.visitBlock(blockTree, adjustments);
+                indentOffset = indentOffset - getIndentStepLevel();
+                verifyBraces(blockTree, adjustments, cs.getOtherBracePlacement());
+            } catch (BadLocationException e) {
+                if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
             }
-            if (start != ctx.lineStartOffset(endOffset)) {
-                li.moveTo(offset);
-                if (li.hasNext()) {
-                    indentOffset = indentOffset + cs.getContinuationIndentSize();
-                    while (li.hasNext()) {
-                        final Element element = li.next();
-                        if (element.getStartOffset() > endOffset) {
-                            break;
-                        }
-                        indentLine(element, adjustments);
-                    }
-                    indentOffset = indentOffset - cs.getContinuationIndentSize();
-                }
-
-            }
-
-        } catch (BadLocationException e) {
-            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitStringExpression(stringExpressionTree, adjustments);
+
+        return adjustments;
+    }
+
+//    @Override
+//    public Queue<Adjustment> visitStringExpression(StringExpressionTree stringExpressionTree, Queue<Adjustment> adjustments) {
+//        SourcePositions sps = sp();
+//        try {
+//            final int offset = (int) sps.getStartPosition(cu(), getCurrentPath().getLeaf());
+//            final int endOffset = (int) sps.getEndPosition(cu(), getCurrentPath().getLeaf());
+//            final int start = ctx.lineStartOffset(offset);
+//            indentLine(start, adjustments);
+//            if (start != ctx.lineStartOffset(endOffset)) {
+//                li.moveTo(offset);
+//                indentMultiline(li, endOffset, adjustments);
+//
+//            }
+//
+//        } catch (BadLocationException e) {
+//            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+//        }
+//        return super.visitStringExpression(stringExpressionTree, adjustments);
+//    }
+
+    /**
+     * Gets continuation indent adjustment. This is sum of spaces to be added to current indet to achieve required
+     * continuation offset.
+     *
+     * @return size of continuation indent adjustment.
+     */
+    private int getCi() {
+        return cs.getContinuationIndentSize() - getIndentStepLevel();
     }
 
     @Override
-    public List<Adjustment> visitBlockExpression(BlockExpressionTree blockExpressionTree, List<Adjustment> adjustments) {
+    public Queue<Adjustment> visitBlockExpression(BlockExpressionTree node, Queue<Adjustment> adjustments) {
         try {
-            SourcePositions sps = info.getTrees().getSourcePositions();
+            SourcePositions sps = sp();
             final int start = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
             indentLine(start, adjustments);
             indentOffset = indentOffset + getIndentStepLevel();
-            super.visitBlockExpression(blockExpressionTree, adjustments);
+            super.visitBlockExpression(node, adjustments);
             indentOffset = indentOffset - getIndentStepLevel();
             final int end = ctx.lineStartOffset((int) sps.getEndPosition(cu(), getCurrentPath().getLeaf()));
             indentLine(end, adjustments);
@@ -523,9 +639,6 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
     }
 
     private int getEmptyLinesBefore(LineIterator<Element> iterator, int pos) throws BadLocationException {
-        final TreePath parent = getCurrentPath().getParentPath();
-        final TokenSequence<JFXTokenId> ts = tu.tokensFor(parent.getLeaf());
-        pos = skipPreviousComment(ts, pos);
         iterator.moveTo(pos);
         int res = 0;
         while (iterator.hasPrevious()) {
@@ -544,7 +657,8 @@ class Visitor extends JavaFXTreePathScanner<List<Adjustment>, List<Adjustment>> 
         return isEmpty(s);
     }
 
-    private int skipPreviousComment(TokenSequence<JFXTokenId> ts, int pos) {
+    private int skipPreviousComment(int pos) {
+        final TokenSequence<JFXTokenId> ts = ts();
         ts.move(pos);
         while (ts.movePrevious()) {
             final Token<JFXTokenId> t = ts.token();

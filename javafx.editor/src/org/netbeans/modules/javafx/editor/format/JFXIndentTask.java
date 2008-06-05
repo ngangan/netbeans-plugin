@@ -43,7 +43,10 @@ package org.netbeans.modules.javafx.editor.format;
 
 import com.sun.source.util.TreePath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.*;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
@@ -53,7 +56,6 @@ import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
-import org.netbeans.modules.javafx.editor.format.Visitor;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -61,6 +63,8 @@ import javax.swing.text.Position;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -223,10 +227,10 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         return 0;
     }
 
+    @SuppressWarnings("unchecked")
     private static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
-        @SuppressWarnings("unchecked")
-        TokenSequence<T> seq = (TokenSequence<T>)th.tokenSequence();
+        TokenSequence<T> seq = (TokenSequence<T>) th.tokenSequence();
         seq.move(dotPos);
         return seq;
     }
@@ -251,43 +255,46 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reformat() throws BadLocationException {
-        if (context == null) throw new IllegalStateException("The context of task is null!");
+ /*       if (context == null) throw new IllegalStateException("The context of task is null!");
         if (context.isIndent()) {
             reindent();
             return;
         }
-//TODO: [RKo] UNCOMMENT!        
-/*
-        final JavaFXSource s = JavaFXSource.forDocument(context.document());
-        try {
-            s.runUserActionTask(new Task<CompilationController>() {
+ */       if (System.getProperty("javafx.editor.enableReformat") != null) {
+            final JavaFXSource s = JavaFXSource.forDocument(context.document());
+            try {
+                s.runUserActionTask(new Task<CompilationController>() {
 
-                public void run(CompilationController controller) throws Exception {
-                    final long s = System.currentTimeMillis();
-                    final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
-                    if (log.isLoggable(Level.INFO)) log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
-                    if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
-                        if (log.isLoggable(Level.INFO)) log.info("The " + phase + " phase has been reached ... OK!");
-                        int dot = context.lineStartOffset(context.startOffset());
-                        final TreeUtilities tu = controller.getTreeUtilities();
-                        final TreePath path = tu.pathFor(context.startOffset());
-                        Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
-                        final List<Adjustment> list = visitor.scan(path, new ArrayList<Adjustment>(20));
-                        applyAdjustments(list);
+                    public void run(CompilationController controller) throws Exception {
+                        final long s = System.currentTimeMillis();
+                        final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
+                        if (log.isLoggable(Level.INFO))
+                            log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
+                        if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
+                            if (log.isLoggable(Level.INFO))
+                                log.info("The " + phase + " phase has been reached ... OK!");
+                            int dot = context.lineStartOffset(context.startOffset());
+                            final TreeUtilities tu = controller.getTreeUtilities();
+                            final TreePath path = tu.pathFor(context.startOffset());
+                            Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
+                            final Queue<Adjustment> list = visitor.scan(path, new LinkedList<Adjustment>());
+                            applyAdjustments(list);
+                        }
                     }
-                }
-            }, true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                }, true);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            reindent();
         }
-*/
-        reindent();
 
     }
 
-    private void applyAdjustments(List<Adjustment> adjustments) throws BadLocationException {
+    private void applyAdjustments(Queue<Adjustment> adjustments) throws BadLocationException {
         if (adjustments == null) return;
-        for (Adjustment adjustment : adjustments) {
+        for (int i = 0; i < adjustments.size(); i++) {
+            final Adjustment adjustment = adjustments.poll();
             adjustment.apply(context);
         }
     }
@@ -297,6 +304,6 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      */
     public ExtraLock reformatLock() {
         return null;
-    }       
+    }
 
 }

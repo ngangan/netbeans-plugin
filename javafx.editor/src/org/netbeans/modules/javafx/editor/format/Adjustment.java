@@ -30,6 +30,10 @@ abstract class Adjustment {
         return new IndentAdjustment(start, newIndent);
     }
 
+    static Adjustment compound(Adjustment... adjustments) {
+        return new CompoundAdjustment(adjustments);
+    }
+
     abstract void apply(Context ctx) throws BadLocationException;
 
     private static class AddAdjustment extends Adjustment {
@@ -78,6 +82,20 @@ abstract class Adjustment {
 
         void apply(Context ctx) throws BadLocationException {
             ctx.modifyIndent(ctx.lineStartOffset(pos.getOffset()), numberOfSpaces);
+        }
+    }
+
+    private static class CompoundAdjustment extends Adjustment {
+        private final Adjustment[] adjs;
+
+        CompoundAdjustment(Adjustment... adjs) {
+            this.adjs = adjs;
+        }
+
+        void apply(Context ctx) throws BadLocationException {
+            for (Adjustment adjustment : adjs) {
+                adjustment.apply(ctx);
+            }
         }
     }
 }
