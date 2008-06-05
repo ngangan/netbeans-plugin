@@ -203,7 +203,10 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                     </and>
                 </condition>
                 <condition property="no.javadoc.preview">
-                    <isfalse value="${{javadoc.preview}}"/>
+                    <and>
+                        <isset property="javadoc.preview"/>
+                        <isfalse value="${{javadoc.preview}}"/>
+                    </and>
                 </condition>
                 <property name="run.jvmargs" value=""/>
                 <property name="javac.compilerargs" value=""/>
@@ -213,14 +216,6 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                         <istrue value="${{no.dependencies}}"/>
                     </and>
                 </condition>
-                <condition property="have.java.sources">
-                    <resourcecount when="gt" count="0">
-                        <xsl:call-template name="createFilesets">
-                            <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
-                            <xsl:with-param name="includes2">**/*.java</xsl:with-param>
-                        </xsl:call-template>
-                    </resourcecount>
-                </condition>        
                 <property name="javac.debug" value="true"/>
                 <property name="javadoc.preview" value="true"/>
                 <property name="application.args" value=""/>
@@ -679,31 +674,50 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
             </target>
             <target name="-compile-fx" if="src.dir">
                     <taskdef name="javafxc" classname="com.sun.tools.javafx.ant.JavaFxAntTask" classpath="${{platform.bootcp}}"/>
-                    <javafxc debug="${{javac.debug}}" deprecation="${{javac.deprecation}}"
+                    <javafxc debug="${{javac.debug}}" 
+                             deprecation="${{javac.deprecation}}"
                              destdir="${{build.classes.dir}}"
-                             excludes="${{excludes}}" includeantruntime="false"
-                             includes="**/*.fx" source="${{javac.source}}" sourcepath=""
+                             excludes="${{excludes}}" 
+                             includeantruntime="false"
+                             includes="**/*.fx" 
+                             source="${{javac.source}}" 
+                             sourcepath=""
                              includeJavaRuntime="false"
-                             srcdir="${{src.dir}}" target="${{javac.target}}"
+                             target="${{javac.target}}"
                              bootclasspath="${{platform.bootcp}}"
                              classpath="${{build.classes.dir}}:${{javac.classpath}}"
                              fork="yes"
                              compilerclasspath="${{platform.bootcp}}">
+                        <xsl:attribute name="srcdir"> 
+                            <xsl:call-template name="createPath">
+                                <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                            </xsl:call-template>
+                        </xsl:attribute>
                         <compilerarg line="${{javac.compilerargs}}"/>
                     </javafxc>
             </target>
             <target name="-compile-fx-single" if="src.dir">
                     <taskdef name="javafxc" classname="com.sun.tools.javafx.ant.JavaFxAntTask" classpath="${{platform.bootcp}}"/>
-                    <javafxc debug="${{javac.debug}}" deprecation="${{javac.deprecation}}"
+                    <javafxc debug="${{javac.debug}}" 
+                             deprecation="${{javac.deprecation}}"
                              destdir="${{build.classes.dir}}"
-                             excludes="${{excludes}}" includeantruntime="false"
-                             includes="${{javac.includes}}" source="${{javac.source}}" sourcepath=""
+                             excludes="${{excludes}}" 
+                             includeantruntime="false"
+                             includes="${{javac.includes}}" 
+                             source="${{javac.source}}" 
+                             sourcepath=""
                              includeJavaRuntime="false"
-                             srcdir="${{src.dir}}" target="${{javac.target}}"
+                             srcdir="${{src.dir}}" 
+                             target="${{javac.target}}"
                              bootclasspath="${{platform.bootcp}}"
                              classpath="${{build.classes.dir}}:${{javac.classpath}}"
                              fork="yes"
                              compilerclasspath="${{platform.bootcp}}">
+                        <xsl:attribute name="srcdir"> 
+                            <xsl:call-template name="createPath">
+                                <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                            </xsl:call-template>
+                        </xsl:attribute>
                         <compilerarg line="${{javac.compilerargs}}"/>
                     </javafxc>
             </target>
@@ -936,7 +950,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 ===============
             </xsl:comment>
             
-            <target name="-javadoc-build" if="have.java.sources">
+            <target name="-javadoc-build">
                 <xsl:attribute name="depends">init</xsl:attribute>
                 <mkdir dir="${{dist.javadoc.dir}}"/>
                 <!-- XXX do an up-to-date check first -->
@@ -955,6 +969,9 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                     <xsl:attribute name="additionalparam">${javadoc.additionalparam}</xsl:attribute>
                     <xsl:attribute name="failonerror">true</xsl:attribute> <!-- #47325 -->
                     <xsl:attribute name="useexternalfile">true</xsl:attribute> <!-- #57375, requires Ant >=1.6.5 -->
+                    <xsl:attribute name="encoding">${javadoc.encoding.used}</xsl:attribute>
+                    <xsl:attribute name="docencoding">UTF-8</xsl:attribute>
+                    <xsl:attribute name="charset">UTF-8</xsl:attribute>
                     <xsl:if test="/p:project/p:configuration/javafxproject3:data/javafxproject3:explicit-platform">
                         <xsl:attribute name="executable">${platform.javadoc}</xsl:attribute>
                     </xsl:if>                                                        
