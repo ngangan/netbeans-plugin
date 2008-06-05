@@ -40,9 +40,17 @@
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import java.io.IOException;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import static javax.lang.model.element.ElementKind.*;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.EXTENDS_KEYWORD;
+
 
 /**
  *
@@ -54,9 +62,47 @@ public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFX
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXClassDeclaration t) {
-        log("inside JFXFunctionDefinition " + t);
-        addKeywordsForClassBody();
+    protected void inside(JFXClassDeclaration cldecl) throws IOException {
+        log("inside JFXClassDeclaration " + cldecl);
+        log("  prefix: " + prefix);
+        int start = (int)sourcePositions.getStartPosition(root, cldecl);
+        log("  offset: " + offset);
+        log("  start: " + start);
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        ts.move(start);
+        boolean afterLBrace = false;
+        boolean afterExtends = false;
+        loop: while (ts.moveNext()) {
+            if (ts.offset() >= offset) {
+                break;
+            }
+            switch (ts.token().id()) {
+                case WS:
+                case LINE_COMMENT:
+                case COMMENT:
+                case DOC_COMMENT:
+                    continue;
+                case LBRACE:
+                    afterLBrace = true;
+                    break loop;
+                case EXTENDS:
+                    afterExtends = true;
+                    break;
+                default:
+                    // TODO:
+            }
+        }
+        log("  afterLBrace: " + afterLBrace);
+        if (afterLBrace) {
+            addKeywordsForClassBody();
+        } else {
+            if (afterExtends) {
+                log("  afterExtends: " + afterExtends);
+                addLocalAndImportedTypes(EnumSet.of(CLASS), null, null, false);
+            } else {
+                addKeyword(EXTENDS_KEYWORD, " ", false);
+            }
+        }
     }
 
     private static void log(String s) {
