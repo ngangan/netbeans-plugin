@@ -45,6 +45,7 @@ package org.netbeans.modules.javafx.editor.format;
 import com.sun.javafx.api.tree.*;
 import com.sun.source.tree.*;
 import com.sun.source.util.SourcePositions;
+import com.sun.source.util.TreePath;
 import org.netbeans.api.java.source.CodeStyle;
 import static org.netbeans.api.java.source.CodeStyle.BracePlacement;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -66,8 +67,9 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
+ * Implementation of tree path scanner to work with actual AST to provide formating.
+ *
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
- * @todo documentation
  */
 class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>> {
     private static Logger log = Logger.getLogger(Visitor.class.getName());
@@ -108,11 +110,11 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-    public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
+    public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {        
         try {
             final int start = (int) sp().getStartPosition(cu(), node);
             indentLine(start, adjustments);
-            if (isMultiline(node)) {
+            if (isMultiline(node) && node.getOnReplaceTree() == null) {
                 li.moveTo(start);
                 if (li.hasNext()) {
                     indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
@@ -376,8 +378,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     li.moveTo(end);
                     if (st.equals(li.get())) {
                         adjustments.offer(Adjustment.add(doc.createPosition(ts.offset()), NEW_LINE_STRING));
-                        break;
                     }
+                    break;
                 }
             } while (ts.movePrevious());
             indentLine(ts.offset(), adjustments);
