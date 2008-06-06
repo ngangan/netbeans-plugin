@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.profiler.utilities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.element.ExecutableElement;
@@ -64,6 +65,13 @@ import org.openide.filesystems.FileUtil;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
+import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeMirror;
+import org.netbeans.modules.javafx.source.classpath.FileObjects;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javac.util.Name;
+
 
 
 /**
@@ -244,7 +252,12 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return null;
     }    
     
-    public static JavaFXSource getSources(JavaFXProject project) {
+    
+    private static ClassPathProviderImpl getCPProvider(JavaFXProject project) {
+        return project.getClassPathProvider();
+    }
+    
+    private static ClasspathInfo createClassPathInfo(JavaFXProject project) {
         ClassPath srcPath = null;
         ClassPath bootPath = null;
         ClassPath compilePath = null;
@@ -252,7 +265,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         FileObject[] roots = project.getFOSourceRoots();
 
         if (roots == null) {
-            ClassPathProviderImpl cpProvider = project.getClassPathProvider();
+            ClassPathProviderImpl cpProvider = getCPProvider(project);
             if (cpProvider != null) {
                 bootPath = cpProvider.getProjectSourcesClassPath(ClassPath.BOOT);
                 compilePath = cpProvider.getProjectSourcesClassPath(ClassPath.EXECUTE);
@@ -265,8 +278,12 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         }
 
         // create ClassPathInfo for JavaSources only -> (bootPath, classPath, sourcePath)
-        final ClasspathInfo cpInfo = ClasspathInfo.create(bootPath, compilePath, srcPath);
-
+        return ClasspathInfo.create(bootPath, compilePath, srcPath);
+    }        
+    
+    
+    public static JavaFXSource getSources(JavaFXProject project) {
+        final ClasspathInfo cpInfo = createClassPathInfo(project);
         return JavaFXSource.create(cpInfo, getSourceFiles(project));
     }
     
@@ -280,7 +297,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         if ((className == null) || (controller == null)) {
             return null;
         }
-
+        
         TypeElement mainClass = controller.getElements().getTypeElement(className.replace('$', '.')); // NOI18N
 
         if (mainClass != null) {
@@ -288,7 +305,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         } else {
             ProfilerLogger.debug("Could not resolve: " + className); // NOI18N
         }
-
         return mainClass;
     }
 
@@ -300,7 +316,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
      * @return Returns an ExecutableElement representing the method or null
      */
     public static ExecutableElement resolveMethodByName(TypeElement parentClass, String methodName, String signature) {
-        // TODO: static initializer
         if ((parentClass == null) || (methodName == null) || (signature == null)) {
             return null;
         }
@@ -309,6 +324,8 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         boolean found = false;
 
         List<ExecutableElement> methods = null;
+        // TBD Not implemented so far
+        
         return foundMethod;
     }
     
@@ -336,4 +353,61 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return result;
     }
     
+    public static FileObject getFile(Element handle, final JavaFXProject project) {
+            String[] signature = getSignature(handle);
+            assert signature.length >= 1;
+            String pkgName, className = null;
+            int index = signature[0].lastIndexOf('.');                          //NOI18N
+            pkgName = FileObjects.convertPackage2Folder(signature[0].substring(0,index));
+            className = signature[0].substring(index+1);
+            
+            final ClasspathInfo cpInfo = createClassPathInfo(project);
+            
+            ClassPath bCP = cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT);
+            ClassPath cCP = cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE);
+            ClassPath sourcePath = cpInfo.getClassPath(ClasspathInfo.PathKind.SOURCE);            
+            
+            List<FileObject> fos = bCP.findAllResources(pkgName);
+            fos.addAll(cCP.findAllResources(pkgName));
+            fos.addAll(sourcePath.findAllResources(pkgName));
+            
+            for (FileObject fo : fos) {
+                LinkedList<FileObject> folders = new LinkedList<FileObject>(sourcePath.findAllResources(pkgName));
+                // TBD make sure if this is case sensitive really
+                boolean caseSensitive = true;
+                int ind = className.indexOf('$'); //NOI18N
+                String sourceFileName = ind == -1 ? className : className.substring(0, ind);
+                folders.addFirst(fo);
+                for (FileObject folder : folders) {
+                    FileObject[] children = folder.getChildren();
+                    for (FileObject child : children) {
+                        if (((caseSensitive && child.getName().equals (sourceFileName)) ||
+                            (!caseSensitive && child.getName().equalsIgnoreCase (sourceFileName))) &&
+                            (child.isData() && isJavaFXFile(child))) {
+                            return child;
+                        }
+                    }
+                }
+            }
+            return null;
+    }
+    
+    private static String[] getSignature(Element element) {
+        assert element != null;
+        assert element instanceof TypeElement;
+        TypeElement te = (TypeElement) element;
+        StringBuilder sb = new StringBuilder ();
+        Name name = ((Symbol.ClassSymbol)te).flatname;
+        assert name != null;
+        int nameLength = name.len;
+        char[] nameChars = new char[512]; //Initial storage
+        
+        if (nameChars.length < nameLength) {
+            nameChars = new char[nameLength];
+        }
+        int charLength = Convert.utf2chars(name.table.names, name.index, nameChars, 0, nameLength);
+        sb.append(nameChars,0,charLength);
+            
+        return new String[] { sb.toString() };
+    }
 }

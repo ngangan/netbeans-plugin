@@ -96,7 +96,7 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                                     public void run() {
                                         // opens the source code on the found method position
                                         try {
-                                            FileObject fo = js.getFileObject();
+                                            FileObject fo = JavaFXProjectUtilities.getFile(openElement, (JavaFXProject)project);
                                             DataObject od = DataObject.find(fo);
                                             OpenCookie oc = od.getCookie(OpenCookie.class);
 
