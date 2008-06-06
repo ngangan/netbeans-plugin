@@ -44,6 +44,7 @@ package org.netbeans.modules.javafx.lexer;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.CharBuffer;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
@@ -80,7 +81,7 @@ public class JavaFlyTokensTest extends NbTestCase {
         r.read(cb);
         cb.rewind();
         String text = cb.toString();
-        TokenHierarchy<?> hi = TokenHierarchy.create(text, JavaFXTokenId.language());
+        TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = hi.tokenSequence();
         
         System.out.println("Flyweight tokens: " + LexerTestUtilities.flyweightTokenCount(ts)
