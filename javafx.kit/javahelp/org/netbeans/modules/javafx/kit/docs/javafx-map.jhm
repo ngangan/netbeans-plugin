@@ -44,9 +44,11 @@
         <mapID target="org.netbeans.modules.javafx.project.ui.wizards.PanelConfigureProject_APP" url="project/newjavafxappwiz-nameandloc.html"/>
 
 <!-- CSH for JavaFX source editor -->
-<!-- <mapID target="text.x-fx" url="editing/csh/about_source_editor.html" /> 
-<mapID target="org.netbeans.modules.javafx.editor.JavaFXEditorKit" url="project/javafx_proj
+<!-- <mapID target="text.x-fx" url="editing/csh/about_source_editor.html" />
 -->
+ 
+<mapID target="org.netbeans.modules.javafx.editor.JavaFXEditorKit" url="editing/editing_javafx_source.html"/>
+
 
 <mapID target="text.x-fx" url="tbd.html" /> 
 

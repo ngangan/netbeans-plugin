@@ -46,6 +46,8 @@ import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.javafx.preview.JavaFXModel;
 import org.netbeans.modules.lexer.editorbridge.LexerEditorKit;
 import org.openide.loaders.DataObject;
+import org.openide.util.HelpCtx;
+import org.openide.util.HelpCtx.Provider;
 import org.openide.util.NbBundle;
 
 import javax.swing.*;
@@ -62,7 +64,7 @@ import java.util.Map;
  *
  * @author answer
  */
-public class JavaFXEditorKit extends LexerEditorKit{
+public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.HelpCtx.Provider{
 
     public static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
     public static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
@@ -427,6 +429,10 @@ public class JavaFXEditorKit extends LexerEditorKit{
     public String getSourceLevel(BaseDocument doc) {
         DataObject dob = NbEditorUtilities.getDataObject(doc);
         return dob != null ? SourceLevelQuery.getSourceLevel(dob.getPrimaryFile()) : null;
+    }
+
+    public HelpCtx getHelpCtx() {
+        return new org.openide.util.HelpCtx(JavaFXEditorKit.class);
     }
     
 /*    @Override
