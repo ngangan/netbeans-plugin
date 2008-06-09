@@ -51,7 +51,7 @@ import org.openide.text.ActiveEditorDrop;
 public class DarkGray implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = "Color.DARK_GRAY"; // NOI18N
+        String code = "Color.DARKGRAY"; // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
