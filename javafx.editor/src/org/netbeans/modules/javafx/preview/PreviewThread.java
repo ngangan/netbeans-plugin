@@ -44,6 +44,7 @@ package org.netbeans.modules.javafx.preview;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.InvocationEvent;
 import java.io.File;
@@ -57,13 +58,10 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.JComponent;
 
-//import sun.awt.AppContext;
-//import sun.awt.SunToolkit;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
@@ -79,7 +77,6 @@ import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.text.Line;
 import org.openide.text.NbDocument;
-import sun.awt.SunToolkit;
         
 public class PreviewThread extends Thread {
     
@@ -172,7 +169,7 @@ public class PreviewThread extends Thread {
         final List <Diagnostic> diagnostics = CodeManager.getDiagnostics();
         if (!diagnostics.isEmpty()) {
             internalPanel = true;
-            mainEventQueue.postEvent(new InvocationEvent(SunToolkit.getDefaultToolkit(), new Runnable() {
+            mainEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
                 public void run() {
                     comp = processDiagnostic(diagnostics);
                 }
@@ -285,7 +282,7 @@ public class PreviewThread extends Thread {
     synchronized public void run() {
         try {
             ((JavaFXDocument)doc).setCompile();
-            mainEventQueue = SunToolkit.getDefaultToolkit().getSystemEventQueue();
+            mainEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
             MirroringPanel mirroringPanel = new MirroringPanel(UIManager.getLookAndFeel()) {
                 @Override
                 protected JPanel createMirroredPanel() {
