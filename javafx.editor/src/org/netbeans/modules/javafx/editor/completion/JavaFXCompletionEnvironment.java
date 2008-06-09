@@ -50,6 +50,7 @@ import com.sun.javafx.api.tree.JavaFXVariableTree;
 import com.sun.javafx.api.tree.OnReplaceTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ErroneousTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -174,7 +175,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     /*
      * Might be overriden in subclasses
      */
-    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
+    public Set<? extends TypeMirror> getSmartTypes(T t) throws IOException {
         log("NOT IMPLEMENTED getSmartTypes() " + this);
         return new HashSet<TypeMirror>();
     }
@@ -277,8 +278,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
     
     // TODO
-    protected void addSmartTypes() throws IOException {
-        Set<? extends TypeMirror> smarts = getSmartTypes();
+    protected void addSmartTypes(T t) throws IOException {
+        Set<? extends TypeMirror> smarts = getSmartTypes(t);
         if (smarts != null) {
             for (TypeMirror smart : smarts) {
                 if (smart != null) {
@@ -291,6 +292,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 //                            TypeElement elem = (TypeElement) dt.asElement();
 //                            addResult(JavaFXCompletionItem.createTypeItem(elem, subtype, offset, false, false, true));
 //                        }
+//                    } else if (smart.) {
+                        
                     }
                 }
             }
@@ -728,6 +731,27 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return ts;
     }
     
+    protected List<Tree> getArgumentsUpToPos(Iterable<? extends ExpressionTree> args, int startPos, int position) {
+        List<Tree> ret = new ArrayList<Tree>();
+        for (ExpressionTree e : args) {
+            int pos = (int) sourcePositions.getEndPosition(root, e);
+            if (pos != Diagnostic.NOPOS && position > pos) {
+                startPos = pos;
+                ret.add(e);
+            }
+        }
+        if (startPos < 0) {
+            return ret;
+        }
+        if (position > startPos) {
+            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(startPos, position);
+            if (last != null && (last.token().id() == JFXTokenId.LPAREN || last.token().id() == JFXTokenId.COMMA)) {
+                return ret;
+            }
+        }
+        return null;
+    }
+
     protected static TokenSequence<JFXTokenId> nextNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
         while (ts.moveNext()) {
             switch (ts.token().id()) {
@@ -766,6 +790,21 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return tree;
     }
 
+    protected static TypeMirror asMemberOf(Element element, TypeMirror type, Types types) {
+        TypeMirror ret = element.asType();
+        TypeMirror enclType = element.getEnclosingElement().asType();
+        if (enclType.getKind() == TypeKind.DECLARED) {
+            enclType = types.erasure(enclType);
+        }
+        while (type != null && type.getKind() == TypeKind.DECLARED) {
+            if (types.isSubtype(type, enclType)) {
+                ret = types.asMemberOf((DeclaredType) type, element);
+                break;
+            }
+            type = ((DeclaredType) type).getEnclosingType();
+        }
+        return ret;
+    }
 
     private static void log(String s) {
         if (LOGGABLE) {

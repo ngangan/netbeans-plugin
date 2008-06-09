@@ -309,8 +309,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
     }
 
     @Override
-    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
-        final MemberSelectTree t = (MemberSelectTree) path.getLeaf();
+    public Set<? extends TypeMirror> getSmartTypes(MemberSelectTree t) throws IOException {
         final TreePath treePath = new TreePath(path, t.getExpression());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (type == null) {

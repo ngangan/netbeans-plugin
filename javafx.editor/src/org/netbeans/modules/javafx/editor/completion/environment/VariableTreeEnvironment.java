@@ -106,8 +106,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
     }
 
     @Override
-    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
-        final VariableTree t = (VariableTree) path.getLeaf();
+    public Set<? extends TypeMirror> getSmartTypes(VariableTree t) throws IOException {
         final TreePath treePath = new TreePath(path, t.getType());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (type == null) {

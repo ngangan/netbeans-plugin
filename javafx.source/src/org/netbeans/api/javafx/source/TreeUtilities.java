@@ -43,17 +43,23 @@ package org.netbeans.api.javafx.source;
 import com.sun.javafx.api.tree.JavaFXTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.source.tree.*;
+import com.sun.source.tree.Scope;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import java.io.IOException;
 import java.io.StringWriter;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenSequence;
 
@@ -104,10 +110,13 @@ public final class TreeUtilities {
     }
     
     private boolean isSynthetic(CompilationUnitTree cut, Tree leaf) throws NullPointerException {
-        JCTree tree = (JCTree) leaf;
-        
-        if (tree.pos == (-1))
-            return true;
+        // XXX do not use instanceof
+        if (leaf instanceof JCTree) {
+            JCTree tree = (JCTree) leaf;
+            if (tree.pos == -1) {
+                return true;
+            }
+        }
         
         //check for synthetic superconstructor call:
         if (leaf.getKind() == Kind.EXPRESSION_STATEMENT) {
@@ -204,6 +213,7 @@ public final class TreeUtilities {
                 this.sourcePositions = sourcePositions;
             }
             
+            @Override
             public Void scan(Tree tree, Void p) {
                 if (tree != null) {
                     super.scan(tree, p);
@@ -349,6 +359,20 @@ public final class TreeUtilities {
             default:
                 throw new IllegalArgumentException("Unsupported kind: " + leaf.getKind());
         }
+    }
+
+    public boolean isAccessible(Scope scope, Element member, TypeMirror type) {
+        if (scope instanceof JavafxcScope 
+                && member instanceof Symbol 
+                && type instanceof Type) {
+            Resolve resolve = Resolve.instance(info.impl.getContext());
+	    return resolve.isAccessible(((JavafxcScope)scope).getEnv(), (Type) type, (Symbol) member);  
+        } else 
+            return false;
+    }
+
+    public boolean isStaticContext(Scope scope) {
+        return Resolve.isStatic(((JavafxcScope)scope).getEnv());
     }
 
     private static void log(String s) {
