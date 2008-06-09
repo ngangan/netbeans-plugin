@@ -91,11 +91,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
     }
 
     @Override
-    public Set<? extends TypeMirror> getSmartTypes() throws IOException {
-        final JFXInstanciate it = (JFXInstanciate) path.getLeaf();
-//        final TreePath treePath = new TreePath(path, it.getTree());
-//        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-
+    public Set<? extends TypeMirror> getSmartTypes(JFXInstanciate it) throws IOException {
         String s = it.getIdentifier().toString();
         TypeElement te = findTypeElement(s);
         TypeMirror type = te != null ? te.asType() : null;

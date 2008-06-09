@@ -46,9 +46,17 @@ import java.io.IOException;
  * @author nenik
  */
 public class CompilationController extends CompilationInfo {
+    private ElementUtilities elementUtilities;
 
     CompilationController(CompilationInfoImpl impl) {
         super(impl);
+    }
+
+    public ElementUtilities getElementUtilities() {
+        if (null == elementUtilities) {
+            elementUtilities = new ElementUtilities(this);
+        }
+        return elementUtilities;
     }
 
     public String getText() {

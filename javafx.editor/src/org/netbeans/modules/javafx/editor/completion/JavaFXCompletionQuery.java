@@ -348,11 +348,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             throw new IllegalStateException("init method not called before resolveCompletion");
         }
         
-        env.addSmartTypes();
-        env.inside(env.getPath().getLeaf());
-        
+        final Tree leaf = env.getPath().getLeaf();
+        env.addSmartTypes(leaf);
+        env.inside(leaf);
         if (LOGGABLE) {
-            log("Results: " + results);
+            log("addSmartTypes results: " + results);
         }
     }
 
