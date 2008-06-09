@@ -43,8 +43,7 @@ package org.netbeans.modules.javafx.editor;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
-import org.netbeans.editor.TokenID;
-import org.netbeans.editor.ext.ExtSyntaxSupport;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 
 /**
  * Test java bracket completion.
@@ -607,13 +606,16 @@ public class JavaFXBracketCompletionUnitTest extends JavaFXBaseDocumentUnitTestC
     }
     
     private boolean isSkipRightBracketOrParen(boolean parenthesis) {
-        TokenID bracketTokenId = parenthesis
-        ? JavaFXTokenContext.RPAREN
-        : JavaFXTokenContext.RBRACKET;
+        JFXTokenId bracketTokenId = parenthesis
+        ? JFXTokenId.RPAREN
+        : JFXTokenId.RBRACKET;
         
         try {
-            return BracketCompletion.isSkipClosingBracket(getDocument(),
-            getCaretOffset(), bracketTokenId);
+            return BracketCompletion.isSkipClosingBracket(
+                    getCaretOffset(), 
+                    getDocument(),
+                    bracketTokenId,
+                    ' ');
         } catch (BadLocationException e) {
             e.printStackTrace(getLog());
             fail();

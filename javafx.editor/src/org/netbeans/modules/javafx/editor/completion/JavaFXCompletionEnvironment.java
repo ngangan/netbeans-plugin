@@ -63,6 +63,8 @@ import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -227,7 +229,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
         log("addMembers: " + type);
-        getController().toPhase(Phase.ANALYZED);
+        controller.toPhase(Phase.ANALYZED);
         
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             log("RETURNING: type.getKind() == " + type.getKind());
@@ -301,11 +303,40 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addLocalMembersAndVars() throws IOException {
         log("addLocalMembersAndVars: " + prefix);
-        getController().toPhase(Phase.ANALYZED);
+        controller.toPhase(Phase.ANALYZED);
         
         for (TreePath tp = getPath(); tp != null; tp = tp.getParentPath()) {
-            log("  tree kind: " + tp.getLeaf().getKind());
             Tree t = tp.getLeaf();
+            log("  tree kind: " + t.getKind());
+            log("  fx instance: " + ((t instanceof JavaFXTree)));
+            if (t instanceof CompilationUnitTree) {
+                CompilationUnitTree cut = (CompilationUnitTree)t;
+                for (Tree tt : cut.getTypeDecls()) {
+                    log("      tt: " + tt);
+                    if (tt.getKind() == Tree.Kind.OTHER && tt instanceof JavaFXTree) {
+                        JavaFXTree jfxtt = (JavaFXTree)tt;
+                        JavaFXKind kk = jfxtt.getJavaFXKind();
+                        if (kk == JavaFXKind.CLASS_DECLARATION) {
+                            JFXClassDeclaration cd = (JFXClassDeclaration)jfxtt;
+                            for (Tree jct : cd.getClassMembers()) {
+                                log("            jct == " + jct);
+                                if (jct.getKind() == Tree.Kind.OTHER && jct instanceof JavaFXTree) {
+                                    JavaFXTree jfxjct = (JavaFXTree)jct;
+                                    JavaFXKind k = jfxjct.getJavaFXKind();
+                                    log("       kind of jct = " + k);
+                                    if (k == JavaFXKind.FUNCTION_DEFINITION) {
+                                        JFXFunctionDefinition fdt = (JFXFunctionDefinition)jfxjct;
+                                        log("      fdt == " + fdt.name.toString());
+                                        if ("javafx$run$".equals(fdt.name.toString())) {
+                                            addBlockExpressionLocals(fdt.getBodyExpression(), tp);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if (t.getKind() != Tree.Kind.OTHER || ! (t instanceof JavaFXTree)) {
                 continue;
             }
@@ -313,31 +344,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             JavaFXKind k = jfxt.getJavaFXKind();
             log("  fx kind: " + k);
             if (k == JavaFXKind.CLASS_DECLARATION) {
-                TypeMirror tm = getController().getTrees().getTypeMirror(tp);
+                TypeMirror tm = controller.getTrees().getTypeMirror(tp);
                 log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind()));
                 addMembers(tm,true, true);
             }
             if (k == JavaFXKind.BLOCK_EXPRESSION) {
-                BlockExpressionTree bet = (BlockExpressionTree)jfxt;
-                log("  block expression: " + bet + "\n");
-                for (StatementTree st : bet.getStatements()) {
-                    TreePath expPath = new TreePath(tp, st);
-                    log("    expPath == " + expPath.getLeaf());
-                    JavafxcTrees trees = controller.getTrees();
-                    Element type = trees.getElement(expPath);
-                    if (type == null) {
-                        continue;
-                    }
-                    log("    type.getKind() == " + type.getKind());
-                    if (type.getKind() == ElementKind.LOCAL_VARIABLE) {
-                        String s = type.getSimpleName().toString();
-                        log("    adding(1) " + s + " with prefix " + prefix);
-                        if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
-                            addResult(JavaFXCompletionItem.createVariableItem(
-                                s, offset, false));
-                        }
-                    }
-                }
+                addBlockExpressionLocals((BlockExpressionTree)jfxt, tp);
             }
             if (k == JavaFXKind.FOR_EXPRESSION) {
                 ForExpressionTree fet = (ForExpressionTree)jfxt;
@@ -391,6 +403,28 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
+    private void addBlockExpressionLocals(BlockExpressionTree bet,TreePath tp) {
+        log("  block expression: " + bet + "\n");
+        for (StatementTree st : bet.getStatements()) {
+            TreePath expPath = new TreePath(tp, st);
+            log("    expPath == " + expPath.getLeaf());
+            JavafxcTrees trees = controller.getTrees();
+            Element type = trees.getElement(expPath);
+            if (type == null) {
+                continue;
+            }
+            log("    type.getKind() == " + type.getKind());
+            if (type.getKind() == ElementKind.LOCAL_VARIABLE) {
+                String s = type.getSimpleName().toString();
+                log("    adding(1) " + s + " with prefix " + prefix);
+                if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    addResult(JavaFXCompletionItem.createVariableItem(
+                        s, offset, false));
+                }
+            }
+        }
+    }
+    
     protected void addPackages(String fqnPrefix) {
         log("NOT IMPLEMENTED: addPackages " + fqnPrefix);
     }
@@ -657,7 +691,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)getController().getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(endPos);
         ts = previousNonWhitespaceToken(ts);
         if (ts == null || ts.offset() < startPos) {
@@ -672,7 +706,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected TokenSequence<JFXTokenId> findFirstNonWhitespaceToken(int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)getController().getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(startPos);
         ts = nextNonWhitespaceToken(ts);
         if (ts == null || ts.offset() >= endPos) {
