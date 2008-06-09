@@ -23,8 +23,6 @@ import javax.swing.*;
 
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
-import sun.awt.AppContext;
-import sun.awt.SunToolkit;
 
 public class MirroringPanel extends JPanel {
     JDialog         mirroredFrame = null;
@@ -32,7 +30,7 @@ public class MirroringPanel extends JPanel {
     MirroringThread mirroringTread = null;
     EventQueue      mirroredEventQueue = null;
     EventQueue      mirroringEventQueue = null;
-    AppContext      ac = null;
+    Object          ac = null;
     LookAndFeel     lf = null;
     BufferedImage   offscreenBuffer = null;
     ThreadGroup     threadGroup = null;
@@ -56,7 +54,12 @@ public class MirroringPanel extends JPanel {
         
         @Override
         public void run() {
-            ac = SunToolkit.createNewAppContext();
+            try {
+                Class acc = this.getClass().getClassLoader().loadClass("sun.awt.SunToolkit");   // NOI18N
+                ac = acc.getDeclaredMethod("createNewAppContext").invoke(null);                 // NOI18N
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
 
             try {
                 UIManager.setLookAndFeel(lf);
