@@ -349,6 +349,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         
         env.addSmartTypes();
+        if (LOGGABLE) {
+            log("addSmartTypes results: " + results);
+        }
         env.inside(env.getPath().getLeaf());
         
         if (LOGGABLE) {
