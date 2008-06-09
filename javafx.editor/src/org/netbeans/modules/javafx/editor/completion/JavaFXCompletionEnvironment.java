@@ -649,10 +649,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
 
-        protected TypeElement findTypeElement(String simpleName) throws IOException {
+        /**
+         * 
+         * @param simpleName name of a class or fully qualified name of a class
+         * @return TypeElement or null if the passed in String does not denote a class
+         */
+        protected TypeElement findTypeElement(String simpleName) {
             log("findTypeElement: " + simpleName);
             JavafxcTrees trees = controller.getTrees();
             TreePath p = new TreePath(root);
+            Elements elements = controller.getElements();
             JavafxcScope scope = trees.getScope(p);
             while (scope != null) {
                 log("  scope == " + scope);
@@ -662,10 +668,17 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
                             continue;
                         }
-                        String name = local.getSimpleName().toString();
-                        if (name != null && name.equals(simpleName) && 
-                                local instanceof TypeElement) {
-                            return (TypeElement)local;
+                        if (local instanceof TypeElement) {
+                            String name = local.getSimpleName().toString();
+                            if (name.equals(simpleName)) {
+                                return (TypeElement)local;
+                            }
+
+                            PackageElement pe = elements.getPackageOf(local);
+                            String fullName = pe.getQualifiedName().toString() + '.' + name;
+                            if (fullName.equals(simpleName)) {
+                                return (TypeElement)local;
+                            }
                         }
                     }
                 }
