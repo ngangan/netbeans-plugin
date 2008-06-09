@@ -14,6 +14,7 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.InvocationEvent;
 import java.awt.event.MouseEvent;
@@ -38,7 +39,7 @@ public class MirroringPanel extends JPanel {
     
     public MirroringPanel(LookAndFeel lf) {
         super();
-        mirroringEventQueue = SunToolkit.getDefaultToolkit().getSystemEventQueue();
+        mirroringEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
         this.lf = lf;
         offscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
         startMirroring();
@@ -63,7 +64,7 @@ public class MirroringPanel extends JPanel {
                 Exceptions.printStackTrace(ex);
             }
             
-            mirroredEventQueue = SunToolkit.getDefaultToolkit().getSystemEventQueue();
+            mirroredEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
             
             KeyboardFocusManager.setCurrentKeyboardFocusManager(new DefaultKeyboardFocusManager(){
 
@@ -96,7 +97,7 @@ public class MirroringPanel extends JPanel {
                     super.paintDirtyRegions();
                     if (offscreenBuffer != null) {
                         mirroredFrame.getLayeredPane().paintAll(offscreenBuffer.getGraphics());
-                        mirroringEventQueue.postEvent(new InvocationEvent(SunToolkit.getDefaultToolkit(), new Runnable() {
+                        mirroringEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
                             public void run() {
                                 repaint();
                             }
@@ -165,9 +166,11 @@ public class MirroringPanel extends JPanel {
     }
 
     public void cleanup() {
+        Window ancestor = SwingUtilities.getWindowAncestor(this);
+        if (ancestor != null) ancestor.setFocusableWindowState(true);
         disableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
         if (mirroredEventQueue != null)
-            mirroredEventQueue.postEvent(new InvocationEvent(SunToolkit.getDefaultToolkit(), new Runnable() {
+            mirroredEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
                 public void run() {
                     if (mirroredFrame!= null) mirroredFrame.dispose();
                     threadGroup.stop();
