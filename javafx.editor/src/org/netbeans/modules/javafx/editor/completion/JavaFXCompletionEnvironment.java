@@ -61,8 +61,10 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.io.IOException;
@@ -589,24 +591,35 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
     
-    protected void addPackageContent(PackageElement pe, EnumSet<ElementKind> kinds, DeclaredType baseType, boolean insideNew) throws IOException {
-            Elements elements = controller.getElements();
-            Types types = controller.getTypes();
-            JavafxcTrees trees = controller.getTrees();
-            for(Element e : pe.getEnclosedElements()) {
-                if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
-                    String name = e.getSimpleName().toString();
-                        if (JavaFXCompletionProvider.startsWith(name, prefix) &&
-                        ! name.contains("$")) {
-                            addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), offset, elements.isDeprecated(e), insideNew, false));
+    protected void addPackageContent(PackageElement pe, EnumSet<ElementKind> kinds, DeclaredType baseType, boolean insideNew) {
+        log("addPackageContent " + pe);
+        Elements elements = controller.getElements();
+        JavafxTypes types = controller.getJavafxTypes();
+        JavafxcTrees trees = controller.getTrees();
+        for(Element e : pe.getEnclosedElements()) {
+            if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
+                String name = e.getSimpleName().toString();
+                if (JavaFXCompletionProvider.startsWith(name, prefix) &&
+                    ! name.contains("$")) {
+                    addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), offset, elements.isDeprecated(e), insideNew, false));
+                }
+                for (Element ee : e.getEnclosedElements()) {
+                    if (ee.getKind().isClass() || ee.getKind() == ElementKind.INTERFACE) {
+                        String ename = ee.getSimpleName().toString();
+                        log(ename + " isJFXClass " + types.isJFXClass((Symbol) ee));
+                        if (JavaFXCompletionProvider.startsWith(ename, prefix) &&
+                            types.isJFXClass((Symbol) ee)) {
+                            addResult(JavaFXCompletionItem.createTypeItem((TypeElement)ee, (DeclaredType)ee.asType(), offset, elements.isDeprecated(ee), insideNew, false));
+                        }
                     }
                 }
             }
-            String pkgName = pe.getQualifiedName() + "."; //NOI18N
-            if (prefix != null && prefix.length() > 0)
-                pkgName += prefix;
-            addPackages(pkgName);
         }
+        String pkgName = pe.getQualifiedName() + "."; //NOI18N
+        if (prefix != null && prefix.length() > 0)
+            pkgName += prefix;
+        addPackages(pkgName);
+    }
 
         private void addTypes(EnumSet<ElementKind> kinds, DeclaredType baseType, Set<? extends Element> toExclude, boolean insideNew) throws IOException {
             if (baseType == null) {
