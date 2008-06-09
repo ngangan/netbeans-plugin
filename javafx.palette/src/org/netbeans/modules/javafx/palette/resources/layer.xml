@@ -36,8 +36,48 @@
             </file>
         </folder>
         
-        <folder name="Actions">
+        <folder name="Components">
             <attr name="position" intvalue="200"/>
+            <file name="ComponentView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComponentView.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="CheckBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CheckBox.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="ComboBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComboBox.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="ComboBoxItem.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComboBoxItem.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Label.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Label.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="Menu.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Menu.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="MenuItem.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MenuItem.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="RadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadioButton.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="Slider.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Slider.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="TextField.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/TextField.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="ToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleButton.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>            
+        </folder>
+        
+        <folder name="Actions">
+            <attr name="position" intvalue="300"/>
             <file name="OnMouseMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseMoved.xml">
                 <attr name="position" intvalue="100"/>
             </file>
@@ -75,8 +115,8 @@
         
         <folder name="Shapes">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
-
-            <attr name="position" intvalue="300"/>
+            <attr name="position" intvalue="400"/>
+            
             <file name="Arc.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Arc.xml">
                 <attr name="position" intvalue="100"/>
             </file>
@@ -108,8 +148,8 @@
         
         <folder name="Transformations">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
-
-            <attr name="position" intvalue="400"/>
+            <attr name="position" intvalue="500"/>
+            
             <file name="Rotate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Rotate.xml">
                 <attr name="position" intvalue="100"/>
             </file>
