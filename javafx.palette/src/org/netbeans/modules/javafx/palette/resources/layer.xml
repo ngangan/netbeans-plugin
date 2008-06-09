@@ -105,6 +105,22 @@
                 <attr name="position" intvalue="900"/>
             </file>
         </folder>
+        
+        <folder name="Transformations">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+
+            <attr name="position" intvalue="400"/>
+            <file name="Rotate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Rotate.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Scale.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Scale.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Translate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Translate.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
+        
         <folder name="Colors">
             <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
