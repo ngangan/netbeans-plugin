@@ -2,6 +2,6 @@ Manifest-Version: 1.0
 OpenIDE-Module: org.netbeans.modules.javafx.debug
 OpenIDE-Module-Layer: org/netbeans/modules/javafx/debug/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/debug/resources/Bundle.properties
-AutoUpdate-Show-In-Client: false
+AutoUpdate-Show-In-Client: true
 OpenIDE-Module-Specification-Version: 1.0
 
