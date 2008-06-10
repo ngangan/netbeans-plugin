@@ -60,7 +60,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -128,7 +127,6 @@ public class GoToSupport {
 
                     if (span == null) {
 //                        CALLER.beep(goToSource, javadoc);
-System.err.println("not an identifier");
                         return ;
                     }
                     
@@ -137,10 +135,8 @@ System.err.println("not an identifier");
                     
                     Tree leaf = path.getLeaf();
                     if (leaf == null) return;
-//                    System.err.println("leaf=" + leaf);
 
                     Element el = controller.getTrees().getElement(path);
-//                    System.err.println("el=" + el);
                     if (el == null) return;
  
                     if (tooltip) {
@@ -171,7 +167,9 @@ System.err.println("not an identifier");
                             long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
                             
                             if (startPos != -1l) doOpen(fo, (int)startPos);
-                        }                        
+                        } else {
+                            ElementOpen.open(controller, el);
+                        }
                     }
                 }
             }, true);
