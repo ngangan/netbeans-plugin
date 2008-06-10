@@ -291,6 +291,7 @@ class BracketCompletion {
      * till the end of caret row. If there is no such element, position after the last non-white
      * character on the caret row is returned.
      */
+    @SuppressWarnings("fallthrough")
     static int getRowOrBlockEnd(BaseDocument doc, int caretOffset) throws BadLocationException {
         int rowEnd = Utilities.getRowLastNonWhite(doc, caretOffset);
         if (rowEnd == -1 || caretOffset >= rowEnd) {
