@@ -174,6 +174,7 @@ public class MirroringPanel extends JPanel {
         disableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
         if (mirroredEventQueue != null)
             mirroredEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
+                @SuppressWarnings("deprecation")
                 public void run() {
                     if (mirroredFrame!= null) mirroredFrame.dispose();
                     threadGroup.stop();

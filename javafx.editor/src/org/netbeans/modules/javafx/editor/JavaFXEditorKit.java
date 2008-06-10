@@ -395,7 +395,8 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     private static class JavaFXGoToSourceAction extends BaseAction {
 
         static final long serialVersionUID =-6440495023918097760L;
-
+        
+        @SuppressWarnings("deprecation")
         public JavaFXGoToSourceAction() {
             super(gotoSourceAction,
                   ABBREV_RESET | MAGIC_POSITION_RESET | UNDO_MERGE_RESET
