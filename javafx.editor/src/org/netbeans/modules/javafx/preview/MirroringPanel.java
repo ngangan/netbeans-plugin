@@ -124,8 +124,8 @@ public class MirroringPanel extends JPanel {
     }
 
     @Override
-    public void reshape(int x, int y, int w, int h) {
-        super.reshape(x, y, w, h);
+    public void setBounds(int x, int y, int w, int h) {
+        super.setBounds(x, y, w, h);
         if (offscreenBuffer == null)
             offscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
         BufferedImage newOffscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
@@ -136,8 +136,8 @@ public class MirroringPanel extends JPanel {
     }
 
     @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
         BufferedImage newOffscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
         newOffscreenBuffer.setData(offscreenBuffer.getRaster());
         offscreenBuffer = newOffscreenBuffer;
