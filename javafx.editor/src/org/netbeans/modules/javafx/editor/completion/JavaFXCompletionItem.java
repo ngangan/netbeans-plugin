@@ -57,6 +57,8 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -88,6 +90,10 @@ import org.openide.xml.XMLUtil;
  * @author Dusan Balek
  */
 public abstract class JavaFXCompletionItem implements CompletionItem {
+    
+    private static final Logger logger = Logger.getLogger(JavaFXCompletionItem.class.getName());
+    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+
     public static final String COLOR_END = "</font>"; //NOI18N
     public static final String STRIKE = "<s>"; //NOI18N
     public static final String STRIKE_END = "</s>"; //NOI18N
@@ -911,7 +917,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             sb.append(')');
             return sb.toString();
-        }
+        }   
     }    
     static class ClassItem extends JavaFXCompletionItem {
         
@@ -1151,6 +1157,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                 Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
                                 TreePath tp = controller.getTreeUtilities().pathFor(offset);
                                 CharSequence cs = elem.getSimpleName(); 
+                                if (elem.getEnclosingElement().getKind() == ElementKind.CLASS) {
+                                    cs = elem.getEnclosingElement().getSimpleName() + "." + elem.getSimpleName();
+                                }
                                 if (!insideNew)
                                     cs = text.insert(0, cs);
                                 String textToReplace = doc.getText(offset, finalLen);
@@ -1346,4 +1355,11 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
         
     }
+    
+    private static void log(String s) {
+        if (LOGGABLE) {
+            logger.fine(s);
+        }
+    }
+
 }
