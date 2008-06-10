@@ -55,7 +55,7 @@ public class MirroringPanel extends JPanel {
         @Override
         public void run() {
             try {
-                Class acc = this.getClass().getClassLoader().loadClass("sun.awt.SunToolkit");   // NOI18N
+                Class<?> acc = this.getClass().getClassLoader().loadClass("sun.awt.SunToolkit");   // NOI18N
                 ac = acc.getDeclaredMethod("createNewAppContext").invoke(null);                 // NOI18N
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
