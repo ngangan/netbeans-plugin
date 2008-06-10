@@ -293,7 +293,7 @@ made subject to such option by the copyright holder.
         <property name="initial-heap-size.value" value=""/>
         <property name="max-heap-size.value" value=""/>
         <property name="jnlp.resources.runtime.value" 
-            value='        &lt;j2se version="${javac.target}+"${initial-heap-size.value}${max-heap-size.value}${run.jvmargs.value}/&gt;'/>
+            value='        &lt;j2se version="${java.specification.version}+"${initial-heap-size.value}${max-heap-size.value}${run.jvmargs.value}/&gt;'/>
     </target>
     <target name="-init-runtime-props" depends="-runtime-props-check,-init-run-jvmargs-value,-init-initial-heap-size-value,-init-max-heap-size-value"/>
     <target name="-runtime-props-check">

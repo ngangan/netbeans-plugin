@@ -390,6 +390,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                         continue;
                     case FUNCTION:
                         verifyFunctionDefSpaces(ts, node, adjustments);
+                        break;
                     default:
                         break;
 

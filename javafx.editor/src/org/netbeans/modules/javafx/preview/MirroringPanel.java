@@ -55,7 +55,7 @@ public class MirroringPanel extends JPanel {
         @Override
         public void run() {
             try {
-                Class acc = this.getClass().getClassLoader().loadClass("sun.awt.SunToolkit");   // NOI18N
+                Class<?> acc = this.getClass().getClassLoader().loadClass("sun.awt.SunToolkit");   // NOI18N
                 ac = acc.getDeclaredMethod("createNewAppContext").invoke(null);                 // NOI18N
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
@@ -124,8 +124,8 @@ public class MirroringPanel extends JPanel {
     }
 
     @Override
-    public void reshape(int x, int y, int w, int h) {
-        super.reshape(x, y, w, h);
+    public void setBounds(int x, int y, int w, int h) {
+        super.setBounds(x, y, w, h);
         if (offscreenBuffer == null)
             offscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
         BufferedImage newOffscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
@@ -136,8 +136,8 @@ public class MirroringPanel extends JPanel {
     }
 
     @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
         BufferedImage newOffscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
         newOffscreenBuffer.setData(offscreenBuffer.getRaster());
         offscreenBuffer = newOffscreenBuffer;
@@ -174,6 +174,7 @@ public class MirroringPanel extends JPanel {
         disableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
         if (mirroredEventQueue != null)
             mirroredEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
+                @SuppressWarnings("deprecation")
                 public void run() {
                     if (mirroredFrame!= null) mirroredFrame.dispose();
                     threadGroup.stop();
