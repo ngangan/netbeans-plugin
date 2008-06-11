@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
@@ -40,30 +39,13 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-
-<!-- You may freely edit this file. See harness/README in the NetBeans platform -->
-<!-- for some information on what you could do (e.g. targets to override). -->
-<!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="org.netbeans.modules.javafx.userlib" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project org.netbeans.modules.javafx.userlib.</description>
-
-    <import file="../../nbbuild/templates/projectized.xml"/>
-
-	<target name="init-release-external" depends="basic-init">
-		<taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="../javafx.sdk.win/lib/FXSDKAntTask.jar"/>
-		<mkdir dir="external"/>
-		<get src="${javafx-sdk.lin.url}" dest="${javafx-sdk.lin.zip}" usetimestamp="true" verbose="true"/>
-		<SetReleaseExternal propertynameprefix="release.${javafx-sdk.lin.zip}!/">
-			<zipfileset src="${javafx-sdk.lin.zip}"/>
-		</SetReleaseExternal>
-	</target>
-
-    <target name="init" depends="basic-init,init-release-external,files-init,build-init,-init-proxy, javafx-sdk"/>
-
-    <target name="javafx-sdk">
-		<BuildLibDesc libfile="build/classes/org/netbeans/modules/javafx/sdk/lin/FXUserLib.xml" headerfile="libhead.xml" tailfile="libtail.xml" itemprefix="        &lt;resource>jar:nbinst:///" itemsuffix="!/&lt;/resource>">
-			<zipfileset src="${javafx-sdk.lin.zip}" includes="**/lib/*.jar"/>
-		</BuildLibDesc>
-    </target>
-
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.apisupport.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/nb-module-project/2">
+            <code-name-base>org.netbeans.modules.javafx.sdk.sol</code-name-base>
+            <module-dependencies/>
+            <public-packages/>
+        </data>
+    </configuration>
 </project>
