@@ -39,8 +39,12 @@
 
 package org.netbeans.modules.javafx.editor;
 
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -51,9 +55,17 @@ import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.java.source.ElementHandle;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -76,18 +88,146 @@ final class ElementOpen {
         if (!comp.getJavafxTypes().isJFXClass((Symbol)tel)) { // java
             openThroughJavaSupport(comp.getJavaFXSource().getFileObject(), el);
         } else {
-            // todo: implement go to javafx element
+            // Find the source file
+            final FileObject srcFile = getFile(el, comp);
+
+            JavaFXSource js = JavaFXSource.forFileObject(srcFile);
+            
+            if (js == null) return;
+
+            js.runUserActionTask(new Task<CompilationController>() {
+                public void run(CompilationController controller) throws Exception {
+                    if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) return;
+                    
+                    // convert the element to local element
+                    Element real = resolve(el, controller);
+                    if (real == null) return;
+                    
+                    System.err.println("real=" + real);
+                    
+                    TreePath elpath = controller.getPath(real);
+                    Tree tree = elpath != null ? elpath.getLeaf() : null;
+
+                    if (tree != null) {
+                        long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
+
+                        if (startPos != -1l) GoToSupport.doOpen(srcFile, (int)startPos);
+                    }
+                }
+            }, true);
     
         }
     }
+
+    private static Element resolve(Element orig, CompilationController context) {
+        String[] sig = getSignatures(orig);
+        ElementKind kind = orig.getKind();
+        switch (kind) {
+            case PACKAGE:
+                break;
+            case CLASS:
+            case INTERFACE:
+            case ENUM:
+            case ANNOTATION_TYPE:
+                return context.getElements().getTypeElement(sig[0].replace('$', '.'));
+
+            case METHOD:
+            case CONSTRUCTOR:                
+                assert sig.length == 3;
+                TypeElement type = context.getElements().getTypeElement(sig[0].replace('$', '.'));
+                if (type != null) {
+                   final List<? extends Element> members = type.getEnclosedElements();
+                   for (Element member : members) {
+                       if (kind == member.getKind()) {
+                           String[] desc = createExecutableDescriptor((ExecutableElement)member);
+                           assert desc.length == 3;
+                           if (sig[1].equals(desc[1]) && sig[2].equals(desc[2])) return member;
+                       }
+                   }
+                }
+                break;
+            case INSTANCE_INIT:
+            case STATIC_INIT:
+                assert sig.length == 2;
+                type = context.getElements().getTypeElement(sig[0].replace('$', '.'));
+                if (type != null) {
+                   final List<? extends Element> members = type.getEnclosedElements();
+                   for (Element member : members) {
+                       if (kind == member.getKind()) {
+                           String[] desc = createExecutableDescriptor((ExecutableElement)member);
+                           assert desc.length == 2;
+                           if (sig[1].equals(desc[1])) return member;
+                       }
+                   }
+                }
+                break;
+
+            case FIELD:
+            case ENUM_CONSTANT:
+                assert sig.length == 3;
+                type = context.getElements().getTypeElement(sig[0].replace('$', '.'));
+                if (type != null) {
+                    final List<? extends Element> members = type.getEnclosedElements();
+                    for (Element member : members) {
+                        if (kind == member.getKind()) {
+                            String[] desc = createFieldDescriptor((VariableElement)member);
+                            assert desc.length == 3;
+                            if (sig[1].equals(desc[1]) && sig[2].equals(desc[2])) return member;
+                        }
+                    }
+                }
+                break;
+        }
+        return null;
+    }   
     
     private static TypeElement getEnclosingClassElement(Element el) {
         while (el != null && el.getKind() != ElementKind.CLASS) {
             el = el.getEnclosingElement();
         }
+        if (el == null) return null;
+        
+        while (el.getEnclosingElement() != null && el.getEnclosingElement().getKind() == ElementKind.CLASS) {
+            el = el.getEnclosingElement();
+        }
         return (TypeElement)el; // or null
     }        
 
+    
+    private static FileObject getFile (Element elem, final CompilationInfo comp) {
+        assert elem != null;
+        assert comp != null;
+
+        try {
+            FileObject ref = comp.getJavaFXSource().getFileObject();
+            TypeElement tel = getEnclosingClassElement(elem);
+            Symbol.ClassSymbol cs = (Symbol.ClassSymbol)tel;
+            String name = cs.className().replace('.', '/') + ".fx"; // NOI18N
+
+            ClasspathInfo cpi = ClasspathInfo.create(ref);
+            ClassPath[] all = new ClassPath[] {
+                cpi.getClassPath(ClasspathInfo.PathKind.BOOT),
+                cpi.getClassPath(ClasspathInfo.PathKind.COMPILE),
+                cpi.getClassPath(ClasspathInfo.PathKind.SOURCE)
+            };
+
+            for (ClassPath cp : all) { // cp never null
+                for (FileObject binRoot : cp.getRoots()) {
+                    SourceForBinaryQuery.Result res = SourceForBinaryQuery.findSourceRoots(binRoot.getURL());
+                    for (FileObject srcRoot : res.getRoots()) {
+                        FileObject fo = srcRoot.getFileObject(name);
+                        if (fo != null) return fo;
+                    }
+                }
+            }
+            
+        } catch (IOException e) {
+            Exceptions.printStackTrace(e);
+        }
+        return null;        
+    }
+
+    
 
     // All of the following code is a hack to call through to the java
     // implementation of open support, where we need to pass "their"

@@ -61,7 +61,7 @@ public class ClasspathInfo {
     private ClassPath srcPath;
     private JavaFileManager fileManager;
     
-    static ClasspathInfo create(FileObject fo) {
+    public static ClasspathInfo create(FileObject fo) {
         ClassPath bootPath = ClassPath.getClassPath(fo, ClassPath.BOOT);
         if (bootPath == null) {
             //javac requires at least java.lang
