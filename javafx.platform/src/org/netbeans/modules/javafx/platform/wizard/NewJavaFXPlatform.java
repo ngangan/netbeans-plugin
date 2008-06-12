@@ -46,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -91,11 +92,13 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
         assert fxFolder != null;
         
         Map<String,String> platformProperties = new HashMap<String,String> ();
-        return new NewJavaFXPlatform (name, createAntName(name), Arrays.asList(new URL[] {installFolder.toURI().toURL(), fxFolder.toURI().toURL()}), fxFolder.toURI().toURL(), platformProperties, Collections.<String,String>emptyMap());
+        List<URL> sources = new ArrayList<URL>(), javadoc = new ArrayList<URL>();
+        findSourcesAndJavadoc(sources, javadoc, installFolder, fxFolder.getParentFile());
+        return new NewJavaFXPlatform (name, createAntName(name), Arrays.asList(new URL[] {installFolder.toURI().toURL(), fxFolder.toURI().toURL()}), fxFolder.toURI().toURL(), platformProperties, Collections.<String,String>emptyMap(), sources, javadoc);
     }
 
-    private NewJavaFXPlatform (String name, String antName, List<URL> javaFolders, URL fxFolder, Map<String,String> platformProperties, Map<String,String> systemProperties) {
-        super(name, antName, javaFolders, fxFolder, platformProperties, systemProperties,null,null);
+    private NewJavaFXPlatform (String name, String antName, List<URL> javaFolders, URL fxFolder, Map<String,String> platformProperties, Map<String,String> systemProperties, List<URL> sources, List<URL> javadoc) {
+        super(name, antName, javaFolders, fxFolder, platformProperties, systemProperties, sources, javadoc);
     }
 
     public boolean isValid () {

@@ -510,7 +510,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 platformElement.appendChild(jdkHomeElement);                
             }            
             final List<ClassPath.Entry> psl = this.instance.getSourceFolders().entries();
-            if (psl.size()>0 && shouldWriteSources ()) {                
+            if (psl.size()>0) {                
                 final Element sourcesElement = doc.createElement (ELEMENT_SOURCEPATH);
                 for (Iterator<ClassPath.Entry> it = psl.iterator(); it.hasNext();) {
                     URL url = it.next ().getURL();
@@ -521,7 +521,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 platformElement.appendChild(sourcesElement);
             }
             final List<URL> pdl = this.instance.getJavadocFolders();
-            if (pdl.size()>0 && shouldWriteJavadoc ()) {
+            if (pdl.size()>0) {
                 final Element javadocElement = doc.createElement(ELEMENT_JAVADOC);
                 for (URL url : pdl) {                    
                     final Element resourceElement = doc.createElement(ELEMENT_RESOURCE);
@@ -549,40 +549,6 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                     Logger.getLogger("global").log(Level.WARNING,"Cannot store property: " + n + " value: " + val);   //NOI18N
                 }
             }
-        }
-        
-        private boolean shouldWriteSources () {
-            if (defaultPlatform) {
-                assert this.instance instanceof DefaultPlatformImpl;
-                DefaultPlatformImpl dp = (DefaultPlatformImpl) this.instance;
-                List<ClassPath.Entry> sfEntries = dp.getSourceFolders().entries();
-                List<URL> defaultSf = DefaultPlatformImpl.getSources (FileUtil.normalizeFile(new File((String)dp.getSystemProperties().get("jdk.home"))));   //NOI18N
-                if (defaultSf == null || sfEntries.size() != defaultSf.size()) {
-                    return true;
-                }
-                Iterator<ClassPath.Entry> sfit = sfEntries.iterator();
-                Iterator<URL> defif = defaultSf.iterator();
-                while (sfit.hasNext()) {
-                    ClassPath.Entry entry = sfit.next ();                    
-                    URL url = defif.next();
-                    if (!url.equals(entry.getURL())) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return true;
-        }
-        
-        private boolean shouldWriteJavadoc () {
-//            if (defaultPlatform) {
-//                assert this.instance instanceof DefaultPlatformImpl;
-//                DefaultPlatformImpl dp = (DefaultPlatformImpl) this.instance;
-//                List jdf = dp.getJavadocFolders();
-//                List defaultJdf = DefaultPlatformImpl.getJavadoc (FileUtil.normalizeFile(new File((String)dp.getSystemProperties().get("jdk.home"))));  //NOI18N
-//                return defaultJdf == null || !jdf.equals (defaultJdf);
-//            }
-            return true;
         }
     }
     

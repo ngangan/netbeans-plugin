@@ -47,6 +47,7 @@ import java.util.*;
 import java.net.URL;
 import java.io.File;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.platform.Specification;
@@ -58,8 +59,10 @@ import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
+import org.openide.util.Utilities;
 
 /**
  * Implementation of the JavaPlatform API class, which serves proper
@@ -390,4 +393,51 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         }
         return ClassPathSupport.createClassPath (resources);
     }
+    
+    protected static void findSourcesAndJavadoc(List<URL> sources, List<URL> javadoc, File ... folders) {
+        //On VMS, the root of the "src.zip" is "src", and this causes
+        //problems with NetBeans 4.0. So use the modified "src.zip" shipped 
+        //with the OpenVMS NetBeans 4.0 kit.
+        if (Utilities.getOperatingSystem() == Utilities.OS_VMS) {
+            String srcHome = System.getProperty("netbeans.openvms.j2seplatform.default.srcdir");
+            if (srcHome != null) {
+                File f = new File(srcHome, "src.zip");
+                if (sources != null && f.exists() && f.canRead()) try {
+                    sources.add(FileUtil.getArchiveRoot(f.toURI().toURL()));
+                } catch (MalformedURLException e) {
+                    Exceptions.printStackTrace(e);
+                }
+            }
+        }
+
+        for (File root : folders) if (root != null ) try {
+            File docs = new File (root,"docs"); //NOI18N
+            if (javadoc != null && docs.isDirectory() && docs.canRead()) 
+                javadoc.add(docs.toURI().toURL());
+            if (sources != null) 
+                for (File f : root.listFiles()) 
+                    if ((f.getName().endsWith("src.zip") || f.getName().endsWith("src.jar")) && f.isFile() && f.canRead()) {
+                        URL url = FileUtil.getArchiveRoot(f.toURI().toURL());
+
+                         //Test for src folder in the src.zip on Mac
+                        if (Utilities.getOperatingSystem() == Utilities.OS_MAC) {
+                             try {
+                                 FileObject fo = URLMapper.findFileObject(url);
+                                 if (fo != null) {
+                                     fo = fo.getFileObject("src");    //NOI18N
+                                     if (fo != null) {
+                                         url = fo.getURL();
+                                     }
+                                 }                             
+                             } catch (FileStateInvalidException fileStateInvalidException) {
+                                 Exceptions.printStackTrace(fileStateInvalidException);
+                             }
+                        }
+                        sources.add(url);
+                    }
+        } catch (MalformedURLException e) {
+            Exceptions.printStackTrace(e);
+        }              
+    }
+    
 }
