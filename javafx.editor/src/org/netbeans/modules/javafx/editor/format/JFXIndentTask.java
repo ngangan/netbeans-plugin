@@ -273,7 +273,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                         if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
                             if (log.isLoggable(Level.INFO))
                                 log.info("The " + phase + " phase has been reached ... OK!");
-                            int dot = context.lineStartOffset(context.startOffset());
+                            final int offset = context.startOffset();
+                            int dot = offset == 0 ? 0 : context.lineIndent(context.lineStartOffset(offset));
                             final TreeUtilities tu = controller.getTreeUtilities();
                             final TreePath path = tu.pathFor(context.startOffset());
                             Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
@@ -293,7 +294,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 
     private void applyAdjustments(Queue<Adjustment> adjustments) throws BadLocationException {
         if (adjustments == null) return;
-        for (int i = 0; i < adjustments.size(); i++) {
+        while (!adjustments.isEmpty()) {
             final Adjustment adjustment = adjustments.poll();
             adjustment.apply(context);
         }
