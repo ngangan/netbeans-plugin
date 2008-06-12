@@ -288,7 +288,7 @@ public class GoToSupport {
         return new int [] {ts.offset(), ts.offset() + t.length()};
     }
 
-    private static boolean doOpen(FileObject fo, int offset) {
+    static boolean doOpen(FileObject fo, int offset) {
         try {
             DataObject od = DataObject.find(fo);
             EditorCookie ec = od.getCookie(EditorCookie.class);

@@ -111,12 +111,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
         try {
-            final int start = (int) sp().getStartPosition(cu(), node);
+            final int start = getStartPos(node);
             indentLine(start, adjustments);
             if (isMultiline(node) && node.getOnReplaceTree() == null) {
                 li.moveTo(start);
                 if (li.hasNext()) {
-                    indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
+                    indentMultiline(li, getEndPos(node), adjustments);
                 }
             }
         } catch (BadLocationException e) {
@@ -131,21 +131,25 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void indentLine(int ls, Queue<Adjustment> adjustments) throws BadLocationException {
-        if (ctx.lineIndent(ctx.lineStartOffset(ls)) != indentOffset) {
-            adjustments.offer(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
+        indentLine(ls, adjustments, indentOffset);
+    }
+
+    private void indentLine(int ls, Queue<Adjustment> adjustments, int indent) throws BadLocationException {
+        if (ctx.lineIndent(ctx.lineStartOffset(ls)) != indent) {
+            adjustments.offer(Adjustment.indent(ctx.document().createPosition(ls), indent));
         }
     }
 
     @Override
     public Queue<Adjustment> visitExpressionStatement(ExpressionStatementTree node, Queue<Adjustment> adjustments) {
         try {
-            final int position = (int) sp().getStartPosition(cu(), node);
+            final int position = getStartPos(node);
             if (isFirstOnLine(position)) {
                 indentLine(position, adjustments);
                 if (isMultiline(node)) {
                     li.moveTo(position);
                     if (li.hasNext()) {
-                        indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
+                        indentMultiline(li, getEndPos(node), adjustments);
                     }
                 }
             } else {
@@ -154,7 +158,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 if (isMultiline(node)) {
                     li.moveTo(position);
                     if (li.hasNext()) {
-                        indentMultiline(li, (int) sp().getEndPosition(cu(), node), adjustments);
+                        indentMultiline(li, getEndPos(node), adjustments);
                     }
                 }
             }
@@ -167,13 +171,35 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitIdentifier(IdentifierTree node, Queue<Adjustment> adjustments) {
         try {
-            final long position = sp().getStartPosition(cu(), node);
-            if (isFirstOnLine((int) position))
-                indentLine((int) position, adjustments);
+            if (isWidow(node)) {
+                final int position = getStartPos(node);
+                indentLine(position, adjustments);
+            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
         return super.visitIdentifier(node, adjustments);
+    }
+
+
+    private boolean isWidow(Tree node) throws BadLocationException {
+        final int endPos = getEndPos(node);
+        boolean probablyWidow = false;
+
+        final TokenSequence<JFXTokenId> ts = ts();
+        ts.move(endPos);
+        while (ts.moveNext()) {
+            if (JFXTokenId.WS == ts.token().id()) {
+                if (NEW_LINE_STRING.equals(ts.token().text().toString())) {
+                    probablyWidow = true;
+                    break;
+                }
+                continue;
+            }
+            break;
+        }
+
+        return probablyWidow && isFirstOnLine(getStartPos(node));
     }
 
     @Override
@@ -183,10 +209,14 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitBinary(BinaryTree node, Queue<Adjustment> adjustments) {
+        final Tree tree = getCurrentPath().getParentPath().getLeaf();
+        if (tree instanceof BinaryTree) {
+            super.visitBinary((BinaryTree) tree, adjustments);
+            return adjustments; 
+        }
         try {
-            SourcePositions sps = sp();
-            final int offset = (int) sps.getStartPosition(cu(), node);
-            final int end = (int) sps.getEndPosition(cu(), node);
+            final int offset = getStartPos(node);
+            final int end = getEndPos(node);
             if (isMultiline(node)) {
                 li.moveTo(offset);
                 if (isFirstOnLine(offset)) {
@@ -195,17 +225,22 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentMultiline(li, end, adjustments);
             }
 
-//            final TokenSequence<JFXTokenId> ts = ts();
-//            ts.move(offset);
-//            while (ts.moveNext() && ts.offset() <= end) {
-//                if ("operator".equals(ts.token().id().primaryCategory())) {
-//                    if (cs.spaceAroundBinaryOps()) {
-//                        if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
-//                            //TODO: [RKo]
-//                        }
-//                    }
-//                }
-//            }
+            final TokenSequence<JFXTokenId> ts = ts(node);
+            ts.move(offset);
+            while (ts.moveNext() && ts.offset() <= end) {
+                if ("operator".equals(ts.token().id().primaryCategory())) {
+                    if (cs.spaceAroundBinaryOps()) {
+                        int operatorOffset = ts.offset();
+                        if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
+                            adjustments.offer(Adjustment.add(ctx.document().createPosition(operatorOffset), ONE_SPACE));
+                        }
+                        if (!ts.moveNext()) throw new BadLocationException("Concurent modification has occured on document.", ts.offset());
+                        if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
+                            adjustments.offer(Adjustment.add(ctx.document().createPosition(ts.offset()), ONE_SPACE));
+                        }
+                    }
+                }
+            }
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
@@ -213,34 +248,36 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return super.visitBinary(node, adjustments);
     }
 
+    private TokenSequence<JFXTokenId> ts(Tree node) {
+        return tu.tokensFor(node);
+    }
+
     @Override
     public Queue<Adjustment> visitObjectLiteralPart(ObjectLiteralPartTree node, Queue<Adjustment> adjustments) {
         if (log.isLoggable(Level.INFO)) log.info("entering: visitObjectLiteralPart " + node);
         try {
-            SourcePositions sps = sp();
-            final int offset = (int) sps.getStartPosition(cu(), node);
+            final int offset = getStartPos(node);
             if (isFirstOnLine(offset)) {
                 indentLine(offset, adjustments);
             }
-//            if (isMultiline(node)) {
-//                li.moveTo(offset);
-//                final Element element = li.get();
-//                if (isFirstOnLine(offset)) {
-//                    indentLine(element, adjustments);
-//                }
-//                indentMultiline(li, (int) sps.getEndPosition(cu(), node), adjustments);
-//            } else {
-//                if (isFirstOnLine(offset)) {
-//                    indentLine(offset, adjustments);
-//                }
-//            }
+            boolean hasContinuosIndent = isMultiline(node) && !isOnSameLine(node, node.getExpression());
+            if (hasContinuosIndent) {
+                indentOffset = indentOffset + getCi();
+            }
+            super.visitObjectLiteralPart(node, adjustments);
+            if (hasContinuosIndent) {
+                indentOffset = indentOffset - getCi();
+            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-//        return adjustments;
-        super.visitObjectLiteralPart(node, adjustments);
+
         if (log.isLoggable(Level.INFO)) log.info("leaving: visitObjectLiteralPart " + node);
         return adjustments;
+    }
+
+    private boolean isOnSameLine(Tree node, Tree tree) throws BadLocationException {
+        return ctx.lineStartOffset(getStartPos(node)) == ctx.lineStartOffset(getStartPos(tree)) ;
     }
 
 
@@ -266,12 +303,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void indentSimpleStructure(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
-        int start = (int) sp().getStartPosition(cu(), node);
+        int start = getStartPos(node);
         if (isFirstOnLine(start)) {
             indentLine(start, adjustments);
         }
         if (isMultiline(node)) {
-            indentLine((int) sp().getEndPosition(cu(), node), adjustments);
+            indentLine(getEndPos(node), adjustments);
         }
     }
 
@@ -369,17 +406,48 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private boolean isMultiline(Tree tree) throws BadLocationException {
-        SourcePositions sps = sp();
-        return ctx.lineStartOffset((int) sps.getStartPosition(cu(), tree))
-                != ctx.lineStartOffset((int) sps.getEndPosition(cu(), tree));
+        return ctx.lineStartOffset(getStartPos(tree)) != ctx.lineStartOffset(getEndPos(tree));
+    }
+
+    @Override
+    public Queue<Adjustment> visitFunctionValue(FunctionValueTree node, Queue<Adjustment> adjustments) {
+        final Tree tree = getCurrentPath().getParentPath().getLeaf();
+        if (tree instanceof FunctionDefinitionTree) {
+            super.visitFunctionValue(node, adjustments);
+        } else {
+            try {
+                if (isFirstOnLine(getStartPos(node))) {
+                    indentLine(getStartPos(node), adjustments);
+                }
+                verifyFunctionSpaces(ts(node), node, adjustments);
+                super.visitFunctionValue(node, adjustments);
+                indentLine(getEndPos(node), adjustments);
+            } catch (BadLocationException e) {
+                if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+            }
+        }
+        return adjustments;
+
+    }
+
+    @Override
+    public Queue<Adjustment> visitMethodInvocation(MethodInvocationTree node, Queue<Adjustment> adjustments) {
+        try {
+            indentSimpleStructure(node, adjustments);
+            incIndent();
+            super.visitMethodInvocation(node, adjustments);
+            decIndent();
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        return adjustments; 
     }
 
     @Override
     public Queue<Adjustment> visitFunctionDefinition(FunctionDefinitionTree node, Queue<Adjustment> adjustments) {
         final TokenSequence<JFXTokenId> ts = ts();
-        SourcePositions sps = sp();
         try {
-            ts.move((int) sps.getStartPosition(cu(), node));
+            ts.move(getStartPos(node));
             while (ts.moveNext()) {
                 final JFXTokenId id = ts.token().id();
                 switch (id) {
@@ -389,7 +457,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     case WS:
                         continue;
                     case FUNCTION:
-                        verifyFunctionDefSpaces(ts, node, adjustments);
+                        verifyFunctionSpaces(ts, node, adjustments);
                         break;
                     default:
                         break;
@@ -403,7 +471,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-    private void verifyFunctionDefSpaces(TokenSequence<JFXTokenId> ts, FunctionDefinitionTree node, Queue<Adjustment> adjustments) throws BadLocationException {
+    private void verifyFunctionSpaces(TokenSequence<JFXTokenId> ts, Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
         if (ts.moveNext() && ts.token().id() == JFXTokenId.IDENTIFIER) {
             if (cs.spaceBeforeMethodDeclLeftBrace()) {
                 if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
@@ -484,7 +552,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private void checkEndBrace(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts, int obraceTokenStart) throws BadLocationException {
         Document doc = ctx.document();
-        final int end = (int) sp().getEndPosition(cu(), node);
+        final int end = getEndPos(node);
         ts.move(end - 1); //getting into last token...
         if (ts.moveNext()) {
             //we are @the end.
@@ -537,11 +605,32 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-    public Queue<Adjustment> visitInstantiate(InstantiateTree instantiateTree, Queue<Adjustment> adjustments) {
-        incIndent();
-        final Queue<Adjustment> list = super.visitInstantiate(instantiateTree, adjustments);
-        decIndent();
-        return list;
+    public Queue<Adjustment> visitInstantiate(InstantiateTree node, Queue<Adjustment> adjustments) {
+        try {
+            final int offset = getStartPos(node);
+            if (isFirstOnLine(offset)) {
+                indentLine(offset, adjustments);
+            }
+            incIndent();
+            super.visitInstantiate(node, adjustments);
+            decIndent();
+            if (isMultiline(node)) {
+                final int end = getEndPos(node);
+                if (isFirstOnLine(end))
+                    indentLine(end, adjustments);
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        return adjustments;
+    }
+
+    private int getEndPos(Tree node) {
+        return (int) sp().getEndPosition(cu(), node);
+    }
+
+    private int getStartPos(Tree node) {
+        return (int) sp().getStartPosition(cu(), node);
     }
 
     @Override
@@ -549,10 +638,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         if (tu.isSynthetic(getCurrentPath())) {
             return super.visitClassDeclaration(node, adjustments);
         }
-        SourcePositions sps = sp();
         final Document doc = ctx.document();
         try {
-            int pos = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
+            int pos = ctx.lineStartOffset(getStartPos(node));
             indentLine(pos, adjustments);
             pos = skipPreviousComment(pos);
             int elc = cs.getBlankLinesBeforeClass();
@@ -592,9 +680,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitImport(ImportTree importTree, Queue<Adjustment> adjustments) {
         if (log.isLoggable(Level.FINE)) log.fine("Visiting import" + importTree);
-        SourcePositions sps = sp();
         try {
-            final int ls = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
+            final int ls = ctx.lineStartOffset(getStartPos(importTree));
             if (indentOffset != ctx.lineIndent(ls)) {
                 adjustments.offer(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
             }
@@ -662,10 +749,13 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitReturn(ReturnTree returnTree, Queue<Adjustment> adjustments) {
-        SourcePositions sps = sp();
-        final int offset = (int) sps.getStartPosition(cu(), getCurrentPath().getLeaf());
+        int offset = getStartPos(returnTree);
         try {
-            indentLine(ctx.lineStartOffset(offset), adjustments);
+            if (!isFirstOnLine(offset)) {
+                adjustments.offer(Adjustment.add(ctx.document().createPosition(offset), NEW_LINE_STRING));
+                offset += 1;
+            }
+            indentLine(offset, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
@@ -674,29 +764,22 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitLiteral(LiteralTree literalTree, Queue<Adjustment> adjustments) {
-        SourcePositions sps = sp();
-        final int offset = (int) sps.getStartPosition(cu(), getCurrentPath().getLeaf());
         try {
-            final int ls = ctx.lineStartOffset(offset);
-            final Document doc = ctx.document();
-            final String s = doc.getText(ls, offset - ls);
-            // we work only with literal which stands alone as "return statement"
-            if (isEmpty(s) && ctx.lineIndent(ls) != indentOffset) {
-                adjustments.offer(Adjustment.indent(doc.createPosition(ls), indentOffset));
+            final int offset = getStartPos(literalTree);
+            if (isFirstOnLine(offset)) {
+                indentLine(offset, adjustments, isWidow(literalTree) ? indentOffset : (indentOffset + getCi()));
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitLiteral(literalTree, adjustments);
+        return adjustments;
     }
 
     @Override
     public Queue<Adjustment> visitBlock(BlockTree blockTree, Queue<Adjustment> adjustments) {
-
         if (!tu.isSynthetic(getCurrentPath())) {
             try {
-                SourcePositions sps = sp();
-                final int start = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
+                final int start = ctx.lineStartOffset(getStartPos(blockTree));
                 indentLine(start, adjustments);
                 incIndent();
                 super.visitBlock(blockTree, adjustments);
@@ -743,13 +826,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitBlockExpression(BlockExpressionTree node, Queue<Adjustment> adjustments) {
         try {
-            SourcePositions sps = sp();
-            final int start = ctx.lineStartOffset((int) sps.getStartPosition(cu(), getCurrentPath().getLeaf()));
+            final int start = ctx.lineStartOffset(getStartPos(node));
             indentLine(start, adjustments);
             incIndent();
             super.visitBlockExpression(node, adjustments);
             decIndent();
-            final int end = ctx.lineStartOffset((int) sps.getEndPosition(cu(), getCurrentPath().getLeaf()));
+            final int end = ctx.lineStartOffset(getEndPos(node));
             indentLine(end, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
