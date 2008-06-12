@@ -599,9 +599,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         Elements elements = controller.getElements();
         JavafxTypes types = controller.getJavafxTypes();
         JavafxcTrees trees = controller.getTrees();
+        TreePath p = new TreePath(root);
+        JavafxcScope scope = trees.getScope(p);
         for(Element e : pe.getEnclosedElements()) {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
+                if (!trees.isAccessible(scope,(TypeElement) e)) {
+                    log("    not accessible " + name);
+                    continue;
+                }
                 if (JavaFXCompletionProvider.startsWith(name, prefix) &&
                     ! name.contains("$")) {
                     addResult(JavaFXCompletionItem.createTypeItem((TypeElement)e, (DeclaredType)e.asType(), offset, elements.isDeprecated(e), insideNew, false));
@@ -609,6 +615,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (Element ee : e.getEnclosedElements()) {
                     if (ee.getKind().isClass() || ee.getKind() == ElementKind.INTERFACE) {
                         String ename = ee.getSimpleName().toString();
+                        if (!trees.isAccessible(scope,(TypeElement) ee)) {
+                            log("    not accessible " + ename);
+                            continue;
+                        }
                         log(ename + " isJFXClass " + types.isJFXClass((Symbol) ee));
                         if (JavaFXCompletionProvider.startsWith(ename, prefix) &&
                             types.isJFXClass((Symbol) ee)) {
@@ -645,6 +655,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             JavafxcTrees trees = controller.getTrees();
             TreePath p = new TreePath(root);
             JavafxcScope scope = trees.getScope(p);
+            JavafxcScope originalScope = scope;
             while (scope != null) {
                 log("  scope == " + scope);
                 for (Element local : scope.getLocalElements()) {
@@ -654,10 +665,25 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             continue;
                         }
                         DeclaredType dt = (DeclaredType)local.asType();
+                        TypeElement te = (TypeElement)local;
                         String name = local.getSimpleName().toString();
+                        if (!trees.isAccessible(originalScope, te)) {
+                            log("    not accessible " + name);
+                            continue;
+                        }
+                        Element parent = te.getEnclosingElement();
+                        if (parent.getKind() == ElementKind.CLASS) {
+                            if (!trees.isAccessible(originalScope,(TypeElement) parent)) {
+                                log("    parent not accessible " + name);
+                                continue;
+                            }
+                        }
                         if (JavaFXCompletionProvider.startsWith(name, prefix) &&
                             ! name.contains("$")) {
-                            addResult(JavaFXCompletionItem.createTypeItem((TypeElement)local, dt, offset, elements.isDeprecated(local), insideNew, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(
+                                te, dt, offset, 
+                                elements.isDeprecated(local), insideNew, false
+                            ));
                         }
                     }
                 }
