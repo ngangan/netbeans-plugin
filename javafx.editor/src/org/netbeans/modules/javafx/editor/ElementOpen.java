@@ -234,6 +234,7 @@ final class ElementOpen {
     // implementation of Element/ElementHandle.
     // All of the Element serialization logic is copied and adapted from
     // javasource's ElementHandle and ClassFileUtils
+    @SuppressWarnings("unchecked")
     private static void openThroughJavaSupport(FileObject reference, Element el) throws Exception {
         org.netbeans.api.java.source.ClasspathInfo cpi = 
                 org.netbeans.api.java.source.ClasspathInfo.create(reference);
