@@ -45,7 +45,9 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -56,10 +58,7 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
 /**
@@ -102,7 +101,6 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         ArrayList<ErrorDescription> c = new ArrayList<ErrorDescription>();
 
         for (Diagnostic d : diag) {
-            int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
             log("    diagnostics: " + d);
             if (d.getSource() instanceof JavaFileObject) {
                 JavaFileObject jfo = (JavaFileObject)d.getSource();
@@ -113,7 +111,27 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             } else {
                 log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null"));
             }
-            if (d.getLineNumber() < lastLine) {
+            long start = d.getStartPosition();
+            long end = d.getEndPosition();
+            if (start != Diagnostic.NOPOS && end != Diagnostic.NOPOS) {
+                log("    start == " + start + "  end == " + end);
+                try {
+                    c.add(ErrorDescriptionFactory.createErrorDescription(
+                        Severity.ERROR,
+                        d.getMessage(Locale.getDefault()),
+                        doc,
+                        doc.createPosition((int) start),
+                        doc.createPosition((int) end)
+                    ));
+                    continue;
+                } catch (BadLocationException ex) {
+                    // let's just try the line number then
+                }
+            } 
+            // let's use the line number
+            int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
+            log("    lastLine == " + lastLine);
+            if (d.getLineNumber()-1 <= lastLine) {
                 c.add(ErrorDescriptionFactory.createErrorDescription(
                     Severity.ERROR, d.getMessage(Locale.getDefault()),
                     doc, (int)d.getLineNumber()));
