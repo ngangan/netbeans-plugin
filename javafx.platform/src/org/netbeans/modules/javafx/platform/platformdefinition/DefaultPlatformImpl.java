@@ -93,11 +93,11 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
-        if (sources == null) {
-            sources = getSources (javaHome);
-        }
-        if (javadoc == null) {
-            javadoc = getJavadoc (javaHome);
+        if (sources == null || javadoc == null) {
+            List<URL> src = new ArrayList<URL>(), jdc = new ArrayList<URL>();
+            findSourcesAndJavadoc(src, jdc, javaHome, fxPath.getParentFile().getParentFile());
+            if (sources == null) sources = src;
+            if (javadoc == null) javadoc = jdc;
         }
         return new DefaultPlatformImpl(javaFolders, fxFolder, properties, new HashMap(System.getProperties()), sources,javadoc);
     }
@@ -132,68 +132,6 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
             s = ""; // NOI18N
         }
         return standardLibs = Util.createClassPath (s);
-    }
-
-    static List<URL> getSources (File javaHome) {
-        if (javaHome != null) {
-            try {
-                File f;
-                //On VMS, the root of the "src.zip" is "src", and this causes
-                //problems with NetBeans 4.0. So use the modified "src.zip" shipped 
-                //with the OpenVMS NetBeans 4.0 kit.
-                if (Utilities.getOperatingSystem() == Utilities.OS_VMS) {
-                    String srcHome = 
-                        System.getProperty("netbeans.openvms.j2seplatform.default.srcdir");
-                    if (srcHome != null)
-                        f = new File(srcHome, "src.zip");
-                    else
-                        f = new File (javaHome, "src.zip");
-                } else {
-                    f = new File (javaHome, "src.zip");    //NOI18N
-                    //If src.zip does not exist, try src.jar (it is on some platforms)
-                    if (!f.exists()) {
-                        f = new File (javaHome, "src.jar");    //NOI18N
-                    }
-                }
-                if (f.exists() && f.canRead()) {
-                    URL url = FileUtil.getArchiveRoot(f.toURI().toURL());
-                    
-                     //Test for src folder in the src.zip on Mac
-                    if (Utilities.getOperatingSystem() == Utilities.OS_MAC) {
-                         try {
-                             FileObject fo = URLMapper.findFileObject(url);
-                             if (fo != null) {
-                                 fo = fo.getFileObject("src");    //NOI18N
-                                 if (fo != null) {
-                                     url = fo.getURL();
-                                 }
-                             }                             
-                         } catch (FileStateInvalidException fileStateInvalidException) {
-                             Exceptions.printStackTrace(fileStateInvalidException);
-                         }
-                    }
-                    return Collections.singletonList (url);
-                }
-            } catch (MalformedURLException e) {
-                Exceptions.printStackTrace(e);
-            }              
-        }
-        return null;
-    }
-    
-    
-    static List<URL> getJavadoc (File javaHome) {
-        if (javaHome != null ) {
-            File f = new File (javaHome,"docs"); //NOI18N
-            if (f.isDirectory() && f.canRead()) {
-                try {
-                    return Collections.singletonList(f.toURI().toURL());
-                } catch (MalformedURLException mue) {
-                    Exceptions.printStackTrace(mue);
-                }
-            }                        
-        }
-        return null;
     }
 
 }
