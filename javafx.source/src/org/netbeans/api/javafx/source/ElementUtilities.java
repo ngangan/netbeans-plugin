@@ -275,8 +275,9 @@ public final class ElementUtilities {
         Types types = JavafxTypes.instance(ctx);
         TypeElement cls;
         while(scope != null) {
+            final Iterable<? extends Element> localElements = scope.getLocalElements();
             if ((cls = scope.getEnclosingClass()) != null) {
-                for (Element local : scope.getLocalElements())
+                for (Element local : localElements)
                     if (acceptor == null || acceptor.accept(local, null)) {
                         CharSequence name = local.getSimpleName();
                         ArrayList<Element> h = hiders.get(name);
@@ -305,7 +306,7 @@ public final class ElementUtilities {
                     }
                 }
             } else {
-                for (Element local : scope.getLocalElements()) {
+                for (Element local : localElements) {
                     if (!local.getKind().isClass() && !local.getKind().isInterface() &&
                         (acceptor == null || acceptor.accept(local, local.getEnclosingElement().asType()))) {
                         CharSequence name = local.getSimpleName();

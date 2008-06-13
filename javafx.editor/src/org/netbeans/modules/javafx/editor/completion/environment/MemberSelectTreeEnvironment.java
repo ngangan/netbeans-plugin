@@ -257,7 +257,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                                         }
                                     }
                             } else {
-                                addMembers(type,true, true);
+                                addMembers(type, true, true, getSmartType(fa));
                             }
                             break;
                         default:
@@ -308,8 +308,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             }
     }
 
-    @Override
-    public Set<? extends TypeMirror> getSmartTypes(MemberSelectTree t) throws IOException {
+    public TypeMirror getSmartType(MemberSelectTree t) throws IOException {
         final TreePath treePath = new TreePath(path, t.getExpression());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (type == null) {
@@ -325,7 +324,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             }
         }
         
-        return type != null ? Collections.singleton(type) : null;
+        return type;
     }
 
     private static void log(String s) {

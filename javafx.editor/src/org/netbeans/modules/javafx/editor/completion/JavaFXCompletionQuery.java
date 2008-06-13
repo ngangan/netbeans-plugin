@@ -349,10 +349,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         
         final Tree leaf = env.getPath().getLeaf();
-        env.addSmartTypes(leaf);
-        if (LOGGABLE) {
-            log("addSmartTypes results: " + results);
-        }
+//        env.addSmartTypes(leaf);
+//        if (LOGGABLE) {
+//            log("addSmartTypes results: " + results);
+//        }
+        controller.toPhase(Phase.ANALYZED);
         env.inside(leaf);
         if (LOGGABLE) {
             log("Results: " + results);

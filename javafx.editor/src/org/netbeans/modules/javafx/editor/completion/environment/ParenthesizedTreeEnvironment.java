@@ -43,11 +43,8 @@ import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.TypeElement;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
@@ -64,27 +61,7 @@ public class ParenthesizedTreeEnvironment extends JavaFXCompletionEnvironment<Pa
         log("inside ParenthesizedTree " + pa);
         Tree exp = unwrapErrTree(pa.getExpression());
         if (exp == null || getOffset() <= sourcePositions.getStartPosition(root, exp)) {
-            HashSet<TypeElement> toExclude = new HashSet<TypeElement>();
-            if (query.queryType == JavaFXCompletionProvider.COMPLETION_QUERY_TYPE && path.getParentPath().getLeaf().getKind() != Tree.Kind.SWITCH) {
-//                Set<? extends TypeMirror> smarts = getSmartTypes();
-//                if (smarts != null) {
-//                    for (TypeMirror smart : smarts) {
-//                        if (smart != null) {
-//                            if (smart.getKind() == TypeKind.DECLARED) {
-//                                for (DeclaredType subtype : getSubtypesOf((DeclaredType) smart)) {
-//                                    TypeElement elem = (TypeElement) subtype.asElement();
-//                                    toExclude.add(elem);
-//                                }
-//                            } else if (smart.getKind() == TypeKind.ARRAY) {
-//                                try {
-//                                } catch (IllegalArgumentException iae) {
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-            }
-            addLocalMembersAndVars();
+            addLocalMembersAndVars(null);
             addValueKeywords();
         } else {
             insideExpression(new TreePath(path, exp));

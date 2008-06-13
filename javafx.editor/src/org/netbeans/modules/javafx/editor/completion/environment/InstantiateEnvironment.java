@@ -41,8 +41,6 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.TypeElement;
@@ -86,12 +84,11 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
             if (tm == null) {
                 return;
             }
-            addMembers(tm, false, true);
+            addMembers(tm, false, true, getSmartType(it));
         }
     }
 
-    @Override
-    public Set<? extends TypeMirror> getSmartTypes(JFXInstanciate it) throws IOException {
+    public TypeMirror getSmartType(JFXInstanciate it) throws IOException {
         String s = it.getIdentifier().toString();
         TypeElement te = findTypeElement(s);
         TypeMirror type = te != null ? te.asType() : null;
@@ -109,7 +106,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
             }
         }
         
-        return type != null ? Collections.singleton(type) : null;
+        return type;
     }
 
     private static void log(String s) {

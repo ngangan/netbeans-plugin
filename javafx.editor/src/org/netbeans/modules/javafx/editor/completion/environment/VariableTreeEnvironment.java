@@ -45,8 +45,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.type.ArrayType;
@@ -105,8 +103,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         }
     }
 
-    @Override
-    public Set<? extends TypeMirror> getSmartTypes(VariableTree t) throws IOException {
+    public TypeMirror getSmartType(VariableTree t) throws IOException {
         final TreePath treePath = new TreePath(path, t.getType());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (type == null) {
@@ -122,7 +119,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             }
         }
         
-        return type != null ? Collections.singleton(type) : null;
+        return type;
     }
 
     private static void log(String s) {
