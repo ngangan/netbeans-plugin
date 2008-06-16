@@ -49,9 +49,9 @@ import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
+import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -365,14 +365,15 @@ public final class TreeUtilities {
         if (scope instanceof JavafxcScope 
                 && member instanceof Symbol 
                 && type instanceof Type) {
-            Resolve resolve = Resolve.instance(info.impl.getContext());
+//            Resolve resolve = Resolve.instance(info.impl.getContext());
+            JavafxResolve resolve =JavafxResolve.instance(info.impl.getContext());
 	    return resolve.isAccessible(((JavafxcScope)scope).getEnv(), (Type) type, (Symbol) member);  
         } else 
             return false;
     }
 
     public boolean isStaticContext(Scope scope) {
-        return Resolve.isStatic(((JavafxcScope)scope).getEnv());
+        return JavafxResolve.isStatic(((JavafxcScope)scope).getEnv());
     }
 
     private static void log(String s) {
