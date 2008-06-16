@@ -136,11 +136,11 @@ class Boid extends CustomNode {
             ]
             content : [
                 Line {
-                    x1 : 0, y1 : -3, x2 : -2, y2 : 3, stroke : Color.WHITE },
+                    startX : 0, startY : -3, endX : -2, endY : 3, stroke : Color.WHITE },
                 Line { 
-                    x1 : -2, y1 : 3, x2 : 2, y2 : 3, stroke : Color.WHITE },
+                    startX : -2, startY : 3, endX : 2, endY : 3, stroke : Color.WHITE },
                 Line { 
-                    x1 : 2, y1 : 3, x2 : 0, y2 : -3, stroke : Color.WHITE }
+                    startX : 2, startY : 3, endX : 0, endY : -3, stroke : Color.WHITE }
             ]
         }
     }
