@@ -322,10 +322,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof KeywordItem)) {
                 return false;
             }
-            
             KeywordItem ki = (KeywordItem) obj;
             return ki.kwd.equals(this.kwd) && ki.postfix.equals(this.postfix);
         }
@@ -467,10 +469,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof PackageItem)) {
                 return false;
             }
-            
             PackageItem pi = (PackageItem) obj;
             return pi.simpleName.equals(this.simpleName) && pi.sortText.equals(this.sortText);
         }
@@ -544,11 +548,19 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof VariableItem)) {
                 return false;
             }
             VariableItem vi = (VariableItem) obj;
-            return vi.varName.equals(this.varName) && vi.typeName.equals(this.typeName);
+            boolean eNames = vi.varName.equals(this.varName);
+            boolean eTypes = false;
+            if (vi.typeName != null && this.typeName != null) {
+                eTypes = vi.typeName.equals(this.typeName);
+            }
+            return eNames && eTypes;
         }
 
         @Override
@@ -645,10 +657,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof MethodItem)) {
                 return false;
             }
-            
             MethodItem mi = (MethodItem) obj;
             return mi.simpleName.equals(this.simpleName) && mi.modifiers.equals(this.modifiers) && mi.params.equals(this.params) && mi.typeName.equals(this.typeName);
         }
@@ -950,10 +964,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof ClassItem)) {
                 return false;
             }
-            
             ClassItem ci = (ClassItem) obj;
             return ci.simpleName.equals(this.simpleName) && ci.type.equals(this.type);
         }
@@ -1337,10 +1353,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (!(obj instanceof ParamDesc)) {
                 return false;
             }
-            
             ParamDesc pd = (ParamDesc) obj;
             return pd.fullTypeName.equals(this.fullTypeName) && pd.typeName.equals(this.typeName) && pd.name.equals(this.name);
         }
