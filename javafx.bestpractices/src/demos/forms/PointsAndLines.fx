@@ -15,74 +15,74 @@ Frame {
         background : Color.BLACK
         content : [
         Line {
-            x1 : p3
-            y1 : p3
-            x2 : p2
-            y2 : p3
+            startX : p3
+            startY : p3
+            endX : p2
+            endY : p3
             stroke : Color.LIGHTGREY
         },
         Line {
-            x1 : p2
-            y1 : p3
-            x2 : p2
-            y2 : p2
+            startX : p2
+            startY : p3
+            endX : p2
+            endY : p2
             stroke : Color.LIGHTGREY
         },
         Line {
-            x1 : p2
-            y1 : p2
-            x2 : p3
-            y2 : p2        
+            startX : p2
+            startY : p2
+            endX : p3
+            endY : p2        
             stroke : Color.LIGHTGREY
         },
         Line {
-            x1 : p3
-            y1 : p2
-            x2 : p3
-            y2 : p3        
+            startX : p3
+            startY : p2
+            endX : p3
+            endY : p3        
             stroke : Color.LIGHTGREY
         },
         // Points
         Line {
-            x1 : p1
-            y1 : p1
-            x2 : p1
-            y2 : p1
+            startX : p1
+            startY : p1
+            endX : p1
+            endY : p1
             stroke : Color.WHITE
         },
         Line {
-            x1 : p1
-            y1 : p3
-            x2 : p1
-            y2 : p3
+            startX : p1
+            startY : p3
+            endX : p1
+            endY : p3
             stroke : Color.WHITE
         },
         Line {
-            x1 : p2
-            y1 : p4
-            x2 : p2
-            y2 : p4
+            startX : p2
+            startY : p4
+            endX : p2
+            endY : p4
             stroke : Color.WHITE
         },
         Line {
-            x1 : p3
-            y1 : p1
-            x2 : p3
-            y2 : p1
+            startX : p3
+            startY : p1
+            endX : p3
+            endY : p1
             stroke : Color.WHITE
         },
         Line {
-            x1 : p4
-            y1 : p2
-            x2 : p4
-            y2 : p2
+            startX : p4
+            startY : p2
+            endX : p4
+            endY : p2
             stroke : Color.WHITE
         },
         Line {
-            x1 : p4
-            y1 : p4
-            x2 : p4
-            y2 : p4
+            startX : p4
+            startY : p4
+            endX : p4
+            endY : p4
             stroke : Color.WHITE
         }
         ]

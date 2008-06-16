@@ -72,24 +72,24 @@ public class CustomCanvas extends CustomNode {
                     }
                 },
                 Line {
-                    x1 : bind 100 + ( 500 * acc )
-                    y1 : 50
-                    x2 : 100
-                    y2 : 50
+                    startX : bind 100 + ( 500 * acc )
+                    startY : 50
+                    endX : 100
+                    endY : 50
                     stroke : Color.WHITE
                 },
                 Line {
-                    x1 : bind 100 + ( 500 * acc )
-                    y1 : 50
-                    x2 : bind 100 + ( 500 * acc ) - 4 * acc / Math.abs( acc )
-                    y2 : 48
+                    startX : bind 100 + ( 500 * acc )
+                    startY : 50
+                    endX : bind 100 + ( 500 * acc ) - 4 * acc / Math.abs( acc )
+                    endY : 48
                     stroke : Color.WHITE
                 },
                 Line {
-                    x1 : bind 100 + ( 500 * acc )
-                    y1 : 50
-                    x2 : bind 100 + ( 500 * acc ) - 4 * acc / Math.abs( acc )
-                    y2 : 52
+                    startX : bind 100 + ( 500 * acc )
+                    startY : 50
+                    endX : bind 100 + ( 500 * acc ) - 4 * acc / Math.abs( acc )
+                    endY : 52
                     stroke : Color.WHITE
                 },
                 parts
