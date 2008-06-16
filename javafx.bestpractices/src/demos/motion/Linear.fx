@@ -23,7 +23,7 @@ Frame {
         background : Color.DARKGRAY
         content : Line {
             transform : [ Translate { y : bind y }]
-            x2 : 200
+            endX : 200
             stroke : Color.WHITE
         }
     }
