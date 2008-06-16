@@ -49,6 +49,14 @@ abstract class Adjustment {
             Document doc = ctx.document();
             doc.insertString(pos.getOffset(), adjustment, null);
         }
+
+
+        public String toString() {
+            return "AddAdjustment[" +
+                    "pos=" + pos +
+                    ", adjustment='" + adjustment + '\'' +
+                    ']';
+        }
     }
 
     private static class ReplaceAdjustment extends Adjustment {
@@ -69,6 +77,14 @@ abstract class Adjustment {
                 doc.insertString(start.getOffset(), replaceWith, null);
         }
 
+
+        public String toString() {
+            return "ReplaceAdjustment[" +
+                    "start=" + start +
+                    ", end=" + end +
+                    ", replaceWith='" + replaceWith + '\'' +
+                    ']';
+        }
     }
 
     private static class IndentAdjustment extends Adjustment {
@@ -82,6 +98,14 @@ abstract class Adjustment {
 
         void apply(Context ctx) throws BadLocationException {
             ctx.modifyIndent(ctx.lineStartOffset(pos.getOffset()), numberOfSpaces);
+        }
+
+
+        public String toString() {
+            return "IndentAdjustment[" +
+                    "pos=" + pos +
+                    ", numberOfSpaces=" + numberOfSpaces +
+                    ']';
         }
     }
 
