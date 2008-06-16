@@ -78,7 +78,7 @@ public class CaseTreeEnvironment extends JavaFXCompletionEnvironment<CaseTree> {
         } else {
             TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(cst, offset);
             if (ts != null && ts.token().id() == JFXTokenId.COLON) {
-                localResult();
+                localResult(null);
                 addKeywordsForStatement();
             }
         }

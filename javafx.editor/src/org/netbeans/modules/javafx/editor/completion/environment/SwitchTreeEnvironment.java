@@ -71,7 +71,7 @@ public class SwitchTreeEnvironment extends JavaFXCompletionEnvironment<SwitchTre
                 lastCase = t;
             }
             if (lastCase != null) {
-                localResult();
+                localResult(null);
                 addKeywordsForStatement();
             } else {
                 TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(st, offset);

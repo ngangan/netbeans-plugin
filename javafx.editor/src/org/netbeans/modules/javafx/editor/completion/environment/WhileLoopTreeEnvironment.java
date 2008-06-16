@@ -59,7 +59,7 @@ public class WhileLoopTreeEnvironment extends JavaFXCompletionEnvironment<WhileL
         log("inside WhileLoopTree " + t);
         WhileLoopTree wlt = t;
         if (getSourcePositions().getEndPosition(root, wlt.getCondition()) <= getOffset()) {
-            localResult();
+            localResult(null);
             addKeywordsForStatement();
         }
 

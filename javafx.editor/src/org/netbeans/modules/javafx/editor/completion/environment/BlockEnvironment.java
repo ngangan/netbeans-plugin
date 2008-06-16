@@ -79,7 +79,7 @@ public class BlockEnvironment extends JavaFXCompletionEnvironment<BlockTree> {
                 }
             }
         }
-        localResult();
+        localResult(null);
         addKeywordsForStatement();
     }
 

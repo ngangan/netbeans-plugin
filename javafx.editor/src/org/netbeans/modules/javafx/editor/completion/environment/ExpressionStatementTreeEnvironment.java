@@ -53,7 +53,6 @@ import java.util.logging.Logger;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -87,7 +86,7 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
                     case WHILE:
                         return;
                 }
-                localResult();
+                localResult(null);
                 Tree parentTree = path.getParentPath().getLeaf();
                 switch (parentTree.getKind()) {
                     case FOR_LOOP:getPath().getLeaf();
@@ -120,7 +119,7 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
             // insideModifiers(tPath);
         } else if (t.getKind() == Tree.Kind.MEMBER_SELECT && ERROR.contentEquals(((MemberSelectTree) t).getIdentifier())) {
             //controller.toPhase(Phase.ELEMENTS_RESOLVED);
-            controller.toPhase(Phase.ANALYZED);
+//            controller.toPhase(Phase.ANALYZED);
             TreePath expPath = new TreePath(tPath, ((MemberSelectTree) t).getExpression());
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
             switch (type.getKind()) {

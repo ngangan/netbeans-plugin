@@ -79,7 +79,7 @@ public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXB
                 }
             }
         }
-        localResult();
+        localResult(null);
         addKeywordsForStatement();
     }
 

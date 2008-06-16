@@ -101,7 +101,7 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
         } else if (parent.getKind() == Tree.Kind.VARIABLE && grandParent.getKind() == Tree.Kind.METHOD) {
             addMemberModifiers(m, true);
         } else {
-            localResult();
+            localResult(null);
             addKeywordsForStatement();
         }
     }   

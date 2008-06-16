@@ -55,7 +55,6 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -138,7 +137,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             }
         
             if (lastNonWhitespaceTokenId != JFXTokenId.STAR) {
-                controller.toPhase(Phase.ANALYZED);
+//                controller.toPhase(Phase.ANALYZED);
                 TreePath parentPath = path.getParentPath();
                 Tree parent = parentPath != null ? parentPath.getLeaf() : null;
                 TreePath grandParentPath = parentPath != null ? parentPath.getParentPath() : null;
@@ -174,7 +173,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     } else if (parent.getKind() == Tree.Kind.METHOD && ((MethodTree)parent).getThrows().contains(fa)) {
                         Types types = controller.getTypes();
                         if (query.queryType == JavaFXCompletionProvider.COMPLETION_QUERY_TYPE && ((MethodTree)parent).getBody() != null) {
-                            controller.toPhase(Phase.ANALYZED);
+//                            controller.toPhase(Phase.ANALYZED);
                             // TODO:
                             log("NOT IMPLEMENTED exs = controller.getTreeUtilities().getUncaughtExceptions(new TreePath(path, ((MethodTree)parent).getBody())); ");
                             JavafxcTrees trees = controller.getTrees();
@@ -309,22 +308,24 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
     }
 
     public TypeMirror getSmartType(MemberSelectTree t) throws IOException {
-        final TreePath treePath = new TreePath(path, t.getExpression());
-        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-        if (type == null) {
-            return null;
-        }
-        
-        int dim = 0;
-        while (dim-- > 0) {
-            if (type.getKind() == TypeKind.ARRAY) {
-                type = ((ArrayType) type).getComponentType();
-            } else {
-                return null;
-            }
-        }
-        
-        return type;
+        return null;
+        // TODO
+//        final TreePath treePath = new TreePath(path, t.getExpression());
+//        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
+//        if (type == null) {
+//            return null;
+//        }
+//        
+//        int dim = 0;
+//        while (dim-- > 0) {
+//            if (type.getKind() == TypeKind.ARRAY) {
+//                type = ((ArrayType) type).getComponentType();
+//            } else {
+//                return null;
+//            }
+//        }
+//        
+//        return type;
     }
 
     private static void log(String s) {

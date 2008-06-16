@@ -70,7 +70,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
         TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
         log("  last == " + last.token().id());
         if (last != null && last.token().id() == JFXTokenId.NEW) {
-            addLocalAndImportedTypes(null, null, null, false);            
+            addLocalAndImportedTypes(null, null, null, false, getSmartType(it));
         } else {
             String s = it.getIdentifier().toString();
             log("  s == " + s);

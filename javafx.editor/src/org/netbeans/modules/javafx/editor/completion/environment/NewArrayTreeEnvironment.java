@@ -78,7 +78,7 @@ public class NewArrayTreeEnvironment extends JavaFXCompletionEnvironment<NewArra
                 if (ts != null && ts.token().id() == JFXTokenId.COMMA) {
                     TreePath parentPath = path.getParentPath();
                     TreePath gparentPath = parentPath.getParentPath();
-                    localResult();
+                    localResult(null);
                     addValueKeywords();
                 }
                 return;
@@ -90,7 +90,7 @@ public class NewArrayTreeEnvironment extends JavaFXCompletionEnvironment<NewArra
             case LBRACE:
                 TreePath parentPath = path.getParentPath();
                 TreePath gparentPath = parentPath.getParentPath();
-                localResult();
+                localResult(null);
                 addValueKeywords();
                 break;
             case RBRACKET:

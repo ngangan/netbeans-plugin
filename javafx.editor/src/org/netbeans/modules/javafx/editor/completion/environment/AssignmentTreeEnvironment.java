@@ -67,7 +67,7 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
                 String asText = getController().getText().substring(asTextStart, offset);
                 int eqPos = asText.indexOf('=');
                 if (eqPos > -1) {
-                    localResult();
+                    localResult(null);
                     addValueKeywords();
                 }
             } else {

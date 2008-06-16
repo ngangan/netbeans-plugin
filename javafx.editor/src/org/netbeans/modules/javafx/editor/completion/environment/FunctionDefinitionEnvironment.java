@@ -140,7 +140,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
                 }
             }
         }
-        localResult();
+        localResult(null);
         addKeywordsForStatement();
     }
 

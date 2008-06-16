@@ -67,7 +67,7 @@ public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironme
                 int eqPos = catText.indexOf('=');
                 //NOI18N
                 if (eqPos > -1) {
-                    localResult();
+                    localResult(null);
                     addValueKeywords();
                 }
             }

@@ -59,7 +59,7 @@ public class IfTreeEnvironment extends JavaFXCompletionEnvironment<IfTree> {
         log("inside IfTree " + t);
         IfTree iff = t;
         if (getSourcePositions().getEndPosition(root, iff.getCondition()) <= getOffset()) {
-            localResult();
+            localResult(null);
             addKeywordsForStatement();
         }
 

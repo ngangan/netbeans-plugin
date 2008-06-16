@@ -67,7 +67,7 @@ public class ArrayAccessTreeEnvironment extends JavaFXCompletionEnvironment<Arra
                 int bPos = aatText.indexOf('[');
                 //NOI18N
                 if (bPos > -1) {
-                    localResult();
+                    localResult(null);
                     addValueKeywords();
                 }
             }

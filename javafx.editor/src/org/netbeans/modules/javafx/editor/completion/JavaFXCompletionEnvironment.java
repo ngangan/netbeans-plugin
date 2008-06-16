@@ -94,7 +94,6 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
@@ -233,7 +232,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, TypeMirror smart) throws IOException {
         log("addMembers: " + type);
-        controller.toPhase(Phase.ANALYZED);
+//        controller.toPhase(Phase.ANALYZED);
 
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             log("RETURNING: type.getKind() == " + type.getKind());
@@ -288,9 +287,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected void localResult() throws IOException {
-        addLocalMembersAndVars(null);
-        addLocalAndImportedTypes(null, null, null, false);
+    protected void localResult(TypeMirror smart) throws IOException {
+        addLocalMembersAndVars(smart);
+        addLocalAndImportedTypes(null, null, null, false, smart);
     }
 
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
@@ -299,7 +298,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addLocalMembersAndVars(TypeMirror smart) throws IOException {
         log("addLocalMembersAndVars: " + prefix);
-        controller.toPhase(Phase.ANALYZED);
+//        controller.toPhase(Phase.ANALYZED);
 
         final JavafxcTrees trees = controller.getTrees();
         if (smart != null && smart.getKind() == TypeKind.DECLARED) {
@@ -655,24 +654,24 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addPackages(pkgName);
     }
 
-    private void addTypes(EnumSet<ElementKind> kinds, DeclaredType baseType, Set<? extends Element> toExclude, boolean insideNew) throws IOException {
-        if (baseType == null) {
-            addAllTypes(kinds, insideNew);
-        } else {
-            Elements elements = controller.getElements();
-            for (DeclaredType subtype : getSubtypesOf(baseType)) {
-                TypeElement elem = (TypeElement) subtype.asElement();
-                addResult(JavaFXCompletionItem.createTypeItem(elem, subtype, offset, elements.isDeprecated(elem), insideNew, true));
-            }
-        }
-        addLocalAndImportedTypes(kinds, baseType, toExclude, insideNew);
-        addPackages(prefix);
-    }
+//    private void addTypes(EnumSet<ElementKind> kinds, DeclaredType baseType, Set<? extends Element> toExclude, boolean insideNew) throws IOException {
+//        if (baseType == null) {
+//            addAllTypes(kinds, insideNew);
+//        } else {
+//            Elements elements = controller.getElements();
+//            for (DeclaredType subtype : getSubtypesOf(baseType)) {
+//                TypeElement elem = (TypeElement) subtype.asElement();
+//                addResult(JavaFXCompletionItem.createTypeItem(elem, subtype, offset, elements.isDeprecated(elem), insideNew, true));
+//            }
+//        }
+//        addLocalAndImportedTypes(kinds, baseType, toExclude, insideNew);
+//        addPackages(prefix);
+//    }
 
-    protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew) throws IOException {
+    protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) throws IOException {
         log("addLocalAndImportedTypes");
         final Elements elements = controller.getElements();
-        final Types types = controller.getTypes();
+//        final Types types = controller.getTypes();
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
@@ -699,11 +698,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             continue;
                         }
                     }
-                    if (JavaFXCompletionProvider.startsWith(name, prefix) &&
-                            !name.contains("$")) {
-                        addResult(JavaFXCompletionItem.createTypeItem(
-                                te, dt, offset,
-                                elements.isDeprecated(local), insideNew, false));
+                    if (smart != null && local.asType() == smart) {
+                        addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, elements.isDeprecated(local), insideNew, true));
+                    }
+                    if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) {
+                        addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, elements.isDeprecated(local), insideNew, false));
                     }
                 }
             }

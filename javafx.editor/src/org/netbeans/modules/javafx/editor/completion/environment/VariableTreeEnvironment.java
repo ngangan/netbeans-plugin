@@ -81,7 +81,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             if (last == null) {
                 insideExpression(new TreePath(path, type));
             } else if (last.token().id() == JFXTokenId.EQ) {
-                localResult();
+                localResult(getSmartType(t));
                 addValueKeywords();
             }
         } else {
@@ -94,7 +94,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
                 if (last == null) {
                     insideExpression(new TreePath(path, type));
                 } else if (last.token().id() == JFXTokenId.EQ) {
-                    localResult();
+                    localResult(getSmartType(t));
                     addValueKeywords();
                 }
             } else {

@@ -69,7 +69,7 @@ public class BinaryTreeEnvironment extends JavaFXCompletionEnvironment<BinaryTre
         if (pos != Diagnostic.NOPOS) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
             if (last != null) {
-                localResult();
+                localResult(null);
                 addValueKeywords();
             }
         }

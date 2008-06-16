@@ -556,18 +556,19 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             VariableItem vi = (VariableItem) obj;
             boolean eNames = vi.varName.equals(this.varName);
-            boolean eTypes = false;
-            if (vi.typeName != null && this.typeName != null) {
-                eTypes = vi.typeName.equals(this.typeName);
-            }
-            return eNames && eTypes;
+//            boolean eTypes = false;
+//            if (vi.typeName != null && this.typeName != null) {
+//                eTypes = vi.typeName.equals(this.typeName);
+//            }
+//            return eNames && eTypes;
+            return eNames;
         }
 
         @Override
         public int hashCode() {
             int hash = 3;
             hash = 97 * hash + (this.varName != null ? this.varName.hashCode() : 0);
-            hash = 97 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
+//            hash = 97 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
             return hash;
         }
 
@@ -971,14 +972,15 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 return false;
             }
             ClassItem ci = (ClassItem) obj;
-            return ci.simpleName.equals(this.simpleName) && ci.type.equals(this.type);
+//            return ci.simpleName.equals(this.simpleName) && ci.type.equals(this.type);
+            return ci.simpleName.equals(this.simpleName);
         }
 
         @Override
         public int hashCode() {
             int hash = 7;
             hash = 53 * hash + (this.simpleName != null ? this.simpleName.hashCode() : 0);
-            hash = 53 * hash + (this.type != null ? this.type.hashCode() : 0);
+//            hash = 53 * hash + (this.type != null ? this.type.hashCode() : 0);
             return hash;
         }
         
