@@ -52,10 +52,10 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import org.netbeans.api.java.classpath.ClassPath.Entry;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
@@ -151,7 +151,7 @@ public class AppletSupport {
     /**
     * @return html file with the same name as applet
     */
-    private static FileObject generateHtml(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir) throws IOException {
+    private static FileObject generateHtml(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform) throws IOException {
         FileObject htmlFile = distDir.getFileObject(appletFile.getName(), HTML_EXT);
         
         if (htmlFile == null) {
@@ -163,7 +163,7 @@ public class AppletSupport {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(htmlFile.getOutputStream(lock));
-            ClassPath cp = ClassPath.getClassPath(appletFile, ClassPath.EXECUTE);
+//            ClassPath cp = ClassPath.getClassPath(appletFile, ClassPath.EXECUTE);
             ClassPath sp = ClassPath.getClassPath(appletFile, ClassPath.SOURCE);
             String path = FileUtil.getRelativePath(sp.findOwnerRoot(appletFile), appletFile);
             String codebase = FileUtil.getRelativePath(buildDir, classesDir);
@@ -173,9 +173,27 @@ public class AppletSupport {
             }
             if (appletFile.getExt().equals("fx")){
                 JavaFXProject project = (JavaFXProject)getProject(appletFile);
+                
                 String distJAR = project.evaluator().getProperty("dist.jar");
                 distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
-                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
+                String libs = distJAR;
+                try{
+                    File fxFolder = new File(((JavaFXPlatform)JavaFXProjectUtil.getActivePlatform(activePlatform)).getJavaFXFolder().toURI());
+                    String[] list = fxFolder.list(new FilenameFilter(){
+                        public boolean accept(File dir, String name){
+                            if (name.endsWith(".jar"))
+                                return true;
+                            else
+                                return false;
+                        }
+                    });
+                    for(int i=0;i < list.length;i++){
+                        libs += ",lib/" + list[i];
+                    }
+                }catch(URISyntaxException e){}
+                
+                
+//                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
                 path = path.substring(0, path.length()-3);
                 fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true); // NOI18N
             }else{
@@ -227,7 +245,7 @@ public class AppletSupport {
             return null;
         }
         try {
-            html = generateHtml(appletFile, buildDir, classesDir, distDir);
+            html = generateHtml(appletFile, buildDir, classesDir, distDir, activePlatform);
             if (html!=null) {
                 return getHTMLPageURL(html, activePlatform);
             }
