@@ -31,11 +31,11 @@ Frame {
                 transform : Translate { y : bind y }
                 content : [
                     Line {
-                        x1 : 0, y1 : 20, x2 : 200, y2 : 0 
+                        startX : 0, startY : 20, endX : 200, endY : 0 
                         stroke : Color.RED
                     },
                     Line {
-                        x1 : 0, y1 : 20, x2 : 200, y2 : 0 
+                        startX : 0, startY : 20, endX : 200, endY : 0 
                         stroke : Color.RED
                         transform : Translate { y : 10 }
                     }
