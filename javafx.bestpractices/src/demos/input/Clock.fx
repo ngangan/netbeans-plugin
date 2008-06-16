@@ -53,27 +53,27 @@ public class ClockWork extends CustomNode {
                 },
                 Line {
                     transform : [ Rotate { angle : bind seconds * 6, x : 100, y : 100 }]
-                    x1 : 100
-                    y1 : 30
-                    x2 : 100
-                    y2 : 100
+                    startX : 100
+                    startY : 30
+                    endX : 100
+                    endY : 100
                     stroke : Color.WHITE
                 },
                 Line {
                     transform : [ Rotate { angle : bind minutes * 6, x : 100, y : 100 }]
-                    x1 : 100
-                    y1 : 40
-                    x2 : 100
-                    y2 : 100
+                    startX : 100
+                    startY : 40
+                    endX : 100
+                    endY : 100
                     stroke : Color.WHITE
                     strokeWidth : 2
                 },
                 Line {
                     transform : [ Rotate { angle : bind hours * 30, x : 100, y : 100 }]
-                    x1 : 100
-                    y1 : 50
-                    x2 : 100
-                    y2 : 100
+                    startX : 100
+                    startY : 50
+                    endX : 100
+                    endY : 100
                     stroke : Color.WHITE
                     strokeWidth : 4
                 }            
