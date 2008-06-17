@@ -142,6 +142,10 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     }
 
     static void setHighlights(Document doc, List<Result> results, List<Result> identifiers) {
+        if (results.isEmpty()) {
+            return;
+        }
+        
         OffsetsBag bag = new OffsetsBag(doc, true);
         for (Result result : results) {
             int start = (int) result.start;
