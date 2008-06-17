@@ -112,6 +112,9 @@ public class BestPracticesWizardPanel implements WizardDescriptor.Panel, WizardD
     }
 
     public void readSettings(Object settings) {
+        if (wizardDescriptor == null){
+            ((WizardDescriptor)settings).putProperty("name", null);
+        }
         wizardDescriptor = (WizardDescriptor) settings;
         component.load( wizardDescriptor );
     }

@@ -105,6 +105,9 @@ public class WeatherFXApplicationWizardPanel implements WizardDescriptor.Panel, 
     }
 
     public void readSettings(Object settings) {
+        if (wizardDescriptor == null){
+            ((WizardDescriptor)settings).putProperty("name", null);
+        }
         wizardDescriptor = (WizardDescriptor) settings;
         component.read(wizardDescriptor);
     }
