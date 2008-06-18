@@ -45,6 +45,7 @@ import com.sun.source.util.TreePath;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
@@ -67,13 +68,18 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
                 String asText = getController().getText().substring(asTextStart, offset);
                 int eqPos = asText.indexOf('=');
                 if (eqPos > -1) {
-                    localResult(null);
+                    localResult(getSmartType(as));
                     addValueKeywords();
                 }
             } else {
                 insideExpression(new TreePath(path, expr));
             }
         }
+    }
+
+    public TypeMirror getSmartType(AssignmentTree as) throws IOException {
+        TypeMirror type = controller.getTrees().getTypeMirror(new TreePath(path, as.getVariable()));
+        return type;
     }
 
     private static void log(String s) {
