@@ -59,6 +59,7 @@ import org.netbeans.modules.editor.indent.spi.Context;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import javax.swing.text.Position;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -68,7 +69,7 @@ import java.util.regex.Pattern;
 /**
  * Implementation of tree path scanner to work with actual AST to provide formating.
  *
- * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
+ * @author Rastislav Komara (<a href="mailto:moonko@netbeans.org">RKo</a>)
  */
 class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>> {
     private static Logger log = Logger.getLogger(Visitor.class.getName());
@@ -145,20 +146,24 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitExpressionStatement(ExpressionStatementTree node, Queue<Adjustment> adjustments) {
         try {
-            final int position = getStartPos(node);
-            if (isFirstOnLine(position)) {
-                indentLine(position, adjustments);
-            } else {
-                adjustments.offer(Adjustment.add(ctx.document().createPosition(position), NEW_LINE_STRING));
-                adjustments.offer(Adjustment.indent(ctx.document().createPosition(position + 1), indentOffset));
-            }
-            if (isMultiline(node)) {
-                indentLine(getEndPos(node), adjustments);
-            }
+            processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
         return super.visitExpressionStatement(node, adjustments);
+    }
+
+    private void processStandaloneNode(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
+        final int position = getStartPos(node);
+        if (isFirstOnLine(position)) {
+            indentLine(position, adjustments);
+        } else {
+            adjustments.offer(Adjustment.add(ctx.document().createPosition(position), NEW_LINE_STRING));
+            adjustments.offer(Adjustment.indent(ctx.document().createPosition(position + 1), indentOffset));
+        }
+        if (isMultiline(node)) {
+            indentLine(getEndPos(node), adjustments);
+        }
     }
 
     @Override
@@ -205,7 +210,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         final Tree tree = getCurrentPath().getParentPath().getLeaf();
         if (tree instanceof BinaryTree) {
             super.visitBinary((BinaryTree) tree, adjustments);
-            return adjustments; 
+            return adjustments;
         }
         try {
             final int offset = getStartPos(node);
@@ -227,7 +232,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                         if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
                             adjustments.offer(Adjustment.add(ctx.document().createPosition(operatorOffset), ONE_SPACE));
                         }
-                        if (!ts.moveNext()) throw new BadLocationException("Concurent modification has occured on document.", ts.offset());
+                        if (!ts.moveNext())
+                            throw new BadLocationException("Concurent modification has occured on document.", ts.offset());
                         if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
                             adjustments.offer(Adjustment.add(ctx.document().createPosition(ts.offset()), ONE_SPACE));
                         }
@@ -270,7 +276,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private boolean isOnSameLine(Tree node, Tree tree) throws BadLocationException {
-        return ctx.lineStartOffset(getStartPos(node)) == ctx.lineStartOffset(getStartPos(tree)) ;
+        return ctx.lineStartOffset(getStartPos(node)) == ctx.lineStartOffset(getStartPos(tree));
     }
 
 
@@ -331,6 +337,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
+/*
     @Override
     public Queue<Adjustment> visitSequenceIndexed(SequenceIndexedTree node, Queue<Adjustment> adjustments) {
         try {
@@ -343,6 +350,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
         return adjustments;
     }
+*/
 
     @Override
     public Queue<Adjustment> visitSequenceSlice(SequenceSliceTree node, Queue<Adjustment> adjustments) {
@@ -433,7 +441,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return adjustments; 
+        return adjustments;
     }
 
     @Override
@@ -454,8 +462,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                         break;
                     default:
                         break;
-
                 }
+                break;
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
@@ -476,7 +484,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 verifyNextIs(JFXTokenId.LPAREN, ts, adjustments, true);
             }
         }
-        verifyBraces(node, adjustments, cs.getMethodDeclBracePlacement());
+        verifyBraces(node, adjustments, cs.getMethodDeclBracePlacement(), cs.spaceBeforeMethodDeclLeftBrace());
     }
 
     private void verifyNextIs(JFXTokenId id, TokenSequence<JFXTokenId> ts, Queue<Adjustment> adjustments, boolean moveNext) throws BadLocationException {
@@ -492,7 +500,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
-    private void verifyBraces(Tree node, Queue<Adjustment> adjustments, BracePlacement bp) throws BadLocationException {
+    @SuppressWarnings({"OverlyComplexMethod"})
+    private void verifyBraces(Tree node, Queue<Adjustment> adjustments, BracePlacement bp, boolean spaceBeforeLeftBrace) throws BadLocationException {
         final TokenSequence<JFXTokenId> ts = tu.tokensFor(node);
         Token<JFXTokenId> obrace = moveTo(ts, JFXTokenId.LBRACE);
         int obraceTokenStart = ts.offset();
@@ -518,7 +527,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     if (nlFound || (obraceTokenStart - (ts.offset() + ts.token().length()) > 1)) {
                         adjustments.offer(Adjustment.replace(doc.createPosition(ts.offset() + ts.token().length()),
                                 doc.createPosition(obraceTokenStart),
-                                cs.spaceBeforeClassDeclLeftBrace() ? ONE_SPACE : STRING_ZERO_LENGTH));
+                                spaceBeforeLeftBrace ? ONE_SPACE : STRING_ZERO_LENGTH));
                     }
                     break;
                 case NEW_LINE:
@@ -537,30 +546,37 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
             }
 
-            checkEndBrace(node, adjustments, ts, obraceTokenStart);
+            checkEndBrace(node, adjustments, ts);
             indentOffset = oldIndent;
         }
 
     }
 
-    private void checkEndBrace(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts, int obraceTokenStart) throws BadLocationException {
+    private void checkEndBrace(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
         Document doc = ctx.document();
         final int end = getEndPos(node);
-        ts.move(end - 1); //getting into last token...
-        if (ts.moveNext()) {
-            //we are @the end.
-            do {
-                if (ts.token().id() == JFXTokenId.RBRACE) {
-                    li.moveTo(obraceTokenStart);
-                    Element st = li.get();
-                    li.moveTo(end);
-                    if (st.equals(li.get())) {
-                        adjustments.offer(Adjustment.add(doc.createPosition(ts.offset()), NEW_LINE_STRING));
+        ts.move(end); //getting into last token...
+        if (ts.movePrevious() && ts.token().id() != JFXTokenId.RBRACE) {
+            return;
+        }
+        while (ts.movePrevious()) {
+            final JFXTokenId id = ts.token().id();
+            switch (id) {
+                case WS: {
+                    final CharSequence cs = ts.token().text();
+                    if (cs != null && "\n".equals(cs.toString())) {
+                        indentEndLine(node, adjustments);
+                        return;
                     }
-                    break;
+                    continue;
                 }
-            } while (ts.movePrevious());
-            indentLine(ts.offset(), adjustments);
+                default: {
+                    adjustments.offer(Adjustment.add(doc.createPosition(end - 1), NEW_LINE_STRING));
+                    adjustments.offer(Adjustment.indent(doc.createPosition(end), indentOffset));
+                    return;
+                }
+            }
+
         }
     }
 
@@ -599,7 +615,13 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitAssignment(AssignmentTree node, Queue<Adjustment> adjustments) {
-        return super.visitAssignment(node, adjustments);
+        try {
+            processStandaloneNode(node, adjustments);
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        super.visitAssignment(node, adjustments);
+        return adjustments;
     }
 
     @Override
@@ -613,14 +635,40 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             super.visitInstantiate(node, adjustments);
             decIndent();
             if (isMultiline(node)) {
-                final int end = getEndPos(node);
-//                if (isFirstOnLine(end))
-                    indentLine(end, adjustments);
+                indentEndLine(node, adjustments);
             }
+
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
         return adjustments;
+    }
+
+    private void indentEndLine(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
+        final int endPos = getEndPos(node);
+        final TokenSequence<JFXTokenId> ts = ts(node);
+        ts.move(endPos);
+        boolean shouldIndent = false;
+        while (ts.movePrevious()) {
+            final JFXTokenId id = ts.token().id();
+            switch (id) {
+                case RBRACE:
+                case RPAREN: {
+                    shouldIndent = true;
+                    continue;
+                }
+                case WS: {
+                    final CharSequence cs = ts.token().text();
+                    if (cs != null && "\n".equals(cs.toString()) && shouldIndent) {
+                        indentLine(endPos, adjustments);
+                        return;
+                    }
+                    continue;
+                }
+                default:
+                    return;
+            }
+        }
     }
 
     private int getEndPos(Tree node) {
@@ -660,12 +708,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             incIndent();
             super.visitClassDeclaration(node, adjustments);
             decIndent();
-
-//            pos = ctx.lineStartOffset((int) sps.getEndPosition(cu(), getCurrentPath().getLeaf()));
-//            indentLine(pos, adjustments);
-
-//            verifyBracesAndSpaces(node, adjustments);
-            verifyBraces(node, adjustments, cs.getClassDeclBracePlacement());
+            verifyBraces(node, adjustments, cs.getClassDeclBracePlacement(), cs.spaceBeforeClassDeclLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
@@ -680,9 +723,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         if (log.isLoggable(Level.FINE)) log.fine("Visiting import" + importTree);
         try {
             final int ls = ctx.lineStartOffset(getStartPos(importTree));
-            if (indentOffset != ctx.lineIndent(ls)) {
-                adjustments.offer(Adjustment.indent(ctx.document().createPosition(ls), indentOffset));
-            }
+            processStandaloneNode(importTree, adjustments);
             if (firstImport == null) {
                 firstImport = getFirstImport();
             }
@@ -746,14 +787,23 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-    public Queue<Adjustment> visitReturn(ReturnTree returnTree, Queue<Adjustment> adjustments) {
-        int offset = getStartPos(returnTree);
+    public Queue<Adjustment> visitCompoundAssignment(CompoundAssignmentTree node, Queue<Adjustment> adjustments) {
+        if (getCurrentPath().getParentPath().getLeaf() instanceof ExpressionStatementTree) {
+            return adjustments;
+        }
         try {
-            if (!isFirstOnLine(offset)) {
-                adjustments.offer(Adjustment.add(ctx.document().createPosition(offset), NEW_LINE_STRING));
-                offset += 1;
-            }
-            indentLine(offset, adjustments);
+            processStandaloneNode(node, adjustments);
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        super.visitCompoundAssignment(node, adjustments);
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitReturn(ReturnTree returnTree, Queue<Adjustment> adjustments) {
+        try {
+            processStandaloneNode(returnTree, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
@@ -782,7 +832,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 incIndent();
                 super.visitBlock(blockTree, adjustments);
                 decIndent();
-                verifyBraces(blockTree, adjustments, cs.getOtherBracePlacement());
+//                verifyBraces(blockTree, adjustments, cs.getOtherBracePlacement(), false);
             } catch (BadLocationException e) {
                 if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
             }
@@ -791,7 +841,144 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-//    @Override
+    @Override
+    public Queue<Adjustment> visitWhileLoop(WhileLoopTree node, Queue<Adjustment> adjustments) {
+        try {
+            verifySpaceBefore(node, adjustments, cs.spaceBeforeWhile());
+            verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        super.visitWhileLoop(node, adjustments);
+        return adjustments;
+    }
+
+    private void verifySpaceBefore(Tree node, Queue<Adjustment> adjustments, boolean spaceBefore) throws BadLocationException {
+        final int start = getStartPos(node);
+        if (!isFirstOnLine(start) && spaceBefore) {
+            final TokenSequence<JFXTokenId> ts = ts();
+            ts.move(start);
+            if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
+                adjustments.offer(Adjustment.add(toPos(start), STRING_EMPTY_LENGTH_ONE));
+            }
+        }
+    }
+
+    @Override
+    public Queue<Adjustment> visitForExpression(ForExpressionTree node, Queue<Adjustment> adjustments) {
+        try {
+            processStandaloneNode(node, adjustments);
+            verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        return super.visitForExpression(node, adjustments);
+    }
+
+    @Override
+    public Queue<Adjustment> visitIf(IfTree node, Queue<Adjustment> adjustments) {
+        try {
+            processStandaloneNode(node, adjustments);
+            verifyBraces(node.getThenStatement(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeIfLeftBrace());
+            verifySpaceBefore(node.getElseStatement(), adjustments, cs.spaceBeforeElse());
+            verifyBraces(node.getElseStatement(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace());
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        return super.visitIf(node, adjustments);
+    }
+
+    private Position toPos(int index) throws BadLocationException {
+        return ctx.document().createPosition(index);
+    }
+
+    @Override
+    public Queue<Adjustment> visitTry(TryTree node, Queue<Adjustment> adjustments) {
+        try {
+            processStandaloneNode(node, adjustments);
+            verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeTryLeftBrace());
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        super.visitTry(node, adjustments);
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitCatch(CatchTree node, Queue<Adjustment> adjustments) {
+        try {
+            final int start = getStartPos(node);
+            if (cs.placeCatchOnNewLine() && !isFirstOnLine(start)) {
+                adjustments.offer(Adjustment.add(toPos(start), NEW_LINE_STRING));
+                adjustments.offer(Adjustment.indent(toPos(start + 1), indentOffset));
+                verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeCatchLeftBrace());
+                verifyParens(node, adjustments, cs.spaceBeforeCatchParen(), false);
+            } else if (!cs.placeCatchOnNewLine() && isFirstOnLine(start)) {
+                final TokenSequence<JFXTokenId> ts = ts();
+                ts.move(start);
+                while (ts.movePrevious()) {
+                    if (ts.token().id() == JFXTokenId.RBRACE) {
+                        adjustments.offer(Adjustment.replace(toPos(ts.offset() + ts.token().length()),
+                                toPos(start), cs.spaceBeforeCatch() ? STRING_EMPTY_LENGTH_ONE : STRING_ZERO_LENGTH));
+                        verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeCatchLeftBrace());
+                        verifyParens(node, adjustments, cs.spaceBeforeCatchParen(), false);
+                        break;
+                    }
+                }
+            } else {
+                verifySpaceBefore(node, adjustments, cs.spaceBeforeCatch() && !cs.placeCatchOnNewLine());
+                verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeCatchLeftBrace());
+                verifyParens(node, adjustments, cs.spaceBeforeCatchParen(), cs.spaceWithinCatchParens());
+            }
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        super.visitCatch(node, adjustments);
+        return adjustments;
+    }
+
+    @SuppressWarnings({"MethodWithMultipleLoops"})
+    private void verifyParens(Tree node, Queue<Adjustment> adjustments, boolean spaceBeforParen, boolean spaceWithin) throws BadLocationException {
+        final TokenSequence<JFXTokenId> ts = ts(node);
+        ts.move(getStartPos(node));
+        final int endPos = getEndPos(node);
+        while (ts.moveNext() && ts.offset() < endPos) {
+            JFXTokenId id = ts.token().id();
+            if (id == JFXTokenId.LPAREN) {
+                int lps = ts.offset();
+                int tl = ts.token().length();
+                spaceWithin(adjustments, spaceWithin, ts, endPos, lps + tl);
+                ts.move(lps);
+                while (ts.movePrevious()) {
+                    id = ts.token().id();
+                    if (id != JFXTokenId.WS) {
+                        adjustments.offer(Adjustment.replace(toPos(ts.offset() + ts.token().length()),
+                                toPos(lps), spaceBeforParen ? STRING_EMPTY_LENGTH_ONE : STRING_ZERO_LENGTH));
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void spaceWithin(Queue<Adjustment> adjustments, boolean spaceWithin, TokenSequence<JFXTokenId> ts, int endPos, int parenEndIndex) throws BadLocationException {
+        if (spaceWithin) {
+            if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
+                adjustments.offer(Adjustment.add(toPos(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+            }
+        } else {
+            if (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
+                while (ts.moveNext() && ts.offset() < endPos) {
+                    if (ts.token().id() != JFXTokenId.WS) {
+                        adjustments.offer(Adjustment.delete(toPos(parenEndIndex), toPos(ts.offset())));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //    @Override
 //    public Queue<Adjustment> visitStringExpression(StringExpressionTree stringExpressionTree, Queue<Adjustment> adjustments) {
 //        SourcePositions sps = sp();
 //        try {
@@ -897,4 +1084,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private boolean isEmpty(String text) {
         return text == null || text.length() == 0 || EMPTY_LINE_PTRN.matcher(text).matches();
     }
+
+
 }

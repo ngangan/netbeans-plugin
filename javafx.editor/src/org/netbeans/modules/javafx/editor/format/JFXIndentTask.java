@@ -260,7 +260,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             reindent();
             return;
         }
- */       if (System.getProperty("javafx.editor.enableReformat") != null) {
+ */
+        //if (System.getProperty("javafx.editor.enableReformat") != null) {
             final JavaFXSource s = JavaFXSource.forDocument(context.document());
             try {
                 s.runUserActionTask(new Task<CompilationController>() {
@@ -286,9 +287,9 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        } else {
-            reindent();
-        }
+//        } else {
+//            reindent();
+//        }
 
     }
 
