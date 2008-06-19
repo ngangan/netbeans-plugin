@@ -230,9 +230,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         query.results.add(i);
     }
 
-    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, TypeMirror smart) throws IOException {
+    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
         log("addMembers: " + type);
-//        controller.toPhase(Phase.ANALYZED);
 
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             log("RETURNING: type.getKind() == " + type.getKind());
@@ -244,25 +243,25 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (dt.asElement().getKind() != ElementKind.CLASS) {
             return;
         }
-
-        HashSet<String> fieldNames = new HashSet<String>();
+        
         Elements elements = controller.getElements();
-        for (Element member : elements.getAllMembers((TypeElement) dt.asElement())) {
-            log("    member == " + member + " member.getKind() " + member.getKind());
+        final TypeElement te = (TypeElement) dt.asElement();
+        for (Element member : te.getEnclosedElements()) {
+            log("    member1 = " + member + " member1.getKind() " + member.getKind());
+            String s = member.getSimpleName().toString();
+            if (fields && member.getKind() == ElementKind.FIELD) {
+                    addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
+            }
+        }
+
+        for (Element member : elements.getAllMembers(te)) {
+            log("    member2 == " + member + " member2.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
             if (methods && member.getKind() == ElementKind.METHOD) {
                 if (s.contains("$")) {
                     continue;
                 }
 
-                Symbol.MethodSymbol sym = (Symbol.MethodSymbol) member;
-                if (smart != null && sym.getReturnType().getKind() == smart.getKind()) {
-                    addResult(
-                            JavaFXCompletionItem.createExecutableItem(
-                            (ExecutableElement) member,
-                            (ExecutableType) member.asType(),
-                            offset, false, false, false, true));
-                }
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     addResult(
                             JavaFXCompletionItem.createExecutableItem(
@@ -271,15 +270,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             offset, false, false, false, false));
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
-                if (fieldNames.contains(s)) {
-                    continue;
-                }
-
-                fieldNames.add(s);
-                Symbol.VarSymbol sym = (Symbol.VarSymbol) member;
-                if (smart != null && sym.type.getKind() == smart.getKind()) {
-                    addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
-                }
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     addResult(JavaFXCompletionItem.createVariableItem(s, offset, false));
                 }
@@ -354,7 +344,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (k == JavaFXKind.CLASS_DECLARATION) {
                 TypeMirror tm = trees.getTypeMirror(tp);
                 log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind()));
-                addMembers(tm, true, true, smart);
+                addMembers(tm, true, true);
             }
             if (k == JavaFXKind.BLOCK_EXPRESSION) {
                 addBlockExpressionLocals((BlockExpressionTree) jfxt, tp, smart);
