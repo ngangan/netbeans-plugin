@@ -17,3 +17,6 @@ derby\.log
 ^javafx.lib/external$
 ^javafx.sdk.win/external$
 ^javafx.graphicssample/src/org/netbeans/modules/javafx/graphicssample/resources/zip/JavaFX2DTutorialProject.zip
+^javafx.sdk.lin/external/javafx_sdk-1_0-pre1-linux-i586.zip
+^javafx.sdk.mac/external/javafx_sdk-1_0-pre1-macosx-universal.zip
+^javafx.sdk.sol/external/javafx_sdk-1_0-pre1-solaris-sparc.zip
