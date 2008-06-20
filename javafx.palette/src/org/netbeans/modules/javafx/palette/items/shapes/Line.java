@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.palette.items.shapes;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
+import org.netbeans.modules.javafx.palette.utils.Util;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -56,6 +57,11 @@ public class Line implements ActiveEditorDrop {
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
+        
+        // Imports
+        Util.addImport( targetComponent, "javafx.gui.Line" );
+        Util.addImport( targetComponent, "javafx.gui.Color" );
+        
         return true;
     }
     
