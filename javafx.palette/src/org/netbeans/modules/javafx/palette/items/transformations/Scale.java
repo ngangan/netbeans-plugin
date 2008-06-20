@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.palette.items.transformations;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
+import org.netbeans.modules.javafx.palette.utils.Util;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -56,6 +57,10 @@ public class Scale implements ActiveEditorDrop {
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
+        
+        // Import
+        Util.addImport( targetComponent, "javafx.gui.Scale" );
+        
         return true;
     }    
 }
