@@ -49,9 +49,9 @@ import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
-import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -61,6 +61,7 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 
 /**
@@ -294,7 +295,7 @@ public final class TreeUtilities {
         if ((start == -1) || (end == -1)) {
             throw new RuntimeException("RE Cannot determine start and end for: " + treeToString(info, tree));
         }
-        TokenSequence<JFXTokenId> t = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> t = ((TokenHierarchy<?>)info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         if (t == null) {
             throw new RuntimeException("RE SDid not get a token sequence.");
         }
@@ -365,15 +366,15 @@ public final class TreeUtilities {
         if (scope instanceof JavafxcScope 
                 && member instanceof Symbol 
                 && type instanceof Type) {
-//            Resolve resolve = Resolve.instance(info.impl.getContext());
-            JavafxResolve resolve =JavafxResolve.instance(info.impl.getContext());
+            Resolve resolve = Resolve.instance(info.impl.getContext());
+//            JavafxResolve resolve =JavafxResolve.instance(info.impl.getContext());
 	    return resolve.isAccessible(((JavafxcScope)scope).getEnv(), (Type) type, (Symbol) member);  
         } else 
             return false;
     }
 
     public boolean isStaticContext(Scope scope) {
-        return JavafxResolve.isStatic(((JavafxcScope)scope).getEnv());
+        return Resolve.isStatic(((JavafxcScope)scope).getEnv());
     }
 
     private static void log(String s) {
