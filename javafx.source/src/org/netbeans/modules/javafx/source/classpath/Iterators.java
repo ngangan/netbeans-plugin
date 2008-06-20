@@ -82,7 +82,7 @@ public final class Iterators {
         }
         
         public Iterator<T> iterator() {
-            return new ChainedIterator (this.iterables);
+            return new ChainedIterator<T> (this.iterables);
         }        
     }
 

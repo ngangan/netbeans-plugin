@@ -202,6 +202,7 @@ public final class ElementUtilities {
      * @return all members in the type
      * @see Elements#getAllMembers
      */
+    @SuppressWarnings("fallthrough")
     public Iterable<? extends Element> getMembers(TypeMirror type, ElementAcceptor acceptor) {
         ArrayList<Element> members = new ArrayList<Element>();
         if (type != null) {
