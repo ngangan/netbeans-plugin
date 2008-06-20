@@ -265,7 +265,6 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             final JavaFXSource s = JavaFXSource.forDocument(context.document());
             try {
                 s.runUserActionTask(new Task<CompilationController>() {
-
                     public void run(CompilationController controller) throws Exception {
                         final long s = System.currentTimeMillis();
                         final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
@@ -275,9 +274,11 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                             if (log.isLoggable(Level.INFO))
                                 log.info("The " + phase + " phase has been reached ... OK!");
                             final int offset = context.startOffset();
-                            int dot = offset == 0 ? 0 : context.lineIndent(context.lineStartOffset(offset));
                             final TreeUtilities tu = controller.getTreeUtilities();
                             final TreePath path = tu.pathFor(context.startOffset());
+                            final int position = (int) controller.getTrees().getSourcePositions()
+                                    .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
+                            int dot = offset == 0 ? 0 : context.lineIndent(context.lineStartOffset(position));
                             Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
                             final Queue<Adjustment> list = visitor.scan(path, new LinkedList<Adjustment>());
                             applyAdjustments(list);
