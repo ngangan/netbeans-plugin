@@ -66,7 +66,6 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
 import javax.lang.model.element.Element;
-import javax.lang.model.type.TypeMirror;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.util.Convert;
@@ -257,7 +256,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return project.getClassPathProvider();
     }
     
-    private static ClasspathInfo createClassPathInfo(JavaFXProject project) {
+    public static ClasspathInfo createClassPathInfo(JavaFXProject project) {
         ClassPath srcPath = null;
         ClassPath bootPath = null;
         ClassPath compilePath = null;

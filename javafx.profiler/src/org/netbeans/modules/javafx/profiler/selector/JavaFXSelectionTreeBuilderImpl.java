@@ -45,16 +45,18 @@ import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.nodes.ProjectNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
+import org.netbeans.modules.javafx.profiler.selector.node.JavaFXProjectPackages;
 import org.openide.util.NbBundle;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.modules.javafx.profiler.selector.node.JavaFXProjectChildren;
 import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
+import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
 
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author cms
  */
 public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
@@ -86,12 +88,12 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     }
 
     // </editor-fold>
-    public List<SelectorNode> buildSelectionTree(final Project project, final boolean includeSubprojects) {
+    public List<SelectorNode> buildSelectionTree(Project project, final boolean includeSubprojects) {
         List<SelectorNode> roots = new ArrayList<SelectorNode>();
 
         ProjectNode projectRoot = new ProjectNode(project, includeSubprojects) {
             protected SelectorChildren getChildren() {
-                return new JavaFXProjectChildren(project);
+                return new Children(includeSubprojects);
             }
         };
 
@@ -99,7 +101,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
 
         return roots;
     }
-
+    
     public boolean supports(Project project) {
         return project instanceof JavaFXProject;
     }
@@ -107,5 +109,68 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     @Override
     public String toString() {
         return getDisplayName();
+    }
+    
+    private class LibrariesNode extends ContainerNode {
+        //~ Instance fields ------------------------------------------------------------------------------------------------------
+
+        private final boolean includeSubprojects;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        public LibrariesNode(final boolean includeSubprojects, final ContainerNode parent) {
+            super(LIBRARIES_STRING, IconResource.LIBRARIES_ICON, parent);
+            this.includeSubprojects = includeSubprojects;
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        protected SelectorChildren getChildren() {
+            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Libraries, includeSubprojects);
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Nodes & Children">
+    private class SourcesNode extends ContainerNode {
+        //~ Instance fields ------------------------------------------------------------------------------------------------------
+
+        private final boolean includeSubprojects;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        public SourcesNode(final boolean includeSubprojects, final ContainerNode parent) {
+            super(SOURCES_STRING, IconResource.PACKAGE_ICON, parent);
+            this.includeSubprojects = includeSubprojects;
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        protected SelectorChildren getChildren() {
+            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Source, includeSubprojects);
+        }
+    }
+
+    private class Children extends SelectorChildren<ProjectNode> {
+        //~ Instance fields ------------------------------------------------------------------------------------------------------
+
+        private final boolean includeSubprojects;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        public Children(boolean includeSubprojects) {
+            this.includeSubprojects = includeSubprojects;
+        }
+
+        @Override
+        protected List<SelectorNode> prepareChildren(ProjectNode parent) {
+            List<SelectorNode> nodes = new ArrayList<SelectorNode>(2);
+            nodes.add(new SourcesNode(includeSubprojects, parent));
+// TBD LibrariesNode not implemented so far            
+//            nodes.add(new LibrariesNode(includeSubprojects, parent));
+
+            return nodes;
+        }
+        
+        //~ Methods --------------------------------------------------------------------------------------------------------------
     }
 }
