@@ -185,6 +185,13 @@ public class JavaFXProjectProperties {
     public static final String WEBSTART_NO_OFFLINE = "webstart.nooffline"; //NOI18N
     public static final String WEBSTART_SELFSIGNED = "webstart.selfsigned"; //NOI18N
 */    
+    //Applet properties
+    
+    public static final String APPLET_JAVASCRIPT="applet.javascript.enable";
+    public static final String APPLET_JNLP = "applet.from.jnlp";
+    public static final String APPLET_DRAGGABLE = "applet.draggable";
+    public static final String APPLET_ARGUMENTS = "applet.java.arguments";
+    public static final String APPLET_RUN_IN_BROWSER="applet.run.in.browser";
     // Properties stored in the PRIVATE.PROPERTIES
     public static final String APPLICATION_ARGS = "application.args"; // NOI18N
     public static final String JAVADOC_PREVIEW="javadoc.preview"; // NOI18N
@@ -278,6 +285,14 @@ public class JavaFXProjectProperties {
     ButtonModel WEBSTART_NO_OFFLINE_MODEL;
     ButtonModel WEBSTART_SELFSIGNED_MODEL;
     */
+    
+    //CustomizerApplet
+    ButtonModel javaScriptModel;
+    ButtonModel jnlpFileModel;
+    ButtonModel draggableModel;
+    ButtonModel runAppletInBrowser;
+    Document javaArgumentsDocument;
+    
     // CustomizerRunTest
 
     // Private fields ----------------------------------------------------------    
@@ -415,6 +430,12 @@ public class JavaFXProjectProperties {
         WEBSTART_NO_OFFLINE_MODEL = projectGroup.createInverseToggleButtonModel(evaluator, WEBSTART_NO_OFFLINE);
         WEBSTART_SELFSIGNED_MODEL = projectGroup.createToggleButtonModel(evaluator, WEBSTART_SELFSIGNED);
         */
+        //CustomizerApplet
+        javaScriptModel = projectGroup.createToggleButtonModel(evaluator, APPLET_JAVASCRIPT);
+        jnlpFileModel = projectGroup.createToggleButtonModel(evaluator, APPLET_JNLP);
+        draggableModel = projectGroup.createToggleButtonModel(evaluator, APPLET_DRAGGABLE);
+        javaArgumentsDocument = projectGroup.createStringDocument(evaluator, APPLET_ARGUMENTS);
+        runAppletInBrowser = projectGroup.createToggleButtonModel(evaluator, APPLET_RUN_IN_BROWSER);
         // CustomizerRun
         RUN_CONFIGS = readRunConfigs();
         activeConfig = evaluator.getProperty("config");
