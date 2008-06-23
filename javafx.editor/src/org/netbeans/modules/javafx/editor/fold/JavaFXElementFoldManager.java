@@ -250,8 +250,8 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 return ;
             }
             
-            //check for initial fold:
-            v.checkInitialFold();
+            //check for comments folds:
+            v.addCommentsFolds();
             
             if (v.stopped || isCancelled()) {
                 return ;
@@ -379,76 +379,37 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             this.sp = sp;
         }
         
-        public void checkInitialFold() {
-            try {
-                TokenHierarchy<?> th = info.getTokenHierarchy();
-                if (th == null) {
-                    stopped = true;
-                    return;
-                }
-                TokenSequence<JFXTokenId>  ts = th.tokenSequence(JFXTokenId.language());
-                
-                while (ts.moveNext()) {
-                    Token<JFXTokenId> token = ts.token();
-                    
-                    if (token.id() == JFXTokenId.COMMENT) {
-                        Document doc   = operation.getHierarchy().getComponent().getDocument();
-                        int startOffset = ts.offset();
-                        boolean collapsed = foldInitialCommentsPreset;
-                        
-                        if (initialCommentFold != null) {
-                            collapsed = initialCommentFold.isCollapsed();
-                        }
-                        log("checkInitialFold adding fold [" + startOffset + ":" + (startOffset + token.length()) + "]");
-                        folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), INITIAL_COMMENT_FOLD_TEMPLATE, collapsed));
-                    }
-                    
-                    if (token.id() != JFXTokenId.WS)
-                        break;
-                }
-            } catch (BadLocationException e) {
-                //the document probably changed, stop
-                stopped = true;
-            } catch (ConcurrentModificationException e) {
-                //from TokenSequence, document probably changed, stop
-                stopped = true;
-            }
-        }
-        
-        private void handleJavadoc(Tree t) throws BadLocationException, ConcurrentModificationException {
-            int start = (int) sp.getStartPosition(cu, t);
-            
-            if (start == (-1)) {
-                // debug:
-                dumpPositions(t, start, -15);
-                return ;
-            }
-            
+        private void addCommentsFolds() {
             TokenHierarchy<?> th = info.getTokenHierarchy();
             if (th == null) {
+                log("addCommentsFolds returning because of null token hierarchy.");
                 return;
             }
             TokenSequence<JFXTokenId>  ts = th.tokenSequence(JFXTokenId.language());
-            
-            if (ts.move(start) == Integer.MAX_VALUE) {
-                return;//nothing
-            }
-            
-            while (ts.movePrevious()) {
+            boolean firstNormalFold = true;
+            while (ts.moveNext()) {
                 Token<JFXTokenId> token = ts.token();
-                
-                if ((token.id() == JFXTokenId.DOC_COMMENT) || 
-                    (token.id() == JFXTokenId.COMMENT)) {
-                    Document doc   = operation.getHierarchy().getComponent().getDocument();
-                    int startOffset = ts.offset();
-                    log("handleJavadoc adding fold [" + startOffset + ":" + (startOffset + token.length()) + "] for javadoc tree: " + t);
-                    folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
-                }
-                if (token.id() != JFXTokenId.ABSTRACT &&
-                    token.id() != JFXTokenId.PUBLIC &&
-                    token.id() != JFXTokenId.WS &&
-                    token.id() != JFXTokenId.LINE_COMMENT) {
-                    break;
+                try {
+                    if (token.id() == JFXTokenId.DOC_COMMENT) {
+                        Document doc   = operation.getHierarchy().getComponent().getDocument();
+                        int startOffset = ts.offset();
+                        log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset);
+                        folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
+                    }
+                    if (token.id() == JFXTokenId.COMMENT) {
+                        Document doc   = operation.getHierarchy().getComponent().getDocument();
+                        int startOffset = ts.offset();
+                        log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]");
+                        if (firstNormalFold) {
+                            log("foldInitialCommentsPreset == " + foldInitialCommentsPreset + " on " + token.text());
+                        }
+                        folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), INITIAL_COMMENT_FOLD_TEMPLATE, firstNormalFold ? foldInitialCommentsPreset : false));
+                        firstNormalFold = false;
+                    }
+                } catch (BadLocationException ble) {
+                    if (LOGGABLE) {
+                        logger.log(Level.FINE, "addDocComments continuing", ble);
+                    }
                 }
             }
         }
@@ -468,8 +429,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                         dumpPositions(node, start, end);
                     }
                 }
-                
-                handleJavadoc(javadocTree != null ? javadocTree : node);
             } catch (BadLocationException e) {
                 //the document probably changed, stop
                 stopped = true;
@@ -500,8 +459,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 } else {
                     dumpPositions(node, start, end);
                 }
-                
-                handleJavadoc(node);
             } catch (BadLocationException e) {
                 //the document probably changed, stop
                 stopped = true;
@@ -533,8 +490,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 } else {
                     dumpPositions(node, start, end);
                 }
-                
-                handleJavadoc(node);
             } catch (BadLocationException e) {
                 //the document probably changed, stop
                 stopped = true;
