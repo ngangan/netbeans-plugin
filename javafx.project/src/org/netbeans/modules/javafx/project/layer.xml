@@ -103,6 +103,9 @@ made subject to such option by the copyright holder.
                     <file name="WebStart.instance">
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createWebStart"/>
                     </file>    
+                    <file name="Applet.instance">
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createApplet"/>
+                    </file>    
                 </folder>
 <!--                
                 <attr name="Application/Client.instance" boolvalue="true"/>

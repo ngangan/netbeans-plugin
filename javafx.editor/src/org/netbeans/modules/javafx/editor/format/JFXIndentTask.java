@@ -61,10 +61,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -189,10 +188,12 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                 } else
                 if (t.id() == JFXTokenId.RBRACE || t.id() == JFXTokenId.RPAREN || t.id() == JFXTokenId.RBRACKET) {
                     level -= getIndentStepLevel();
+                } else if (t.id() == JFXTokenId.COMMENT) {
+                    level -= getIndentStepLevel();
                 }
                 t = ts.moveNext() ? ts.token() : null;
             }
-
+                                                                
             // Handle special cases. This cases are handled with small guessing.
             int nlo = adjustOffsetToNewLine(lso, lso); //start offset of next line
             if (KEEP_LEVEL_PTRN.matcher(document.getText(lso, nlo - lso)).matches()) {
@@ -255,39 +256,39 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reformat() throws BadLocationException {
- /*       if (context == null) throw new IllegalStateException("The context of task is null!");
-        if (context.isIndent()) {
-            reindent();
-            return;
-        }
- */
+        /*       if (context == null) throw new IllegalStateException("The context of task is null!");
+               if (context.isIndent()) {
+                   reindent();
+                   return;
+               }
+        */
         //if (System.getProperty("javafx.editor.enableReformat") != null) {
-            final JavaFXSource s = JavaFXSource.forDocument(context.document());
-            try {
-                s.runUserActionTask(new Task<CompilationController>() {
-                    public void run(CompilationController controller) throws Exception {
-                        final long s = System.currentTimeMillis();
-                        final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
+        final JavaFXSource s = JavaFXSource.forDocument(context.document());
+        try {
+            s.runUserActionTask(new Task<CompilationController>() {
+                public void run(CompilationController controller) throws Exception {
+                    final long s = System.currentTimeMillis();
+                    final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
+                    if (log.isLoggable(Level.INFO))
+                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
+                    if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
                         if (log.isLoggable(Level.INFO))
-                            log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
-                        if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
-                            if (log.isLoggable(Level.INFO))
-                                log.info("The " + phase + " phase has been reached ... OK!");
-                            final int offset = context.startOffset();
-                            final TreeUtilities tu = controller.getTreeUtilities();
-                            final TreePath path = tu.pathFor(context.startOffset());
-                            final int position = (int) controller.getTrees().getSourcePositions()
-                                    .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
-                            int dot = offset == 0 ? 0 : position < 0 ? 0 : context.lineIndent(context.lineStartOffset(position));
-                            Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
-                            final Queue<Adjustment> list = visitor.scan(path, new LinkedList<Adjustment>());
-                            applyAdjustments(list);
-                        }
+                            log.info("The " + phase + " phase has been reached ... OK!");
+                        final int offset = context.startOffset();
+                        final TreeUtilities tu = controller.getTreeUtilities();
+                        final TreePath path = tu.pathFor(context.startOffset());
+                        final int position = (int) controller.getTrees().getSourcePositions()
+                                .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
+                        int dot = offset == 0 ? 0 : position < 0 ? 0 : context.lineIndent(context.lineStartOffset(position));
+                        Visitor visitor = new Visitor(controller, context, dot, null); //TODO: [RKo] Try to identify project.;
+                        final Queue<Adjustment> list = visitor.scan(path, new LinkedList<Adjustment>());
+                        applyAdjustments(list);
                     }
-                }, true);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+                }
+            }, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 //        } else {
 //            reindent();
 //        }

@@ -87,9 +87,10 @@ final class ElementOpen {
 
         if (!comp.getJavafxTypes().isJFXClass((Symbol)tel)) { // java
             openThroughJavaSupport(comp.getJavaFXSource().getFileObject(), el);
-        } else {
+        } //else {
             // Find the source file
             final FileObject srcFile = getFile(el, comp);
+            if (srcFile == null) return;
 
             JavaFXSource js = JavaFXSource.forFileObject(srcFile);
             
@@ -116,7 +117,7 @@ final class ElementOpen {
                 }
             }, true);
     
-        }
+//        }
     }
 
     private static Element resolve(Element orig, CompilationController context) {
@@ -213,9 +214,12 @@ final class ElementOpen {
 
             for (ClassPath cp : all) { // cp never null
                 for (FileObject binRoot : cp.getRoots()) {
+                    FileObject fo = binRoot.getFileObject(name);
+                    if (fo != null) return fo;
+
                     SourceForBinaryQuery.Result res = SourceForBinaryQuery.findSourceRoots(binRoot.getURL());
                     for (FileObject srcRoot : res.getRoots()) {
-                        FileObject fo = srcRoot.getFileObject(name);
+                        fo = srcRoot.getFileObject(name);
                         if (fo != null) return fo;
                     }
                 }

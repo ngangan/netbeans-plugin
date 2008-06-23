@@ -67,6 +67,8 @@ import org.openide.filesystems.*;
 import org.openide.util.*;
 import org.netbeans.api.java.classpath.*;
 import org.netbeans.api.java.platform.*;
+import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.spi.project.support.ant.EditableProperties;
 
 /** Support for execution of applets.
 *
@@ -151,7 +153,7 @@ public class AppletSupport {
     /**
     * @return html file with the same name as applet
     */
-    private static FileObject generateHtml(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform) throws IOException {
+    private static FileObject generateHtml(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform, EditableProperties ep) throws IOException {
         FileObject htmlFile = distDir.getFileObject(appletFile.getName(), HTML_EXT);
         
         if (htmlFile == null) {
@@ -171,6 +173,11 @@ public class AppletSupport {
             if (codebase == null) {
                 codebase = classesDir.getURL().toString();
             }
+            String appletJavaScript = ep.getProperty(JavaFXProjectProperties.APPLET_JAVASCRIPT);
+            boolean isJavaScript = "true".equals(appletJavaScript);
+            boolean isInBrowser = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_RUN_IN_BROWSER));
+            String draggable = ep.getProperty(JavaFXProjectProperties.APPLET_DRAGGABLE);
+            String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
             if (appletFile.getExt().equals("fx")){
                 JavaFXProject project = (JavaFXProject)getProject(appletFile);
                 
@@ -195,10 +202,18 @@ public class AppletSupport {
                 
 //                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
                 path = path.substring(0, path.length()-3);
-                fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true); // NOI18N
+                if (isJavaScript && isInBrowser) {
+                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args); // NOI18N
+                } else {
+                    fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args); // NOI18N
+                }
             }else{
                 path = path.substring(0, path.length()-5);
-                fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false); // NOI18N
+                if (isJavaScript && isInBrowser) {
+                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args); // NOI18N
+                } else {
+                    fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args); // NOI18N
+                }
             }
         } finally {
             lock.releaseLock();
@@ -238,14 +253,14 @@ public class AppletSupport {
     /**
     * @return URL of the html file with the same name as sibling
     */
-    public static URL generateHtmlFileURL(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform) throws FileStateInvalidException {
+    public static URL generateHtmlFileURL(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform, EditableProperties ep) throws FileStateInvalidException {
         FileObject html = null;
         IOException ex = null;
         if ((appletFile == null) || (buildDir == null) || (classesDir == null)) {
             return null;
         }
         try {
-            html = generateHtml(appletFile, buildDir, classesDir, distDir, activePlatform);
+            html = generateHtml(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
             if (html!=null) {
                 return getHTMLPageURL(html, activePlatform);
             }
@@ -298,7 +313,7 @@ public class AppletSupport {
     * @param file is a file to be filled
     * @param name is name of the applet                                     
     */
-    private static void fillInFile(PrintWriter writer, String name, String codebase, boolean isFX) {
+    private static void fillInFile(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<HTML>"); // NOI18N
@@ -326,11 +341,17 @@ public class AppletSupport {
             writer.print ("\"javafx.gui.Applet\""); // NOI18N
             writer.println(" width=350 height=200>"); // NOI18N
             writer.println("<param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
-            writer.println("</APPLET>"); // NOI18N
         }else{
             writer.print ("\"" + name + "\""); // NOI18N
-            writer.println(" width=350 height=200></APPLET>"); // NOI18N
+            writer.println(" width=350 height=200>"); // NOI18N
         }
+        if (draggable!=null) {
+            if ("true".equals(draggable)) writer.println("<param name=\"draggable\" value=\"true\">");
+        }
+        if (java_args!=null) {
+            writer.println("<param name=\"java_arguments\" value=\""+java_args+"\">");
+        }
+        writer.println("</APPLET>"); // NOI18N
         writer.println("</P>\n"); // NOI18N
 
         writer.print("<HR WIDTH=\"100%\"><FONT SIZE=-1><I>"); // NOI18N
@@ -342,7 +363,71 @@ public class AppletSupport {
         writer.flush();
     }
 
+    /** fills in file with html source so it is html file with applet
+    * @param file is a file to be filled
+    * @param name is name of the applet                                     
+    */
+    private static void fillInFileJavaScript(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args) {
+        ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
+        writer.println("<HTML>"); // NOI18N
+        writer.println("<HEAD>"); // NOI18N
+
+        writer.print("   <TITLE>"); // NOI18N
+        writer.print(bundle.getString("GEN_title"));
+        writer.println("</TITLE>"); // NOI18N
+
+        writer.println("</HEAD>"); // NOI18N
+        writer.println("<BODY>\n"); // NOI18N
+
+        writer.print(bundle.getString("GEN_warning"));
+
+        writer.print("<H3><HR WIDTH=\"100%\">"); // NOI18N
+        writer.print(bundle.getString("GEN_header"));
+        writer.println("<HR WIDTH=\"100%\"></H3>\n"); // NOI18N
+
+        writer.println("<P>"); // NOI18N
+        writer.println("<script src=\"http://java.com/js/deployJava.js\"></script><br>");
+        writer.println("<script>");
+        writer.println("    var attributes =");
+        writer.println("        {");
+        if (codebase == null) {
+            writer.print("            code: "); // NOI18N
+        } else { 
+            writer.print("           " + codebase.replaceAll("=", ":")+",\n             code: "); // NOI18N
+        }
+        if (isFX){
+            writer.println("'javafx.gui.Applet',");
+            writer.println("            width: 375,");
+            writer.println("            height: 375");
+            writer.println("        };");
+            writer.println("    var parameters = {");
+            writer.print("        ApplicationClass:"+"'" + name + "',");
+        } else {
+            writer.println("'" + name + "'");
+            writer.println("        };");
+            writer.print("    var parameters = {");
+        }  
+        if (draggable!=null) {
+            if ("true".equals(draggable)) writer.print("\n        draggable: 'true',");
+        }
+        if (java_args!=null) {
+            writer.print("\n        java_arguments: '"+java_args+"'");
+        }
+        writer.println("\n    };");
+        //XXX TODO Java Hardcoded here
+        writer.println("    deployJava.runApplet( attributes, parameters, \"1.5\" );");
+        writer.println("</script>");
+        writer.println("</P>\n"); // NOI18N
+
+        writer.print("<HR WIDTH=\"100%\"><FONT SIZE=-1><I>"); // NOI18N
+        writer.print(bundle.getString("GEN_copy"));
+        writer.println("</I></FONT>"); // NOI18N
+
+        writer.println("</BODY>"); // NOI18N
+        writer.println("</HTML>"); // NOI18N
+        writer.flush();
+    }
 
     /** fills in policy file with all permissions granted
     * @param writer is a file to be filled

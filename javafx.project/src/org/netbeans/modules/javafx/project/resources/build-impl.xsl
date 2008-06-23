@@ -1249,6 +1249,26 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                     </customize>
                 </javafxproject1:java-run>
             </target>
+            <target name="run-applet-in-browser">
+                <xsl:attribute name="depends">init,compile,-do-jar-with-libraries</xsl:attribute>
+                <fail unless="applet.url">Must select one file in the IDE or set applet.url</fail>
+                <condition property="browser" value="firefox">
+                    <os family="unix"/>
+                </condition>
+                <condition property="browser" value="open">
+                    <os family="mac"/>
+                </condition>
+                <!--condition property="browser.args" value="-a Safari">
+                    <os family="mac"/>
+                </condition-->
+                <condition property="browser" value="start">
+                    <os family="windows"/>
+                </condition>
+
+                <exec executable="${{browser}}" spawn="true">
+                    <arg value="${{applet.url}}"/>
+                </exec>
+            </target>
             
             <xsl:comment>
                 =========================

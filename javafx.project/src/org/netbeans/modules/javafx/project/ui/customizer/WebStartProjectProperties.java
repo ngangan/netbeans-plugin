@@ -99,6 +99,7 @@ public class WebStartProjectProperties {
     public static final String CB_TYPE_LOCAL = "local";
     public static final String CB_TYPE_USER = "user";
     public static final String PACK200_COMPRESS_MODEL="pack200.jar.compress";
+    public static final String PACK200_ENABLE_MODEL = "jnlp.packEnabled";
     // special value to persist Ant script handling
     public static final String CB_URL_WEB_PROP_VALUE = "$$$$codebase";
     public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value";
@@ -111,6 +112,7 @@ public class WebStartProjectProperties {
     ButtonModel allowOfflineModel;
     ButtonModel signedModel;
     ButtonModel pack200Model;
+    ButtonModel enablePack200Model;
     ComboBoxModel codebaseModel;
     // and Documents
     Document iconDocument;
@@ -137,6 +139,7 @@ public class WebStartProjectProperties {
         }
         iconDocument = jnlpPropGroup.createStringDocument(evaluator, JNLP_ICON);
         pack200Model = jnlpPropGroup.createToggleButtonModel(evaluator, PACK200_COMPRESS_MODEL);
+        enablePack200Model = jnlpPropGroup.createToggleButtonModel(evaluator, PACK200_ENABLE_MODEL);
         codebaseModel = new CodebaseComboBoxModel();
         codebaseURLDocument = createCBTextFieldDocument();
     }
