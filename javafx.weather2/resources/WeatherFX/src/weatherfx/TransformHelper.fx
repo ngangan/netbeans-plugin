@@ -28,13 +28,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-/*
- * TransformHelper.fx
- *
- *  
- * Created on Oct 11, 2007, 6:54:12 PM
- */
-
 package weatherfx;
 
 /**
