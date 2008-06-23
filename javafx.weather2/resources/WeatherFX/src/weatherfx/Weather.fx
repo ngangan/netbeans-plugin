@@ -27,12 +27,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 */
 
-/*
- * Weather.fx
- *
- * Created on Sep 20, 2007, 9:32:45 AM
- */
-
 package weatherfx;
 
 import javafx.gui.*;

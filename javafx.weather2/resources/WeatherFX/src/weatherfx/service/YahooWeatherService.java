@@ -26,12 +26,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-/*
- * YahooWeatherService.java
- * 
- * Created on Sep 29, 2007, 9:35:09 AM
- * 
- */
 
 package weatherfx.service;
 

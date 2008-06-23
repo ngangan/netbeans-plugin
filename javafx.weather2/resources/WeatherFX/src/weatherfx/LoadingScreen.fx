@@ -28,12 +28,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-/*
- * LoadingScreen.fx
- *
- * Created on Apr 8, 2008, 12:40:12 PM
- */
-
 package weatherfx;
 
 

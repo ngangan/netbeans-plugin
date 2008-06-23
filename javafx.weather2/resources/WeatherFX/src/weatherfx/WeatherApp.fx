@@ -28,12 +28,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-/*
- * WeatherApp.fx
- *
- * Created on Sep 28, 2007, 4:12:30 PM
- */
-
 package weatherfx;
 
 
