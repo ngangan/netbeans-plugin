@@ -19,6 +19,12 @@ import java.awt.Window;
 import java.awt.event.InvocationEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.peer.ComponentPeer;
+import java.awt.peer.DialogPeer;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import javax.swing.*;
 
 import javax.swing.JPanel;
@@ -49,14 +55,14 @@ public class MirroringPanel extends JPanel {
     
     class MirroringThread extends Thread {
         public MirroringThread(ThreadGroup tg) {
-            super(tg, "SACT");
+            super(tg, "SACT"); // NOI18N
         }
         
         @Override
         public void run() {
             try {
-                Class<?> acc = this.getClass().getClassLoader().loadClass("sun.awt.SunToolkit");   // NOI18N
-                ac = acc.getDeclaredMethod("createNewAppContext").invoke(null);                 // NOI18N
+                Class<?> acc = this.getClass().getClassLoader().loadClass(STK);
+                ac = acc.getDeclaredMethod(CNAPC).invoke(null);
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -82,14 +88,51 @@ public class MirroringPanel extends JPanel {
             mirroredPanel = createMirroredPanel();
             if (mirroredPanel == null) return;
             
-            mirroredFrame = new JDialog();
+            mirroredFrame = new JDialog() {
+               ComponentPeer origDialogPeer;
+               ComponentPeer proxyInstPeer;
+               public void addNotify() {
+                    super.addNotify();
+                    replacePeer();
+               }
+               void replacePeer() {
+                    origDialogPeer = getPeer();
+
+                    InvocationHandler handler = new InvocationHandler() {
+                        public Object invoke(Object proxy, Method method, Object[] args) {
+                            if (method.getName().contentEquals(SHOW)) {
+                                return null;
+                            }
+
+                            Object ret = null;
+                            try {
+                                ret = method.invoke(origDialogPeer, args);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            return ret;
+                        }
+                    };
+
+                    proxyInstPeer = (DialogPeer)Proxy.newProxyInstance(
+                        DialogPeer.class.getClassLoader(), new Class[] {DialogPeer.class}, handler);
+
+                    try {
+                        Field peer = Component.class.getDeclaredField(PEER);
+                        peer.setAccessible(true);
+                        peer.set(this, proxyInstPeer);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                } 
+            };
+
             mirroredFrame.setUndecorated(true);
             mirroredFrame.setFocusableWindowState(false);
             mirroredFrame.setLayout(new BorderLayout());
             JScrollPane jsp = new JScrollPane();
             jsp.setViewportView(mirroredPanel);
             mirroredFrame.add(jsp);
-            mirroredFrame.setLocation(-2000, -2000);
             mirroredFrame.setVisible(true);
             mirroredFrame.setSize(getSize().width + mirroredFrame.getInsets().left + mirroredFrame.getInsets().right, getSize().height + mirroredFrame.getInsets().top + mirroredFrame.getInsets().bottom);
             mirroredFrame.setFocusableWindowState(true);
@@ -172,23 +215,16 @@ public class MirroringPanel extends JPanel {
         Window ancestor = SwingUtilities.getWindowAncestor(this);
         if (ancestor != null) ancestor.setFocusableWindowState(true);
         disableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
-        if (mirroredEventQueue != null)
-            mirroredEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
-                @SuppressWarnings("deprecation")
-                public void run() {
-                    if (mirroredFrame!= null) mirroredFrame.dispose();
-                    threadGroup.stop();
-                    while (threadGroup.activeCount() > 0) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ex) {
-                            Exceptions.printStackTrace(ex);
-                        }
-                    }
-                    threadGroup.destroy();
-                }
-            }));
+        if (ac != null) {
+            try {
+                Class<?> acc = this.getClass().getClassLoader().loadClass(APC);
+                acc.getDeclaredMethod(DSP).invoke(ac);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
         mirroredEventQueue = null;
+        ac = null;
     }
     
     @Override
@@ -200,7 +236,7 @@ public class MirroringPanel extends JPanel {
     private static int instanceCounter = 0;
     
     void startMirroring() {
-        threadGroup = new ThreadGroup("SACG" + instanceCounter++);
+        threadGroup = new ThreadGroup("SACG" + instanceCounter++); // NOI18N
         mirroringTread = new MirroringThread(threadGroup);
         mirroringTread.start();
         try {
@@ -210,4 +246,11 @@ public class MirroringPanel extends JPanel {
         }
         enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     }
+    
+    static private String STK = "sun.awt.SunToolkit";                       // NOI18N
+    static private String CNAPC = "createNewAppContext";                    // NOI18N
+    static private String APC = "sun.awt.AppContext";                       // NOI18N
+    static private String DSP = "dispose";                                  // NOI18N
+    static private String SHOW = "show";                                    // NOI18N
+    static private String PEER = "peer";                                    // NOI18N
 }
