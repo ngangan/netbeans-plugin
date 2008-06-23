@@ -532,11 +532,11 @@ class JavaFXActionProvider implements ActionProvider {
                             ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL, "Error while saving project: " + e);
                         }
                     }
-
+                    
                     if (file.existsExt("html") || file.existsExt("HTML")) { //NOI18N
                         url = copyAppletHTML(file, "html"); //NOI18N
                     } else {
-                        url = generateAppletHTML(file);
+                        url = generateAppletHTML(file, ep);
                     }
                     if (url == null) {
                         return null;
@@ -545,8 +545,13 @@ class JavaFXActionProvider implements ActionProvider {
                     if (command.equals (COMMAND_RUN_SINGLE)) {
                         targetNames = new String[] {"run-applet"}; // NOI18N
                     } else if (command.equals (COMMAND_RUN_APPLET)) {
-                        String[] targets = targetsFromConfig.get(command);
-                        targetNames = (targets != null) ? targets : commands.get(COMMAND_RUN_APPLET);
+                        String runInBrowser = ep.getProperty("applet.run.in.browser");
+                        if ("true".equals(runInBrowser)) {
+                            targetNames = new String[]{"run-applet-in-browser"}; // NOI18N
+                        } else {
+                            String[] targets = targetsFromConfig.get(command);
+                            targetNames = (targets != null) ? targets : commands.get(COMMAND_RUN_APPLET);
+                        }
                     } else{
                         p.setProperty("debug.class", clazz); // NOI18N
                         targetNames = new String[] {"debug-applet"}; // NOI18N
@@ -1068,7 +1073,7 @@ class JavaFXActionProvider implements ActionProvider {
         dlg.setVisible(true);
     }
 
-    private URL generateAppletHTML(FileObject file) {
+    private URL generateAppletHTML(FileObject file, EditableProperties ep) {
         URL url = null;
         try {
             String buildDirProp = project.evaluator().getProperty("build.dir"); //NOI18N
@@ -1090,7 +1095,7 @@ class JavaFXActionProvider implements ActionProvider {
                 classesDir = FileUtil.createFolder(project.getProjectDirectory(), classesDirProp);
             }
             String activePlatformName = project.evaluator().getProperty("platform.active"); //NOI18N
-            url = AppletSupport.generateHtmlFileURL(file, buildDir, classesDir, distDir, activePlatformName);
+            url = AppletSupport.generateHtmlFileURL(file, buildDir, classesDir, distDir, activePlatformName, ep);
         } catch (FileStateInvalidException fe) {
             //ingore
         } catch (IOException ioe) {

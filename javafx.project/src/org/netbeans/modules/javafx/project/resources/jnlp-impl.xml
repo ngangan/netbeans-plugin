@@ -80,6 +80,7 @@ made subject to such option by the copyright holder.
     </information>
 <!--$${JNLP.SECURITY}-->
     <resources>
+<!--$${JNLP.PACK200.ENABLED}-->
 <!--$${JNLP.RESOURCES.RUNTIME}-->
 <!--$${JNLP.RESOURCES.MAIN.JAR}-->
 <!--$${JNLP.RESOURCES.JARS}-->
@@ -139,7 +140,17 @@ made subject to such option by the copyright holder.
         </condition>
     </target>
     
-    <!-- Offline-Allowed -->
+   <!-- Pack200 enabled -->
+   
+   <target name="-init-pack200" if="pack200.enabled.set" depends="-preinit-pack200">
+       <property name="jnlp.pack200.enabled.value" value='        &lt;property name="jnlp.packEnabled" value="true"/&gt;'/>
+   </target>
+   <target name="-preinit-pack200">
+       <condition property="pack200.enabled.set">
+           <equals arg1="${jnlp.packEnabled}" arg2="true" trim="true"/>
+       </condition>
+   </target>
+   <!-- Offline-Allowed -->
     
     <target name="-init-offline" if="offline.allowed.set" depends="-preinit-offline">
         <property name="jnlp.offline.allowed.value" value="        &lt;offline-allowed/&gt;"/>
@@ -216,13 +227,14 @@ made subject to such option by the copyright holder.
     
     <!-- Generating JNLP file -->
     
-    <target name="generate-jnlp" depends="jnlp-init-generate-master,-init-codebase,-init-resources-runtime,-init-security,-init-resources-jars,-init-application-args,-init-icons,-init-offline,-init-descriptions,jnlp-init-notinited">
+    <target name="generate-jnlp" depends="jnlp-init-generate-master,-init-codebase,-init-resources-runtime,-init-security,-init-resources-jars,-init-application-args,-init-icons,-init-offline,-init-pack200,-init-descriptions,jnlp-init-notinited">
         <copy file="${master.jnlp.file}" tofile="${jnlp.dest.dir}/${launch.jnlp.file}__" overwrite="true" encoding="UTF-8">
             <filterchain>
                 <replacestring from="$${jnlp.codebase}" to="${jnlp.codebase.value}"/>
                 <replacestring from="&lt;!--$${JNLP.ICONS}--&gt;" to="${jnlp.icons.value}"/>
                 <replacestring from="&lt;!--$${JNLP.SECURITY}--&gt;" to="${jnlp.security}"/>
                 <replacestring from="&lt;!--$${JNLP.OFFLINE.ALLOWED}--&gt;" to="${jnlp.offline.allowed.value}"/>
+                <replacestring from="&lt;!--$${JNLP.PACK200.ENABLED}--&gt;" to="${jnlp.pack200.enabled.value}"/>
                 <replacestring from="&lt;!--$${JNLP.RESOURCES.RUNTIME}--&gt;" to="${jnlp.resources.runtime.value}"/>
                 <replacestring from="&lt;!--$${JNLP.RESOURCES.MAIN.JAR}--&gt;" to="${jnlp.resources.main.jar.value}"/>
                 <replacestring from="&lt;!--$${JNLP.RESOURCES.JARS}--&gt;" to="${jnlp.resources.jars.value}"/>
@@ -241,6 +253,7 @@ made subject to such option by the copyright holder.
     <target name="jnlp-init-notinited">
         <property name="jnlp.security" value=""/>
         <property name="jnlp.offline.allowed.value" value=""/>
+        <property name="jnlp.pack200.enabled.value" value=""/>
         <property name="application.homepage" value=""/>
         <property name="jnlp.application.args.value" value=""/>
     </target>

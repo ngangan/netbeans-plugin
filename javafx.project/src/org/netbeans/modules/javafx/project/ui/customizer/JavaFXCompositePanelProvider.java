@@ -74,7 +74,9 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
     private static final String APPLICATION = "Application";
     
     private static final String WEBSTART = "WebStart";
-
+    
+    private static final String APPLET = "Applet";
+    
     private String name;
     
     /** Creates a new instance of JavaFXCompositePanelProvider */
@@ -138,6 +140,9 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
         } else if (WEBSTART.equals(name)) {
             toReturn = ProjectCustomizer.Category.create(WEBSTART,
                     bundle.getString("LBL_Config_WebStart"), null, (ProjectCustomizer.Category[])null); //NOI18N
+        } else if (APPLET.equals(name)) {
+            toReturn = ProjectCustomizer.Category.create(APPLET,
+                    bundle.getString("LBL_Config_Applet"), null, (ProjectCustomizer.Category[])null); //NOI18N
         }
         assert toReturn != null : "No category for name:" + name;
         return toReturn;
@@ -182,6 +187,8 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
             category.setOkButtonListener(new SavePropsListener(jwsProps, context.lookup(Project.class)));
             JComponent component = new CustomizerWebStart(jwsProps);
             return component;
+        } else if (APPLET.equals(nm)) {
+            return new CustomizerApplet(uiProps);
         }
         return new JPanel();
 
@@ -221,7 +228,10 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
     public static JavaFXCompositePanelProvider createWebStart() {
         return new JavaFXCompositePanelProvider(WEBSTART);
     }
-    
+    public static JavaFXCompositePanelProvider createApplet() {
+        return new JavaFXCompositePanelProvider(APPLET);
+    }
+
     // ----------
     
     private static class SavePropsListener implements ActionListener {
