@@ -90,6 +90,7 @@ final class ElementOpen {
         } else {
             // Find the source file
             final FileObject srcFile = getFile(el, comp);
+            if (srcFile == null) return;
 
             JavaFXSource js = JavaFXSource.forFileObject(srcFile);
             
