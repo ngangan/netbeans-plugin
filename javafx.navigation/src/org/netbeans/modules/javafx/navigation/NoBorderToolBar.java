@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,13 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
+ * Contributor(s):
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,48 +37,32 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
- * Contributor(s):
- * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.modules.javafx.navigation;
 
-import java.io.IOException;
+import java.awt.Graphics;
+import javax.swing.JToolBar;
 
 /**
+ * ToolBar that doesn't paint any border.
  *
- * @author nenik
+ * @author S. Aubrecht
  */
-public class CompilationController extends CompilationInfo {
-
-    CompilationController(CompilationInfoImpl impl) {
-        super(impl);
+public class NoBorderToolBar extends JToolBar {
+    
+    /** Creates a new instance of NoBorderToolbar */
+    public NoBorderToolBar() {
     }
-
-    public String getText() {
-        return getJavaFXSource().getText();
+    
+    /** Creates a new instance of NoBorderToolbar 
+     * @param layout
+     */
+    public NoBorderToolBar( int layout ) {
+        super( layout );
     }
-
-    /** Moves the state to required phase. If given state was already reached 
-     * the state is not changed. The method will throw exception if a state is 
-     * illegal required. Acceptable parameters for thid method are <BR>
-     * <LI>{@link JavaFXSource.Phase.PARSED}
-     * <LI>{@link JavaFXSource.Phase.ELEMENTS_RESOLVED}
-     * <LI>{@link JavaFXSource.Phase.RESOLVED}
-     * <LI>{@link JavaFXSource.Phase.UP_TO_DATE}   
-     * @param phase The required phase
-     * @return the reached state
-     * @throws IllegalArgumentException in case that given state can not be 
-     *         reached using this method
-     * @throws IOException when the file cannot be red
-     */    
-    public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase ) throws IOException {
-        return impl.toPhase(phase);
+    
+    @Override
+    protected void paintComponent(Graphics g) {
     }
-        
-    void invalidate() {
-    }
-
 }

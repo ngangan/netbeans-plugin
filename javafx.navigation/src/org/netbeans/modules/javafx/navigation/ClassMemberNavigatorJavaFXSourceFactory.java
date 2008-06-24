@@ -36,43 +36,62 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.javafx.navigation;
 
-package org.netbeans.api.javafx.source;
-
-import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.JavaFXSource.Priority;
+import org.netbeans.api.javafx.source.support.LookupBasedJavaSourceTaskFactory;
+import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
 
 /**
  *
- * @author nenik
+ * @author Jan Lahoda, Petr Hrebejk
  */
-public class CompilationController extends CompilationInfo {
+public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaSourceTaskFactory {
 
-    CompilationController(CompilationInfoImpl impl) {
-        super(impl);
+    private static final CancellableTask<CompilationInfo> EMPTY_TASK = new CancellableTask<CompilationInfo>() {
+        public void cancel() {}
+        public void run(CompilationInfo parameter) throws Exception {}
+    };
+    private ClassMemberPanelUI ui;
+
+    static ClassMemberNavigatorJavaFXSourceFactory getInstance() {
+        return Lookup.getDefault().lookup(ClassMemberNavigatorJavaFXSourceFactory.class);
     }
 
-    public String getText() {
-        return getJavaFXSource().getText();
+    public ClassMemberNavigatorJavaFXSourceFactory() {
+//        super(Phase.ELEMENTS_RESOLVED, Priority.LOW, "text/x-java", "application/x-class-file");
+        super(Phase.ELEMENTS_RESOLVED, Priority.LOW, "text/x-fx");
     }
 
-    /** Moves the state to required phase. If given state was already reached 
-     * the state is not changed. The method will throw exception if a state is 
-     * illegal required. Acceptable parameters for thid method are <BR>
-     * <LI>{@link JavaFXSource.Phase.PARSED}
-     * <LI>{@link JavaFXSource.Phase.ELEMENTS_RESOLVED}
-     * <LI>{@link JavaFXSource.Phase.RESOLVED}
-     * <LI>{@link JavaFXSource.Phase.UP_TO_DATE}   
-     * @param phase The required phase
-     * @return the reached state
-     * @throws IllegalArgumentException in case that given state can not be 
-     *         reached using this method
-     * @throws IOException when the file cannot be red
-     */    
-    public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase ) throws IOException {
-        return impl.toPhase(phase);
-    }
-        
-    void invalidate() {
+    @Override
+    protected CancellableTask<CompilationInfo> createTask(FileObject file) {
+        return ui == null ? EMPTY_TASK : ui.getTask();
     }
 
+    @Override
+    public List<FileObject> getFileObjects() {
+        List<FileObject> result = super.getFileObjects();
+        if (result.size() == 1) {
+            return result;
+        }
+        return Collections.emptyList();
+    }
+
+    public synchronized void setLookup(Lookup l, ClassMemberPanelUI ui) {
+        this.ui = ui;
+        super.setLookup(l);
+    }
+
+    @Override
+    protected void lookupContentChanged() {
+        if (ui != null) {
+            ui.showWaitNode(); // Creating new task (file changed)
+        }
+    }
 }

@@ -44,6 +44,7 @@ import com.sun.javafx.api.JavafxcTask;
 import com.sun.source.tree.Scope;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Source;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Symtab;
@@ -132,9 +133,9 @@ public final class ElementUtilities {
      *  @param element to check
      *  @return true if and only if the given element is syntetic, false otherwise
      */
-//    public boolean isSynthetic(Element element) {
-//        return (((Symbol) element).flags() & Flags.SYNTHETIC) != 0 || (((Symbol) element).flags() & Flags.GENERATEDCONSTR) != 0;
-//    }
+    public boolean isSynthetic(Element element) {
+        return (((Symbol) element).flags() & Flags.SYNTHETIC) != 0 || (((Symbol) element).flags() & Flags.GENERATEDCONSTR) != 0;
+    }
     
     /**
      * Returns true if this element represents a method which overrides a
