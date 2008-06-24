@@ -773,7 +773,6 @@ jarsigner.storepass=${jarsigner.storepass}
         <antcall target="build-nb-base"/>
         <antcall target="build-nb-javase"/>
         <antcall target="build-nb-javafx"/>
-        <antcall target="build-jdk6u10"/>
     </target>
 
     <target name="build-netbeans-for-mysql" if="do.build.mysql.no.netbeans">
@@ -1805,33 +1804,6 @@ jarsigner.storepass=${jarsigner.storepass}
                 value=""/>
         </ant>
     </target>    
-
-     <target name="build-jdk6u10" if="do.build.jdk6u10">
-        <echo message="BUILDING JDK6U10 ========================================"/>
-        <ant dir="${nbi.netbeans.dir}/infra/build/products/jdk" antfile="build_jdk6u10.xml" target="release-all">
-            <property 
-                name="basedir" 
-                value="${nbi.netbeans.dir}/infra/build/products/jdk"/>
-            <property 
-                name="environment.properties" 
-                value="${environment.properties}"/>
-            
-            <property
-                name="dist.dir"
-                value="${output.dir}/components"/>
-            
-            <property
-                name="release.parent.uid"
-                value=""/>
-            <property
-                name="release.parent.version"
-                value=""/>
-            <property
-                name="release.parent.platforms"
-                value=""/>
-        </ant>
-    </target>    
-
 
   
     <target name="generate-netbeans-javase-bundles">
