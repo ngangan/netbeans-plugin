@@ -90,6 +90,8 @@ public class AppletSupport {
     private final static String POLICY_FILE_NAME = "applet";
     private final static String POLICY_FILE_EXT = "policy";
 
+    private final static String APPLET_MAIN_CLASS="javafx.application.Applet";
+            
     private AppletSupport() {
     }
 
@@ -430,7 +432,7 @@ public class AppletSupport {
 
             }
             if (isFX) {
-                writer.print("\"javafx.gui.Applet\""); // NOI18N
+                writer.print("\""+APPLET_MAIN_CLASS+"\""); // NOI18N
 
                 writer.println(" width=350 height=200>"); // NOI18N
 
@@ -508,7 +510,7 @@ public class AppletSupport {
 
         }
         if (isFX) {
-            writer.println("'javafx.gui.Applet',");
+            writer.println("'"+APPLET_MAIN_CLASS+"',");
             writer.println("            width: 375,");
             writer.println("            height: 375");
             writer.println("        };");
@@ -589,7 +591,7 @@ public class AppletSupport {
 
         writer.println("            name=\"" + name + "\""); // NOI18N
 
-        writer.println("            main-class=\"javafx.gui.Applet\""); // NOI18N
+        writer.println("            main-class=\""+APPLET_MAIN_CLASS+"\""); // NOI18N
 
         writer.println("            width=\"300\""); // NOI18N
 
