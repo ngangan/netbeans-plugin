@@ -27,9 +27,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package image;
+package image;
 
-import javafx.gui.*;
+import javafx.input.MouseEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.transform.Translate;
+import javafx.scene.transform.Scale;
 
 var x : Number = 40;
     

@@ -27,10 +27,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package input;
+package input;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.paint.Color;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 var miliseconds : Integer;
 var colors : Color[];

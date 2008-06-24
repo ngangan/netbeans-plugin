@@ -27,10 +27,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package particles;
+package particles;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.Group;
+import javafx.scene.geometry.Circle;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 import java.lang.System;

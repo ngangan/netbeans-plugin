@@ -27,10 +27,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package transform;
+package transform;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;
@@ -67,8 +71,8 @@ Frame {
         background : Color.GRAY
         content : Rectangle {
             transform : [ 
-                javafx.gui.Rotate { angle : bind angle, x : 100, y : 100 }, 
-                javafx.gui.Translate { x : 43, y : 43 } 
+                javafx.scene.transform.Rotate { angle : bind angle, x : 100, y : 100 }, 
+                javafx.scene.transform.Translate { x : 43, y : 43 } 
             ]
             width : 114, height : 114
             fill : Color.WHITE

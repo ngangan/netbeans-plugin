@@ -27,10 +27,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package image;
+package image;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.Interpolator;
+import javafx.scene.Group;
+import javafx.scene.geometry.Line;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.transform.Translate;
 
 var y : Number;
 

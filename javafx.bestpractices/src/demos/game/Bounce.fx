@@ -27,10 +27,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package game;
+package game;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.geometry.Circle;
+import javafx.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.transform.Translate;
 
 var STICK : Integer = 1; 
 var BOUNCING : Integer = 2;

@@ -27,9 +27,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package math;
+package math;
 
-import javafx.gui.*;
+import javafx.input.MouseEvent;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.Group;
+import javafx.scene.paint.Color;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.geometry.Circle;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.transform.Translate;
+import javafx.scene.transform.Rotate;
 
 import java.lang.Math;
 
