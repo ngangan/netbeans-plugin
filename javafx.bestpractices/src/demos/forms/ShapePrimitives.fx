@@ -27,9 +27,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package forms;
+package forms;
 
-import javafx.gui.*;
+import javafx.scene.paint.Color;
+import javafx.scene.geometry.Polygon;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.geometry.Circle;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
 
 Frame {
     content : Canvas {    

@@ -27,10 +27,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package transform;
+package transform;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.Interpolator;
 
 import java.lang.Math;
 
@@ -61,8 +66,8 @@ Frame {
         content : [
             Rectangle {
                 transform : [ 
-                    javafx.gui.Translate { x : bind 100 - 40 * s / 2, y : bind 100 - 40 * s / 2 },
-                    javafx.gui.Scale { x : bind s, y : bind s }
+                    javafx.scene.transform.Translate { x : bind 100 - 40 * s / 2, y : bind 100 - 40 * s / 2 },
+                    javafx.scene.transform.Scale { x : bind s, y : bind s }
                 ]
                 x : 0, y : 0
                 width : 40, height : 40

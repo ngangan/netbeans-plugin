@@ -29,7 +29,14 @@
  
 package color;
 
-import javafx.gui.*;
+import javafx.scene.Group;
+import javafx.scene.CustomNode;
+import javafx.scene.Node;
+import javafx.scene.paint.Color;
+import javafx.scene.geometry.Arc;
+import javafx.scene.geometry.ArcType;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
 
 public class ColorWheel extends CustomNode {
     attribute segments : Number = 12;

@@ -58,7 +58,7 @@ public class Cyan implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.gui.Color" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
         
         return true;
     }

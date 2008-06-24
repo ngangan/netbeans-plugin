@@ -27,10 +27,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package math;
+package math;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.geometry.Circle;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.Translate;
+import javafx.scene.transform.Rotate;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.Interpolator;
 
 import java.lang.Math;
 

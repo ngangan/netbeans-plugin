@@ -59,8 +59,8 @@ public class Ellipse implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.Ellipse" );
-        Util.addImport( targetComponent, "javafx.gui.Color" );
+        Util.addImport( targetComponent, "javafx.scene.geometry.Ellipse" );
+        Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         return true;
     }
 }

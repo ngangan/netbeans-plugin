@@ -27,9 +27,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package input;
+package input;
 
-import javafx.gui.*;
+import javafx.input.MouseEvent;
+import javafx.scene.Group;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.transform.Translate;
 
 var mouseX : Number = 100;
 var mouseY : Number = 100;

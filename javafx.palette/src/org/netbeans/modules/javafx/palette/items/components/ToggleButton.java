@@ -59,7 +59,7 @@ public class ToggleButton implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.component.ToggleButton" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.swing.ToggleButton" ); // NOI18N
         
         return true;
     }    

@@ -27,10 +27,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package particles;
+package particles;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.Group;
+import javafx.scene.geometry.Line;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;
@@ -160,8 +167,8 @@ class Boid extends CustomNode {
     function create(): Node {
         return Group {
             transform : [ 
-                javafx.gui.Translate { x : bind loc.x, y : bind loc.y },
-                javafx.gui.Rotate { angle : bind Math.toDegrees( vel.heading2D()) + 90 }
+                javafx.scene.transform.Translate { x : bind loc.x, y : bind loc.y },
+                javafx.scene.transform.Rotate { angle : bind Math.toDegrees( vel.heading2D()) + 90 }
             ]
             content : [
                 Line {

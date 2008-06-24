@@ -29,7 +29,10 @@
 
  package forms;
 
-import javafx.gui.*;
+import javafx.scene.geometry.Line;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
 
 var d = 40;
 var p1 = d;
