@@ -248,6 +248,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         final TypeElement te = (TypeElement) dt.asElement();
         for (Element member : te.getEnclosedElements()) {
             log("    member1 = " + member + " member1.getKind() " + member.getKind());
+            if ("<error>".equals(member.getSimpleName().toString())) {
+                continue;
+            }
             String s = member.getSimpleName().toString();
             if (fields && member.getKind() == ElementKind.FIELD) {
                     addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
@@ -257,6 +260,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         for (Element member : elements.getAllMembers(te)) {
             log("    member2 == " + member + " member2.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
+            if ("<error>".equals(member.getSimpleName().toString())) {
+                continue;
+            }
             if (methods && member.getKind() == ElementKind.METHOD) {
                 if (s.contains("$")) {
                     continue;
@@ -701,7 +707,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     /**
-     * 
      * @param simpleName name of a class or fully qualified name of a class
      * @return TypeElement or null if the passed in String does not denote a class
      */
@@ -709,35 +714,56 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         log("findTypeElement: " + simpleName);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
-        Elements elements = controller.getElements();
         JavafxcScope scope = trees.getScope(p);
         while (scope != null) {
             log("  scope == " + scope);
-            for (Element local : scope.getLocalElements()) {
-                log("    local == " + local);
-                if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
-                    if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
-                        continue;
-                    }
-                    if (local instanceof TypeElement) {
-                        String name = local.getSimpleName().toString();
-                        if (name.equals(simpleName)) {
-                            return (TypeElement) local;
-                        }
-
-                        PackageElement pe = elements.getPackageOf(local);
-                        String fullName = pe.getQualifiedName().toString() + '.' + name;
-                        if (fullName.equals(simpleName)) {
-                            return (TypeElement) local;
-                        }
-                    }
-                }
+            TypeElement res = findTypeElement(scope.getLocalElements(), simpleName);
+            if (res != null) {
+                return res;
             }
             scope = scope.getEnclosingScope();
+        }
+        Element e = trees.getElement(p);
+        while (e != null && e.getKind() != ElementKind.PACKAGE) {
+            e = e.getEnclosingElement();
+        }
+        if (e != null) {
+            PackageElement pkge = (PackageElement)e;
+            return findTypeElement(pkge.getEnclosedElements(), simpleName);
         }
         return null;
     }
 
+    /**
+     * @param simpleName name of a class or fully qualified name of a class
+     * @return TypeElement or null if the passed in String does not denote a class
+     */
+    private TypeElement findTypeElement(Iterable<? extends Element> from, String simpleName) {
+        Elements elements = controller.getElements();
+        for (Element local : from) {
+            log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
+            if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                    log("        is not TypeKind.DECLARED -- ignoring");
+                    continue;
+                }
+                if (local instanceof TypeElement) {
+                    String name = local.getSimpleName().toString();
+                    if (name.equals(simpleName)) {
+                        return (TypeElement) local;
+                    }
+
+                    PackageElement pe = elements.getPackageOf(local);
+                    String fullName = pe.getQualifiedName().toString() + '.' + name;
+                    if (fullName.equals(simpleName)) {
+                        return (TypeElement) local;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
     private void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
         log("NOT IMPLEMENTED addAllTypes ");
 //            for(ElementHandle<TypeElement> name : controller.getJavaSource().getClasspathInfo().getClassIndex().getDeclaredTypes(prefix != null ? prefix : EMPTY, kind, EnumSet.allOf(ClassIndex.SearchScope.class))) {
