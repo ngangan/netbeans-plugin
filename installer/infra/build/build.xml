@@ -253,6 +253,7 @@
             classpath="${custom.tasks.cls}" 
             classname="org.netbeans.installer.infra.build.ant.registries.CreateBundle"/>
 
+
 	<set property="nb.build.type.number"
                  value="0"/>
         <set property="nb.build.suffix"
@@ -344,6 +345,9 @@
 	     </and>
         </condition>
 
+        <condition property="do.build.javafx">
+	     <equals arg1="${build.javafx}" arg2="1"/>
+        </condition>
 
         <condition property="nb.locales.isset">
  	     <not>
@@ -443,6 +447,20 @@
     	        </filterchain>
 	    </loadfile>            
             <property name="javaeesdk-javadocs.build.number" value="20070814"/>
+        </if>
+
+	<if property="build.javafx" value="1">
+             <get
+            	src="${javafx.builds.host}/hudson/view/JavaFX/job/JavaFX_NB_Plugin_NB61_daily/lastSuccessfulBuild/buildNumber"
+            	dest="${temp.file}"/>
+             <loadfile property="javafx.build.number"
+          	    srcFile="${temp.file}">
+	        <filterchain>
+        	    <striplinebreaks/>
+    	        </filterchain>
+	     </loadfile>
+	     <property name="javafx.full.number"
+		       value="1.0.0.0.${javafx.build.number}"/>
         </if>
         
         <delete file="${temp.file}" failonerror="false"/>
@@ -597,6 +615,13 @@ sjsas.image.token.hostname.macosx=${sjsas.image.token.hostname.macosx}
         </echo>
         </if>
 
+        <if property="do.build.javafx">
+	<echo file="${environment.properties}" append="true">
+javafx.full.number=${javafx.full.number}
+javafx.build.number=${javafx.build.number}
+	</echo>
+
+        </if>
         <!-- Jar singing properties -->
 	<if property="jarsigner.enabled" value="true">
 	    <echo file="${environment.properties}" append="true">
@@ -673,6 +698,16 @@ jarsigner.storepass=${jarsigner.storepass}
         	    </fileset>
 	        </delete>
 	</if>
+	<if property="do.build.javafx">
+		<delete failonerror="false">
+        	    <fileset dir="${nbi.cache.dir}/packaged">        
+			<include name="**/nb-javafx*"/>
+			<exclude name="**/nb-javafx*${javafx.build.number}*"/>
+                	
+        	    </fileset>
+	        </delete>
+	</if>
+
     </target>
 
 
@@ -689,6 +724,8 @@ jarsigner.storepass=${jarsigner.storepass}
 	<!--<antcall target="build-wtk"/>-->
         <antcall target="build-javaeesdk"/>
         <antcall target="build-jdk"/>
+
+        <antcall target="build-netbeans-javafx-jdk"/>
 
         <!--<antcall target="export-temp-registry"/>-->
         
@@ -729,6 +766,14 @@ jarsigner.storepass=${jarsigner.storepass}
 	<set property="netbeans.group.uid" value=""/>
         <antcall target="build-nb-base"/>
         <antcall target="build-nb-javase"/>        
+    </target>
+
+    <target name="build-netbeans-javafx-jdk" if="do.build.javafx">
+	<set property="netbeans.group.uid" value=""/>
+        <antcall target="build-nb-base"/>
+        <antcall target="build-nb-javase"/>
+        <antcall target="build-nb-javafx"/>
+        <antcall target="build-jdk6u10"/>
     </target>
 
     <target name="build-netbeans-for-mysql" if="do.build.mysql.no.netbeans">
@@ -798,6 +843,7 @@ jarsigner.storepass=${jarsigner.storepass}
         <antcall target="generate-mysql-bundles"/>
         <antcall target="generate-jdk-bundles"/>
         <antcall target="generate-javatoolsbundle-bundles"/>
+        <antcall target="generate-javafx-bundles"/>
     </target>
 
     <target name="generate-jdk-bundles" depends="init-jdk-bundles,get-bundled-jvms" if="do.build.jdk">	
@@ -1208,6 +1254,32 @@ jarsigner.storepass=${jarsigner.storepass}
                 value=""/>
         </ant>        
      </target>
+
+     <target name="build-nb-javafx">        
+        <echo message="BUILDING NB-JAVAFX ========================================"/>
+        <ant dir="${nbi.netbeans.dir}/infra/build/products/nb-javafx" target="release-all">
+            <property 
+                name="basedir" 
+                value="${nbi.netbeans.dir}/infra/build/products/nb-javafx"/>
+            <property 
+                name="environment.properties" 
+                value="${environment.properties}"/>
+            
+            <property
+                name="dist.dir"
+                value="${output.dir}/components"/>
+            
+            <property
+                name="release.parent.uid"
+                value="${netbeans.group.uid}"/>
+            <property
+                name="release.parent.version"
+                value=""/>
+            <property
+                name="release.parent.platforms"
+                value=""/>
+        </ant>
+    </target>
 
      <target name="build-runtimes-group">
         <echo message="BUILDING RUNTIMES-GROUP ==================================="/>
@@ -1711,6 +1783,32 @@ jarsigner.storepass=${jarsigner.storepass}
      <target name="build-jdk6" if="do.build.jdk6">
         <echo message="BUILDING JDK6 ========================================"/>
         <ant dir="${nbi.netbeans.dir}/infra/build/products/jdk" antfile="build_jdk6.xml" target="release-all">
+            <property 
+                name="basedir" 
+                value="${nbi.netbeans.dir}/infra/build/products/jdk"/>
+            <property 
+                name="environment.properties" 
+                value="${environment.properties}"/>
+            
+            <property
+                name="dist.dir"
+                value="${output.dir}/components"/>
+            
+            <property
+                name="release.parent.uid"
+                value=""/>
+            <property
+                name="release.parent.version"
+                value=""/>
+            <property
+                name="release.parent.platforms"
+                value=""/>
+        </ant>
+    </target>    
+
+     <target name="build-jdk6u10" if="do.build.jdk6u10">
+        <echo message="BUILDING JDK6U10 ========================================"/>
+        <ant dir="${nbi.netbeans.dir}/infra/build/products/jdk" antfile="build_jdk6u10.xml" target="release-all">
             <property 
                 name="basedir" 
                 value="${nbi.netbeans.dir}/infra/build/products/jdk"/>
@@ -2587,6 +2685,17 @@ jarsigner.storepass=${jarsigner.storepass}
         </create-bundle>
     </target>
 
+    <target name="generate-javafx-bundles" if="do.build.javafx">
+	<!-- JavaFX bundles --> 	
+        <create-bundle root="${output.dir}/registry-temp" 
+                       platform="windows" 
+                       target="${nb.bundles.output.dir}/javafx/netbeans-6.1-javafx-windows.exe">
+            <component uid="nb-base" version="${nb.full.version}"/>
+            <component uid="nb-javase" version="${nb.full.version}"/>
+            <component uid="nb-javafx" version="${javafx.full.version}"/>
+	    <bundleProperty name="${welcome.type}" value="javafx"/>
+        </create-bundle>
+    </target>
 
 
     <target name="prepare-output-dir">
