@@ -49,9 +49,11 @@ import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.comp.Resolve;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
+import com.sun.tools.javafx.comp.JavafxAttrContext;
+import com.sun.tools.javafx.comp.JavafxEnv;
+import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -363,18 +365,21 @@ public final class TreeUtilities {
     }
 
     public boolean isAccessible(Scope scope, Element member, TypeMirror type) {
-        if (scope instanceof JavafxcScope 
-                && member instanceof Symbol 
-                && type instanceof Type) {
-            Resolve resolve = Resolve.instance(info.impl.getContext());
-//            JavafxResolve resolve =JavafxResolve.instance(info.impl.getContext());
-	    return resolve.isAccessible(((JavafxcScope)scope).getEnv(), (Type) type, (Symbol) member);  
+        if (scope instanceof JavafxcScope && member instanceof Symbol && type instanceof Type) {
+//            Resolve resolve = Resolve.instance(info.impl.getContext());
+            JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
+            Object env = ((JavafxcScope) scope).getEnv();
+            JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
+	    return resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);  
         } else 
             return false;
     }
 
     public boolean isStaticContext(Scope scope) {
-        return Resolve.isStatic(((JavafxcScope)scope).getEnv());
+        Object env = ((JavafxcScope) scope).getEnv();
+        JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
+        return JavafxResolve.isStatic(fxEnv);
+//        return Resolve.isStatic(((JavafxcScope) scope).getEnv());
     }
 
     private static void log(String s) {

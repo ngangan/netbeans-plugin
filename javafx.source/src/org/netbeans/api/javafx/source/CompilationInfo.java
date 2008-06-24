@@ -36,11 +36,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.JavafxcTask;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
@@ -56,19 +55,44 @@ import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JavafxTreeScanner;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import org.netbeans.api.lexer.TokenHierarchy;
+import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author nenik
  */
 public class CompilationInfo {
+
     final CompilationInfoImpl impl;
+    private ElementUtilities elementUtilities;
+    private TreeUtilities treeUtilities;
+
+    public ElementUtilities getElementUtilities() {
+        if (null == elementUtilities) {
+            elementUtilities = new ElementUtilities(this);
+        }
+        return elementUtilities;
+    }
+
+    public FileObject getFileObject() {
+        return impl.getJavaFXSource().getFileObject();
+    }
+
+    public TreeUtilities getTreeUtilities() {
+        if (null == treeUtilities) {
+            treeUtilities = new TreeUtilities(this);
+        }
+        return treeUtilities;
+    }
 
     public CompilationInfo(JavaFXSource source) {
         impl = new CompilationInfoImpl(source);
@@ -89,77 +113,118 @@ public class CompilationInfo {
     public JavafxcTrees getTrees() {
         return JavafxcTrees.instance(impl.getJavafxcTask());
     }
-    
-        // XXX: hack around lack of support in compiler
+    // XXX: hack around lack of support in compiler
     public TreePath getPath(Element e) {
-        Symbol sym = (Symbol)e;
+        Symbol sym = (Symbol) e;
         JavafxEnter enter = JavafxEnter.instance(impl.getContext());
         JavafxEnv env = enter.getEnv(sym.enclClass());
-        if (env == null) return null;
+        if (env == null) {
+            return null;
+        }
         JCTree tree = declarationFor(sym, env.tree);
         return tree == null ? null : getTrees().getPath(getCompilationUnit(), tree);
     }
-    
+
     private static JCTree declarationFor(final Symbol sym, final JCTree tree) {
 
         class DeclScanner extends JavafxTreeScanner {
+
             JCTree result = null;
+
+            @Override
             public void scan(JCTree tree) {
-                if (tree!=null && result==null)
+                if (tree != null && result == null) {
                     tree.accept(this);
-            }
-	    public @Override void visitTopLevel(JCCompilationUnit that) {
-		if (that.packge == sym) result = that;
-		else super.visitTopLevel(that);
-	    }
-            public @Override void visitClassDeclaration(JFXClassDeclaration that) {
-		if (that.sym == sym) result = that;
-		else super.visitClassDeclaration(that);
+                }
             }
 
-	    public @Override void visitClassDef(JCClassDecl that) {
-		if (that.sym == sym) result = that;
-		else super.visitClassDef(that);
-	    }
-
-            public @Override void visitFunctionDefinition(JFXFunctionDefinition that) {
-		if (that.sym == sym) result = that;
-                else super.visitFunctionDefinition(that);
+            public 
+            @Override
+            void visitTopLevel( JCCompilationUnit that) {
+                if (that.packge == sym) {
+                    result = that;
+                } else {
+                    super.visitTopLevel(that);
+                }
             }
-            
-	    public @Override void visitMethodDef(JCMethodDecl that) {
-		if (that.sym == sym) result = that;
-		else super.visitMethodDef(that);
-	    }
 
-            public @Override void visitVar(JFXVar that) {
-		if (that.sym == sym) result = that;
-		else super.visitVarDef(that);
+            public 
+            @Override
+            void visitClassDeclaration( JFXClassDeclaration that) {
+                if (that.sym == sym) {
+                    result = that;
+                } else {
+                    super.visitClassDeclaration(that);
+                }
             }
-            
-	    public @Override void visitVarDef(JCVariableDecl that) {
-		if (that.sym == sym) result = that;
-		else super.visitVarDef(that);
-	    }
-	}
-	DeclScanner s = new DeclScanner();
-	tree.accept(s);
-	return s.result;
+
+            public 
+            @Override
+            void visitClassDef( JCClassDecl that) {
+                if (that.sym == sym) {
+                    result = that;
+                } else {
+                    super.visitClassDef(that);
+                }
+            }
+
+            public 
+            @Override
+            void visitFunctionDefinition( JFXFunctionDefinition that) {
+                if (that.sym == sym) {
+                    result = that;
+                } else {
+                    super.visitFunctionDefinition(that);
+                }
+            }
+
+            public 
+            @Override
+            void visitMethodDef( JCMethodDecl that) {
+                if (that.sym == sym) {
+                    result = that;
+                } else {
+                    super.visitMethodDef(that);
+                }
+            }
+
+            public 
+            @Override
+            void visitVar( JFXVar that) {
+                if (that.sym == sym) {
+                    result = that;
+                } else {
+                    super.visitVarDef(that);
+                }
+            }
+
+            public 
+            @Override
+            void visitVarDef( JCVariableDecl that) {
+                if (that.sym == sym) {
+                    result = that;
+                } else {
+                    super.visitVarDef(that);
+                }
+            }
+        }
+        DeclScanner s = new DeclScanner();
+        tree.accept(s);
+        return s.result;
     }
-
 
     public Types getTypes() {
         return impl.getJavafxcTask().getTypes();
     }
-    
+
     public JavafxTypes getJavafxTypes() {
         return JavafxTypes.instance(impl.getContext());
     }
-    
+
     public Elements getElements() {
-	return impl.getJavafxcTask().getElements();
+        return impl.getJavafxcTask().getElements();
     }
-    
+
     /**
      * Returns {@link JavaFXSource} for which this {@link CompilationInfo} was created.
      * @return JavaFXSource
@@ -167,7 +232,7 @@ public class CompilationInfo {
     public JavaFXSource getJavaFXSource() {
         return impl.getJavaFXSource();
     }
-    
+
     /**
      * Returns the javafxc tree representing the source file.
      * @return {@link CompilationUnitTree} the compilation unit cantaining the top level classes contained in the,
@@ -183,8 +248,46 @@ public class CompilationInfo {
     public TokenHierarchy getTokenHierarchy() {
         return impl.getTokenHierarchy();
     }
-    
+
     public List<Diagnostic> getDiagnostics() {
         return this.impl.getDiagnostics();
+    }
+
+    public List<? extends TypeElement> getTopLevelElements() {
+//        checkConfinement();
+//        if (this.impl.getPositionConverter() == null) {
+//            throw new IllegalStateException ();
+//        }
+        final List<TypeElement> result = new ArrayList<TypeElement>();
+//        final JavaSource javaSource = this.impl.getJavaSource();
+//        if (javaSource.isClassFile()) {
+//            Elements elements = getElements();
+//            assert elements != null;
+//            assert javaSource.rootFo != null;
+//            String name = FileObjects.convertFolder2Package(FileObjects.stripExtension(FileUtil.getRelativePath(javaSource.rootFo, getFileObject())));
+//            TypeElement e = ((JavacElements)elements).getTypeElementByBinaryName(name);
+//            if (e != null) {                
+//                result.add (e);
+//            }
+//        }
+//        else {
+        CompilationUnitTree cu = getCompilationUnit();
+        if (cu == null) {
+            return null;
+        }
+
+        final JavafxcTrees trees = getTrees();
+        assert trees != null;
+        List<? extends Tree> typeDecls = cu.getTypeDecls();
+        TreePath cuPath = new TreePath(cu);
+        for (Tree t : typeDecls) {
+            TreePath p = new TreePath(cuPath, t);
+            Element e = trees.getElement(p);
+            if (e != null && (e.getKind().isClass() || e.getKind().isInterface())) {
+                result.add((TypeElement) e);
+            }
+        }
+//        }
+        return Collections.unmodifiableList(result);
     }
 }

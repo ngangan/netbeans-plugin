@@ -46,27 +46,15 @@ import java.io.IOException;
  * @author nenik
  */
 public class CompilationController extends CompilationInfo {
-    private ElementUtilities elementUtilities;
 
     CompilationController(CompilationInfoImpl impl) {
         super(impl);
-    }
-
-    public ElementUtilities getElementUtilities() {
-        if (null == elementUtilities) {
-            elementUtilities = new ElementUtilities(this);
-        }
-        return elementUtilities;
     }
 
     public String getText() {
         return getJavaFXSource().getText();
     }
 
-    public TreeUtilities getTreeUtilities() {
-        return new TreeUtilities(this);
-    }
-  
     /** Moves the state to required phase. If given state was already reached 
      * the state is not changed. The method will throw exception if a state is 
      * illegal required. Acceptable parameters for thid method are <BR>
