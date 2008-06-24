@@ -59,8 +59,8 @@ public class ComboBox implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.gui.component.ComboBox" ); // NOI18N
-        Util.addImport( targetComponent, "javafx.gui.component.ComboBoxItem" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.swing.ComboBox" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.swing.ComboBoxItem" ); // NOI18N
         
         return true;
     }    

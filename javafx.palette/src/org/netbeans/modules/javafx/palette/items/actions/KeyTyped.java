@@ -59,7 +59,7 @@ public class KeyTyped implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.KeyEvent" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.input.KeyEvent" ); // NOI18N
         
         return true;
     }

@@ -59,7 +59,7 @@ public class Translate implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.gui.Translate" );
+        Util.addImport( targetComponent, "javafx.scene.transform.Translate" );
         
         return true;
     }    

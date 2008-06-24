@@ -59,7 +59,7 @@ public class Button implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.gui.component.Button" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.swing.Button" ); // NOI18N
         
         return true;
     }    

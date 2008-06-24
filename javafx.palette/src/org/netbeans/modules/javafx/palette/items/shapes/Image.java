@@ -59,8 +59,8 @@ public class Image implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.ImageView" );
-        Util.addImport( targetComponent, "javafx.gui.Image" );
+        Util.addImport( targetComponent, "javafx.scene.image.ImageView" );
+        Util.addImport( targetComponent, "javafx.scene.image.Image" );
         
         return true;
     }

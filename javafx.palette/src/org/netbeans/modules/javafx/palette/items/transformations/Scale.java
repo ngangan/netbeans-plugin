@@ -59,7 +59,7 @@ public class Scale implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.gui.Scale" );
+        Util.addImport( targetComponent, "javafx.scene.transform.Scale" );
         
         return true;
     }    

@@ -59,7 +59,7 @@ public class Slider implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.component.Slider" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.swing.Slider" ); // NOI18N
         
         return true;
     }    

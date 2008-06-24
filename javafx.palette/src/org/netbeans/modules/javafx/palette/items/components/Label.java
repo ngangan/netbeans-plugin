@@ -59,7 +59,7 @@ public class Label implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.component.Label" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.swing.Label" ); // NOI18N
         
         return true;
     }    
