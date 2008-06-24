@@ -59,7 +59,7 @@ public class Rotate implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.gui.Rotate" );
+        Util.addImport( targetComponent, "javafx.scene.transform.Rotate" );
         
         return true;
     }    

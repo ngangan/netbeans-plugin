@@ -27,10 +27,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package transform;
+package transform;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.Interpolator;
 
 var xPos : Number = -40;
    
@@ -57,12 +62,12 @@ Frame {
         background : Color.GRAY
         content : [
             Rectangle {
-                transform : [ javafx.gui.Translate { x : bind xPos, y : 60 }]
+                transform : [ javafx.scene.transform.Translate { x : bind xPos, y : 60 }]
                 width : 40, height : 40
                 fill : Color.WHITE
             },
             Rectangle {
-                transform : [ javafx.gui.Translate { x : bind 2 * xPos, y : 100 }]
+                transform : [ javafx.scene.transform.Translate { x : bind 2 * xPos, y : 100 }]
                 width : 40, height : 40
                 fill : Color.BLACK
             }

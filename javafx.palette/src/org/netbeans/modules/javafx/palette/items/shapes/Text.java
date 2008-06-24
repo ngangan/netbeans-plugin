@@ -59,9 +59,9 @@ public class Text implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.Text" );
-        Util.addImport( targetComponent, "javafx.gui.Font" );
-        Util.addImport( targetComponent, "javafx.gui.FontStyle" );
+        Util.addImport( targetComponent, "javafx.scene.text.Text" );
+        Util.addImport( targetComponent, "javafx.scene.Font" );
+        Util.addImport( targetComponent, "javafx.scene.FontStyle" );
         
         return true;
     }

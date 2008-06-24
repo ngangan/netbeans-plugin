@@ -27,10 +27,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package math;
+package math;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.input.MouseEvent;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.paint.Color;
+import javafx.scene.geometry.Rectangle;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 var boxes : Box[] = [
     Box {

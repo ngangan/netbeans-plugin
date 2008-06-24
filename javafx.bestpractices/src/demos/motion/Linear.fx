@@ -27,10 +27,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package motion;
+package motion;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.scene.geometry.Line;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.transform.Translate;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 
 var y : Number = 200;

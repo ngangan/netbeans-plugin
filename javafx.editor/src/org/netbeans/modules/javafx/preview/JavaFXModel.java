@@ -109,10 +109,12 @@ public class JavaFXModel {
         }
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().contentEquals("platform.active")) {                             // NOI18N
-                projectsClassBytes.remove(project);
-                if (project instanceof JavaFXProject) {
-                    PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
-                    evaluator.removePropertyChangeListener(this);
+                synchronized (projectsClassBytes) {
+                    projectsClassBytes.remove(project);
+                    if (project instanceof JavaFXProject) {
+                        PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
+                        evaluator.removePropertyChangeListener(this);
+                    }
                 }
             }
         }

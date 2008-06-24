@@ -27,10 +27,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
- package particles;
+package particles;
 
-import javafx.gui.*;
-import javafx.animation.*;
+import javafx.input.MouseEvent;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.Group;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.geometry.Line;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.swing.Frame;
+import javafx.scene.swing.Canvas;
+import javafx.scene.transform.Translate;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;

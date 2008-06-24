@@ -59,9 +59,9 @@ public class Arc implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.gui.Arc" );
-        Util.addImport( targetComponent, "javafx.gui.ArcType" );
-        Util.addImport( targetComponent, "javafx.gui.Color" );
+        Util.addImport( targetComponent, "javafx.scene.geometry.Arc" );
+        Util.addImport( targetComponent, "javafx.scene.geometry.ArcType" );
+        Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         return true;
     }
 }
