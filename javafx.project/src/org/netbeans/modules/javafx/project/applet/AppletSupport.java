@@ -377,6 +377,8 @@ public class AppletSupport {
                     path = path.replace(File.separatorChar, '/');   //NOI18N
 
                 }
+                //Workaround to get it work in windows
+                path = path.replaceAll(" ", "%20");
                 url = new URL("file", null, path);
             } catch (MalformedURLException e) {
                 ErrorManager.getDefault().notify(e);
