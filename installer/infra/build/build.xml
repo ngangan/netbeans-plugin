@@ -617,7 +617,7 @@ sjsas.image.token.hostname.macosx=${sjsas.image.token.hostname.macosx}
 
         <if property="do.build.javafx">
 	<echo file="${environment.properties}" append="true">
-javafx.full.number=${javafx.full.number}
+javafx.full.version=${javafx.full.version}
 javafx.build.number=${javafx.build.number}
 	</echo>
 
