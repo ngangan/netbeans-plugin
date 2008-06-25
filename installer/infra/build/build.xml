@@ -628,6 +628,7 @@ jarsigner.storepass=${jarsigner.storepass}
 		<include name="**/nb*"/>
                 <exclude name="**/nb*${build.number}*"/>
                 <exclude name="**/nb-portalpack*"/>
+		<exclude name="**/nb-javafx*"/>
 
                 <!-- glassfish -->
                 <include name="**/glassfish*"/>
@@ -687,7 +688,7 @@ jarsigner.storepass=${jarsigner.storepass}
 		<delete failonerror="false">
         	    <fileset dir="${nbi.cache.dir}/packaged">        
 			<include name="**/nb-javafx*"/>
-			<exclude name="**/nb-javafx*${javafx.build.number}*"/>                	
+			<exclude name="**/nb-javafx*${javafx.full.version}*"/>                	
         	    </fileset>
 	        </delete>
 	</if>
@@ -2321,9 +2322,11 @@ jarsigner.storepass=${jarsigner.storepass}
 
     <target name="generate-javafx-bundles" if="do.build.javafx">
 	<!-- JavaFX bundles --> 	
+	<property name="javafx.bundles.output.dir" value="${nb.bundles.output.dir}/javafx"/>
+	<mkdir dir="${javafx.bundles.output.dir}"/>
         <create-bundle root="${output.dir}/registry-temp" 
                        platform="windows" 
-                       target="${nb.bundles.output.dir}/javafx/netbeans-6.1-javafx-windows.exe">
+                       target="${javafx.bundles.output.dir}/netbeans-6.1-javafx-windows.exe">
             <component uid="nb-base" version="${nb.full.version}"/>
             <component uid="nb-javase" version="${nb.full.version}"/>
             <component uid="nb-javafx" version="${javafx.full.version}"/>
