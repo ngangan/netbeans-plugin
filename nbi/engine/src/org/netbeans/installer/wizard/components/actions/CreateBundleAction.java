@@ -44,7 +44,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarEntry;
@@ -56,7 +55,6 @@ import org.netbeans.installer.product.components.Product;
 import org.netbeans.installer.product.Registry;
 import org.netbeans.installer.product.filters.RegistryFilter;
 import org.netbeans.installer.product.filters.SubTreeFilter;
-import org.netbeans.installer.utils.EngineUtils;
 import org.netbeans.installer.utils.FileUtils;
 import org.netbeans.installer.utils.LogManager;
 import org.netbeans.installer.utils.helper.Status;
@@ -67,10 +65,8 @@ import org.netbeans.installer.utils.FileProxy;
 import org.netbeans.installer.utils.ResourceUtils;
 import org.netbeans.installer.utils.StreamUtils;
 import org.netbeans.installer.utils.XMLUtils;
-import org.netbeans.installer.utils.cli.CLIHandler;
 import org.netbeans.installer.utils.exceptions.XMLException;
 import org.netbeans.installer.utils.helper.EngineResources;
-import org.netbeans.installer.utils.helper.ErrorLevel;
 import org.netbeans.installer.utils.helper.ExtendedUri;
 import org.netbeans.installer.utils.helper.Platform;
 import org.netbeans.installer.utils.progress.Progress;
@@ -119,7 +115,6 @@ public class CreateBundleAction extends WizardAction {
     /////////////////////////////////////////////////////////////////////////////////
     // Instance
     private Progress progress;
-    private HashSet<String> jarEntries = new HashSet <String>();
     
     public CreateBundleAction() {
         setProperty(TITLE_PROPERTY, DEFAULT_TITLE);
@@ -178,7 +173,7 @@ public class CreateBundleAction extends WizardAction {
             progress.setDetail(StringUtils.format(
                     getProperty(PROGRESS_ADD_ENGINE_DETAIL_PROPERTY)));
             
-            engine = new JarFile(EngineUtils.cacheEngine(new Progress()));
+            engine = new JarFile(Installer.cacheInstallerEngine(new Progress()));
             output = new JarOutputStream(new FileOutputStream(targetFile));
             
             // transfer the engine, skipping existing bundled components
@@ -204,24 +199,20 @@ public class CreateBundleAction extends WizardAction {
                     continue;
                 }
                 
-                putNextEntry(output,entry);
+                output.putNextEntry(entry);
                 StreamUtils.transferData(engine.getInputStream(entry), output);
             }
             
-            putNextEntry(output, EngineResources.DATA_DIRECTORY + "/");
+            output.putNextEntry(new JarEntry(
+                    EngineResources.DATA_DIRECTORY + "/"));
             
             
             // transfer the engine files list
-            putNextEntry(output, EngineResources.ENGINE_CONTENTS_LIST);
+            output.putNextEntry(new JarEntry(
+                    EngineResources.ENGINE_CONTENTS_LIST));
             StreamUtils.transferData(
                     ResourceUtils.getResource(EngineResources.ENGINE_CONTENTS_LIST),
                     output);
-            InputStream optionsListStream = ResourceUtils.getResource(CLIHandler.OPTIONS_LIST);
-            if (optionsListStream != null) {
-                //transfer engine command-line options list
-                putNextEntry(output, CLIHandler.OPTIONS_LIST);
-                StreamUtils.transferData(optionsListStream, output);
-            }
             
             // load default engine properties and set all components to be installed by default
             String [] contents = StringUtils.splitByLines(
@@ -245,7 +236,7 @@ public class CreateBundleAction extends WizardAction {
                     
                     engineProps.setProperty(Registry.SUGGEST_INSTALL_PROPERTY,
                             StringUtils.EMPTY_STRING + true);
-                    putNextEntry(output, entry);
+                    output.putNextEntry(new JarEntry(entry));
                     engineProps.store(output, null);
                 }
             }            
@@ -276,29 +267,29 @@ public class CreateBundleAction extends WizardAction {
                         StringUtils.asString(platforms, "%20");
                 
                 // create the required directories structure
-                putNextEntry(output,
+                output.putNextEntry(new JarEntry(
                         EngineResources.DATA_DIRECTORY + "/" +
-                        product.getUid() + "/");
-                putNextEntry(output,
-                        EngineResources.DATA_DIRECTORY + "/" +
-                        product.getUid() + "/" +
-                        product.getVersion() + "/" +
-                        StringUtils.asString(product.getPlatforms(), " ") + "/");
-                putNextEntry(output,
+                        product.getUid() + "/"));
+                output.putNextEntry(new JarEntry(
                         EngineResources.DATA_DIRECTORY + "/" +
                         product.getUid() + "/" +
                         product.getVersion() + "/" +
-                        StringUtils.asString(product.getPlatforms(), " ") + "/" +
-                        "logic" + "/");
-                putNextEntry(output,
+                        StringUtils.asString(product.getPlatforms(), " ") + "/"));
+                output.putNextEntry(new JarEntry(
                         EngineResources.DATA_DIRECTORY + "/" +
                         product.getUid() + "/" +
                         product.getVersion() + "/" +
                         StringUtils.asString(product.getPlatforms(), " ") + "/" +
-                        "data" + "/");
+                        "logic" + "/"));
+                output.putNextEntry(new JarEntry(
+                        EngineResources.DATA_DIRECTORY + "/" +
+                        product.getUid() + "/" +
+                        product.getVersion() + "/" +
+                        StringUtils.asString(product.getPlatforms(), " ") + "/" +
+                        "data" + "/"));
                 
                 // transfer the icon
-                putNextEntry(output, entryPrefix + "/icon.png");
+                output.putNextEntry(new JarEntry(entryPrefix + "/icon.png"));
                 StreamUtils.transferFile(
                         new File(product.getIconUri().getLocal()),
                         output);
@@ -316,8 +307,8 @@ public class CreateBundleAction extends WizardAction {
                     if (isCanceled()) return;
                     
                     // transfer the file
-                    putNextEntry(output,
-                            entryPrefix + "/logic/logic," + (i + 1) + ".jar");
+                    output.putNextEntry(new JarEntry(
+                            entryPrefix + "/logic/logic," + (i + 1) + ".jar"));
                     StreamUtils.transferFile(
                             new File(logicUri.getLocal()),
                             output);
@@ -344,8 +335,8 @@ public class CreateBundleAction extends WizardAction {
                     if (isCanceled()) return;
                     
                     // transfer the file
-                    putNextEntry(output,
-                            entryPrefix + "/data/data," + (i + 1) + ".jar");
+                    output.putNextEntry(new JarEntry(
+                            entryPrefix + "/data/data," + (i + 1) + ".jar"));
                     StreamUtils.transferFile(
                             new File(dataUris.get(i).getLocal()),
                             output);
@@ -395,12 +386,12 @@ public class CreateBundleAction extends WizardAction {
                         group.getUid();
                 
                 // create the required directories structure
-                putNextEntry(output,
+                output.putNextEntry(new JarEntry(
                         EngineResources.DATA_DIRECTORY + "/" +
-                        group.getUid() + "/");
+                        group.getUid() + "/"));
                 
                 // transfer the icon
-                putNextEntry(output, entryPrefix + "/icon.png");
+                output.putNextEntry(new JarEntry(entryPrefix + "/icon.png"));
                 StreamUtils.transferFile(
                         new File(group.getIconUri().getLocal()),
                         output);
@@ -417,9 +408,8 @@ public class CreateBundleAction extends WizardAction {
             if (isCanceled()) return;
             
             // serialize the registry: get the document and save it to the jar file
-            putNextEntry(output,
-                    EngineResources.DATA_DIRECTORY + "/" + 
-                    Registry.DEFAULT_BUNDLED_REGISTRY_FILE_NAME);
+            output.putNextEntry(new JarEntry(
+                    EngineResources.DATA_DIRECTORY + "/registry.xml"));
             XMLUtils.saveXMLDocument(
                     registry.getRegistryDocument(filter, false, true, true), output);
             
@@ -477,18 +467,6 @@ public class CreateBundleAction extends WizardAction {
         
         if (progress != null) {
             progress.setCanceled(true);
-        }
-    }
-    
-    private void putNextEntry(JarOutputStream output, String entryName) throws IOException {
-        putNextEntry(output, new JarEntry(entryName));
-    }
-
-    private void putNextEntry(JarOutputStream output, JarEntry je) throws IOException {
-        if (!jarEntries.add(je.getName())) {
-            LogManager.log(ErrorLevel.MESSAGE, "... already exist, skipping " + je.getName());
-        } else {
-            output.putNextEntry(je);
         }
     }
 }

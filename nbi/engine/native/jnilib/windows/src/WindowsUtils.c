@@ -68,21 +68,7 @@ HKEY getHKEY(jint jSection) {
     }
 }
 
-LONG getMode(jint jmode) {
-    switch (jmode) {
-        case org_netbeans_installer_utils_system_windows_WindowsRegistry_MODE_DEFAULT:
-            return 0L;
-        case org_netbeans_installer_utils_system_windows_WindowsRegistry_MODE_32BIT:
-            return KEY_WOW64_32KEY;
-        case org_netbeans_installer_utils_system_windows_WindowsRegistry_MODE_64BIT:
-            return KEY_WOW64_64KEY;
-        default:
-            return 0L;
-    }
-}
-
-
-int queryValue(int mode, HKEY section, const unsigned short* key, const unsigned short* name, DWORD* type, DWORD* size, byte** value, int expand) {
+int queryValue(HKEY section, const unsigned short* key, const unsigned short* name, DWORD* type, DWORD* size, byte** value, int expand) {
     int result = 1;
     
     HKEY hkey = 0;
@@ -90,14 +76,14 @@ int queryValue(int mode, HKEY section, const unsigned short* key, const unsigned
     int tempSize = 0;
     byte* tempValue = NULL;
     
-    if (RegOpenKeyExW(section, key, 0, KEY_QUERY_VALUE | mode, &hkey) == ERROR_SUCCESS) {
-        if (RegQueryValueExW(hkey, name, NULL, (LPDWORD) &tempType, NULL, (LPDWORD) &tempSize) == ERROR_SUCCESS) {
+    if (RegOpenKeyExW(section, key, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+        if (RegQueryValueExW(hkey, name, NULL, &tempType, NULL, &tempSize) == ERROR_SUCCESS) {
             tempValue = (byte*) malloc(tempSize + 8);
             
             if (tempValue != NULL) {
                 memset(tempValue, 0, tempSize + 8);
                 
-                if (RegQueryValueExW(hkey, name, NULL, (LPDWORD) &tempType, tempValue, (LPDWORD) &tempSize) == ERROR_SUCCESS) {
+                if (RegQueryValueExW(hkey, name, NULL, &tempType, tempValue, &tempSize) == ERROR_SUCCESS) {
                     if (expand && (tempType == REG_EXPAND_SZ)) {
                         int expandedSize = (int) wcslen((unsigned short*) tempValue) + 2;
                         byte* expandedValue = (byte*) malloc(expandedSize);
@@ -140,12 +126,12 @@ int queryValue(int mode, HKEY section, const unsigned short* key, const unsigned
     return result;
 }
 
-int setValue(int mode, HKEY section, const unsigned short* key, const unsigned short* name, DWORD type, const byte* data, int size, int expand) {
+int setValue(HKEY section, const unsigned short* key, const unsigned short* name, DWORD type, const byte* data, int size, int expand) {
     int result = 1;
     
     HKEY hkey  = 0;
     
-    if (RegOpenKeyExW(section, key, 0, KEY_SET_VALUE | mode, &hkey) == ERROR_SUCCESS) {
+    if (RegOpenKeyExW(section, key, 0, KEY_SET_VALUE, &hkey) == ERROR_SUCCESS) {
         if (!(RegSetValueExW(hkey, name, 0, type, data, size) == ERROR_SUCCESS)) {
             result = 0;
         }

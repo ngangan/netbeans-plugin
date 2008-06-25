@@ -43,15 +43,8 @@ extern "C" {
 #endif
 
 
-WCHAR * getStringValue(HKEY root, WCHAR *key, WCHAR *valueName, BOOL access64key);
-WCHAR * getStringValuePC(HKEY root, WCHAR *parentkey, WCHAR *childkey, WCHAR *valueName, BOOL access64key);
-
-#ifndef KEY_WOW64_32KEY
-#define KEY_WOW64_32KEY 0x0200
-#endif
-#ifndef KEY_WOW64_64KEY
-#define KEY_WOW64_64KEY 0x0100
-#endif
+WCHAR * getStringValue(HKEY root, WCHAR *key, WCHAR *valueName);
+WCHAR * getStringValuePC(HKEY root, WCHAR *parentkey, WCHAR *childkey, WCHAR *valueName);
 
 
 #ifdef	__cplusplus

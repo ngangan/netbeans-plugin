@@ -46,7 +46,6 @@ import org.netbeans.installer.product.filters.ProductFilter;
 import org.netbeans.installer.utils.FileProxy;
 import org.netbeans.installer.utils.FileUtils;
 import org.netbeans.installer.utils.LogManager;
-import org.netbeans.installer.utils.StringUtils;
 import org.netbeans.installer.utils.SystemUtils;
 import org.netbeans.installer.utils.applications.JavaUtils;
 import org.netbeans.installer.utils.applications.JavaUtils.JavaInfo;
@@ -56,7 +55,6 @@ import org.netbeans.installer.utils.exceptions.InstallationException;
 import org.netbeans.installer.utils.exceptions.NativeException;
 import org.netbeans.installer.utils.exceptions.UninstallationException;
 import org.netbeans.installer.utils.helper.FilesList;
-import org.netbeans.installer.utils.helper.RemovalMode;
 import org.netbeans.installer.utils.helper.Status;
 import org.netbeans.installer.utils.helper.Text;
 import org.netbeans.installer.utils.progress.Progress;
@@ -350,53 +348,6 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
 
         /////////////////////////////////////////////////////////////////////////////
         try {
-            progress.setDetail(getString("CL.install.glassfish.integration")); // NOI18N
-
-            final List<Product> glassfishes =
-                    Registry.getInstance().getProducts("glassfish-mod");
-
-            Product productToIntegrate = null;
-            for (Product glassfish : glassfishes) {
-                final Product bundledProduct = bundledRegistry.getProduct(
-                        glassfish.getUid(), glassfish.getVersion());
-                if (glassfish.getStatus() == Status.INSTALLED && bundledProduct != null) {
-                    final File location = glassfish.getInstallationLocation();
-                    if (location != null && FileUtils.exists(location) && !FileUtils.isEmpty(location)) {
-                        productToIntegrate = glassfish;
-                        break;
-                    }
-                }
-            }
-            if (productToIntegrate == null) {
-                for (Product glassfish : glassfishes) {
-                    if (glassfish.getStatus() == Status.INSTALLED) {
-                        final File location = glassfish.getInstallationLocation();
-                        if (location != null && FileUtils.exists(location) && !FileUtils.isEmpty(location)) {
-                            productToIntegrate = glassfish;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (productToIntegrate != null) {
-                final File location = productToIntegrate.getInstallationLocation();
-                LogManager.log("... integrate " + getSystemDisplayName() + " with " + productToIntegrate.getDisplayName() + " installed at " + location);
-                NetBeansUtils.setJvmOption(
-                        installLocation,
-                        GLASSFISH_MOD_JVM_OPTION_NAME,
-                        location.getAbsolutePath(),
-                        true);
-            }
-        } catch (IOException e) {
-            throw new InstallationException(
-                    getString("CL.install.error.glassfish.integration"), // NOI18N
-                    e);
-        } finally {
-            progress.setDetail(StringUtils.EMPTY_STRING); // NOI18N
-        }
-        
-        /////////////////////////////////////////////////////////////////////////////
-        try {
             progress.setDetail(getString("CL.install.tomcat.integration")); // NOI18N
 
             final List<Product> tomcats =
@@ -459,15 +410,6 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
         } catch  (IOException e) {
             LogManager.log("Cannot add jdk`s id to netbeans productid file", e);
         }
-
-        try {
-            filesList.add(new File(nbCluster,"servicetag/registration.xml"));
-            filesList.add(new File(nbCluster,"servicetag"));
-        } catch (IOException e) {
-            LogManager.log(e);
-        }
-
-	
         /////////////////////////////////////////////////////////////////////////////
         progress.setPercentage(Progress.COMPLETE);
     }
@@ -636,9 +578,6 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
         return shortcut;
     }
     
-    public RemovalMode getRemovalMode() {
-        return RemovalMode.LIST;
-    }
     
     /////////////////////////////////////////////////////////////////////////////////
     // Constants
@@ -686,8 +625,6 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
             "JDK";//NOI18N
     public static final String GLASSFISH_JVM_OPTION_NAME =
             "-Dcom.sun.aas.installRoot"; // NOI18N
-    public static final String GLASSFISH_MOD_JVM_OPTION_NAME =
-            "-Dorg.glassfish.v3.installRoot"; //NOI18N
     
     public static final String TOMCAT_JVM_OPTION_NAME_TOKEN =
             "-Dorg.netbeans.modules.tomcat.autoregister.token"; // NOI18N

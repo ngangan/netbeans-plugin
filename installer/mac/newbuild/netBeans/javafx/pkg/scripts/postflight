@@ -17,18 +17,13 @@
 # Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
 # Microsystems, Inc. All Rights Reserved.
 
-chown_dir=$1
-unpack_dir=$2
 set -e
 
-echo Changing ownership for $chown_dir
-chown -R root:admin "$chown_dir"
+script_dir=`dirname "$0"`
 
-echo Calling unpack200 in $unpack_dir
-cd "$unpack_dir"
-for x in `find . -name \*.jar.pack` ; do
-    jar=`echo $x | sed 's/jar.pack/jar/'`
-    /System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/bin/unpack200 -r $x $jar
-done
+#add Product ID
+"$script_dir"/addproduct_id.sh "JAVAFX"
 
-exit 0
+if [ -d "/Library/Receipts/javafx.pkg" ] ; then
+    rm -rf "/Library/Receipts/javafx.pkg"
+fi

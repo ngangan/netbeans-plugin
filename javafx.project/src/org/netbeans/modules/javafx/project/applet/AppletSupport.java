@@ -89,9 +89,8 @@ public class AppletSupport {
 
     private final static String POLICY_FILE_NAME = "applet";
     private final static String POLICY_FILE_EXT = "policy";
+    private final static String APPLET_MAIN_CLASS = "javafx.application.Applet";
 
-    private final static String APPLET_MAIN_CLASS="javafx.application.Applet";
-            
     private AppletSupport() {
     }
 
@@ -183,7 +182,7 @@ public class AppletSupport {
             String appletJavaScript = ep.getProperty(JavaFXProjectProperties.APPLET_JAVASCRIPT);
             boolean isJavaScript = "true".equals(appletJavaScript);
             boolean isInBrowser = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_RUN_IN_BROWSER));
-            String jnlpFileName = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP))?htmlFile.getName()+"."+JNLP_EXT:null;
+            String jnlpFileName = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP)) ? htmlFile.getName() + "." + JNLP_EXT : null;
             String draggable = ep.getProperty(JavaFXProjectProperties.APPLET_DRAGGABLE);
             String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
             if (appletFile.getExt().equals("fx")) {
@@ -214,7 +213,7 @@ public class AppletSupport {
 //                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
                 path = path.substring(0, path.length() - 3);
                 if (isJavaScript && isInBrowser) {
-                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args); // NOI18N
+                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName); // NOI18N
 
                 } else {
                     fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName); // NOI18N
@@ -223,7 +222,7 @@ public class AppletSupport {
             } else {
                 path = path.substring(0, path.length() - 5);
                 if (isJavaScript && isInBrowser) {
-                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args); // NOI18N
+                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName); // NOI18N
 
                 } else {
                     fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName); // NOI18N
@@ -424,7 +423,7 @@ public class AppletSupport {
 
         if (jnlpFileName != null) {
             writer.println("<APPLET width=350 height=200>");
-            writer.println("<param name=\"jnlp_href\" value=\"" + name + "\">");
+            writer.println("    <param name=\"jnlp_href\" value=\"" + jnlpFileName + "\">");
         } else {
             if (codebase == null) {
                 writer.print("<APPLET code="); // NOI18N
@@ -434,11 +433,11 @@ public class AppletSupport {
 
             }
             if (isFX) {
-                writer.print("\""+APPLET_MAIN_CLASS+"\""); // NOI18N
+                writer.print("\"" + APPLET_MAIN_CLASS + "\""); // NOI18N
 
                 writer.println(" width=350 height=200>"); // NOI18N
 
-                writer.println("<param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
+                writer.println("    <param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
 
             } else {
                 writer.print("\"" + name + "\""); // NOI18N
@@ -449,11 +448,11 @@ public class AppletSupport {
         }
         if (draggable != null) {
             if ("true".equals(draggable)) {
-                writer.println("<param name=\"draggable\" value=\"true\">");
+                writer.println("    <param name=\"draggable\" value=\"true\">");
             }
         }
         if (java_args != null) {
-            writer.println("<param name=\"java_arguments\" value=\"" + java_args + "\">");
+            writer.println("    <param name=\"java_arguments\" value=\"" + java_args + "\">");
         }
         writer.println("</APPLET>"); // NOI18N
 
@@ -475,7 +474,7 @@ public class AppletSupport {
      * @param file is a file to be filled
      * @param name is name of the applet                                     
      */
-    private static void fillInFileJavaScript(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args) {
+    private static void fillInFileJavaScript(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args, String jnlpFileName) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<HTML>"); // NOI18N
@@ -502,36 +501,42 @@ public class AppletSupport {
 
         writer.println("<script src=\"http://java.com/js/deployJava.js\"></script><br>");
         writer.println("<script>");
-        writer.println("    var attributes =");
-        writer.println("        {");
-        if (codebase == null) {
-            writer.print("            code: "); // NOI18N
-
-        } else {
-            writer.print("           " + codebase.replaceAll("=", ":") + ",\n             code: "); // NOI18N
-
-        }
-        if (isFX) {
-            writer.println("'"+APPLET_MAIN_CLASS+"',");
-            writer.println("            width: 375,");
-            writer.println("            height: 375");
-            writer.println("        };");
+        writer.println("    var attributes = {");
+        if (jnlpFileName != null) {
+            writer.println("    };");
             writer.println("    var parameters = {");
-            writer.print("        ApplicationClass:" + "'" + name + "',");
+            writer.println("            jnlp_href:'" + jnlpFileName + "',");
+
         } else {
-            writer.println("'" + name + "'");
-            writer.println("        };");
-            writer.print("    var parameters = {");
-        }
+            if (codebase == null) {
+                writer.print("            code: "); // NOI18N
+
+            } else {
+                writer.print("           " + codebase.replaceAll("=", ":") + ",\n             code: "); // NOI18N
+
+            }
+            if (isFX) {
+                writer.println("'" + APPLET_MAIN_CLASS + "',");
+                writer.println("            width: 375,");
+                writer.println("            height: 375");
+                writer.println("    };");
+                writer.println("    var parameters = {");
+                writer.println("        ApplicationClass:" + "'" + name + "',");
+            } else {
+                writer.println("'" + name + "'");
+                writer.println("    };");
+                writer.print("    var parameters = {");
+            }
+        } 
         if (draggable != null) {
             if ("true".equals(draggable)) {
-                writer.print("\n        draggable: 'true',");
+                writer.println("            draggable: 'true',");
             }
         }
         if (java_args != null) {
-            writer.print("\n        java_arguments: '" + java_args + "'");
+            writer.println("        java_arguments: '" + java_args + "'");
         }
-        writer.println("\n    };");
+        writer.println("    };");
         //XXX TODO Java Hardcoded here
         writer.println("    deployJava.runApplet( attributes, parameters, \"1.5\" );");
         writer.println("</script>");
@@ -585,25 +590,16 @@ public class AppletSupport {
                 mainJar = "";
             }
             writer.println("            <jar href=\"lib/" + libs[i] + "\"" + mainJar + ">"); // NOI18N
-
         }
         writer.println("        </resources>"); // NOI18N
-
         writer.println("        <applet-desc"); // NOI18N
-
         writer.println("            name=\"" + name + "\""); // NOI18N
-
-        writer.println("            main-class=\""+APPLET_MAIN_CLASS+"\""); // NOI18N
-
+        writer.println("            main-class=\"" + APPLET_MAIN_CLASS + "\""); // NOI18N
         writer.println("            width=\"300\""); // NOI18N
-
         writer.println("            height=\"300\">"); // NOI18N
-
         writer.println("            <param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
-
         writer.println("        </applet-desc>"); // NOI18N
-
-
+        writer.println("    </jnlp>"); // NOI18N
         writer.flush();
     }
 

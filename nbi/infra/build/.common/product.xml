@@ -358,21 +358,9 @@
             <set 
                 property="current.zip" 
                 value="${product.data.${i}.zip}"/>
-
-            <condition property="product.tar.${i}.is.set" value="true" else="false">
-		<isset property="product.data.${i}.tar"/>
-            </condition>
-
-            <if property="product.tar.${i}.is.set" value="true">
-                <set 
-                    property="current.tar" 
-                    value="${product.data.${i}.tar}"/>
-            </if>
-            <if property="product.tar.${i}.is.set" value="false">
-                <set 
-                    property="current.tar" 
-                    value="false"/>
-            </if>
+            <set 
+                property="current.tar" 
+                value="${product.data.${i}.tar}"/>
 
             <set 
                 property="current.file" 

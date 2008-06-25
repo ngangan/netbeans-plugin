@@ -36,13 +36,6 @@
 # 
 
 deleteFiles() {
-        testSymlinkErr=`test -L / > /dev/null`
-        if [ -z "$testSymlinkErr" ] ; then
-            isSymlink=-L
-        else
-            isSymlink=-h
-        fi
-
 	#wait for main thread to finish...
 	sleep 3
 	waitOnError=1
@@ -65,7 +58,7 @@ deleteFiles() {
 			result=1
 			if [ -n "$file" ] ; then
 				#echo "... file not zero"
-				if [ $isSymlink "$file" ] || [ -f "$file" ] ; then
+				if [ -L "$file" ] || [ -f "$file" ] ; then
 					# file or symlink
 					#echo "deleting [F] $file"
 					rm -f "$file" 2>/dev/null 1>&2
@@ -105,5 +98,6 @@ deleteFiles() {
 		rm -f "$0"
 	fi
 }
+
 
 deleteFiles "$@"

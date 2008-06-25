@@ -55,15 +55,15 @@ public final class LauncherFactory {
         if (platform.isCompatibleWith(Platform.WINDOWS)) {
             return new ExeLauncher(properties);
         }
-
-        if (platform.isCompatibleWith(Platform.MACOSX)) {
-            return new CommandLauncher(properties);
-        }
         
-        if (platform.isCompatibleWith(Platform.UNIX)) {
+        if (platform.isCompatibleWith(Platform.LINUX) || 
+                platform.isCompatibleWith(Platform.SOLARIS)) {
             return new ShLauncher(properties);
         }
         
+        if (platform.isCompatibleWith(Platform.MACOSX)) {
+            return new CommandLauncher(properties);
+        }
         
         return new JarLauncher(properties);
     }

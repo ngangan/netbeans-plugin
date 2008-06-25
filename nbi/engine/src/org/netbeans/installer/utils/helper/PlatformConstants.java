@@ -56,8 +56,6 @@ public final class PlatformConstants {
     
     public static final String OS_FAMILY_MACOSX = 
             "macosx";
-    public static final String OS_FAMILY_UNIX = 
-            "unix";
     
     public static final String HARDWARE_X86 = 
             "x86";
@@ -70,7 +68,4 @@ public final class PlatformConstants {
     
     public static final String HARDWARE_PPC = 
             "ppc";
-    
-    public static final String HARDWARE_PPC64 = 
-            "ppc64";
 }

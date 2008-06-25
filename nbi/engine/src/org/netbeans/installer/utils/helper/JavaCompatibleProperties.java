@@ -44,37 +44,34 @@ import java.util.List;
  * @author Dmitry Lipin
  */
 public class JavaCompatibleProperties {
-    private Version minVersion;
-    private Version maxVersion;
+    private String minVersion;
+    private String maxVersion;
     private String vendor;
     private String osName;
     private String osArch;
     
     public JavaCompatibleProperties() {        
     }
-    public JavaCompatibleProperties(Version minVersion, Version maxVersion, String vendor,  String osName, String osArch) {
+    public JavaCompatibleProperties(String minVersion, String maxVersion, String vendor,  String osName, String osArch) {        
         setMinVersion(minVersion);
         setMaxVersion(maxVersion);
         setVendor(vendor);
         setOsName(osName);
         setOsArch(osArch);
     }
-    public JavaCompatibleProperties(String minVersion, String maxVersion, String vendor,  String osName, String osArch) {        
-        this(Version.getVersion(minVersion), Version.getVersion(maxVersion),vendor,osName,osArch);
-    }
-    public Version getMinVersion() {
+    public String getMinVersion() {
         return minVersion;
     }
     
-    public void setMinVersion(Version minVersion) {
+    public void setMinVersion(String minVersion) {
         this.minVersion = minVersion;
     }
     
-    public Version getMaxVersion() {
+    public String getMaxVersion() {
         return maxVersion;
     }
     
-    public void setMaxVersion(Version maxVersion) {
+    public void setMaxVersion(String maxVersion) {
         this.maxVersion = maxVersion;
     }
     

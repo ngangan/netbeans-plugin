@@ -1261,7 +1261,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 <!--condition property="browser.args" value="-a Safari">
                     <os family="mac"/>
                 </condition-->
-                <condition property="browser" value="start">
+                <condition property="browser" value="cmd.exe /C start">
                     <os family="windows"/>
                 </condition>
 

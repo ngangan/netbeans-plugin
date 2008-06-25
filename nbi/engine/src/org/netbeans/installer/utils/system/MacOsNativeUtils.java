@@ -49,7 +49,6 @@ import org.netbeans.installer.utils.helper.ErrorLevel;
 import org.netbeans.installer.utils.helper.ExecutionResults;
 import org.netbeans.installer.utils.FileUtils;
 import org.netbeans.installer.utils.LogManager;
-import org.netbeans.installer.utils.helper.Platform;
 import org.netbeans.installer.utils.system.shortcut.FileShortcut;
 import org.netbeans.installer.utils.system.shortcut.InternetShortcut;
 import org.netbeans.installer.utils.system.shortcut.Shortcut;
@@ -78,16 +77,8 @@ public class MacOsNativeUtils extends UnixNativeUtils {
         loadNativeLibrary(LIBRARY_PATH_MACOSX);
         initializeForbiddenFiles(FORBIDDEN_DELETING_FILES_MACOSX);
     }
-
-    @Override
-    protected Platform getPlatform() {        
-        return System.getProperty("os.arch").contains("ppc") ? 
-            Platform.MACOSX_PPC : 
-            Platform.MACOSX_X86;
-    }
     
     // NativeUtils implementation/override //////////////////////////////////////////
-    @Override
     public File getDefaultApplicationsLocation() {
         File applications = new File("/Applications");
         
@@ -116,7 +107,7 @@ public class MacOsNativeUtils extends UnixNativeUtils {
         }
         return fileName;
     }
-    @Override
+    
     public File getShortcutLocation(Shortcut shortcut, LocationType locationType) throws NativeException {
         String fileName = getShortcutFilename(shortcut);
         
@@ -145,7 +136,7 @@ public class MacOsNativeUtils extends UnixNativeUtils {
             throw new NativeException("Can`t create URL shortcut", ex);
         }
     }
-    @Override
+    
     public File createShortcut(Shortcut shortcut, LocationType locationType) throws NativeException {
         final File shortcutFile = getShortcutLocation(shortcut, locationType);
         
@@ -176,7 +167,7 @@ public class MacOsNativeUtils extends UnixNativeUtils {
             throw new NativeException("Cannot create shortcut", e);
         }
     }
-    @Override
+    
     public void removeShortcut(Shortcut shortcut, LocationType locationType, boolean cleanupParents) throws NativeException {
         final File shortcutFile = getShortcutLocation(shortcut, locationType);
         
@@ -228,7 +219,8 @@ public class MacOsNativeUtils extends UnixNativeUtils {
     }
     
     // private //////////////////////////////////////////////////////////////////////
-    private String getOSVersion() {
+    private String getOSVersion(
+            ) {
         return System.getProperty("os.version");
     }
     
@@ -420,7 +412,7 @@ public class MacOsNativeUtils extends UnixNativeUtils {
                             }
                         }
                         index++;
-                    }
+                    };
                     
                     if(dct!=null) {
                         LogManager.log(ErrorLevel.DEBUG,
@@ -499,7 +491,7 @@ public class MacOsNativeUtils extends UnixNativeUtils {
                 }
             }
         } catch (IOException ex) {
-            LogManager.log(ErrorLevel.WARNING,ex);
+            LogManager.log(ErrorLevel.WARNING);
             returnResult = -1;
         }
         return returnResult;

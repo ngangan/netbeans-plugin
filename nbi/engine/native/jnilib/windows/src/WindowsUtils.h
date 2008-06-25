@@ -54,11 +54,10 @@ extern "C" {
 
 HKEY getHKEY(jint jSection);
 
-int queryValue(int mode, HKEY section, const unsigned short * key, const unsigned short * name, DWORD* type, DWORD* size, byte** value, int expand);
+int queryValue(HKEY section, const unsigned short * key, const unsigned short * name, DWORD* type, DWORD* size, byte** value, int expand);
 
-int setValue(int mode, HKEY section, const unsigned short * key, const unsigned short * name, DWORD type, const byte* data, int size, int expand);
+int setValue(HKEY section, const unsigned short * key, const unsigned short * name, DWORD type, const byte* data, int size, int expand);
 
-LONG getMode(jint jmode);
 #ifdef __cplusplus
 }
 #endif

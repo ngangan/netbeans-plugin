@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.zip.ZipOutputStream;
 import org.netbeans.installer.Installer;
 import org.netbeans.installer.product.Registry;
-import org.netbeans.installer.utils.EngineUtils;
 import org.netbeans.installer.utils.ErrorManager;
 import org.netbeans.installer.utils.FileProxy;
 import org.netbeans.installer.utils.FileUtils;
@@ -138,7 +137,7 @@ public class CreateMacOSAppLauncherAction extends WizardAction {
                 "-Xms64m"
             });
             
-            properties.setMainClass(EngineUtils.getEngineMainClass().getName());
+            properties.setMainClass(Installer.class.getName());
             properties.setTestJVMClass(JavaUtils.TEST_JDK_CLASSNAME);
             
             File tmpDirectory =
@@ -225,9 +224,4 @@ public class CreateMacOSAppLauncherAction extends WizardAction {
         
         LogManager.logExit("finished creating the app launcher");
     }
-
-    @Override
-    public boolean canExecuteForward() {
-        return !Boolean.getBoolean(Registry.CREATE_BUNDLE_SKIP_NATIVE_LAUNCHER_PROPERTY);
-    }    
 }

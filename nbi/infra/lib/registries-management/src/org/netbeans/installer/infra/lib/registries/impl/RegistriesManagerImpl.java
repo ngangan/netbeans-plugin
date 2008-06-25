@@ -653,9 +653,7 @@ public class RegistriesManagerImpl implements RegistriesManager {
                 "nb-base",
                 "nb-javase",
                 "nb-javaee",
-                "nb-groovy",
                 "glassfish",
-                "glassfish-mod",
                 "tomcat",
                 "sjsas");
         final List<String> javame = Arrays.asList(
@@ -666,8 +664,7 @@ public class RegistriesManagerImpl implements RegistriesManager {
         final List<String> ruby = Arrays.asList(
                 "nb-platform",
                 "nb-base",
-                "nb-ruby",
-                "glassfish-mod");
+                "nb-ruby");
         
         final List<String> cnd = Arrays.asList(
                 "nb-platform",
@@ -689,10 +686,7 @@ public class RegistriesManagerImpl implements RegistriesManager {
                 "nb-soa",
                 "nb-uml",
                 "nb-ruby",
-                "nb-groovy",
-                "nb-php",
                 "glassfish",
-                "glassfish-mod",
                 "openesb",
                 "sjsam",
                 "tomcat",
@@ -1035,7 +1029,6 @@ public class RegistriesManagerImpl implements RegistriesManager {
             
             FileUtils.deleteFile(tempStatefile);
             FileUtils.deleteFile(tempPropertiesFile);
-            FileUtils.deleteFile(tempBundlePropertiesFile);
             FileUtils.deleteFile(tempUserDir, true);
             
             if (platform == Platform.WINDOWS) {

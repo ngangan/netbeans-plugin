@@ -50,9 +50,11 @@ var INFO_ICON_H = "img/info_icon_h.gif";
 
 var ONE_SRC      = "img/one.gif";
 var ONE_LEFT_SRC = "img/one_left.gif";
+var TWO_SRC      = "img/two.gif";
 
 var IMG_ONE      = '<img src="' + ONE_SRC + '"/>';
 var IMG_ONE_LEFT = '<img src="' + ONE_LEFT_SRC + '"/>';
+var IMG_TWO      = '<img src="' + TWO_SRC + '"/>';
 
 var CHECKED_WHITE_SRC = "img/checked_badge_white.gif";
 var CHECKED_BEIGE_SRC = "img/checked_badge_beige.gif";
@@ -72,6 +74,8 @@ var IMAGE_CHECKED_BEIGE = '<img src="' + CHECKED_BEIGE_SRC + '"/>';
 var IMAGE_WARNING_BEIGE = '<img src="' + WARNING_BEIGE_SRC + '"/>';
 
 var download_tabs_number = 0;
+var last_selected_lang = 0;
+var MORE_LANG_ID = "more";
 
 function handle_keyup(event) {
     //if (event.keyCode == 13) {
@@ -109,6 +113,9 @@ function initialize() {
 function write_languages() {
    for(var i=0; i < LANGUAGE_IDS.length; i++ ) {
    	document.write('<option value="' + LANGUAGE_IDS[i] + '">' + LANGUAGE_NAMES[i] + '</option>');
+   }
+   if(ADD_MORE_REDIRECT_VALUE == 1) {
+       document.write('<option value="' + MORE_LANG_ID + '">' + MORE_LANGUAGES + '</option>');
    }
 }
 
@@ -161,6 +168,7 @@ function write_components() {
 			document.write('    <td class="onhover_change beige left_border" id="product_' + index + '_cnd"></td>');
 			document.write('    <td class="onhover_change left_border" id="product_' + index + '_php"></td>');
 			document.write('    <td class="onhover_change beige left_border right_border" id="product_' + index + '_full"></td>');
+			
 			document.write('</tr>');
         }
     }
@@ -172,7 +180,7 @@ function write_table_header() {
     document.write('<td class="no_border no_padding" colspan="7">');    
     document.write('<table class="components_table">');
     document.write('<tr class="no_hover">');
-    document.write('	<td class="no_hover header" colspan="7">' + NETBEANS_DOWNLOAD_BUNDLES_MSG + '</td>');
+    document.write('	<td class="no_hover header" colspan="7">' + (COMMUNITY_BUILD == 1 ? NETBEANS_DOWNLOAD_BUNDLES_COMMUNITY_MSG + IMG_TWO: NETBEANS_DOWNLOAD_BUNDLES_MSG) + '</td>');
     document.write('</tr></table>');
     document.write('</td>');
     document.write('</tr>');
@@ -354,9 +362,17 @@ function select_language() {
     for(var i=0;i<languageOptions.length;i++) {
         if(languageOptions[i].value == language) select.selectedIndex = i;
     }
+    last_selected_lang = select.selectedIndex;
 }
 
 function update() {
+    var select = document.getElementById("language_select");
+    if(select.options[select.selectedIndex].value == MORE_LANG_ID) {
+        select.selectedIndex = last_selected_lang;
+        window.location = MORE_LANGUAGES_REDIRECT_URL;
+    }
+    last_selected_lang = select.selectedIndex;
+
     var select = document.getElementById("platform_select");
     var platform = select.options[select.selectedIndex].value;
     var platform_display_name = select.options[select.selectedIndex].text;
@@ -451,6 +467,7 @@ function update() {
         } else {
             document.getElementById("product_" + i + "_cnd").innerHTML = '';
         }
+	
         if (product_properties[i] & PROPERTY_PHP) {
             if (product_messages[i] == null) {
                 document.getElementById("product_" + i + "_php").innerHTML = IMAGE_CHECKED_BEIGE;
@@ -460,7 +477,7 @@ function update() {
         } else {
             document.getElementById("product_" + i + "_php").innerHTML = '';
         }
-
+        
 	if (product_messages[i] == null) {
 		document.getElementById("product_" + i + "_display_name").innerHTML = '<a class="product_display_name">' + product_display_names[i] + "</a>";
 	} else {
@@ -580,14 +597,14 @@ function update() {
     cnd_size = Math.ceil(cnd_size / 1024.0);
     php_size = Math.ceil(php_size / 1024.0);
 
-    if( platform == "zip") {       
-       full_size   = get_file_size_mb(get_file_name(platform, "all"),     174);
-       java_size   = get_file_size_mb(get_file_name(platform, "javase"),   67);
-       javaee_size = get_file_size_mb(get_file_name(platform, "javaee"),  122);
-       javame_size = get_file_size_mb(get_file_name(platform, "mobility"), 77);
-       ruby_size   = get_file_size_mb(get_file_name(platform, "ruby"),     55);
-       cnd_size    = get_file_size_mb(get_file_name(platform, "cpp"),      41);
-       php_size    = get_file_size_mb(get_file_name(platform, "php"),      38);
+    if( platform == "zip") {
+       full_size = 157;
+       java_size = 51;
+       javaee_size = 102;
+       javame_size = 61;
+       ruby_size = 40;
+       cnd_size = 27;
+       php_size = 28;
     } 
 
     if ((platform.indexOf("solaris")!=-1) || (platform.indexOf("macosx")!=-1)) {
@@ -621,6 +638,14 @@ function update() {
     else {
         document.getElementById("jdk_note").innerHTML = JDK_NOTE_ALL.replace('{0}',JDK_DOWNLOAD_LINK).replace('{1}',NBJDK_DOWNLOAD_LINK).replace('{2}',JDK_LATEST_UPDATE);
     }
+    if (COMMUNITY_BUILD == 1) {
+	document.getElementById("community_number").innerHTML  = "<a class=\"special_message_number\">2</a>";
+	document.getElementById("community_message").innerHTML = "<a class=\"special_message_text\">" + COMMUNITY_MESSAGE + "</a>";
+    }
+    else {
+	document.getElementById("community_message").innerHTML = "";
+	document.getElementById("community_number").innerHTML  = "";
+    }
 }
 
 function is_compatible(index, platform) {
@@ -644,16 +669,6 @@ function is_compatible(index, platform) {
     return false;
 }
 
-function get_file_size_mb(name,defaultValue) {
-   var size = getSize(name);
-   if(size=="") {
-       size = defaultValue;
-   } else {
-       size = Math.ceil(size / (1024 * 1024));
-   }
-   return size;
-}
-
 function add_download_tab(name, url) {
    if(download_tabs_number!=0) {
        document.write(" | ");
@@ -666,13 +681,28 @@ function add_download_tab(name, url) {
    download_tabs_number++;
 }
 
-function get_file_name(platform, option) {
-    var file_name = "";
+function download(option) {
+    var select = document.getElementById("platform_select");
+    var platform = select.options[select.selectedIndex].value;
+
+    var basename  = "";
+	
     if(platform=="zip") {
-        file_name += ZIP_FILES_PREFIX;
+        if(option != "php") {
+            basename += "zip/" + ZIP_FILES_PREFIX;
+        } else {
+            basename += "zip/netbeans-6.1-ea-200804221056";
+        }
     } else {
-        file_name += BUNDLE_FILES_PREFIX;
+        if(option != "php") {
+            basename += "bundles/" + BUNDLE_FILES_PREFIX;
+        } else {
+            basename += "bundles/netbeans-6.1-ea";
+        }
     }
+
+    var file_name = START_PAGE + "?" + basename;
+
     if (option != "all") {
     	file_name += "-" + option;
     }
@@ -680,6 +710,8 @@ function get_file_name(platform, option) {
     if ( platform != "zip" ) {
    	file_name += "-" + platform;
     }
+
+
     if (platform == "windows") {
         file_name += ".exe";
     } else if ((platform == "macosx-x86") || (platform == "macosx-ppc")) {
@@ -691,50 +723,27 @@ function get_file_name(platform, option) {
     } else {
         file_name += ".sh";
     }
-    return file_name;
-}
-
-function get_file_url(platform, option) {
-    var basename  = "";
-	
-    if(platform=="zip") {
-        basename += "zip/";
-    } else {
-        basename += "bundles/";
-    }    
-    basename += get_file_name(platform, option);    
-    return basename;
-}
-
-function download(option) {
-    var select = document.getElementById("platform_select");
-    var platform = select.options[select.selectedIndex].value;
-
-    var file_url = get_file_url(platform, option);
-
-    var download_url = START_PAGE + "?" + file_url;
-
-    download_url += "&platform=" + platform;
+    file_name += "&platform=" + platform;
 
     var language_select = document.getElementById("language_select");
     var language = language_select.options[language_select.selectedIndex].value;
-    download_url += "&lang=" + language;
-    download_url += "&option=" + option;
+    file_name += "&lang=" + language;
+    file_name += "&option=" + option;
     var email = document.getElementById("emailfield").value;
     if(email!="" && email.indexOf(".")!=-1 && email.indexOf("@")!=-1 && email.indexOf("&")==-1 && email.indexOf("?")==-1) {
 	var monthly = (document.getElementById("monthlycb").checked ? 1 : 0);
 	var weekly  = (document.getElementById("weeklycb").checked ? 1 : 0);
 	var contact = (document.getElementById("contactcb").checked ? 1 : 0);
 	if(monthly==1 || weekly ==1 || contact==1) {
-		download_url+= "&email="   + email;
-		download_url+= "&monthly=" + monthly;
-		download_url+= "&weekly="  + weekly;
-		download_url+= "&contact=" + contact;
+		file_name+= "&email="   + email;
+		file_name+= "&monthly=" + monthly;
+		file_name+= "&weekly="  + weekly;
+		file_name+= "&contact=" + contact;
         }
     }
     var overriden_language=get_overridden_language();
     if(overriden_language!=DEFAULT_LANGUAGE) {
-        download_url += "&" + PAGELANG_SEP + overriden_language;
+        file_name += "&" + PAGELANG_SEP + overriden_language;
     }
-    window.location = download_url;
+    window.location = file_name;
 }
