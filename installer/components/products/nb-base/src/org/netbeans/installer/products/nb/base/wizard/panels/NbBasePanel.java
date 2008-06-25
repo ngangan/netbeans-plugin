@@ -48,6 +48,8 @@ import javax.swing.ComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.installer.product.Registry;
+import org.netbeans.installer.product.components.Product;
 import org.netbeans.installer.utils.helper.swing.NbiButton;
 import org.netbeans.installer.utils.helper.swing.NbiLabel;
 import org.netbeans.installer.utils.ResourceUtils;
@@ -114,12 +116,45 @@ public class NbBasePanel extends DestinationPanel {
         
         jdkLocationPanel.setWizard(getWizard());
         
-        jdkLocationPanel.setProperty(
+        String minVersionNbBase = getProperty(JdkLocationPanel.MINIMUM_JDK_VERSION_PROPERTY);
+        String maxVersionNbBase = getProperty(JdkLocationPanel.MAXIMUM_JDK_VERSION_PROPERTY);
+        Version min = (minVersionNbBase!=null) ? Version.getVersion(minVersionNbBase) : null;
+        Version max = (maxVersionNbBase!=null) ? Version.getVersion(maxVersionNbBase) : null;
+        
+        
+        final Object objectContext = getWizard().getContext().get(Product.class);
+        if (objectContext != null && objectContext instanceof Product) {
+            Product nbbaseProduct = (Product) objectContext;
+            for(Product product : Registry.getInstance().getInavoidableDependents(nbbaseProduct)) {
+                String minVersionString = product.getProperty(JdkLocationPanel.MINIMUM_JDK_VERSION_PROPERTY);
+                if(minVersionString!=null) {
+                    Version depMinVersion = Version.getVersion(minVersionString);
+                    if(min==null) {
+                        min = depMinVersion;
+                    } else if(depMinVersion.newerThan(min)) {
+                        min = depMinVersion;                        
+                    }
+                }
+                String maxVersionString = product.getProperty(JdkLocationPanel.MAXIMUM_JDK_VERSION_PROPERTY);
+                if(maxVersionString!=null) {
+                    Version depMaxVersion = Version.getVersion(maxVersionString);
+                    if(min==null) {
+                        max= depMaxVersion;
+                    } else if(depMaxVersion.olderThan(max)) {
+                        max = depMaxVersion;                        
+                    }
+                }
+            }
+        }
+        String finalMinVersion = (min==null) ? null : min.toString();
+        String finalMaxVersion = (max==null) ? null : max.toString();
+        
+        jdkLocationPanel.setProperty( 
                 JdkLocationPanel.MINIMUM_JDK_VERSION_PROPERTY,
-                getProperty(JdkLocationPanel.MINIMUM_JDK_VERSION_PROPERTY));
+                finalMinVersion);
         jdkLocationPanel.setProperty(
                 JdkLocationPanel.MAXIMUM_JDK_VERSION_PROPERTY,
-                getProperty(JdkLocationPanel.MAXIMUM_JDK_VERSION_PROPERTY));
+                finalMaxVersion);
         
         if (getProperty(JdkLocationPanel.PREFERRED_JDK_VERSION_PROPERTY) != null) {
             jdkLocationPanel.setProperty(
