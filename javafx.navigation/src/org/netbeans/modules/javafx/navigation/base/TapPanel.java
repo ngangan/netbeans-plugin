@@ -87,6 +87,7 @@ public final class TapPanel extends javax.swing.JPanel {
             ((TapPanel) e.getSource()).setArmed(false);
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             ((TapPanel) e.getSource()).setArmed(((TapPanel) e.getSource()).isArmPoint(e.getPoint()));
         }
@@ -101,6 +102,7 @@ public final class TapPanel extends javax.swing.JPanel {
             }
         }
 
+        @Override
         public void mouseDragged(MouseEvent e) {
             //do nothing
         }

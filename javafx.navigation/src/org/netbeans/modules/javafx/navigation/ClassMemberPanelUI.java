@@ -39,12 +39,9 @@
 package org.netbeans.modules.javafx.navigation;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.Action;
@@ -54,7 +51,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
-import javax.swing.tree.TreePath;
 import org.netbeans.modules.javafx.navigation.ElementNode.Description;
 import org.netbeans.modules.javafx.navigation.actions.FilterSubmenuAction;
 import org.netbeans.modules.javafx.navigation.actions.SortActionSupport.SortByNameAction;
@@ -297,10 +293,11 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
 //        }
 //    };
 
-    private class MyBeanTreeView extends BeanTreeView implements ToolTipManagerEx.ToolTipProvider {
+//    private class MyBeanTreeView extends BeanTreeView implements ToolTipManagerEx.ToolTipProvider {
+    private class MyBeanTreeView extends BeanTreeView {
 
         public MyBeanTreeView() {
-            new ToolTipManagerEx(this);
+//            new ToolTipManagerEx(this);
         }
 
         public boolean getScrollOnExpand() {
@@ -315,11 +312,11 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
             return tree;
         }
 
-        public String getToolTipText(Point loc) {
+//        public String getToolTipText(Point loc) {
 //            ElementJavadoc doc = getDocumentation(loc);
 //            return null == doc ? null : doc.getText();
-            return "tooltip"; // TODO
-        }
+//            return "tooltip"; // TODO
+//        }
 
 //        private ElementJavadoc getDocumentation(Point loc) {
 //            TreePath path = tree.getPathForLocation(loc.x, loc.y);
@@ -333,85 +330,85 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
 //            return null;
 //        }
 
-        public Rectangle getToolTipSourceBounds(Point loc) {
-            ElementNode root = getRootNode();
-            if (root == null) {
-                return null;
-            }
-            TreePath path = tree.getPathForLocation(loc.x, loc.y);
-            return null == path ? null : tree.getPathBounds(path);
-        }
-
-        public Point getToolTipLocation(Point mouseLocation, Dimension tipSize) {
-            Point screenLocation = getLocationOnScreen();
-            Rectangle sBounds = getGraphicsConfiguration().getBounds();
-            Dimension compSize = getSize();
-            Point res = new Point();
-            Rectangle tooltipSrcRect = getToolTipSourceBounds(mouseLocation);
-
-            Point viewPosition = getViewport().getViewPosition();
-            screenLocation.x -= viewPosition.x;
-            screenLocation.y -= viewPosition.y;
-
-            //first try bottom right
-            res.x = screenLocation.x + compSize.width;
-            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
-
-            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y + tipSize.height <= sBounds.y + sBounds.height) {
-                return res;
-            }
-
-            //upper right
-            res.x = screenLocation.x + compSize.width;
-            res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
-
-            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y >= sBounds.y) {
-                return res;
-            }
-
-            //lower left
-            res.x = screenLocation.x - tipSize.width;
-            res.y = screenLocation.y + tooltipSrcRect.y;
-
-            if (res.x >= sBounds.x && res.y + tipSize.height <= sBounds.y + sBounds.height) {
-                return res;
-            }
-
-            //upper left
-            res.x = screenLocation.x - tipSize.width;
-            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height - tipSize.height;
-
-            if (res.x >= sBounds.x && res.y >= sBounds.y) {
-                return res;
-            }
-
-            //give up (who's got such a small display anyway?)
-            res.x = screenLocation.x + tooltipSrcRect.x;
-            if (sBounds.y + sBounds.height - (screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height) > screenLocation.y + tooltipSrcRect.y - sBounds.y) {
-                res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
-            } else {
-                res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
-            }
-
-            return res;
-        }
-
-        public void invokeUserAction(final MouseEvent me) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    if (null != me) {
-//                        ElementJavadoc doc = getDocumentation(me.getPoint());
-//                        JavadocTopComponent tc = JavadocTopComponent.findInstance();
-//                        if (null != tc) {
-//                            tc.open();
-//                            tc.setJavadoc(doc);
-//                            tc.requestActive();
-//                        }
-                    }
-                }
-            });
-        }        //#123940 start
+//        public Rectangle getToolTipSourceBounds(Point loc) {
+//            ElementNode root = getRootNode();
+//            if (root == null) {
+//                return null;
+//            }
+//            TreePath path = tree.getPathForLocation(loc.x, loc.y);
+//            return null == path ? null : tree.getPathBounds(path);
+//        }
+//
+//        public Point getToolTipLocation(Point mouseLocation, Dimension tipSize) {
+//            Point screenLocation = getLocationOnScreen();
+//            Rectangle sBounds = getGraphicsConfiguration().getBounds();
+//            Dimension compSize = getSize();
+//            Point res = new Point();
+//            Rectangle tooltipSrcRect = getToolTipSourceBounds(mouseLocation);
+//
+//            Point viewPosition = getViewport().getViewPosition();
+//            screenLocation.x -= viewPosition.x;
+//            screenLocation.y -= viewPosition.y;
+//
+//            //first try bottom right
+//            res.x = screenLocation.x + compSize.width;
+//            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
+//
+//            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y + tipSize.height <= sBounds.y + sBounds.height) {
+//                return res;
+//            }
+//
+//            //upper right
+//            res.x = screenLocation.x + compSize.width;
+//            res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
+//
+//            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y >= sBounds.y) {
+//                return res;
+//            }
+//
+//            //lower left
+//            res.x = screenLocation.x - tipSize.width;
+//            res.y = screenLocation.y + tooltipSrcRect.y;
+//
+//            if (res.x >= sBounds.x && res.y + tipSize.height <= sBounds.y + sBounds.height) {
+//                return res;
+//            }
+//
+//            //upper left
+//            res.x = screenLocation.x - tipSize.width;
+//            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height - tipSize.height;
+//
+//            if (res.x >= sBounds.x && res.y >= sBounds.y) {
+//                return res;
+//            }
+//
+//            //give up (who's got such a small display anyway?)
+//            res.x = screenLocation.x + tooltipSrcRect.x;
+//            if (sBounds.y + sBounds.height - (screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height) > screenLocation.y + tooltipSrcRect.y - sBounds.y) {
+//                res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
+//            } else {
+//                res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
+//            }
+//
+//            return res;
+//        }
+//
+//        public void invokeUserAction(final MouseEvent me) {
+//            SwingUtilities.invokeLater(new Runnable() {
+//
+//                public void run() {
+//                    if (null != me) {
+////                        ElementJavadoc doc = getDocumentation(me.getPoint());
+////                        JavadocTopComponent tc = JavadocTopComponent.findInstance();
+////                        if (null != tc) {
+////                            tc.open();
+////                            tc.setJavadoc(doc);
+////                            tc.requestActive();
+////                        }
+//                    }
+//                }
+//            });
+//        }        //#123940 start
         private boolean inHierarchy;
         private boolean doExpandAll;
 
