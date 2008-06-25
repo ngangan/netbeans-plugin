@@ -858,6 +858,7 @@ public class NbWelcomePanel extends ErrorMessagePanel {
     
     public enum BundleType {
         JAVASE("javase"),
+        JAVAFX("javafx"),
         JAVAEE("javaee"),
         JAVAME("javame"),
         RUBY("ruby"),
