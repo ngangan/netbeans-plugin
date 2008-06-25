@@ -84,6 +84,11 @@ class DesktopManager extends DefaultDesktopManager {
         this.desktop = desktop;
     }
 
+    @Override
+    public void activateFrame(JInternalFrame f) {
+        if (f != null) super.activateFrame(f);
+    }
+
     public void endResizingFrame(JComponent f) {
         super.endResizingFrame(f);
         resizeDesktop();
