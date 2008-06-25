@@ -66,11 +66,6 @@ public class CustomizerApplet extends javax.swing.JPanel {
 
         javaScriptCheckBox.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.text")); // NOI18N
         javaScriptCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.toolTipText")); // NOI18N
-        javaScriptCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                javaScriptCheckBoxActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -82,11 +77,6 @@ public class CustomizerApplet extends javax.swing.JPanel {
 
         jnlpFileCheckBox.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.text")); // NOI18N
         jnlpFileCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.toolTipText")); // NOI18N
-        jnlpFileCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jnlpFileCheckBoxActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -179,21 +169,6 @@ private void runInBrowserCheckBoxActionPerformed(java.awt.event.ActionEvent evt)
     }
     setEnabledAllComponents(enabled);
 }//GEN-LAST:event_runInBrowserCheckBoxActionPerformed
-
-private void javaScriptCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_javaScriptCheckBoxActionPerformed
-// TODO add your handling code here:
-    boolean isSelected = javaScriptCheckBox.getModel().isSelected();
-    if (isSelected) {
-        jnlpFileCheckBox.getModel().setSelected(!isSelected);
-    }
-}//GEN-LAST:event_javaScriptCheckBoxActionPerformed
-private void jnlpFileCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {
-    boolean isSelected = jnlpFileCheckBox.getModel().isSelected();
-    if (isSelected) {
-        javaScriptCheckBox.getModel().setSelected(!isSelected);
-    }
-    
-}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel descriptionLabel;
