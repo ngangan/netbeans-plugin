@@ -164,7 +164,7 @@ if [ -z "$COMMUNITY_ML_BUILD" ] ; then
     COMMUNITY_ML_BUILD=0
 fi
 
-f [ -z "$BUILD_JAVAFX" ] ; then
+if [ -z "$BUILD_JAVAFX" ] ; then
     #do not build NetBeans/JavaFX bundles by default
     BUILD_JAVAFX=0
 fi
