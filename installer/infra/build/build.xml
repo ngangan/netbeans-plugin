@@ -2322,7 +2322,7 @@ jarsigner.storepass=${jarsigner.storepass}
 
     <target name="generate-javafx-bundles" if="do.build.javafx">
 	<!-- JavaFX bundles --> 	
-	<property name="javafx.bundles.output.dir" value="${nb.bundles.output.dir}/javafx"/>
+	<property name="javafx.bundles.output.dir" value="${nb.bundles.output.dir}"/>
 	<mkdir dir="${javafx.bundles.output.dir}"/>
         <create-bundle root="${output.dir}/registry-temp" 
                        platform="windows" 
