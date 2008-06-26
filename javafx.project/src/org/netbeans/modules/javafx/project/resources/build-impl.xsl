@@ -1258,15 +1258,15 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 <condition property="browser" value="firefox">
                     <os family="unix"/>
                 </condition>
-                <!--condition property="browser.args" value="-a Safari">
-                    <os family="mac"/>
-                </condition-->
-                <condition property="browser" value="cmd.exe /C start">
+                <condition property="browser" value="cmd.exe">
                     <os family="windows"/>
                 </condition>
-
+                <condition property="browser.args" value="/C start">
+                    <os family="windows"/>
+                </condition>
+                <property name="browser.args" value=""/>
                 <exec executable="${{browser}}" spawn="true">
-                    <arg value="${{applet.url}}"/>
+                    <arg value="${{browser.args}} ${{applet.url}}"/>
                 </exec>
             </target>
             
