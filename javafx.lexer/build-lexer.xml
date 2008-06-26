@@ -42,7 +42,19 @@ made subject to such option by the copyright holder.
 -->
 
 <project name="ANTLRLexer" default="gen" basedir=".">
-    <property file="${basedir}/nbproject/private/user-private.properties"/>
+
+    <!--
+        Before start please configure this property by your exact location of Java FX Compiler project.
+    -->
+    <property name="jfxc.home" value="E:\\SunWork\\jfxc\\trunk"/>
+
+    <property name="antlr.grammarv3" value="v3"/>
+    <property name="jfxc.grammar" value="${jfxc.home}/src/share/classes/com/sun/tools/javafx/antlr/${antlr.grammarv3}.g"/>
+    <property name="lexer.grammar" value="${basedir}/${antlr.grammarv3}.g"/>
+    <property name="antlr.dir" value="${jfxc.home}/tools/antlr-2008-01-14.10"/>
+    <property name="antlr.generated.dir" value="${basedir}/src/org/netbeans/lib/javafx/lexer"/>
+    <property name="local.tmp" value="${basedir}/tmp"/>
+
     <path id="antlr.class.path">
         <fileset dir="${antlr.dir}" includes="**/*.jar"/>
     </path>
@@ -53,11 +65,11 @@ made subject to such option by the copyright holder.
             <fileset dir="${antlr.generated.dir}" includes="${antlr.grammarv3}*"/>
         </delete>
         <mkdir dir="${antlr.generated.dir}"/>
-        <uptodate property="parserv3.uptodate" srcfile="${jfxc.grammar}"
+        <uptodate property="parserv3.uptodate" srcfile="${lexer.grammar}"
                   targetfile="${antlr.generated.dir}/${antlr.grammarv3}Lexer.java"/>
         <property name="local.grammar" value="${antlr.generated.dir}/${antlr.grammarv3}.g"/>
 
-        <copy file="${jfxc.grammar}" todir="${antlr.generated.dir}"/>
+        <copy file="${lexer.grammar}" todir="${antlr.generated.dir}"/>
         <replace dir="${antlr.generated.dir}">
             <include name="*.g"/>
             <replacetoken><![CDATA[package com.sun.tools.javafx.antlr;]]></replacetoken>
@@ -70,6 +82,8 @@ made subject to such option by the copyright holder.
     </target>
 
     <target name="_generate-parserv3" unless="parserv3.uptodate">
+        <property name="boo" refid="antlr.class.path"/>
+        <echo message="ANTLR PATH: ${boo}"/>
 
         <java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true">
             <arg value="-o"/>

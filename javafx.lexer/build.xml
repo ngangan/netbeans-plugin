@@ -41,22 +41,121 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 
-<project name="org.netbeans.modules.javafx.lexer" default="grammar" basedir=".">
-<!--<project name="org.netbeans.modules.javafx.lexer" default="netbeans" basedir=".">-->
+<!--<project name="org.netbeans.modules.javafx.lexer" default="grammar" basedir=".">-->
+<project name="org.netbeans.modules.javafx.lexer" default="netbeans" basedir=".">
 
     <import file="../../nbbuild/templates/projectized.xml"/>
 
-    <target name="_verifyGrammar" if="jfxc.grammar.available">
-        <echo message="This verification is not implemented yet!" />
+
+    <property name="jfxl.jfxc.home" value="E:\\SunWork\\jfxc\\trunk"/>
+    <property name="jfxl.antlr.grammarv3" value="v3"/>
+    <property name="jfxl.jfxc.grammar"
+              value="${jfxl.jfxc.home}/src/share/classes/com/sun/tools/javafx/antlr/${jfxl.antlr.grammarv3}.g"/>
+    <property name="jfxl.lexer.grammar" value="${basedir}/${jfxl.antlr.grammarv3}.g"/>
+
+
+    <property name="jfxl.antlr.dir" value="${jfxl.jfxc.home}/tools/antlr-2008-01-14.10"/>
+
+    <path id="jfxl.antlr.classpath">
+         <fileset dir="${jfxl.antlr.dir}">
+             <include name="**/*.jar"/>
+             <include name="*.jar"/>
+         </fileset>
+     </path>
+
+    <property name="jfxl.antlr.generated.dir" value="${basedir}/src/org/netbeans/lib/javafx/lexer"/>
+
+    <target name="_verifyGrammar" depends="build-init" if="compile.grammar">
+        <echo message="Verifying grammar compatibility"/>
+
+        <path id="jfxl.grammarVerifierCp">
+                <pathelement path="${build.classes.dir}"/>
+                <pathelement path="${netbeans.dest.dir}/ide9/modules/org-netbeans-modules-lexer.jar"/>
+                <pathelement path="${netbeans.dest.dir}/java2/modules/org-netbeans-modules-java-lexer.jar"/>
+                <pathelement path="${netbeans.dest.dir}/platform8/lib/org-openide-util.jar"/>
+                <path refid="cp" />
+        </path>
+        <property name="debug.jfxl.grammarVerifierCp" refid="jfxl.grammarVerifierCp"/>
+        <echo message="Verifier classpath: ${debug.jfxl.grammarVerifierCp}" /> 
+
+
+        <java classname="org.netbeans.lib.javafx.lexer.GrammarVerifier" resultproperty="antlr.verify.output"
+              fork="true" logError="true">
+            <classpath refid="jfxl.grammarVerifierCp" />
+            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}.tokens"/>
+        </java>
+        <fail message="Grammar verification failed.">
+            <condition>
+                <not>
+                    <equals arg1="0" arg2="${antlr.verify.output}" trim="true"/>
+                </not>
+            </condition>
+        </fail>
+        <echo message="Grammar compatibility verified."/>
     </target>
 
+    <target name="compile" depends="init, pre-compile, projectized-common.compile, post-compile"
+            description="Overriden compile from common project."/>
 
-    <target name="grammar" description="Verify current implementation against current JFX grammar." >
-        <property file="${basedir}/nbproject/private/user-private.properties" />
-        <echo message="Loading grammar ${jfxc.grammar}" />
-        <available file="${jfxc.grammar}" type="file" property="jfxc.grammar.available"/>
-        <antcall target="_verifyGrammar" />
-        <antcall target="netbeans" />
+    <target name="_antlrgen" if="lexerNotUptodate">
+        <mkdir dir="${jfxl.antlr.generated.dir}"/>
+        <copy file="${jfxl.lexer.grammar}" todir="${jfxl.antlr.generated.dir}"/>
+        <replace dir="${jfxl.antlr.generated.dir}">
+            <include name="*.g"/>
+            <replacetoken><![CDATA[package com.sun.tools.javafx.antlr;]]></replacetoken>
+            <replacevalue><![CDATA[package org.netbeans.lib.javafx.lexer;]]></replacevalue>
+        </replace>
+
+        <echo message="Generating lexer from ${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}.g"/>
+        <property name="info.antrl.classpath" refid="jfxl.antlr.classpath" />
+        <echo message="Antlr classpath = ${info.antrl.classpath}" />
+        <java classname="org.antlr.Tool" fork="true" resultproperty="antlr.output" newenvironment="true" failonerror="true">
+            <classpath>
+                <fileset dir="${jfxl.antlr.dir}">
+                    <include name="**/*.jar"/>
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="-o"/>
+            <arg value="${jfxl.antlr.generated.dir}"/>
+            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}.g"/>
+            <jvmarg value="-Xmx256m"/>
+        </java>
+        <fail message="Grammar compilation has failed.">
+            <condition>
+                <not>
+                    <equals arg1="0" arg2="${antlr.output}" trim="true"/>
+                </not>
+            </condition>
+        </fail>
+        <delete file="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}Parser.java" />
+    </target>
+
+    <target name="pre-compile" if="compile.grammar">
+        <fail message="Grammar not found! ${jfxl.jfxc.grammar}">
+            <condition>
+                <not>
+                    <available file="${jfxl.jfxc.grammar}" type="file"/>
+                </not>
+            </condition>
+        </fail>
+        <condition property="lexerNotUptodate">
+            <not>
+                <uptodate srcfile="${jfxl.jfxc.grammar}" targetfile="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}Lexer.java"/>
+            </not>
+        </condition>
+        <antcall target="_antlrgen"/>
+    </target>
+
+    <target name="post-compile">
+        <antcall target="_verifyGrammar"/>
+    </target>
+
+    <target name="grammar" description="Verify current implementation against current JFX grammar.">
+        <echo message="Loading grammar ${jfxl.jfxc.grammar}"/>
+        <available file="${jfxl.jfxc.grammar}" type="file" property="jfxc.grammar.available"/>
+        <antcall target="_verifyGrammar"/>
+        <antcall target="netbeans"/>
     </target>
 
 </project>

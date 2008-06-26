@@ -138,7 +138,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
         super.visitVariable(node, adjustments);
         return adjustments;
-    }                                           
+    }
 
     private void indentLine(Element line, Queue<Adjustment> adjustments) throws BadLocationException {
         final int ls = ctx.lineStartOffset(line.getStartOffset());
@@ -737,27 +737,30 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             final int sp = getStartPos(node);
             int elc = cs.getBlankLinesBeforeClass();
             processStandaloneNode(node, adjustments);
-            if (!isFirstOnLine(sp)) {
+            if (!isFirstOnLine(sp) && !holdOnLine(getCurrentPath().getParentPath().getLeaf())) {
                 adjustments.offer(Adjustment.add(ctx.document().createPosition(sp), buildString(elc, NEW_LINE_STRING).toString()));
                 adjustments.offer(Adjustment.indent(ctx.document().createPosition(sp + elc + 1), indentOffset));
             } else {
                 int pos = ctx.lineStartOffset(sp);
                 indentLine(pos, adjustments);
-                pos = skipPreviousComment(pos);
 
+                final Tree tree = getCurrentPath().getParentPath().getLeaf();
+                if (tree instanceof CompilationUnitTree || tree instanceof ClassDeclarationTree) {
+                    pos = skipPreviousComment(pos);
 
-                int emptyLines = getEmptyLinesBefore(li, pos);
+                    int emptyLines = getEmptyLinesBefore(li, pos);
 
-                elc = elc - emptyLines;
+                    elc = elc - emptyLines;
 
-                if (elc < 0) {
-                    Element nth = getNthElement(Math.abs(elc), li);
-                    if (nth != null) {
-                        adjustments.offer(Adjustment.delete(doc.createPosition(nth.getStartOffset()), doc.createPosition(pos)));
-                    }
-                } else if (elc > 0) {
-                    StringBuilder sb = buildString(elc, NEW_LINE_STRING);
-                    adjustments.offer(Adjustment.add(doc.createPosition(pos), sb.toString()));
+                    if (elc < 0) {
+                        Element nth = getNthElement(Math.abs(elc), li);
+                        if (nth != null) {
+                            adjustments.offer(Adjustment.delete(doc.createPosition(nth.getStartOffset()), doc.createPosition(pos)));
+                        }
+                    } else if (elc > 0) {
+                        StringBuilder sb = buildString(elc, NEW_LINE_STRING);
+                        adjustments.offer(Adjustment.add(doc.createPosition(pos), sb.toString()));
+                    }                               
                 }
             }
 
