@@ -56,7 +56,7 @@ Microsystems, Inc. All Rights Reserved.
                                          ide(baseide), nb6.0-etc(baseide), platform(baseide), gsf(baseide),
 					 javafx(javafx)"/>        
         <for-each list="${clusters}" separator="," property="cluster.name"  propertyArg="module.name">
-            <ant target="unzip-cluster"/>                           
+            <antcall target="unzip-cluster"/>                           
         </for-each>                                                  
     </target>
     
@@ -81,18 +81,18 @@ Microsystems, Inc. All Rights Reserved.
     </target>
 
     <target name="build-pkg" depends="unzip-nb" description="Builds NB and packs packages" >                  
-        <ant target="size-pack-module">
+        <antcall target="size-pack-module">
             <property name="module.name" value="baseide"/>            
-        </ant>            
+        </antcall>            
         <ant dir="${basedir}/netBeans/baseide"/>          
-        <ant target="build-modules"/>       
+        <antcall target="build-modules"/>       
     </target>
     
     <target name="build-modules">        
         <property name="modules" value="javase(${javase-title}),
                                         javafx(${javafx-title})"/>        
         <for-each list="${modules}" separator="," property="module.name"  propertyArg="module.title">
-            <ant target="build-module"/>                           
+            <antcall target="build-module"/>                           
         </for-each>                        
     </target>
     
@@ -104,7 +104,7 @@ Microsystems, Inc. All Rights Reserved.
             </filterset>
         </copy>
         
-        <ant target="size-pack-module"/>
+        <antcall target="size-pack-module"/>
         
         <copy file="commonfiles/Description.plist" filtering="true" overwrite="true" tofile="${basedir}/netBeans/${module.name}/pkg/scripts/Description.plist">
             <filterset>
@@ -129,11 +129,11 @@ Microsystems, Inc. All Rights Reserved.
         <property name="bundles" value="-javafx(./build/baseide.pkg ./build/javase.pkg  ./build/javafx.pkg)"/>        
         <for-each list="${bundles}" separator="," property="bundle.type"  propertyArg="packages">
             <delete dir="${basedir}/dist_dmg"/>                          
-            <ant target="build-dmg">
+            <antcall target="build-dmg">
                  <property name="dmg.name" value="${dmg.prefix.name}${ml.suffix}${bundle.type}-macosx"/>  
                  <property name="mpkg.name" value="${mpkg.name_nb}"/>
                  <property name="license.file" value="${basedir}/dmg/Resources/license.txt"/>                                  
-            </ant>     
+            </antcall>     
         </for-each>         
         <delete file="${basedir}/build/sizes.pro"/>
     </target>     
@@ -163,10 +163,10 @@ Microsystems, Inc. All Rights Reserved.
         <condition property="do.copy.translated.files">
             <istrue value="${mlbuild}"/>
         </condition>        
-        <ant target="copy-translated-files"/> 
+        <antcall target="copy-translated-files"/> 
         
         <for-each list="${locales}" separator="," property="locale">
-            <ant target="build-lproj-dir"/>                           
+            <antcall target="build-lproj-dir"/>                           
         </for-each>            
         <delete dir="${resources.full.dir}"/>
     </target> 
@@ -233,7 +233,7 @@ Microsystems, Inc. All Rights Reserved.
         <copy file="${license.file}" 
               tofile="${mpkg.file}/Contents/Resources/License.txt" />                         
                          
-        <ant target="prepare-lproj-dirs"/>                                             
+        <antcall target="prepare-lproj-dirs"/>                                             
         
         <copy file="dmg/distribution${bundle.type}.dist" tofile="${mpkg.file}/Contents/distribution.dist">                                    
             <filterset>                      
