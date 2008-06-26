@@ -38,11 +38,8 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-/*
- * TapPanel.java
- *
- * Created on 22. srpen 2003, 22:20
- */
+
+
 package org.netbeans.modules.javafx.navigation.base;
 
 import javax.swing.*;
@@ -182,9 +179,7 @@ public final class TapPanel extends javax.swing.JPanel {
 
     public void setExpanded(boolean b) {
         if (expanded != b) {
-            Dimension d = getPreferredSize();
             expanded = b;
-            Dimension d1 = getPreferredSize();
             if (isDisplayable()) {
                 revalidate();
             }

@@ -50,14 +50,13 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
+import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -98,17 +97,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
     public void run(CompilationInfo info) throws Exception {
         canceled.set(false); // Task shared for one file needs reset first
-        long start = System.currentTimeMillis();
-
-//        if (info.getChangedTree() != null) {
-//            //method body has been reparsed - no need to update the navigator
-//            long end = System.currentTimeMillis();
-//            Logger.getLogger("TIMER").log(Level.FINE, "Element Scanning Task", //NOI18N
-//                    new Object[]{info.getFileObject(), end - start});
-//            return;
-//        }
-
-        //System.out.println("The task is running" + info.getFileObject().getNameExt() + "=====================================" ) ;
 
         Description rootDescription = new Description(ui);
         rootDescription.fileObject = info.getFileObject();
@@ -138,9 +126,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         if (!canceled.get()) {
             ui.refresh(rootDescription);
         }
-        long end = System.currentTimeMillis();
-        Logger.getLogger("TIMER").log(Level.FINE, "Element Scanning Task", //NOI18N
-                new Object[]{info.getFileObject(), end - start});
     }
 
     private static class PositionVisitor extends JavaFXTreePathScanner<Void, Map<Element, Long>> {
@@ -224,8 +209,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             return null;
         }
 
-        
-
         @Override
         public Void scan(Tree tree, Map<Element, Long> p) {
             if (!canceled.get()) {
@@ -255,14 +238,28 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
     private Description element2description(final Element e, final Element parent,
             final boolean isParentInherited, final CompilationInfo info,
             final Map<Element, Long> pos) {
+
         if (info.getElementUtilities().isSynthetic(e)) {
             return null;
         }
+
         boolean inherited = isParentInherited || (null != parent && !parent.equals(e.getEnclosingElement()));
-//        Description d = new Description(ui, e.getSimpleName().toString(), ElementHandle.create(e), e.getKind(), TreePathHandle.create(e, info), inherited);
         Description d = new Description(ui, e.getSimpleName().toString(), e, e.getKind(), inherited);
 
         if (e instanceof TypeElement) {
+            if (null != parent) {
+                final JavafxcTrees trees = info.getTrees();
+                final JavafxcScope scope = trees.getScope(info.getPath(parent));
+                if (!trees.isAccessible(scope, (TypeElement) e)) {
+                    return null;
+                }
+            }
+
+            final String name = e.getSimpleName().toString();
+            if (name.contains("$")) {
+                return null;
+            }
+
             d.subs = new ArrayList<Description>();
             d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited);
         } else if (e instanceof ExecutableElement) {
@@ -275,7 +272,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         d.modifiers = e.getModifiers();
-        d.pos = getPosition(e, info, pos);
+        d.pos = getPosition(e, pos);
 
 //        if (inherited) {
 //            d.cpInfo = info.getClasspathInfo();
@@ -284,7 +281,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return d;
     }
 
-    private long getPosition(final Element e, final CompilationInfo info, final Map<Element, Long> pos) {
+    private long getPosition(final Element e, final Map<Element, Long> pos) {
         Long res = pos.get(e);
         if (res == null) {
 //                java.util.logging.Logger.getLogger(ElementScanningTask.class.getName()).warning("No pos for: " + e);
@@ -384,8 +381,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         // sb.append(print(e.asType()));            
         List<? extends TypeParameterElement> typeParams = e.getTypeParameters();
 
-        //System.out.println("Element " + e + "type params" + typeParams.size() );
-
         if (typeParams != null && !typeParams.isEmpty()) {
             sb.append("&lt;"); // NOI18N
 
@@ -394,7 +389,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 sb.append(tp.getSimpleName());
                 try { // XXX Verry ugly -> file a bug against Javac?
                     List<? extends TypeMirror> bounds = tp.getBounds();
-                    //System.out.println( tp.getSimpleName() + "   bounds size " + bounds.size() );
                     if (!bounds.isEmpty()) {
                         sb.append(printBounds(bounds));
                     }

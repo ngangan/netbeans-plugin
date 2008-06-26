@@ -27,3 +27,9 @@ script_dir=`dirname "$0"`
 if [ -d "/Library/Receipts/javafx.pkg" ] ; then
     rm -rf "/Library/Receipts/javafx.pkg"
 fi
+
+cd "$NETBEANS_INSTALL_DIR"/Contents/Resources/NetBeans*/etc
+
+if [ -z `cat netbeans.clusters | grep "^javafx$"` ] ; then
+	echo "javafx" >> netbeans.clusters
+fi

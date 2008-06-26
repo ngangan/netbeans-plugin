@@ -38,11 +38,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-/*
- * TrivialLayout.java
- *
- * Created on 20. srpen 2003, 18:33
- */
 
 package org.netbeans.modules.javafx.navigation.base;
 
@@ -55,64 +50,64 @@ import java.awt.*;
  * @author Tim Boudreau
  */
 final class TrivialLayout implements LayoutManager {
-    public void addLayoutComponent (String name, Component comp) {
+
+    public void addLayoutComponent(String name, Component comp) {
         //do nothing
     }
 
-    public void removeLayoutComponent (Component comp) {
+    public void removeLayoutComponent(Component comp) {
         //do nothing
     }
 
-    public void layoutContainer (Container parent) {
-        if ( parent instanceof TapPanel ) {
-            layoutTapPanel ( (TapPanel) parent );
+    public void layoutContainer(Container parent) {
+        if (parent instanceof TapPanel) {
+            layoutTapPanel((TapPanel) parent);
         } else {
-            layoutComp ( parent );
+            layoutComp(parent);
         }
     }
 
     /**
      * Standard layout for any container
      */
-    private void layoutComp (Container parent) {
-        Component[] c = parent.getComponents ();
-        if ( c.length > 0 ) {
-            c[ 0 ].setBounds ( 0, 0, parent.getWidth (), parent.getHeight () );
+    private void layoutComp(Container parent) {
+        Component[] c = parent.getComponents();
+        if (c.length > 0) {
+            c[0].setBounds(0, 0, parent.getWidth(), parent.getHeight());
         }
     }
 
     /**
      * Layout for TapPanel, taking into account its minimumHeight
      */
-    private void layoutTapPanel (TapPanel tp) {
-        Component[] c = tp.getComponents ();
-        if ( c.length > 0 ) {
-            Dimension d2 = c[ 0 ].getPreferredSize ();
-            if ( tp.isExpanded () ) {
-                int top = tp.getOrientation () == tp.UP ? 0 : tp.getMinimumHeight ();
-                int height = Math.min ( tp.getHeight () - tp.getMinimumHeight (), d2.height );
-                c[ 0 ].setBounds ( 0, top, tp.getWidth (), height );
+    private void layoutTapPanel(TapPanel tp) {
+        Component[] c = tp.getComponents();
+        if (c.length > 0) {
+            Dimension d2 = c[ 0].getPreferredSize();
+            if (tp.isExpanded()) {
+                int top = tp.getOrientation() == TapPanel.UP ? 0 : tp.getMinimumHeight();
+                int height = Math.min(tp.getHeight() - tp.getMinimumHeight(), d2.height);
+                c[0].setBounds(0, top, tp.getWidth(), height);
             } else {
-                c[ 0 ].setBounds ( 0, 0, 0, 0 );
+                c[0].setBounds(0, 0, 0, 0);
             }
         }
     }
 
-
-    public Dimension minimumLayoutSize (Container parent) {
-        Dimension result = new Dimension ( 20, 10 );
-        Component[] c = parent.getComponents ();
+    public Dimension minimumLayoutSize(Container parent) {
+        Dimension result = new Dimension(20, 10);
+        Component[] c = parent.getComponents();
         TapPanel tp = (TapPanel) parent;
-        if ( c.length > 0 ) {
-            Dimension d2 = c[ 0 ].getPreferredSize ();
+        if (c.length > 0) {
+            Dimension d2 = c[ 0].getPreferredSize();
             result.width = d2.width;
-            result.height = tp.isExpanded () ? d2.height + tp.getMinimumHeight () : tp.getMinimumHeight ();
+            result.height = tp.isExpanded() ? d2.height + tp.getMinimumHeight() : tp.getMinimumHeight();
         }
         return result;
     }
 
-    public Dimension preferredLayoutSize (Container parent) {
-        return minimumLayoutSize ( parent );
+    public Dimension preferredLayoutSize(Container parent) {
+        return minimumLayoutSize(parent);
     }
 }
 

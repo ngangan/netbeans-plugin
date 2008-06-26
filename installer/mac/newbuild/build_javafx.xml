@@ -22,7 +22,12 @@ Microsystems, Inc. All Rights Reserved.
 <project name="Mac Installer" basedir="." default="build-all-dmg">
     
     <import file="${basedir}/build.pro"/>
+    <echo message="Properties Loaded..."/>
+
     <property file="${basedir}/Bundle.properties"/>
+    <echo message="Bundle Properties Loaded..."/>
+    <echo message="NetBeans Title : ${netbeans-title}"/>
+
     <condition property="ml.suffix" value="-ml" else="">
         <istrue value="${mlbuild}"/>
     </condition>      
@@ -206,7 +211,7 @@ Microsystems, Inc. All Rights Reserved.
             <arg value="-c"/>
             <arg value="cat ${resources.full.dir}/Bundle${locale.suffix}.properties |
                 sed 's/#.*$//;s/^/&quot;/;s/$/&quot;;/;s/=/&quot; = &quot;/;s/^&quot;&quot;;//;
-                s/'\$${buildnumber}'/'${buildnumber}'/;s/'\$${javafx.version}'/'${javafx.version}'/' 
+                s/'\$${buildnumber}'/'${buildnumber}'/' 
                 > ${resources.full.dir}/Localizable.strings"/>
         </exec>         
         <native2ascii encoding="UTF-16" src="${resources.full.dir}" dest="${mpkg.file}/Contents/Resources/${locale.dir}.lproj" 
