@@ -45,7 +45,7 @@ if [ ! -z $NATIVE_MAC_MACHINE ] && [ ! -z $MAC_PATH ]; then
        exit $ERROR_CODE;
    fi
 
-
+   mkdir -p $DIST/bundles
    scp -q -v $NATIVE_MAC_MACHINE:$MAC_PATH/installer/mac/newbuild/dist_en/* $DIST/bundles
    ERROR_CODE=$?
    if [ $ERROR_CODE != 0 ]; then
