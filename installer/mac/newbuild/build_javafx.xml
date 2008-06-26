@@ -82,7 +82,7 @@ Microsystems, Inc. All Rights Reserved.
 
     <target name="build-pkg" depends="unzip-nb" description="Builds NB and packs packages" >                  
         <antcall target="size-pack-module">
-            <property name="module.name" value="baseide"/>            
+            <param name="module.name" value="baseide"/>            
         </antcall>            
         <ant dir="${basedir}/netBeans/baseide"/>          
         <antcall target="build-modules"/>       
@@ -130,9 +130,9 @@ Microsystems, Inc. All Rights Reserved.
         <for-each list="${bundles}" separator="," property="bundle.type"  propertyArg="packages">
             <delete dir="${basedir}/dist_dmg"/>                          
             <antcall target="build-dmg">
-                 <property name="dmg.name" value="${dmg.prefix.name}${ml.suffix}${bundle.type}-macosx"/>  
-                 <property name="mpkg.name" value="${mpkg.name_nb}"/>
-                 <property name="license.file" value="${basedir}/dmg/Resources/license.txt"/>                                  
+                 <param name="dmg.name" value="${dmg.prefix.name}${ml.suffix}${bundle.type}-macosx"/>  
+                 <param name="mpkg.name" value="${mpkg.name_nb}"/>
+                 <param name="license.file" value="${basedir}/dmg/Resources/license.txt"/>                                  
             </antcall>     
         </for-each>         
         <delete file="${basedir}/build/sizes.pro"/>
