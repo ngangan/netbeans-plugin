@@ -17,15 +17,15 @@
 # Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
 # Microsystems, Inc. All Rights Reserved.
 
-set -e
+cluster_id="$1"
 
 script_dir=`dirname "$0"`
 
-#add Product ID
-"$script_dir"/addproduct_id.sh "JAVAFX"
+. "$script_dir"/env.sh
 
-if [ -d "/Library/Receipts/javafx.pkg" ] ; then
-    rm -rf "/Library/Receipts/javafx.pkg"
+
+cd "$NETBEANS_INSTALL_DIR"/Contents/Resources/NetBeans*/etc
+
+if [ -z `cat netbeans.clusters | grep "^$cluster_id$"` ] ; then
+	echo "$cluster_id" >> netbeans.clusters
 fi
-
-"$script_dir"/add_cluster.sh "javafx"
