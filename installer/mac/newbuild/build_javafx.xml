@@ -121,6 +121,8 @@ Microsystems, Inc. All Rights Reserved.
               todir="${basedir}/netBeans/${module.name}/pkg/scripts"/> 
         <copy file="${basedir}/netBeans/baseide/pkg/scripts/addproduct_id.sh" 
               todir="${basedir}/netBeans/${module.name}/pkg/scripts"/>        
+        <copy file="${basedir}/netBeans/baseide/pkg/scripts/add_cluster.sh" 
+              todir="${basedir}/netBeans/${module.name}/pkg/scripts"/>        
         
         <echo message="Building ${module.name} into ${basedir}/build/${module.name}.pkg"/>
         <exec executable="sh" failonerror="yes">

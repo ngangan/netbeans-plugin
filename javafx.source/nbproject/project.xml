@@ -148,6 +148,7 @@
                 <package>org.netbeans.api.javafx.source</package>
                 <package>org.netbeans.api.javafx.source.support</package>
                 <package>org.netbeans.modules.javafx.source.classpath</package>
+                <package>org.netbeans.modules.javafx.source.ui</package>
             </public-packages>
         </data>
     </configuration>

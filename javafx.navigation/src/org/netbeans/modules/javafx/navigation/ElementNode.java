@@ -51,7 +51,7 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.modules.javafx.source.ui.Icons;
 import org.openide.filesystems.FileObject;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -76,16 +76,16 @@ public class ElementNode extends AbstractNode {
         setDisplayName(description.name);
     }
 
-//    @Override
-//    public Image getIcon(int type) {
-//        return description.kind == null ? super.getIcon(type) : Utilities.icon2Image(ElementIcons.getElementIcon(description.kind, description.modifiers));
-//    }
+    @Override
+    public Image getIcon(int type) {
+        return description.kind == null ? super.getIcon(type) : Utilities.icon2Image(Icons.getElementIcon(description.kind, description.modifiers));
+    }
 
-//    @Override
-//    public Image getOpenedIcon(int type) {
-//        return getIcon(type);
-//    }
-
+    @Override
+    public Image getOpenedIcon(int type) {
+        return getIcon(type);
+    }
+    
     @Override
     public String getDisplayName() {
         if (description.name != null) {
@@ -126,7 +126,7 @@ public class ElementNode extends AbstractNode {
 //    public Action getPreferredAction() {
 //        return getOpenAction();
 //    }
-
+    
     @Override
     public boolean canCopy() {
         return false;
@@ -169,7 +169,7 @@ public class ElementNode extends AbstractNode {
 //        }
 //        return openAction;
 //    }
-
+    
     static synchronized Node getWaitNode() {
         if (WAIT_NODE == null) {
             WAIT_NODE = new WaitNode();
@@ -279,7 +279,7 @@ public class ElementNode extends AbstractNode {
     static class Description {
 
         public static final Comparator<Description> ALPHA_COMPARATOR = new DescriptionComparator(true);
-//        public static final Comparator<Description> POSITION_COMPARATOR = new DescriptionComparator(false);
+        public static final Comparator<Description> POSITION_COMPARATOR = new DescriptionComparator(false);
         ClassMemberPanelUI ui;
         FileObject fileObject; // For the root description
         final String name;
@@ -293,7 +293,6 @@ public class ElementNode extends AbstractNode {
         long pos;
         boolean isInherited;
 //        ClasspathInfo cpInfo;
-
         Description(ClassMemberPanelUI ui) {
             this.ui = ui;
             this.name = null;
@@ -307,8 +306,8 @@ public class ElementNode extends AbstractNode {
         Description(ClassMemberPanelUI ui,
                 String name,
                 Element element,
-//                ElementHandle<? extends Element> elementHandle,
-//                TreePathHandle tpHandle,
+                //                ElementHandle<? extends Element> elementHandle,
+                //                TreePathHandle tpHandle,
                 ElementKind kind,
                 boolean inherited) {
             this.ui = ui;
@@ -320,35 +319,31 @@ public class ElementNode extends AbstractNode {
 //            this.treePathHandle = tpHandle;
         }
 
-        public FileObject getFileObject() {
+//        public FileObject getFileObject() {
 //            if (!isInherited) {
-                return ui.getFileObject();
+//            return ui.getFileObject();
 //            }
 //            return JavaFXSourceUtils.getFile(elementHandle, cpInfo);
-        }
+//        }
 
         @Override
         public boolean equals(Object o) {
 
             if (o == null) {
-                //System.out.println("- f nul");
                 return false;
             }
 
             if (!(o instanceof Description)) {
-                // System.out.println("- not a desc");
                 return false;
             }
 
             Description d = (Description) o;
 
             if (kind != d.kind) {
-                // System.out.println("- kind");
                 return false;
             }
 
             if (!name.equals(d.name)) {
-                // System.out.println("- name");
                 return false;
             }
 
@@ -356,14 +351,6 @@ public class ElementNode extends AbstractNode {
 //                return false;
 //            }
 
-            /*
-            if ( !modifiers.equals(d.modifiers)) {
-            // E.println("- modifiers");
-            return false;
-            }
-             */
-
-            // System.out.println("Equals called");            
             return true;
         }
 
@@ -390,15 +377,15 @@ public class ElementNode extends AbstractNode {
                 if (alpha) {
                     return alphaCompare(d1, d2);
                 } else {
-//                    if (d1.isInherited && !d2.isInherited) {
-//                        return 1;
-//                    }
-//                    if (!d1.isInherited && d2.isInherited) {
-//                        return -1;
-//                    }
-//                    if (d1.isInherited && d2.isInherited) {
-//                        return alphaCompare(d1, d2);
-//                    }
+                    if (d1.isInherited && !d2.isInherited) {
+                        return 1;
+                    }
+                    if (!d1.isInherited && d2.isInherited) {
+                        return -1;
+                    }
+                    if (d1.isInherited && d2.isInherited) {
+                        return alphaCompare(d1, d2);
+                    }
                     return d1.pos == d2.pos ? 0 : d1.pos < d2.pos ? -1 : 1;
                 }
             }
