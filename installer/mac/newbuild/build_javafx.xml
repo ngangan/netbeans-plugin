@@ -50,7 +50,7 @@ Microsystems, Inc. All Rights Reserved.
 
     <target name="unzip-nb" description="Unzip clusters to modules" >                                                  
         <mkdir dir="build"/> 
-	<get file="${javafx_location}" tofile="${common.name}-javafx.zip"/>
+	<get src="${javafx_location}" dest="${common.name}-javafx.zip"/>
 
         <property name="clusters" value="apisupport(javase), profiler(javase), java(javase), harness(javase),
                                          ide(baseide), nb6.0-etc(baseide), platform(baseide), gsf(baseide),
