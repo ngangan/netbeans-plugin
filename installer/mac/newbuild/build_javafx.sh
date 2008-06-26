@@ -38,7 +38,7 @@ cd "$basename"
 chmod -R a+x *.sh
 
 commonname=$work_dir/zip/moduleclusters/$prefix-$buildnumber 
-ant -f $basename/build_javafx.xml build-all-javafx-dmg -Dcommon.name=$commonname -Dprefix=$prefix -Dbuildnumber=$buildnumber -Dmlbuild='false' -Dgf_builds_host=$GLASSFISH_BUILDS_HOST -Dopenesb_builds_host=$OPENESB_BUILDS_HOST -Dbinary_cache_host=$BINARY_CACHE_HOST  -Djavafx_builds_host=$JAVAFX_BUILDS_HOST
+ant -f $basename/build_javafx.xml build-all-dmg -Dcommon.name=$commonname -Dprefix=$prefix -Dbuildnumber=$buildnumber -Dmlbuild='false' -Dgf_builds_host=$GLASSFISH_BUILDS_HOST -Dopenesb_builds_host=$OPENESB_BUILDS_HOST -Dbinary_cache_host=$BINARY_CACHE_HOST  -Djavafx_builds_host=$JAVAFX_BUILDS_HOST
 
 rm -rf "$basename"/dist_en
 mv -f "$basename"/dist "$basename"/dist_en
