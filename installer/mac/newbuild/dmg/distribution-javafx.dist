@@ -53,7 +53,7 @@ function checkSystemversion() {
 		my.result.message = system.localizedStringWithFormat('ERR_INVALID_VERSION_MSG');
 	} else {
 		try {
-			result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0') == true;
+			result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.6') == true;
 		} catch (e) {}
 		if(!result) {
 			my.result.type = 'Fatal';
