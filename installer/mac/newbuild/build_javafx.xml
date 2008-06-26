@@ -22,7 +22,12 @@ Microsystems, Inc. All Rights Reserved.
 <project name="Mac Installer" basedir="." default="build-all-dmg">
     
     <import file="${basedir}/build.pro"/>
+    <echo message="Properties Loaded..."/>
+
     <property file="${basedir}/Bundle.properties"/>
+    <echo message="Bundle Properties Loaded..."/>
+    <echo message="NetBeans Title : ${netbeans-title}"/>
+
     <condition property="ml.suffix" value="-ml" else="">
         <istrue value="${mlbuild}"/>
     </condition>      
