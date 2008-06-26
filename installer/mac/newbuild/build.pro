@@ -35,7 +35,7 @@
     <property name="dmg.prefix.name" value="${prefix}"/>                  
 
     <!-- JavaFX Properties -->
-    <property name="javafx_location" value="${javafx_builds_host}/hudson/job/JavaFX_NB_Plugin_NB61_daily/ws/main/nbbuild/netbeans/javafx//*zip*/javafx.zip"/>
+    <property name="javafx_location" value="${javafx_builds_host}/hudson/job/JavaFX_NB_Plugin_NB61_daily/lastSuccessfulBuild/artifact/main/contrib/zips/javafx-cluster-mac.zip"/>
 
     <property name="mpkg.name_nb_mysql" value="NetBeans IDE with MySQL"/> 
     <property name="mysql_10.5.pkg.name" value="mysql-5.0.51a-osx10.5-x86"/>
