@@ -40,14 +40,13 @@ public final class ClassMemberFilters {
     private static final String SHOW_FIELDS = "show_fields";
     private static final String SHOW_INHERITED = "show_inherited";
     
-    private static final String SORT_ALPHA = "sort_alpha";
-    private static final String SORT_POSITION = "sort_position";
+//    private static final String SORT_ALPHA = "sort_alpha";
+//    private static final String SORT_POSITION = "sort_position";
     
     private FiltersManager filters;
     
     private boolean naturalSort = false;
     
-    /** Creates a new instance of ClassMemberFilters */
     ClassMemberFilters( ClassMemberPanelUI ui ) {
         this.ui = ui;
         naturalSort = NbPreferences.forModule( ClassMemberFilters.class ).getBoolean( "naturalSort", false ); //NOI18N
@@ -71,14 +70,14 @@ public final class ClassMemberFilters {
         boolean non_public = filters.isSelected(SHOW_NON_PUBLIC);
         boolean statik = filters.isSelected(SHOW_STATIC);
         boolean fields = filters.isSelected(SHOW_FIELDS);
-//        boolean inherited = filters.isSelected(SHOW_INHERITED);
+        boolean inherited = filters.isSelected(SHOW_INHERITED);
         
         ArrayList<Description> result = new ArrayList<Description>(original.size());
         for (Description description : original) {
             
-//            if ( !inherited && description.isInherited ) {
-//                continue;
-//            }
+            if ( !inherited && description.isInherited ) {
+                continue;
+            }
             if ( !non_public && 
                  !description.modifiers.contains(Modifier.PUBLIC)                 
                  /* Fix for #89777 && !description.modifiers.contains(Modifier.PROTECTED) */ ) {
@@ -98,8 +97,7 @@ public final class ClassMemberFilters {
             result.add(description);                        
         }
                 
-//        Collections.sort( result, isNaturalSort() ?  Description.POSITION_COMPARATOR : Description.ALPHA_COMPARATOR );
-        Collections.sort( result, Description.ALPHA_COMPARATOR );
+        Collections.sort( result, isNaturalSort() ?  Description.POSITION_COMPARATOR : Description.ALPHA_COMPARATOR );
         
         return result;
     }
@@ -128,28 +126,28 @@ public final class ClassMemberFilters {
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowInherited"),     //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowInheritedTip"),     //NOI18N
                 false,
-                new ImageIcon (Utilities.loadImage("org/netbeans/modules/java/navigation/resources/filterHideInherited.png")), //NOI18N
+                new ImageIcon (Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideInherited.png")), //NOI18N
                 null
         );
         desc.addFilter(SHOW_FIELDS,
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowFields"),     //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowFieldsTip"),     //NOI18N
                 true,
-                new ImageIcon (Utilities.loadImage("org/netbeans/modules/java/navigation/resources/filterHideFields.gif")), //NOI18N
+                new ImageIcon (Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideFields.gif")), //NOI18N
                 null
         );
         desc.addFilter(SHOW_STATIC,
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowStatic"),     //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowStaticTip"),     //NOI18N
                 true,
-                new ImageIcon (Utilities.loadImage("org/netbeans/modules/java/navigation/resources/filterHideStatic.png")), //NOI18N
+                new ImageIcon (Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideStatic.png")), //NOI18N
                 null
         );
         desc.addFilter(SHOW_NON_PUBLIC,
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowNonPublic"),     //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowNonPublicTip"),     //NOI18N
                 true,
-                new ImageIcon (Utilities.loadImage("org/netbeans/modules/java/navigation/resources/filterHideNonPublic.png")), //NOI18N
+                new ImageIcon (Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideNonPublic.png")), //NOI18N
                 null
         );
         

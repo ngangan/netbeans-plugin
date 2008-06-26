@@ -38,7 +38,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.navigation.base;
 
 import java.util.ArrayList;
@@ -50,10 +49,9 @@ import javax.swing.Icon;
  */
 public final class FiltersDescription {
 
-    public static FiltersManager createManager (FiltersDescription descr) {
+    public static FiltersManager createManager(FiltersDescription descr) {
         return FiltersManager.create(descr);
     }
-
     /** List of <FilterItem> describing filters properties */
     private List<FilterItem> filters;
 
@@ -61,52 +59,50 @@ public final class FiltersDescription {
     public FiltersDescription() {
         filters = new ArrayList<FilterItem>();
     }
-    
-    public void addFilter (String name, String displayName, String tooltip,
-            boolean isSelected, Icon selectedIcon, Icon unselectedIcon) {
-        FilterItem newItem = new FilterItem(name, displayName, tooltip, 
-                isSelected, selectedIcon, unselectedIcon);
+
+    public void addFilter(String name, String displayName, String tooltip, boolean isSelected, Icon selectedIcon, Icon unselectedIcon) {
+        FilterItem newItem = new FilterItem(name, displayName, tooltip, isSelected, selectedIcon, unselectedIcon);
         filters.add(newItem);
     }
-    
-    public int getFilterCount () {
+
+    public int getFilterCount() {
         return filters.size();
     }
-    
-    public String getName (int index) {
+
+    public String getName(int index) {
         return filters.get(index).name;
     }
-    
-    public String getDisplayName (int index) {
+
+    public String getDisplayName(int index) {
         return filters.get(index).displayName;
     }
-    
-    public String getTooltip (int index) {
+
+    public String getTooltip(int index) {
         return filters.get(index).tooltip;
     }
-    
-    public Icon getSelectedIcon (int index) {
+
+    public Icon getSelectedIcon(int index) {
         return filters.get(index).selectedIcon;
     }
-    
-    public Icon getUnselectedIcon (int index) {
+
+    public Icon getUnselectedIcon(int index) {
         return filters.get(index).unselectedIcon;
     }
-    
-    public boolean isSelected (int index) {
+
+    public boolean isSelected(int index) {
         return filters.get(index).isSelected;
     }
-    
+
     static class FilterItem {
+
         String name;
         String displayName;
         String tooltip;
         Icon selectedIcon;
         Icon unselectedIcon;
         boolean isSelected;
-        
-        FilterItem (String name, String displayName, String tooltip,
-                boolean isSelected, Icon selectedIcon, Icon unselectedIcon) {
+
+        FilterItem(String name, String displayName, String tooltip, boolean isSelected, Icon selectedIcon, Icon unselectedIcon) {
             this.name = name;
             this.displayName = displayName;
             this.tooltip = tooltip;
@@ -114,7 +110,6 @@ public final class FiltersDescription {
             this.unselectedIcon = unselectedIcon;
             this.isSelected = isSelected;
         }
-        
     }
     
 }
