@@ -255,14 +255,14 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 }
             }
 
+            d.subs = new ArrayList<Description>();
+            d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited);
+        } else if (e instanceof ExecutableElement) {
             final String name = e.getSimpleName().toString();
             if (name.contains("$")) {
                 return null;
             }
 
-            d.subs = new ArrayList<Description>();
-            d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited);
-        } else if (e instanceof ExecutableElement) {
             d.htmlHeader = createHtmlHeader((ExecutableElement) e, info.getElements().isDeprecated(e), d.isInherited);
         } else if (e instanceof VariableElement) {
             if (!(e.getKind() == ElementKind.FIELD || e.getKind() == ElementKind.ENUM_CONSTANT)) {
