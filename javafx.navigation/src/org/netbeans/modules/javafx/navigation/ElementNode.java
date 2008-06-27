@@ -51,6 +51,8 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.swing.Action;
+import org.netbeans.modules.javafx.navigation.actions.OpenAction;
 import org.netbeans.modules.javafx.source.ui.Icons;
 import org.openide.filesystems.FileObject;
 import org.openide.nodes.AbstractNode;
@@ -67,7 +69,7 @@ import org.openide.util.datatransfer.PasteType;
 public class ElementNode extends AbstractNode {
 
     private static Node WAIT_NODE;
-//    private OpenAction openAction;
+    private OpenAction openAction;
     private Description description;
 
     public ElementNode(Description description) {
@@ -102,30 +104,28 @@ public class ElementNode extends AbstractNode {
         return description.htmlHeader;
     }
 
-//    @Override
-//    public Action[] getActions(boolean context) {
-//
-//        if (context || description.name == null) {
-//            return description.ui.getActions();
-//        } else {
-//            Action panelActions[] = description.ui.getActions();
-//
-//            Action actions[] = new Action[4 + panelActions.length];
-//            actions[0] = getOpenAction();
-//            actions[1] = RefactoringActionsFactory.whereUsedAction();
-//            actions[2] = RefactoringActionsFactory.popupSubmenuAction();
-//            actions[3] = null;
-//            for (int i = 0; i < panelActions.length; i++) {
-//                actions[4 + i] = panelActions[i];
-//            }
-//            return actions;
-//        }
-//    }
+    @Override
+    public Action[] getActions(boolean context) {
 
-//    @Override
-//    public Action getPreferredAction() {
-//        return getOpenAction();
-//    }
+        if (context || description.name == null) {
+            return description.ui.getActions();
+        } else {
+            Action panelActions[] = description.ui.getActions();
+
+            Action actions[] = new Action[2 + panelActions.length];
+            actions[0] = getOpenAction();
+            actions[1] = null;
+            for (int i = 0; i < panelActions.length; i++) {
+                actions[2 + i] = panelActions[i];
+            }
+            return actions;
+        }
+    }
+
+    @Override
+    public Action getPreferredAction() {
+        return getOpenAction();
+    }
     
     @Override
     public boolean canCopy() {
@@ -162,13 +162,12 @@ public class ElementNode extends AbstractNode {
         // Do nothing
     }
 
-//    private synchronized Action getOpenAction() {
-//        if (openAction == null) {
-//            FileObject fo = description.getFileObject();
-//            openAction = new OpenAction(description.elementHandle, fo, description.name);
-//        }
-//        return openAction;
-//    }
+    private synchronized Action getOpenAction() {
+        if (openAction == null) {
+            openAction = new OpenAction(description.element, description.ui.getFileObject(), description.name);
+        }
+        return openAction;
+    }
     
     static synchronized Node getWaitNode() {
         if (WAIT_NODE == null) {
@@ -192,7 +191,6 @@ public class ElementNode extends AbstractNode {
     }
 
     public ElementNode getNodeForElement(Element e) {
-
         if (getDescritption().element != null && getDescritption().element.toString().equals(e.toString())) {
             return this;
         }
@@ -214,7 +212,6 @@ public class ElementNode extends AbstractNode {
         Children ch = getChildren();
         if (ch instanceof ElementChilren) {
             HashSet<Description> oldSubs = new HashSet<Description>(description.subs);
-
 
             // Create a hashtable which maps Description to node.
             // We will then identify the nodes by the description. The trick is 

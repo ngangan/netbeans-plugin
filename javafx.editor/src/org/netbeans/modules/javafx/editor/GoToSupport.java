@@ -62,6 +62,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
+import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -288,7 +289,7 @@ public class GoToSupport {
         return new int [] {ts.offset(), ts.offset() + t.length()};
     }
 
-    static boolean doOpen(FileObject fo, int offset) {
+    public static boolean doOpen(FileObject fo, int offset) {
         try {
             DataObject od = DataObject.find(fo);
             EditorCookie ec = od.getCookie(EditorCookie.class);

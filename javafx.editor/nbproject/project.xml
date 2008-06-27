@@ -464,7 +464,9 @@ made subject to such option by the copyright holder.
                     </test-dependency>
                 </test-type>
             </test-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>org.netbeans.api.javafx.editor</package>
+            </public-packages>
         </data>
     </configuration>
 </project>
