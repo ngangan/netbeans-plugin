@@ -261,7 +261,7 @@ public class ElementNode extends AbstractNode {
 
     private static final class ElementChilren extends Children.Keys<Description> {
 
-        public ElementChilren(List<Description> descriptions, ClassMemberFilters filters) {
+        public ElementChilren(Set<Description> descriptions, ClassMemberFilters filters) {
             resetKeys(descriptions, filters);
         }
 
@@ -269,7 +269,7 @@ public class ElementNode extends AbstractNode {
             return new Node[]{new ElementNode(key)};
         }
 
-        void resetKeys(List<Description> descriptions, ClassMemberFilters filters) {
+        void resetKeys(Set<Description> descriptions, ClassMemberFilters filters) {
             setKeys(filters.filter(descriptions));
         }
     }
@@ -283,22 +283,17 @@ public class ElementNode extends AbstractNode {
         ClassMemberPanelUI ui;
         FileObject fileObject; // For the root description
         final String name;
-//        final ElementHandle<? extends Element> elementHandle;
-//        final TreePathHandle treePathHandle;
         final Element element;
         final ElementKind kind;
         Set<Modifier> modifiers;
-        List<Description> subs;
+        Set<Description> subs;
         String htmlHeader;
         long pos;
         boolean isInherited;
-//        ClasspathInfo cpInfo;
         Description(ClassMemberPanelUI ui) {
             this.ui = ui;
             this.name = null;
             this.element = null;
-//            this.elementHandle = null;
-//            this.treePathHandle = null;
             this.kind = null;
             this.isInherited = false;
         }
@@ -306,25 +301,14 @@ public class ElementNode extends AbstractNode {
         Description(ClassMemberPanelUI ui,
                 String name,
                 Element element,
-                //                ElementHandle<? extends Element> elementHandle,
-                //                TreePathHandle tpHandle,
                 ElementKind kind,
                 boolean inherited) {
             this.ui = ui;
             this.name = name;
             this.element = element;
-//            this.elementHandle = elementHandle;
             this.kind = kind;
             this.isInherited = inherited;
-//            this.treePathHandle = tpHandle;
         }
-
-//        public FileObject getFileObject() {
-//            if (!isInherited) {
-//            return ui.getFileObject();
-//            }
-//            return JavaFXSourceUtils.getFile(elementHandle, cpInfo);
-//        }
 
         @Override
         public boolean equals(Object o) {
@@ -347,9 +331,9 @@ public class ElementNode extends AbstractNode {
                 return false;
             }
 
-//            if (!this.elementHandle.signatureEquals(d.elementHandle)) {
-//                return false;
-//            }
+            if (!this.element.getSimpleName().equals(d.element.getSimpleName())) {
+                return false;
+            }
 
             return true;
         }
@@ -360,7 +344,7 @@ public class ElementNode extends AbstractNode {
 
             hash = 29 * hash + (this.name != null ? this.name.hashCode() : 0);
             hash = 29 * hash + (this.kind != null ? this.kind.hashCode() : 0);
-            // hash = 29 * hash + (this.modifiers != null ? this.modifiers.hashCode() : 0);
+            hash = 29 * hash + this.element.getSimpleName().hashCode();
             return hash;
         }
 

@@ -52,8 +52,8 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +100,8 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
         Description rootDescription = new Description(ui);
         rootDescription.fileObject = info.getFileObject();
-        rootDescription.subs = new ArrayList<Description>();
+//        rootDescription.subs = new ArrayList<Description>();
+        rootDescription.subs = new HashSet<Description>();
 
         // Get all outerclasses in the Compilation unit
         CompilationUnitTree cuTree = info.getCompilationUnit();
@@ -255,7 +256,8 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 }
             }
 
-            d.subs = new ArrayList<Description>();
+//            d.subs = new ArrayList<Description>();
+            d.subs = new HashSet<Description>();
             d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited);
         } else if (e instanceof ExecutableElement) {
             final String name = e.getSimpleName().toString();
