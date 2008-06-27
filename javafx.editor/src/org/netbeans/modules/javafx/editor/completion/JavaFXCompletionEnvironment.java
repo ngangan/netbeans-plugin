@@ -619,7 +619,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         Symbol s = (Symbol)pe;
         for (Scope.Entry e = s.members().elems; e != null; e = e.sibling) {
             if ((e.sym != null) && (!e.sym.toString().contains("$"))){
-                e.sym.complete();
+                try {
+                    e.sym.complete();
+                } catch (RuntimeException x) {
+                    if (LOGGABLE) {
+                        logger.log(Level.FINE,"Let's see whether we survive this: ",x);
+                    }
+                }
             }
         }
         return pe.getEnclosedElements();
@@ -745,7 +751,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         if (e != null) {
             PackageElement pkge = (PackageElement)e;
-            return findTypeElement(pkge.getEnclosedElements(), simpleName);
+            return findTypeElement(getEnclosedElements(pkge), simpleName);
         }
         return null;
     }
