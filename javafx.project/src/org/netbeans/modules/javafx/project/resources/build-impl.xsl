@@ -1266,7 +1266,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 </condition>
                 <property name="browser.args" value=""/>
                 <exec executable="${{browser}}" spawn="true">
-                    <arg value="${{browser.args}} ${{applet.url}}"/>
+                    <arg line="${{browser.args}} ${{applet.url}}"/>
                 </exec>
             </target>
             
