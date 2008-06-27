@@ -62,6 +62,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
@@ -72,7 +73,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -609,6 +609,22 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
+    /**
+     * This methods hacks over issue #135926. To prevent NPE we first complete
+     * all symbols that are classes and not inner classes in a package.
+     * @param pe
+     * @return pe.getEnclosedElements() but without the NPE
+     */
+    private List<? extends Element> getEnclosedElements(PackageElement pe) {
+        Symbol s = (Symbol)pe;
+        for (Scope.Entry e = s.members().elems; e != null; e = e.sibling) {
+            if ((e.sym != null) && (!e.sym.toString().contains("$"))){
+                e.sym.complete();
+            }
+        }
+        return pe.getEnclosedElements();
+    }
+    
     protected void addPackageContent(PackageElement pe, EnumSet<ElementKind> kinds, DeclaredType baseType, boolean insideNew) {
         log("addPackageContent " + pe);
         Elements elements = controller.getElements();
@@ -616,7 +632,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
-        for (Element e : pe.getEnclosedElements()) {
+        for (Element e : getEnclosedElements(pe)) {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
                 if (!trees.isAccessible(scope, (TypeElement) e)) {
