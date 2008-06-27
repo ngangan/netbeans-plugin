@@ -202,8 +202,13 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             } else if (KEEP_LEVEL_PTRN.matcher(document.getText(ls, lso - ls)).matches()) {
                 // if previous line is "closing" line move this +1 level.
                 level += getIndentStepLevel();
+            } else {
+                final String previousLineText = document.getText(ls, lso - ls);
+                if ( previousLineText.trim().endsWith(":")
+                || previousLineText.trim().endsWith("=")) {
+                    level += getIndentStepLevel();
+                }
             }
-
             //if we got buggy source code we descent only to zero indent.
             return Math.max(0, level);
         }

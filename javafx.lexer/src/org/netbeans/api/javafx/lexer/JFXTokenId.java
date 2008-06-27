@@ -204,7 +204,7 @@ public enum JFXTokenId implements TokenId {
     TRUE("keyword-literal", 39),
     SEMI("separator", 79),
     COLON("operator", 99),
-    POSTINIT(null, 27),
+    POSTINIT("keyword", 27),
     SEMI_INSERT_END(null, 48),
     PERCENTEQ("operator", 98),
     FINALLY("keyword-directive", 57),

@@ -793,7 +793,7 @@ class BracketCompletion {
      * @param bracket bracket to match
      * @return matching opposite bracket
      */
-    private static char matching(char bracket) {
+    /*private*/ static char matching(char bracket) {
         switch (bracket) {
             case '(':
                 return ')';

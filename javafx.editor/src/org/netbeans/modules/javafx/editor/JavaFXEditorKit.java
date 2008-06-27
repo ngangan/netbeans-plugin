@@ -69,10 +69,10 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     public static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
     public static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
     public static final String FX_MIME_TYPE = "text/x-fx";
-    
+
     public JavaFXEditorKit() {
         super(FX_MIME_TYPE);
-        
+
         Settings.addInitializer (new Settings.Initializer () {
             public String getName() {
                 return FX_MIME_TYPE;
@@ -85,13 +85,13 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
 
         });
     }
-    
+
     @Override
     public String getContentType() {
         return FX_MIME_TYPE;
     }
-   
- 
+
+
     @Override
     public Document createDefaultDocument(){
         Document doc = new JavaFXDocument(this.getClass());
@@ -101,7 +101,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         }
         return doc;
     }
-    
+
     @Override
     protected Action[] createActions() {
         Action[] superActions = super.createActions();
@@ -119,8 +119,8 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         };
         return TextAction.augmentList(superActions, javafxActions);
     }
-    
-    
+
+
     public static class ToggleFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
         ResetFXPreviewExecution resetAction = null;
 
@@ -128,7 +128,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         protected Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
-        
+
         public ToggleFXPreviewExecution(ResetFXPreviewExecution resetAction) {
             super(toggleFXPreviewExecution);
             this.resetAction = resetAction;
@@ -136,7 +136,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     "org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
             putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
         }
-        
+
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
             JavaFXDocument doc = getJavaFXDocument(target);
             if (doc != null) {
@@ -150,7 +150,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                 }
             }
         }
-        
+
         private JavaFXDocument getJavaFXDocument(JTextComponent comp){
             Component c = comp;
             while (c != null) {
@@ -161,7 +161,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             }
             return null;
         }
-        
+
         public java.awt.Component getToolbarPresenter() {
             PreviewButton b = new PreviewButton();
             b.setSelected(false);
@@ -170,16 +170,16 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             b.setText("");
             return b;
         }
-        
+
          private static final class PreviewButton extends JToggleButton implements ChangeListener{
-            
-            
+
+
             public void stateChanged(ChangeEvent evt) {
                 boolean selected = isSelected();
                 super.setContentAreaFilled(selected);
                 super.setBorderPainted(selected);
             }
-             
+
             @Override
             public void setBorderPainted(boolean arg0) {
                     if(!isSelected()){
@@ -195,10 +195,10 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             }
          }
     }
-    
+
     static class DocEvent implements DocumentEvent {
         Document doc = null;
-        
+
         public DocEvent(Document doc){
             this.doc = doc;
         }
@@ -222,23 +222,23 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         public ElementChange getChange(Element elem) {
             return null;
         }
-      
+
     }
-    
+
     public static class ResetFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
-        
+
         public ResetFXPreviewExecution() {
             super(buttonResetFXPreviewExecution);
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
                     "org/netbeans/modules/javafx/editor/resources/reset_preview.png"))); // NOI18N
             putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("reset-fx-preview-execution"));
         }
-        
+
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
             JavaFXDocument doc = getJavaFXDocument(target);
             JavaFXModel.previewReq(doc, true);
         }
-        
+
         private JavaFXDocument getJavaFXDocument(JTextComponent comp){
             Component c = comp;
             while (c != null) {
@@ -249,7 +249,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             }
             return null;
         }
-        
+
         public java.awt.Component getToolbarPresenter() {
             JButton b = new JButton(this);
             b.setAction(this);
@@ -259,8 +259,8 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             b.setEnabled(false);
             return b;
         }
-    }    
-    
+    }
+
     public static class JavaDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
 
         @Override
@@ -274,14 +274,14 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     caret.setDot(dotPos+1);
                 }else{
                     super.insertString(doc, dotPos, caret, str, overwrite);
-                    
+
                 }
             } else {
                 super.insertString(doc, dotPos, caret, str, overwrite);
                 BracketCompletion.charInserted(doc, dotPos, caret, insertedChar);
             }
         }
-        
+
         @Override
         protected void replaceSelection(JTextComponent target,
                 int dotPos,
@@ -326,11 +326,11 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             }
         }
     }
-    
+
     public static class JavaInsertBreakAction extends InsertBreakAction {
-        
+
         static final long serialVersionUID = -1506173310438326380L;
-        
+
         @Override
         protected Object beforeBreak(JTextComponent target, BaseDocument doc, Caret caret) {
             int dotPos = caret.getDot();
@@ -347,16 +347,27 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
                         int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
                         doc.insertString(end, "}", null); // NOI18N
-                        doc.getFormatter().indentNewLine(doc, end);                        
+                        doc.getFormatter().indentNewLine(doc, end);
                         caret.setDot(dotPos);
                         return Boolean.TRUE;
+                    } else {
+                        final String epsylon = doc.getText(dotPos - 1, 2);
+                        final char c = epsylon.charAt(0);
+                        if (c == '[' || c == '(' || c == '{') {
+                            if (epsylon.charAt(1) == BracketCompletion.matching(c)) {
+                                doc.insertString(dotPos + 1 , "\n", null);
+                                doc.getFormatter().indentNewLine(doc, dotPos);
+                                caret.setDot(dotPos);
+                                return Boolean.TRUE;
+                            }
+                        }
                     }
                 } catch (BadLocationException ex) {
                 }
             }
             return null;
         }
-        
+
         @Override
         protected void afterBreak(JTextComponent target, BaseDocument doc, Caret caret, Object cookie) {
             if (cookie != null) {
@@ -369,9 +380,9 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         }
 
       }
-    
+
     public static class JavaDeleteCharAction extends ExtDeleteCharAction {
-        
+
         public JavaDeleteCharAction(String nm, boolean nextChar) {
             super(nm, nextChar);
         }
@@ -395,7 +406,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     private static class JavaFXGoToSourceAction extends BaseAction {
 
         static final long serialVersionUID =-6440495023918097760L;
-        
+
         @SuppressWarnings("deprecation")
         public JavaFXGoToSourceAction() {
             super(gotoSourceAction,
@@ -410,16 +421,16 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                 GoToSupport.goTo((BaseDocument) target.getDocument(), target.getCaretPosition(), true);
             }
         }
-        
+
         public String getPopupMenuText(JTextComponent target) {
             return NbBundle.getBundle(JavaFXEditorKit.class).getString("goto_source_open_source_not_formatted"); //NOI18N
         }
-        
+
         protected Class getShortDescriptionBundleClass() {
             return BaseKit.class;
         }
     }
-    
+
 /*
     @Override
     public Syntax createSyntax(Document doc) {
@@ -435,10 +446,10 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     public HelpCtx getHelpCtx() {
         return new org.openide.util.HelpCtx(JavaFXEditorKit.class);
     }
-    
+
 /*    @Override
     public Formatter createFormatter() {
 //        return new JavaFXFormatter(this.getClass());
-        
+
     }*/
 }

@@ -502,7 +502,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         }
         verifyBraces(node, adjustments, cs.getMethodDeclBracePlacement(), cs.spaceBeforeMethodDeclLeftBrace());
-        processStandaloneNode(node, adjustments);
+        if (!holdOnLine(getCurrentPath().getParentPath().getLeaf())) {
+            processStandaloneNode(node, adjustments);
+        }
     }
 
     private void verifyNextIs(JFXTokenId id, TokenSequence<JFXTokenId> ts, Queue<Adjustment> adjustments, boolean moveNext) throws BadLocationException {
@@ -672,6 +674,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof BindExpressionTree
                 || tree instanceof CatchTree
                 || tree instanceof ConditionalExpressionTree
+                || tree instanceof ObjectLiteralPartTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
@@ -765,7 +768,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     } else if (elc > 0) {
                         StringBuilder sb = buildString(elc, NEW_LINE_STRING);
                         adjustments.offer(Adjustment.add(doc.createPosition(pos), sb.toString()));
-                    }                               
+                    }
                 }
             }
 
