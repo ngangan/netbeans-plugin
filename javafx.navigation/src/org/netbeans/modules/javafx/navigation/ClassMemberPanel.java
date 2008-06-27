@@ -62,9 +62,13 @@ public class ClassMemberPanel implements NavigatorPanel {
     public void panelActivated(Lookup context) {
         assert context != null;
         INSTANCE = this;
-        // System.out.println("Panel Activated");
-        ClassMemberNavigatorJavaFXSourceFactory.getInstance().setLookup(context, getClassMemberPanelUI());
-        getClassMemberPanelUI().showWaitNode();
+        final ClassMemberNavigatorJavaFXSourceFactory instance = ClassMemberNavigatorJavaFXSourceFactory.getInstance();
+        if (instance != null) {
+            instance.setLookup(context, getClassMemberPanelUI());
+            getClassMemberPanelUI().showWaitNode();
+        } else {
+            System.err.println("Can't instantiate ClassMemberNavigatorJavaFXSourceFactory ! No navigator will be available.");
+        }
     }
 
     public void panelDeactivated() {
