@@ -33,8 +33,8 @@ import javafx.scene.Node;
 import javafx.scene.CustomNode;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 

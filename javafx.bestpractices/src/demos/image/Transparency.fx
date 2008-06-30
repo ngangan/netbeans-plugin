@@ -32,8 +32,8 @@ package image;
 import javafx.input.MouseEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
 

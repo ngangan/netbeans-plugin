@@ -35,8 +35,8 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Arc;
 import javafx.scene.geometry.ArcType;
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 
 public class ColorWheel extends CustomNode {
     attribute segments : Number = 12;
