@@ -165,6 +165,7 @@
         </folder>
         
         <folder name="Colors">
+            <attr name="position" intvalue="600"/>            
             <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
             </file>
@@ -206,6 +207,7 @@
             </file>
         </folder>
         <folder name="Animation">
+            <attr name="position" intvalue="700"/>            
             <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
                 <attr name="position" intvalue="100"/>
             </file>
