@@ -44,6 +44,8 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import javax.lang.model.element.Element;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -61,6 +63,7 @@ import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.filesystems.FileObject;
 import org.openide.nodes.Node;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
@@ -146,18 +149,18 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         });
     }
 
-//    public void selectElementNode(ElementHandle<Element> eh) {
-//        ElementNode root = getRootNode();
-//        if (root == null) {
-//            return;
-//        }
-//        ElementNode node = root.getNodeForElement(eh);
-//        try {
-//            manager.setSelectedNodes(new Node[]{node == null ? getRootNode() : node});
-//        } catch (PropertyVetoException propertyVetoException) {
-//            Exceptions.printStackTrace(propertyVetoException);
-//        }
-//    }
+    public void selectElementNode(Element e) {
+        ElementNode root = getRootNode();
+        if (root == null) {
+            return;
+        }
+        ElementNode node = root.getNodeForElement(e);
+        try {
+            manager.setSelectedNodes(new Node[]{node == null ? getRootNode() : node});
+        } catch (PropertyVetoException propertyVetoException) {
+            Exceptions.printStackTrace(propertyVetoException);
+        }
+    }
 
     public void refresh(final Description description) {
 

@@ -41,71 +41,26 @@
 
 package org.netbeans.modules.javafx.navigation;
 
-import javax.lang.model.element.Element;
-import javax.swing.JComponent;
-import org.netbeans.spi.navigator.NavigatorPanel;
-import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
+import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.JavaFXSource.Priority;
+import org.netbeans.api.javafx.source.support.CaretAwareJavaSourceTaskFactory;
+import org.openide.filesystems.FileObject;
 
 /**
+ * This factory creates tasks sensitive to the caret position in open Java editor.
  *
- * @author Tomas Zezula
+ * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  */
-public class ClassMemberPanel implements NavigatorPanel {
-
-    private ClassMemberPanelUI component;
-
-    private static ClassMemberPanel INSTANCE;   //Always accessed in event dispatch thread
+public class CaretListeningFactory extends CaretAwareJavaSourceTaskFactory {
     
-    public ClassMemberPanel() {
+    public CaretListeningFactory() {
+        super(Phase.ELEMENTS_RESOLVED, Priority.LOW);
     }
 
-    public void panelActivated(Lookup context) {
-        assert context != null;
-        INSTANCE = this;
-        final ClassMemberNavigatorJavaFXSourceFactory instance = ClassMemberNavigatorJavaFXSourceFactory.getInstance();
-        if (instance != null) {
-            instance.setLookup(context, getClassMemberPanelUI());
-            getClassMemberPanelUI().showWaitNode();
-        } else {
-            System.err.println("Can't instantiate ClassMemberNavigatorJavaFXSourceFactory ! No navigator will be available.");
-        }
-    }
-
-    public void panelDeactivated() {
-        getClassMemberPanelUI().showWaitNode(); // To clear the ui
-        ClassMemberNavigatorJavaFXSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
-        INSTANCE = null;
-    }
-
-    public Lookup getLookup() {
-        return this.getClassMemberPanelUI().getLookup();
-    }
-
-    public String getDisplayName() {
-        return NbBundle.getMessage(ClassMemberPanel.class,"LBL_members");
-    }
-
-    public String getDisplayHint() {
-        return NbBundle.getMessage(ClassMemberPanel.class,"HINT_members");
-    }
-
-    public JComponent getComponent() {
-        return getClassMemberPanelUI();
-    }
-
-    public void selectElement(Element e) {
-        getClassMemberPanelUI().selectElementNode(e);
+    public CancellableTask<CompilationInfo> createTask(FileObject fileObject) {
+        return new CaretListeningTask(this, fileObject);
     }
     
-    private synchronized ClassMemberPanelUI getClassMemberPanelUI() {
-        if (this.component == null) {
-            this.component = new ClassMemberPanelUI();
-        }
-        return this.component;
-    }
-    
-    public static ClassMemberPanel getInstance() {
-        return INSTANCE;
-    }    
 }
