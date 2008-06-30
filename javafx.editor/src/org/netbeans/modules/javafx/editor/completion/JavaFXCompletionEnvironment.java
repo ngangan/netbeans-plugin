@@ -739,7 +739,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         JavafxcScope scope = trees.getScope(p);
         while (scope != null) {
             log("  scope == " + scope);
-            TypeElement res = findTypeElement(scope.getLocalElements(), simpleName);
+            TypeElement res = findTypeElement(scope.getLocalElements(), simpleName,null);
             if (res != null) {
                 return res;
             }
@@ -751,16 +751,18 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         if (e != null) {
             PackageElement pkge = (PackageElement)e;
-            return findTypeElement(getEnclosedElements(pkge), simpleName);
+            return findTypeElement(getEnclosedElements(pkge), simpleName,pkge);
         }
         return null;
     }
 
     /**
      * @param simpleName name of a class or fully qualified name of a class
+     * @param myPackage can be null - if not null the inner classes of classes from this package will be checked
      * @return TypeElement or null if the passed in String does not denote a class
      */
-    private TypeElement findTypeElement(Iterable<? extends Element> from, String simpleName) {
+    private TypeElement findTypeElement(Iterable<? extends Element> from, String simpleName,PackageElement myPackage) {
+        log("  private findTypeElement " + simpleName + " in package " + myPackage);
         Elements elements = controller.getElements();
         for (Element local : from) {
             log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
@@ -779,6 +781,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     String fullName = pe.getQualifiedName().toString() + '.' + name;
                     if (fullName.equals(simpleName)) {
                         return (TypeElement) local;
+                    }
+                    if (pe == myPackage) {
+                        log("   will check inner classes of: " + local);
+                        TypeElement res = findTypeElement(local.getEnclosedElements(), simpleName,null);
+                        if (res != null) {
+                            return res;
+                        }
                     }
                 }
             }
