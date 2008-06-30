@@ -205,7 +205,7 @@
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
-        <folder name="Timeline">
+        <folder name="Animation">
             <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
                 <attr name="position" intvalue="100"/>
             </file>
