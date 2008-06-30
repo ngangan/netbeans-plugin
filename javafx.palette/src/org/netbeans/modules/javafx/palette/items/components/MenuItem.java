@@ -59,7 +59,7 @@ public class MenuItem implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.swing.MenuItem" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.ext.swing.MenuItem" ); // NOI18N
         
         return true;
     }    

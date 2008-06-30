@@ -59,7 +59,7 @@ public class TextField implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.swing.TextField" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.ext.swing.TextField" ); // NOI18N
         
         return true;
     }    
