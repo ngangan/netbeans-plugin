@@ -32,8 +32,8 @@ package input;
 import javafx.input.MouseEvent;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 
 var gx : Number = 10;
 var gy : Number = 90;

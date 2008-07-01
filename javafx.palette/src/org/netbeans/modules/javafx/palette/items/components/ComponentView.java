@@ -59,7 +59,7 @@ public class ComponentView implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.swing.ComponentView" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.ext.swing.ComponentView" ); // NOI18N
         
         return true;
     }

@@ -29,8 +29,8 @@
 
 package math;
 
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
 import javafx.animation.Timeline;

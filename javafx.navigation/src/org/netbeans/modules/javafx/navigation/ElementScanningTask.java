@@ -221,6 +221,9 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
     }
 
     private void addMembers(final TypeElement e, final Description parentDescription, final CompilationInfo info, final Map<Element, Long> pos) {
+        if (e == null) {
+            return;
+        }
         List<? extends Element> members = info.getElements().getAllMembers(e);
         for (Element m : members) {
             if (canceled.get()) {

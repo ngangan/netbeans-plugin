@@ -78,38 +78,41 @@
         
         <folder name="Actions">
             <attr name="position" intvalue="300"/>
-            <file name="OnMouseMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseMoved.xml">
+            <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
                 <attr name="position" intvalue="100"/>
             </file>
-            <file name="OnMouseEntered.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseEntered.xml">
+            <file name="OnMouseMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseMoved.xml">
                 <attr name="position" intvalue="200"/>
             </file>
-            <file name="OnMouseExited.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseExited.xml">
+            <file name="OnMouseEntered.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseEntered.xml">
                 <attr name="position" intvalue="300"/>
             </file>
-            <file name="OnMouseClicked.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseClicked.xml">
+            <file name="OnMouseExited.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseExited.xml">
                 <attr name="position" intvalue="400"/>
             </file>
-            <file name="OnMousePressed.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMousePressed.xml">
+            <file name="OnMouseClicked.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseClicked.xml">
                 <attr name="position" intvalue="500"/>
             </file>
-            <file name="OnMouseReleased.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseReleased.xml">
+            <file name="OnMousePressed.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMousePressed.xml">
                 <attr name="position" intvalue="600"/>
             </file>
-            <file name="OnMouseDragged.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseDragged.xml">
+            <file name="OnMouseReleased.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseReleased.xml">
                 <attr name="position" intvalue="700"/>
             </file>
-            <file name="OnMouseWheelMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseWheelMoved.xml">
+            <file name="OnMouseDragged.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseDragged.xml">
                 <attr name="position" intvalue="800"/>
             </file>
-            <file name="OnKeyPressed.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyPressed.xml">
+            <file name="OnMouseWheelMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseWheelMoved.xml">
                 <attr name="position" intvalue="900"/>
             </file>
-            <file name="OnKeyReleased.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyReleased.xml">
+            <file name="OnKeyPressed.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyPressed.xml">
                 <attr name="position" intvalue="1000"/>
             </file>
-            <file name="OnKeyTyped.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyTyped.xml">
+            <file name="OnKeyReleased.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyReleased.xml">
                 <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="OnKeyTyped.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyTyped.xml">
+                <attr name="position" intvalue="1200"/>
             </file>
         </folder>
         
@@ -162,6 +165,7 @@
         </folder>
         
         <folder name="Colors">
+            <attr name="position" intvalue="600"/>            
             <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
             </file>
@@ -202,7 +206,8 @@
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
-        <folder name="Timeline">
+        <folder name="Animation">
+            <attr name="position" intvalue="700"/>            
             <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
                 <attr name="position" intvalue="100"/>
             </file>

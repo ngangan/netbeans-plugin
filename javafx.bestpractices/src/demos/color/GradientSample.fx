@@ -36,8 +36,8 @@ import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 import java.lang.System;
 
 var B1 = Color.rgb( 190, 190, 190 );

@@ -60,7 +60,7 @@ public class Application implements ActiveEditorDrop {
         
         // Imports
         Util.addImport( targetComponent, "javafx.application.Application" );
-        Util.addImport( targetComponent, "javafx.scene.swing.Canvas" );
+        Util.addImport( targetComponent, "javafx.ext.swing.Canvas" );
         return true;
     }
 }

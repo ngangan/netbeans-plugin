@@ -36,8 +36,8 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
-import javafx.scene.swing.Frame;
-import javafx.scene.swing.Canvas;
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
 
