@@ -176,13 +176,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return insideForEachExpressiion;
     }
 
-    /*
-     * Might be overriden in subclasses
-     */
-//    public Set<? extends TypeMirror> getSmartTypes(T t) throws IOException {
-//        log("NOT IMPLEMENTED getSmartTypes() " + this);
-//        return new HashSet<TypeMirror>();
-//    }
     /**
      * If the tree is broken we are in fact not in the compilation unit.
      * @param env
@@ -213,16 +206,18 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void insideExpression(TreePath exPath) throws IOException {
+        log("insideExpression " + exPath.getLeaf());
         Tree et = exPath.getLeaf();
         Tree parent = exPath.getParentPath().getLeaf();
         int endPos = (int) getSourcePositions().getEndPosition(root, et);
         if (endPos != Diagnostic.NOPOS && endPos < offset) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(endPos, offset);
+            log("  last: " + last);
             if (last != null) {
                 return;
             }
         }
-        log("NOT IMPLEMENTED: insideExpression " + exPath);
+        log("NOT IMPLEMENTED: insideExpression " + exPath.getLeaf());
 
     }
 
@@ -586,6 +581,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addMemberModifiers(Set<Modifier> modifiers, boolean isLocal) {
+        log("addMemberModifiers");
         List<String> kws = new ArrayList<String>();
         if (isLocal) {
         } else {
@@ -672,62 +668,112 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addPackages(pkgName);
     }
 
-//    private void addTypes(EnumSet<ElementKind> kinds, DeclaredType baseType, Set<? extends Element> toExclude, boolean insideNew) throws IOException {
-//        if (baseType == null) {
-//            addAllTypes(kinds, insideNew);
-//        } else {
-//            Elements elements = controller.getElements();
-//            for (DeclaredType subtype : getSubtypesOf(baseType)) {
-//                TypeElement elem = (TypeElement) subtype.asElement();
-//                addResult(JavaFXCompletionItem.createTypeItem(elem, subtype, offset, elements.isDeprecated(elem), insideNew, true));
-//            }
-//        }
-//        addLocalAndImportedTypes(kinds, baseType, toExclude, insideNew);
-//        addPackages(prefix);
-//    }
+    private void addBasicTypes(boolean insideNew) {
+        log("addBasicTypes " + insideNew);
+        addBasicType("Boolean", "boolean", insideNew);
+        addBasicType("Integer", "int", insideNew);
+        addBasicType("Number", "double", insideNew);
+        addBasicType("String", "String", insideNew);
+    }
 
+    private void addBasicType(String name1, String name2, boolean insideNew) {
+        log("  addBasicType " + name1 + " : " + name2);
+        JavafxcTrees trees = controller.getTrees();
+        TreePath p = new TreePath(root);
+        JavafxcScope scope = trees.getScope(p);
+        log("  scope == " + scope);
+        for (Element local : scope.getLocalElements()) {
+            log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
+            if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                if (! (local instanceof TypeElement)) {
+                    log("    " + local.getSimpleName() + " not TypeElement");
+                    continue;
+                }
+                TypeElement te = (TypeElement) local;
+                String name = local.getSimpleName().toString();
+                if (name.equals(name2)) {
+                    if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
+                        log("    found " + name1);
+                        if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                            addResult(JavaFXCompletionItem.createTypeItem(name1, offset, false, insideNew, false));
+                        } else {
+                            DeclaredType dt = (DeclaredType) local.asType();
+                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, false, insideNew, false));
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) throws IOException {
+        addBasicTypes(insideNew);
         log("addLocalAndImportedTypes");
-        final Elements elements = controller.getElements();
-//        final Types types = controller.getTypes();
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
         JavafxcScope originalScope = scope;
         while (scope != null) {
             log("  scope == " + scope);
-            for (Element local : scope.getLocalElements()) {
-                log("    local == " + local);
-                if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
-                    if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+            addLocalAndImportedTypes(scope.getLocalElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,false);
+            scope = scope.getEnclosingScope();
+        }
+        Element e = trees.getElement(p);
+        while (e != null && e.getKind() != ElementKind.PACKAGE) {
+            e = e.getEnclosingElement();
+        }
+        if (e != null) {
+            log("will scan package " + e.getSimpleName());
+            PackageElement pkge = (PackageElement)e;
+            addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
+        }
+    }
+    
+    private void addLocalAndImportedTypes(Iterable<? extends Element> from,
+            final EnumSet<ElementKind> kinds, final DeclaredType baseType, 
+            final Set<? extends Element> toExclude,
+            boolean insideNew, TypeMirror smart, JavafxcScope originalScope,
+            PackageElement myPackage,boolean simpleNameOnly) throws IOException {
+        final Elements elements = controller.getElements();
+        JavafxcTrees trees = controller.getTrees();
+        for (Element local : from) {
+            log("    local == " + local);
+            if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                    continue;
+                }
+                DeclaredType dt = (DeclaredType) local.asType();
+                TypeElement te = (TypeElement) local;
+                String name = local.getSimpleName().toString();
+                if (!trees.isAccessible(originalScope, te)) {
+                    log("    not accessible " + name);
+                    continue;
+                }
+                Element parent = te.getEnclosingElement();
+                if (parent.getKind() == ElementKind.CLASS) {
+                    if (!trees.isAccessible(originalScope, (TypeElement) parent)) {
+                        log("    parent not accessible " + name);
                         continue;
                     }
-                    DeclaredType dt = (DeclaredType) local.asType();
-                    TypeElement te = (TypeElement) local;
-                    String name = local.getSimpleName().toString();
-                    if (!trees.isAccessible(originalScope, te)) {
-                        log("    not accessible " + name);
-                        continue;
-                    }
-                    Element parent = te.getEnclosingElement();
-                    if (parent.getKind() == ElementKind.CLASS) {
-                        if (!trees.isAccessible(originalScope, (TypeElement) parent)) {
-                            log("    parent not accessible " + name);
-                            continue;
-                        }
-                    }
-                    if (smart != null && local.asType() == smart) {
-                        addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, elements.isDeprecated(local), insideNew, true));
-                    }
-                    if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) {
+                }
+                if (smart != null && local.asType() == smart) {
+                    addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, elements.isDeprecated(local), insideNew, true));
+                }
+                if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) {
+                    if (simpleNameOnly) {
+                        addResult(JavaFXCompletionItem.createTypeItem(local.getSimpleName().toString(), offset, elements.isDeprecated(local), insideNew, false));
+                    } else {
                         addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, elements.isDeprecated(local), insideNew, false));
                     }
                 }
+                if (parent == myPackage) {
+                   log("   will check inner classes of: " + local);
+                    addLocalAndImportedTypes(local.getEnclosedElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,true);
+                }
             }
-            scope = scope.getEnclosingScope();
         }
     }
-
     /**
      * @param simpleName name of a class or fully qualified name of a class
      * @return TypeElement or null if the passed in String does not denote a class

@@ -138,6 +138,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 throw new IllegalArgumentException("kind=" + elem.getKind());
         }
     }
+    public static final JavaFXCompletionItem createTypeItem(String name,  int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
+        return new ClassItem(name, 0, substitutionOffset, isDeprecated, insideNew, smartType);
+    }
 
     protected JavaFXCompletionItem(int substitutionOffset) {
         this.substitutionOffset = substitutionOffset;
@@ -950,15 +953,31 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private CharSequence sortText;
         private String leftText;
         private DeclaredType type;
-        
-        private ClassItem(TypeElement elem, DeclaredType type, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
+        private TypeElement elem;
+
+        private ClassItem(String name, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
             super(substitutionOffset);
             this.dim = dim;
             this.isDeprecated = isDeprecated;
             this.insideNew = insideNew;
             this.smartType = smartType;
+            this.simpleName = name;
+            this.typeName = name;
+            this.sortText = this.simpleName;
+        }
+        
+        private ClassItem(TypeElement elem, DeclaredType type, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
+            super(substitutionOffset);
+            this.dim = dim;
+            this.elem = elem;
+            this.isDeprecated = isDeprecated;
+            this.insideNew = insideNew;
+            this.smartType = smartType;
             this.simpleName = elem.getSimpleName().toString();
-            this.typeName = type != null ? type.toString() : null;
+            if (type != null) {
+                TypeElement te = (TypeElement)type.asElement();
+                this.typeName = te.getQualifiedName().toString();
+            }
             this.type = type;
             this.sortText = this.simpleName;
         }
@@ -1080,72 +1099,24 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
                     public void run(CompilationController controller) throws IOException {
                         controller.toPhase(Phase.ANALYZED);
-                        TypeElement elem = (TypeElement)type.asElement();
+                        TypeElement eleme = elem;
+                        if (type != null) {
+                            eleme = (TypeElement)type.asElement();
+                        }
                         boolean asTemplate = false;
                         StringBuilder sb = new StringBuilder();
                         int cnt = 1;
                         sb.append("${PAR"); //NOI18N
                         sb.append(cnt++);
-                        if ((type == null || type.getKind() != TypeKind.ERROR) &&
-                                EnumSet.range(ElementKind.PACKAGE, ElementKind.INTERFACE).contains(elem.getEnclosingElement().getKind())) {
-                            sb.append(" type=\""); //NOI18N
-                            sb.append(elem.getQualifiedName());
-                            sb.append("\" default=\""); //NOI18N
-                            sb.append(elem.getSimpleName());
+                        
+                        sb.append(" default=\""); //NOI18N
+                        if (eleme != null) {
+                            sb.append(eleme.getQualifiedName());
                         } else {
-                            sb.append(" default=\""); //NOI18N
-                            sb.append(elem.getQualifiedName());
+                            sb.append(simpleName);
                         }
+                            
                         sb.append("\" editable=false}"); //NOI18N
-                        Iterator<? extends TypeMirror> tas = type != null ? type.getTypeArguments().iterator() : null;
-                        if (tas != null && tas.hasNext()) {
-                            sb.append('<'); //NOI18N
-                            while (tas.hasNext()) {
-                                TypeMirror ta = tas.next();
-                                sb.append("${PAR"); //NOI18N
-                                sb.append(cnt++);
-                                if (ta.getKind() == TypeKind.TYPEVAR) {
-                                    TypeVariable tv = (TypeVariable)ta;
-                                    if (elem == tv.asElement().getEnclosingElement()) {
-                                        sb.append(" type=\""); //NOI18N
-                                        ta = tv.getUpperBound();
-                                        sb.append(ta.toString());
-                                        sb.append("\" default=\""); //NOI18N
-                                        sb.append(ta.toString());
-                                    } else {
-                                        sb.append(" editable=false default=\""); //NOI18N
-                                        sb.append(ta.toString());
-                                        asTemplate = true;
-                                    }
-                                    sb.append("\"}"); //NOI18N
-                                } else if (ta.getKind() == TypeKind.WILDCARD) {
-                                    sb.append(" type=\""); //NOI18N
-                                    TypeMirror bound = ((WildcardType)ta).getExtendsBound();
-                                    if (bound == null)
-                                        bound = ((WildcardType)ta).getSuperBound();
-                                    sb.append(bound != null ? bound.toString() : "Object"); //NOI18N
-                                    sb.append("\" default=\""); //NOI18N
-                                    sb.append(bound != null ? bound.toString() : "Object"); //NOI18N
-                                    sb.append("\"}"); //NOI18N
-                                    asTemplate = true;
-                                } else if (ta.getKind() == TypeKind.ERROR) {
-                                    sb.append(" default=\""); //NOI18N
-                                    sb.append(((ErrorType)ta).asElement().getSimpleName());
-                                    sb.append("\"}"); //NOI18N
-                                    asTemplate = true;
-                                } else {
-                                    sb.append(" type=\""); //NOI18N
-                                    sb.append(ta.toString());
-                                    sb.append("\" default=\""); //NOI18N
-                                    sb.append(ta.toString());
-                                    sb.append("\" editable=false}"); //NOI18N
-                                    asTemplate = true;
-                                }
-                                if (tas.hasNext())
-                                    sb.append(", "); //NOI18N
-                            }
-                            sb.append('>'); //NOI18N
-                        }
                         for(int i = 0; i < dim; i++) {
                             sb.append("[${PAR"); //NOI18N
                             sb.append(cnt++);
@@ -1174,9 +1145,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                             try {
                                 Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
                                 TreePath tp = controller.getTreeUtilities().pathFor(offset);
-                                CharSequence cs = elem.getSimpleName(); 
-                                if (elem.getEnclosingElement().getKind() == ElementKind.CLASS) {
-                                    cs = elem.getEnclosingElement().getSimpleName() + "." + elem.getSimpleName();
+                                CharSequence cs = simpleName;
+                                if (eleme != null) {
+                                    cs = eleme.getSimpleName(); 
+                                    if (eleme.getEnclosingElement().getKind() == ElementKind.CLASS) {
+                                        cs = eleme.getEnclosingElement().getSimpleName() + "." + eleme.getSimpleName();
+                                    }
                                 }
                                 if (!insideNew)
                                     cs = text.insert(0, cs);
@@ -1196,24 +1170,20 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                 JavafxcTrees trees = controller.getTrees();
                                 Scope scope = controller.getTreeUtilities().scopeFor(offset);
                                 int val = 0; // no constructors seen yet
-                                for (ExecutableElement ee : ElementFilter.constructorsIn(elem.getEnclosedElements())) {
-                                    if (trees.isAccessible(scope, ee, type)) {
-                                        if (ctor != null) {
-                                            val = 2; // more than one accessible constructors seen
-                                            break;
+                                if (eleme != null) {
+                                    for (ExecutableElement ee : ElementFilter.constructorsIn(eleme.getEnclosedElements())) {
+                                        if (trees.isAccessible(scope, ee, type)) {
+                                            if (ctor != null) {
+                                                val = 2; // more than one accessible constructors seen
+                                                break;
+                                            }
+                                            ctor = ee;
                                         }
-                                        ctor = ee;
+                                        val = 1; // constructor seen
                                     }
-                                    val = 1; // constructor seen
                                 }
                                 if (val != 1 || ctor != null) {
                                     final JavaFXCompletionItem item = null;
-                                    
-                                    // TODO:
-//                                            val == 0 ? 
-//                                                createDefaultConstructorItem(elem, offset, true) :
-//                                                val == 2 || Utilities.hasAccessibleInnerClassConstructor(elem, scope, trees) ? 
-//                                                    null : createExecutableItem(ctor, (ExecutableType)controller.getTypes().asMemberOf(type, ctor), offset, false, false, false, true);
                                     try {
                                         final Position offPosition = doc.createPosition(offset);
                                         SwingUtilities.invokeLater(new Runnable() {
