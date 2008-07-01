@@ -30,9 +30,14 @@
 
 package weatherfx;
 
+import javafx.scene.Group;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.Transform;
+
+import javafx.ext.swing.Frame;
+import javafx.ext.swing.Canvas;
 
 import java.lang.*;
-import javafx.gui.*;
 import weatherfx.service.YahooWeatherService;
 
 /**

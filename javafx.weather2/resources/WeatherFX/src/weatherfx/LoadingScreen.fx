@@ -30,8 +30,22 @@
 
 package weatherfx;
 
-
-import javafx.gui.*;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.Font;
+import javafx.scene.FontStyle;
+import javafx.scene.geometry.CurveTo;
+import javafx.scene.geometry.MoveTo;
+import javafx.scene.geometry.LineTo;
+import javafx.scene.geometry.Path;
+import javafx.scene.geometry.ClosePath;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextOrigin;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.transform.Affine;
 
 
 /**
@@ -93,12 +107,12 @@ public class LoadingScreen extends CustomNode  {
                             absolute: true
                         },
                         CurveTo {
-                            x1: 0.0
-                            y1: 3.907
-                            x2: -1.516
-                            y2: 7.076
-                            x3: -3.383
-                            y3: 7.076
+                            controlX1: 0.0
+                            controlY1: 3.907
+                            controlX2: -1.516
+                            controlY2: 7.076
+                            x: -3.383
+                            y: 7.076
                             //smooth: false
                             absolute: false
                         },
@@ -107,12 +121,12 @@ public class LoadingScreen extends CustomNode  {
                             absolute: false
                         },
                         CurveTo {
-                            x1: -1.871
-                            y1: 0.0
-                            x2: -3.387
-                            y2: -3.169
-                            x3: -3.387
-                            y3: -7.076
+                            controlX1: -1.871
+                            controlY1: 0.0
+                            controlX2: -3.387
+                            controlY2: -3.169
+                            x: -3.387
+                            y: -7.076
                             //smooth: false
                             absolute: false
                         },
@@ -121,12 +135,12 @@ public class LoadingScreen extends CustomNode  {
                             absolute: false
                         },
                         CurveTo {
-                            x1: 0.5
-                            y1: 3.667
-                            x2: 2.016
-                            y2: 0.5
-                            x3: 3.887
-                            y3: 0.5
+                            controlX1: 0.5
+                            controlY1: 3.667
+                            controlX2: 2.016
+                            controlY2: 0.5
+                            x: 3.887
+                            y: 0.5
                             //smooth: false
                             absolute: true
                         },
@@ -135,12 +149,12 @@ public class LoadingScreen extends CustomNode  {
                             absolute: false
                         },
                         CurveTo {
-                            x1: 1.867
-                            y1: 0.0
-                            x2: 3.383
-                            y2: 3.167
-                            x3: 3.383
-                            y3: 7.076
+                            controlX1: 1.867
+                            controlY1: 0.0
+                            controlX2: 3.383
+                            controlY2: 3.167
+                            x: 3.383
+                            y: 7.076
                             //smooth: false
                             absolute: false
                         },

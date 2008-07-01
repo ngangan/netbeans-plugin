@@ -29,9 +29,39 @@
 
 package weatherfx;
 
-import javafx.gui.*;
-import javafx.gui.effect.*;
+import javafx.scene.Node;
+import javafx.scene.CustomNode;
+import javafx.scene.Group;
+import javafx.scene.Font;
+import javafx.scene.FontStyle;
+import javafx.scene.HorizontalAlignment;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.geometry.Shape;
+import javafx.scene.geometry.Circle;
+import javafx.scene.geometry.Line;
+import javafx.scene.geometry.Rectangle;
+import javafx.scene.geometry.Path;
+import javafx.scene.geometry.MoveTo;
+import javafx.scene.geometry.CurveTo;
+import javafx.scene.geometry.LineTo;
+import javafx.scene.geometry.ClosePath;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextOrigin;
+import javafx.scene.transform.Affine;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.animation.*;
+
+import javafx.ext.swing.Canvas;
+
 import java.lang.System;
 
 /**
@@ -320,12 +350,12 @@ public class Weather extends CustomNode {
                         absolute: true
                         },
                     CurveTo {
-                        x1: 0.0
-                        y1: 3.907
-                        x2: -1.516
-                        y2: 7.076
-                        x3: -3.383
-                        y3: 7.076
+                        controlX1: 0.0
+                        controlY1: 3.907
+                        controlX2: -1.516
+                        controlY2: 7.076
+                        x: -3.383
+                        y: 7.076
                         //smooth: false
                         absolute: false
                         },
@@ -336,12 +366,12 @@ public class Weather extends CustomNode {
                         absolute: false
                         },
                     CurveTo {
-                        x1: -1.871
-                        y1: 0.0
-                        x2: -3.387
-                        y2: -3.169
-                        x3: -3.387
-                        y3: -7.076
+                        controlX1: -1.871
+                        controlY1: 0.0
+                        controlX2: -3.387
+                        controlY2: -3.169
+                        x: -3.387
+                        y: -7.076
                         //smooth: false
                         absolute: false
                         },
@@ -350,12 +380,12 @@ public class Weather extends CustomNode {
                         absolute: false
                         },
                     CurveTo {
-                        x1: 0.0
-                        y1: -3.908
-                        x2: 1.516
-                        y2: -7.076
-                        x3: 3.387
-                        y3: -7.076
+                        controlX1: 0.0
+                        controlY1: -3.908
+                        controlX2: 1.516
+                        controlY2: -7.076
+                        x: 3.387
+                        y: -7.076
                         //smooth: false
                         absolute: false
                         },
@@ -364,12 +394,12 @@ public class Weather extends CustomNode {
                         absolute: false
                         },
                     CurveTo {
-                        x1: 1.867
-                        y1: 0.0
-                        x2: 3.383
-                        y2: 3.167
-                        x3: 3.383
-                        y3: 7.076
+                        controlX1: 1.867
+                        controlY1: 0.0
+                        controlX2: 3.383
+                        controlY2: 3.167
+                        x: 3.383
+                        y: 7.076
                         //smooth: false
                         absolute: false
                         },
@@ -480,12 +510,12 @@ public class Weather extends CustomNode {
                         absolute: true
                         },
                     CurveTo {
-                        x1: 0.0
-                        y1: 3.907
-                        x2: -1.516
-                        y2: 7.076
-                        x3: -3.383
-                        y3: 7.076
+                        controlX1: 0.0
+                        controlY1: 3.907
+                        controlX2: -1.516
+                        controlY2: 7.076
+                        x: -3.383
+                        y: 7.076
                         //smooth: false
                         absolute: false
                         },
@@ -494,12 +524,12 @@ public class Weather extends CustomNode {
                         absolute: false
                         },
                     CurveTo {
-                        x1: -1.871
-                        y1: 0.0
-                        x2: -3.387
-                        y2: -3.169
-                        x3: -3.387
-                        y3: -7.076
+                        controlX1: -1.871
+                        controlY1: 0.0
+                        controlX2: -3.387
+                        controlY2: -3.169
+                        x: -3.387
+                        y: -7.076
                         //smooth: false
                         absolute: false
                         },
@@ -508,12 +538,12 @@ public class Weather extends CustomNode {
                         absolute: false
                         },
                     CurveTo {
-                        x1: 0.0
-                        y1: -3.908
-                        x2: 1.516
-                        y2: -7.076
-                        x3: 3.387
-                        y3: -7.076
+                        controlX1: 0.0
+                        controlY1: -3.908
+                        controlX2: 1.516
+                        controlY2: -7.076
+                        x: 3.387
+                        y: -7.076
                         //smooth: false
                         absolute: false
                         },
@@ -522,12 +552,12 @@ public class Weather extends CustomNode {
                         absolute: false
                         },
                     CurveTo {
-                        x1: 1.867
-                        y1: 0.0
-                        x2: 3.383
-                        y2: 3.167
-                        x3: 3.383
-                        y3: 7.076
+                        controlX1: 1.867
+                        controlY1: 0.0
+                        controlX2: 3.383
+                        controlY2: 3.167
+                        x: 3.383
+                        y: 7.076
                         //smooth: false
                         absolute: false
                         },/*
@@ -707,27 +737,27 @@ public class Weather extends CustomNode {
                 Line {
                     opacity: bind tomorrowNodesOpacity
                     stroke: rgba(0x00, 0x00, 0x00, 0xff)
-                    x1: 0
-                    x2: 90.369            
-                    y1: 128.248
-                    y2: 128.248
+                    startX: 0
+                    endX: 90.369            
+                    startY: 128.248
+                    endY: 128.248
                     },
 
                 Line {
                     opacity: bind todayNodesOpacity
                     stroke: rgba(0x00, 0x00, 0x00, 0xff)
-                    x1: 90.369
-                    x2: 233.345
-                    y1: 128.248
-                    y2: 128.248
+                    startX: 90.369
+                    endX: 233.345
+                    startY: 128.248
+                    endY: 128.248
                     },
 
                 Line {
                     stroke: rgba(0x00, 0x00, 0x00, 0xff)
-                    x1: 90.369
-                    x2: 90.369
-                    y1: 140.546
-                    y2: 128.248
+                    startX: 90.369
+                    endX: 90.369
+                    startY: 140.546
+                    endY: 128.248
                     },
 
                 // city name
@@ -816,18 +846,6 @@ public class Weather extends CustomNode {
     
 }
 
-
-/*
-
-
-trigger on Weather.weatherModel[oldValue] = newValue {
-    loadingScreenOpacity = [1.0,0.99..0.0] dur 1000;
-    weatherScreenOpacity = [0.0,0.01..1.0] dur 1000;
-}*/
-
-
-
-
 var weatherModel = WeatherModel {
     cityName: "San Francisco"
     temperature: 45
@@ -846,6 +864,3 @@ var weather = Weather{
 Canvas {
    content: weather
 }
-
-
-
