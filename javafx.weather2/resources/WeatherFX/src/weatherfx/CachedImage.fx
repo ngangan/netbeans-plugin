@@ -29,7 +29,7 @@
 
 package weatherfx;
 
-import javafx.gui.*;
+import javafx.scene.image.*;
 import java.lang.*;
 import javafx.lang.*;
 

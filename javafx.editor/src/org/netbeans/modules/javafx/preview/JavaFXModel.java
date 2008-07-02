@@ -80,6 +80,7 @@ public class JavaFXModel {
     private static ChangeThread changeThread = null;
     private static long lastVisitTime = 0;
     private static Map <Project, Map <String, byte[]>> projectsClassBytes = null;
+    private static Object projectsClassBytesLock = new Object();
     
     static{
         initFX();
@@ -91,11 +92,15 @@ public class JavaFXModel {
                 Project projects[] = OpenProjects.getDefault().getOpenProjects();
                 ArrayList<Project> projectArray = new ArrayList<Project>();
                 Collections.addAll(projectArray, projects);
-                synchronized (projectsClassBytes) {
-                    for (Object project : projectsClassBytes.keySet()) {
-                        if (!projectArray.contains((Project)project)) {
-                            projectsClassBytes.remove(project);
+                synchronized (projectsClassBytesLock) {
+                    ArrayList<Project> removedProjects = new ArrayList<Project>();
+                    for (Project project : projectsClassBytes.keySet()) {
+                        if (!projectArray.contains(project)) {
+                            removedProjects.add(project);
                         }
+                    }
+                    for (Project project : removedProjects) {
+                        projectsClassBytes.remove(project);
                     }
                 }
             }
@@ -109,7 +114,7 @@ public class JavaFXModel {
         }
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().contentEquals("platform.active")) {                             // NOI18N
-                synchronized (projectsClassBytes) {
+                synchronized (projectsClassBytesLock) {
                     projectsClassBytes.remove(project);
                     if (project instanceof JavaFXProject) {
                         PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
@@ -122,7 +127,7 @@ public class JavaFXModel {
     
     
     static public void addClassBytes(Project project, Map<String, byte[]> classBytes) {
-        synchronized (projectsClassBytes) {
+        synchronized (projectsClassBytesLock) {
             Map <String, byte[]> classBytesForProj = projectsClassBytes.get(project);
             if (classBytesForProj == null) {
                 classBytesForProj = new HashMap <String, byte[]>();
@@ -138,7 +143,7 @@ public class JavaFXModel {
     }
     
     static public void putClassBytes(Project project, Map<String, byte[]> classBytes) {
-        synchronized (projectsClassBytes) {
+        synchronized (projectsClassBytesLock) {
             Map <String, byte[]> classBytesForProj = projectsClassBytes.get(project);
             if (classBytesForProj == null) {
                 classBytesForProj = new HashMap <String, byte[]>();
@@ -156,7 +161,7 @@ public class JavaFXModel {
     }
     
     static public Map<String, byte[]> getClassBytes(Project project) {
-        synchronized (projectsClassBytes) {
+        synchronized (projectsClassBytesLock) {
             Map<String, byte[]> classBytes = projectsClassBytes.get(project);
             if (classBytes != null)
                 return classBytes;

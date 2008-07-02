@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -55,7 +56,13 @@ import javax.swing.text.JTextComponent;
 public class Util {
 
     public static void addImport( final JTextComponent targetComponent, final String im ) {
-        String doc = targetComponent.getText();
+        String doc = null;
+        try {
+            doc = targetComponent.getDocument().getText(0, targetComponent.getDocument().getEndPosition().getOffset());
+        } catch (BadLocationException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        if( doc == null ) return;
         
         Pattern packagePattern = Pattern.compile( "package [a-zA-Z0-9_.]+;" );
         Pattern importPattern = Pattern.compile( "import [a-zA-Z0-9_.*]+;" );

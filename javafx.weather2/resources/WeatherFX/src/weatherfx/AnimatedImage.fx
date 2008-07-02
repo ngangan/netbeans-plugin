@@ -26,15 +26,11 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-/*
- * AnimatedImage.fx
- * 
- * Created on Oct 8, 2007, 11:54:12 AM
- */
-
+ 
 package weatherfx;
 
-import javafx.gui.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.animation.*;
 import java.lang.*;
 
