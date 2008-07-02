@@ -93,27 +93,32 @@ public class MirroringPanel extends JPanel {
                ComponentPeer proxyInstPeer;
                public void addNotify() {
                     super.addNotify();
-                    replacePeer();
+                    if (!replacePeer()) setLocation(-2000, -2000);
                }
-               void replacePeer() {
+               boolean replacePeer() {
                     origDialogPeer = getPeer();
+                    if (origDialogPeer.getClass().toString().startsWith("apple")) return false;
 
                     InvocationHandler handler = new InvocationHandler() {
                         public Object invoke(Object proxy, Method method, Object[] args) {
                             if (method.getName().contentEquals(SHOW)) {
                                 return null;
                             }
-
+                            
                             Object ret = null;
                             try {
                                 ret = method.invoke(origDialogPeer, args);
                             } catch (Exception ex) {
-                                ex.printStackTrace();
+                                // Linux problems
+                                if (method.getName().contentEquals("requestFocus"))
+                                   ret = true;
+                                else
+                                    ex.printStackTrace();
                             }
                             return ret;
                         }
                     };
-
+ 
                     proxyInstPeer = (DialogPeer)Proxy.newProxyInstance(
                         DialogPeer.class.getClassLoader(), new Class[] {DialogPeer.class}, handler);
 
@@ -124,7 +129,8 @@ public class MirroringPanel extends JPanel {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-                } 
+                    return true;
+                }; 
             };
 
             mirroredFrame.setUndecorated(true);
