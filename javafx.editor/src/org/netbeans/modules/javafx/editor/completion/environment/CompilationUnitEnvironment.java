@@ -60,10 +60,6 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Comp
     @Override
     protected void inside(CompilationUnitTree t) throws IOException {
         log("inside JFXFunctionDefinition " + t);
-        if (isTreeBroken()) {
-            // don't do anything in this case
-            return;
-        }
         Tree pkg = root.getPackageName();
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {
             addKeywordsForCU();

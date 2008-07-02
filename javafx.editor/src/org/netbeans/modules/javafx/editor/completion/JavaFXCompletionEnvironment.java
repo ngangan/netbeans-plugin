@@ -70,11 +70,14 @@ import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,11 +94,20 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.swing.text.BadLocationException;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.editor.indent.api.IndentUtils;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileSystem;
+import org.openide.filesystems.FileUtil;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
@@ -904,6 +916,79 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
         return null;
+    }
+    
+    /**
+     * We don't have an AST - let's try some heuristics
+     */
+    void useCrystalBall() {
+        try {
+            int lineStart = IndentUtils.lineStartOffset(controller.getJavaFXSource().getDocument(), offset);
+            log("useCrystalBall lineStart " + lineStart + " offset " + offset);
+            TokenSequence<JFXTokenId> ts = findFirstNonWhitespaceToken(lineStart, offset);
+            if (ts == null) {
+                log("sorry");
+                return;
+            }
+            log("  first == " + ts.token().id() + " at " + ts.offset());
+            if (ts.token().id() == JFXTokenId.IMPORT) {
+                int count = ts.offset();
+                char[] chars = new char[count];
+                while (count>0) chars[--count] = ' ';
+                String helper = new String(chars);
+                String next = ts.token().text().toString();
+                while (ts.offset() < offset && ts.moveNext()) {
+                    log("Watching : " + ts.token().id() + " " + ts.token().text().toString());
+                    helper += next;
+                    next = ts.token().text().toString();
+                    log("helper == " + helper);
+                }
+                helper += "*;";
+                log("Helper prepared: " + helper);
+                useFakeSource(helper, helper.length()-2);
+            }
+        } catch (BadLocationException ex) {
+            if (LOGGABLE) {
+                logger.log(Level.FINE,"Crystal ball failed: ",ex);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param source
+     */
+    private void useFakeSource(String source, final int pos) {
+        log("useFakeSource " + source + " pos == " + pos);
+        try {
+            FileSystem fs = FileUtil.createMemoryFileSystem();
+            FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
+            Writer w = new OutputStreamWriter(fo.getOutputStream());
+            w.write(source);
+            w.close();
+            log("  source written to " + fo);
+            ClasspathInfo info = ClasspathInfo.create(controller.getFileObject());
+            JavaFXSource s = JavaFXSource.create(info,Collections.singleton(fo));
+            log("  jfxsource obtained " + s);
+            s.runWhenScanFinished(new Task<CompilationController>() {
+                public void run(CompilationController fakeController) throws Exception {
+                    log("    scan finished");
+                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos);
+                    log("    env == " + env);
+                    fakeController.toPhase(Phase.ANALYZED);
+                    log("    fake analyzed");
+                    if (! env.isTreeBroken()) {
+                        log("    fake non-broken tree");
+                        final Tree leaf = env.getPath().getLeaf();
+                        env.inside(leaf);
+                    } 
+                }
+            },true);
+        } catch (IOException ex) {
+            if (LOGGABLE) {
+                logger.log(Level.FINE,"useFakeSource failed: ",ex);
+            }
+        }
     }
 
     protected static TokenSequence<JFXTokenId> nextNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
