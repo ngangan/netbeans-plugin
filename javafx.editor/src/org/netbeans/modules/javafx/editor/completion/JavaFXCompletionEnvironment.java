@@ -73,6 +73,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -96,8 +97,10 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.swing.text.BadLocationException;
 import javax.tools.Diagnostic;
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
@@ -453,7 +456,47 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addPackages(String fqnPrefix) {
-        log("NOT IMPLEMENTED: addPackages " + fqnPrefix);
+        log("addPackages " + fqnPrefix);
+        JavaFXSource js = controller.getJavaFXSource();
+        
+        ClasspathInfo info = js.getCpInfo();
+        ArrayList<FileObject> fos = new ArrayList<FileObject>();
+        ClassPath cp = info.getClassPath(PathKind.SOURCE);
+        fos.addAll(Arrays.asList(cp.getRoots()));
+        cp = info.getClassPath(PathKind.COMPILE);
+        fos.addAll(Arrays.asList(cp.getRoots()));
+        cp = info.getClassPath(PathKind.BOOT);
+        fos.addAll(Arrays.asList(cp.getRoots()));
+        String pr = "";
+        if (fqnPrefix.lastIndexOf('.') >= 0) {
+            pr = fqnPrefix.substring(0, fqnPrefix.lastIndexOf('.'));
+        }
+        log("  pr == " + pr);
+        for (String name : pr.split("\\.")) {
+            ArrayList<FileObject> newFos = new ArrayList<FileObject>();
+            log("  traversing to " + name);
+            for (FileObject f : fos) {
+                if (f.isFolder()) {
+                    FileObject child = f.getFileObject(name);
+                    if (child != null) {
+                        newFos.add(child);
+                    }
+                }
+            }
+            log("  replacing " + fos + "\n   with " + newFos);
+            fos = newFos;
+        }
+        for (FileObject fo : fos) {
+            if (fo.isFolder()) {
+                for (FileObject child : fo.getChildren()) {
+                    if (child.isFolder()) {
+                        log(" found : " + child);
+                        String s = child.getPath().replace('/', '.');
+                        addResult(JavaFXCompletionItem.createPackageItem(s, offset, false));
+                    }
+                }
+            }
+        }
     }
 
     protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) throws IOException {
@@ -945,7 +988,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
                 helper += "*;";
                 log("Helper prepared: " + helper);
-                useFakeSource(helper, helper.length()-2);
+                if (!helper.endsWith("import *;")) {
+                    useFakeSource(helper, helper.length()-2);
+                } else {
+                    addPackages("");
+                }
             }
         } catch (BadLocationException ex) {
             if (LOGGABLE) {
