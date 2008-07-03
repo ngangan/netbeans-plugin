@@ -60,6 +60,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -87,7 +88,8 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     private JScrollPane scroll = null;
     private static final JPanel nothingPanel = getSloganPanel(loadIcon("org/netbeans/modules/javafx/editor/resources/blank.png"), "Nothing to show...");;
     private static final JPanel compilePanel = getSloganPanel(loadIcon("org/netbeans/modules/javafx/editor/resources/clock.gif"), "Compile...");;
-
+    private static final JPanel runtimeErrorPanel = getSloganPanel(loadIcon("org/netbeans/modules/javafx/editor/resources/error.gif"), "Unexpected runtime errors...");;
+    private static final String vrongJavaVersion = "Please, use version 1.6 of Java to enable Preview. Current version is: ";   // NOI18N
     boolean executionEnabled = false;
     boolean errorAndSyntaxEnabled = false;
     
@@ -209,6 +211,17 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     
     public static JPanel getNothingPane() {
         return nothingPanel;
+    }
+    
+    public static JPanel getErrorPane() {
+        return runtimeErrorPanel;
+    }
+
+    public static JComponent getVrongVersion() {
+        JTextArea jta = new JTextArea();
+        jta.setForeground(Color.decode("#a40000"));
+        jta.append(vrongJavaVersion + System.getProperty("java.runtime.version"));
+        return jta;
     }
     
     static public JPanel getSloganPanel(ImageIcon icon, String text) {

@@ -47,8 +47,8 @@ import org.netbeans.api.project.Project;
 public class CodeManager {
     private static final String[] getComponentNames = {"getComponent", "getJComponent"};                     // NOI18N
     private static final String[] frameNames = {"frame", "window"};                                          // NOI18N
-    private static final String[] dialogNames = {"jdialog", "jDialog"};                                          // NOI18N
-    private static final String[] getVisualNodeNames = {"getVisualNode", "getSGNode"};                       // NOI18N
+    private static final String[] dialogNames = {"jdialog", "jDialog"};                                      // NOI18N
+    private static final String[] getVisualNodeNames = {"getVisualNode", "getSGNode", "impl_getSGNode"};     // NOI18N
     
     private static final String secuencesClassName = "com.sun.javafx.runtime.sequence.Sequences";            // NOI18N
     private static final String secuenceClassName = "com.sun.javafx.runtime.sequence.Sequence";              // NOI18N
@@ -191,7 +191,7 @@ public class CodeManager {
         memoryClassLoader.loadMap(classBytes);
         return run(name, memoryClassLoader);
     }
-    
+
     private static Object run(String name, ClassLoader classLoader) throws Exception {
         Class<?> mainClass = classLoader.loadClass(name); 
         Class<?> paramClass = classLoader.loadClass(secuenceClassName); 

@@ -80,8 +80,6 @@ import org.openide.text.NbDocument;
         
 public class PreviewThread extends Thread {
     
-    static final String nothingToShow = "Nothing to show...";                                                                   //NOI18
-    private static final String vrongJavaVersion = "Please, use version 1.6 of Java to enable Preview. Current version is: ";   // NOI18N
     JPanel contentPanel = null;
     
     private class Hyperlink implements HyperlinkListener {
@@ -141,7 +139,7 @@ public class PreviewThread extends Thread {
         List <Window> initialList = getOwnerlessWindowsList();
 
         if (!checkJavaVersion()) {
-            comp = getVrongVersion();
+            comp = JavaFXDocument.getVrongVersion();
             return;
         }
         Object obj = null;
@@ -262,13 +260,6 @@ public class PreviewThread extends Thread {
         pane.setText(text);
         hl.setMaps(foMap, offsetMap);
         return pane;
-    }
-
-    private JComponent getVrongVersion() {
-        JTextArea jta = new JTextArea();
-        jta.setForeground(Color.decode("#a40000"));
-        jta.append(vrongJavaVersion + System.getProperty("java.runtime.version"));
-        return jta;
     }
 
     public PreviewThread(FXDocument doc) {
