@@ -85,6 +85,7 @@ public class FileObjects {
   */  
     
     public static final String JAVAFX  = "fx"; //JavaFXDataLoader.FX_EXTENSION;
+    public static final String JAVA  = "java";
     public static final String CLASS = "class"; //ClassDataLoader.CLASS_EXTENSION;
     public static final String JAR   = "jar";  //NOI18N
     public static final String FILE  = "file"; //NOI18N
@@ -369,7 +370,7 @@ public class FileObjects {
             return JavaFileObject.Kind.OTHER;
         }
         String lcextension = extension.toLowerCase();
-        if (FileObjects.JAVAFX.equals(lcextension)) {
+        if (FileObjects.JAVAFX.equals(lcextension) || FileObjects.JAVA.equals(lcextension)) {
                 return JavaFileObject.Kind.SOURCE;
         }
         if (FileObjects.CLASS.equals(lcextension) || FileObjects.SIG.equals(lcextension)) {
