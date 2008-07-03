@@ -8,8 +8,8 @@
 package ${package};
 </#if>
 
-import javafx.gui.Application;
-import javafx.gui.swing.Label;
+import javafx.application.Application;
+import javafx.ext.swing.Label;
 
 /**
  * @author ${user}
