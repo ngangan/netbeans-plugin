@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.preview;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -50,11 +51,12 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
-
+        
 class MemoryClassLoader extends ClassLoader {
 
     Map<String, byte[]> classBytes;
-    ClassLoader compositClassLoader;
+    ClassLoader compositeClassLoader;
+    static ClassLoader bootClassLoader = null;
 
     public MemoryClassLoader(ClassPath[] classPaths) {
         classBytes = new HashMap<String, byte[]>();
@@ -66,11 +68,22 @@ class MemoryClassLoader extends ClassLoader {
             for (int j = 0; j < classPaths[i].getRoots().length; j++)
                 fos[counter++] = classPaths[i].getRoots()[j];
         try {
-            compositClassLoader = new NbClassLoader(fos, classPaths[0].getClassLoader(false).getParent(), null);
-            MFOURLStreamHanfler.setClassLoader(compositClassLoader);
+            compositeClassLoader = new NbClassLoader(fos, classPaths[0].getClassLoader(false).getParent(), null);
         } catch (FileStateInvalidException ex) {
             Exceptions.printStackTrace(ex);
         }
+    }
+    
+    public MemoryClassLoader(URL[] sourceCP, URL[] executeCP, URL[] bootCP) {
+        classBytes = new HashMap<String, byte[]>();
+        if (bootClassLoader == null)
+            bootClassLoader = new URLClassLoader(bootCP, this.getClass().getClassLoader().getParent(), null);
+        compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP), bootClassLoader, null);
+    }
+    
+    public MemoryClassLoader(URL[] classPaths) {
+        classBytes = new HashMap<String, byte[]>();
+        compositeClassLoader = new URLClassLoader(classPaths, this.getClass().getClassLoader().getParent(), null);
     }
 
     public void loadMap(Map<String, byte[]> classBytes) throws ClassNotFoundException {
@@ -104,9 +117,9 @@ class MemoryClassLoader extends ClassLoader {
                     Exceptions.printStackTrace(ex);
                 }
             } else
-                url = compositClassLoader.getResource(name);
+                url = compositeClassLoader.getResource(name);
         } else
-            url = compositClassLoader.getResource(name);
+            url = compositeClassLoader.getResource(name);
         return url;
     }
 
@@ -115,7 +128,7 @@ class MemoryClassLoader extends ClassLoader {
             Class classs = null;
             if (classs != null) return classs;
             try {
-                classs = compositClassLoader.loadClass(name);
+                classs = compositeClassLoader.loadClass(name);
             } catch (NoClassDefFoundError er) {
             } catch (ClassNotFoundException ex) {
             }
@@ -141,5 +154,18 @@ class MemoryClassLoader extends ClassLoader {
         } else {
             return super.findClass(className);
         }
+    }
+}
+class URLUtil {
+    public static URL[] merge(URL[]... args) {
+        int count = 0;
+        for (URL[] arg : args)
+            count+= arg.length;
+        URL[] c = new URL[count];
+        count = 0;
+        for (URL[] arg : args)
+            for (URL url : arg)
+                c[count++] = url;
+        return c;
     }
 }
