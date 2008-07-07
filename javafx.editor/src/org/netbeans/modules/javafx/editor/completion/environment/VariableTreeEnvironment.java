@@ -76,6 +76,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             log("    last(1) == " + (last == null ? "null" : last.token().id()));
             if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
+                addBasicTypes();
             }
             return;
         }

@@ -563,6 +563,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
             }
         }
+        addKeywordsForStatement();
     }
 
     protected void addKeywordsForClassBody() {
@@ -739,15 +740,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addPackages(pkgName);
     }
 
-    private void addBasicTypes(boolean insideNew) {
-        log("addBasicTypes " + insideNew);
-        addBasicType("Boolean", "boolean", insideNew);
-        addBasicType("Integer", "int", insideNew);
-        addBasicType("Number", "double", insideNew);
-        addBasicType("String", "String", insideNew);
+    protected void addBasicTypes() {
+        log("addBasicTypes ");
+        addBasicType("Boolean", "boolean");
+        addBasicType("Integer", "int");
+        addBasicType("Number", "double");
+        addBasicType("String", "String");
     }
 
-    private void addBasicType(String name1, String name2, boolean insideNew) {
+    private void addBasicType(String name1, String name2) {
         log("  addBasicType " + name1 + " : " + name2);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
@@ -766,10 +767,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
                         log("    found " + name1);
                         if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
-                            addResult(JavaFXCompletionItem.createTypeItem(name1, offset, false, insideNew, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(name1, offset, false, false, false));
                         } else {
                             DeclaredType dt = (DeclaredType) local.asType();
-                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, false, insideNew, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, false, false, false));
                         }
                         return;
                     }
@@ -779,7 +780,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
     
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) throws IOException {
-        addBasicTypes(insideNew);
         log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
