@@ -80,6 +80,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
@@ -263,7 +264,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             String s = member.getSimpleName().toString();
             if (fields && member.getKind() == ElementKind.FIELD) {
+                if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
+                }
             }
         }
 
@@ -783,6 +786,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             PackageElement pkge = (PackageElement)e;
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
+        addPackages("");
     }
     
     private void addLocalAndImportedTypes(Iterable<? extends Element> from,
@@ -993,6 +997,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 } else {
                     addPackages("");
                 }
+            } else {
+                // try to "type" x at the current caret position
+                String text = controller.getText();
+                StringBuilder builder = new StringBuilder(text);
+                builder.insert(offset, 'x');
+                useFakeSource(builder.toString(), offset);
             }
         } catch (BadLocationException ex) {
             if (LOGGABLE) {
@@ -1009,7 +1019,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         log("useFakeSource " + source + " pos == " + pos);
         try {
             FileSystem fs = FileUtil.createMemoryFileSystem();
-            FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
+            final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
             Writer w = new OutputStreamWriter(fo.getOutputStream());
             w.write(source);
             w.close();
@@ -1028,6 +1038,17 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         log("    fake non-broken tree");
                         final Tree leaf = env.getPath().getLeaf();
                         env.inside(leaf);
+                        // try to remove faked entries:
+                        String fakeName = fo.getName();
+                        Set<JavaFXCompletionItem> toRemove = new TreeSet<JavaFXCompletionItem>();
+                        for (JavaFXCompletionItem r : query.results) {
+                            log("    checking " + r.getLeftHtmlText());
+                            if (r.getLeftHtmlText().contains(fakeName)) {
+                                log("    will remove " + r);
+                                toRemove.add(r);
+                            }
+                        }
+                        query.results.removeAll(toRemove);
                     } 
                 }
             },true);
