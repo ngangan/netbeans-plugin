@@ -987,7 +987,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             log("useCrystalBall lineStart " + lineStart + " offset " + offset);
             TokenSequence<JFXTokenId> ts = findFirstNonWhitespaceToken(lineStart, offset);
             if (ts == null) {
-                log("sorry");
+                // nothing interesting on this line? let's try to delete it:
+                tryToDeleteCurrentLine(lineStart);
                 return;
             }
             log("  first == " + ts.token().id() + " at " + ts.offset());
@@ -1016,6 +1017,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 StringBuilder builder = new StringBuilder(text);
                 builder.insert(offset, 'x');
                 useFakeSource(builder.toString(), offset);
+                if (query.results.isEmpty()) {
+                    // still nothing? let's be desperate:
+                    tryToDeleteCurrentLine(lineStart);
+                }
             }
         } catch (BadLocationException ex) {
             if (LOGGABLE) {
@@ -1024,6 +1029,26 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
+    /**
+     * 
+     * @param lineStart
+     */
+    private void tryToDeleteCurrentLine(int lineStart) {
+        log("tryToDeleteCurrentLine lineStart == " + lineStart + " offset == " + offset);
+        if (offset < lineStart) {
+            log("   no line, sorry");
+            return;
+        }
+        int pLength = (prefix != null ? prefix.length():0);
+        int count = offset - lineStart + pLength;
+        char[] chars = new char[count];
+        while (count>0) chars[--count] = ' ';
+        String text = controller.getText();
+        StringBuilder builder = new StringBuilder(text);
+        builder.replace(lineStart, offset + pLength, new String(chars));
+        useFakeSource(builder.toString(), offset);
+    }
+    
     /**
      * 
      * @param source
