@@ -70,12 +70,17 @@ import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
@@ -91,11 +96,22 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.swing.text.BadLocationException;
 import javax.tools.Diagnostic;
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.editor.indent.api.IndentUtils;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileSystem;
+import org.openide.filesystems.FileUtil;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
@@ -227,7 +243,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
         log("addMembers: " + type);
-
+        JavafxcTrees trees = controller.getTrees();
+        TreePath p = new TreePath(root);
+        JavafxcScope scope = trees.getScope(p);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             log("RETURNING: type.getKind() == " + type.getKind());
             return;
@@ -247,8 +265,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             String s = member.getSimpleName().toString();
+            if (!trees.isAccessible(scope, member,dt)) {
+                log("    not accessible " + s);
+                continue;
+            }
             if (fields && member.getKind() == ElementKind.FIELD) {
+                if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
+                }
             }
         }
 
@@ -256,6 +280,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             log("    member2 == " + member + " member2.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
             if ("<error>".equals(member.getSimpleName().toString())) {
+                continue;
+            }
+            if (!trees.isAccessible(scope, member,dt)) {
+                log("    not accessible " + s);
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
@@ -441,7 +469,50 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addPackages(String fqnPrefix) {
-        log("NOT IMPLEMENTED: addPackages " + fqnPrefix);
+        log("addPackages " + fqnPrefix);
+        if (fqnPrefix == null) {
+            fqnPrefix = "";
+        }
+        JavaFXSource js = controller.getJavaFXSource();
+        
+        ClasspathInfo info = js.getCpInfo();
+        ArrayList<FileObject> fos = new ArrayList<FileObject>();
+        ClassPath cp = info.getClassPath(PathKind.SOURCE);
+        fos.addAll(Arrays.asList(cp.getRoots()));
+        cp = info.getClassPath(PathKind.COMPILE);
+        fos.addAll(Arrays.asList(cp.getRoots()));
+        cp = info.getClassPath(PathKind.BOOT);
+        fos.addAll(Arrays.asList(cp.getRoots()));
+        String pr = "";
+        if (fqnPrefix.lastIndexOf('.') >= 0) {
+            pr = fqnPrefix.substring(0, fqnPrefix.lastIndexOf('.'));
+        }
+        log("  pr == " + pr);
+        for (String name : pr.split("\\.")) {
+            ArrayList<FileObject> newFos = new ArrayList<FileObject>();
+            log("  traversing to " + name);
+            for (FileObject f : fos) {
+                if (f.isFolder()) {
+                    FileObject child = f.getFileObject(name);
+                    if (child != null) {
+                        newFos.add(child);
+                    }
+                }
+            }
+            log("  replacing " + fos + "\n   with " + newFos);
+            fos = newFos;
+        }
+        for (FileObject fo : fos) {
+            if (fo.isFolder()) {
+                for (FileObject child : fo.getChildren()) {
+                    if (child.isFolder()) {
+                        log(" found : " + child);
+                        String s = child.getPath().replace('/', '.');
+                        addResult(JavaFXCompletionItem.createPackageItem(s, offset, false));
+                    }
+                }
+            }
+        }
     }
 
     protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) throws IOException {
@@ -492,6 +563,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
             }
         }
+        addKeywordsForStatement();
     }
 
     protected void addKeywordsForClassBody() {
@@ -668,15 +740,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addPackages(pkgName);
     }
 
-    private void addBasicTypes(boolean insideNew) {
-        log("addBasicTypes " + insideNew);
-        addBasicType("Boolean", "boolean", insideNew);
-        addBasicType("Integer", "int", insideNew);
-        addBasicType("Number", "double", insideNew);
-        addBasicType("String", "String", insideNew);
+    protected void addBasicTypes() {
+        log("addBasicTypes ");
+        addBasicType("Boolean", "boolean");
+        addBasicType("Integer", "int");
+        addBasicType("Number", "double");
+        addBasicType("String", "String");
     }
 
-    private void addBasicType(String name1, String name2, boolean insideNew) {
+    private void addBasicType(String name1, String name2) {
         log("  addBasicType " + name1 + " : " + name2);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
@@ -695,10 +767,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
                         log("    found " + name1);
                         if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
-                            addResult(JavaFXCompletionItem.createTypeItem(name1, offset, false, insideNew, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(name1, offset, false, false, false));
                         } else {
                             DeclaredType dt = (DeclaredType) local.asType();
-                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, false, insideNew, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, offset, false, false, false));
                         }
                         return;
                     }
@@ -708,7 +780,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
     
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) throws IOException {
-        addBasicTypes(insideNew);
         log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
@@ -728,6 +799,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             PackageElement pkge = (PackageElement)e;
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
+        addPackages("");
     }
     
     private void addLocalAndImportedTypes(Iterable<? extends Element> from,
@@ -904,6 +976,125 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
         return null;
+    }
+    
+    /**
+     * We don't have an AST - let's try some heuristics
+     */
+    void useCrystalBall() {
+        try {
+            int lineStart = IndentUtils.lineStartOffset(controller.getJavaFXSource().getDocument(), offset);
+            log("useCrystalBall lineStart " + lineStart + " offset " + offset);
+            TokenSequence<JFXTokenId> ts = findFirstNonWhitespaceToken(lineStart, offset);
+            if (ts == null) {
+                // nothing interesting on this line? let's try to delete it:
+                tryToDeleteCurrentLine(lineStart);
+                return;
+            }
+            log("  first == " + ts.token().id() + " at " + ts.offset());
+            if (ts.token().id() == JFXTokenId.IMPORT) {
+                int count = ts.offset();
+                char[] chars = new char[count];
+                while (count>0) chars[--count] = ' ';
+                String helper = new String(chars);
+                String next = ts.token().text().toString();
+                while (ts.offset() < offset && ts.moveNext()) {
+                    log("Watching : " + ts.token().id() + " " + ts.token().text().toString());
+                    helper += next;
+                    next = ts.token().text().toString();
+                    log("helper == " + helper);
+                }
+                helper += "*;";
+                log("Helper prepared: " + helper);
+                if (!helper.endsWith("import *;")) {
+                    useFakeSource(helper, helper.length()-2);
+                } else {
+                    addPackages("");
+                }
+            } else {
+                // try to "type" x at the current caret position
+                String text = controller.getText();
+                StringBuilder builder = new StringBuilder(text);
+                builder.insert(offset, 'x');
+                useFakeSource(builder.toString(), offset);
+                if (query.results.isEmpty()) {
+                    // still nothing? let's be desperate:
+                    tryToDeleteCurrentLine(lineStart);
+                }
+            }
+        } catch (BadLocationException ex) {
+            if (LOGGABLE) {
+                logger.log(Level.FINE,"Crystal ball failed: ",ex);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param lineStart
+     */
+    private void tryToDeleteCurrentLine(int lineStart) {
+        log("tryToDeleteCurrentLine lineStart == " + lineStart + " offset == " + offset);
+        if (offset < lineStart) {
+            log("   no line, sorry");
+            return;
+        }
+        int pLength = (prefix != null ? prefix.length():0);
+        int count = offset - lineStart + pLength;
+        char[] chars = new char[count];
+        while (count>0) chars[--count] = ' ';
+        String text = controller.getText();
+        StringBuilder builder = new StringBuilder(text);
+        builder.replace(lineStart, offset + pLength, new String(chars));
+        useFakeSource(builder.toString(), offset);
+    }
+    
+    /**
+     * 
+     * @param source
+     */
+    private void useFakeSource(String source, final int pos) {
+        log("useFakeSource " + source + " pos == " + pos);
+        try {
+            FileSystem fs = FileUtil.createMemoryFileSystem();
+            final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
+            Writer w = new OutputStreamWriter(fo.getOutputStream());
+            w.write(source);
+            w.close();
+            log("  source written to " + fo);
+            ClasspathInfo info = ClasspathInfo.create(controller.getFileObject());
+            JavaFXSource s = JavaFXSource.create(info,Collections.singleton(fo));
+            log("  jfxsource obtained " + s);
+            s.runWhenScanFinished(new Task<CompilationController>() {
+                public void run(CompilationController fakeController) throws Exception {
+                    log("    scan finished");
+                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos);
+                    log("    env == " + env);
+                    fakeController.toPhase(Phase.ANALYZED);
+                    log("    fake analyzed");
+                    if (! env.isTreeBroken()) {
+                        log("    fake non-broken tree");
+                        final Tree leaf = env.getPath().getLeaf();
+                        env.inside(leaf);
+                        // try to remove faked entries:
+                        String fakeName = fo.getName();
+                        Set<JavaFXCompletionItem> toRemove = new TreeSet<JavaFXCompletionItem>();
+                        for (JavaFXCompletionItem r : query.results) {
+                            log("    checking " + r.getLeftHtmlText());
+                            if (r.getLeftHtmlText().contains(fakeName)) {
+                                log("    will remove " + r);
+                                toRemove.add(r);
+                            }
+                        }
+                        query.results.removeAll(toRemove);
+                    } 
+                }
+            },true);
+        } catch (IOException ex) {
+            if (LOGGABLE) {
+                logger.log(Level.FINE,"useFakeSource failed: ",ex);
+            }
+        }
     }
 
     protected static TokenSequence<JFXTokenId> nextNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {

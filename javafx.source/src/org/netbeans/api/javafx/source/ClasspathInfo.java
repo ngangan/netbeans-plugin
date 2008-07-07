@@ -109,13 +109,59 @@ public class ClasspathInfo {
 //	OUTPUT,
     }
 
-    
+/*    
+    private static File getSymbolsForUrl(URL url) throws IOException {
+        // Danger, Will Robinson!
+        
+        try {
+            ClassLoader friend = org.netbeans.api.java.source.JavaSource.class.getClassLoader();
+            Class cIndex = friend.loadClass("org.netbeans.modules.java.source.usages.Index");
+            //public static File getClassFolder (final URL url) throws IOException {                
+            Method mGetClassFolder = cIndex.getMethod("getClassFolder", URL.class);
+            File file = (File)mGetClassFolder.invoke(null, url);
+//        return Index.getClassFolder(sourceUrl);
+            return file;
+        } catch (Exception e) {
+            throw (IOException)new IOException().initCause(e);
+        }
+    }
+    private static List<URL> getSymbolsForPath(ClassPath cp) throws IOException {
+        List<URL> l = new ArrayList<URL>();
+        for (ClassPath.Entry e : cp.entries()) {
+            URL src = e.getURL();
+            
+            File cacheFolder = getSymbolsForUrl(src);
+            System.err.println("sym for " + src + " = " + cacheFolder);
+            URL cacheUrl = cacheFolder.toURI().toURL();
+            if (!cacheFolder.exists()) {                                
+                 cacheUrl = new URL (cacheUrl.toExternalForm()+"/");     //NOI18N
+            }
+            //            _cache.add(ClassPathSupport.createResource(cacheUrl));
+
+            
+            l.add(cacheUrl);
+        }
+        return l;
+    }
+*/    
     synchronized JavaFileManager getFileManager() {
         if (fileManager == null) {
+/*            List<URL> userJavaClasses = null;
+            try {
+                userJavaClasses = getSymbolsForPath(srcPath);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }*/
+            ClassPath cachedSrcPath = srcPath;
+/*            if (userJavaClasses != null) {
+                URL[] urls = userJavaClasses.toArray(new URL[userJavaClasses.size()]);
+                cachedSrcPath = ClassPathSupport.createProxyClassPath(srcPath, ClassPathSupport.createClassPath(urls));
+                System.err.println("cached=" + cachedSrcPath);
+            }*/
             fileManager = new ProxyFileManager (
                     new CachingFileManager(bootPath), // cacheFile, ignoreExcludes
                     new CachingFileManager(compilePath), // ignoreExcludes
-                    new SourceFileManager(srcPath)
+                    new SourceFileManager(cachedSrcPath)
             );
         }
         return this.fileManager;

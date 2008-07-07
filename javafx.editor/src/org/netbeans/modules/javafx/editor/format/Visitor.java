@@ -118,7 +118,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
         try {
-            final int start = getStartPos(node);
+            final int start  = getStartPos(node);
 //            if (isFirstOnLine(start)) {
 //                indentLine(start, adjustments);
 //            }
@@ -134,7 +134,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                         indentMultiline(li, getEndPos(node), adjustments);
                     }
                 }
-            }
+            }            
+
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
@@ -164,7 +165,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitExpressionStatement(node, adjustments);
+        super.visitExpressionStatement(node, adjustments);
+        return adjustments;
     }
 
     private void processStandaloneNode(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
@@ -190,7 +192,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitIdentifier(node, adjustments);
+        super.visitIdentifier(node, adjustments);
+        return adjustments;
     }
 
 
@@ -227,13 +230,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             return adjustments;
         }
         try {
+            if (!holdOnLine(tree)) {
+                processStandaloneNode(node, adjustments);
+            }
             final int offset = getStartPos(node);
             final int end = getEndPos(node);
             if (isMultiline(node)) {
-                li.moveTo(offset);
-                if (isFirstOnLine(offset)) {
-                    indentLine(li.get(), adjustments);
-                }
                 indentMultiline(li, end, adjustments);
             }
 
@@ -258,7 +260,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitBinary(node, adjustments);
+        super.visitBinary(node, adjustments);
+        return adjustments;
     }
 
     private TokenSequence<JFXTokenId> ts(Tree node) {
@@ -316,13 +319,42 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void indentSimpleStructure(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
-        int start = getStartPos(node);
-        if (isFirstOnLine(start)) {
-            indentLine(start, adjustments);
+        if (!holdOnLine(node)) {
+            processStandaloneNode(node, adjustments);
         }
+        int start = getStartPos(node);
         if (isMultiline(node)) {
             indentLine(getEndPos(node), adjustments);
         }
+//        if (isFirstOnLine(start)) {
+//            indentLine(start, adjustments);
+//        }
+
+    }
+
+    @Override
+    public Queue<Adjustment> visitIndexof(IndexofTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitEmptyStatement(EmptyStatementTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitBreak(BreakTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitPrimitiveType(PrimitiveTypeTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitContinue(ContinueTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
     }
 
     @Override
@@ -675,6 +707,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof CatchTree
                 || tree instanceof ConditionalExpressionTree
                 || tree instanceof ObjectLiteralPartTree
+                || tree instanceof FunctionValueTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
@@ -737,8 +770,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitClassDeclaration(ClassDeclarationTree node, Queue<Adjustment> adjustments) {
-        if (tu.isSynthetic(getCurrentPath())) {
-            return super.visitClassDeclaration(node, adjustments);
+        if (getStartPos(node) == getEndPos(node)) {
+            super.visitClassDeclaration(node, adjustments);
+            return adjustments;
         }
         final Document doc = ctx.document();
         try {
@@ -812,7 +846,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitImport(importTree, adjustments);
+        super.visitImport(importTree, adjustments);
+        return adjustments;
     }
 
     private Tree getLastImport() {
@@ -874,7 +909,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitReturn(returnTree, adjustments);
+        super.visitReturn(returnTree, adjustments);
+        return adjustments;
     }
 
     @Override
@@ -887,6 +923,21 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitTimeLiteral(TimeLiteralTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitTypeAny(TypeAnyTree node, Queue<Adjustment> adjustments) {
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitTypeUnknown(TypeUnknownTree node, Queue<Adjustment> adjustments) {
         return adjustments;
     }
 
@@ -939,7 +990,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitForExpression(node, adjustments);
+        super.visitForExpression(node, adjustments);
+        return adjustments;
     }
 
     @Override
@@ -952,7 +1004,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        return super.visitIf(node, adjustments);
+        super.visitIf(node, adjustments);
+        return adjustments;
     }
 
     private Position toPos(int index) throws BadLocationException {

@@ -339,7 +339,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     @SuppressWarnings("unchecked")
     private void resolveCompletion(CompilationController controller) throws IOException {
-        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller);
+        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset);
         results = new HashSet<JavaFXCompletionItem>();
         anchorOffset = env.getOffset();
         
@@ -349,12 +349,15 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         
         final Tree leaf = env.getPath().getLeaf();
-//        env.addSmartTypes(leaf);
-//        if (LOGGABLE) {
-//            log("addSmartTypes results: " + results);
-//        }
+        
         controller.toPhase(Phase.ANALYZED);
-        env.inside(leaf);
+        
+        if (! env.isTreeBroken()) {
+            env.inside(leaf);
+        } else {
+            env.useCrystalBall();
+        }
+        
         if (LOGGABLE) {
             log("Results: " + results);
         }
@@ -396,9 +399,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
     }
 
-    private JavaFXCompletionEnvironment getCompletionEnvironment(CompilationController controller) throws IOException {
+    JavaFXCompletionEnvironment getCompletionEnvironment(CompilationController controller, int offset) throws IOException {
         controller.toPhase(Phase.PARSED);
-        int offset = caretOffset;
         String prefix = null;
         if (offset > 0) {
             TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());

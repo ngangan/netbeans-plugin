@@ -80,8 +80,6 @@ import org.openide.text.NbDocument;
         
 public class PreviewThread extends Thread {
     
-    static final String nothingToShow = "Nothing to show...";                                                                   //NOI18
-    private static final String vrongJavaVersion = "Please, use version 1.6 of Java to enable Preview. Current version is: ";   // NOI18N
     JPanel contentPanel = null;
     
     private class Hyperlink implements HyperlinkListener {
@@ -132,21 +130,28 @@ public class PreviewThread extends Thread {
     
         
     private FXDocument doc;
-    private JComponent comp = null;
-    private boolean internalPanel = false;
+    private Object context;
+   
+    public List <Diagnostic> compile() {
+        try {
+            context = CodeManager.compile(doc);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return CodeManager.getDiagnostics();
+    }
     
-    boolean finished = false;
-    
-    public void compile() {
+    public JComponent execute() {
+        JComponent comp = null;
         List <Window> initialList = getOwnerlessWindowsList();
 
         if (!checkJavaVersion()) {
-            comp = getVrongVersion();
-            return;
+            comp = JavaFXDocument.getVrongVersion();
+            return comp;
         }
         Object obj = null;
         try {
-            obj = CodeManager.execute(doc);
+            obj = CodeManager.run(context);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -166,33 +171,16 @@ public class PreviewThread extends Thread {
         for (Window frame : suspectedList) {
             frame.dispose();
         }
-        final List <Diagnostic> diagnostics = CodeManager.getDiagnostics();
-        if (!diagnostics.isEmpty()) {
-            internalPanel = true;
-            mainEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
-                public void run() {
-                    comp = processDiagnostic(diagnostics);
-                }
-            }));
-            while (comp == null) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
+        if (comp == null) {
+            comp = JavaFXDocument.getNothingPane();
         }
-        else {
-            if (comp == null) {
-                comp = JavaFXDocument.getNothingPane();
-            }
-        }
-        if (!internalPanel) {
-            JPanel pane = new JPanel();
-            pane.setLayout(new BorderLayout());
-            pane.add(comp);
-            comp = (JComponent) pane;
-        }
+
+        JPanel pane = new JPanel();
+        pane.setLayout(new BorderLayout());
+        pane.add(comp);
+        comp = (JComponent) pane;
+        
+        return comp;
     }
 
     private List <Window> getOwnerlessWindowsList() {
@@ -264,44 +252,31 @@ public class PreviewThread extends Thread {
         return pane;
     }
 
-    private JComponent getVrongVersion() {
-        JTextArea jta = new JTextArea();
-        jta.setForeground(Color.decode("#a40000"));
-        jta.append(vrongJavaVersion + System.getProperty("java.runtime.version"));
-        return jta;
-    }
-
     public PreviewThread(FXDocument doc) {
         super();
         this.doc = doc;
     }
 
-    EventQueue mainEventQueue = null;
-
     @Override
     synchronized public void run() {
-        try {
-            ((JavaFXDocument)doc).setCompile();
-            mainEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-            MirroringPanel mirroringPanel = new MirroringPanel(UIManager.getLookAndFeel()) {
-                @Override
-                protected JPanel createMirroredPanel() {
-                    compile();
-                    if (!internalPanel)
-                        return (JPanel)comp;
-                    else
-                        return null;
-                }
-            };
-            if (!internalPanel)
-                ((JavaFXDocument)doc).renderPreview(mirroringPanel);
-            else {
-                mirroringPanel.cleanup();
-                ((JavaFXDocument)doc).renderPreview(comp);
+        ((JavaFXDocument)doc).setCompile();
+        final List <Diagnostic> diagnostics = compile();
+        if (!diagnostics.isEmpty()) {
+            ((JavaFXDocument)doc).renderPreview(processDiagnostic(diagnostics));
+        } else {
+            MirroringPanel mirroringPanel = null;
+            try {
+                mirroringPanel = new MirroringPanel(UIManager.getLookAndFeel()) {
+                    @Override
+                    protected JPanel createMirroredPanel() {
+                        return (JPanel)execute();
+                    }
+                };
+            } catch (MirroringPanel.MPException ex) {
+                ((JavaFXDocument)doc).renderPreview(JavaFXDocument.getErrorPane());
             }
-            
-        } catch(Exception ex) {
-            ex.printStackTrace();
+            if (mirroringPanel!= null)
+                ((JavaFXDocument)doc).renderPreview(mirroringPanel);
         }
     }
 }

@@ -41,7 +41,7 @@ public class MirroringPanel extends JPanel {
     BufferedImage   offscreenBuffer = null;
     ThreadGroup     threadGroup = null;
     
-    public MirroringPanel(LookAndFeel lf) {
+    public MirroringPanel(LookAndFeel lf) throws MPException {
         super();
         mirroringEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
         this.lf = lf;
@@ -148,12 +148,14 @@ public class MirroringPanel extends JPanel {
                 public void paintDirtyRegions() {
                     super.paintDirtyRegions();
                     if (offscreenBuffer != null) {
-                        mirroredFrame.getLayeredPane().paintAll(offscreenBuffer.getGraphics());
-                        mirroringEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
-                            public void run() {
-                                repaint();
-                            }
-                        }));
+                        if (mirroredFrame != null) {
+                            mirroredFrame.getLayeredPane().paintAll(offscreenBuffer.getGraphics());
+                            mirroringEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
+                                public void run() {
+                                    repaint();
+                                }
+                            }));
+                        }
                     }
                 }
             });
@@ -225,8 +227,8 @@ public class MirroringPanel extends JPanel {
             try {
                 Class<?> acc = this.getClass().getClassLoader().loadClass(APC);
                 acc.getDeclaredMethod(DSP).invoke(ac);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Throwable er) {
+                er.printStackTrace();
             }
         }
         mirroredEventQueue = null;
@@ -241,16 +243,23 @@ public class MirroringPanel extends JPanel {
     
     private static int instanceCounter = 0;
     
-    void startMirroring() {
+    void startMirroring() throws MPException {
         threadGroup = new ThreadGroup("SACG" + instanceCounter++); // NOI18N
         mirroringTread = new MirroringThread(threadGroup);
         mirroringTread.start();
         try {
-            mirroringTread.join();
+            mirroringTread.join(20000);
+            if (mirroringTread.isAlive()) {
+                cleanup();
+                throw new MPException();
+            }
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         }
         enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+    }
+ 
+    public class MPException extends Exception {
     }
     
     static private String STK = "sun.awt.SunToolkit";                       // NOI18N

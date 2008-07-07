@@ -59,11 +59,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Comp
 
     @Override
     protected void inside(CompilationUnitTree t) throws IOException {
-        log("inside JFXFunctionDefinition " + t);
-        if (isTreeBroken()) {
-            // don't do anything in this case
-            return;
-        }
+        log("inside CompilationUnitTree " + t);
         Tree pkg = root.getPackageName();
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {
             addKeywordsForCU();
@@ -75,6 +71,9 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Comp
             TokenSequence<JFXTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
             if (first != null && first.token().id() == JFXTokenId.SEMI) {
                 addKeywordsForCU();
+                addPackages("");
+                addLocalAndImportedTypes(null, null, null, false, null);
+                addLocalMembersAndVars(null);
             }
         }
     }

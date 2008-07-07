@@ -145,6 +145,7 @@ public final class JavaFXSource {
     public final int reparseDelay;
     
     private final ClasspathInfo cpInfo;
+
     private final AtomicReference<Request> rst = new AtomicReference<Request> ();
     private final FileChangeListener fileChangeListener;
     
@@ -518,10 +519,20 @@ out:            for (Iterator<Collection<Request>> it = CompilationJob.finishedR
     }
     
     public TokenHierarchy getTokenHierarchy() {
-        if ((listener == null) || (listener.getDocument() == null)) {
+        if (listener == null) {
             return null;
         }
-        TokenHierarchy th = TokenHierarchy.get(listener.getDocument());
+        Document doc = listener.getDocument();
+        if (doc == null) {
+            try {
+                DataObject od = DataObject.find(getFileObject());
+                EditorCookie ec = od.getLookup().lookup(EditorCookie.class);
+                doc = ec.openDocument();
+            } catch (IOException dnfe) {
+                return null;
+            }
+        }
+        TokenHierarchy th = TokenHierarchy.get(doc);
         return th;
     }
     
@@ -535,6 +546,10 @@ out:            for (Iterator<Collection<Request>> it = CompilationJob.finishedR
             Exceptions.printStackTrace(ex);
         }
         return "";
+    }
+    
+    public ClasspathInfo getCpInfo() {
+        return cpInfo;
     }
     
     private static void handleAddRequest (final Request nr) {

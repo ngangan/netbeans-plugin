@@ -33,6 +33,7 @@ import org.netbeans.modules.javafx.editor.FXDocument;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
@@ -40,6 +41,8 @@ import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.Window;
 import java.io.File;
+import java.io.Serializable;
+import java.net.URL;
 import javax.swing.JDialog;
 import javax.tools.Diagnostic;
 import org.netbeans.api.project.Project;
@@ -47,8 +50,8 @@ import org.netbeans.api.project.Project;
 public class CodeManager {
     private static final String[] getComponentNames = {"getComponent", "getJComponent"};                     // NOI18N
     private static final String[] frameNames = {"frame", "window"};                                          // NOI18N
-    private static final String[] dialogNames = {"jdialog", "jDialog"};                                          // NOI18N
-    private static final String[] getVisualNodeNames = {"getVisualNode", "getSGNode"};                       // NOI18N
+    private static final String[] dialogNames = {"jdialog", "jDialog"};                                      // NOI18N
+    private static final String[] getVisualNodeNames = {"getVisualNode", "getSGNode", "impl_getSGNode"};     // NOI18N
     
     private static final String secuencesClassName = "com.sun.javafx.runtime.sequence.Sequences";            // NOI18N
     private static final String secuenceClassName = "com.sun.javafx.runtime.sequence.Sequence";              // NOI18N
@@ -62,10 +65,30 @@ public class CodeManager {
     private static final String dianosticPrefix = "gets javafxc diagnostics: ";                              // NOI18N
     private static final String noCPFoundPrefix = "No classpath was found for folder: ";                     // NOI18N
     
-    private static final DiagnosticCollector diagnostics = new DiagnosticCollector();
+    private static DiagnosticCollector diagnostics = new DiagnosticCollector();
     
-    public static Object execute(FXDocument doc) {
-        
+    // Temporary solution until fixing of JavafxcTask.generate()
+    static class Context implements Serializable {
+        Context(
+            Map<String, byte[]> classBytes,
+            String className,
+            URL[] sourceCP,
+            URL[] executeCP,
+            URL[] bootCP) {
+            this.classBytes = classBytes;
+            this.className = className;
+            this.sourceCP = sourceCP;
+            this.executeCP = executeCP;
+            this.bootCP = bootCP;
+        };
+        Map<String, byte[]> classBytes;
+        String className;
+        URL[] sourceCP;
+        URL[] executeCP;
+        URL[] bootCP;
+    }
+    
+    public static Object compile(FXDocument doc) {
         ClassLoader orig = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(ToolProvider.class.getClassLoader());
         
@@ -102,20 +125,37 @@ public class CodeManager {
         
         Map<String, byte[]> oldClassBytes = cut(JavaFXModel.getClassBytes(project), className);
         
-        Map<String, byte[]> classBytes = compile(javaFileObjects, oldClassBytes, sourceCP, compileCP, bootCP, executeCP, project, tool, standardManager, diagnostics);  
+        Map<String, byte[]> classBytes = compile(javaFileObjects, oldClassBytes, sourceCP, compileCP, bootCP, executeCP, project, tool, standardManager, diagnostics);
         JavaFXModel.putClassBytes(project, classBytes);
         
-        Object obj = null;
-        if (classBytes != null) {
-            className = checkCase(classBytes, className);
-            try {
-                obj = run(className, sourceCP, executeCP, bootCP, classBytes);
-            } catch (Exception ex){
-                ex.printStackTrace();
-            }
-        }        
         Thread.currentThread().setContextClassLoader(orig);
+        
+        return new Context(classBytes, className, toURLs(sourceCP), toURLs(executeCP), toURLs(bootCP));
+    }
+    
+    public static Object run(Object context) {
+        Object obj = null;
+        if (context != null) {
+            //ClassLoader orig = Thread.currentThread().getContextClassLoader();
+            //Thread.currentThread().setContextClassLoader(ToolProvider.class.getClassLoader());
+
+            Context env = (Context)context;
+            if (env.classBytes != null) {
+                env.className = checkCase(env.classBytes, env.className);
+                try {
+                    obj = run(env.className, env.sourceCP, env.executeCP, env.bootCP, env.classBytes);
+                } catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+            //Thread.currentThread().setContextClassLoader(orig);
+        }
         return obj;
+    }
+    
+    public static Object execute(FXDocument doc) {
+        Context env = (Context)compile(doc);
+        return run(env);
     }
     
     static public List<Diagnostic> getDiagnostics() {
@@ -149,11 +189,11 @@ public class CodeManager {
         MemoryFileManager manager = new MemoryFileManager(standardManager, mcl);
         manager.setClassBytes(classBytes);
         
-        try {
+        /*try {
             mcl.loadMap(JavaFXModel.getClassBytes(project));
         } catch (ClassNotFoundException ex) {
             Exceptions.printStackTrace(ex);
-        }
+        }*/
         
         options.add("-target");              // NOI18N
         options.add("1.5");                  // NOI18N
@@ -185,9 +225,42 @@ public class CodeManager {
         
         return classBytesDone;
     }
+    
+    private static URL[] toURLs(ClassPath classPath) {
+        URL urls[] = new URL[classPath.getRoots().length];
+        for (int j = 0; j < classPath.getRoots().length; j++)
+            try {
+                urls[j] = classPath.getRoots()[j].getURL();
+            } catch (FileStateInvalidException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        return urls;
+    }
+    
+    private static URL[] toURLs(ClassPath[] classPaths) {
+        int counter = 0;
+        for (int i = 0; i < classPaths.length; i++) counter+= classPaths[i].getRoots().length;
+        URL urls[] = new URL[counter];
+        counter = 0;
+        for (int i = 0; i < classPaths.length; i++) 
+            for (int j = 0; j < classPaths[i].getRoots().length; j++)
+                try {
+                    urls[counter++] = classPaths[i].getRoots()[j].getURL();
+                } catch (FileStateInvalidException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+        return urls;
+    }
         
     private static Object run(String name, ClassPath sourceClassPath, ClassPath execClassPath, ClassPath bootClassPath, Map<String, byte[]> classBytes) throws Exception {
         MemoryClassLoader memoryClassLoader = new MemoryClassLoader(new ClassPath[] {sourceClassPath, execClassPath, bootClassPath});
+        memoryClassLoader.loadMap(classBytes);
+        return run(name, memoryClassLoader);
+    }
+    
+    private static Object run(String name, URL[] sourceCP, URL[] executeCP, URL[] bootCP, Map<String, byte[]> classBytes) throws Exception {
+        MemoryClassLoader memoryClassLoader = new MemoryClassLoader(sourceCP, executeCP, bootCP);
+        MFOURLStreamHanfler.setClassLoader(memoryClassLoader);
         memoryClassLoader.loadMap(classBytes);
         return run(name, memoryClassLoader);
     }
@@ -290,7 +363,7 @@ public class CodeManager {
         intFrame.setMaximizable(true);
         intFrame.setIconifiable(true);
         intFrame.setVisible(true);
-        //frame.dispose();
+        frame.dispose();
         AutoResizableDesktopPane jdp = new AutoResizableDesktopPane();
         jdp.setBackground(Color.WHITE);
         jdp.add(intFrame);
@@ -435,4 +508,3 @@ public class CodeManager {
         JavaFXModel.putClassBytes(project, cut(newMap, className));
     }
 }
-
