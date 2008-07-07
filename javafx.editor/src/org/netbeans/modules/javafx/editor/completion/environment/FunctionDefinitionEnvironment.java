@@ -73,28 +73,11 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
         JFXFunctionDefinition def = t;
         int startPos = (int) sourcePositions.getStartPosition(root, def);
         JFXType retType = def.getJFXReturnType();
-        if (retType == null) {
-            int modPos = (int) sourcePositions.getEndPosition(root, def.getModifiers());
-            if (modPos > startPos) {
-                startPos = modPos;
-            }
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(startPos, offset);
-            if (last == null) {
-                addMemberModifiers(def.getModifiers().getFlags(), false);
-                return;
-            }
-        } else {
-            if (offset <= sourcePositions.getStartPosition(root, retType)) {
-                addMemberModifiers(def.getModifiers().getFlags(), false);
-                return;
-            }
-            startPos = (int) sourcePositions.getEndPosition(root, retType) + 1;
-        }
-        log("start: " + startPos);
-        log("offset: " + offset);
+        log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType);
         String headerText = controller.getText().substring(startPos, offset > startPos ? offset : startPos);
+        log("  headerText(1) == " + headerText);
         int parStart = headerText.indexOf('(');
-        log("parStart: " + parStart);
+        log("  parStart: " + parStart);
         if (parStart >= 0) {
             int parEnd = headerText.indexOf(')', parStart);
             if (parEnd > parStart) {
@@ -108,18 +91,24 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
                     parStart = parPos - startPos;
                 }
                 headerText = headerText.substring(parStart).trim();
-                if ("(".equals(headerText) || ",".equals(headerText)) {
-                    addMemberModifiers(Collections.<Modifier>emptySet(), true);
-                }
+            }
+            log("  headerText(2) ==" + headerText);
+            if (":".equals(headerText)) {
+                addLocalAndImportedTypes(null, null, null, false, null);
+                addBasicTypes();
+                return;
             }
         } else if (retType != null && headerText.trim().length() == 0) {
+            log("  insideExpression for retType:");
             insideExpression(new TreePath(path, retType));
+            return;
         }
         int bodyPos = (int) sourcePositions.getStartPosition(root, def.getBodyExpression());
-        log("bodyPos: " + bodyPos);
-        if (offset > bodyPos) {
+        log("  bodyPos: " + bodyPos);
+        if ((bodyPos >=0) && (offset > bodyPos)) {
+            log(" we are inside body of the function:");
             insideFunctionBlock(def.getBodyExpression().getStatements());
-        }
+        } 
     }
     void insideFunctionBlock(com.sun.tools.javac.util.List<JCStatement> statements) throws IOException {
         StatementTree last = null;
