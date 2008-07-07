@@ -460,6 +460,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addPackages(String fqnPrefix) {
         log("addPackages " + fqnPrefix);
+        if (fqnPrefix == null) {
+            fqnPrefix = "";
+        }
         JavaFXSource js = controller.getJavaFXSource();
         
         ClasspathInfo info = js.getCpInfo();
