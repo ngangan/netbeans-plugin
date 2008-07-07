@@ -118,7 +118,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
         try {
-            final int start = getStartPos(node);
+            final int start  = getStartPos(node);
 //            if (isFirstOnLine(start)) {
 //                indentLine(start, adjustments);
 //            }
@@ -741,7 +741,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitClassDeclaration(ClassDeclarationTree node, Queue<Adjustment> adjustments) {
-        if (tu.isSynthetic(getCurrentPath())) {
+        if (getStartPos(node) == getEndPos(node)) {
             return super.visitClassDeclaration(node, adjustments);
         }
         final Document doc = ctx.document();

@@ -99,17 +99,26 @@ public final class TreeUtilities {
      * @throws NullPointerException if the given tree is null
      */
     public boolean isSynthetic(TreePath path) throws NullPointerException {
-        if (path == null)
-            throw new NullPointerException();
-        
-        while (path != null) {
-            if (isSynthetic(path.getCompilationUnit(), path.getLeaf()))
-                return true;
-            
-            path = path.getParentPath();
+        if (path == null) {
+            return false;
         }
-        
-        return false;
+        SourcePositions sp = info.getTrees().getSourcePositions();
+        final CompilationUnitTree cu = path.getCompilationUnit();
+        final Tree leaf = path.getLeaf();
+        final long s = sp.getStartPosition(cu, leaf);
+        final long e = sp.getEndPosition(cu, leaf);
+        return s == e || s < 0 || e < 0;
+//        if (path == null)
+//            throw new NullPointerException();
+//
+//        while (path != null) {
+//            if (isSynthetic(path.getCompilationUnit(), path.getLeaf()))
+//                return true;
+//
+//            path = path.getParentPath();
+//        }
+
+//        return false;
     }
     
     private boolean isSynthetic(CompilationUnitTree cut, Tree leaf) throws NullPointerException {
@@ -230,7 +239,7 @@ public final class TreeUtilities {
                         throw new Result(new TreePath(getCurrentPath(), tree));
                     } else {
                         if ((start == -1) || (end == -1)) {
-                            if (!isSynthetic(getCurrentPath().getCompilationUnit(), tree)) {
+                            if (!isSynthetic(getCurrentPath())) {
                                 // here we might have a problem
                                 if (LOGGABLE) {
                                     logger.finest("SCAN: Cannot determine start and end for: " + treeToString(info, tree));
