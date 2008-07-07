@@ -243,7 +243,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
         log("addMembers: " + type);
-
+        JavafxcTrees trees = controller.getTrees();
+        TreePath p = new TreePath(root);
+        JavafxcScope scope = trees.getScope(p);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             log("RETURNING: type.getKind() == " + type.getKind());
             return;
@@ -263,6 +265,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             String s = member.getSimpleName().toString();
+            if (!trees.isAccessible(scope, member,dt)) {
+                log("    not accessible " + s);
+                continue;
+            }
             if (fields && member.getKind() == ElementKind.FIELD) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
@@ -274,6 +280,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             log("    member2 == " + member + " member2.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
             if ("<error>".equals(member.getSimpleName().toString())) {
+                continue;
+            }
+            if (!trees.isAccessible(scope, member,dt)) {
+                log("    not accessible " + s);
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
