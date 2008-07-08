@@ -507,6 +507,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (FileObject child : fo.getChildren()) {
                     if (child.isFolder()) {
                         log(" found : " + child);
+                        if (("META-INF".equals(child.getName())) || 
+                            ("doc-files".equals(child.getName()))) {
+                            continue;
+                        }
                         String s = child.getPath().replace('/', '.');
                         addResult(JavaFXCompletionItem.createPackageItem(s, offset, false));
                     }
@@ -1019,7 +1023,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 useFakeSource(builder.toString(), offset);
                 if (query.results.isEmpty()) {
                     // still nothing? let's be desperate:
-                    tryToDeleteCurrentLine(lineStart);
+                    String currentLine = controller.getText().substring(lineStart, offset);
+                    if ((!currentLine.contains(":"))  && 
+                        (!currentLine.contains("(")) &&
+                        (!currentLine.contains("{"))
+                    ) {
+                        tryToDeleteCurrentLine(lineStart);
+                    }
                 }
             }
         } catch (BadLocationException ex) {

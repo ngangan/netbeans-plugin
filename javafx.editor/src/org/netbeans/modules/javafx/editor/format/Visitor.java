@@ -319,16 +319,16 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void indentSimpleStructure(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
-        if (!holdOnLine(node)) {
-            processStandaloneNode(node, adjustments);
-        }
+//        if (!holdOnLine(node)) {
+//            processStandaloneNode(node, adjustments);
+//        }
         int start = getStartPos(node);
+        if (isFirstOnLine(start)) {
+            indentLine(start, adjustments);
+        }
         if (isMultiline(node)) {
             indentLine(getEndPos(node), adjustments);
         }
-//        if (isFirstOnLine(start)) {
-//            indentLine(start, adjustments);
-//        }
 
     }
 
@@ -708,6 +708,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof ConditionalExpressionTree
                 || tree instanceof ObjectLiteralPartTree
                 || tree instanceof FunctionValueTree
+                || tree instanceof SequenceExplicitTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
