@@ -1019,7 +1019,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 useFakeSource(builder.toString(), offset);
                 if (query.results.isEmpty()) {
                     // still nothing? let's be desperate:
-                    tryToDeleteCurrentLine(lineStart);
+                    String currentLine = controller.getText().substring(lineStart, offset);
+                    if ((!currentLine.contains(":"))  && 
+                        (!currentLine.contains("(")) &&
+                        (!currentLine.contains("{"))
+                    ) {
+                        tryToDeleteCurrentLine(lineStart);
+                    }
                 }
             }
         } catch (BadLocationException ex) {
