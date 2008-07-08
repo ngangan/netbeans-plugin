@@ -42,16 +42,23 @@ package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.JavaFXTree;
+import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.JavaFXVariableTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -74,10 +81,10 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.navigation.ElementNode.Description;
 
-/** XXX Remove the ElementScanner class from here it should be wenough to
- * consult the Elements class. It should also permit for showing inherited members.
+/** 
  *
  * @author phrebejk
+ * @author Anton Chechel (space magic fixes only)
  */
 public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
@@ -91,7 +98,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
     }
 
     public void cancel() {
-        //System.out.println("Element task canceled");
         canceled.set(true);
     }
 
@@ -100,7 +106,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
         Description rootDescription = new Description(ui);
         rootDescription.fileObject = info.getFileObject();
-//        rootDescription.subs = new ArrayList<Description>();
         rootDescription.subs = new HashSet<Description>();
 
         // Get all outerclasses in the Compilation unit
@@ -115,12 +120,30 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         if (!canceled.get()) {
+            Element magicRunMethod = null;
+            out:
+            for (Element element : elements) {
+                Symbol.ClassSymbol sym = (Symbol.ClassSymbol) element;
+                for (Symbol symbol : sym.members().getElements()) {
+                    if ("javafx$run$".equals(symbol.getSimpleName().toString())) {
+                        magicRunMethod = symbol;
+                        break out;
+                    }
+                }
+            }
+
+            // top level elements
             for (Element element : elements) {
                 Description topLevel = element2description(element, null, false, info, pos);
                 if (null != topLevel) {
                     rootDescription.subs.add(topLevel);
                     addMembers((TypeElement) element, topLevel, info, pos);
                 }
+            }
+
+            // elements from magic javafx$run$ method, should be top level as well
+            if (magicRunMethod != null) {
+                addMembers((ExecutableElement) magicRunMethod, rootDescription, info, pos);
             }
         }
 
@@ -239,16 +262,104 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
     }
 
+    private void addMembers(final ExecutableElement e, final Description parentDescription, final CompilationInfo info, final Map<Element, Long> pos) {
+        if (e == null) {
+            return;
+        }
+
+        final JavafxcTrees trees = info.getTrees();
+        final CompilationUnitTree cut = info.getCompilationUnit();
+        for (Tree tt : cut.getTypeDecls()) {
+            if (tt.getKind() == Tree.Kind.OTHER && tt instanceof JavaFXTree) {
+                JavaFXTree jfxtt = (JavaFXTree) tt;
+                JavaFXKind kk = jfxtt.getJavaFXKind();
+                if (kk == JavaFXKind.CLASS_DECLARATION) {
+                    JFXClassDeclaration cd = (JFXClassDeclaration) jfxtt;
+                    for (Tree jct : cd.getClassMembers()) {
+                        if (jct.getKind() == Tree.Kind.OTHER && jct instanceof JavaFXTree) {
+                            JavaFXTree jfxjct = (JavaFXTree) jct;
+                            JavaFXKind k = jfxjct.getJavaFXKind();
+                            if (k == JavaFXKind.FUNCTION_DEFINITION) {
+                                JFXFunctionDefinition fdt = (JFXFunctionDefinition) jfxjct;
+                                if ("javafx$run$".equals(fdt.name.toString())) {
+                                    for (StatementTree st : fdt.getBodyExpression().getStatements()) {
+                                        if (canceled.get()) {
+                                            return;
+                                        }
+                                        TreePath path = trees.getPath(cut, fdt);
+                                        TreePath expPath = new TreePath(path, st);
+                                        Element el = trees.getElement(expPath);
+                                        if (el == null) {
+                                            continue;
+                                        }
+                                        Description d = element2description(el, e, parentDescription.isInherited, info, pos);
+                                        if (null != d) {
+                                            parentDescription.subs.add(d);
+                                            if (el instanceof TypeElement && !d.isInherited) {
+                                                addMembers((TypeElement) el, d, info, pos);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+//        JavafxcTrees trees = info.getTrees();
+//        TreePath path = trees.getPath(e);
+//        JFXFunctionDefinition tree = (JFXFunctionDefinition) trees.getTree(e);
+//        JFXBlockExpression bodyExpression = tree.getBodyExpression();
+//        for (StatementTree st : bodyExpression.getStatements()) {
+//            if (canceled.get()) {
+//                return;
+//            }
+//            TreePath expPath = new TreePath(path, st);
+//            Element el = trees.getElement(expPath);
+//            if (el == null) {
+//                continue;
+//            }
+//            Description d = element2description(el, e, parentDescription.isInherited, info, pos);
+//            if (null != d) {
+//                parentDescription.subs.add(d);
+//                if (el instanceof TypeElement && !d.isInherited) {
+//                    addMembers((TypeElement) el, d, info, pos);
+//                }
+//            }
+//        }
+
+//        Symbol.MethodSymbol sym = (Symbol.MethodSymbol) e;
+//        Iterable<Symbol> elements = sym.getEnclosedElements();
+//        for (Symbol m : elements) {
+//            if (canceled.get()) {
+//                return;
+//            }
+//            Description d = element2description(m, e, parentDescription.isInherited, info, pos);
+//            if (null != d) {
+//                parentDescription.subs.add(d);
+//                if (m instanceof TypeElement && !d.isInherited) {
+//                    addMembers((TypeElement) m, d, info, pos);
+//                }
+//            }
+//        }
+    }
+
     private Description element2description(final Element e, final Element parent,
             final boolean isParentInherited, final CompilationInfo info,
             final Map<Element, Long> pos) {
 
-        if (info.getElementUtilities().isSynthetic(e)) {
+        final String name = e.getSimpleName().toString();
+        final boolean spaceMagic = e.getEnclosingElement().getSimpleName().toString().equals("javafx$run$");
+        if (!spaceMagic && info.getElementUtilities().isSynthetic(e)) {
             return null;
         }
 
-        boolean inherited = isParentInherited || (null != parent && !parent.equals(e.getEnclosingElement()));
-        Description d = new Description(ui, e.getSimpleName().toString(), e, e.getKind(), inherited);
+        final boolean inherited = isParentInherited || (null != parent && !parent.equals(e.getEnclosingElement()));
+        final ElementKind kind = e.getKind();
+        final ElementKind spaceMagicKind = kind == ElementKind.LOCAL_VARIABLE ? ElementKind.FIELD : kind;
+        Description d = new Description(ui, name, e, spaceMagicKind, inherited);
 
         if (e instanceof TypeElement) {
             if (null != parent) {
@@ -259,18 +370,16 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 }
             }
 
-//            d.subs = new ArrayList<Description>();
             d.subs = new HashSet<Description>();
             d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited);
         } else if (e instanceof ExecutableElement) {
-            final String name = e.getSimpleName().toString();
-            if (name.contains("$")) {
+            if (!spaceMagic && name.contains("$")) {
                 return null;
             }
 
             d.htmlHeader = createHtmlHeader((ExecutableElement) e, info.getElements().isDeprecated(e), d.isInherited);
         } else if (e instanceof VariableElement) {
-            if (!(e.getKind() == ElementKind.FIELD || e.getKind() == ElementKind.ENUM_CONSTANT)) {
+            if (!spaceMagic && kind != ElementKind.FIELD && kind != ElementKind.ENUM_CONSTANT) {
                 return null;
             }
             d.htmlHeader = createHtmlHeader((VariableElement) e, info.getElements().isDeprecated(e), d.isInherited);
@@ -279,17 +388,12 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         d.modifiers = e.getModifiers();
         d.pos = getPosition(e, pos);
 
-//        if (inherited) {
-//            d.cpInfo = info.getClasspathInfo();
-//        }
-
         return d;
     }
 
     private long getPosition(final Element e, final Map<Element, Long> pos) {
         Long res = pos.get(e);
         if (res == null) {
-//                java.util.logging.Logger.getLogger(ElementScanningTask.class.getName()).warning("No pos for: " + e);
             return -1;
         }
         return res.longValue();
