@@ -42,11 +42,7 @@
 package org.netbeans.modules.javafx.preview;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.InvocationEvent;
 import java.io.File;
 import java.lang.reflect.Method;
 import javax.swing.event.HyperlinkEvent;
@@ -61,7 +57,6 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
@@ -266,13 +261,13 @@ public class PreviewThread extends Thread {
         } else {
             MirroringPanel mirroringPanel = null;
             try {
-                mirroringPanel = new MirroringPanel(UIManager.getLookAndFeel()) {
+                mirroringPanel = new MirroringPanel(JavaFXModel.getProject(doc), UIManager.getLookAndFeel()) {
                     @Override
                     protected JPanel createMirroredPanel() {
                         return (JPanel)execute();
                     }
                 };
-            } catch (MirroringPanel.MPException ex) {
+            } catch (Exception ex) {
                 ((JavaFXDocument)doc).renderPreview(JavaFXDocument.getErrorPane());
             }
             if (mirroringPanel!= null)
