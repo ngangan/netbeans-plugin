@@ -507,6 +507,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (FileObject child : fo.getChildren()) {
                     if (child.isFolder()) {
                         log(" found : " + child);
+                        if (("META-INF".equals(child.getName())) || 
+                            ("doc-files".equals(child.getName()))) {
+                            continue;
+                        }
                         String s = child.getPath().replace('/', '.');
                         addResult(JavaFXCompletionItem.createPackageItem(s, offset, false));
                     }
