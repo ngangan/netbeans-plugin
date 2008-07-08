@@ -31,7 +31,7 @@
 package weatherfx;
 
 /**
- * * A simple helper class for holding transformation values
+ * A simple helper class for holding transformation values
  * 
  * @author breh
  */
@@ -44,6 +44,4 @@ public class TransformHelper {
     // scale
     public attribute scale:Number = 1.0;
 }
-
-//attribute TransformHelper.scale = 1.0;
 

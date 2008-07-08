@@ -81,34 +81,19 @@ public class AnimatedImage extends ImageView {
     
     
     public function loadImages():Void {
-        //System.out.println("Loading images: {baseName}");
         var count = imagesCount - 1;
         if (baseURL <> null) {
             images =  for (i in [0..count]) {
                 CachedImage.getCachedImage("{baseURL}/{baseName}{%03d i}.{extension}");
-                /*Image {    
-                    url: "{baseURL}/{baseName}{%03d i}.{extension}" 
-                }*/
             };    
         }
     }
     
    
     public static function create(baseURL:String, baseName:String, extension:String, imagesCount:Integer):AnimatedImage {    
-        //System.out.println("Creatign images {baseName}");
         var animatedImage = AnimatedImage{baseURL:baseURL, baseName:baseName, extension:extension, imagesCount:imagesCount};
         animatedImage.loadImages();
         animatedImage.play();
         return animatedImage;
-    }
-    
-    /*
-    public function create():Node {
-        loadImages();
-        var imgView = ImageView {
-            image: bind images[currentImageIndex];
-        }
-        play();
-        return imgView;
-    } */   
+    }    
 }

@@ -39,8 +39,6 @@ import java.lang.System;
  * @author breh
  */
 
-
-
 public class WeatherModel {
     
     public static /*readonly*/ attribute UNKNOWN:Integer = 0;
@@ -119,7 +117,6 @@ public class WeatherModel {
         tomorrowConditionCode = translateConditionCode(yws.getConditionCode(1));    
         tomorrowLows = yws.getLowsTemp(1);
         tomorrowHighs = yws.getHighsTemp(1);
-        //System.out.println("conditions: {cityName} {yws.getConditionCode()} {yws.getConditionCode(1)} {todayConditionCode}");
     }
     
     

@@ -29,35 +29,13 @@
 
 package weatherfx;
 
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.scene.Group;
-import javafx.scene.Font;
-import javafx.scene.FontStyle;
-import javafx.scene.HorizontalAlignment;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.geometry.Shape;
-import javafx.scene.geometry.Circle;
-import javafx.scene.geometry.Line;
-import javafx.scene.geometry.Rectangle;
-import javafx.scene.geometry.Path;
-import javafx.scene.geometry.MoveTo;
-import javafx.scene.geometry.CurveTo;
-import javafx.scene.geometry.LineTo;
-import javafx.scene.geometry.ClosePath;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextOrigin;
-import javafx.scene.transform.Affine;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.*;
+import javafx.scene.paint.*;
+import javafx.scene.effect.*;
+import javafx.scene.geometry.*;
+import javafx.scene.text.*;
+import javafx.scene.transform.*;
+import javafx.scene.image.*;
 import javafx.animation.*;
 
 import javafx.ext.swing.Canvas;
@@ -65,13 +43,9 @@ import javafx.ext.swing.Canvas;
 import java.lang.System;
 
 /**
- * Class holding all the graphics data. Original imported from Adobe Illustrator
- * using SVG export and SVG -> JavaFX converter.
- * 
- * @author breh
+ * Main class for the business logic
+ *
  */
-
-
 public class Weather extends CustomNode {
     
     private function rgba(r:Number, g:Number, b:Number, a:Number):Color {
@@ -81,10 +55,7 @@ public class Weather extends CustomNode {
     private function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
         return Affine{m00:m00 m01:m01 m02:m02 m10:m10 m11:m11 m12:m12};
         }    
-    
-    // gfx
-    
-    
+        
     private attribute outlineShape:Shape;
     
     private function showWeather() {
@@ -160,7 +131,7 @@ public class Weather extends CustomNode {
         KeyFrame {
             time: 0s
             values: [
-                todayNodesOpacity => 1.0, // this sucks big time
+                todayNodesOpacity => 1.0,
                 lowsTriangleTransform.tx => 0.0,
                 lowsTriangleTransform.ty => 0.0,
                 highsTriangleTransform.tx => 0.0,                
@@ -217,17 +188,6 @@ public class Weather extends CustomNode {
                     todayHighsTY => -70.0,
                     tomorrowLowsTY => 0.0,
                     tomorrowHighsTY => 0.0,
-                    /*
-                    lowsTriangleTransform.tx => lowsTriangleTransform.tx,
-                    lowsTriangleTransform.ty => lowsTriangleTransform.ty,
-                    highsTriangleTransform.tx => highsTriangleTransform.tx,
-                    highsTriangleTransform.ty => highsTriangleTransform.ty,                    
-                    lowsTriangleTransform.scale => lowsTriangleTransform.scale,
-                    todayLowsTY => todayLowsTY,
-                    todayHighsTY => todayHighsTY,
-                    tomorrowLowsTY => tomorrowLowsTY,
-                    tomorrowHighsTY => tomorrowHighsTY,                    
-                    */
                 ]
                 }, 
             KeyFrame {
@@ -282,19 +242,7 @@ public class Weather extends CustomNode {
             opacity: 0.0
             onMousePressed: function (e) { 
                 toTodayTimeline.start();
-                }
-            
-            /*
-            onMouseEntered: operation (e:CanvasMouseEvent) {                       
-                System.out.println("entered today");
-                self.opacity = [0.00,0.01 .. 0.5] dur 1000;
-            }
-            onMouseExited: operation (e:CanvasMouseEvent) {                       
-                System.out.println("exited today");
-
-                self.opacity = [0.5, 0.49 .. 0] dur 1000;
-            }
-    */
+                }            
             };
         return today;
         }
@@ -560,11 +508,7 @@ public class Weather extends CustomNode {
                         y: 7.076
                         //smooth: false
                         absolute: false
-                        },/*
-                                LineTo {
-                                    y: 133.471
-                                    absolute: true
-                                },*/
+                        },
                     ClosePath {},
                     ]
                     stroke: rgba(0x00, 0x00, 0x00, 0xff)
