@@ -74,11 +74,16 @@ class MemoryClassLoader extends ClassLoader {
         }
     }
     
+//    public MemoryClassLoader(URL[] sourceCP, URL[] executeCP, URL[] bootCP) {
+//        classBytes = new HashMap<String, byte[]>();
+//        if (bootClassLoader == null)
+//            bootClassLoader = new URLClassLoader(bootCP, this.getClass().getClassLoader().getParent(), null);
+//        compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP), bootClassLoader, null);
+//    }
+    
     public MemoryClassLoader(URL[] sourceCP, URL[] executeCP, URL[] bootCP) {
         classBytes = new HashMap<String, byte[]>();
-        if (bootClassLoader == null)
-            bootClassLoader = new URLClassLoader(bootCP, this.getClass().getClassLoader().getParent(), null);
-        compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP), bootClassLoader, null);
+        compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP, bootCP), this.getClass().getClassLoader().getParent(), null);
     }
     
     public MemoryClassLoader(URL[] classPaths) {
@@ -132,8 +137,7 @@ class MemoryClassLoader extends ClassLoader {
             } catch (NoClassDefFoundError er) {
             } catch (ClassNotFoundException ex) {
             }
-            if (classs != null) return classs;
-            return Thread.currentThread().getContextClassLoader().loadClass(name);
+            return classs;
         }
 
         Class result = findClass(name);

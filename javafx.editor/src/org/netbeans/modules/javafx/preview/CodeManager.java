@@ -136,8 +136,6 @@ public class CodeManager {
     public static Object run(Object context) {
         Object obj = null;
         if (context != null) {
-            //ClassLoader orig = Thread.currentThread().getContextClassLoader();
-            //Thread.currentThread().setContextClassLoader(ToolProvider.class.getClassLoader());
 
             Context env = (Context)context;
             if (env.classBytes != null) {
@@ -148,7 +146,6 @@ public class CodeManager {
                     ex.printStackTrace();
                 }
             }
-            //Thread.currentThread().setContextClassLoader(orig);
         }
         return obj;
     }
@@ -266,6 +263,7 @@ public class CodeManager {
     }
     
     private static Object run(String name, ClassLoader classLoader) throws Exception {
+        Thread.currentThread().setContextClassLoader(classLoader);
         Class<?> mainClass = classLoader.loadClass(name); 
         Class<?> paramClass = classLoader.loadClass(secuenceClassName); 
         Class<?> sequencesClass = classLoader.loadClass(secuencesClassName); 

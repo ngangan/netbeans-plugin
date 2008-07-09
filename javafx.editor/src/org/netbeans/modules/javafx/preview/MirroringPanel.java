@@ -185,13 +185,16 @@ public class MirroringPanel extends JPanel implements Runnable {
         g.drawImage(offscreenBuffer, 0, 0, null);
     }
     
+    private Component focusOwner = null;
     void onMouseEvent(MouseEvent ev) {
         switch (ev.getID()) {
             case MouseEvent.MOUSE_ENTERED:
                 SwingUtilities.getWindowAncestor(this).setFocusableWindowState(false);
+                focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
                 break;
             case MouseEvent.MOUSE_EXITED:
                 SwingUtilities.getWindowAncestor(this).setFocusableWindowState(true);
+                if (focusOwner != null) focusOwner.requestFocus();
                 break;
         }
         if (mirroredEventQueue != null && mirroredFrame != null) {
