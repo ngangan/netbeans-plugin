@@ -142,6 +142,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             if (doc != null) {
                 if(doc.executionAllowed()) {
                     doc.enableExecution(false);
+                    JavaFXModel.destroyAC(JavaFXModel.getProject(doc));
                     putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
                 } else {
                     doc.enableExecution(true);
@@ -236,6 +237,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
             JavaFXDocument doc = getJavaFXDocument(target);
+            JavaFXModel.destroyAC(JavaFXModel.getProject(doc));
             JavaFXModel.previewReq(doc, true);
         }
 

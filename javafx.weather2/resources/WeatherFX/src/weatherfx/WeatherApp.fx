@@ -50,8 +50,6 @@ var weather1 = Weather{};
 var weather2 = Weather{};
 var weather3 = Weather{};
 
-//var canvasViewport = CanvasViewport{currentWidth: 50 currentHeight: 50};
-
 var f = Frame {
     background: Color.BLACK
     content: Canvas {
@@ -76,7 +74,6 @@ var f = Frame {
     width: 260
     height: 310
     visible: true
-    //undecorated: true    
 };
 
 

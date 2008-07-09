@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2007,2008 Sun Microsystems, Inc.
  * All rights reserved.
@@ -70,7 +69,6 @@ public class LoadingScreen extends CustomNode  {
 
     private function SVGID_1_(): LinearGradient {
          LinearGradient {
-            //gradientUnits: USER_SPACE_ON_USE
             startX: 117.1709
             endX: 117.1709
             startY: 77.7261

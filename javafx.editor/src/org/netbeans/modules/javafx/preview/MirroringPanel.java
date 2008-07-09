@@ -26,23 +26,23 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import javax.swing.*;
-
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
+import org.netbeans.api.project.Project;
 
-public class MirroringPanel extends JPanel {
+public class MirroringPanel extends JPanel implements Runnable {
     JDialog         mirroredFrame = null;
     JPanel          mirroredPanel = null;
-    MirroringThread mirroringTread = null;
     EventQueue      mirroredEventQueue = null;
     EventQueue      mirroringEventQueue = null;
-    Object          ac = null;
     LookAndFeel     lf = null;
     BufferedImage   offscreenBuffer = null;
     ThreadGroup     threadGroup = null;
+    Project         project = null;
     
-    public MirroringPanel(LookAndFeel lf) throws MPException {
+    public MirroringPanel(Project project, LookAndFeel lf) throws Exception {
         super();
+        this.project = project;
         mirroringEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
         this.lf = lf;
         offscreenBuffer = (BufferedImage) createImage(getWidth(), getHeight());
@@ -53,113 +53,99 @@ public class MirroringPanel extends JPanel {
         return null;
     }
     
-    class MirroringThread extends Thread {
-        public MirroringThread(ThreadGroup tg) {
-            super(tg, "SACT"); // NOI18N
+    public void run() {
+        try {
+            UIManager.setLookAndFeel(lf);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        
-        @Override
-        public void run() {
-            try {
-                Class<?> acc = this.getClass().getClassLoader().loadClass(STK);
-                ac = acc.getDeclaredMethod(CNAPC).invoke(null);
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
-            }
 
-            try {
-                UIManager.setLookAndFeel(lf);
-            } catch (UnsupportedLookAndFeelException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            
-            mirroredEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-            
-            KeyboardFocusManager.setCurrentKeyboardFocusManager(new DefaultKeyboardFocusManager(){
+        mirroredEventQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
 
-              @Override
-                public Window getFocusedWindow() {
-                    synchronized (KeyboardFocusManager.class) {
-                        return (mirroredFrame);
+        KeyboardFocusManager.setCurrentKeyboardFocusManager(new DefaultKeyboardFocusManager(){
+
+          @Override
+            public Window getFocusedWindow() {
+                synchronized (KeyboardFocusManager.class) {
+                    return (mirroredFrame);
+                }
+            }
+        });
+
+        mirroredPanel = createMirroredPanel();
+        if (mirroredPanel == null) return;
+
+        mirroredFrame = new JDialog() {
+           ComponentPeer origDialogPeer;
+           ComponentPeer proxyInstPeer;
+           public void addNotify() {
+                super.addNotify();
+                if (!replacePeer()) setLocation(-2000, -2000);
+           }
+           boolean replacePeer() {
+                origDialogPeer = getPeer();
+                if (origDialogPeer.getClass().toString().startsWith("apple")) return false;
+
+                InvocationHandler handler = new InvocationHandler() {
+                    public Object invoke(Object proxy, Method method, Object[] args) {
+                        if (method.getName().contentEquals(SHOW)) {
+                            return null;
+                        }
+
+                        Object ret = null;
+                        try {
+                            ret = method.invoke(origDialogPeer, args);
+                        } catch (Exception ex) {
+                            // Linux problems
+                            if (method.getName().contentEquals("requestFocus"))
+                               ret = true;
+                            else
+                                ex.printStackTrace();
+                        }
+                        return ret;
+                    }
+                };
+
+                proxyInstPeer = (DialogPeer)Proxy.newProxyInstance(
+                    DialogPeer.class.getClassLoader(), new Class[] {DialogPeer.class}, handler);
+
+                try {
+                    Field peer = Component.class.getDeclaredField(PEER);
+                    peer.setAccessible(true);
+                    peer.set(this, proxyInstPeer);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return true;
+            }; 
+        };
+
+        mirroredFrame.setUndecorated(true);
+        mirroredFrame.setFocusableWindowState(false);
+        mirroredFrame.setLayout(new BorderLayout());
+        JScrollPane jsp = new JScrollPane();
+        jsp.setViewportView(mirroredPanel);
+        mirroredFrame.add(jsp);
+        mirroredFrame.setVisible(true);
+        mirroredFrame.setSize(getSize().width + mirroredFrame.getInsets().left + mirroredFrame.getInsets().right, getSize().height + mirroredFrame.getInsets().top + mirroredFrame.getInsets().bottom);
+        mirroredFrame.setFocusableWindowState(true);
+
+        RepaintManager.setCurrentManager(new RepaintManager() {
+            @Override
+            public void paintDirtyRegions() {
+                super.paintDirtyRegions();
+                if (offscreenBuffer != null) {
+                    if (mirroredFrame != null) {
+                        mirroredFrame.getLayeredPane().paintAll(offscreenBuffer.getGraphics());
+                        mirroringEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
+                            public void run() {
+                                repaint();
+                            }
+                        }));
                     }
                 }
-            });
-
-            mirroredPanel = createMirroredPanel();
-            if (mirroredPanel == null) return;
-            
-            mirroredFrame = new JDialog() {
-               ComponentPeer origDialogPeer;
-               ComponentPeer proxyInstPeer;
-               public void addNotify() {
-                    super.addNotify();
-                    if (!replacePeer()) setLocation(-2000, -2000);
-               }
-               boolean replacePeer() {
-                    origDialogPeer = getPeer();
-                    if (origDialogPeer.getClass().toString().startsWith("apple")) return false;
-
-                    InvocationHandler handler = new InvocationHandler() {
-                        public Object invoke(Object proxy, Method method, Object[] args) {
-                            if (method.getName().contentEquals(SHOW)) {
-                                return null;
-                            }
-                            
-                            Object ret = null;
-                            try {
-                                ret = method.invoke(origDialogPeer, args);
-                            } catch (Exception ex) {
-                                // Linux problems
-                                if (method.getName().contentEquals("requestFocus"))
-                                   ret = true;
-                                else
-                                    ex.printStackTrace();
-                            }
-                            return ret;
-                        }
-                    };
- 
-                    proxyInstPeer = (DialogPeer)Proxy.newProxyInstance(
-                        DialogPeer.class.getClassLoader(), new Class[] {DialogPeer.class}, handler);
-
-                    try {
-                        Field peer = Component.class.getDeclaredField(PEER);
-                        peer.setAccessible(true);
-                        peer.set(this, proxyInstPeer);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    return true;
-                }; 
-            };
-
-            mirroredFrame.setUndecorated(true);
-            mirroredFrame.setFocusableWindowState(false);
-            mirroredFrame.setLayout(new BorderLayout());
-            JScrollPane jsp = new JScrollPane();
-            jsp.setViewportView(mirroredPanel);
-            mirroredFrame.add(jsp);
-            mirroredFrame.setVisible(true);
-            mirroredFrame.setSize(getSize().width + mirroredFrame.getInsets().left + mirroredFrame.getInsets().right, getSize().height + mirroredFrame.getInsets().top + mirroredFrame.getInsets().bottom);
-            mirroredFrame.setFocusableWindowState(true);
-            
-            RepaintManager.setCurrentManager(new RepaintManager() {
-                @Override
-                public void paintDirtyRegions() {
-                    super.paintDirtyRegions();
-                    if (offscreenBuffer != null) {
-                        if (mirroredFrame != null) {
-                            mirroredFrame.getLayeredPane().paintAll(offscreenBuffer.getGraphics());
-                            mirroringEventQueue.postEvent(new InvocationEvent(Toolkit.getDefaultToolkit(), new Runnable() {
-                                public void run() {
-                                    repaint();
-                                }
-                            }));
-                        }
-                    }
-                }
-            });
-        }
+            }
+        });
     }
 
     @Override
@@ -223,16 +209,7 @@ public class MirroringPanel extends JPanel {
         Window ancestor = SwingUtilities.getWindowAncestor(this);
         if (ancestor != null) ancestor.setFocusableWindowState(true);
         disableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
-        if (ac != null) {
-            try {
-                Class<?> acc = this.getClass().getClassLoader().loadClass(APC);
-                acc.getDeclaredMethod(DSP).invoke(ac);
-            } catch (Throwable er) {
-                er.printStackTrace();
-            }
-        }
-        mirroredEventQueue = null;
-        ac = null;
+        mirroredFrame.dispose();
     }
     
     @Override
@@ -243,25 +220,16 @@ public class MirroringPanel extends JPanel {
     
     private static int instanceCounter = 0;
     
-    void startMirroring() throws MPException {
-        threadGroup = new ThreadGroup("SACG" + instanceCounter++); // NOI18N
-        mirroringTread = new MirroringThread(threadGroup);
-        mirroringTread.start();
+    void startMirroring() throws Exception {
         try {
-            mirroringTread.join(20000);
-            if (mirroringTread.isAlive()) {
-                cleanup();
-                throw new MPException();
-            }
-        } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
+            JavaFXModel.runInAC(project, this);
+        } catch (Exception ex) {
+            JavaFXModel.destroyAC(project);
+            throw ex;
         }
         enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     }
  
-    public class MPException extends Exception {
-    }
-    
     static private String STK = "sun.awt.SunToolkit";                       // NOI18N
     static private String CNAPC = "createNewAppContext";                    // NOI18N
     static private String APC = "sun.awt.AppContext";                       // NOI18N

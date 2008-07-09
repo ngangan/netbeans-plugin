@@ -292,6 +292,7 @@ public final class ElementOpen {
             case STATIC_INIT:
                 signatures = createExecutableDescriptor((ExecutableElement) element);
                 break;
+            case LOCAL_VARIABLE: // space magic
             case FIELD:
             case ENUM_CONSTANT:
                 signatures = createFieldDescriptor((VariableElement) element);
@@ -408,6 +409,10 @@ public final class ElementOpen {
         assert ve != null;
         String[] result = new String[3];
         Element enclosingElement = ve.getEnclosingElement();
+        // space magic
+//        if (!(enclosingElement instanceof TypeElement)) {
+//            enclosingElement = enclosingElement.getEnclosingElement();
+//        }
         assert enclosingElement instanceof TypeElement;
         result[0] = encodeClassNameOrArray((TypeElement) enclosingElement);
         result[1] = ve.getSimpleName().toString();

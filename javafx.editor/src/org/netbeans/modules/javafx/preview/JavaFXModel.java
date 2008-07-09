@@ -53,9 +53,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Collections;
-import javax.swing.SwingUtilities;
-//import net.java.javafx.type.expr.CompilationUnit;
-//import net.java.javafx.typeImpl.Compilation;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -63,7 +60,6 @@ import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.filesystems.FileObject;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
-
 
 /**
  *
@@ -80,6 +76,7 @@ public class JavaFXModel {
     private static ChangeThread changeThread = null;
     private static long lastVisitTime = 0;
     private static Map <Project, Map <String, byte[]>> projectsClassBytes = null;
+    private static Map <Project, ACThread> projectsAppContextsThreads = null;
     private static Object projectsClassBytesLock = new Object();
     
     static{
@@ -101,6 +98,7 @@ public class JavaFXModel {
                     }
                     for (Project project : removedProjects) {
                         projectsClassBytes.remove(project);
+                        destroyAC(project);
                     }
                 }
             }
@@ -116,6 +114,7 @@ public class JavaFXModel {
             if (evt.getPropertyName().contentEquals("platform.active")) {                             // NOI18N
                 synchronized (projectsClassBytesLock) {
                     projectsClassBytes.remove(project);
+                    destroyAC(project);
                     if (project instanceof JavaFXProject) {
                         PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
                         evaluator.removePropertyChangeListener(this);
@@ -124,7 +123,6 @@ public class JavaFXModel {
             }
         }
     }
-    
     
     static public void addClassBytes(Project project, Map<String, byte[]> classBytes) {
         synchronized (projectsClassBytesLock) {
@@ -181,7 +179,6 @@ public class JavaFXModel {
     }
     
     public static void sourceChanged(FXDocument doc){
-        
         CodeManager.cut(doc);
         lastVisitTime = System.currentTimeMillis();
         previewReq(doc, true);
@@ -254,6 +251,7 @@ public class JavaFXModel {
             new Thread(new ChangeThread()).start();
         }
         projectsClassBytes = new HashMap<Project, Map<String, byte[]>>();
+        projectsAppContextsThreads = new HashMap<Project, ACThread>();
         OpenProjects.getDefault().addPropertyChangeListener(new ProjectListener());
     }
     
@@ -270,6 +268,104 @@ public class JavaFXModel {
         }
     }
     
+    static class ACThread extends Thread {
+        private volatile Runnable request = null;
+        private Object lock1 = new Object();
+        private Object lock2 = new Object();
+        private volatile boolean skipLock1 = false;
+        private volatile boolean skipLock2 = false;
+        Object ac = null;
+        
+        public ACThread(ThreadGroup tg) {
+            super(tg, "SACT"); // NOI18N
+        }
+        
+        public void execute(Runnable runnable) throws Exception {
+            synchronized (lock1) {
+                request = runnable;
+                lock1.notifyAll();
+                skipLock1 = true;
+            }
+            synchronized (lock2) {
+                try {
+                    if (!skipLock2) {
+                        lock2.wait(15000);
+                        skipLock2 = false;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                if (request != null)
+                    throw new Exception();
+            }
+        }
+        
+        @Override
+        public void run() {
+            try {
+                Class<?> acc = this.getClass().getClassLoader().loadClass(STK);
+                ac = acc.getDeclaredMethod(CNAPC).invoke(null);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            while (true) {
+                synchronized (lock1) {
+                    while (request == null) {
+                        try {
+                            if (!skipLock2) {
+                                lock1.wait();
+                                skipLock1 = false;
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+                request.run();
+                request = null;
+                synchronized (lock2) {
+                    lock2.notify();
+                    skipLock2 = true;
+                }
+            }
+        }
+        
+        public void cleanup() {
+            if (ac != null) {
+                try {
+                    Class<?> acc = this.getClass().getClassLoader().loadClass(APC);
+                    acc.getDeclaredMethod(DSP).invoke(ac);
+                } catch (Throwable er) {
+                    er.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    private static int instanceCounter = 0;
+    private static ACThread createAC(Project project) {
+        ACThread thread = new ACThread(new ThreadGroup("SACG" + instanceCounter++));
+        projectsAppContextsThreads.put(project, thread);
+        thread.start();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+        return thread;
+    }
+    
+    public static void destroyAC(Project project) {
+        if (projectsAppContextsThreads.containsKey(project))
+            projectsAppContextsThreads.remove(project).cleanup();
+    }
+    
+    public static void runInAC(Project project, Runnable runnable) throws Exception {
+        ACThread thread = projectsAppContextsThreads.get(project);
+        if (thread == null) thread = createAC(project);
+        thread.execute(runnable);
+    }
+            
     public static Project getProject(FXDocument doc){
         return getProject(NbEditorUtilities.getFileObject(doc));
     }
@@ -296,4 +392,9 @@ public class JavaFXModel {
             ChangeThread.doc = doc;
         }
     }
+    
+    static private String STK = "sun.awt.SunToolkit";                       // NOI18N
+    static private String CNAPC = "createNewAppContext";                    // NOI18N
+    static private String APC = "sun.awt.AppContext";                       // NOI18N
+    static private String DSP = "dispose";                                  // NOI18N
 }
