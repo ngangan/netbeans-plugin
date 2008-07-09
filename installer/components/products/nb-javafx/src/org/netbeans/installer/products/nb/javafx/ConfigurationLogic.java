@@ -49,7 +49,7 @@ public class ConfigurationLogic extends NbClusterConfigurationLogic {
     private static final String JAVAFX_CLUSTER = 
             "{javafx-cluster}"; // NOI18N
     private static final String ID = 
-            "JAVAFX"; // NOI18N
+            "FX"; // NOI18N
     
     /////////////////////////////////////////////////////////////////////////////////
     // Instance
