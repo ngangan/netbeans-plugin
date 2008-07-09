@@ -38,7 +38,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.debugger.javafx.breakpoints;
 
 import com.sun.jdi.AbsentInformationException;
@@ -77,35 +76,31 @@ import org.netbeans.modules.debugger.javafx.models.JavaFXThreadImpl;
 import org.openide.ErrorManager;
 import org.openide.util.NbBundle;
 
-
-
 /**
-* Implementation of breakpoint on method.
-*
-* @author   Jan Jancura
-*/
+ * Implementation of breakpoint on method.
+ *
+ * @author   Jan Jancura
+ */
 public class LineBreakpointImpl extends ClassBasedBreakpoint {
-    
+
     private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.breakpoints"); // NOI18N
-    
-    private int                 lineNumber;
-    private BreakpointsReader   reader;
-    
-    
-    public LineBreakpointImpl (
-        LineBreakpoint breakpoint, 
-        BreakpointsReader reader,
-        JavaFXDebuggerImpl debugger,
-        Session session,
-        SourcePath sourcePath
-    ) {
-        super (breakpoint, reader, debugger, session);
+
+    private int lineNumber;
+    private BreakpointsReader reader;
+
+    public LineBreakpointImpl(
+            LineBreakpoint breakpoint,
+            BreakpointsReader reader,
+            JavaFXDebuggerImpl debugger,
+            Session session,
+            SourcePath sourcePath) {
+        super(breakpoint, reader, debugger, session);
         this.reader = reader;
         updateLineNumber();
         setSourceRoot(sourcePath.getSourceRoot(breakpoint.getURL()));
-        set ();
+        set();
     }
-    
+
     private void updateLineNumber() {
         int line = getBreakpoint().getLineNumber();
         String url = getBreakpoint().getURL();
@@ -120,32 +115,32 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
     protected LineBreakpoint getBreakpoint() {
         return (LineBreakpoint) super.getBreakpoint();
     }
-    
-    void fixed () {
-        logger.fine("LineBreakpoint fixed: "+this);
+
+    void fixed() {
+        logger.fine("LineBreakpoint fixed: " + this);
         updateLineNumber();
-        super.fixed ();
+        super.fixed();
     }
-    
-    protected void setRequests () {
+
+    protected void setRequests() {
         LineBreakpoint breakpoint = getBreakpoint();
         updateLineNumber();
-        String[] preferredSourceRoot = new String[] { null };
+        String[] preferredSourceRoot = new String[]{null};
         String sourcePath = getDebugger().getEngineContext().getRelativePath(breakpoint.getURL(), '/', true);
         String reason = null;
         if (sourcePath == null) {
             reason = NbBundle.getMessage(LineBreakpointImpl.class,
-                                         "MSG_NoSourceRoot",
-                                         breakpoint.getURL());
+                    "MSG_NoSourceRoot",
+                    breakpoint.getURL());
         } else if (!isEnabled(sourcePath, preferredSourceRoot)) {
             reason = NbBundle.getMessage(LineBreakpointImpl.class,
-                                         "MSG_DifferentPrefferedSourceRoot",
-                                         preferredSourceRoot[0]);
+                    "MSG_DifferentPrefferedSourceRoot",
+                    preferredSourceRoot[0]);
         }
         if (reason != null) {
             ErrorManager.getDefault().log(ErrorManager.WARNING,
-                    "Unable to submit line breakpoint to "+breakpoint.getURL()+
-                    " at line "+lineNumber+", reason: "+reason);
+                    "Unable to submit line breakpoint to " + breakpoint.getURL() +
+                    " at line " + lineNumber + ", reason: " + reason);
             setValidity(Breakpoint.VALIDITY.INVALID, reason);
             return;
         }
@@ -153,13 +148,13 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
         if (className == null) {
             className = reader.findCachedClassName(breakpoint);
             if (className == null) {
-                className = EditorContextBridge.getContext().getClassName (
-                    breakpoint.getURL (), 
-                    lineNumber
-                );
+                className = EditorContextBridge.getContext().getClassName(
+                        breakpoint.getURL(),
+                        lineNumber);
                 //TODO XXX HARDCODE for test
-                if (className==""){
-                    className = sourcePath.substring(0,sourcePath.length()-3).replaceAll("/", ".");//"javafxapplication71.Main";
+                if (className == "") {
+                    className = sourcePath.substring(0, sourcePath.length() - 3).replaceAll("/", ".");//"javafxapplication71.Main";
+
                 }
                 if (className != null && className.length() > 0) {
                     reader.storeCachedClassName(breakpoint, className);
@@ -167,62 +162,65 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
             }
         }
         if (className == null || className.length() == 0) {
-            logger.warning("Class name not defined for breakpoint "+breakpoint);
+            logger.warning("Class name not defined for breakpoint " + breakpoint);
             setValidity(Breakpoint.VALIDITY.INVALID, NbBundle.getMessage(LineBreakpointImpl.class, "MSG_NoBPClass"));
-            return ;
+            return;
         }
-        logger.fine("LineBreakpoint "+breakpoint+" - setting request for "+className);
-        setClassRequests (
-            new String[] {
-                className // The class name is correct even for inner classes now
-            }, 
-            new String [0],
-            ClassLoadUnloadBreakpoint.TYPE_CLASS_LOADED
-        );
-        checkLoadedClasses (className, null);
+        logger.fine("LineBreakpoint " + breakpoint + " - setting request for " + className);
+        setClassRequests(
+                new String[]{
+                    className // The class name is correct even for inner classes now
+
+                },
+                new String[0],
+                ClassLoadUnloadBreakpoint.TYPE_CLASS_LOADED);
+        checkLoadedClasses(className, null);
     }
 
-    protected void classLoaded (ReferenceType referenceType) {
+    protected void classLoaded(ReferenceType referenceType) {
         LineBreakpoint breakpoint = getBreakpoint();
-        logger.fine("Class "+referenceType+" loaded for breakpoint "+breakpoint);
-        
-        String[] reason = new String[] { null };
-        List locations = getLocations (
-            referenceType,
-            breakpoint.getStratum (),
-            breakpoint.getSourceName (),
-            breakpoint.getSourcePath(),
-            lineNumber,
-            reason
-        );
+        logger.fine("Class " + referenceType + " loaded for breakpoint " + breakpoint);
+
+        String[] reason = new String[]{null};
+        List locations = getLocations(
+                referenceType,
+                breakpoint.getStratum(),
+                breakpoint.getSourceName(),
+                breakpoint.getSourcePath(),
+                lineNumber,
+                reason);
         if (locations.isEmpty()) {
             ErrorManager.getDefault().log(ErrorManager.WARNING,
-                    "Unable to submit line breakpoint to "+referenceType.name()+
-                    " at line "+lineNumber+", reason: "+reason[0]);
+                    "Unable to submit line breakpoint to " + referenceType.name() +
+                    " at line " + lineNumber + ", reason: " + reason[0]);
             setValidity(Breakpoint.VALIDITY.INVALID, reason[0]);
             return;
-        } 
+        }
+        Location prevLocation = null;
         for (Iterator it = locations.iterator(); it.hasNext();) {
-            Location location = (Location)it.next();
-            try {           
-                BreakpointRequest br = getEventRequestManager ().
-                    createBreakpointRequest (location);
-                setFilters(br);
-                addEventRequest (br);
-                setValidity(Breakpoint.VALIDITY.VALID, null);
-                //System.out.println("Breakpoint " + br + location + "created");
+            Location location = (Location) it.next();
+            try {
+                if ((prevLocation==null) ? true : (location.lineNumber()!=prevLocation.lineNumber()) ) {
+                    BreakpointRequest br = getEventRequestManager().
+                            createBreakpointRequest(location);
+                    setFilters(br);
+                    addEventRequest(br);
+                    setValidity(Breakpoint.VALIDITY.VALID, null);
+                    //System.out.println("Breakpoint " + br + location + "created");
+                    prevLocation = location;
+                }
             } catch (VMDisconnectedException e) {
             }
         }
     }
-    
+
     protected EventRequest createEventRequest(EventRequest oldRequest) {
         Location location = ((BreakpointRequest) oldRequest).location();
-        BreakpointRequest br = getEventRequestManager ().createBreakpointRequest (location);
+        BreakpointRequest br = getEventRequestManager().createBreakpointRequest(location);
         setFilters(br);
         return br;
     }
-    
+
     private void setFilters(BreakpointRequest br) {
         JavaFXThread[] threadFilters = getBreakpoint().getThreadFilters(getDebugger());
         if (threadFilters != null && threadFilters.length > 0) {
@@ -238,17 +236,16 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
         }
     }
 
-    public boolean exec (Event event) {
+    public boolean exec(Event event) {
         if (event instanceof BreakpointEvent) {
-            return perform (
-                event,
-                getBreakpoint().getCondition (),
-                ((BreakpointEvent) event).thread (),
-                ((LocatableEvent) event).location ().declaringType (),
-                null
-            );
+            return perform(
+                    event,
+                    getBreakpoint().getCondition(),
+                    ((BreakpointEvent) event).thread(),
+                    ((LocatableEvent) event).location().declaringType(),
+                    null);
         }
-        return super.exec (event);
+        return super.exec(event);
     }
 
     @Override
@@ -261,40 +258,38 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
             //System.err.println("  BP line = "+getBreakpoint().getLineNumber());
             if (lineNumber == old) {
                 // No change, skip it
-                return ;
+                return;
             }
         }
         super.propertyChange(evt);
     }
-    
-    
-    private static List getLocations (
-        ReferenceType referenceType,
-        String stratum,
-        String sourceName,
-        String bpSourcePath,
-        int lineNumber,
-        String[] reason
-    ) {
+
+    private static List getLocations(
+            ReferenceType referenceType,
+            String stratum,
+            String sourceName,
+            String bpSourcePath,
+            int lineNumber,
+            String[] reason) {
         try {
             reason[0] = null;
             List locations = locationsOfLineInClass(referenceType, stratum,
-                                                    sourceName, bpSourcePath,
-                                                    lineNumber, reason);
+                    sourceName, bpSourcePath,
+                    lineNumber, reason);
             /* Obsolete, no special handling of inner classes, referenceType is
-               the correct class now.
-             if (locations.isEmpty()) {
-                // add lines from innerclasses
-                Iterator i = referenceType.nestedTypes ().iterator ();
-                while (i.hasNext ()) {
-                    ReferenceType rt = (ReferenceType) i.next ();
-                    locations = locationsOfLineInClass(rt, stratum, sourceName,
-                                                       bpSourcePath, lineNumber,
-                                                       reason);
-                    if (!locations.isEmpty()) {
-                        break;
-                    }
-                }
+            the correct class now.
+            if (locations.isEmpty()) {
+            // add lines from innerclasses
+            Iterator i = referenceType.nestedTypes ().iterator ();
+            while (i.hasNext ()) {
+            ReferenceType rt = (ReferenceType) i.next ();
+            locations = locationsOfLineInClass(rt, stratum, sourceName,
+            bpSourcePath, lineNumber,
+            reason);
+            if (!locations.isEmpty()) {
+            break;
+            }
+            }
             }*/
             if (locations.isEmpty() && reason[0] == null) {
                 reason[0] = NbBundle.getMessage(LineBreakpointImpl.class, "MSG_NoLocation", Integer.toString(lineNumber), referenceType.name());
@@ -316,40 +311,40 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
             ErrorManager.getDefault().notify(ErrorManager.ERROR, ex);
         } catch (InternalException iex) {
             // Something wrong in JDI
-            ErrorManager.getDefault().annotate(iex, 
+            ErrorManager.getDefault().annotate(iex,
                     NbBundle.getMessage(LineBreakpointImpl.class,
-                    "MSG_jdi_internal_error") );
+                    "MSG_jdi_internal_error"));
             ErrorManager.getDefault().notify(iex);
             // We should indicate somehow that the breakpoint is invalid...
             reason[0] = iex.getLocalizedMessage();
         }
         return Collections.EMPTY_LIST;
     }
-    
+
     private static List<Location> locationsOfLineInClass(
-        ReferenceType referenceType,
-        String stratum,
-        String sourceName,
-        String bpSourcePath,
-        int lineNumber,
-        String[] reason) throws AbsentInformationException, ObjectCollectedException,
-                                ClassNotPreparedException, InternalException {
-        List<Location> list = referenceType.locationsOfLine (
-            stratum,
-            sourceName,
-            lineNumber
-        );
+            ReferenceType referenceType,
+            String stratum,
+            String sourceName,
+            String bpSourcePath,
+            int lineNumber,
+            String[] reason) throws AbsentInformationException, ObjectCollectedException,
+            ClassNotPreparedException, InternalException {
+        List<Location> list = referenceType.locationsOfLine(
+                stratum,
+                sourceName,
+                lineNumber);
 
         if (logger.isLoggable(Level.FINER)) {
             logger.finer("LineBreakpoint: locations for ReferenceType=" +
-                    referenceType + ", stratum=" + stratum + 
+                    referenceType + ", stratum=" + stratum +
                     ", source name=" + sourceName + ", bpSourcePath=" +
-                    bpSourcePath+", lineNumber=" + lineNumber + 
+                    bpSourcePath + ", lineNumber=" + lineNumber +
                     " are: {" + list + "}");
         }
-        if (!list.isEmpty ()) {
-            if (bpSourcePath == null)
+        if (!list.isEmpty()) {
+            if (bpSourcePath == null) {
                 return list;
+            }
             bpSourcePath = bpSourcePath.replace(java.io.File.separatorChar, '/');
             ArrayList<Location> locations = new ArrayList<Location>(list.size());
             for (Iterator<Location> it = list.iterator(); it.hasNext();) {
@@ -359,18 +354,19 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
                 if (lSourcePath.equals(bpSourcePath)) {
                     locations.add(l);
                 } else {
-                    reason[0] = "Breakpoint source path '"+bpSourcePath+"' is different from the location source path '"+lSourcePath+"'.";
+                    reason[0] = "Breakpoint source path '" + bpSourcePath + "' is different from the location source path '" + lSourcePath + "'.";
                 }
             }
             if (logger.isLoggable(Level.FINER)) {
                 logger.finer("LineBreakpoint: relevant location(s) for path '" + bpSourcePath + "': " + locations);
             }
-            if (!locations.isEmpty())
+            if (!locations.isEmpty()) {
                 return locations;
+            }
         }
         return Collections.emptyList();
     }
-    
+
     /**
      * Normalizes the given path by removing unnecessary "." and ".." sequences.
      * This normalization is needed because the compiler stores source paths like "foo/../inc.jsp" into .class files. 
@@ -379,24 +375,22 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
      * 
      * @param path path to normalize
      * @return normalized path without "." and ".." elements
-     */ 
+     */
     private static String normalize(String path) {
-      Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");
-      Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");
-      
-      for (Matcher m = thisDirectoryPattern.matcher(path); m.find(); )
-      {
-        path = m.replaceAll("$1");
-        m = thisDirectoryPattern.matcher(path);
-      }
-      for (Matcher m = parentDirectoryPattern.matcher(path); m.find(); )
-      {
-        if (!m.group(2).equals("..")) {
-          path = path.substring(0, m.start()) + m.group(1) + path.substring(m.end());
-          m = parentDirectoryPattern.matcher(path);        
+        Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");
+        Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");
+
+        for (Matcher m = thisDirectoryPattern.matcher(path); m.find();) {
+            path = m.replaceAll("$1");
+            m = thisDirectoryPattern.matcher(path);
         }
-      }
-      return path;
+        for (Matcher m = parentDirectoryPattern.matcher(path); m.find();) {
+            if (!m.group(2).equals("..")) {
+                path = path.substring(0, m.start()) + m.group(1) + path.substring(m.end());
+                m = parentDirectoryPattern.matcher(path);
+            }
+        }
+        return path;
     }
 }
 
