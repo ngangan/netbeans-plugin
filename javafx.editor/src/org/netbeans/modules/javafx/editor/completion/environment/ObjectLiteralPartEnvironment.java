@@ -39,9 +39,12 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
+import com.sun.source.util.TreePath;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.type.TypeMirror;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
@@ -54,10 +57,26 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXObjectLiteralPart t) {
-        log("inside JFXFunctionDefinition " + t);
-    }
+    protected void inside(JFXObjectLiteralPart t) throws IOException {
+        log("inside JFXObjectLiteralPart " + t + "  offset == " + offset);
+        addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
+        addLocalMembersAndVars(getSmartType(t));
+        addValueKeywords();
 
+    }
+    
+    private TypeMirror getSmartType(JFXObjectLiteralPart t) throws IOException {
+        if (t.getExpression() == null) {
+            return null;
+        }
+        // note: this is probably wrong
+        TypeMirror type = controller.getTrees().getTypeMirror(new TreePath(path, t.getExpression()));
+        // it should instead extract the name of the attribute and extract
+        //   the type from the named attribute
+        log("  smart == " + type);
+        return type;
+    }
+    
     private static void log(String s) {
         if (LOGGABLE) {
             logger.fine(s);
