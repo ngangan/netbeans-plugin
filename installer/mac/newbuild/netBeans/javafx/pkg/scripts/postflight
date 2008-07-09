@@ -22,7 +22,7 @@ set -e
 script_dir=`dirname "$0"`
 
 #add Product ID
-"$script_dir"/addproduct_id.sh "JAVAFX"
+"$script_dir"/addproduct_id.sh "FX"
 
 if [ -d "/Library/Receipts/javafx.pkg" ] ; then
     rm -rf "/Library/Receipts/javafx.pkg"
