@@ -187,6 +187,9 @@ public class AppletSupport {
             String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
             if (appletFile.getExt().equals("fx")) {
                 JavaFXProject project = (JavaFXProject) getProject(appletFile);
+		if (project == null) {
+		    project = (JavaFXProject)getProject(buildDir);
+		}
 
                 String distJAR = project.evaluator().getProperty("dist.jar");
                 distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
