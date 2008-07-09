@@ -91,7 +91,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
     @SuppressWarnings("fallthrough")
     @Override
     protected void inside(MemberSelectTree fa) throws IOException {
-        log("inside MemberSelectTree " + fa);
+        if (LOGGABLE) log("inside MemberSelectTree " + fa);
             int expEndPos = (int)sourcePositions.getEndPosition(root, fa.getExpression());
             boolean afterDot = false;
             boolean afterLt = false;
@@ -164,7 +164,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     } else if (parent.getKind() == Tree.Kind.VARIABLE && ((VariableTree)parent).getType() == fa && grandParent.getKind() == Tree.Kind.CATCH) {
                         if (query.queryType == JavaFXCompletionProvider.COMPLETION_QUERY_TYPE) {
                             // TODO:
-                            log("NOT IMPLEMENTED:  exs = controller.getTreeUtilities().getUncaughtExceptions(grandParentPath.getParentPath());");
+                            if (LOGGABLE) log("NOT IMPLEMENTED:  exs = controller.getTreeUtilities().getUncaughtExceptions(grandParentPath.getParentPath());");
                         }
                         kinds = EnumSet.of(CLASS);
                         baseType = controller.getTypes().getDeclaredType(controller.getElements().getTypeElement("java.lang.Throwable")); //NOI18N
@@ -173,7 +173,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         if (query.queryType == JavaFXCompletionProvider.COMPLETION_QUERY_TYPE && ((MethodTree)parent).getBody() != null) {
 //                            controller.toPhase(Phase.ANALYZED);
                             // TODO:
-                            log("NOT IMPLEMENTED exs = controller.getTreeUtilities().getUncaughtExceptions(new TreePath(path, ((MethodTree)parent).getBody())); ");
+                            if (LOGGABLE) log("NOT IMPLEMENTED exs = controller.getTreeUtilities().getUncaughtExceptions(new TreePath(path, ((MethodTree)parent).getBody())); ");
                             JavafxcTrees trees = controller.getTrees();
                             for (ExpressionTree thr : ((MethodTree)parent).getThrows()) {
                                 if (sourcePositions.getEndPosition(root, thr) >= offset)
@@ -238,7 +238,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                             if (el != null && (el.getKind().isClass() || el.getKind().isInterface())) {
                                 if (parent.getKind() == Tree.Kind.NEW_CLASS && ((NewClassTree)parent).getIdentifier() == fa && prefix != null) {
                                     String typeName = el.toString() + "." + prefix; //NOI18N
-                                    log("NOT IMPLEMENTED: handling members of " + typeName);
+                                    if (LOGGABLE) log("NOT IMPLEMENTED: handling members of " + typeName);
 //                                    TypeMirror tm = controller.getTreeUtilities().parseType(typeName, getScope().getEnclosingClass());
 //                                    if (tm != null && tm.getKind() == TypeKind.DECLARED)
 //                                        addMembers(tm, ((DeclaredType)tm).asElement(), EnumSet.of(CONSTRUCTOR), null, inImport, insideNew);
@@ -265,7 +265,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                             if (el != null && el.getKind() == PACKAGE) {                                
                                 if (parent.getKind() == Tree.Kind.NEW_CLASS && ((NewClassTree)parent).getIdentifier() == fa && prefix != null) {
                                     String typeName = el + "." + prefix; //NOI18N
-                                    log("NOT IMPLEMENTED: handling members of " + typeName);
+                                    if (LOGGABLE) log("NOT IMPLEMENTED: handling members of " + typeName);
 //                                    TypeMirror tm = controller.getTreeUtilities().parseType(typeName, getScope().getEnclosingClass());
 //                                    if (tm != null && tm.getKind() == TypeKind.DECLARED)
 //                                        addMembers(tm, ((DeclaredType)tm).asElement(), EnumSet.of(CONSTRUCTOR), null, inImport, insideNew);

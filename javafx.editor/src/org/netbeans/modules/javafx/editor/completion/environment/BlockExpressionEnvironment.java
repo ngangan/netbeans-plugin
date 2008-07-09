@@ -61,7 +61,7 @@ public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXB
 
     @Override
     protected void inside(JFXBlockExpression bl) throws IOException {
-        log("inside JFXBlockExpression " + bl);
+        if (LOGGABLE) log("inside JFXBlockExpression " + bl);
         StatementTree last = null;
         for (StatementTree stat : bl.getStatements()) {
             int pos = (int) sourcePositions.getStartPosition(root, stat);

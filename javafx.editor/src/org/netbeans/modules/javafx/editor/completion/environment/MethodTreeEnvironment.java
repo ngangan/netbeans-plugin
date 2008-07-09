@@ -64,7 +64,7 @@ public class MethodTreeEnvironment extends JavaFXCompletionEnvironment<MethodTre
 
     @Override
     protected void inside(MethodTree t) throws IOException {
-        log("inside MethodTree " + t);
+        if (LOGGABLE) log("inside MethodTree " + t);
         MethodTree mth = t;
         int startPos = (int) sourcePositions.getStartPosition(root, mth);
         Tree retType = mth.getReturnType();

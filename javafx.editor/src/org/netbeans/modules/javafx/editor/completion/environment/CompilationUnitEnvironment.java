@@ -59,7 +59,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Comp
 
     @Override
     protected void inside(CompilationUnitTree t) throws IOException {
-        log("inside CompilationUnitTree " + t);
+        if (LOGGABLE) log("inside CompilationUnitTree " + t);
         Tree pkg = root.getPackageName();
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {
             addKeywordsForCU();

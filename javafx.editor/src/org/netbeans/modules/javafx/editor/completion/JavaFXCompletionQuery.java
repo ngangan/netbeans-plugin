@@ -359,7 +359,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         
         if (LOGGABLE) {
-            log("Results: " + results);
+            if (LOGGABLE) log("Results: " + results);
         }
     }
 
@@ -415,14 +415,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 offset = ts.offset();
             }
         }
-        log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
+        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
         TreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
         JavaFXCompletionEnvironment result = null;
         if (t instanceof JavaFXTree && t.getKind() == Tree.Kind.OTHER) {
             JavaFXTree jfxt = (JavaFXTree) t;
             JavaFXKind k = jfxt.getJavaFXKind();
-            log("JavaFXKind: " + k);
+            if (LOGGABLE) log("JavaFXKind: " + k);
             switch (k) {
                 case BIND_EXPRESSION:
                     break;
@@ -494,7 +494,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                     break;
             }
         } else {
-            log("Java Kind: " + t.getKind());
+            if (LOGGABLE) log("Java Kind: " + t.getKind());
             switch (t.getKind()) {
                 case COMPILATION_UNIT:
                     result = new CompilationUnitEnvironment();

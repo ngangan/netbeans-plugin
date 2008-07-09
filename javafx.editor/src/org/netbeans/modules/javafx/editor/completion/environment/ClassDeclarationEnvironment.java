@@ -63,11 +63,11 @@ public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFX
 
     @Override
     protected void inside(JFXClassDeclaration cldecl) throws IOException {
-        log("inside JFXClassDeclaration " + cldecl);
-        log("  prefix: " + prefix);
+        if (LOGGABLE) log("inside JFXClassDeclaration " + cldecl);
+        if (LOGGABLE) log("  prefix: " + prefix);
         int start = (int)sourcePositions.getStartPosition(root, cldecl);
-        log("  offset: " + offset);
-        log("  start: " + start);
+        if (LOGGABLE) log("  offset: " + offset);
+        if (LOGGABLE) log("  start: " + start);
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterLBrace = false;
@@ -92,12 +92,12 @@ public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFX
                     // TODO:
             }
         }
-        log("  afterLBrace: " + afterLBrace);
+        if (LOGGABLE) log("  afterLBrace: " + afterLBrace);
         if (afterLBrace) {
             addKeywordsForClassBody();
         } else {
             if (afterExtends) {
-                log("  afterExtends: " + afterExtends);
+                if (LOGGABLE) log("  afterExtends: " + afterExtends);
                 addLocalAndImportedTypes(EnumSet.of(CLASS), null, null, false, null);
             } else {
                 addKeyword(EXTENDS_KEYWORD, " ", false);

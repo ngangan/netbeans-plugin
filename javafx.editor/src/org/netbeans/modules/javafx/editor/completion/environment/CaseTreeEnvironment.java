@@ -63,7 +63,7 @@ public class CaseTreeEnvironment extends JavaFXCompletionEnvironment<CaseTree> {
 
     @Override
     protected void inside(CaseTree t) throws IOException {
-        log("inside CaseTree " + t);
+        if (LOGGABLE) log("inside CaseTree " + t);
         CaseTree cst = (CaseTree) path.getLeaf();
         if (cst.getExpression() != null && 
            ((sourcePositions.getStartPosition(root, cst.getExpression()) >= offset) ||

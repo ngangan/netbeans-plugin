@@ -61,11 +61,11 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
 
     @Override
     protected void inside(JFXForExpression foe) throws IOException {
-        log("inside JFXForExpression " + foe);
-        log("  prefix: " + prefix);
+        if (LOGGABLE) log("inside JFXForExpression " + foe);
+        if (LOGGABLE) log("  prefix: " + prefix);
         int start = (int)sourcePositions.getStartPosition(root, foe);
-        log("  offset: " + offset);
-        log("  start: " + start);
+        if (LOGGABLE) log("  offset: " + offset);
+        if (LOGGABLE) log("  start: " + start);
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
@@ -95,12 +95,12 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
                     afterIdentifier = true;
                     break;
                 default:
-                    log("  default: " + ts.token().id());
+                    if (LOGGABLE) log("  default: " + ts.token().id());
                     // there is too much, return nothing
                     return;
             }
         }
-        log("  afterIdentifier: " + afterIdentifier);
+        if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier);
         if (afterIdentifier) {
             addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false));
             return;
@@ -108,9 +108,9 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
         if (afterLParen) {
             if (prefix != null && prefix.length() > 0) {
                 // ok the user has already typed something
-                log("  NOT IMPLEMENTED: suggest ending the variable name and \"in \" after");
+                if (LOGGABLE) log("  NOT IMPLEMENTED: suggest ending the variable name and \"in \" after");
             } else {
-                log("  NOT IMPLEMENTED: suggest a variable name");
+                if (LOGGABLE) log("  NOT IMPLEMENTED: suggest a variable name");
             }
         }
     }

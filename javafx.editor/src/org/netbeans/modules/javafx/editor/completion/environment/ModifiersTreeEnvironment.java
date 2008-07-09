@@ -64,7 +64,7 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
 
     @Override
     protected void inside(ModifiersTree t) throws IOException {
-        log("inside ModifiersTree " + t);
+        if (LOGGABLE) log("inside ModifiersTree " + t);
         ModifiersTree mods = t;
         Set<Modifier> m = EnumSet.noneOf(Modifier.class);
         final TokenSequence<JFXTokenId> idTokenSequence = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());

@@ -62,7 +62,7 @@ public class ClassTreeEnvironment extends JavaFXCompletionEnvironment<ClassTree>
 
     @Override
     protected void inside(ClassTree t) {
-        log("inside ClassTree " + t);
+        if (LOGGABLE) log("inside ClassTree " + t);
         ClassTree cls = t;
         int startPos = (int) sourcePositions.getEndPosition(root, cls.getModifiers());
         if (startPos <= 0) {

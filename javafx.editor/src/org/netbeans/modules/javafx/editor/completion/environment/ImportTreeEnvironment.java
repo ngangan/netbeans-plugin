@@ -55,7 +55,7 @@ public class ImportTreeEnvironment extends JavaFXCompletionEnvironment<ImportTre
 
     @Override
     protected void inside(ImportTree t) {
-        log("inside ImportTree " + t);
+        if (LOGGABLE) log("inside ImportTree " + t);
         if (offset <= sourcePositions.getStartPosition(root, t.getQualifiedIdentifier())) {
             addPackages(prefix);
         }

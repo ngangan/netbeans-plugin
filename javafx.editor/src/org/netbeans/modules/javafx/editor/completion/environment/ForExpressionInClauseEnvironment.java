@@ -59,11 +59,11 @@ public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironmen
 
     @Override
     protected void inside(JFXForExpressionInClause feic) throws IOException {
-        log("inside JFXForExpressionInClause " + feic);
-        log("  prefix: " + prefix);
+        if (LOGGABLE) log("inside JFXForExpressionInClause " + feic);
+        if (LOGGABLE) log("  prefix: " + prefix);
         int start = (int)sourcePositions.getStartPosition(root, feic);
-        log("  offset: " + offset);
-        log("  start: " + start);
+        if (LOGGABLE) log("  offset: " + offset);
+        if (LOGGABLE) log("  start: " + start);
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterLBracket = false;
@@ -84,7 +84,7 @@ public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironmen
                     // TODO:
             }
         }
-        log("  afterLBracket: " + afterLBracket);
+        if (LOGGABLE) log("  afterLBracket: " + afterLBracket);
         if (afterLBracket) {
             // numbers here
         } else {

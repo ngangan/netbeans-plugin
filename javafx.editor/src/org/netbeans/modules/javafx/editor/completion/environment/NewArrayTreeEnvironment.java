@@ -61,7 +61,7 @@ public class NewArrayTreeEnvironment extends JavaFXCompletionEnvironment<NewArra
 
     @Override
     protected void inside(NewArrayTree nat) throws IOException {
-        log("inside NewArrayTree " + nat);
+        if (LOGGABLE) log("inside NewArrayTree " + nat);
         if (nat.getInitializers() != null) {
             Tree last = null;
             int lastPos = offset;

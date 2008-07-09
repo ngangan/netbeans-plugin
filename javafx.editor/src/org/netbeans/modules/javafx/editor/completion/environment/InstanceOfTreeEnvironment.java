@@ -55,7 +55,7 @@ public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<Insta
 
     @Override
     protected void inside(InstanceOfTree t) {
-        log("inside InstanceOfTree " + t);
+        if (LOGGABLE) log("inside InstanceOfTree " + t);
     }
 
     private static void log(String s) {

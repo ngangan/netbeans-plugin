@@ -58,7 +58,7 @@ public class ArrayAccessTreeEnvironment extends JavaFXCompletionEnvironment<Arra
 
     @Override
     protected void inside(ArrayAccessTree aat) throws IOException {
-        log("inside ArrayAccessTree " + aat);
+        if (LOGGABLE) log("inside ArrayAccessTree " + aat);
         int aaTextStart = (int) sourcePositions.getEndPosition(root, aat.getExpression());
         if (aaTextStart != Diagnostic.NOPOS) {
             Tree expr = unwrapErrTree(aat.getIndex());

@@ -70,7 +70,7 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
     @SuppressWarnings("fallthrough")
     @Override
     protected void inside(ExpressionStatementTree est) throws IOException {
-        log("inside ExpressionStatementTree " + est);
+        if (LOGGABLE) log("inside ExpressionStatementTree " + est);
         Tree t = est.getExpression();
         if (t.getKind() == Tree.Kind.ERRONEOUS) {
             Iterator<? extends Tree> it = ((ErroneousTree) t).getErrorTrees().iterator();
@@ -143,7 +143,7 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
                 default:
                     
             }
-            log("NOT IMPLEMENTED: insideExpressionStatement ");
+            if (LOGGABLE) log("NOT IMPLEMENTED: insideExpressionStatement ");
         } else {
             insideExpression(tPath);
         }

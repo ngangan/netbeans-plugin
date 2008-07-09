@@ -154,7 +154,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             if (start >= 0 && end >= 0) {
                 bag.addHighlight(start, end, getAttributeSet(result));
             } else {
-                log("* Incorrect positions for highlighting: " + start + ", " + end);
+                if (LOGGABLE) log("* Incorrect positions for highlighting: " + start + ", " + end);
             }
 
             // highlighting fot variables from cache

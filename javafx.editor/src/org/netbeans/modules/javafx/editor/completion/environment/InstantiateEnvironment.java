@@ -63,24 +63,24 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
     @Override
     protected void inside(JFXInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
-        log("inside JFXInstanciate " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n");
+        if (LOGGABLE) log("inside JFXInstanciate " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n");
         if (pos < 0) {
             return;
         }
         TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
-        log("  last == " + last.token().id());
+        if (LOGGABLE) log("  last == " + last.token().id());
         if (last != null && last.token().id() == JFXTokenId.NEW) {
             addLocalAndImportedTypes(null, null, null, false, getSmartType(it));
         } else {
             String s = it.getIdentifier().toString();
-            log("  s == " + s);
+            if (LOGGABLE) log("  s == " + s);
             TypeElement te = findTypeElement(s);
-            log("  te == " + te);
+            if (LOGGABLE) log("  te == " + te);
             if (te == null) {
                 return;
             }
             TypeMirror tm = te.asType();
-            log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind()));
+            if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind()));
             if (tm == null) {
                 return;
             }

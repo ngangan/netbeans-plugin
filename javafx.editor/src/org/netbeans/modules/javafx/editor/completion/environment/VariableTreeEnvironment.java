@@ -65,15 +65,15 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
 
     @Override
     protected void inside(VariableTree t) throws IOException {
-        log("inside VariableTree " + t + "  offset == " + offset);
+        if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset);
         VariableTree var = t;
         boolean isLocal = path.getParentPath().getLeaf().getKind() != Tree.Kind.CLASS;
         Tree type = var.getType();
         int typePos = type.getKind() == Tree.Kind.ERRONEOUS && ((ErroneousTree) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
-        log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos);
+        if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos);
         if (offset <= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-            log("    last(1) == " + (last == null ? "null" : last.token().id()));
+            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
             if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
                 addBasicTypes();
@@ -81,7 +81,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             return;
         }
         TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
-        log("    last(2) == " + (last == null ? "null" : last.token().id()));
+        if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id()));
         if ((last != null) && (last.token().id() == JFXTokenId.EQ)) {
             localResult(getSmartType(t));
             addValueKeywords();
@@ -90,12 +90,12 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
 
     private TypeMirror getSmartType(VariableTree t) throws IOException {
         if (t.getInitializer() == null) {
-            log("  getSmartType no initializer");
+            if (LOGGABLE) log("  getSmartType no initializer");
             return null;
         }
         final TreePath treePath = new TreePath(path, t.getInitializer());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-        log("getSmartType path == " + path.getLeaf() + "  type == " + type);
+        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type);
         if (type == null) {
             return null;
         }

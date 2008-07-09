@@ -153,7 +153,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * This method should be overriden in subclasses
      */
     protected void inside(T t) throws IOException {
-        log("NOT IMPLEMENTED inside " + t);
+        if (LOGGABLE) log("NOT IMPLEMENTED inside " + t);
     }
 
     public int getOffset() {
@@ -200,7 +200,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected boolean isTreeBroken() {
         int start = (int) sourcePositions.getStartPosition(root, root);
         int end = (int) sourcePositions.getEndPosition(root, root);
-        log("isTreeBroken start: " + start + " end: " + end);
+        if (LOGGABLE) log("isTreeBroken start: " + start + " end: " + end);
         return start == -1 || end == -1;
     }
 
@@ -222,18 +222,18 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void insideExpression(TreePath exPath) throws IOException {
-        log("insideExpression " + exPath.getLeaf());
+        if (LOGGABLE) log("insideExpression " + exPath.getLeaf());
         Tree et = exPath.getLeaf();
         Tree parent = exPath.getParentPath().getLeaf();
         int endPos = (int) getSourcePositions().getEndPosition(root, et);
         if (endPos != Diagnostic.NOPOS && endPos < offset) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(endPos, offset);
-            log("  last: " + last);
+            if (LOGGABLE) log("  last: " + last);
             if (last != null) {
                 return;
             }
         }
-        log("NOT IMPLEMENTED: insideExpression " + exPath.getLeaf());
+        if (LOGGABLE) log("NOT IMPLEMENTED: insideExpression " + exPath.getLeaf());
 
     }
 
@@ -242,17 +242,17 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
-        log("addMembers: " + type);
+        if (LOGGABLE) log("addMembers: " + type);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
-            log("RETURNING: type.getKind() == " + type.getKind());
+            if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
             return;
         }
 
         DeclaredType dt = (DeclaredType) type;
-        log("  elementKind == " + dt.asElement().getKind());
+        if (LOGGABLE) log("  elementKind == " + dt.asElement().getKind());
         if (dt.asElement().getKind() != ElementKind.CLASS) {
             return;
         }
@@ -260,13 +260,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         Elements elements = controller.getElements();
         final TypeElement te = (TypeElement) dt.asElement();
         for (Element member : te.getEnclosedElements()) {
-            log("    member1 = " + member + " member1.getKind() " + member.getKind());
+            if (LOGGABLE) log("    member1 = " + member + " member1.getKind() " + member.getKind());
             if ("<error>".equals(member.getSimpleName().toString())) {
                 continue;
             }
             String s = member.getSimpleName().toString();
             if (!trees.isAccessible(scope, member,dt)) {
-                log("    not accessible " + s);
+                if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
             if (fields && member.getKind() == ElementKind.FIELD) {
@@ -277,13 +277,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
 
         for (Element member : elements.getAllMembers(te)) {
-            log("    member2 == " + member + " member2.getKind() " + member.getKind());
+            if (LOGGABLE) log("    member2 == " + member + " member2.getKind() " + member.getKind());
             String s = member.getSimpleName().toString();
             if ("<error>".equals(member.getSimpleName().toString())) {
                 continue;
             }
             if (!trees.isAccessible(scope, member,dt)) {
-                log("    not accessible " + s);
+                if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
@@ -312,16 +312,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
-        log("addMemberConstantsAndTypes: " + type + " elem: " + elem);
+        if (LOGGABLE) log("addMemberConstantsAndTypes: " + type + " elem: " + elem);
     }
 
     protected void addLocalMembersAndVars(TypeMirror smart) throws IOException {
-        log("addLocalMembersAndVars: " + prefix);
+        if (LOGGABLE) log("addLocalMembersAndVars: " + prefix);
 //        controller.toPhase(Phase.ANALYZED);
 
         final JavafxcTrees trees = controller.getTrees();
         if (smart != null && smart.getKind() == TypeKind.DECLARED) {
-            log("adding declared type + subtypes: " + smart);
+            if (LOGGABLE) log("adding declared type + subtypes: " + smart);
             DeclaredType dt = (DeclaredType) smart;
             TypeElement elem = (TypeElement) dt.asElement();
             addResult(JavaFXCompletionItem.createTypeItem(elem, dt, offset, false, false, true));
@@ -334,26 +334,26 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
         for (TreePath tp = getPath(); tp != null; tp = tp.getParentPath()) {
             Tree t = tp.getLeaf();
-            log("  tree kind: " + t.getKind());
-            log("  fx instance: " + ((t instanceof JavaFXTree)));
+            if (LOGGABLE) log("  tree kind: " + t.getKind());
+            if (LOGGABLE) log("  fx instance: " + ((t instanceof JavaFXTree)));
             if (t instanceof CompilationUnitTree) {
                 CompilationUnitTree cut = (CompilationUnitTree) t;
                 for (Tree tt : cut.getTypeDecls()) {
-                    log("      tt: " + tt);
+                    if (LOGGABLE) log("      tt: " + tt);
                     if (tt.getKind() == Tree.Kind.OTHER && tt instanceof JavaFXTree) {
                         JavaFXTree jfxtt = (JavaFXTree) tt;
                         JavaFXKind kk = jfxtt.getJavaFXKind();
                         if (kk == JavaFXKind.CLASS_DECLARATION) {
                             JFXClassDeclaration cd = (JFXClassDeclaration) jfxtt;
                             for (Tree jct : cd.getClassMembers()) {
-                                log("            jct == " + jct);
+                                if (LOGGABLE) log("            jct == " + jct);
                                 if (jct.getKind() == Tree.Kind.OTHER && jct instanceof JavaFXTree) {
                                     JavaFXTree jfxjct = (JavaFXTree) jct;
                                     JavaFXKind k = jfxjct.getJavaFXKind();
-                                    log("       kind of jct = " + k);
+                                    if (LOGGABLE) log("       kind of jct = " + k);
                                     if (k == JavaFXKind.FUNCTION_DEFINITION) {
                                         JFXFunctionDefinition fdt = (JFXFunctionDefinition) jfxjct;
-                                        log("      fdt == " + fdt.name.toString());
+                                        if (LOGGABLE) log("      fdt == " + fdt.name.toString());
                                         if ("javafx$run$".equals(fdt.name.toString())) {
                                             addBlockExpressionLocals(fdt.getBodyExpression(), tp, smart);
                                         }
@@ -369,10 +369,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             JavaFXTree jfxt = (JavaFXTree) t;
             JavaFXKind k = jfxt.getJavaFXKind();
-            log("  fx kind: " + k);
+            if (LOGGABLE) log("  fx kind: " + k);
             if (k == JavaFXKind.CLASS_DECLARATION) {
                 TypeMirror tm = trees.getTypeMirror(tp);
-                log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind()));
+                if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind()));
                 addMembers(tm, true, true);
             }
             if (k == JavaFXKind.BLOCK_EXPRESSION) {
@@ -380,11 +380,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             if (k == JavaFXKind.FOR_EXPRESSION) {
                 ForExpressionTree fet = (ForExpressionTree) jfxt;
-                log("  for expression: " + fet + "\n");
+                if (LOGGABLE) log("  for expression: " + fet + "\n");
                 for (ForExpressionInClauseTree fetic : fet.getInClauses()) {
-                    log("  fetic: " + fetic + "\n");
+                    if (LOGGABLE) log("  fetic: " + fetic + "\n");
                     String s = fetic.getVariable().getName().toString();
-                    log("    adding(2) " + s + " with prefix " + prefix);
+                    if (LOGGABLE) log("    adding(2) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new TreePath(tp, fetic));
                     if (smart != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
@@ -397,9 +397,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (k == JavaFXKind.FUNCTION_VALUE) {
                 FunctionValueTree fvt = (FunctionValueTree) jfxt;
                 for (VariableTree var : fvt.getParameters()) {
-                    log("  var: " + var + "\n");
+                    if (LOGGABLE) log("  var: " + var + "\n");
                     String s = var.getName().toString();
-                    log("    adding(3) " + s + " with prefix " + prefix);
+                    if (LOGGABLE) log("    adding(3) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new TreePath(tp, var));
                     if (smart != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
@@ -412,11 +412,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (k == JavaFXKind.ON_REPLACE) {
                 OnReplaceTree ort = (OnReplaceTree) jfxt;
                 // commented out log because of JFXC-1205
-                // log("  OnReplaceTree: " + ort + "\n");
+                // if (LOGGABLE) log("  OnReplaceTree: " + ort + "\n");
                 JavaFXVariableTree varTree = ort.getNewElements();
                 if (varTree != null) {
                     String s1 = varTree.getName().toString();
-                    log("    adding(4) " + s1 + " with prefix " + prefix);
+                    if (LOGGABLE) log("    adding(4) " + s1 + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new TreePath(tp, varTree));
                     if (smart != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(s1, offset, true));
@@ -428,7 +428,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 JavaFXVariableTree varTree2 = ort.getOldValue();
                 if (varTree2 != null) {
                     String s2 = varTree2.getName().toString();
-                    log("    adding(5) " + s2 + " with prefix " + prefix);
+                    if (LOGGABLE) log("    adding(5) " + s2 + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new TreePath(tp, varTree2));
                     if (smart != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(s2, offset, true));
@@ -442,19 +442,19 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     private void addBlockExpressionLocals(BlockExpressionTree bet, TreePath tp, TypeMirror smart) {
-        log("  block expression: " + bet + "\n");
+        if (LOGGABLE) log("  block expression: " + bet + "\n");
         for (StatementTree st : bet.getStatements()) {
             TreePath expPath = new TreePath(tp, st);
-            log("    expPath == " + expPath.getLeaf());
+            if (LOGGABLE) log("    expPath == " + expPath.getLeaf());
             JavafxcTrees trees = controller.getTrees();
             Element type = trees.getElement(expPath);
             if (type == null) {
                 continue;
             }
-            log("    type.getKind() == " + type.getKind());
+            if (LOGGABLE) log("    type.getKind() == " + type.getKind());
             if (type.getKind() == ElementKind.LOCAL_VARIABLE) {
                 String s = type.getSimpleName().toString();
-                log("    adding(1) " + s + " with prefix " + prefix);
+                if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix);
                 TypeMirror tm = trees.getTypeMirror(expPath);
                 if (smart != null && tm.getKind() == smart.getKind()) {
                     addResult(JavaFXCompletionItem.createVariableItem(
@@ -469,7 +469,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addPackages(String fqnPrefix) {
-        log("addPackages " + fqnPrefix);
+        if (LOGGABLE) log("addPackages " + fqnPrefix);
         if (fqnPrefix == null) {
             fqnPrefix = "";
         }
@@ -487,10 +487,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (fqnPrefix.lastIndexOf('.') >= 0) {
             pr = fqnPrefix.substring(0, fqnPrefix.lastIndexOf('.'));
         }
-        log("  pr == " + pr);
+        if (LOGGABLE) log("  pr == " + pr);
         for (String name : pr.split("\\.")) {
             ArrayList<FileObject> newFos = new ArrayList<FileObject>();
-            log("  traversing to " + name);
+            if (LOGGABLE) log("  traversing to " + name);
             for (FileObject f : fos) {
                 if (f.isFolder()) {
                     FileObject child = f.getFileObject(name);
@@ -499,14 +499,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                 }
             }
-            log("  replacing " + fos + "\n   with " + newFos);
+            if (LOGGABLE) log("  replacing " + fos + "\n   with " + newFos);
             fos = newFos;
         }
         for (FileObject fo : fos) {
             if (fo.isFolder()) {
                 for (FileObject child : fo.getChildren()) {
                     if (child.isFolder()) {
-                        log(" found : " + child);
+                        if (LOGGABLE) log(" found : " + child);
                         if (("META-INF".equals(child.getName())) || 
                             ("doc-files".equals(child.getName()))) {
                             continue;
@@ -520,12 +520,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) throws IOException {
-        log("NOT IMPLEMENTED: getSubtypesOf " + baseType);
+        if (LOGGABLE) log("NOT IMPLEMENTED: getSubtypesOf " + baseType);
         return Collections.emptyList();
     }
 
     protected void addMethodArguments(MethodInvocationTree mit) throws IOException {
-        log("NOT IMPLEMENTED: addMethodArguments " + mit);
+        if (LOGGABLE) log("NOT IMPLEMENTED: addMethodArguments " + mit);
     }
 
     protected void addKeyword(String kw, String postfix, boolean smartType) {
@@ -657,7 +657,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addMemberModifiers(Set<Modifier> modifiers, boolean isLocal) {
-        log("addMemberModifiers");
+        if (LOGGABLE) log("addMemberModifiers");
         List<String> kws = new ArrayList<String>();
         if (isLocal) {
         } else {
@@ -704,7 +704,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
     
     protected void addPackageContent(PackageElement pe, EnumSet<ElementKind> kinds, DeclaredType baseType, boolean insideNew) {
-        log("addPackageContent " + pe);
+        if (LOGGABLE) log("addPackageContent " + pe);
         Elements elements = controller.getElements();
         JavafxTypes types = controller.getJavafxTypes();
         JavafxcTrees trees = controller.getTrees();
@@ -714,7 +714,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
                 if (!trees.isAccessible(scope, (TypeElement) e)) {
-                    log("    not accessible " + name);
+                    if (LOGGABLE) log("    not accessible " + name);
                     continue;
                 }
                 if (JavaFXCompletionProvider.startsWith(name, prefix) &&
@@ -725,7 +725,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (ee.getKind().isClass() || ee.getKind() == ElementKind.INTERFACE) {
                         String ename = ee.getSimpleName().toString();
                         if (!trees.isAccessible(scope, (TypeElement) ee)) {
-                            log("    not accessible " + ename);
+                            if (LOGGABLE) log("    not accessible " + ename);
                             continue;
                         }
                         log(ename + " isJFXClass " + types.isJFXClass((Symbol) ee));
@@ -745,7 +745,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addBasicTypes() {
-        log("addBasicTypes ");
+        if (LOGGABLE) log("addBasicTypes ");
         addBasicType("Boolean", "boolean");
         addBasicType("Integer", "int");
         addBasicType("Number", "double");
@@ -753,23 +753,23 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     private void addBasicType(String name1, String name2) {
-        log("  addBasicType " + name1 + " : " + name2);
+        if (LOGGABLE) log("  addBasicType " + name1 + " : " + name2);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
-        log("  scope == " + scope);
+        if (LOGGABLE) log("  scope == " + scope);
         for (Element local : scope.getLocalElements()) {
-            log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
+            if (LOGGABLE) log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
             if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
                 if (! (local instanceof TypeElement)) {
-                    log("    " + local.getSimpleName() + " not TypeElement");
+                    if (LOGGABLE) log("    " + local.getSimpleName() + " not TypeElement");
                     continue;
                 }
                 TypeElement te = (TypeElement) local;
                 String name = local.getSimpleName().toString();
                 if (name.equals(name2)) {
                     if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
-                        log("    found " + name1);
+                        if (LOGGABLE) log("    found " + name1);
                         if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
                             addResult(JavaFXCompletionItem.createTypeItem(name1, offset, false, false, false));
                         } else {
@@ -784,13 +784,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
     
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) throws IOException {
-        log("addLocalAndImportedTypes");
+        if (LOGGABLE) log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
         JavafxcScope originalScope = scope;
         while (scope != null) {
-            log("  scope == " + scope);
+            if (LOGGABLE) log("  scope == " + scope);
             addLocalAndImportedTypes(scope.getLocalElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,false);
             scope = scope.getEnclosingScope();
         }
@@ -799,7 +799,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             e = e.getEnclosingElement();
         }
         if (e != null) {
-            log("will scan package " + e.getSimpleName());
+            if (LOGGABLE) log("will scan package " + e.getSimpleName());
             PackageElement pkge = (PackageElement)e;
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
@@ -814,7 +814,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         final Elements elements = controller.getElements();
         JavafxcTrees trees = controller.getTrees();
         for (Element local : from) {
-            log("    local == " + local);
+            if (LOGGABLE) log("    local == " + local);
             if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
                 if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
                     continue;
@@ -823,13 +823,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 TypeElement te = (TypeElement) local;
                 String name = local.getSimpleName().toString();
                 if (!trees.isAccessible(originalScope, te)) {
-                    log("    not accessible " + name);
+                    if (LOGGABLE) log("    not accessible " + name);
                     continue;
                 }
                 Element parent = te.getEnclosingElement();
                 if (parent.getKind() == ElementKind.CLASS) {
                     if (!trees.isAccessible(originalScope, (TypeElement) parent)) {
-                        log("    parent not accessible " + name);
+                        if (LOGGABLE) log("    parent not accessible " + name);
                         continue;
                     }
                 }
@@ -844,7 +844,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                 }
                 if (parent == myPackage) {
-                   log("   will check inner classes of: " + local);
+                   if (LOGGABLE) log("   will check inner classes of: " + local);
                     addLocalAndImportedTypes(local.getEnclosedElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,true);
                 }
             }
@@ -855,12 +855,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * @return TypeElement or null if the passed in String does not denote a class
      */
     protected TypeElement findTypeElement(String simpleName) {
-        log("findTypeElement: " + simpleName);
+        if (LOGGABLE) log("findTypeElement: " + simpleName);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
         JavafxcScope scope = trees.getScope(p);
         while (scope != null) {
-            log("  scope == " + scope);
+            if (LOGGABLE) log("  scope == " + scope);
             TypeElement res = findTypeElement(scope.getLocalElements(), simpleName,null);
             if (res != null) {
                 return res;
@@ -884,13 +884,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * @return TypeElement or null if the passed in String does not denote a class
      */
     private TypeElement findTypeElement(Iterable<? extends Element> from, String simpleName,PackageElement myPackage) {
-        log("  private findTypeElement " + simpleName + " in package " + myPackage);
+        if (LOGGABLE) log("  private findTypeElement " + simpleName + " in package " + myPackage);
         Elements elements = controller.getElements();
         for (Element local : from) {
-            log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
+            if (LOGGABLE) log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
             if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
                 if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
-                    log("        is not TypeKind.DECLARED -- ignoring");
+                    if (LOGGABLE) log("        is not TypeKind.DECLARED -- ignoring");
                     continue;
                 }
                 if (local instanceof TypeElement) {
@@ -905,7 +905,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         return (TypeElement) local;
                     }
                     if (pe == myPackage) {
-                        log("   will check inner classes of: " + local);
+                        if (LOGGABLE) log("   will check inner classes of: " + local);
                         TypeElement res = findTypeElement(local.getEnclosedElements(), simpleName,null);
                         if (res != null) {
                             return res;
@@ -918,7 +918,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
     
     private void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
-        log("NOT IMPLEMENTED addAllTypes ");
+        if (LOGGABLE) log("NOT IMPLEMENTED addAllTypes ");
 //            for(ElementHandle<TypeElement> name : controller.getJavaSource().getClasspathInfo().getClassIndex().getDeclaredTypes(prefix != null ? prefix : EMPTY, kind, EnumSet.allOf(ClassIndex.SearchScope.class))) {
 //                LazyTypeCompletionItem item = LazyTypeCompletionItem.create(name, kinds, anchorOffset, controller.getJavaSource(), insideNew);
 //                if (item.isAnnonInner())
@@ -988,14 +988,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     void useCrystalBall() {
         try {
             int lineStart = IndentUtils.lineStartOffset(controller.getJavaFXSource().getDocument(), offset);
-            log("useCrystalBall lineStart " + lineStart + " offset " + offset);
+            if (LOGGABLE) log("useCrystalBall lineStart " + lineStart + " offset " + offset);
             TokenSequence<JFXTokenId> ts = findFirstNonWhitespaceToken(lineStart, offset);
             if (ts == null) {
                 // nothing interesting on this line? let's try to delete it:
                 tryToDeleteCurrentLine(lineStart);
                 return;
             }
-            log("  first == " + ts.token().id() + " at " + ts.offset());
+            if (LOGGABLE) log("  first == " + ts.token().id() + " at " + ts.offset());
             if (ts.token().id() == JFXTokenId.IMPORT) {
                 int count = ts.offset();
                 char[] chars = new char[count];
@@ -1003,13 +1003,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 String helper = new String(chars);
                 String next = ts.token().text().toString();
                 while (ts.offset() < offset && ts.moveNext()) {
-                    log("Watching : " + ts.token().id() + " " + ts.token().text().toString());
+                    if (LOGGABLE) log("Watching : " + ts.token().id() + " " + ts.token().text().toString());
                     helper += next;
                     next = ts.token().text().toString();
-                    log("helper == " + helper);
+                    if (LOGGABLE) log("helper == " + helper);
                 }
                 helper += "*;";
-                log("Helper prepared: " + helper);
+                if (LOGGABLE) log("Helper prepared: " + helper);
                 if (!helper.endsWith("import *;")) {
                     useFakeSource(helper, helper.length()-2);
                 } else {
@@ -1044,9 +1044,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * @param lineStart
      */
     private void tryToDeleteCurrentLine(int lineStart) {
-        log("tryToDeleteCurrentLine lineStart == " + lineStart + " offset == " + offset);
+        if (LOGGABLE) log("tryToDeleteCurrentLine lineStart == " + lineStart + " offset == " + offset);
         if (offset < lineStart) {
-            log("   no line, sorry");
+            if (LOGGABLE) log("   no line, sorry");
             return;
         }
         int pLength = (prefix != null ? prefix.length():0);
@@ -1064,35 +1064,35 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * @param source
      */
     private void useFakeSource(String source, final int pos) {
-        log("useFakeSource " + source + " pos == " + pos);
+        if (LOGGABLE) log("useFakeSource " + source + " pos == " + pos);
         try {
             FileSystem fs = FileUtil.createMemoryFileSystem();
             final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
             Writer w = new OutputStreamWriter(fo.getOutputStream());
             w.write(source);
             w.close();
-            log("  source written to " + fo);
+            if (LOGGABLE) log("  source written to " + fo);
             ClasspathInfo info = ClasspathInfo.create(controller.getFileObject());
             JavaFXSource s = JavaFXSource.create(info,Collections.singleton(fo));
-            log("  jfxsource obtained " + s);
+            if (LOGGABLE) log("  jfxsource obtained " + s);
             s.runWhenScanFinished(new Task<CompilationController>() {
                 public void run(CompilationController fakeController) throws Exception {
-                    log("    scan finished");
+                    if (LOGGABLE) log("    scan finished");
                     JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos);
-                    log("    env == " + env);
+                    if (LOGGABLE) log("    env == " + env);
                     fakeController.toPhase(Phase.ANALYZED);
-                    log("    fake analyzed");
+                    if (LOGGABLE) log("    fake analyzed");
                     if (! env.isTreeBroken()) {
-                        log("    fake non-broken tree");
+                        if (LOGGABLE) log("    fake non-broken tree");
                         final Tree leaf = env.getPath().getLeaf();
                         env.inside(leaf);
                         // try to remove faked entries:
                         String fakeName = fo.getName();
                         Set<JavaFXCompletionItem> toRemove = new TreeSet<JavaFXCompletionItem>();
                         for (JavaFXCompletionItem r : query.results) {
-                            log("    checking " + r.getLeftHtmlText());
+                            if (LOGGABLE) log("    checking " + r.getLeftHtmlText());
                             if (r.getLeftHtmlText().contains(fakeName)) {
-                                log("    will remove " + r);
+                                if (LOGGABLE) log("    will remove " + r);
                                 toRemove.add(r);
                             }
                         }

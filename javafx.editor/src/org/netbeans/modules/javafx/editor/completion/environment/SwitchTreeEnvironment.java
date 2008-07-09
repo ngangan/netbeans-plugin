@@ -60,7 +60,7 @@ public class SwitchTreeEnvironment extends JavaFXCompletionEnvironment<SwitchTre
 
     @Override
     protected void inside(SwitchTree st) throws IOException {
-        log("inside SwitchTree " + st);
+        if (LOGGABLE) log("inside SwitchTree " + st);
         if (sourcePositions.getStartPosition(root, st.getExpression()) < offset) {
             CaseTree lastCase = null;
             for (CaseTree t : st.getCases()) {

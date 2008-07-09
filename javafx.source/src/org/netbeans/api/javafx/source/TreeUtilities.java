@@ -318,8 +318,8 @@ public final class TreeUtilities {
         StringWriter s = new StringWriter();
         try {
             new JavafxPretty(s, false).printExpr((JCTree)t);
-        } catch (IOException e) {
-            throw new AssertionError(e);
+        } catch (Exception e) {
+            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getKind(), e);
         }
         if (t instanceof JavaFXTree && t.getKind() == Kind.OTHER) {
             JavaFXTree jfxt = (JavaFXTree)t;

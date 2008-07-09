@@ -61,7 +61,7 @@ public class BlockEnvironment extends JavaFXCompletionEnvironment<BlockTree> {
 
     @Override
     protected void inside(BlockTree bl) throws IOException {
-        log("inside BlockTree " + bl);
+        if (LOGGABLE) log("inside BlockTree " + bl);
         StatementTree last = null;
         for (StatementTree stat : bl.getStatements()) {
             int pos = (int) sourcePositions.getStartPosition(root, stat);

@@ -147,13 +147,13 @@ public class JavaFXCompletionProvider implements CompletionProvider {
                 if (ts.language() == JFXTokenId.language())
                     return (TokenSequence<JFXTokenId>)ts;
                 if (!ts.moveNext() && !ts.movePrevious()) {
-                    log("getJavaFXTokenSequence returning null (1) for offset " + offset);
+                    if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset);
                     return null;
                 }
                 ts = ts.embedded();
             }
         }
-        log("getJavaFXTokenSequence returning null (2) for offset " + offset);
+        if (LOGGABLE) log("getJavaFXTokenSequence returning null (2) for offset " + offset);
         return null;
     }
     

@@ -69,15 +69,15 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
 
     @Override
     protected void inside(JFXFunctionDefinition t) throws IOException {
-        log("inside JFXFunctionDefinition " + t);
+        if (LOGGABLE) log("inside JFXFunctionDefinition " + t);
         JFXFunctionDefinition def = t;
         int startPos = (int) sourcePositions.getStartPosition(root, def);
         JFXType retType = def.getJFXReturnType();
-        log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType);
+        if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType);
         String headerText = controller.getText().substring(startPos, offset > startPos ? offset : startPos);
-        log("  headerText(1) == " + headerText);
+        if (LOGGABLE) log("  headerText(1) == " + headerText);
         int parStart = headerText.indexOf('(');
-        log("  parStart: " + parStart);
+        if (LOGGABLE) log("  parStart: " + parStart);
         if (parStart >= 0) {
             int parEnd = headerText.indexOf(')', parStart);
             if (parEnd > parStart) {
@@ -92,21 +92,21 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
                 }
                 headerText = headerText.substring(parStart).trim();
             }
-            log("  headerText(2) ==" + headerText);
+            if (LOGGABLE) log("  headerText(2) ==" + headerText);
             if (":".equals(headerText)) {
                 addLocalAndImportedTypes(null, null, null, false, null);
                 addBasicTypes();
                 return;
             }
         } else if (retType != null && headerText.trim().length() == 0) {
-            log("  insideExpression for retType:");
+            if (LOGGABLE) log("  insideExpression for retType:");
             insideExpression(new TreePath(path, retType));
             return;
         }
         int bodyPos = (int) sourcePositions.getStartPosition(root, def.getBodyExpression());
-        log("  bodyPos: " + bodyPos);
+        if (LOGGABLE) log("  bodyPos: " + bodyPos);
         if ((bodyPos >=0) && (offset > bodyPos)) {
-            log(" we are inside body of the function:");
+            if (LOGGABLE) log(" we are inside body of the function:");
             insideFunctionBlock(def.getBodyExpression().getStatements());
         } 
     }

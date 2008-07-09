@@ -239,7 +239,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             final JavaFXElementFoldVisitor v = manager.new JavaFXElementFoldVisitor(info, cu, info.getTrees().getSourcePositions());
             
             scan(v, cu, null);
-            log("No of folds after scan: " + v.folds.size());
+            if (LOGGABLE) log("No of folds after scan: " + v.folds.size());
             if (v.folds.size() == 0) {
                 // this is a hack to somehow fool the effects of #133144
                 // this should be removed when the error recovery is implemented
@@ -257,7 +257,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 return ;
             }
             
-            log("will commit folds: " + v.folds.size());
+            if (LOGGABLE) log("will commit folds: " + v.folds.size());
             
             SwingUtilities.invokeLater(manager.new CommitFolds(v.folds));
             
@@ -382,7 +382,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         private void addCommentsFolds() {
             TokenHierarchy<?> th = info.getTokenHierarchy();
             if (th == null) {
-                log("addCommentsFolds returning because of null token hierarchy.");
+                if (LOGGABLE) log("addCommentsFolds returning because of null token hierarchy.");
                 return;
             }
             TokenSequence<JFXTokenId>  ts = th.tokenSequence(JFXTokenId.language());
@@ -393,15 +393,15 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     if (token.id() == JFXTokenId.DOC_COMMENT) {
                         Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
-                        log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset);
+                        if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset);
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
                     }
                     if (token.id() == JFXTokenId.COMMENT) {
                         Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
-                        log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]");
+                        if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]");
                         if (firstNormalFold) {
-                            log("foldInitialCommentsPreset == " + foldInitialCommentsPreset + " on " + token.text());
+                            if (LOGGABLE) log("foldInitialCommentsPreset == " + foldInitialCommentsPreset + " on " + token.text());
                         }
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), INITIAL_COMMENT_FOLD_TEMPLATE, firstNormalFold ? foldInitialCommentsPreset : false));
                         firstNormalFold = false;
@@ -422,7 +422,8 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     int end   = (int)sp.getEndPosition(cu, node);
                     
                     if (start != (-1) && end != (-1)) {
-                        log("handleTree adding fold [" + start + ":" + end + "] for tree: " + node);
+                        if (LOGGABLE) log("handleTree adding fold [" + start + ":" + end + "]");
+                        if (LOGGABLE) log("  for tree: " + node);
                         folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldCodeBlocksPreset));
                     } else {
                         // debug:
@@ -454,7 +455,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 int end   = (int)sp.getEndPosition(cu, node);
 
                 if (start != (-1) && end != (-1)) {
-                    log("visitInstantiate adding fold [" + start + ":" + end + "] for tree: " + node);
+                    if (LOGGABLE) log("visitInstantiate adding fold [" + start + ":" + end + "] for tree: " + node);
                     folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldInnerClassesPreset));
                 } else {
                     dumpPositions(node, start, end);
@@ -485,7 +486,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 int end   = (int)sp.getEndPosition(cu, node);
 
                 if (start != (-1) && end != (-1)) {
-                    log("visitClassDeclaration adding fold [" + start + ":" + end + "] for tree: " + node);
+                    if (LOGGABLE) log("visitClassDeclaration adding fold [" + start + ":" + end + "] for tree: " + node);
                     folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldInnerClassesPreset));
                 } else {
                     dumpPositions(node, start, end);
@@ -564,7 +565,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     importsStart += 7/*"import ".length()*/;
                     
                     if (importsStart < importsEnd) {
-                        log("visitCompilationUnit adding fold [" + importsStart + ":" + importsEnd + "]");
+                        if (LOGGABLE) log("visitCompilationUnit adding fold [" + importsStart + ":" + importsEnd + "]");
                         folds.add(new FoldInfo(doc, importsStart , importsEnd, IMPORTS_FOLD_TEMPLATE, collapsed));
                     }
                 } catch (BadLocationException e) {

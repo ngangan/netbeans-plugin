@@ -58,7 +58,7 @@ public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironme
 
     @Override
     protected void inside(CompoundAssignmentTree cat) throws IOException {
-        log("inside CompoundAssignmentTree " + cat);
+        if (LOGGABLE) log("inside CompoundAssignmentTree " + cat);
         int catTextStart = (int) sourcePositions.getEndPosition(root, cat.getVariable());
         if (catTextStart != Diagnostic.NOPOS) {
             Tree expr = unwrapErrTree(cat.getExpression());

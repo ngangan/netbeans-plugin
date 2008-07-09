@@ -56,7 +56,7 @@ public class IfTreeEnvironment extends JavaFXCompletionEnvironment<IfTree> {
 
     @Override
     protected void inside(IfTree t) throws IOException {
-        log("inside IfTree " + t);
+        if (LOGGABLE) log("inside IfTree " + t);
         IfTree iff = t;
         if (getSourcePositions().getEndPosition(root, iff.getCondition()) <= getOffset()) {
             localResult(null);

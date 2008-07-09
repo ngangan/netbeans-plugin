@@ -58,7 +58,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
 
     @Override
     protected void inside(JFXObjectLiteralPart t) throws IOException {
-        log("inside JFXObjectLiteralPart " + t + "  offset == " + offset);
+        if (LOGGABLE) log("inside JFXObjectLiteralPart " + t + "  offset == " + offset);
         addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
         addLocalMembersAndVars(getSmartType(t));
         addValueKeywords();
@@ -73,7 +73,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
         TypeMirror type = controller.getTrees().getTypeMirror(new TreePath(path, t.getExpression()));
         // it should instead extract the name of the attribute and extract
         //   the type from the named attribute
-        log("  smart == " + type);
+        if (LOGGABLE) log("  smart == " + type);
         return type;
     }
     

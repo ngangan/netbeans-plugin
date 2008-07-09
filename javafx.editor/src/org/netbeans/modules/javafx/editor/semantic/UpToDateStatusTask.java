@@ -88,11 +88,11 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private void process(CompilationInfo info) {
-        log("process: " + info.getJavaFXSource().getFileObject());
+        if (LOGGABLE) log("process: " + info.getJavaFXSource().getFileObject());
         
         Document doc = info.getJavaFXSource().getDocument();
         if (doc == null) {
-            log("  no document for: " + info.getJavaFXSource());
+            if (LOGGABLE) log("  no document for: " + info.getJavaFXSource());
             return;
         }
 
@@ -101,20 +101,20 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         ArrayList<ErrorDescription> c = new ArrayList<ErrorDescription>();
 
         for (Diagnostic d : diag) {
-            log("    diagnostics: " + d);
+            if (LOGGABLE) log("    diagnostics: " + d);
             if (d.getSource() instanceof JavaFileObject) {
                 JavaFileObject jfo = (JavaFileObject)d.getSource();
                 if (! jfo.getName().equals(info.getJavaFXSource().getFileObject().getNameExt())) {
-                    log("    in different file: " + jfo.getName() + " vs.: " + info.getJavaFXSource().getFileObject().getNameExt());
+                    if (LOGGABLE) log("    in different file: " + jfo.getName() + " vs.: " + info.getJavaFXSource().getFileObject().getNameExt());
                     continue;
                 }
             } else {
-                log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null"));
+                if (LOGGABLE) log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null"));
             }
             long start = d.getStartPosition();
             long end = d.getEndPosition();
             if (start != Diagnostic.NOPOS && end != Diagnostic.NOPOS) {
-                log("    start == " + start + "  end == " + end);
+                if (LOGGABLE) log("    start == " + start + "  end == " + end);
                 try {
                     c.add(ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
@@ -130,13 +130,13 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             } 
             // let's use the line number
             int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
-            log("    lastLine == " + lastLine);
+            if (LOGGABLE) log("    lastLine == " + lastLine);
             if (d.getLineNumber()-1 <= lastLine) {
                 c.add(ErrorDescriptionFactory.createErrorDescription(
                     Severity.ERROR, d.getMessage(Locale.getDefault()),
                     doc, (int)d.getLineNumber()));
             } else {
-                log("   after last line: " + d);
+                if (LOGGABLE) log("   after last line: " + d);
             }
         }
         HintsController.setErrors(doc, "semantic-highlighter", c);
