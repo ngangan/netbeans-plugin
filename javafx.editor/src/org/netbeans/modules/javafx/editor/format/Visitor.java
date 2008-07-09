@@ -118,7 +118,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
         try {
-            final int start  = getStartPos(node);
+            final int start = getStartPos(node);
 //            if (isFirstOnLine(start)) {
 //                indentLine(start, adjustments);
 //            }
@@ -134,7 +134,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                         indentMultiline(li, getEndPos(node), adjustments);
                     }
                 }
-            }            
+            }
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
@@ -495,25 +495,24 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         final TokenSequence<JFXTokenId> ts = ts();
         try {
             processStandaloneNode(node, adjustments);
-            verifyFunctionSpaces(ts, node, adjustments);
 
-//            ts.move(getStartPos(node));
-//            while (ts.moveNext()) {
-//                final JFXTokenId id = ts.token().id();
-//                switch (id) {
-//                    case PUBLIC:
-//                    case PRIVATE:
-//                    case STATIC:
-//                    case WS:
-//                        continue;
-//                    case FUNCTION:
-//                        verifyFunctionSpaces(ts, node, adjustments);
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                break;
-//            }
+            ts.move(getStartPos(node));
+            while (ts.moveNext()) {
+                final JFXTokenId id = ts.token().id();
+                switch (id) {
+                    case PUBLIC:
+                    case PRIVATE:
+                    case STATIC:
+                    case WS:
+                        continue;
+                    case FUNCTION:
+                        verifyFunctionSpaces(ts, node, adjustments);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
@@ -771,7 +770,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitClassDeclaration(ClassDeclarationTree node, Queue<Adjustment> adjustments) {
-        if (getStartPos(node) == getEndPos(node)) {
+        if (tu.isSynthetic(getCurrentPath())) {
             super.visitClassDeclaration(node, adjustments);
             return adjustments;
         }
