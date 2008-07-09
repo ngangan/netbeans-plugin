@@ -85,6 +85,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     protected static final String ONE_SPACE = STRING_EMPTY_LENGTH_ONE;
     private TokenSequence<TokenId> ts;
     private static final String STRING_ZERO_LENGTH = "";
+    private boolean disableContinuosIndent;
 
 
     Visitor(CompilationInfo info, Context ctx, int startOffset, Project project) {
@@ -373,12 +374,15 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitSequenceExplicit(SequenceExplicitTree node, Queue<Adjustment> adjustments) {
         try {
+            disableContinuosIndent = true;
             indentSimpleStructure(node, adjustments);
             incIndent();
             super.visitSequenceExplicit(node, adjustments);
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        } finally {
+            disableContinuosIndent = false;
         }
         return adjustments;
     }
@@ -1125,7 +1129,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
      * @return size of continuation indent adjustment.
      */
     private int getCi() {
-        return cs.getContinuationIndentSize() - getIndentStepLevel();
+        return disableContinuosIndent ? 0 : (cs.getContinuationIndentSize() - getIndentStepLevel());
     }
 
     @Override
