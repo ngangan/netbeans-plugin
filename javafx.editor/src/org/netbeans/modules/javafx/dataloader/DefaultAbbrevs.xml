@@ -105,7 +105,7 @@ made subject to such option by the copyright holder.
     <codetemplate abbreviation="if" contexts="BLOCK,CASE" descriptionId="CT_if">
         <code>
 <![CDATA[if (${EXP instanceof="java.lang.Boolean" default="exp"}) {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 }
 ]]>
         </code>
@@ -113,7 +113,7 @@ made subject to such option by the copyright holder.
     <codetemplate abbreviation="ife" contexts="BLOCK,CASE" descriptionId="CT_ife">
         <code>
 <![CDATA[if (${EXP instanceof="java.lang.Boolean" default="exp"}) {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 } else {
 }
 ]]>
@@ -122,28 +122,28 @@ made subject to such option by the copyright holder.
     <codetemplate abbreviation="el">
         <!-- TODO: context = immediately after if statement in body of an operation -->
         <code><![CDATA[else {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 }]]>
         </code>
     </codetemplate> 
     <codetemplate abbreviation="eli">
         <!-- TODO: context = immediately after if statement in body of an operation -->
         <code><![CDATA[else if (${EXP instanceof="java.lang.Boolean" default="exp"}) {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 }]]>
         </code>
     </codetemplate> 
     <codetemplate abbreviation="wh">
         <code>
 <![CDATA[while (${EXP instanceof="java.lang.Boolean" default="exp"}) {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 }]]>
         </code>
     </codetemplate> 
     <codetemplate abbreviation="tr" contexts="BLOCK,CASE">
         <code>
 <![CDATA[try {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 } catch (${Variable default="e"}) {
 }
 ]]>
@@ -159,7 +159,7 @@ made subject to such option by the copyright holder.
     <codetemplate abbreviation="fi">
         <!-- context = immediately after try catch statement in body of an operation -->
         <code><![CDATA[finally {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 }
 ]]>
         </code>
@@ -167,7 +167,7 @@ made subject to such option by the copyright holder.
     <codetemplate abbreviation="for" contexts="BLOCK,CASE">
         <code>
 <![CDATA[for (${IDX newVarName default="idx"} in ${ARR array default="arr"}) {
-   ${selection line}${cursor}
+   ${selection}${cursor}
 }
 ]]>
         </code>
