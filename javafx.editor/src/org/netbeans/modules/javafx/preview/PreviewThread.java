@@ -42,6 +42,7 @@
 package org.netbeans.modules.javafx.preview;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -135,7 +136,8 @@ public class PreviewThread extends Thread {
         }
         return CodeManager.getDiagnostics();
     }
-    
+
+    Object obj = null;
     public JComponent execute() {
         JComponent comp = null;
         List <Window> initialList = getOwnerlessWindowsList();
@@ -144,9 +146,13 @@ public class PreviewThread extends Thread {
             comp = JavaFXDocument.getVrongVersion();
             return comp;
         }
-        Object obj = null;
         try {
-            obj = CodeManager.run(context);
+            EventQueue.invokeAndWait(
+                new Runnable() {
+                    public void run() {
+                        obj = CodeManager.run(context);
+                    }
+                });
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }

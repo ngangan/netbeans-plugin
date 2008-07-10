@@ -289,7 +289,7 @@ public class JavaFXModel {
             synchronized (lock2) {
                 try {
                     if (!skipLock2) {
-                        lock2.wait(15000);
+                        lock2.wait(20000);
                         skipLock2 = false;
                     }
                 } catch (Exception ex) {
