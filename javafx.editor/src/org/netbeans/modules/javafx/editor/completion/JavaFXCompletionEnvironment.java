@@ -1031,6 +1031,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     String currentLine = controller.getText().substring(lineStart, offset);
                     if ((!currentLine.contains(":"))  && 
                         (!currentLine.contains("(")) &&
+                        (!currentLine.contains(".")) &&
                         (!currentLine.contains("{"))
                     ) {
                         tryToDeleteCurrentLine(lineStart);
