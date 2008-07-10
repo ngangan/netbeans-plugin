@@ -172,7 +172,7 @@ class CompilationInfoImpl {
         }
         
         public void report(Diagnostic<? extends JavaFileObject> message) {            
-            LOGGER.info("Error at [" + message.getLineNumber() + ":" + message.getColumnNumber() + "]/" + message.getEndPosition() + " - " + message.getMessage(null));
+            LOGGER.fine("Error at [" + message.getLineNumber() + ":" + message.getColumnNumber() + "]/" + message.getEndPosition() + " - " + message.getMessage(null));
             errors.put((int)message.getPosition(),message);
         }
     }
