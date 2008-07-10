@@ -1022,6 +1022,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 builder.insert(offset, 'x');
                 useFakeSource(builder.toString(), offset);
                 if (query.results.isEmpty()) {
+                    builder = new StringBuilder(text);
+                    builder.insert(offset, "x;");
+                    useFakeSource(builder.toString(), offset);
+                }
+                if (query.results.isEmpty()) {
                     // still nothing? let's be desperate:
                     String currentLine = controller.getText().substring(lineStart, offset);
                     if ((!currentLine.contains(":"))  && 
