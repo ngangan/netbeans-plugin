@@ -55,8 +55,10 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.util.HashMap;
@@ -77,6 +79,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.navigation.ElementNode.Description;
@@ -360,6 +363,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         final ElementKind kind = e.getKind();
         final ElementKind spaceMagicKind = kind == ElementKind.LOCAL_VARIABLE ? ElementKind.FIELD : kind;
         Description d = new Description(ui, name, e, spaceMagicKind, inherited);
+        final JavafxTypes javafxTypes = info.getJavafxTypes();
 
         if (e instanceof TypeElement) {
             if (null != parent) {
@@ -371,18 +375,18 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             }
 
             d.subs = new HashSet<Description>();
-            d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited);
+            d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited, javafxTypes);
         } else if (e instanceof ExecutableElement) {
             if (!spaceMagic && name.contains("$")) {
                 return null;
             }
 
-            d.htmlHeader = createHtmlHeader((ExecutableElement) e, info.getElements().isDeprecated(e), d.isInherited);
+            d.htmlHeader = createHtmlHeader((ExecutableElement) e, info.getElements().isDeprecated(e), d.isInherited, javafxTypes);
         } else if (e instanceof VariableElement) {
             if (!spaceMagic && kind != ElementKind.FIELD && kind != ElementKind.ENUM_CONSTANT) {
                 return null;
             }
-            d.htmlHeader = createHtmlHeader((VariableElement) e, info.getElements().isDeprecated(e), d.isInherited);
+            d.htmlHeader = createHtmlHeader((VariableElement) e, info.getElements().isDeprecated(e), d.isInherited, javafxTypes);
         }
 
         d.modifiers = e.getModifiers();
@@ -400,7 +404,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
     }
 
     /** Creates HTML display name of the Executable element */
-    private String createHtmlHeader(ExecutableElement e, boolean isDeprecated, boolean isInherited) {
+    private String createHtmlHeader(ExecutableElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
 
         StringBuilder sb = new StringBuilder();
         if (isDeprecated) {
@@ -424,7 +428,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         for (Iterator<? extends VariableElement> it = params.iterator(); it.hasNext();) {
             VariableElement param = it.next();
             sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-            sb.append(print(param.asType()));
+            sb.append(print(types, param.asType()));
             sb.append("</font>"); // NOI18N
             sb.append(" "); // NOI18N
             sb.append(param.getSimpleName());
@@ -441,7 +445,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             if (rt.getKind() != TypeKind.VOID) {
                 sb.append(" : "); // NOI18N     
                 sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-                sb.append(print(e.getReturnType()));
+                sb.append(print(types, e.getReturnType()));
                 sb.append("</font>"); // NOI18N                    
             }
         }
@@ -449,7 +453,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return sb.toString();
     }
 
-    private String createHtmlHeader(VariableElement e, boolean isDeprecated, boolean isInherited) {
+    private String createHtmlHeader(VariableElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -467,14 +471,14 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         if (e.getKind() != ElementKind.ENUM_CONSTANT) {
             sb.append(" : "); // NOI18N
             sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-            sb.append(print(e.asType()));
+            sb.append(print(types, e.asType()));
             sb.append("</font>"); // NOI18N
         }
 
         return sb.toString();
     }
 
-    private String createHtmlHeader(TypeElement e, boolean isDeprecated, boolean isInherited) {
+    private String createHtmlHeader(TypeElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
 
         StringBuilder sb = new StringBuilder();
         if (isDeprecated) {
@@ -499,7 +503,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 try { // XXX Verry ugly -> file a bug against Javac?
                     List<? extends TypeMirror> bounds = tp.getBounds();
                     if (!bounds.isEmpty()) {
-                        sb.append(printBounds(bounds));
+                        sb.append(printBounds(bounds, types));
                     }
                 } catch (NullPointerException npe) {
                     System.err.println("El " + e);
@@ -516,7 +520,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         // Add superclass and implemented interfaces
 
         TypeMirror sc = e.getSuperclass();
-        String scName = print(sc);
+        String scName = print(types, sc);
 
         if (sc == null ||
                 e.getKind() == ElementKind.ENUM ||
@@ -543,7 +547,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 for (Iterator<? extends TypeMirror> it = ifaces.iterator(); it.hasNext();) {
                     TypeMirror typeMirror = it.next();
                     sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N                
-                    sb.append(print(typeMirror));
+                    sb.append(print(types, typeMirror));
                     sb.append("</font>"); // NOI18N
                     if (it.hasNext()) {
                         sb.append(", "); // NOI18N
@@ -556,7 +560,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return sb.toString();
     }
 
-    private String printBounds(List<? extends TypeMirror> bounds) {
+    private String printBounds(List<? extends TypeMirror> bounds, JavafxTypes types) {
         if (bounds.size() == 1 && "java.lang.Object".equals(bounds.get(0).toString())) {
             return "";
         }
@@ -567,7 +571,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
         for (Iterator<? extends TypeMirror> it = bounds.iterator(); it.hasNext();) {
             TypeMirror bound = it.next();
-            sb.append(print(bound));
+            sb.append(print(types, bound));
             if (it.hasNext()) {
                 sb.append(" & "); // NOI18N
             }
@@ -577,9 +581,9 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return sb.toString();
     }
 
-    private String print(TypeMirror tm) {
+    private String print(JavafxTypes types, TypeMirror tm) {
         StringBuilder sb;
-
+        
         switch (tm.getKind()) {
             case DECLARED:
                 DeclaredType dt = (DeclaredType) tm;
@@ -590,7 +594,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
                     for (Iterator<? extends TypeMirror> it = typeArgs.iterator(); it.hasNext();) {
                         TypeMirror ta = it.next();
-                        sb.append(print(ta));
+                        sb.append(print(types, ta));
                         if (it.hasNext()) {
                             sb.append(", ");
                         }
@@ -605,7 +609,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 return sb.toString();
             case ARRAY:
                 ArrayType at = (ArrayType) tm;
-                sb = new StringBuilder(print(at.getComponentType()));
+                sb = new StringBuilder(print(types, at.getComponentType()));
                 sb.append("[]");
                 return sb.toString();
             case WILDCARD:
@@ -613,14 +617,18 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 sb = new StringBuilder("?");
                 if (wt.getExtendsBound() != null) {
                     sb.append(" extends "); // NOI18N
-                    sb.append(print(wt.getExtendsBound()));
+                    sb.append(print(types, wt.getExtendsBound()));
                 }
                 if (wt.getSuperBound() != null) {
                     sb.append(" super "); // NOI18N
-                    sb.append(print(wt.getSuperBound()));
+                    sb.append(print(types, wt.getSuperBound()));
                 }
                 return sb.toString();
             default:
+                if (tm instanceof Type) {
+                    // another space magic
+                    return FXSourceUtils.typeToString(types, (Type) tm);
+                }
                 return tm.toString();
         }
     }

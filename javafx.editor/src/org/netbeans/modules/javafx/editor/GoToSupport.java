@@ -46,9 +46,6 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.MethodType;
-import com.sun.tools.javac.code.TypeTags;
-import com.sun.tools.javac.util.List;
-import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -63,6 +60,7 @@ import javax.lang.model.type.TypeKind;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.editor.ElementOpen;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -193,7 +191,7 @@ public class GoToSupport {
             
             Symbol sym = (Symbol)elem;
             Type type = sym.asType();
-            return prefix + "<b>" + var + "</b> : " + typeToString(types, type);
+            return prefix + "<b>" + var + "</b> : " + FXSourceUtils.typeToString(types, type);
         }
         
         if (elem instanceof TypeElement) {
@@ -203,56 +201,11 @@ public class GoToSupport {
             ExecutableElement var = (ExecutableElement)elem;
             Symbol sym = (Symbol)elem;
             Type type = sym.asType();
-            return "<html>" + var.getEnclosingElement() + ".<b>" + sym.name.toString() + "</b>" + methodToString(types, (MethodType)type);
+            return "<html>" + var.getEnclosingElement() + ".<b>" + sym.name.toString() + "</b>" + FXSourceUtils.methodToString(types, (MethodType)type);
         }
         return null;
     }
     
-    private static String methodToString(JavafxTypes types, MethodType mtype) {
-        StringBuilder s = new StringBuilder();
-        s.append("(");
-        if (mtype == null) {
-            s.append("???");
-        } else {
-            List<Type> args = mtype.argtypes;
-            for (List<Type> l = args; l.nonEmpty(); l = l.tail) {
-                if (l != args)
-                    s.append(", ");
-                s.append(':');
-                s.append(typeToString(types, l.head));
-            }
-        }
-        s.append("):");
-        s.append(mtype == null ? "???" : typeToString(types, mtype.restype));
-        return s.toString();
-    }
-    
-    private static String typeToString(JavafxTypes types, Type type) {
-        String suffix = "";
-        if (type instanceof FunctionType) {
-            MethodType mtype = ((FunctionType)type).asMethodType();
-            return "function" + methodToString(types, mtype);
-        }
-        
-        if (types.isSequence(type)) {
-            suffix = "[ ]";
-            type = types.elementType(type);
-        }
-        switch (type.tag) {
-            case TypeTags.DOUBLE:
-                return "Number" + suffix;
-
-            case TypeTags.INT:
-                return "Integer" + suffix;
-
-            case TypeTags.VOID:
-                return "Void" + suffix;
-
-            default:
-                return type.toString() + suffix;
-        }
-    }
-
     private static final Set<JFXTokenId> USABLE_TOKEN_IDS = EnumSet.of(JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
 
     public static int[] getIdentifierSpan(Document doc, int offset, Token<JFXTokenId>[] token) {
