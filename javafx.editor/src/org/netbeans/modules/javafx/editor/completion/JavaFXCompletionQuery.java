@@ -174,7 +174,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}");
     
-    Set<JavaFXCompletionItem> results;
+    public Set<JavaFXCompletionItem> results;
     private boolean hasAdditionalItems;
     private JToolTip toolTip;
     private CompletionDocumentation documentation;

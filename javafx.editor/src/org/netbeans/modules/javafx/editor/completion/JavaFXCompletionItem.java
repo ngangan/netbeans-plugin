@@ -100,7 +100,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     public static final String BOLD = "<b>"; //NOI18N
     public static final String BOLD_END = "</b>"; //NOI18N
 
-    protected int substitutionOffset;
+    public int substitutionOffset;
     
     protected static int SMART_TYPE = 1000;
     private static final String GENERATE_TEXT = NbBundle.getMessage(JavaFXCompletionItem.class, "generate_Lbl");

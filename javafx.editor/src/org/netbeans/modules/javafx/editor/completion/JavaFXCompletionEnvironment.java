@@ -122,6 +122,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     private static final Logger logger = Logger.getLogger(JavaFXCompletionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+    private static int usingFakeSource = 0;
     protected int offset;
     protected String prefix;
     protected boolean isCamelCasePrefix;
@@ -1069,9 +1070,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * 
      * @param source
      */
-    private void useFakeSource(String source, final int pos) {
+    protected void useFakeSource(String source, final int pos) {
         if (LOGGABLE) log("useFakeSource " + source + " pos == " + pos);
+        if (usingFakeSource > 1) {
+            // allow to recurse only twice ;-)
+            return;
+        }
         try {
+            usingFakeSource++;
             FileSystem fs = FileUtil.createMemoryFileSystem();
             final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
             Writer w = new OutputStreamWriter(fo.getOutputStream());
@@ -1110,6 +1116,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (LOGGABLE) {
                 logger.log(Level.FINE,"useFakeSource failed: ",ex);
             }
+        } finally {
+            usingFakeSource--;
         }
     }
 
