@@ -111,6 +111,7 @@ class MemoryClassLoader extends ClassLoader {
     @Override
     protected URL findResource(String name) {
         URL url = null;
+        if (name.startsWith("/")) name = name.substring(1);
         String ext = FileUtil.getExtension(name);
         if (ext.contentEquals("class")) {
             String pureName = name.substring(0, name.length() - ext.length() - 1);
