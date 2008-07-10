@@ -478,6 +478,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case SET_ATTRIBUTE_TO_OBJECT:
                     break;
                 case STRING_EXPRESSION:
+                    result = new StringExpressionEnvironment();
                     break;
                 case TIME_LITERAL:
                     break;
