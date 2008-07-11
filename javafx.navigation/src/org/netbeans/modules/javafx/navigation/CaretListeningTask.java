@@ -200,6 +200,11 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                         break;
                     case VARIABLE:
                         e = ci.getTrees().getElement(tp);
+
+                        if (SpaceMagicUtils.hasSpiritualInvocation(e)) {
+                            return e;
+                        }
+                        
                         if (e != null && !e.getKind().isField()) {
                             e = null;
                         }

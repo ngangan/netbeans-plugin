@@ -164,7 +164,7 @@ public class ElementNode extends AbstractNode {
 
     private synchronized Action getOpenAction() {
         if (openAction == null) {
-            openAction = new OpenAction(description.element, description.ui.getFileObject(), description.name);
+            openAction = new OpenAction(description.element, description.ui.getFileObject(), description.name, description.pos);
         }
         return openAction;
     }

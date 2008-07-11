@@ -40,16 +40,15 @@
  */
 package org.netbeans.modules.javafx.navigation;
 
+import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.JavaFXVariableTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.SourcePositions;
@@ -59,8 +58,6 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -118,7 +115,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         final Map<Element, Long> pos = new HashMap<Element, Long>();
         if (!canceled.get()) {
             JavafxcTrees trees = info.getTrees();
-            PositionVisitor posVis = new PositionVisitor(trees, canceled);
+            PositionVisitor posVis = new PositionVisitor(info, trees, canceled);
             posVis.scan(cuTree, pos);
         }
 
@@ -128,7 +125,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             for (Element element : elements) {
                 Symbol.ClassSymbol sym = (Symbol.ClassSymbol) element;
                 for (Symbol symbol : sym.members().getElements()) {
-                    if ("javafx$run$".equals(symbol.getSimpleName().toString())) {
+                    if (SpaceMagicUtils.isSpiritualMethod(symbol)) {
                         magicRunMethod = symbol;
                         break out;
                     }
@@ -157,14 +154,16 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
     private static class PositionVisitor extends JavaFXTreePathScanner<Void, Map<Element, Long>> {
 
+        private final CompilationInfo info;
         private final JavafxcTrees trees;
         private final SourcePositions sourcePositions;
         private final AtomicBoolean canceled;
         private CompilationUnitTree cu;
 
-        public PositionVisitor(final JavafxcTrees trees, final AtomicBoolean canceled) {
+        public PositionVisitor(final CompilationInfo info, final JavafxcTrees trees, final AtomicBoolean canceled) {
             assert trees != null;
             assert canceled != null;
+            this.info = info;
             this.trees = trees;
             this.sourcePositions = trees.getSourcePositions();
             this.canceled = canceled;
@@ -222,6 +221,20 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             if (e != null) {
                 long pos = this.sourcePositions.getStartPosition(cu, node);
                 p.put(e, pos);
+                
+                // guesss what? space magic! weeeee! >:-((
+                if (SpaceMagicUtils.isSpiritualMethod(e)) {
+                    List<Element> spiritualMembers = SpaceMagicUtils.getSpiritualMembers(info);
+                    for (Element sm : spiritualMembers) {
+                        TreePath smPath = info.getPath(sm);
+                        Tree smTree = smPath != null ? smPath.getLeaf() : null;
+
+                        if (smTree != null) {
+                            long smPos = this.sourcePositions.getStartPosition(cu, smTree);
+                            p.put(sm, smPos);
+                        }
+                    }
+                }
             }
             return null;
         }
@@ -270,83 +283,16 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             return;
         }
 
-        final JavafxcTrees trees = info.getTrees();
-        final CompilationUnitTree cut = info.getCompilationUnit();
-        for (Tree tt : cut.getTypeDecls()) {
-            if (tt.getKind() == Tree.Kind.OTHER && tt instanceof JavaFXTree) {
-                JavaFXTree jfxtt = (JavaFXTree) tt;
-                JavaFXKind kk = jfxtt.getJavaFXKind();
-                if (kk == JavaFXKind.CLASS_DECLARATION) {
-                    JFXClassDeclaration cd = (JFXClassDeclaration) jfxtt;
-                    for (Tree jct : cd.getClassMembers()) {
-                        if (jct.getKind() == Tree.Kind.OTHER && jct instanceof JavaFXTree) {
-                            JavaFXTree jfxjct = (JavaFXTree) jct;
-                            JavaFXKind k = jfxjct.getJavaFXKind();
-                            if (k == JavaFXKind.FUNCTION_DEFINITION) {
-                                JFXFunctionDefinition fdt = (JFXFunctionDefinition) jfxjct;
-                                if ("javafx$run$".equals(fdt.name.toString())) {
-                                    for (StatementTree st : fdt.getBodyExpression().getStatements()) {
-                                        if (canceled.get()) {
-                                            return;
-                                        }
-                                        TreePath path = trees.getPath(cut, fdt);
-                                        TreePath expPath = new TreePath(path, st);
-                                        Element el = trees.getElement(expPath);
-                                        if (el == null) {
-                                            continue;
-                                        }
-                                        Description d = element2description(el, e, parentDescription.isInherited, info, pos);
-                                        if (null != d) {
-                                            parentDescription.subs.add(d);
-                                            if (el instanceof TypeElement && !d.isInherited) {
-                                                addMembers((TypeElement) el, d, info, pos);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+        List<Element> spiritualMembers = SpaceMagicUtils.getSpiritualMembers(info);
+        for (Element el : spiritualMembers) {
+            Description d = element2description(el, e, parentDescription.isInherited, info, pos);
+            if (null != d) {
+                parentDescription.subs.add(d);
+                if (el instanceof TypeElement && !d.isInherited) {
+                    addMembers((TypeElement) el, d, info, pos);
                 }
             }
         }
-
-//        JavafxcTrees trees = info.getTrees();
-//        TreePath path = trees.getPath(e);
-//        JFXFunctionDefinition tree = (JFXFunctionDefinition) trees.getTree(e);
-//        JFXBlockExpression bodyExpression = tree.getBodyExpression();
-//        for (StatementTree st : bodyExpression.getStatements()) {
-//            if (canceled.get()) {
-//                return;
-//            }
-//            TreePath expPath = new TreePath(path, st);
-//            Element el = trees.getElement(expPath);
-//            if (el == null) {
-//                continue;
-//            }
-//            Description d = element2description(el, e, parentDescription.isInherited, info, pos);
-//            if (null != d) {
-//                parentDescription.subs.add(d);
-//                if (el instanceof TypeElement && !d.isInherited) {
-//                    addMembers((TypeElement) el, d, info, pos);
-//                }
-//            }
-//        }
-
-//        Symbol.MethodSymbol sym = (Symbol.MethodSymbol) e;
-//        Iterable<Symbol> elements = sym.getEnclosedElements();
-//        for (Symbol m : elements) {
-//            if (canceled.get()) {
-//                return;
-//            }
-//            Description d = element2description(m, e, parentDescription.isInherited, info, pos);
-//            if (null != d) {
-//                parentDescription.subs.add(d);
-//                if (m instanceof TypeElement && !d.isInherited) {
-//                    addMembers((TypeElement) m, d, info, pos);
-//                }
-//            }
-//        }
     }
 
     private Description element2description(final Element e, final Element parent,
@@ -354,7 +300,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             final Map<Element, Long> pos) {
 
         final String name = e.getSimpleName().toString();
-        final boolean spaceMagic = e.getEnclosingElement().getSimpleName().toString().equals("javafx$run$");
+        final boolean spaceMagic = SpaceMagicUtils.isSpiritualMethod(e.getEnclosingElement());
         if (!spaceMagic && info.getElementUtilities().isSynthetic(e)) {
             return null;
         }
@@ -583,7 +529,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
     private String print(JavafxTypes types, TypeMirror tm) {
         StringBuilder sb;
-        
+
         switch (tm.getKind()) {
             case DECLARED:
                 DeclaredType dt = (DeclaredType) tm;

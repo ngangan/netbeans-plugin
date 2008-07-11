@@ -76,6 +76,10 @@ public final class ElementOpen {
     private ElementOpen() {
     }
 
+    public static void open(final FileObject srcFile, int offset) throws Exception {
+        GoToSupport.doOpen(srcFile, (int) offset);
+    }
+    
     public static void open(final FileObject srcFile, final Element el) throws Exception {
         if (srcFile == null) {
             return;

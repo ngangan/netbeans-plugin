@@ -45,6 +45,7 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.editor.ElementOpen;
+import org.netbeans.modules.javafx.navigation.SpaceMagicUtils;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.*;
@@ -60,15 +61,17 @@ public final class OpenAction extends AbstractAction {
     private Element element;
     private FileObject fileObject;
     private String displayName;
+    private long offset;
 
-    public OpenAction(Element element, FileObject fileObject) {
-        this(element, fileObject, null);
-    }
+//    public OpenAction(Element element, FileObject fileObject) {
+//        this(element, fileObject, null, -1);
+//    }
 
-    public OpenAction(Element element, FileObject fileObject, String displayName) {
+    public OpenAction(Element element, FileObject fileObject, String displayName, long offset) {
         this.element = element;
         this.fileObject = fileObject;
         this.displayName = displayName;
+        this.offset = offset;
         putValue(Action.NAME, NbBundle.getMessage(OpenAction.class, "LBL_Goto")); //NOI18N
     }
 
@@ -80,7 +83,12 @@ public final class OpenAction extends AbstractAction {
             }
         } else {
             try {
-                ElementOpen.open(fileObject, element);
+                if (SpaceMagicUtils.hasSpiritualInvocation(element)) {
+                    // space magic here, can't be opened via element
+                    ElementOpen.open(fileObject, (int) offset);
+                } else {
+                    ElementOpen.open(fileObject, element);
+                }
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
