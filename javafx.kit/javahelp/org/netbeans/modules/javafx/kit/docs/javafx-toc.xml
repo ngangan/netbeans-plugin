@@ -24,6 +24,7 @@
 
       <tocitem text="Editing JavaFX Script Source Files" >
         <tocitem text="Editing JavaFX Script Source Files" target="javafx_editing_source" />
+        <tocitem text="About the JavaFX Script Palette" target="javafx_editing_palette" />
 	<tocitem text="Using the JavaFX Script Preview Feature" target="javafx_using_javafxpreview" />
       </tocitem>
 

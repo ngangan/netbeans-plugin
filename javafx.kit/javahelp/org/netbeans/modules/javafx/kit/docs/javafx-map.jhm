@@ -31,6 +31,7 @@
 
 <!-- Editing section -->
 	<mapID target="javafx_editing_source" url="editing/editing_javafx_source.html"/>
+        <mapID target="javafx_editing_palette" url="editing/about_javafx_palette.html"/>
 	<mapID target="javafx_using_javafxpreview" url="editing/using_javafxpreview.html"/>
 
 <!--	<mapID target="editing.about" url="editing/editing_about.html" />
