@@ -10,7 +10,7 @@
 <link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
 </head>
 <body>
-<h2>Setting the Target JDK in a JavaFX Project</h2>
+<h2>Setting the Target JavaFX SDK in a JavaFX Project</h2>
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
 <p>By default, every new JavaFX project uses the JavaFX SDK platform  as the default  platform the IDE uses for compilation, execution, debugging, and profiling of JavaFX Script applications. This platform is based on the bundled JavaFX libraries and the default Java SE platform (JDK) that is bundled with the IDE. You can view your IDE's JDK version by choosing Help &gt; About 
   and clicking 
@@ -26,20 +26,20 @@
 <p><b>To set the default platform for a JavaFX project:</b></p>
 <ol>
   <li>Right-click the project's root node in the Projects window and choose Properties.<br>
-  Alternatively, you can select the project in the Projects window and select File &gt; <i>&quot;&lt;JavaFX_project_name&gt;&quot;</i> Properties from the main menu.  </li>
+  Alternatively, on the Windows platform, you can select the project in the Projects window and select File &gt; <i>&quot;&lt;JavaFX_project_name&gt;&quot;</i> Properties from the main menu.  </li>
   <li>In the Project Properties dialog box, select the Libraries node in the
   	left pane. </li>
-  <li>Choose the desired JavaFX platform in the JavaFX Platform combo box. </li>
-  <li>Select the desired platform in the Platforms pane on the left and click Close.
+  <li>Choose the desired JavaFX platform in the JavaFX Platform combo box and click OK 
     <p>Switching the target Platform for a JavaFX project does the following: 
-	<ul>
-      	<li>Offers the new target platform's classes for code completion.</li>
-      	<li>If available, displays the target JDK's source code and Javadoc documentation.</li>
-      	<li>Uses the target SDK's executables (<tt>javafxc</tt> and <tt>javafxrt</tt>) 
-        	to compile and execute your application.</li>
-      	<li>Compiles your source code against the target SDK's libraries.
-      	</li>
+    <ul>
+   	    <li>Offers the new target platform's classes for code completion.</li>
+      	  <li>If available, displays the target SDK's source code and Javadoc documentation.</li>
+      	  <li>Uses the target SDK's executables (<tt>javafxc</tt> and <tt>javafxrt</tt>) 
+        	  to compile and execute your application.</li>
+      	  <li>Compiles your source code against the target SDK's libraries.
+      	  </li>
     </ul>
+  </li>
 </ol>
 <p><b>To register additional JavaFX platforms with the IDE:</b></p>
   <ol>
