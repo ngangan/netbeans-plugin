@@ -98,6 +98,7 @@ made subject to such option by the copyright holder.
             description="Overriden compile from common project."/>
 
     <target name="_antlrgen" if="lexerNotUptodate">
+        <copy file="${jfxl.jfxc.grammar}" todir="${basedir}" />
         <mkdir dir="${jfxl.antlr.generated.dir}"/>
         <copy file="${jfxl.lexer.grammar}" todir="${jfxl.antlr.generated.dir}"/>
         <replace dir="${jfxl.antlr.generated.dir}">

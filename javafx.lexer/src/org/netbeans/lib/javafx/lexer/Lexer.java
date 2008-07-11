@@ -42,6 +42,8 @@
 package org.netbeans.lib.javafx.lexer;
 
 import com.sun.tools.javac.util.Log;
+import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javafx.util.MsgSym;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
@@ -211,6 +213,27 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
 
     protected void resetPercentIsFormat() {
         quoteStack.resetPercentIsFormat();
+    }
+
+    protected void checkIntLiteralRange(String text, int pos, int radix) {
+//
+//        long value = Convert.string2long(text, radix);
+//
+//        pos = pos - text.length();
+//
+//        if (previousTokenType == v3Lexer.SUB) {
+//            value = -value;
+//            if ( value < Integer.MIN_VALUE )
+//                log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "small", new String("-" + text));
+//
+//        } else if (value > Integer.MAX_VALUE) {
+//            log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "big", text);
+//
+//        } 
+    }
+
+    protected void processFormatString() {
+        
     }
 
     /**

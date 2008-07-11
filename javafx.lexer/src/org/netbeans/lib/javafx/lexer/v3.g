@@ -1,12 +1,10 @@
- /*
+/*
  * Copyright 2007 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.  
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -36,6 +34,7 @@ tokens {
    SEMI_INSERT_START;
    ABSTRACT='abstract';
    ASSERT='assert';
+   AT='at';
    ATTRIBUTE='attribute';
    BIND='bind';
    BOUND='bound';
@@ -48,6 +47,7 @@ tokens {
    FUNCTION='function';
    IF='if';
    IMPORT='import';
+   INDEXOF='indexof';
    INIT='init';
    INSERT='insert';
    LET='let';
@@ -62,6 +62,7 @@ tokens {
    PUBLIC='public';
    READONLY='readonly';
    RETURN='return';
+   REVERSE='reverse';
    SUPER='super';
    SIZEOF='sizeof';
    STATIC='static';
@@ -69,6 +70,7 @@ tokens {
    THROW='throw';
    TRY='try';
    TRUE='true';
+   TYPEOF='typeof';
    VAR='var';
    WHILE='while';
    
@@ -93,19 +95,18 @@ tokens {
    FIRST='first';
    FROM='from';
    IN='in';
-   INDEXOF='indexof';
    INSTANCEOF='instanceof';
    INTO='into';
    INVERSE='inverse';
    LAST='last';
    LAZY='lazy';
+   MOD='mod';
    ON='on';
    OR='or';
    REPLACE='replace';
-   REVERSE='reverse';
    STEP='step';
    THEN='then';
-   TYPEOF='typeof';
+   TRIGGER='trigger';
    WITH='with';
    WHERE='where';
    
@@ -132,6 +133,7 @@ tokens {
    STAREQ='*=';
    SLASHEQ='/=';
    PERCENTEQ='%=';
+   NOTEQ='!=';
    COLON=':';
    QUES='?';
    TWEEN='tween';
@@ -139,6 +141,7 @@ tokens {
 
    // these are imaginary tokens
    MODULE;
+   EMPTY_MODULE_ITEM;
    MODIFIER;
    CLASS_MEMBERS;
    PARAM;
@@ -150,9 +153,6 @@ tokens {
    SLICE_CLAUSE;
    ON_REPLACE_SLICE;
    ON_REPLACE;
-   ON_REPLACE_ELEMENT;
-   ON_INSERT_ELEMENT;
-   ON_DELETE_ELEMENT;
    EXPR_LIST;
    FUNC_APPLY;
    NEGATIVE;
@@ -173,16 +173,16 @@ tokens {
    TYPE_ARG;
    TYPED_ARG_LIST;
    DOC_COMMENT;
-   SUCHTHAT_BLOCK;
-   NAMED_TWEEN;
+   ATTR_INTERPOLATE;
 }
 
 @lexer::header {
 package org.netbeans.lib.javafx.lexer;
 
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.Log;
-
+import com.sun.tools.javafx.util.MsgSym;
 }
 
 @header {
@@ -192,42 +192,41 @@ import com.sun.tools.javac.util.Context;
 import org.antlr.runtime.tree.*;
 import org.antlr.runtime.*;
 
+import com.sun.tools.javafx.util.MsgSym;
 }
 
 @lexer::members {
+    /** The log to be used for error diagnostics.
+     */
+//    private Log log;
+    
     static final byte NO_INSERT_SEMI = 0; // default
-        static final byte INSERT_SEMI = 1; 
-        static final byte IGNORE_FOR_SEMI = 2; 
-        static final byte[] semiKind = new byte[LAST_TOKEN];
-        { 
-          for (int i = SEMI_INSERT_START; i < SEMI_INSERT_END; ++i) {
-              semiKind[i] = INSERT_SEMI;
-          }
-          semiKind[RBRACE] = INSERT_SEMI;
-          semiKind[STRING_LITERAL] = INSERT_SEMI;
-          semiKind[QUOTE_LBRACE_STRING_LITERAL] = INSERT_SEMI;
-          semiKind[DECIMAL_LITERAL] = INSERT_SEMI;
-          semiKind[OCTAL_LITERAL] = INSERT_SEMI;
-          semiKind[HEX_LITERAL] = INSERT_SEMI;
-          semiKind[TIME_LITERAL] = INSERT_SEMI;
-          semiKind[FLOATING_POINT_LITERAL] = INSERT_SEMI;
-          semiKind[IDENTIFIER] = INSERT_SEMI;
-          
-          semiKind[WS] = IGNORE_FOR_SEMI;
-          semiKind[COMMENT] = IGNORE_FOR_SEMI;
-          semiKind[LINE_COMMENT] = IGNORE_FOR_SEMI;
-        }
-
+    static final byte INSERT_SEMI = 1; 
+    static final byte IGNORE_FOR_SEMI = 2; 
+    static final byte[] semiKind = new byte[LAST_TOKEN];
+    { 
+      for (int i = SEMI_INSERT_START; i < SEMI_INSERT_END; ++i) {
+          semiKind[i] = INSERT_SEMI;
+      }
+      semiKind[RBRACE] = INSERT_SEMI;
+      semiKind[STRING_LITERAL] = INSERT_SEMI;
+      semiKind[QUOTE_LBRACE_STRING_LITERAL] = INSERT_SEMI;
+      semiKind[DECIMAL_LITERAL] = INSERT_SEMI;
+      semiKind[OCTAL_LITERAL] = INSERT_SEMI;
+      semiKind[HEX_LITERAL] = INSERT_SEMI;
+      semiKind[TIME_LITERAL] = INSERT_SEMI;
+      semiKind[FLOATING_POINT_LITERAL] = INSERT_SEMI;
+      semiKind[IDENTIFIER] = INSERT_SEMI;
+      
+      semiKind[WS] = IGNORE_FOR_SEMI;
+      semiKind[COMMENT] = IGNORE_FOR_SEMI;
+      semiKind[LINE_COMMENT] = IGNORE_FOR_SEMI;
+    }
+      
     public v3Lexer(Context context, CharStream input) {
-        	this(input);
-            this.log = Log.instance(context);
-        }
-
-    // quote context --
-        static final int CUR_QUOTE_CTX	= 0;	// 0 = use current quote context
-        static final int SNG_QUOTE_CTX	= 1;	// 1 = single quote quote context
-        static final int DBL_QUOTE_CTX	= 2;	// 2 = double quote quote context
-     
+    	this(input);
+        this.log = Log.instance(context);
+    }
 
     protected int getSyntheticSemiType() {
         return SEMI;
@@ -241,13 +240,41 @@ import org.antlr.runtime.*;
         return previousTokenType == RBRACE && (ttype == EOF || semiKind[ttype] == INSERT_SEMI);
     }
 
- }
+
+    protected void checkIntLiteralRange(String text, int pos, int radix) {
+       
+        long value = Convert.string2long(text, radix);
+        
+        pos = pos - text.length();
+        
+        if (previousTokenType == SUB) {
+            value = -value;
+            if ( value < Integer.MIN_VALUE )
+                log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "small", new String("-" + text));
+             
+        } else if (value > Integer.MAX_VALUE) {
+            log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "big", text);
+            
+        } 
+    }
+
+    // quote context --
+    static final int CUR_QUOTE_CTX	= 0;	// 0 = use current quote context
+    static final int SNG_QUOTE_CTX	= 1;	// 1 = single quote quote context
+    static final int DBL_QUOTE_CTX	= 2;	// 2 = double quote quote context
+            }
 
 @members {
     Tree getDocComment(Token start) {
        int index = start.getTokenIndex() - 1;
-       while (index >= 0 && input.get(index).getType() == WS)
-           --index;
+       while (index >= 0) { 
+           Token tok = input.get(index);
+           if (tok.getType() == WS || 
+               tok.getType() == SEMI && tok.getText().equals("beginning of new statement"))
+              --index;
+           else
+              break;
+       }
        if (index < 0 || input.get(index).getType() != COMMENT)
            return null;
        Token token = input.get(index);
@@ -308,7 +335,8 @@ NextIsPercent[int quoteContext]
 				|				{ enterBrace(quoteContext, false); }
 				;
 FORMAT_STRING_LITERAL		: 				{ percentIsFormat() }?=>
-				  '%' (~' ')* 			{ resetPercentIsFormat(); }
+				  '%' (~' ')* 			{ processFormatString();
+	 							  resetPercentIsFormat(); }
 				;
 TRANSLATION_KEY                 : '##' 
                                   ( 
@@ -320,13 +348,14 @@ fragment
 TranslationKeyBody              : (~('[' | ']' | '\\')|'\\' .)+
                                 ;
  
-TIME_LITERAL : (DECIMAL_LITERAL | Digits '.' (Digits)? (Exponent)? ) ( 'ms' | 'm' | 's' | 'h' ) ;
+TIME_LITERAL : (DECIMAL_LITERAL | Digits '.' (Digits)? (Exponent)? | '.' Digits (Exponent)?) ( 'ms' | 'm' | 's' | 'h' ) ;
 
-DECIMAL_LITERAL : ('0' | '1'..'9' '0'..'9'*) ;
+DECIMAL_LITERAL : ('0' | '1'..'9' '0'..'9'*)  { checkIntLiteralRange(getText(), getCharIndex(), 10); };
 
-OCTAL_LITERAL : '0' ('0'..'7')+ ;
+OCTAL_LITERAL : '0' ('0'..'7')+  { checkIntLiteralRange(getText(), getCharIndex(), 8); };
 
-HEX_LITERAL : '0' ('x'|'X') HexDigit+    			{ setText(getText().substring(2, getText().length())); };
+HEX_LITERAL : '0' ('x'|'X') HexDigit+    			{ setText(getText().substring(2, getText().length()));
+                                                                  checkIntLiteralRange(getText(), getCharIndex(), 16); };
 
 fragment
 HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
@@ -411,7 +440,7 @@ COMMENT
     ;
 
 LINE_COMMENT
-    : '//' ~('\n'|'\r')* '\r'? ('\n' | EOF) {$channel=HIDDEN;}
+    : '//' ~('\n'|'\r')* '\r'? ('\n'|EOF) {$channel=HIDDEN;}
     ;
 
 LAST_TOKEN
@@ -423,20 +452,23 @@ LAST_TOKEN
  *------------------------------------------------------------------*/
 
 module
+@after { Tree docComment = getDocComment($module.start);
+         $module.tree.addChild(docComment); }
 	: packageDecl? moduleItems EOF 		-> ^(MODULE packageDecl? moduleItems)
        	;
 packageDecl 
        	: PACKAGE qualname SEMI         	-> ^(PACKAGE qualname)
 	;
 moduleItems    
-	: moduleItem (SEMI moduleItem )*	-> moduleItem*
+	: moduleItem (SEMI moduleItem )*	-> moduleItem+
 	;
 moduleItem 
 	: importDecl 				-> importDecl
 	| classDefinition 			-> classDefinition
+        | functionDefinition                    -> functionDefinition
 	| statement				-> statement
 	| expression				-> expression
-	|					->
+	|					-> EMPTY_MODULE_ITEM
 	;
 importDecl
  	: IMPORT importId			-> ^(IMPORT importId)
@@ -469,7 +501,7 @@ classMember
 	| attributeDeclaration 
 	| overrideDeclaration 
 	| functionDefinition 
-	| triggerDefinition
+//	| triggerDefinition
 	;
 functionDefinition
 @after { Tree docComment = getDocComment($functionDefinition.start);
@@ -495,9 +527,10 @@ initDefinition
 postInitDefinition
 	: POSTINIT block 			-> ^(POSTINIT block)
 	;
-triggerDefinition
-	: WITH name onReplaceClause		-> ^(WITH name onReplaceClause)
-	;
+//triggerDefinition
+//	: WITH name onReplaceClause		-> ^(WITH name onReplaceClause)
+//	;
+
 //TODO: modifier flag testing should be done in JavafxAttr, where it would be cleaner and better errors could be generated
 functionModifierFlags  
 	: BOUND (accessModifier functionModifier? )?	-> ^(MODIFIER accessModifier? functionModifier? BOUND?)
@@ -557,7 +590,7 @@ blockComponent
 	;
 statement 
 	: variableDeclaration	
-	| functionDefinition 
+//	| functionDefinition 
 	| insertStatement 	
 	| deleteStatement 
  	| whileStatement
@@ -626,37 +659,40 @@ catchClause
 	: CATCH LPAREN formalParameter RPAREN block
 						-> ^(CATCH formalParameter block)
 	;
-interpolateExpression
-        : simpleInterpolate
-        | blockInterpolate
-        ;
-simpleInterpolate
-        : id=qualname SUCHTHAT tweenValue                       -> ^(SUCHTHAT $id tweenValue)
-        ;
-blockInterpolate
-        : id=qualname SUCHTHAT LBRACE namedTweenValue (COMMA namedTweenValue)* RBRACE                 
-                                                                -> ^(SUCHTHAT_BLOCK $id namedTweenValue*)
-        ;
-namedTweenValue
-        : id=qualname COLON expr=primaryExpression (TWEEN interpolate=name)? (COMMA | SEMI)?
-                                                                -> ^(NAMED_TWEEN $id $expr $interpolate?)
-        ;
-tweenValue
-        : expr=primaryExpression TWEEN interpolate=name         -> ^(TWEEN $expr $interpolate)
-        ;
 boundExpression 
-	: BIND LAZY? expression (WITH INVERSE)?
-						-> ^(BIND LAZY? INVERSE? expression)
+	: BIND expression (WITH INVERSE)?
+						-> ^(BIND INVERSE? expression)
 	| expression				-> ^(EXPRESSION expression)
 	;
 expression 
-       	: blockExpression
-       	| ifExpression   		
+       	: ifExpression   		
        	| forExpression   	
        	| newExpression 	
-	| assignmentExpression	 
-        | interpolateExpression
+	| assignmentExpression	
+        | keyValueLiteralExpression
       	;
+keyValueLiteralExpression
+        : qualname SUCHTHAT 
+                ( interpolatedExpression                       
+                                                                -> ^(SUCHTHAT qualname interpolatedExpression)
+                | LBRACE attributedInterpolatedExpression       
+                         (COMMA attributedInterpolatedExpression)*                           
+                  RBRACE                                        -> ^(SUCHTHAT qualname attributedInterpolatedExpression+) 
+                )
+        ;
+interpolatedExpression
+        : andExpression tweenExpression?      -> ^(TWEEN andExpression tweenExpression?)
+        ;
+
+attributedInterpolatedExpression
+        : qualname COLON 
+                        (interpolatedExpression                     -> ^(ATTR_INTERPOLATE qualname interpolatedExpression)
+ //                       | LBRACE keyValueLiteralExpression RBRACE   -> ^(ATTR_INTERPOLATE qualname keyValueLiteralExpression)
+                        )
+        ;
+tweenExpression
+        : TWEEN andExpression                                   -> andExpression
+        ;
 forExpression
 	: FOR LPAREN inClause (COMMA inClause)* RPAREN expression
 								-> ^(FOR inClause* expression)
@@ -685,7 +721,10 @@ assignmentOpExpression
 	   |   SUBEQ   e2=expression				-> ^(SUBEQ $e1 $e2) 
 	   |   STAREQ   e2=expression				-> ^(STAREQ $e1 $e2) 
 	   |   SLASHEQ   e2=expression				-> ^(SLASHEQ $e1 $e2) 
-	   |   PERCENTEQ   e2=expression			-> ^(PERCENTEQ $e1 $e2) 
+	   |   PERCENTEQ   e2=expression	{ log.warning(pos($PERCENTEQ), MsgSym.MESSAGE_JAVAFX_GENERALWARNING, "The operator \%= will not be supported in the JavaFX 1.0 release" );}			
+                                                                -> ^(PERCENTEQ $e1 $e2) 
+/*	   | SUCHTHAT expr=andExpression (TWEEN interpolate=andExpression)?
+                                                               -> ^(SUCHTHAT $e1 $expr $interpolate?)*/
 	   |							-> $e1
 	   )
 	;
@@ -706,7 +745,9 @@ typeExpression
 	;
 relationalExpression  
 	: ( additiveExpression					-> additiveExpression )
-	   (   LTGT   e=additiveExpression			-> ^(LTGT $relationalExpression $e)
+	   (   LTGT   e=additiveExpression      { log.warning(pos($LTGT), MsgSym.MESSAGE_JAVAFX_GENERALWARNING, "The not-equal operator <> will be replaced by !=" );}	
+                                                                -> ^(LTGT $relationalExpression $e)
+           |   NOTEQ  e=additiveExpression                      -> ^(NOTEQ $relationalExpression $e)
 	   |   EQEQ   e=additiveExpression			-> ^(EQEQ $relationalExpression $e)
 	   |   LTEQ   e=additiveExpression			-> ^(LTEQ $relationalExpression $e)
 	   |   GTEQ   e=additiveExpression			-> ^(GTEQ $relationalExpression $e)
@@ -724,7 +765,9 @@ multiplicativeExpression
 	: ( unaryExpression					-> unaryExpression )
 	   (   STAR    e=unaryExpression			-> ^(STAR    $multiplicativeExpression $e)
 	   |   SLASH   e=unaryExpression			-> ^(SLASH   $multiplicativeExpression $e)
-	   |   PERCENT e=unaryExpression			-> ^(PERCENT $multiplicativeExpression $e)
+	   |   PERCENT e=unaryExpression	{ log.warning(pos($PERCENT), MsgSym.MESSAGE_JAVAFX_GENERALWARNING, "The remainder operator \% will be replaced by mod" );}	
+                                                                -> ^(PERCENT $multiplicativeExpression $e)
+           |   MOD     e=unaryExpression			-> ^(MOD $multiplicativeExpression $e)
 	   ) * 
 	;
 //TODO: POUND QUES TYPEOF REVERSE
@@ -753,7 +796,7 @@ postfixExpression
 	   | LPAREN expressionList RPAREN           		-> ^(FUNC_APPLY[$LPAREN] $postfixExpression expressionList)
 	   | LBRACKET (name PIPE expression RBRACKET		-> ^(PIPE $postfixExpression name expression)
 	     | first=expression
-               (RBRACKET					-> ^(SEQ_INDEX $postfixExpression $first)
+               (RBRACKET					-> ^(SEQ_INDEX[$LBRACKET] $postfixExpression $first)
 	       | DOTDOT (
 	                  LT last=expression? 			-> ^(SEQ_SLICE_EXCLUSIVE[$LBRACKET] $postfixExpression $first $last?)
 	                | last=expression? 			-> ^(SEQ_SLICE[$LBRACKET] $postfixExpression $first $last?)
@@ -772,10 +815,15 @@ primaryExpression
        	| SUPER							-> SUPER
        	| stringExpression 					-> stringExpression
        	| bracketExpression 					-> bracketExpression
+        | blockExpression 					-> blockExpression
        	| literal 						-> literal
       	| functionExpression					-> functionExpression
        	| LPAREN expression RPAREN				-> expression
-       	;
+        | AT LPAREN TIME_LITERAL RPAREN LBRACE keyFrameLiteralPart* RBRACE    -> ^(AT TIME_LITERAL keyFrameLiteralPart*)
+       	;        
+keyFrameLiteralPart
+        : keyValueLiteralExpression (SEMI)?                     -> keyValueLiteralExpression
+        ;
 functionExpression  
 	: FUNCTION formalParameters typeReference blockExpression
 								-> ^(FUNC_EXPR[$FUNCTION] formalParameters typeReference blockExpression)
@@ -860,8 +908,7 @@ typeArgList
  	| /* emprty list */			-> ^(TYPED_ARG_LIST)
 	;
 typeArg 
- 	: name? COLON type			-> ^(COLON name? type)	
- 	| name					-> ^(COLON name ^(TYPE_UNKNOWN))
+ 	: (name? COLON)? type			-> ^(COLON name? type)
  	;
 typeReference 
  	: COLON type				-> type
@@ -873,7 +920,7 @@ cardinality
 	;
 typeName  
 	: qualname 		
-		(LT genericArgument (COMMA genericArgument)* GT
+		(LT genericArgument (COMMA genericArgument)* GT { log.error(pos($LT), "javafx.generalerror", "Java generic type declarations are not currently supported"); }
 						-> ^(TYPE_ARG[$LT] qualname genericArgument+)
 		|				-> qualname
 		)
