@@ -47,7 +47,7 @@ import javafx.scene.image.ImageView;
 import javafx.animation.*;
 
 import javafx.ext.swing.Canvas;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Label;
 import javafx.ext.swing.ComponentView;
 import javafx.ext.swing.BorderPanel;
@@ -667,7 +667,8 @@ class Model {
                 try {
                     java.lang.Thread.currentThread().setPriority(java.lang.Thread.MIN_PRIORITY);
                     if( apiKey == "" ) {
-                        System.err.println( "WARNING: The api key is not defined. Define it in the code. Search apiKey in source." );
+                        System.err.println( "WARNING: The api key is not defined. Define it in the code. Search apiKey attribute in the source." );
+                        return;
                     }
                     var flickr:Flickr = new Flickr( apiKey );
                     result = flickr.getPhotosInterface().search(params, COUNT, page);
@@ -1344,7 +1345,7 @@ class MySlider extends CustomNode {
 
 var canvas:Canvas;
 
-Frame {
+SwingFrame {
     title: "Flickr Flockr - JavaFX"
     height: 750, width: 1000
     background: Color.BLACK
