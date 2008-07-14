@@ -126,7 +126,7 @@ public class WeatherModel {
     
     public function translateDirectionToString(dir:Number):String {
         var windDirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
-        dir = dir % 360;    
+        dir = dir mod 360;    
         var i = ((dir + 22.5 ) / 45).intValue();
         return windDirs[i];
     }

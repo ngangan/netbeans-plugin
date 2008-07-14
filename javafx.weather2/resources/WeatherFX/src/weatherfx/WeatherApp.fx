@@ -34,7 +34,7 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 
 import java.lang.*;
@@ -50,7 +50,7 @@ var weather1 = Weather{};
 var weather2 = Weather{};
 var weather3 = Weather{};
 
-var f = Frame {
+var f = SwingFrame {
     background: Color.BLACK
     content: Canvas {
         content:[

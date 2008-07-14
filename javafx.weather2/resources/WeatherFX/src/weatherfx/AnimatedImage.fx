@@ -82,7 +82,7 @@ public class AnimatedImage extends ImageView {
     
     public function loadImages():Void {
         var count = imagesCount - 1;
-        if (baseURL <> null) {
+        if (baseURL != null) {
             images =  for (i in [0..count]) {
                 CachedImage.getCachedImage("{baseURL}/{baseName}{%03d i}.{extension}");
             };    
