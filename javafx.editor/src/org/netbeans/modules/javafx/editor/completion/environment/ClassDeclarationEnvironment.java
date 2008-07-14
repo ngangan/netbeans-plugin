@@ -58,7 +58,7 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  */
 public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFXClassDeclaration> {
     
-    private static final Logger logger = Logger.getLogger(FunctionDefinitionEnvironment.class.getName());
+    private static final Logger logger = Logger.getLogger(ClassDeclarationEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
