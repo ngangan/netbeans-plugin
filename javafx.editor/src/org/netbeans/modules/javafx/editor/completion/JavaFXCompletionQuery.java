@@ -464,8 +464,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case SEQUENCE_DELETE:
                     break;
                 case SEQUENCE_EMPTY:
+                    result = new SequenceEmptyEnvironment();
                     break;
                 case SEQUENCE_EXPLICIT:
+                    result = new SequenceExplicitEnvironment();
                     break;
                 case SEQUENCE_INDEXED:
                     break;

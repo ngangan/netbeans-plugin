@@ -994,6 +994,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (ts == null) {
                 // nothing interesting on this line? let's try to delete it:
                 tryToDeleteCurrentLine(lineStart);
+                if (query.results.isEmpty()) {
+                    tryToTypeSomeNonsense(lineStart);
+                }
                 return;
             }
             if (LOGGABLE) log("  first == " + ts.token().id() + " at " + ts.offset());
@@ -1017,27 +1020,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     addPackages("");
                 }
             } else {
-                // try to "type" x at the current caret position
-                String text = controller.getText();
-                StringBuilder builder = new StringBuilder(text);
-                builder.insert(offset, 'x');
-                useFakeSource(builder.toString(), offset);
-                if (query.results.isEmpty()) {
-                    builder = new StringBuilder(text);
-                    builder.insert(offset, "x;");
-                    useFakeSource(builder.toString(), offset);
-                }
-                if (query.results.isEmpty()) {
-                    // still nothing? let's be desperate:
-                    String currentLine = controller.getText().substring(lineStart, offset);
-                    if ((!currentLine.contains(":"))  && 
-                        (!currentLine.contains("(")) &&
-                        (!currentLine.contains(".")) &&
-                        (!currentLine.contains("{"))
-                    ) {
-                        tryToDeleteCurrentLine(lineStart);
-                    }
-                }
+                tryToTypeSomeNonsense(lineStart);
             }
         } catch (BadLocationException ex) {
             if (LOGGABLE) {
@@ -1046,6 +1029,39 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
+    private void tryToTypeSomeNonsense(int lineStart) {
+        String text = controller.getText();
+        StringBuilder builder = new StringBuilder(text);
+        builder.insert(offset, 'x');
+        useFakeSource(builder.toString(), offset);
+        if (query.results.isEmpty()) {
+            builder = new StringBuilder(text);
+            builder.insert(offset, "x;");
+            useFakeSource(builder.toString(), offset);
+        }
+        if (query.results.isEmpty()) {
+            builder = new StringBuilder(text);
+            builder.insert(offset, "x]");
+            useFakeSource(builder.toString(), offset);
+        }
+        if (query.results.isEmpty()) {
+            builder = new StringBuilder(text);
+            builder.insert(offset, "x];");
+            useFakeSource(builder.toString(), offset);
+        }
+        if (query.results.isEmpty()) {
+            // still nothing? let's be desperate:
+            String currentLine = controller.getText().substring(lineStart, offset);
+            if ((!currentLine.contains(":"))  && 
+                (!currentLine.contains("(")) &&
+                (!currentLine.contains(".")) &&
+                (!currentLine.contains("{"))
+            ) {
+                tryToDeleteCurrentLine(lineStart);
+            }
+        }
+    }
+    
     /**
      * 
      * @param lineStart
