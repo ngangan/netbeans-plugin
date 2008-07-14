@@ -29,7 +29,7 @@
 
 package math;
 
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
@@ -38,6 +38,10 @@ import javafx.animation.KeyFrame;
 
 import java.lang.Math;
     
+/**
+ * @author Michal Skvor
+ */
+
 var dots : Circle[];
 var theta : Number = 0.0;
 var amplitude : Number = 75;
@@ -70,7 +74,7 @@ for( i in [0..25] ) {
     x += dx;
 }
 
-Frame {
+SwingFrame {
     content : Canvas {
         background : Color.BLACK
         content : dots

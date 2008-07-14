@@ -33,7 +33,7 @@ import javafx.input.MouseEvent;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
@@ -41,6 +41,9 @@ import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 
+/**
+ * @author Michal Skvor
+ */
 
 var esize : Number = 25;
 var mouseX : Number = 100;
@@ -67,7 +70,7 @@ var timer : Timeline = Timeline {
         }
 };
 
-Frame {
+SwingFrame {
     content : Canvas {
         content : [
             Rectangle {

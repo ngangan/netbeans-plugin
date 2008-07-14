@@ -32,15 +32,19 @@ package input;
 import javafx.input.MouseEvent;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
+
+/**
+ * @author Michal Skvor
+ */
 
 var width : Number = 200;
 var height : Number = 200;
 var mouseX : Number = 0;
 var mouseY : Number = 0;
     
-Frame {
+SwingFrame {
     content : Canvas {
         content : [
             Rectangle {

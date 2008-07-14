@@ -31,17 +31,21 @@ package image;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
+
+/**
+ * @author Michal Skvor
+ */
 
 var width : Number = 200;
 var height : Number = 200;
 
 var img = Image { url : "{__DIR__}/../resources/background.png" };
     
-Frame {
+SwingFrame {
     content : Canvas {
         content : [
             ImageView {

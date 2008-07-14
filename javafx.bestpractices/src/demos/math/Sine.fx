@@ -29,7 +29,7 @@
 
 package math;
 
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
@@ -40,6 +40,10 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Interpolator;
 
 import java.lang.Math;
+
+/**
+ * @author Michal Skvor
+ */
 
 var diameter : Number = bind 45 * Math.sin( angle ) + 210;
 var angle : Number = 0.0;
@@ -73,7 +77,7 @@ for( i in [0..4] ) {
     angle += 360 / 5;
 }
 
-Frame {
+SwingFrame {
     content : Canvas {
         background : Color.LIGHTGREY
         content : [

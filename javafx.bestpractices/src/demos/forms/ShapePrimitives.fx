@@ -33,10 +33,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.geometry.Polygon;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 
-Frame {
+/**
+ * @author Michal Skvor
+ */
+
+SwingFrame {
     content : Canvas {    
         background : Color.BLACK
         content : [

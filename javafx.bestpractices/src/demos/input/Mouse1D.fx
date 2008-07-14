@@ -32,8 +32,12 @@ package input;
 import javafx.input.MouseEvent;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
+
+/**
+ * @author Michal Skvor
+ */
 
 var gx : Number = 10;
 var gy : Number = 90;
@@ -42,7 +46,7 @@ var width : Number = 200;
 var leftColor:Color = Color { red : 0.0, green : 0.4, blue : 0.6 };
 var rightColor:Color = Color { red : 0.0, green : 0.2, blue : 0.4 };
         
-Frame {
+SwingFrame {
     content : Canvas {
         content : [
             Rectangle {

@@ -34,7 +34,7 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.geometry.Circle;
 import javafx.scene.geometry.Line;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
@@ -45,9 +45,13 @@ import javafx.animation.KeyFrame;
 import java.util.Calendar;
 import java.lang.System;
 
+/**
+ * @author Michal Skvor
+ */
+
 var clockWork : ClockWork = ClockWork {};
 
-Frame {
+SwingFrame {
     content : Canvas {
         content : clockWork
         }

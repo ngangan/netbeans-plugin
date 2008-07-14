@@ -36,15 +36,18 @@ import javafx.scene.Group;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
 import java.lang.System;
 
+/**
+ * @author Michal Skvor
+ */
         
-Frame {
+SwingFrame {
     var input : StoringInput = StoringInput {};
     content : Canvas {
         content : bind [

@@ -34,7 +34,7 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -43,9 +43,13 @@ import java.lang.Math;
 import java.util.Random;
 import java.lang.System;
 
+/**
+ * @author Michal Skvor
+ */
+
 var flock : Flock = Flock{};
 
-Frame {
+SwingFrame {
     content : Canvas {
         background : Color.LIGHTGREY
         content : bind flock

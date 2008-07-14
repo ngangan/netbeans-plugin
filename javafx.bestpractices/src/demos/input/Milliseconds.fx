@@ -31,10 +31,14 @@ package input;
 
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
+
+/**
+ * @author Michal Skvor
+ */
 
 var miliseconds : Integer;
 var colors : Color[];
@@ -48,7 +52,7 @@ var timeline : Timeline = Timeline {
                 var milliseconds : Number = ( java.lang.System.currentTimeMillis()) as Number;                
                 for( i in [0..9] ) {
                     var ii : Integer = ( i + 1 ) * 100;
-                    var color : Number = milliseconds % ii / ii;
+                    var color : Number = milliseconds mod ii / ii;
                     colors[i] = Color { 
                         red : color, green : color, blue : color };
                 }
@@ -66,7 +70,7 @@ for( i in [0..9] ) {
     } into barrs;
 }
 
-Frame {
+SwingFrame {
     content : Canvas {
         content : bind barrs;
     };

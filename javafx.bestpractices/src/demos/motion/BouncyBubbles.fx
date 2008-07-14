@@ -33,13 +33,17 @@ import javafx.scene.Node;
 import javafx.scene.CustomNode;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;
+
+/**
+ * @author Michal Skvor
+ */
 
 var spring : Number = 0.05;
 var gravity : Number = 0.05;
@@ -71,7 +75,7 @@ for( i in [1..12] ) {
     } into bubbles;
 }
 
-Frame {
+SwingFrame {
     content : Canvas {
         background : Color.GRAY
         content : bind bubbles

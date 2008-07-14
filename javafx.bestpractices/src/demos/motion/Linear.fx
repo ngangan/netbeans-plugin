@@ -31,12 +31,15 @@ package motion;
 
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
+/**
+ * @author Michal Skvor
+ */
 
 var y : Number = 200;
 
@@ -52,7 +55,7 @@ var timeline : Timeline = Timeline {
         }
 };
     
-Frame {
+SwingFrame {
     content : Canvas {
         background : Color.DARKGRAY
         content : Line {

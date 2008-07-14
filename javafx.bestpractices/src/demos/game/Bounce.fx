@@ -37,9 +37,13 @@ import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
 import javafx.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
+
+/**
+ * @author Michal Skvor
+ */
 
 var STICK : Integer = 1; 
 var BOUNCING : Integer = 2;
@@ -107,7 +111,7 @@ for( j in [0..5] ) {
     }
 }
 
-Frame {
+SwingFrame {
     content : Canvas {
         content : bind [
             Rectangle {

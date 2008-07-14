@@ -31,8 +31,12 @@
 
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
+
+/**
+ * @author Michal Skvor
+ */
 
 var d = 40;
 var p1 = d;
@@ -40,7 +44,7 @@ var p2 = p1 + d;
 var p3 = p2 + d;
 var p4 = p3 + d;
         
-Frame {
+SwingFrame {
     content : Canvas {
         width : 200
         height : 200

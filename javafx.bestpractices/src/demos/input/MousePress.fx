@@ -33,9 +33,13 @@ import javafx.input.MouseEvent;
 import javafx.scene.Group;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
+import javafx.ext.swing.SwingFrame;
 import javafx.ext.swing.Canvas;
 import javafx.scene.transform.Translate;
+
+/**
+ * @author Michal Skvor
+ */
 
 var mouseX : Number = 100;
 var mouseY : Number = 100;
@@ -46,7 +50,7 @@ var buttons : Rectangle[] = [
     Rectangle { x : 35, y : 5, width : 10, height : 20, fill : Color.WHITE }
 ];
 
-Frame {
+SwingFrame {
     content : Canvas {
         content : [
             Rectangle {
