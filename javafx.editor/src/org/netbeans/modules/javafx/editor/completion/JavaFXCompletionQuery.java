@@ -129,6 +129,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String OR_KEYWORD = "or";
     public static final String OVERRIDE_KEYWORD = "override";
     public static final String PACKAGE_KEYWORD = "package";
+    public static final String POSTINIT_KEYWORD = "postinit";
     public static final String PRIVATE_KEYWORD = "private";
     public static final String PROTECTED_KEYWORD = "protected";
     public static final String PUBLIC_KEYWORD = "public";
@@ -168,6 +169,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         ABSTRACT_KEYWORD,
         ATTRIBUTE_KEYWORD, 
         FUNCTION_KEYWORD,
+        INIT_KEYWORD,
+        POSTINIT_KEYWORD,
         PRIVATE_KEYWORD, PROTECTED_KEYWORD, PUBLIC_KEYWORD,
         READONLY_KEYWORD
     };
@@ -464,8 +467,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case SEQUENCE_DELETE:
                     break;
                 case SEQUENCE_EMPTY:
+                    result = new SequenceEmptyEnvironment();
                     break;
                 case SEQUENCE_EXPLICIT:
+                    result = new SequenceExplicitEnvironment();
                     break;
                 case SEQUENCE_INDEXED:
                     break;

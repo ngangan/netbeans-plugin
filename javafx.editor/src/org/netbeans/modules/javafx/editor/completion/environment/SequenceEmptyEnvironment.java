@@ -39,70 +39,47 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafx.tree.JFXSequenceEmpty;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static javax.lang.model.element.ElementKind.*;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.EXTENDS_KEYWORD;
-
 
 /**
  *
  * @author David Strupl
  */
-public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFXClassDeclaration> {
-    
-    private static final Logger logger = Logger.getLogger(ClassDeclarationEnvironment.class.getName());
+public class SequenceEmptyEnvironment extends JavaFXCompletionEnvironment<JFXSequenceEmpty> {
+
+    private static final Logger logger = Logger.getLogger(SequenceEmptyEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXClassDeclaration cldecl) throws IOException {
-        if (LOGGABLE) log("inside JFXClassDeclaration " + cldecl);
-        if (LOGGABLE) log("  prefix: " + prefix);
-        int start = (int)sourcePositions.getStartPosition(root, cldecl);
-        if (LOGGABLE) log("  offset: " + offset);
-        if (LOGGABLE) log("  start: " + start);
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        ts.move(start);
-        boolean afterLBrace = false;
-        boolean afterExtends = false;
-        loop: while (ts.moveNext()) {
-            if (ts.offset() >= offset) {
-                break;
-            }
-            switch (ts.token().id()) {
-                case WS:
-                case LINE_COMMENT:
-                case COMMENT:
-                case DOC_COMMENT:
-                    continue;
-                case LBRACE:
-                    afterLBrace = true;
-                    break loop;
-                case EXTENDS:
-                    afterExtends = true;
-                    break;
-                default:
-                    // TODO:
-            }
-        }
-        if (LOGGABLE) log("  afterLBrace: " + afterLBrace);
-        if (afterLBrace) {
-            addKeywordsForClassBody();
-        } else {
-            if (afterExtends) {
-                if (LOGGABLE) log("  afterExtends: " + afterExtends);
-                addLocalAndImportedTypes(EnumSet.of(CLASS), null, null, false, null);
-            } else {
-                addKeyword(EXTENDS_KEYWORD, " ", false);
-            }
-        }
+    protected void inside(JFXSequenceEmpty t) throws IOException {
+        if (LOGGABLE) log("inside JFXSequenceEmpty " + t + "  offset == " + offset);
+        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+        if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
+        localResult(getSmartType(t));
+        addValueKeywords();
+    }
+
+    private TypeMirror getSmartType(JFXSequenceEmpty t) throws IOException {
+        final TreePath treePath = new TreePath(path, t);
+        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
+        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(1) == " + type);
+        // handle sequences as their element type
+        JavafxTypes types = controller.getJavafxTypes();
+        if (types.isSequence((Type) type)) {
+            type = types.elementType((Type) type);
+        } 
+        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(2) == " + type);
+        return type;
     }
 
     private static void log(String s) {
