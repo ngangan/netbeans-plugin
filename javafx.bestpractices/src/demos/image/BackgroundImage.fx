@@ -35,11 +35,15 @@ import javafx.animation.Interpolator;
 import javafx.scene.Group;
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Translate;
+
+/**
+ * @author Michal Skvor
+ */
 
 var y : Number;
 
@@ -60,7 +64,7 @@ var timeline = Timeline {
 };
         
 Frame {    
-    content : Canvas {
+    stage : Stage {
         content : [
             ImageView {
                 image : Image { url : "{__DIR__}/../resources/background.png" }

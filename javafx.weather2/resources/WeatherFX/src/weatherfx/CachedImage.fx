@@ -44,7 +44,7 @@ public class CachedImage {
     
     public static function getCachedImage(url:String):Image {
         var img:Image = null;
-        if (url <> null) {
+        if (url != null) {
             var imgIndex =  Sequences.indexOf(urls, url); 
             if (imgIndex >=0) {
                 img = images[imgIndex];

@@ -31,13 +31,17 @@ package transform;
 
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.animation.Interpolator;
 
 import java.lang.Math;
+
+/**
+ * @author Michal Skvor
+ */
 
 var a : Number = 0.0;
 var s : Number = bind Math.sin( a ) * 2;
@@ -61,8 +65,8 @@ var timeline : Timeline = Timeline {
 };
 
 Frame {
-    content : Canvas {
-        background : Color.GRAY
+    stage : Stage {
+        fill : Color.GRAY
         content : [
             Rectangle {
                 transform : [ 

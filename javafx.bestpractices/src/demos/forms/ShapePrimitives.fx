@@ -33,38 +33,42 @@ import javafx.scene.paint.Color;
 import javafx.scene.geometry.Polygon;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
+
+/**
+ * @author Michal Skvor
+ */
 
 Frame {
-    content : Canvas {    
-        background : Color.BLACK
+    stage : Stage {    
+        fill : Color.BLACK
         content : [
-        Polygon {
-            points : [ 10, 10, 10, 200, 45, 200 ]
-            fill : Color.LIGHTGREY
-        },
-        Rectangle {
-            x : 45
-            y : 34
-            width : 35
-            height : 35
-            fill : Color.LIGHTGREY
-        },
-        Polygon {
-            points : [ 105, 10, 120, 10, 120, 200, 80, 200 ]
-            fill : Color.LIGHTGREY
-        },
-        Circle {
-            centerX : 140
-            centerY : 80
-            radius : 20
-            fill : Color.LIGHTGREY
-        },
-        Polygon {
-            points : [ 160, 10, 195, 200, 160, 200 ]
-            fill : Color.LIGHTGREY
-        }
+            Polygon {
+                points : [ 10, 10, 10, 200, 45, 200 ]
+                fill : Color.LIGHTGREY
+            },
+            Rectangle {
+                x : 45
+                y : 34
+                width : 35
+                height : 35
+                fill : Color.LIGHTGREY
+            },
+            Polygon {
+                points : [ 105, 10, 120, 10, 120, 200, 80, 200 ]
+                fill : Color.LIGHTGREY
+            },
+            Circle {
+                centerX : 140
+                centerY : 80
+                radius : 20
+                fill : Color.LIGHTGREY
+            },
+            Polygon {
+                points : [ 160, 10, 195, 200, 160, 200 ]
+                fill : Color.LIGHTGREY
+            }
         ]
     };
     

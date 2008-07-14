@@ -36,12 +36,16 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
 
 import java.lang.Math;
+
+/**
+ * @author Michal Skvor
+ */
 
 var eyes : Eye[] = [
     Eye { x : 50, y : 16, size : 40 },
@@ -52,7 +56,7 @@ var eyes : Eye[] = [
 ];
     
 Frame {
-    content : Canvas {
+    stage : Stage {
         content : [
             Rectangle {
                 width : 200, height : 200

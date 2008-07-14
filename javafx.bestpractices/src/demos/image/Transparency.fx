@@ -32,17 +32,21 @@ package image;
 import javafx.input.MouseEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
+
+/**
+ * @author Michal Skvor
+ */
 
 var x : Number = 40;
     
 var img : Image = Image { url : "{__DIR__}/../resources/overlay.png" };
 
 Frame {
-    content : Canvas {
+    stage : Stage {
         content : [
             ImageView {
                 image : Image { url : "{__DIR__}/../resources/background.png" }

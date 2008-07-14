@@ -32,12 +32,16 @@ package math;
 import javafx.input.MouseEvent;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
+
+/**
+ * @author Michal Skvor
+ */
 
 var boxes : Box[] = [
     Box {
@@ -74,8 +78,8 @@ var timer : Timeline = Timeline {
 };
 
 Frame {
-    content : Canvas {
-        background : Color.BLACK
+    stage : Stage {
+        fill : Color.BLACK
         content : [
             Rectangle {
                 width : 200, height : 200

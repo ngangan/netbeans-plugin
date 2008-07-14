@@ -31,13 +31,17 @@ package transform;
 
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;
+
+/**
+ * @author Michal Skvor
+ */
 
 var angle : Number = 0.0;
 var jitter : Number = 0.0;
@@ -67,8 +71,8 @@ var jitterTimeline : Timeline = Timeline {
 };
     
 Frame {    
-    content : Canvas {
-        background : Color.GRAY
+    stage : Stage {
+        fill : Color.GRAY
         content : Rectangle {
             transform : [ 
                 javafx.scene.transform.Rotate { angle : bind angle, x : 100, y : 100 }, 
