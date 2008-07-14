@@ -221,7 +221,7 @@ public enum JFXTokenId implements TokenId {
     TRIGGER("keyword", 76),
     EMPTY_MODULE_ITEM(null, 108),
     AT("keyword", 7),
-    MOD("operator",70),
+    MOD("keyword",70),
     ATTR_INTERPOLATE("keyword", 140),
     UNKNOWN("error", 200);
 
