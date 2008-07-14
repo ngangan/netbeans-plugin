@@ -37,7 +37,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.applications;
+package org.netbeans.modules.javafx.palette.items.components;
 
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
@@ -51,16 +51,16 @@ import org.netbeans.modules.javafx.palette.utils.Util;
  *
  * @author Michal Skvor
  */
-public class Frame implements ActiveEditorDrop {
+public class SwingFrame implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Frame.class, "TEMPLATE_Frame" ); // NOI18N
+        String code = NbBundle.getMessage( SwingFrame.class, "TEMPLATE_SwingFrame"  ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Util.addImport( targetComponent, "javafx.application.Frame" );
-        Util.addImport( targetComponent, "javafx.application.Stage" );
+        Util.addImport( targetComponent, "javafx.ext.swing.SwingFrame" );
+        Util.addImport( targetComponent, "javafx.ext.swing.Canvas" );
                 
         return true;
     }

@@ -34,10 +34,16 @@
             <file name="CustomNode.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CustomNode.xml">
                 <attr name="position" intvalue="300"/>
             </file>
+            <file name="Stage.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stage.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
         </folder>
         
-        <folder name="Components">
-            <attr name="position" intvalue="200"/>
+        <folder name="Swing Components">
+            <attr name="position" intvalue="800"/>
+            <file name="SwingFrame.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingFrame.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
             <file name="ComponentView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComponentView.xml">
                 <attr name="position" intvalue="100"/>
             </file>
