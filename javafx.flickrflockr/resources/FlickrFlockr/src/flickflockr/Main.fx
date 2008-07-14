@@ -217,7 +217,7 @@ public class Sprite extends CustomNode {
     attribute r: Number= bind boid.r;
     attribute heading: Number;
       attribute imageUrl: String on replace { 
-        if (imageUrl <> null) {
+        if (imageUrl != null) {
             image = Image { 
                 placeholder: image
                 url: imageUrl, backgroundLoading: true 
@@ -252,7 +252,7 @@ public class Sprite extends CustomNode {
 
     attribute largeImageProgress = bind largeImage.progress on replace {
         System.out.println("progress = {largeImageProgress}");
-        if (largeImage <> null and largeImageProgress == 100) {
+        if (largeImage != null and largeImageProgress == 100) {
             fader.start();
         }
     }
@@ -266,7 +266,7 @@ public class Sprite extends CustomNode {
             screenAlpha = Math.max(sx, sy);
             //System.out.println("screenAlpha {screenAlpha}");
             fullScreenTimeline.start();
-        if (largeImageUrl <> null) {
+        if (largeImageUrl != null) {
             fader.stop();
             System.out.println("large image { largeImageUrl }");
             largeImage = Image { 
@@ -410,7 +410,7 @@ scaleTimeline = Timeline {
 
               Group {
                   opacity: bind largeImageFade
-                  visible: bind largeImage <> null
+                  visible: bind largeImage != null
                   content: 
                   [Rectangle { height: bind screenHeight, width: bind screenWidth,
                               fill: Color.BLACK 
@@ -569,12 +569,13 @@ class PhotoModelHolder {
 }
 
 class Model {
+    attribute apiKey: String = ""; // Here comes your api key
     attribute COUNT: Integer;
     attribute tagMap: Map;
     attribute accessingFlickr:Boolean;
     attribute imageLoading:Boolean;
     attribute updating:Boolean;
-    attribute queryString:String = " " on replace { if (queryString <> null) { doSearch(); }; }
+    attribute queryString:String = " " on replace { if (queryString != null) { doSearch(); }; }
     attribute photos: PhotoModelHolder[] = for (i in [1..COUNT]) PhotoModelHolder {};
     attribute page: Number = 1;
     attribute resultPage: Number;
@@ -665,14 +666,17 @@ class Model {
             public function run():Void {
                 try {
                     java.lang.Thread.currentThread().setPriority(java.lang.Thread.MIN_PRIORITY);
-                    var flickr:Flickr = new Flickr("c8e56e2c73b31a14061f0981baa23a2a");
+                    if( apiKey == "" ) {
+                        System.err.println( "WARNING: The api key is not defined. Define it in the code. Search apiKey in source." );
+                    }
+                    var flickr:Flickr = new Flickr( apiKey );
                     result = flickr.getPhotosInterface().search(params, COUNT, page);
                     //                    System.out.println("got photos");
                     var iter = result.iterator();
                     var ii = 0;
                     var m = result.size();
                     while (iter.hasNext()) {
-                        if (searchCount <> count) {
+                        if (searchCount != count) {
                             return;
                         }
                         var p = iter.next() as Photo;
@@ -898,7 +902,7 @@ class Boid {
 class FlickrFlockr extends CustomNode {   
     attribute fullScreen: Boolean;
     attribute hasSelection:Boolean = false on replace {
-        if (fader <> null) {
+        if (fader != null) {
             fader.start();
         }
     }
@@ -961,7 +965,7 @@ class FlickrFlockr extends CustomNode {
           tagMap.put(boid1.id, map);
       }
       var result = map.get(boid2.id) as java.lang.Double;
-      if (result <> null) {
+      if (result != null) {
           return result.doubleValue();
       }
       var count = 0.0;
@@ -1038,7 +1042,7 @@ class FlickrFlockr extends CustomNode {
     }
 
     function createBoids():Void {
-        if (model <> null) {
+        if (model != null) {
             boids = for (i in [0..<BOID_COUNT]) Boid {
                     id: i
                     r: bind radius/10.0
