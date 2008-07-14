@@ -29,8 +29,8 @@
 
 package math;
 
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
@@ -40,6 +40,10 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Interpolator;
 
 import java.lang.Math;
+
+/**
+ * @author Michal Skvor
+ */
 
 var diameter : Number = bind 45 * Math.sin( angle ) + 210;
 var angle : Number = 0.0;
@@ -74,8 +78,8 @@ for( i in [0..4] ) {
 }
 
 Frame {
-    content : Canvas {
-        background : Color.LIGHTGREY
+    stage : Stage {
+        fill : Color.LIGHTGREY
         content : [
             Circle {
                 centerX : 130

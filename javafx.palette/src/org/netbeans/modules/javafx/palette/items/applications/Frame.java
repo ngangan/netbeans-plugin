@@ -59,7 +59,7 @@ public class Frame implements ActiveEditorDrop {
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Util.addImport( targetComponent, "javafx.ext.swing.Frame" );
+        Util.addImport( targetComponent, "javafx.ext.swing.SwingFrame" );
         Util.addImport( targetComponent, "javafx.ext.swing.Canvas" );
                 
         return true;

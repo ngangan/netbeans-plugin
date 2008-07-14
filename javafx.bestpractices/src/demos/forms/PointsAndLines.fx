@@ -31,8 +31,12 @@
 
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
+
+/**
+ * @author Michal Skvor
+ */
 
 var d = 40;
 var p1 = d;
@@ -41,10 +45,10 @@ var p3 = p2 + d;
 var p4 = p3 + d;
         
 Frame {
-    content : Canvas {
+    stage : Stage {
         width : 200
         height : 200
-        background : Color.BLACK
+        fill : Color.BLACK
         content : [
         Line {
             startX : p3

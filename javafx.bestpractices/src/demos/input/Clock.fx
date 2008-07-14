@@ -34,8 +34,8 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.geometry.Circle;
 import javafx.scene.geometry.Line;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
@@ -45,10 +45,14 @@ import javafx.animation.KeyFrame;
 import java.util.Calendar;
 import java.lang.System;
 
+/**
+ * @author Michal Skvor
+ */
+
 var clockWork : ClockWork = ClockWork {};
 
 Frame {
-    content : Canvas {
+    stage : Stage {
         content : clockWork
         }
     

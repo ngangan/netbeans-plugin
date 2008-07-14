@@ -29,8 +29,8 @@
 
 package math;
 
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
 import javafx.animation.Timeline;
@@ -38,6 +38,10 @@ import javafx.animation.KeyFrame;
 
 import java.lang.Math;
     
+/**
+ * @author Michal Skvor
+ */
+
 var dots : Circle[];
 var theta : Number = 0.0;
 var amplitude : Number = 75;
@@ -71,8 +75,8 @@ for( i in [0..25] ) {
 }
 
 Frame {
-    content : Canvas {
-        background : Color.BLACK
+    stage : Stage {
+        fill : Color.BLACK
         content : dots
     }
     

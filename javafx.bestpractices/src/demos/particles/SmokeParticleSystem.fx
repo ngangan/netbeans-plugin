@@ -38,8 +38,8 @@ import javafx.scene.geometry.Line;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -47,9 +47,13 @@ import javafx.animation.KeyFrame;
 import java.lang.Math;
 import java.util.Random;
 
+/**
+ * @author Michal Skvor
+ */
+
 Frame {                    
-    content : Canvas {
-        background : Color.BLACK
+    stage : Stage {
+        fill : Color.BLACK
         content : CustomCanvas {}
     }
 

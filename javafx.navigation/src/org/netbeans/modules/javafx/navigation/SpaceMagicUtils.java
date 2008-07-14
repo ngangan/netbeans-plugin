@@ -59,9 +59,12 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  * 
  * @author Anton Chechel The Wizard
  */
-public class SpaceMagicUtils {
+public final class SpaceMagicUtils {
 
     public static final String MAGIC_FUNCTION = "javafx$run$";
+    
+    private SpaceMagicUtils() {
+    }
 
     /**
      * Determines whether a given element has spiritual invocation of magic function.

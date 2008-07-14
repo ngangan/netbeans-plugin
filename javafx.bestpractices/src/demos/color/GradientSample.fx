@@ -36,9 +36,13 @@ import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.ext.swing.Frame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import java.lang.System;
+
+/**
+ * @author Michal Skvor
+ */
 
 var B1 = Color.rgb( 190, 190, 190 );
 var B2 = Color.rgb(  20,  20,  20 );
@@ -54,7 +58,7 @@ var Y_AXIS = false;
 var X_AXIS = true;
         
 Frame {
-    content : Canvas {
+    stage : Stage {
         content: [
             GradientBox { x :   0, y :   0, size : 200, c1 : B1, c2 : B2, axis : Y_AXIS },
             GradientBox { x :  25, y :  25, size :  75, c1 : C1, c2 : C2, axis : Y_AXIS },
