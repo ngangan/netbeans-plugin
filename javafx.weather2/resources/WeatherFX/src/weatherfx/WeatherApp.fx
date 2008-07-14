@@ -34,8 +34,8 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 
 import java.lang.*;
 import weatherfx.service.YahooWeatherService;
@@ -50,9 +50,9 @@ var weather1 = Weather{};
 var weather2 = Weather{};
 var weather3 = Weather{};
 
-var f = SwingFrame {
-    background: Color.BLACK
-    content: Canvas {
+var f = Frame {
+    stage: Stage {
+        fill: Color.BLACK
         content:[
             Group {
                 transform: Transform.translate(0,5);
