@@ -34,8 +34,8 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -79,9 +79,9 @@ function update() : Void {
     }
 }    
     
-SwingFrame {
-    content : Canvas {
-        background : Color.BLACK
+Frame {
+    stage : Stage {
+        fill : Color.BLACK
         content : bind parts 
     }
     

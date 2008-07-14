@@ -31,8 +31,8 @@ package input;
 
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -70,8 +70,8 @@ for( i in [0..9] ) {
     } into barrs;
 }
 
-SwingFrame {
-    content : Canvas {
+Frame {
+    stage : Stage {
         content : bind barrs;
     };
     

@@ -35,8 +35,8 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Arc;
 import javafx.scene.geometry.ArcType;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 
 /**
  * @author Michal Skvor
@@ -107,9 +107,9 @@ public class ColorWheel extends CustomNode {
 }
 
 
-SwingFrame {
-    content : Canvas {
-        background : Color.GRAY
+Frame {
+    stage : Stage {
+        fill : Color.GRAY
         content : ColorWheel {}
     }
     

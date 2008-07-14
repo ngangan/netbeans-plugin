@@ -35,8 +35,8 @@ import javafx.animation.Interpolator;
 import javafx.scene.Group;
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Translate;
@@ -63,8 +63,8 @@ var timeline = Timeline {
     ]
 };
         
-SwingFrame {    
-    content : Canvas {
+Frame {    
+    stage : Stage {
         content : [
             ImageView {
                 image : Image { url : "{__DIR__}/../resources/background.png" }

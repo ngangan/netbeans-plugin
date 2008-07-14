@@ -33,8 +33,8 @@ import javafx.input.MouseEvent;
 import javafx.scene.geometry.Circle;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 
 import java.lang.Math;
 import java.lang.System;
@@ -71,8 +71,8 @@ for( x in [0..10] ) {
     }
 }
 
-SwingFrame {
-    content : Canvas {    
+Frame {
+    stage : Stage {    
         width : 200
         height : 200
         content : [ 

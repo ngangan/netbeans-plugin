@@ -29,8 +29,8 @@
 
 package math;
 
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
@@ -77,9 +77,9 @@ for( i in [0..4] ) {
     angle += 360 / 5;
 }
 
-SwingFrame {
-    content : Canvas {
-        background : Color.LIGHTGREY
+Frame {
+    stage : Stage {
+        fill : Color.LIGHTGREY
         content : [
             Circle {
                 centerX : 130

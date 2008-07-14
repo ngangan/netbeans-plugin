@@ -33,8 +33,8 @@ import javafx.input.MouseEvent;
 import javafx.scene.Group;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 
 /**
@@ -50,8 +50,8 @@ var buttons : Rectangle[] = [
     Rectangle { x : 35, y : 5, width : 10, height : 20, fill : Color.WHITE }
 ];
 
-SwingFrame {
-    content : Canvas {
+Frame {
+    stage : Stage {
         content : [
             Rectangle {
                 width : 200, height : 200

@@ -35,8 +35,8 @@ import javafx.scene.CustomNode;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -48,8 +48,8 @@ import java.lang.Math;
 
 var easing : Ball = Ball {};
     
-SwingFrame {
-    content : Canvas {
+Frame {
+    stage : Stage {
         content : [
             Rectangle {  
                 width : 200, height : 200

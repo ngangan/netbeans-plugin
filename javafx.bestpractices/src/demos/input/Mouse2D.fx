@@ -32,8 +32,8 @@ package input;
 import javafx.input.MouseEvent;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 
 /**
  * @author Michal Skvor
@@ -44,8 +44,8 @@ var height : Number = 200;
 var mouseX : Number = 0;
 var mouseY : Number = 0;
     
-SwingFrame {
-    content : Canvas {
+Frame {
+    stage : Stage {
         content : [
             Rectangle {
                 width : 200, height : 200

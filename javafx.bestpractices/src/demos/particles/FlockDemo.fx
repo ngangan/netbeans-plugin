@@ -34,8 +34,8 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -49,9 +49,9 @@ import java.lang.System;
 
 var flock : Flock = Flock{};
 
-SwingFrame {
-    content : Canvas {
-        background : Color.LIGHTGREY
+Frame {
+    stage : Stage {
+        fill : Color.LIGHTGREY
         content : bind flock
     };       
     

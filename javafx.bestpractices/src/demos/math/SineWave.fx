@@ -29,8 +29,8 @@
 
 package math;
 
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.geometry.Circle;
 import javafx.scene.paint.Color;
 import javafx.animation.Timeline;
@@ -74,9 +74,9 @@ for( i in [0..25] ) {
     x += dx;
 }
 
-SwingFrame {
-    content : Canvas {
-        background : Color.BLACK
+Frame {
+    stage : Stage {
+        fill : Color.BLACK
         content : dots
     }
     

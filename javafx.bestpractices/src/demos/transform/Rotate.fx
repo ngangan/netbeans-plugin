@@ -31,8 +31,8 @@ package transform;
 
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -70,9 +70,9 @@ var jitterTimeline : Timeline = Timeline {
     }
 };
     
-SwingFrame {    
-    content : Canvas {
-        background : Color.GRAY
+Frame {    
+    stage : Stage {
+        fill : Color.GRAY
         content : Rectangle {
             transform : [ 
                 javafx.scene.transform.Rotate { angle : bind angle, x : 100, y : 100 }, 

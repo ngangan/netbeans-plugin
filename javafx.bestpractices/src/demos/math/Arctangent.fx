@@ -36,8 +36,8 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.geometry.Circle;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
 
@@ -55,8 +55,8 @@ var eyes : Eye[] = [
     Eye { x : 175, y : 120,  size : 40 }
 ];
     
-SwingFrame {
-    content : Canvas {
+Frame {
+    stage : Stage {
         content : [
             Rectangle {
                 width : 200, height : 200

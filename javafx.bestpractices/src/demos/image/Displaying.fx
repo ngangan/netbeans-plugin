@@ -31,8 +31,8 @@ package image;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
 
@@ -45,8 +45,8 @@ var height : Number = 200;
 
 var img = Image { url : "{__DIR__}/../resources/background.png" };
     
-SwingFrame {
-    content : Canvas {
+Frame {
+    stage : Stage {
         content : [
             ImageView {
                 image : img

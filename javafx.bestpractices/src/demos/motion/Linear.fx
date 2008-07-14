@@ -31,8 +31,8 @@ package motion;
 
 import javafx.scene.geometry.Line;
 import javafx.scene.paint.Color;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -55,9 +55,9 @@ var timeline : Timeline = Timeline {
         }
 };
     
-SwingFrame {
-    content : Canvas {
-        background : Color.DARKGRAY
+Frame {
+    stage : Stage {
+        fill : Color.DARKGRAY
         content : Line {
             transform : [ Translate { y : bind y }]
             endX : 200

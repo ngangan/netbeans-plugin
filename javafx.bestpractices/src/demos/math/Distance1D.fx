@@ -32,8 +32,8 @@ package math;
 import javafx.input.MouseEvent;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
-import javafx.ext.swing.SwingFrame;
-import javafx.ext.swing.Canvas;
+import javafx.application.Frame;
+import javafx.application.Stage;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Rectangle;
 import javafx.animation.Timeline;
@@ -77,9 +77,9 @@ var timer : Timeline = Timeline {
         }
 };
 
-SwingFrame {
-    content : Canvas {
-        background : Color.BLACK
+Frame {
+    stage : Stage {
+        fill : Color.BLACK
         content : [
             Rectangle {
                 width : 200, height : 200
