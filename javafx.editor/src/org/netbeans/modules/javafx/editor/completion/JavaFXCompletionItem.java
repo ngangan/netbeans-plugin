@@ -72,6 +72,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import org.netbeans.api.editor.completion.Completion;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
@@ -281,6 +282,14 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 }
             }
         }
+
+        // TODO this should be tested, if something will not work, comment this block
+        try {
+            String tx = doc.getText(0, doc.getLength());
+            len = FXSourceUtils.getSubstitutionLenght(tx, offset, len);
+        } catch (BadLocationException e) {
+        }
+
         // Update the text
         doc.atomicLock();
         try {
@@ -427,6 +436,14 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 sb.append(cnt++);
                 sb.append(" instanceof=\"int\" default=\"\"}]"); //NOI18N                
             }
+
+            // TODO this should be tested, if something will not work, comment this block
+            try {
+                String tx = doc.getText(0, doc.getLength());
+                len = FXSourceUtils.getSubstitutionLenght(tx, offset, len);
+            } catch (BadLocationException e) {
+            }
+
             doc.atomicLock();
             try {
                 Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
@@ -877,6 +894,14 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         add = null;
                     }
                 }
+
+                // TODO this should be tested, if something will not work, comment this block
+                try {
+                    String tx = doc.getText(0, doc.getLength());
+                    len = FXSourceUtils.getSubstitutionLenght(tx, offset, len);
+                } catch (BadLocationException e) {
+                }
+
                 doc.atomicLock();
                 try {
                     Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
@@ -1123,13 +1148,21 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                             sb.append(" instanceof=\"int\" default=\"\"}]"); //NOI18N
                             asTemplate = true;
                         }
+
+                        int finalLen2 = finalLen;
+                        try {
+                            String tx = doc.getText(0, doc.getLength());
+                            finalLen2 = FXSourceUtils.getSubstitutionLenght(tx, offset, finalLen);
+                        } catch (BadLocationException e) {
+                        }
+                        
                         if (asTemplate) {
                             if (insideNew)
                                 sb.append("${cursor completionInvoke}"); //NOI18N
-                            if (finalLen > 0) {
+                            if (finalLen2 > 0) {
                                 doc.atomicLock();
                                 try {
-                                    doc.remove(offset, finalLen);
+                                    doc.remove(offset, finalLen2);
                                 } catch (BadLocationException e) {
                                     // Can't update
                                 } finally {
@@ -1154,9 +1187,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                 }
                                 if (!insideNew)
                                     cs = text.insert(0, cs);
-                                String textToReplace = doc.getText(offset, finalLen);
+                                String textToReplace = doc.getText(offset, finalLen2);
                                 if (textToReplace.contentEquals(cs)) return;
-                                doc.remove(offset, finalLen);
+                                doc.remove(offset, finalLen2);
                                 doc.insertString(offset, cs.toString(), null);
                                 if (semiPosition != null)
                                     doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N

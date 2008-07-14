@@ -7,7 +7,17 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
 
-public class FXSourceUtils {
+/**
+ * 
+ * @author Anton Chechel
+ */
+public final class FXSourceUtils {
+    
+    // TODO whitespaces ?
+    private static final char[] CODE_COMPL_SUBST_BREAKERS = {' ', '\t', ';', '.', '(', ')'};
+
+    private FXSourceUtils() {
+    }
 
     public static String typeToString(JavafxTypes types, Type type) {
         String suffix = "";
@@ -53,5 +63,25 @@ public class FXSourceUtils {
         s.append("):");
         s.append(mtype == null ? "???" : typeToString(types, mtype.restype));
         return s.toString();
+    }
+
+    public static int getSubstitutionLenght(final String text, final int offset, int length) {
+        if (text == null) {
+            return length;
+        }
+        
+        int index = offset + text.length();
+        for (int i = 0; i < CODE_COMPL_SUBST_BREAKERS.length; i++) {
+            int k = text.indexOf(CODE_COMPL_SUBST_BREAKERS[i], offset);
+            if (k != -1 && k < index) {
+                index = k;
+            }
+        }
+        int ret = index - offset;
+        if (length > ret) {
+            ret = length;
+        }
+        return ret;
+//        return index > length ?  : length;
     }
 }
