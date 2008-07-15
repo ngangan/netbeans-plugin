@@ -84,7 +84,7 @@ public class MirroringPanel extends JPanel implements Runnable {
            }
            boolean replacePeer() {
                 origDialogPeer = getPeer();
-                if (origDialogPeer.getClass().toString().startsWith("apple")) return false;
+                if (origDialogPeer.getClass().getName().startsWith("apple")) return false; // NOI18N
 
                 InvocationHandler handler = new InvocationHandler() {
                     public Object invoke(Object proxy, Method method, Object[] args) {
