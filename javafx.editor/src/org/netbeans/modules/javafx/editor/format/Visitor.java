@@ -484,7 +484,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitMethodInvocation(MethodInvocationTree node, Queue<Adjustment> adjustments) {
         try {
-            indentSimpleStructure(node, adjustments);
+//            indentSimpleStructure(node, adjustments);
+            if (!holdOnLine(getCurrentPath().getParentPath().getLeaf())) {
+                processStandaloneNode(node, adjustments);
+            } else {
+                indentSimpleStructure(node, adjustments);
+            }
             incIndent();
             super.visitMethodInvocation(node, adjustments);
             decIndent();
@@ -714,6 +719,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof SequenceExplicitTree
                 || tree instanceof SequenceInsertTree
                 || tree instanceof SequenceDeleteTree                
+                || tree instanceof MethodInvocationTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
