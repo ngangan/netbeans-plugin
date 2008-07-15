@@ -243,6 +243,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
+        addMembers(type, methods, fields, null);
+    }
+    
+    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) throws IOException {
         if (LOGGABLE) log("addMembers: " + type);
         JavafxcTrees trees = controller.getTrees();
         TreePath p = new TreePath(root);
@@ -272,7 +276,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             if (fields && member.getKind() == ElementKind.FIELD) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
-                    addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
+                    addResult(JavaFXCompletionItem.createVariableItem(s, offset, textToAdd, true));
                 }
             }
         }
@@ -301,7 +305,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
-                    addResult(JavaFXCompletionItem.createVariableItem(s, offset, false));
+                    addResult(JavaFXCompletionItem.createVariableItem(s, offset, textToAdd, false));
                 }
             }
         }

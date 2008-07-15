@@ -102,6 +102,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     public static final String BOLD_END = "</b>"; //NOI18N
 
     public int substitutionOffset;
+    public String textToAdd;
     
     protected static int SMART_TYPE = 1000;
     private static final String GENERATE_TEXT = NbBundle.getMessage(JavaFXCompletionItem.class, "generate_Lbl");
@@ -114,6 +115,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return new PackageItem(pkgFQN, substitutionOffset, isDeprecated);
     }
 
+    public static final JavaFXCompletionItem createVariableItem(String varName, int substitutionOffset, String textToAdd, boolean smartType) {
+        return new VariableItem(null, varName, substitutionOffset, textToAdd, smartType);
+    }
+    
     public static final JavaFXCompletionItem createVariableItem(String varName, int substitutionOffset, boolean smartType) {
         return new VariableItem(null, varName, substitutionOffset, smartType);
     }
@@ -147,12 +152,17 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         this.substitutionOffset = substitutionOffset;
     }
     
+    protected JavaFXCompletionItem(int substitutionOffset, String textToAdd) {
+        this.substitutionOffset = substitutionOffset;
+        this.textToAdd = textToAdd;
+    }
+    
     public void defaultAction(JTextComponent component) {
         if (component != null) {
             Completion.get().hideDocumentation();
             Completion.get().hideCompletion();
             int caretOffset = component.getSelectionEnd();
-            substituteText(component, substitutionOffset, caretOffset - substitutionOffset, null);
+            substituteText(component, substitutionOffset, caretOffset - substitutionOffset, textToAdd);
         }
     }
 
@@ -561,6 +571,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         private VariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
             super(substitutionOffset);
+            this.varName = varName;
+            this.smartType = smartType;
+            this.typeName = type != null ? type.toString() : null;
+        }
+
+        private VariableItem(TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
+            super(substitutionOffset, textToAdd);
             this.varName = varName;
             this.smartType = smartType;
             this.typeName = type != null ? type.toString() : null;

@@ -84,7 +84,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
             if (tm == null) {
                 return;
             }
-            addMembers(tm, false, true);
+            addMembers(tm, false, true, ":");
         }
     }
 
