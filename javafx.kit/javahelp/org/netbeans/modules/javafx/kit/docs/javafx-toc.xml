@@ -6,11 +6,11 @@
 <toc version="2.0">
    <tocitem text="IDE Basics">
 	<tocitem text="Getting Started">
-	  <tocitem text="JavaFX Script Applications" target="javafx_proj_process_top" />
+	  <tocitem text="JavaFX Applications" target="javafx_proj_process_top" />
         </tocitem>
    </tocitem>
-   <tocitem text="JavaFX Script Applications" expand="false">
-      <tocitem text="About JavaFX Script Applications" target="javafx_app_about" />
+   <tocitem text="JavaFX Applications" expand="false">
+      <tocitem text="About JavaFX Applications" target="javafx_app_about" />
 
       <tocitem text="JavaFX Project Setup and Configuration" >
         <tocitem text="About JavaFX Projects" target="javafx_proj_about" />
@@ -19,32 +19,32 @@
         <tocitem text="Deleting a JavaFX Project" target="javafx_proj_deleting" />
         <tocitem text="Moving, Copying, and Renaming a JavaFX Project" target="javafx_proj_move_copy_rename" />
 	<tocitem text="Setting the Target JDK" target="javafx_proj_jdk" />
-	<tocitem text="Customizing JavaFX Script Syntax Settings" target="javafx_options" />
+	<tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
       </tocitem>
 
-      <tocitem text="Editing JavaFX Script Source Files" >
-        <tocitem text="Editing JavaFX Script Source Files" target="javafx_editing_source" />
-        <tocitem text="About the JavaFX Script Palette" target="javafx_editing_palette" />
-	<tocitem text="Using the JavaFX Script Preview Feature" target="javafx_using_javafxpreview" />
+      <tocitem text="Editing JavaFX Source Files" >
+        <tocitem text="Editing JavaFX Source Files" target="javafx_editing_source" />
+        <tocitem text="About the JavaFX Palette" target="javafx_editing_palette" />
+	<tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
       </tocitem>
 
-      <tocitem text="Building JavaFX Script Applications" >
-        <tocitem text="About Building JavaFX Script Applications" target="javafx_comp_about" />
+      <tocitem text="Building JavaFX Applications" >
+        <tocitem text="About Building JavaFX Applications" target="javafx_comp_about" />
 		<tocitem text="Working with JavaFX Project Builds" target="javafx_comp_process" />	
         <tocitem text="Building a JavaFX Project" target="javafx_comp_project" />
 		<tocitem text="Managing the Classpath of JavaFX Projects" target="javafx_comp_classpath" />
       </tocitem> 
 
-      <tocitem text="Running JavaFX Script Applications" >
- <!--       <tocitem text="About Running JavaFX Script Applications" target="javafx_run_about" />  -->
+      <tocitem text="Running JavaFX Applications" >
+ <!--       <tocitem text="About Running JavaFX Applications" target="javafx_run_about" />  -->
         <tocitem text="Working with JavaFX Project Execution" target="javafx_run_process" />
-        <tocitem text="Running a JavaFX Script Application" target="javafx_run_app" />
+        <tocitem text="Running a JavaFX Application" target="javafx_run_app" />
         <tocitem text="Setting the Runtime Classpath of JavaFX Projects" target="javafx_run_classpath" />
         <tocitem text="Setting the Main JavaFX Class and Runtime Arguments" target="javafx_run_args" />
       </tocitem>
       
-      <tocitem text="Debugging JavaFX Script Applications" target="javafx_debug_about" />
-	  <tocitem text="Profiling JavaFX Script Applications" target="javafx_profile_about" />
-      <tocitem text="About Deploying JavaFX Script Applications" target="javafx_deploy_about" />
+      <tocitem text="Debugging JavaFX Applications" target="javafx_debug_about" />
+	  <tocitem text="Profiling JavaFX Applications" target="javafx_profile_about" />
+      <tocitem text="About Deploying JavaFX Applications" target="javafx_deploy_about" />
     </tocitem>
 </toc>	
