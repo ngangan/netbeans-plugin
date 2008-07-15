@@ -13,7 +13,7 @@ import com.sun.tools.javafx.code.JavafxTypes;
  */
 public final class FXSourceUtils {
     
-    private static final char[] CODE_COMPL_SUBST_BREAKERS = {' ', '\t', ';', '.', '(', ')', '\n', '\r'};
+    private static final char[] CODE_COMPL_SUBST_BREAKERS = {';', '.', ',', '+', '-', '*', '/', '%', '^', '|', '&', '(', ')', '{' ,'}', ' ', '\t', '\n', '\r'};
 
     private FXSourceUtils() {
     }
@@ -81,6 +81,5 @@ public final class FXSourceUtils {
             ret = length;
         }
         return ret;
-//        return index > length ?  : length;
     }
 }
