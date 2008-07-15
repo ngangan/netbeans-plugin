@@ -156,12 +156,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     
     public static final String[] STATEMENT_KEYWORDS = new String[]{
         FOR_KEYWORD,
+        IF_KEYWORD,
         TRY_KEYWORD, 
         WHILE_KEYWORD
     };
     public static final String[] STATEMENT_SPACE_KEYWORDS = new String[]{
         INSERT_KEYWORD,
         NEW_KEYWORD,
+        REVERSE_KEYWORD,
         THROW_KEYWORD,
         VAR_KEYWORD
     };
