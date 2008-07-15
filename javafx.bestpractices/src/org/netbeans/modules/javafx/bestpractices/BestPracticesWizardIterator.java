@@ -124,7 +124,12 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
                     helper.putProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH, props );        
                 }
             }
-        }        
+        }     
+        
+        // Create manifest
+        FileObject manifestFO = srcDir.getParent().createData( "manifest", "mf" );
+        props.setProperty( "manifest.file", "manifest.mf" );
+        helper.putProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH, props );
         
         // Traverse created directory
         resultSet.add( dir );
