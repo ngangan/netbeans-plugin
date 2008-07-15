@@ -13,8 +13,7 @@ import com.sun.tools.javafx.code.JavafxTypes;
  */
 public final class FXSourceUtils {
     
-    // TODO whitespaces ?
-    private static final char[] CODE_COMPL_SUBST_BREAKERS = {' ', '\t', ';', '.', '(', ')'};
+    private static final char[] CODE_COMPL_SUBST_BREAKERS = {' ', '\t', ';', '.', '(', ')', '\n', '\r'};
 
     private FXSourceUtils() {
     }
