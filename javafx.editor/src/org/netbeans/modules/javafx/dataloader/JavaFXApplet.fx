@@ -9,12 +9,18 @@ package ${package};
 </#if>
 
 import javafx.application.*;
-import javafx.ext.swing.*;
+import javafx.scene.*;
 
 /**
  * @author ${user}
  */
 
 Application{
-    content: Label{ text: "Application content"}
+    stage: Stage{
+        content: Text {
+            x: 10, y: 30
+            content: "Application content"
+            font: Font { size: 24  style: FontStyle.PLAIN }
+        }
+    }
 } 
