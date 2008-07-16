@@ -54,7 +54,7 @@ made subject to such option by the copyright holder.
 
         <zip destfile="zips/javafx-cluster-win.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0/**"/>
+		<exclude name="javafx-sdk1.0pre1/**"/>
 		<exclude name="**/*-lin.*"/>
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-mac.*"/>
@@ -64,7 +64,7 @@ made subject to such option by the copyright holder.
 
         <zip destfile="zips/javafx-cluster-mac.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0/**"/>
+		<exclude name="javafx-sdk1.0pre1/**"/>
 		<exclude name="**/*-lin.*"/>
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-win.*"/>
@@ -74,7 +74,7 @@ made subject to such option by the copyright holder.
 
         <zip destfile="zips/javafx-cluster-lin.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0/**"/>
+		<exclude name="javafx-sdk1.0pre1/**"/>
 		<exclude name="**/*-mac.*"/>
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-win.*"/>
@@ -84,7 +84,7 @@ made subject to such option by the copyright holder.
 
         <zip destfile="zips/javafx-cluster-sol.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0/**"/>
+		<exclude name="javafx-sdk1.0pre1/**"/>
 		<exclude name="**/*-lin.*"/>
 		<exclude name="**/*-mac.*"/>
 		<exclude name="**/*-win.*"/>
