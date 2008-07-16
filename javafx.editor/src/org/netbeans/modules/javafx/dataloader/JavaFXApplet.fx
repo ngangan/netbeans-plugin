@@ -10,6 +10,7 @@ package ${package};
 
 import javafx.application.*;
 import javafx.scene.*;
+import javafx.scene.text.*;
 
 /**
  * @author ${user}
