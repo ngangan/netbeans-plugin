@@ -18,7 +18,7 @@
         <tocitem text="JavaFX Project Tasks: Quick Reference" target="javafx_proj_quickref"/>
         <tocitem text="Deleting a JavaFX Project" target="javafx_proj_deleting" />
         <tocitem text="Moving, Copying, and Renaming a JavaFX Project" target="javafx_proj_move_copy_rename" />
-	<tocitem text="Setting the Target JDK" target="javafx_proj_jdk" />
+	<tocitem text="Setting the Target JavaFX SDK Platform" target="javafx_proj_sdk" />
 	<tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
       </tocitem>
 

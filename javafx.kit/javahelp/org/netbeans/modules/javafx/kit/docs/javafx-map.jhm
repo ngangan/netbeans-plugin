@@ -65,7 +65,7 @@
 	<mapID target="javafx_proj_process_top" url="project/javafx_proj_process.html#top"/>
 	<mapID target="javafx_proj_quickref" url="project/javafx_proj_quickref.html"/>
 <!--	<mapID target="javafx_proj_main" url="project/javafx_proj_main.html"/> -->
-	<mapID target="javafx_proj_jdk" url="project/javafx_proj_jdk.html" />
+	<mapID target="javafx_proj_sdk" url="project/javafx_proj_sdk.html" />
 
 	<mapID target="javafx_options" url="configure/javafx_options.html"/>
 
