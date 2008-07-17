@@ -146,16 +146,8 @@ public class PreviewThread extends Thread {
             comp = JavaFXDocument.getVrongVersion();
             return comp;
         }
-        try {
-            EventQueue.invokeAndWait(
-                new Runnable() {
-                    public void run() {
-                        obj = CodeManager.run(context);
-                    }
-                });
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
+
+        obj = CodeManager.run(context);
 
         List <Window> suspectedList = getOwnerlessWindowsList();
         suspectedList.removeAll(initialList);
