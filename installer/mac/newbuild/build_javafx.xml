@@ -139,7 +139,7 @@ Microsystems, Inc. All Rights Reserved.
             <antcall target="build-dmg">
                  <param name="dmg.name" value="${dmg.prefix.name}${ml.suffix}${bundle.type}-macosx"/>  
                  <param name="mpkg.name" value="${mpkg.name_nb}"/>
-                 <param name="license.file" value="${basedir}/dmg/Resources/license.txt"/>                                  
+                 <param name="license.file" value="${basedir}/dmg/Resources/license_javafx.txt"/>                                  
             </antcall>     
         </for-each>         
         <delete file="${basedir}/build/sizes.pro"/>
