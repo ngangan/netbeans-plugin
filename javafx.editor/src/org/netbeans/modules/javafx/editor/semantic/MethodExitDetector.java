@@ -40,18 +40,16 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
+import com.sun.javafx.api.tree.CatchTree;
+import com.sun.javafx.api.tree.ConditionalExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.source.tree.CatchTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.ThrowTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TryTree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.ReturnTree;
+import com.sun.javafx.api.tree.ThrowTree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
+import com.sun.javafx.api.tree.UnitTree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -84,7 +82,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     private Collection<TypeMirror> exceptions;
     private Stack<Map<TypeMirror, List<Tree>>> exceptions2HighlightsStack;
     
-    public List<int[]> process(CompilationInfo info, Document document, MethodTree methoddecl, Collection<Tree> excs) {
+    public List<int[]> process(CompilationInfo info, Document document, FunctionDefinitionTree methoddecl, Collection<Tree> excs) {
         this.info = info;
         this.doc  = document;
         this.highlights = new ArrayList<int[]>();
@@ -92,12 +90,12 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
         this.exceptions2HighlightsStack.push(null);
         
         try {
-            CompilationUnitTree cu = info.getCompilationUnit();
+            UnitTree cu = info.getCompilationUnit();
             
             //"return" exit point only if not searching for exceptions:
             doExitPoints = excs == null;
             
-            Boolean wasReturn = scan(TreePath.getPath(cu, methoddecl), null);
+            Boolean wasReturn = scan(JavaFXTreePath.getPath(cu, methoddecl), null);
             
             if (isCanceled())
                 return null;
@@ -120,7 +118,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
                     if (isCanceled())
                         return null;
                     
-                    TypeMirror m = info.getTrees().getTypeMirror(TreePath.getPath(cu, t));
+                    TypeMirror m = info.getTrees().getTypeMirror(JavaFXTreePath.getPath(cu, t));
                     
                     if (m != null) {
                         exceptions.add(m);
@@ -266,7 +264,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     
     @Override
     public Boolean visitCatch(CatchTree tree, Stack<Tree> d) {
-        TypeMirror type1 = info.getTrees().getTypeMirror(new TreePath(new TreePath(getCurrentPath(), tree.getParameter()), tree.getParameter().getType()));
+        TypeMirror type1 = info.getTrees().getTypeMirror(new JavaFXTreePath(new JavaFXTreePath(getCurrentPath(), tree.getParameter()), tree.getParameter().getType()));
         Types t = info.getTypes();
         
         if (type1 != null) {
@@ -292,8 +290,8 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     }
     
     @Override
-    public Boolean visitMethodInvocation(MethodInvocationTree tree, Stack<Tree> d) {
-        Element el = info.getTrees().getElement(new TreePath(getCurrentPath(), tree.getMethodSelect()));
+    public Boolean visitMethodInvocation(FunctionInvocationTree tree, Stack<Tree> d) {
+        Element el = info.getTrees().getElement(new JavaFXTreePath(getCurrentPath(), tree.getMethodSelect()));
         
         if (el == null) {
             System.err.println("Warning: decl == null");
@@ -312,42 +310,18 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     
     @Override
     public Boolean visitThrow(ThrowTree tree, Stack<Tree> d) {
-        addToExceptionsMap(info.getTrees().getTypeMirror(new TreePath(getCurrentPath(), tree.getExpression())), tree);
+        addToExceptionsMap(info.getTrees().getTypeMirror(new JavaFXTreePath(getCurrentPath(), tree.getExpression())), tree);
         
         super.visitThrow(tree, d);
         
         return Boolean.TRUE;
     }
-    
+            
     @Override
-    public Boolean visitNewClass(NewClassTree tree, Stack<Tree> d) {
-        Element el = info.getTrees().getElement(getCurrentPath());
-        
-        if (el != null && el.getKind() == ElementKind.CONSTRUCTOR) {
-            for (TypeMirror m : ((ExecutableElement) el).getThrownTypes()) {
-                addToExceptionsMap(m, tree);
-            }
-        }
-        
-        super.visitNewClass(tree, d);
-        return null;
-    }
-    
-    @Override
-    public Boolean visitMethod(MethodTree node, Stack<Tree> p) {
-        scan(node.getModifiers(), p);
-        scan(node.getReturnType(), p);
-        scan(node.getTypeParameters(), p);
-        scan(node.getParameters(), p);
-        scan(node.getThrows(), p);
-        return scan(node.getBody(), p);
-    }
-    
-    @Override
-    public Boolean visitIf(IfTree node, Stack<Tree> p) {
+    public Boolean visitConditionalExpression(ConditionalExpressionTree node, Stack<Tree> p) {
         scan(node.getCondition(), p);
-        Boolean thenResult = scan(node.getThenStatement(), p);
-        Boolean elseResult = scan(node.getElseStatement(), p);
+        Boolean thenResult = scan(node.getTrueExpression(), p);
+        Boolean elseResult = scan(node.getFalseExpression(), p);
         
         if (thenResult == Boolean.TRUE && elseResult == Boolean.TRUE)
             return Boolean.TRUE;

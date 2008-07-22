@@ -56,7 +56,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class CaseTreeEnvironment extends JavaFXCompletionEnvironment<CaseTree> {
+public class CaseTreeEnvironment extends JavaFXCompletionEnvironment{}/*<CaseTree> {
     
     private static final Logger logger = Logger.getLogger(CaseTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -91,3 +91,4 @@ public class CaseTreeEnvironment extends JavaFXCompletionEnvironment<CaseTree> {
         }
     }
 }
+*/

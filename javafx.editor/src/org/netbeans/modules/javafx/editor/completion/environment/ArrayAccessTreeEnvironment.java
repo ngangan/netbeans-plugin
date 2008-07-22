@@ -51,7 +51,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class ArrayAccessTreeEnvironment extends JavaFXCompletionEnvironment<ArrayAccessTree> {
+public class ArrayAccessTreeEnvironment extends JavaFXCompletionEnvironment {} /*<ArrayAccessTree> {
     
     private static final Logger logger = Logger.getLogger(ArrayAccessTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -81,3 +81,4 @@ public class ArrayAccessTreeEnvironment extends JavaFXCompletionEnvironment<Arra
         }
     }
 }
+*/

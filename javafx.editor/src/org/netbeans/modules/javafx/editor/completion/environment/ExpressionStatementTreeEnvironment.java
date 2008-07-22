@@ -62,7 +62,7 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  *
  * @author David Strupl
  */
-public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironment<ExpressionStatementTree> {
+public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironment{}/*<ExpressionStatementTree> {
     
     private static final Logger logger = Logger.getLogger(ExpressionStatementTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -155,3 +155,4 @@ public class ExpressionStatementTreeEnvironment extends JavaFXCompletionEnvironm
         }
     }
 }
+*/

@@ -41,8 +41,8 @@
 
 package org.netbeans.modules.javafx.editor;
 
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.MethodType;
@@ -130,7 +130,7 @@ public class GoToSupport {
                     }
                     
                     final int offset = span[0] + 1;
-                    TreePath path = controller.getTreeUtilities().pathFor(offset);
+                    JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
                     
                     Tree leaf = path.getLeaf();
                     if (leaf == null) return;
@@ -159,7 +159,7 @@ public class GoToSupport {
                             }
                         }
                         
-                        TreePath elpath = controller.getPath(el);
+                        JavaFXTreePath elpath = controller.getPath(el);
                         Tree tree = elpath != null && path.getCompilationUnit() == elpath.getCompilationUnit()? elpath.getLeaf(): null;
                         
                         if (tree != null) {

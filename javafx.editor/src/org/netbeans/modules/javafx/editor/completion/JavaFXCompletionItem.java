@@ -41,15 +41,13 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.Scope;
-import com.sun.source.tree.ThrowTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.ReturnTree;
+import com.sun.javafx.api.tree.Scope;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.ThrowTree;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.awt.Font;
@@ -848,14 +846,14 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
                             public void run(CompilationController controller) throws Exception {
                                 controller.toPhase(Phase.PARSED);
-                                TreePath tp = controller.getTreeUtilities().pathFor(c.getSelectionEnd());
+                                JavaFXTreePath tp = controller.getTreeUtilities().pathFor(c.getSelectionEnd());
                                 Tree tree = tp.getLeaf();
-                                if (tree.getKind() == Tree.Kind.IDENTIFIER || tree.getKind() == Tree.Kind.PRIMITIVE_TYPE)
+                                if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER /*|| tree.getJavaFXKind() == Tree.JavaFXKind.PRIMITIVE_TYPE*/)
                                     tp = tp.getParentPath();
-                                if (tp.getLeaf().getKind() == Tree.Kind.MEMBER_SELECT ||
-                                    (tp.getLeaf().getKind() == Tree.Kind.METHOD_INVOCATION && ((MethodInvocationTree)tp.getLeaf()).getMethodSelect() == tree))
+                                if (tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT ||
+                                    (tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.METHOD_INVOCATION && ((FunctionInvocationTree)tp.getLeaf()).getMethodSelect() == tree))
                                     tp = tp.getParentPath();
-                                if (tp.getLeaf().getKind() == Tree.Kind.EXPRESSION_STATEMENT || tp.getLeaf().getKind() == Tree.Kind.BLOCK)
+                                if (/*tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.EXPRESSION_STATEMENT ||*/ tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION)
                                     ret[0] = ";"; //NOI18N
                             }
                         }, true);
@@ -1194,7 +1192,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                             doc.atomicLock();
                             try {
                                 Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
-                                TreePath tp = controller.getTreeUtilities().pathFor(offset);
+                                JavaFXTreePath tp = controller.getTreeUtilities().pathFor(offset);
                                 CharSequence cs = simpleName;
                                 if (eleme != null) {
                                     cs = eleme.getSimpleName(); 
@@ -1301,15 +1299,15 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 public void run(CompilationController controller) throws Exception {
                     controller.toPhase(JavaFXSource.Phase.PARSED);
                     Tree t = null;
-                    TreePath tp = controller.getTreeUtilities().pathFor(offset);
+                    JavaFXTreePath tp = controller.getTreeUtilities().pathFor(offset);
                     while (t == null && tp != null) {
-                        switch(tp.getLeaf().getKind()) {
-                            case EXPRESSION_STATEMENT:
+                        switch(tp.getLeaf().getJavaFXKind()) {
+/*                            case EXPRESSION_STATEMENT:
                                 ExpressionTree expr = ((ExpressionStatementTree)tp.getLeaf()).getExpression();
                                 if (expr != null && expr.getKind() == Tree.Kind.ERRONEOUS) {
                                     // TODO:
                                 }
-                                break;
+                                break;*/
                             case IMPORT:                                
                                 t = tp.getLeaf();
                                 break;

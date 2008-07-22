@@ -39,7 +39,7 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.BinaryTree;
+import com.sun.javafx.api.tree.BinaryTree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

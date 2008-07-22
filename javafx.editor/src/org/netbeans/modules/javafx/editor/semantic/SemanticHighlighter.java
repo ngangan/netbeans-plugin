@@ -40,14 +40,14 @@ package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.JavaFXVariableTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +130,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             List<Result> result = new ArrayList<Result>();
-            CompilationUnitTree compilationUnit = info.getCompilationUnit();
+            UnitTree compilationUnit = info.getCompilationUnit();
             JavaFXThreeVisitor javaFXThreeVisitor = new JavaFXThreeVisitor(info);
             javaFXThreeVisitor.scan(compilationUnit, result);
             setHighlights(doc, result, identifiers);
@@ -245,7 +245,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         }
 
         @Override
-        public Void visitMethodInvocation(MethodInvocationTree tree, List<Result> list) {
+        public Void visitMethodInvocation(FunctionInvocationTree tree, List<Result> list) {
             SourcePositions sourcePositions = info.getTrees().getSourcePositions();
             long start = sourcePositions.getStartPosition(info.getCompilationUnit(), getCurrentPath().getLeaf());
             long end = sourcePositions.getEndPosition(info.getCompilationUnit(), getCurrentPath().getLeaf());
@@ -287,7 +287,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         }
 
         @Override
-        public Void visitVariable(JavaFXVariableTree tree, List<Result> list) {
+        public Void visitVariable(VariableTree tree, List<Result> list) {
             SourcePositions sourcePositions = info.getTrees().getSourcePositions();
             long start = sourcePositions.getStartPosition(info.getCompilationUnit(), getCurrentPath().getLeaf());
             long end = sourcePositions.getEndPosition(info.getCompilationUnit(), getCurrentPath().getLeaf());
@@ -401,7 +401,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     
                     if (JFXTokenId.IDENTIFIER.equals(t.id())) {
                         start = ts.offset();
-                        TreePath subPath = tu.pathFor((int) start);
+                        JavaFXTreePath subPath = tu.pathFor((int) start);
                         Element subElement = info.getTrees().getElement(subPath);
                         if (subElement != null) {
                             String subElementName = subElement.getSimpleName().toString();

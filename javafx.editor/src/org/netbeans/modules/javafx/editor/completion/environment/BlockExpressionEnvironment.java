@@ -39,9 +39,9 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TryTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javafx.tree.JFXBlockExpression;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -62,15 +62,15 @@ public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXB
     @Override
     protected void inside(JFXBlockExpression bl) throws IOException {
         if (LOGGABLE) log("inside JFXBlockExpression " + bl);
-        StatementTree last = null;
-        for (StatementTree stat : bl.getStatements()) {
+        ExpressionTree last = null;
+        for (ExpressionTree stat : bl.getStatements()) {
             int pos = (int) sourcePositions.getStartPosition(root, stat);
             if (pos == Diagnostic.NOPOS || offset <= pos) {
                 break;
             }
             last = stat;
         }
-        if (last != null && last.getKind() == Tree.Kind.TRY) {
+        if (last != null && last.getJavaFXKind() == Tree.JavaFXKind.TRY) {
             if (((TryTree) last).getFinallyBlock() == null) {
                 addKeyword(CATCH_KEYWORD, null, false);
                 addKeyword(FINALLY_KEYWORD, null, false);

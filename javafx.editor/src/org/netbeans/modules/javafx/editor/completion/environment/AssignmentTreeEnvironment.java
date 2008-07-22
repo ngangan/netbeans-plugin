@@ -39,9 +39,9 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.AssignmentTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,13 +72,13 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
                     addValueKeywords();
                 }
             } else {
-                insideExpression(new TreePath(path, expr));
+                insideExpression(new JavaFXTreePath(path, expr));
             }
         }
     }
 
     public TypeMirror getSmartType(AssignmentTree as) throws IOException {
-        TypeMirror type = controller.getTrees().getTypeMirror(new TreePath(path, as.getVariable()));
+        TypeMirror type = controller.getTrees().getTypeMirror(new JavaFXTreePath(path, as.getVariable()));
         return type;
     }
 

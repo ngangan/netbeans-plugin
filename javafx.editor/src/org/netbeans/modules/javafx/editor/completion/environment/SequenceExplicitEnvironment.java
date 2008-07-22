@@ -39,7 +39,7 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXSequenceExplicit;
@@ -70,7 +70,7 @@ public class SequenceExplicitEnvironment extends JavaFXCompletionEnvironment<JFX
     }
 
     private TypeMirror getSmartType(JFXSequenceExplicit t) throws IOException {
-        final TreePath treePath = new TreePath(path, t);
+        final JavaFXTreePath treePath = new JavaFXTreePath(path, t);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(1) == " + type);
         // handle sequences as their element type

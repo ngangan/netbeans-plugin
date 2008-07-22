@@ -43,8 +43,6 @@
 package org.netbeans.modules.javafx.editor.format;
 
 import com.sun.javafx.api.tree.*;
-import com.sun.source.tree.*;
-import com.sun.source.util.SourcePositions;
 import org.netbeans.api.java.source.CodeStyle;
 import static org.netbeans.api.java.source.CodeStyle.BracePlacement;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -117,7 +115,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-    public Queue<Adjustment> visitVariable(JavaFXVariableTree node, Queue<Adjustment> adjustments) {
+    public Queue<Adjustment> visitVariable(VariableTree node, Queue<Adjustment> adjustments) {
         try {
             final int start = getStartPos(node);
 //            if (isFirstOnLine(start)) {
@@ -159,7 +157,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
-    @Override
+/*    @Override
     public Queue<Adjustment> visitExpressionStatement(ExpressionStatementTree node, Queue<Adjustment> adjustments) {
         try {
             processStandaloneNode(node, adjustments);
@@ -169,7 +167,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         super.visitExpressionStatement(node, adjustments);
         return adjustments;
     }
-
+*/
     private void processStandaloneNode(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
         final int position = getStartPos(node);
         if (isFirstOnLine(position)) {
@@ -348,11 +346,11 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-    @Override
+/*    @Override
     public Queue<Adjustment> visitPrimitiveType(PrimitiveTypeTree node, Queue<Adjustment> adjustments) {
         return adjustments;
     }
-
+*/
     @Override
     public Queue<Adjustment> visitContinue(ContinueTree node, Queue<Adjustment> adjustments) {
         return adjustments;
@@ -482,7 +480,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-    public Queue<Adjustment> visitMethodInvocation(MethodInvocationTree node, Queue<Adjustment> adjustments) {
+    public Queue<Adjustment> visitMethodInvocation(FunctionInvocationTree node, Queue<Adjustment> adjustments) {
         try {
 //            indentSimpleStructure(node, adjustments);
             if (!holdOnLine(getCurrentPath().getParentPath().getLeaf())) {
@@ -660,7 +658,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return null;
     }
 
-    private CompilationUnitTree cu() {
+    private UnitTree cu() {
         return info.getCompilationUnit();
     }
 
@@ -707,7 +705,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private boolean holdOnLine(Tree tree) {
         return tree instanceof ReturnTree
-                || tree instanceof JavaFXVariableTree
+                || tree instanceof VariableTree
                 || tree instanceof AssignmentTree
                 || tree instanceof UnaryTree
                 || tree instanceof BinaryTree
@@ -719,7 +717,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof SequenceExplicitTree
                 || tree instanceof SequenceInsertTree
                 || tree instanceof SequenceDeleteTree                
-                || tree instanceof MethodInvocationTree
+                || tree instanceof FunctionInvocationTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
@@ -767,8 +765,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } else if (node instanceof FunctionDefinitionTree) {
             FunctionDefinitionTree tree = (FunctionDefinitionTree) node;
             return includeModifiers(tree.getModifiers());
-        } else if (node instanceof JavaFXVariableTree) {
-            JavaFXVariableTree tree = (JavaFXVariableTree) node;
+        } else if (node instanceof VariableTree) {
+            VariableTree tree = (VariableTree) node;
             return includeModifiers(tree.getModifiers());
         }
         return Integer.MAX_VALUE;
@@ -799,7 +797,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentLine(pos, adjustments);
 
                 final Tree tree = getCurrentPath().getParentPath().getLeaf();
-                if (tree instanceof CompilationUnitTree || tree instanceof ClassDeclarationTree) {
+                if (tree instanceof UnitTree || tree instanceof ClassDeclarationTree) {
                     pos = skipPreviousComment(pos);
 
                     int emptyLines = getEmptyLinesBefore(li, pos);
@@ -902,9 +900,10 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitCompoundAssignment(CompoundAssignmentTree node, Queue<Adjustment> adjustments) {
+/*
         if (getCurrentPath().getParentPath().getLeaf() instanceof ExpressionStatementTree) {
             return adjustments;
-        }
+        }*/
         try {
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
@@ -953,7 +952,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-    @Override
+/*    @Override
     public Queue<Adjustment> visitBlock(BlockTree blockTree, Queue<Adjustment> adjustments) {
         if (!tu.isSynthetic(getCurrentPath())) {
             try {
@@ -970,7 +969,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         return adjustments;
     }
-
+*/
     @Override
     public Queue<Adjustment> visitWhileLoop(WhileLoopTree node, Queue<Adjustment> adjustments) {
         try {
@@ -1007,16 +1006,18 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-    public Queue<Adjustment> visitIf(IfTree node, Queue<Adjustment> adjustments) {
+//    public Queue<Adjustment> visitIf(IfTree node, Queue<Adjustment> adjustments) {
+    public Queue<Adjustment> visitConditionalExpression(ConditionalExpressionTree node, Queue<Adjustment> adjustments) {
         try {
             processStandaloneNode(node, adjustments);
-            verifyBraces(node.getThenStatement(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeIfLeftBrace());
-            verifySpaceBefore(node.getElseStatement(), adjustments, cs.spaceBeforeElse());
-            verifyBraces(node.getElseStatement(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace());
+            verifyBraces(node.getTrueExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeIfLeftBrace());
+            verifySpaceBefore(node.getFalseExpression(), adjustments, cs.spaceBeforeElse());
+            verifyBraces(node.getFalseExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
-        super.visitIf(node, adjustments);
+//        super.visitIf(node, adjustments);
+        super.visitConditionalExpression(node, adjustments);
         return adjustments;
     }
 

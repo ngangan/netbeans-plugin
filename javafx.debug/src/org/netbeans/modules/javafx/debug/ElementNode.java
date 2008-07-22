@@ -40,8 +40,7 @@
  */
 package org.netbeans.modules.javafx.debug;
 
-//import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.Tree;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Element;

@@ -38,8 +38,8 @@
  */
 
 package org.netbeans.api.javafx.source;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -96,7 +96,7 @@ public class PathFinderTest {
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                 }
                 int currentOffset = 80;
-                TreePath currentPath = controller.getTreeUtilities().pathFor(currentOffset);
+                JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(currentOffset);
                 Tree tree = currentPath.getLeaf();
                 System.out.println("Tree is: "+ tree.toString());
             }

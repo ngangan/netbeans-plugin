@@ -40,90 +40,9 @@
  */
 package org.netbeans.modules.javafx.debug;
 
-import com.sun.javafx.api.tree.BindExpressionTree;
-import com.sun.javafx.api.tree.BlockExpressionTree;
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ForExpressionInClauseTree;
-import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionValueTree;
-import com.sun.javafx.api.tree.IndexofTree;
-import com.sun.javafx.api.tree.InitDefinitionTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.InterpolateTree;
-import com.sun.javafx.api.tree.InterpolateValueTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.JavaFXVariableTree;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
-import com.sun.javafx.api.tree.OnReplaceTree;
-import com.sun.javafx.api.tree.SequenceDeleteTree;
-import com.sun.javafx.api.tree.SequenceEmptyTree;
-import com.sun.javafx.api.tree.SequenceExplicitTree;
-import com.sun.javafx.api.tree.SequenceIndexedTree;
-import com.sun.javafx.api.tree.SequenceInsertTree;
-import com.sun.javafx.api.tree.SequenceRangeTree;
-import com.sun.javafx.api.tree.SequenceSliceTree;
-import com.sun.javafx.api.tree.SetAttributeToObjectTree;
-import com.sun.javafx.api.tree.StringExpressionTree;
-import com.sun.javafx.api.tree.TimeLiteralTree;
-import com.sun.javafx.api.tree.TriggerTree;
-import com.sun.javafx.api.tree.TypeAnyTree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.TypeFunctionalTree;
-import com.sun.javafx.api.tree.TypeUnknownTree;
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.ArrayAccessTree;
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.AssertTree;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.BreakTree;
-import com.sun.source.tree.CaseTree;
-import com.sun.source.tree.CatchTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ConditionalExpressionTree;
-import com.sun.source.tree.ContinueTree;
-import com.sun.source.tree.DoWhileLoopTree;
-import com.sun.source.tree.EmptyStatementTree;
-import com.sun.source.tree.EnhancedForLoopTree;
-import com.sun.source.tree.ErroneousTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ForLoopTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.InstanceOfTree;
-import com.sun.source.tree.LabeledStatementTree;
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.ParenthesizedTree;
-import com.sun.source.tree.PrimitiveTypeTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.SwitchTree;
-import com.sun.source.tree.SynchronizedTree;
-import com.sun.source.tree.ThrowTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
-import com.sun.source.tree.TryTree;
-import com.sun.source.tree.TypeCastTree;
-import com.sun.source.tree.TypeParameterTree;
-import com.sun.source.tree.UnaryTree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.tree.WhileLoopTree;
-import com.sun.source.tree.WildcardTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.javafx.api.tree.*;
+import com.sun.tools.javafx.tree.JFXErroneous;
+import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -146,11 +65,11 @@ import org.openide.util.NbBundle;
  */
 public class TreeNode extends AbstractNode implements OffsetProvider {
     
-    private TreePath tree;
+    private JavaFXTreePath tree;
     private CompilationInfo info;
     private boolean synthetic;
     
-    public static Node getTree(CompilationInfo info, TreePath tree) {
+    public static Node getTree(CompilationInfo info, JavaFXTreePath tree) {
         List<Node> result = new ArrayList<Node>();
         
         new FindChildrenTreeVisitor(info).scan(tree, result);
@@ -158,30 +77,16 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         return result.get(0);
     }
     
-    private static String treeToString(CompilationInfo info, TreePath tp) {
+    private static String treeToString(CompilationInfo info, JavaFXTreePath tp) {
         Tree t = tp.getLeaf();
-        JavaFXTree.JavaFXKind k = null;
         StringWriter s = new StringWriter();
         try {
-            new JavafxPretty(s, false).printExpr((JCTree)t);
+            new JavafxPretty(s, false).printExpr((JFXTree)t);
         } catch (Exception e) {
-            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Unable to pretty print " + t.getKind(), e); // NOI18N
+            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e); // NOI18N
         }
-        if (t instanceof JavaFXTree && t.getKind() == Kind.OTHER) {
-            JavaFXTree jfxt = (JavaFXTree)t;
-            k = jfxt.getJavaFXKind();
-        }
-        String res = null;
-        if (k != null) {
-            res = k.toString();
-        } else {
-            res = String.valueOf(t.getKind());
-            // XXX:debugging
-            if (res.equals("null")) {
-                System.err.println("Tree with null kind:" + t.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(t)));
-//                System.err.println("  is " + t);
-            }
-        }
+        String res = t.getJavaFXKind().toString();
+
         SourcePositions pos = info.getTrees().getSourcePositions();
         res = res + '[' + pos.getStartPosition(tp.getCompilationUnit(), t) + ',' + 
                 pos.getEndPosition(tp.getCompilationUnit(), t) + "]:" + s.toString();
@@ -189,7 +94,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
     }
 
     /** Creates a new instance of TreeNode */
-    public TreeNode(CompilationInfo info, TreePath tree, List<Node> nodes) {
+    public TreeNode(CompilationInfo info, JavaFXTreePath tree, List<Node> nodes) {
         super(nodes.isEmpty() ? Children.LEAF: new NodeChilren(nodes));
         this.tree = tree;
         this.info = info;
@@ -399,20 +304,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             return null;
         }
 
-        public Void visitVariable(JavaFXVariableTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitVariable/*Declaration*/(tree, below);
-            // XXX: Won't be there, just JFXC-1119 workaround
-//            super.scan(tree.getOnReplaceTree(), below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
         @Override
         public Void visitOnReplace(OnReplaceTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
@@ -522,18 +413,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitSetAttributeToObject(SetAttributeToObjectTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitSetAttributeToObject(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitStringExpression(StringExpressionTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
@@ -551,7 +430,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             
             addCorrespondingType(below);
             addCorrespondingComments(below);
-            super.visitOther(tree, below);
+            super.visitTimeLiteral(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -619,59 +498,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitOther(Tree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitOther(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-        
-        @Override
-        public Void visitAnnotation(AnnotationTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            //???
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitAnnotation(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitMethodInvocation(MethodInvocationTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitMethodInvocation(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitAssert(AssertTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitAssert(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitAssignment(AssignmentTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
@@ -708,36 +534,12 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitBlock(BlockTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitBlock(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitBreak(BreakTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingType(below);
             addCorrespondingComments(below);
             super.visitBreak(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitCase(CaseTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitCase(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -755,7 +557,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             return null;
         }
 
-        @Override
+        /*@Override
         public Void visitClass(ClassTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
@@ -767,8 +569,8 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
-        }
-
+        }*/
+        
         @Override
         public Void visitConditionalExpression(ConditionalExpressionTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
@@ -806,60 +608,12 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitDoWhileLoop(DoWhileLoopTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitDoWhileLoop(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitErroneous(ErroneousTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingType(below);
             addCorrespondingComments(below);
-            scan(((com.sun.tools.javac.tree.JCTree.JCErroneous)tree).errs, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitExpressionStatement(ExpressionStatementTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitExpressionStatement(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitEnhancedForLoop(EnhancedForLoopTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitEnhancedForLoop(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitForLoop(ForLoopTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitForLoop(tree, below);
+            scan(((JFXErroneous)tree).errs, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -880,48 +634,12 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitIf(IfTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitIf(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitImport(ImportTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingType(below);
             addCorrespondingComments(below);
             super.visitImport(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitArrayAccess(ArrayAccessTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitArrayAccess(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitLabeledStatement(LabeledStatementTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitLabeledStatement(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -940,14 +658,14 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitMethod(MethodTree tree, List<Node> d) {
+        public Void visitMethodInvocation(FunctionInvocationTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingElement(below);
             addCorrespondingType(below);
             addCorrespondingComments(below);
             
-            super.visitMethod(tree, below);
+            super.visitMethodInvocation(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -960,34 +678,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             addCorrespondingType(below);
             addCorrespondingComments(below);
             super.visitModifiers(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitNewArray(NewArrayTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitNewArray(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitNewClass(NewClassTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitNewClass(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -1044,30 +734,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitSwitch(SwitchTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitSwitch(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitSynchronized(SynchronizedTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitSynchronized(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitThrow(ThrowTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
@@ -1080,7 +746,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitCompilationUnit(CompilationUnitTree tree, List<Node> d) {
+        public Void visitCompilationUnit(UnitTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingElement(below);
@@ -1106,66 +772,12 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitParameterizedType(ParameterizedTypeTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitParameterizedType(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitArrayType(ArrayTypeTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitArrayType(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitTypeCast(TypeCastTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingType(below);
             addCorrespondingComments(below);
             super.visitTypeCast(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitPrimitiveType(PrimitiveTypeTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitPrimitiveType(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
-        public Void visitTypeParameter(TypeParameterTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitTypeParameter(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -1197,11 +809,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
 
         @Override
         public Void visitVariable(VariableTree tree, List<Node> d) {
-            // XXX: Won't be there, just JFXC-1119 workaround
-/*            if (tree instanceof JavaFXVariableTree) {
-                visitVariableDeclaration((JavaFXVariableTree)tree, d);
-                return null;
-            }*/
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingElement(below);
@@ -1227,19 +834,19 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitWildcard(WildcardTree tree, List<Node> d) {
+        public Void visitKeyFrameLiteral(KeyFrameLiteralTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
             addCorrespondingType(below);
             addCorrespondingComments(below);
-            super.visitWildcard(tree, below);
+            super.visitKeyFrameLiteral(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
         }
-        
+
         private void addCorrespondingElement(List<Node> below) {
-            TreePath tp = getCurrentPath();
+            JavaFXTreePath tp = getCurrentPath();
             try {
                 Element el = info.getTrees().getElement(tp);
 

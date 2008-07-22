@@ -39,9 +39,9 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.ParenthesizedTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.ParenthesizedTree;
+import com.sun.javafx.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,7 +64,7 @@ public class ParenthesizedTreeEnvironment extends JavaFXCompletionEnvironment<Pa
             addLocalMembersAndVars(null);
             addValueKeywords();
         } else {
-            insideExpression(new TreePath(path, exp));
+            insideExpression(new JavaFXTreePath(path, exp));
         }
     }
 

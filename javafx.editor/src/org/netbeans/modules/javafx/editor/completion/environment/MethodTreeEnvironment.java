@@ -57,7 +57,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class MethodTreeEnvironment extends JavaFXCompletionEnvironment<MethodTree> {
+public class MethodTreeEnvironment extends JavaFXCompletionEnvironment{}/*<MethodTree> {
     
     private static final Logger logger = Logger.getLogger(MethodTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -131,3 +131,4 @@ public class MethodTreeEnvironment extends JavaFXCompletionEnvironment<MethodTre
         }
     }
 }
+*/

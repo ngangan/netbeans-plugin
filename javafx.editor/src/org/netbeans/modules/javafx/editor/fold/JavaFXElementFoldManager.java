@@ -43,16 +43,14 @@ package org.netbeans.modules.javafx.editor.fold;
 import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.SequenceExplicitTree;
-import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.SourcePositions;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -235,7 +233,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             
             long startTime = System.currentTimeMillis();
 
-            final CompilationUnitTree cu = info.getCompilationUnit();
+            final UnitTree cu = info.getCompilationUnit();
             final JavaFXElementFoldVisitor v = manager.new JavaFXElementFoldVisitor(info, cu, info.getTrees().getSourcePositions());
             
             scan(v, cu, null);
@@ -369,11 +367,11 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
 
         private List<FoldInfo> folds = new ArrayList<JavaFXElementFoldManager.FoldInfo>();
         private CompilationInfo info;
-        private CompilationUnitTree cu;
+        private UnitTree cu;
         private SourcePositions sp;
         private boolean stopped;
         
-        public JavaFXElementFoldVisitor(CompilationInfo info, CompilationUnitTree cu, SourcePositions sp) {
+        public JavaFXElementFoldVisitor(CompilationInfo info, UnitTree cu, SourcePositions sp) {
             this.info = info;
             this.cu = cu;
             this.sp = sp;
@@ -437,13 +435,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 //from TokenSequence, document probably changed, stop
                 stopped = true;
             }
-        }
-        
-        @Override
-        public Object visitMethod(MethodTree node, Object p) {
-            super.visitMethod(node, p);
-            handleTree(node.getBody(), node, false);
-            return null;
         }
 
         @Override
@@ -528,16 +519,9 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             handleTree(node, null, false);
             return null;
         }
-
-        @Override
-        public Object visitBlock(BlockTree node, Object p) {
-            super.visitBlock(node, p);
-            handleTree(node, null, false);
-            return null;
-        }
         
         @Override
-        public Object visitCompilationUnit(CompilationUnitTree node, Object p) {
+        public Object visitCompilationUnit(UnitTree node, Object p) {
             int importsStart = Integer.MAX_VALUE;
             int importsEnd   = -1;
             
@@ -628,7 +612,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         }
         
     }
-    public static int findBodyStart(final Tree cltree, final CompilationUnitTree cu, final SourcePositions positions, final Document doc) {
+    public static int findBodyStart(final Tree cltree, final UnitTree cu, final SourcePositions positions, final Document doc) {
         final int[] result = new int[1];
         
         doc.render(new Runnable() {
@@ -640,7 +624,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         return result[0];
     }
     
-    private static int findBodyStartImpl(Tree cltree, CompilationUnitTree cu, SourcePositions positions, Document doc) {
+    private static int findBodyStartImpl(Tree cltree, UnitTree cu, SourcePositions positions, Document doc) {
         int start = (int)positions.getStartPosition(cu, cltree);
         int end   = (int)positions.getEndPosition(cu, cltree);
         

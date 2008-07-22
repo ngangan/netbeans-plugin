@@ -39,11 +39,11 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,15 +56,15 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment<MethodInvocationTree> {
+public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment<FunctionInvocationTree> {
 
     private static final Logger logger = Logger.getLogger(MethodInvocationTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
     
     @Override
-    protected void inside(MethodInvocationTree t) throws IOException {
+    protected void inside(FunctionInvocationTree t) throws IOException {
         if (LOGGABLE) log("inside MethodInvocationTree " + t);
-        MethodInvocationTree mi = t;
+        FunctionInvocationTree mi = t;
         TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(mi, offset);
         if (ts == null || (ts.token().id() != JFXTokenId.LPAREN && ts.token().id() != JFXTokenId.COMMA)) {
             SourcePositions sp = getSourcePositions();
@@ -72,7 +72,7 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
             for (ExpressionTree arg : mi.getArguments()) {
                 int pos = (int) sp.getEndPosition(root, arg);
                 if (lastTokenEndOffset == pos) {
-                    insideExpression(new TreePath(path, arg));
+                    insideExpression(new JavaFXTreePath(path, arg));
                     break;
                 }
                 if (offset <= pos) {
@@ -88,9 +88,9 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
         addValueKeywords();
     }
 
-    private TypeMirror getSmartType(MethodInvocationTree mi) throws IOException {
+    private TypeMirror getSmartType(FunctionInvocationTree mi) throws IOException {
         Tree argType = getArgumentUpToPos(mi.getArguments(), (int) sourcePositions.getEndPosition(root, mi.getMethodSelect()), offset);
-        return argType != null ? controller.getTrees().getTypeMirror(new TreePath(path, argType)) : null;
+        return argType != null ? controller.getTrees().getTypeMirror(new JavaFXTreePath(path, argType)) : null;
     }
 
     private static void log(String s) {

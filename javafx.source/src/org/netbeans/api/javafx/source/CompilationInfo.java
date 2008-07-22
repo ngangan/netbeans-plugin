@@ -38,21 +38,19 @@
  */
 package org.netbeans.api.javafx.source;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.comp.JavafxEnter;
 import com.sun.tools.javafx.comp.JavafxEnv;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JFXUnit;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JavafxTreeScanner;
 import java.util.ArrayList;
@@ -114,37 +112,34 @@ public class CompilationInfo {
         return JavafxcTrees.instance(impl.getJavafxcTask());
     }
     // XXX: hack around lack of support in compiler
-    public TreePath getPath(Element e) {
+    public JavaFXTreePath getPath(Element e) {
         Symbol sym = (Symbol) e;
         JavafxEnter enter = JavafxEnter.instance(impl.getContext());
         JavafxEnv env = enter.getEnv(sym.enclClass());
         if (env == null) {
             return null;
         }
-        JCTree tree = declarationFor(sym, env.tree);
+        JFXTree tree = declarationFor(sym, env.tree);
         return tree == null ? null : getTrees().getPath(getCompilationUnit(), tree);
     }
 
-    private static JCTree declarationFor(final Symbol sym, final JCTree tree) {
+    private static JFXTree declarationFor(final Symbol sym, final JFXTree tree) {
 
         class DeclScanner extends JavafxTreeScanner {
 
-            JCTree result = null;
+            JFXTree result = null;
 
-            @Override
-            public void scan(JCTree tree) {
+            public @Override void scan(JFXTree tree) {
                 if (tree != null && result == null) {
                     tree.accept(this);
                 }
             }
 
-            public 
-            @Override
-            void visitTopLevel( JCCompilationUnit that) {
+            public @Override void visitUnit( JFXUnit that) {
                 if (that.packge == sym) {
                     result = that;
                 } else {
-                    super.visitTopLevel(that);
+                    super.visitUnit(that);
                 }
             }
 
@@ -160,16 +155,6 @@ public class CompilationInfo {
 
             public 
             @Override
-            void visitClassDef( JCClassDecl that) {
-                if (that.sym == sym) {
-                    result = that;
-                } else {
-                    super.visitClassDef(that);
-                }
-            }
-
-            public 
-            @Override
             void visitFunctionDefinition( JFXFunctionDefinition that) {
                 if (that.sym == sym) {
                     result = that;
@@ -178,15 +163,6 @@ public class CompilationInfo {
                 }
             }
 
-            public 
-            @Override
-            void visitMethodDef( JCMethodDecl that) {
-                if (that.sym == sym) {
-                    result = that;
-                } else {
-                    super.visitMethodDef(that);
-                }
-            }
 
             public 
             @Override
@@ -194,19 +170,10 @@ public class CompilationInfo {
                 if (that.sym == sym) {
                     result = that;
                 } else {
-                    super.visitVarDef(that);
+                    super.visitVar(that);
                 }
             }
 
-            public 
-            @Override
-            void visitVarDef( JCVariableDecl that) {
-                if (that.sym == sym) {
-                    result = that;
-                } else {
-                    super.visitVarDef(that);
-                }
-            }
         }
         DeclScanner s = new DeclScanner();
         tree.accept(s);
@@ -240,7 +207,7 @@ public class CompilationInfo {
      * 
      * @throws java.lang.IllegalStateException  when the phase is less than {@link JavaFXSource.Phase#PARSED}
      */
-    public CompilationUnitTree getCompilationUnit() {
+    public UnitTree getCompilationUnit() {
         return impl.getCompilationUnit();
 
     }
@@ -271,7 +238,7 @@ public class CompilationInfo {
 //            }
 //        }
 //        else {
-        CompilationUnitTree cu = getCompilationUnit();
+        UnitTree cu = getCompilationUnit();
         if (cu == null) {
             return null;
         }
@@ -279,9 +246,9 @@ public class CompilationInfo {
         final JavafxcTrees trees = getTrees();
         assert trees != null;
         List<? extends Tree> typeDecls = cu.getTypeDecls();
-        TreePath cuPath = new TreePath(cu);
+        JavaFXTreePath cuPath = new JavaFXTreePath(cu);
         for (Tree t : typeDecls) {
-            TreePath p = new TreePath(cuPath, t);
+            JavaFXTreePath p = new JavaFXTreePath(cuPath, t);
             Element e = trees.getElement(p);
             if (e != null && (e.getKind().isClass() || e.getKind().isInterface())) {
                 result.add((TypeElement) e);

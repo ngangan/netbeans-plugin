@@ -39,8 +39,8 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,13 +52,13 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<CompilationUnitTree> {
+public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<UnitTree> {
     
     private static final Logger logger = Logger.getLogger(FunctionDefinitionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(CompilationUnitTree t) throws IOException {
+    protected void inside(UnitTree t) throws IOException {
         if (LOGGABLE) log("inside CompilationUnitTree " + t);
         Tree pkg = root.getPackageName();
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {

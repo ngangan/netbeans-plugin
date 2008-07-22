@@ -38,12 +38,11 @@
  */
 package org.netbeans.modules.javafx.navigation;
 
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
@@ -108,31 +107,25 @@ public final class SpaceMagicUtils {
     public static List<Element> getSpiritualMembers(final CompilationInfo info) {
         final List<Element> elements = new ArrayList<Element>();
         final JavafxcTrees trees = info.getTrees();
-        final CompilationUnitTree cut = info.getCompilationUnit();
+        final UnitTree cut = info.getCompilationUnit();
         
         for (Tree tt : cut.getTypeDecls()) {
-            if (tt.getKind() == Tree.Kind.OTHER && tt instanceof JavaFXTree) {
-                JavaFXTree jfxtt = (JavaFXTree) tt;
-                JavaFXKind kk = jfxtt.getJavaFXKind();
-                if (kk == JavaFXKind.CLASS_DECLARATION) {
-                    JFXClassDeclaration cd = (JFXClassDeclaration) jfxtt;
-                    
-                    for (Tree jct : cd.getClassMembers()) {
-                        if (jct.getKind() == Tree.Kind.OTHER && jct instanceof JavaFXTree) {
-                            JavaFXTree jfxjct = (JavaFXTree) jct;
-                            JavaFXKind k = jfxjct.getJavaFXKind();
-                            if (k == JavaFXKind.FUNCTION_DEFINITION) {
-                                JFXFunctionDefinition fdt = (JFXFunctionDefinition) jfxjct;
-                                if (MAGIC_FUNCTION.equals(fdt.name.toString())) {
-                                    
-                                    for (StatementTree st : fdt.getBodyExpression().getStatements()) {
-                                        TreePath path = trees.getPath(cut, fdt);
-                                        TreePath expPath = new TreePath(path, st);
-                                        Element element = trees.getElement(expPath);
-                                        if (element != null) {
-                                            elements.add(element);
-                                        }
-                                    }
+            JavaFXKind kk = tt.getJavaFXKind();
+            if (kk == JavaFXKind.CLASS_DECLARATION) {
+                JFXClassDeclaration cd = (JFXClassDeclaration) tt;
+
+                for (Tree jct : cd.getClassMembers()) {
+                    JavaFXKind k = jct.getJavaFXKind();
+                    if (k == JavaFXKind.FUNCTION_DEFINITION) {
+                        JFXFunctionDefinition fdt = (JFXFunctionDefinition) jct;
+                        if (MAGIC_FUNCTION.equals(fdt.name.toString())) {
+
+                            for (ExpressionTree st : fdt.getBodyExpression().getStatements()) {
+                                JavaFXTreePath path = trees.getPath(cut, fdt);
+                                JavaFXTreePath expPath = new JavaFXTreePath(path, st);
+                                Element element = trees.getElement(expPath);
+                                if (element != null) {
+                                    elements.add(element);
                                 }
                             }
                         }

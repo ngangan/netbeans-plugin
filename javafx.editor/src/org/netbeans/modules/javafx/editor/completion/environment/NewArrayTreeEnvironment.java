@@ -54,7 +54,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class NewArrayTreeEnvironment extends JavaFXCompletionEnvironment<NewArrayTree> {
+public class NewArrayTreeEnvironment extends JavaFXCompletionEnvironment{}/*<NewArrayTree> {
     
     private static final Logger logger = Logger.getLogger(NewArrayTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -107,3 +107,4 @@ public class NewArrayTreeEnvironment extends JavaFXCompletionEnvironment<NewArra
         }
     }
 }
+*/

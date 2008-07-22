@@ -40,17 +40,13 @@
 package org.netbeans.api.javafx.source;
 
 import org.netbeans.modules.javafx.source.classpath.SourceFileObject;
-import com.sun.javafx.api.JavafxcTask;
-import com.sun.source.tree.CompilationUnitTree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.JavacFileManager;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,7 +62,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
@@ -218,11 +213,11 @@ public final class JavaFXSource {
             }
 
             long start = System.currentTimeMillis();
-            Iterable<? extends CompilationUnitTree> trees = cc.getJavafxcTask().parse();
+            Iterable<? extends UnitTree> trees = cc.getJavafxcTask().parse();
 //                new JavaFileObject[] {currentInfo.jfo});
-            Iterator<? extends CompilationUnitTree> it = trees.iterator();
+            Iterator<? extends UnitTree> it = trees.iterator();
             assert it.hasNext();
-            CompilationUnitTree unit = it.next();
+            UnitTree unit = it.next();
             cc.setCompilationUnit(unit);
             assert !it.hasNext();
             cc.setPhase(Phase.PARSED);

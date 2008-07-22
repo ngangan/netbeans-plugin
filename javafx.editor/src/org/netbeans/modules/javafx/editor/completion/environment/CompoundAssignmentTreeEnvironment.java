@@ -39,8 +39,8 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.CompoundAssignmentTree;
+import com.sun.javafx.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

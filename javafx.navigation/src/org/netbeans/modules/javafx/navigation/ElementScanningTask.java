@@ -40,19 +40,14 @@
  */
 package org.netbeans.modules.javafx.navigation;
 
-import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.JavaFXVariableTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
@@ -109,7 +104,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         rootDescription.subs = new HashSet<Description>();
 
         // Get all outerclasses in the Compilation unit
-        CompilationUnitTree cuTree = info.getCompilationUnit();
+        UnitTree cuTree = info.getCompilationUnit();
         List<? extends TypeElement> elements = info.getTopLevelElements();
 
         final Map<Element, Long> pos = new HashMap<Element, Long>();
@@ -158,7 +153,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         private final JavafxcTrees trees;
         private final SourcePositions sourcePositions;
         private final AtomicBoolean canceled;
-        private CompilationUnitTree cu;
+        private UnitTree cu;
 
         public PositionVisitor(final CompilationInfo info, final JavafxcTrees trees, final AtomicBoolean canceled) {
             assert trees != null;
@@ -170,39 +165,9 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         @Override
-        public Void visitCompilationUnit(CompilationUnitTree node, Map<Element, Long> p) {
+        public Void visitCompilationUnit(UnitTree node, Map<Element, Long> p) {
             this.cu = node;
             return super.visitCompilationUnit(node, p);
-        }
-
-        @Override
-        public Void visitClass(ClassTree node, Map<Element, Long> p) {
-            Element e = this.trees.getElement(this.getCurrentPath());
-            if (e != null) {
-                long pos = this.sourcePositions.getStartPosition(cu, node);
-                p.put(e, pos);
-            }
-            return super.visitClass(node, p);
-        }
-
-        @Override
-        public Void visitMethod(MethodTree node, Map<Element, Long> p) {
-            Element e = this.trees.getElement(this.getCurrentPath());
-            if (e != null) {
-                long pos = this.sourcePositions.getStartPosition(cu, node);
-                p.put(e, pos);
-            }
-            return null;
-        }
-
-        @Override
-        public Void visitVariable(VariableTree node, Map<Element, Long> p) {
-            Element e = this.trees.getElement(this.getCurrentPath());
-            if (e != null) {
-                long pos = this.sourcePositions.getStartPosition(cu, node);
-                p.put(e, pos);
-            }
-            return null;
         }
 
         @Override
@@ -226,7 +191,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 if (SpaceMagicUtils.isSpiritualMethod(e)) {
                     List<Element> spiritualMembers = SpaceMagicUtils.getSpiritualMembers(info);
                     for (Element sm : spiritualMembers) {
-                        TreePath smPath = info.getPath(sm);
+                        JavaFXTreePath smPath = info.getPath(sm);
                         Tree smTree = smPath != null ? smPath.getLeaf() : null;
 
                         if (smTree != null) {
@@ -240,7 +205,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         @Override
-        public Void visitVariable(JavaFXVariableTree node, Map<Element, Long> p) {
+        public Void visitVariable(VariableTree node, Map<Element, Long> p) {
             Element e = this.trees.getElement(this.getCurrentPath());
             if (e != null) {
                 long pos = this.sourcePositions.getStartPosition(cu, node);

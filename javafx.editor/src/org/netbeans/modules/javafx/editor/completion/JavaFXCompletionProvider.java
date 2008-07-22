@@ -41,10 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
-import com.sun.source.tree.*;
-import com.sun.source.util.*;
-
-
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -53,6 +50,8 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -89,13 +88,13 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         return theString.startsWith(prefix);
     }
     
-    public static TreePath getPathElementOfKind(Tree.Kind kind, TreePath path) {
+    public static JavaFXTreePath getPathElementOfKind(Tree.JavaFXKind kind, JavaFXTreePath path) {
         return getPathElementOfKind(EnumSet.of(kind), path);
     }
     
-    public static TreePath getPathElementOfKind(EnumSet<Tree.Kind> kinds, TreePath path) {
+    public static JavaFXTreePath getPathElementOfKind(EnumSet<Tree.JavaFXKind> kinds, JavaFXTreePath path) {
         while (path != null) {
-            if (kinds.contains(path.getLeaf().getKind()))
+            if (kinds.contains(path.getLeaf().getJavaFXKind()))
                 return path;
             path = path.getParentPath();
         }

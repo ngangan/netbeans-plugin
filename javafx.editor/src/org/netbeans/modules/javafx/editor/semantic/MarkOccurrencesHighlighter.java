@@ -40,18 +40,14 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.DoWhileLoopTree;
-import com.sun.source.tree.ForLoopTree;
-import com.sun.source.tree.LabeledStatementTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
-import com.sun.source.tree.WhileLoopTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.ForExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.WhileLoopTree;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -198,7 +194,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         OccurrencesMarkProvider.get(doc).setOccurrences(OccurrencesMarkProvider.createMarks(doc, bag, ES_COLOR, NbBundle.getMessage(MarkOccurrencesHighlighter.class, "LBL_ES_TOOLTIP")));
     }
     
-    private boolean isIn(CompilationUnitTree cu, SourcePositions sp, Tree tree, int position) {
+    private boolean isIn(UnitTree cu, SourcePositions sp, Tree tree, int position) {
         return sp.getStartPosition(cu, tree) <= position && position <= sp.getEndPosition(cu, tree);
     }
     
@@ -214,16 +210,17 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     
 //    List<int[]> processImpl(CompilationInfo info, Preferences node, Document doc, int caretPosition) {
     List<int[]> processImpl(CompilationInfo info, Document doc, int caretPosition) {
-        CompilationUnitTree cu = info.getCompilationUnit();
+        UnitTree cu = info.getCompilationUnit();
 //        TreePath tp = info.getTreeUtilities().pathFor(caretPosition);
         TreeUtilities tu = new TreeUtilities(info);
-        TreePath tp = tu.pathFor(caretPosition);
-        TreePath typePath = findTypePath(tp);
+        JavaFXTreePath tp = tu.pathFor(caretPosition);
+        JavaFXTreePath typePath = findTypePath(tp);
         
         if (isCancelled())
             return null;
         
         //detect caret inside the return type or throws clause:
+        /* XXX[pn]: couldn't work before. Did it?
         if (typePath != null && typePath.getParentPath().getLeaf().getKind() == Kind.METHOD) {
             //hopefully found something, check:
             MethodTree decl = (MethodTree) typePath.getParentPath().getLeaf();
@@ -258,7 +255,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                     }
                 }
             }
-        }
+        }*/
         
         if (isCancelled())
             return null;
@@ -266,7 +263,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 //        if (node.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true)) {
         if (true) {
             //detect caret inside the extends/implements clause:
-            if (typePath != null && typePath.getParentPath().getLeaf().getKind() == Kind.CLASS) {
+            /* XXX[pn]: couldn't work before. Did it? 
+             if (typePath != null && typePath.getParentPath().getLeaf().getKind() == Kind.CLASS) {
                 ClassTree ctree = (ClassTree) typePath.getParentPath().getLeaf();
                 int bodyStart = Utilities.findBodyStart(ctree, cu, info.getTrees().getSourcePositions(), doc);
                 
@@ -289,13 +287,14 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                     if (isClass(superType) && isClass(thisType))
                         return detectMethodsForClass(info, doc, typePath.getParentPath(), (TypeElement) superType, (TypeElement) thisType);
                 }
-            }
+            }*/
             
             if (isCancelled())
                 return null;
             
             TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
             
+            /* XXX[pn]: couldn't work before. Did it?
             if (ts != null && tp.getLeaf().getKind() == Kind.CLASS) {
                 int bodyStart = Utilities.findBodyStart(tp.getLeaf(), cu, info.getTrees().getSourcePositions(), doc);
                 
@@ -340,7 +339,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 //                        }
                     }
                 }
-            }
+            }*/
         }
         
         if (isCancelled())
@@ -349,7 +348,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         Tree tree = tp.getLeaf();
         
 //        if (node.getBoolean(MarkOccurencesSettings.BREAK_CONTINUE, true) && (tree.getKind() == Kind.BREAK || tree.getKind() == Kind.CONTINUE)) {
-        if ((tree.getKind() == Kind.BREAK || tree.getKind() == Kind.CONTINUE)) {
+        if ((tree.getJavaFXKind() == JavaFXKind.BREAK || tree.getJavaFXKind() == JavaFXKind.CONTINUE)) {
             return detectBreakOrContinueTarget(info, doc, tp);
         }
         
@@ -368,9 +367,9 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 //        }
         
         if (   el != null
-                && (!(tree.getKind() == Kind.CLASS) || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))
+                && (!(false/*tree.getKind() == Kind.CLASS*/) || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))
                 && !Utilities.isKeyword(tree)
-                && (!(tree.getKind() == Kind.METHOD) || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))
+                && (!(false/*tree.getKind() == Kind.METHOD*/) || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))
 //                && isEnabled(node, el)
 //                || (insideJavadoc && isEnabled(node, el))
                 ) {
@@ -393,13 +392,13 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return null;
     }
     
-    private static final Set<Kind> TYPE_PATH_ELEMENT = EnumSet.of(Kind.IDENTIFIER, Kind.PRIMITIVE_TYPE, Kind.PARAMETERIZED_TYPE, Kind.MEMBER_SELECT, Kind.ARRAY_TYPE);
+    private static final Set<JavaFXKind> TYPE_PATH_ELEMENT = EnumSet.of(JavaFXKind.IDENTIFIER, /*JavaFXKind.PRIMITIVE_TYPE, JavaFXKind.PARAMETERIZED_TYPE,*/ JavaFXKind.MEMBER_SELECT/*, JavaFXKind.ARRAY_TYPE*/);
     
-    private static TreePath findTypePath(TreePath tp) {
-        if (!TYPE_PATH_ELEMENT.contains(tp.getLeaf().getKind()))
+    private static JavaFXTreePath findTypePath(JavaFXTreePath tp) {
+        if (!TYPE_PATH_ELEMENT.contains(tp.getLeaf().getJavaFXKind()))
             return null;
         
-        while (TYPE_PATH_ELEMENT.contains(tp.getParentPath().getLeaf().getKind())) {
+        while (TYPE_PATH_ELEMENT.contains(tp.getParentPath().getLeaf().getJavaFXKind())) {
             tp = tp.getParentPath();
         }
         
@@ -472,13 +471,13 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         canceled = false;
     }
     
-    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, TreePath clazz, TypeElement superType, TypeElement thisType) {
+/*    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, JavaFXTreePath clazz, TypeElement superType, TypeElement thisType) {
         return detectMethodsForClass(info, document, clazz, Collections.singletonList(superType), thisType);
     }
     
 //    static Coloring MO = ColoringAttributes.add(ColoringAttributes.empty(), ColoringAttributes.MARK_OCCURRENCES);
     
-    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, TreePath clazz, List<TypeElement> superTypes, TypeElement thisType) {
+    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, JavaFXTreePath clazz, List<TypeElement> superTypes, TypeElement thisType) {
         List<int[]> highlights = new ArrayList<int[]>();
         ClassTree clazzTree = (ClassTree) clazz.getLeaf();
         TypeElement jlObject = info.getElements().getTypeElement("java.lang.Object");
@@ -511,11 +510,11 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         
         return highlights;
     }
-    
-    private List<int[]> detectBreakOrContinueTarget(CompilationInfo info, Document document, TreePath breakOrContinue) {
+  */  
+    private List<int[]> detectBreakOrContinueTarget(CompilationInfo info, Document document, JavaFXTreePath breakOrContinue) {
         List<int[]> result = new ArrayList<int[]>();
 //        StatementTree target = info.getTreeUtilities().getBreakContinueTarget(breakOrContinue);
-        StatementTree target = new TreeUtilities(info).getBreakContinueTarget(breakOrContinue);
+        ExpressionTree target = new TreeUtilities(info).getBreakContinueTarget(breakOrContinue);
         
         if (target == null)
             return null;
@@ -528,24 +527,19 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             result.add(new int[] {ts.offset(), ts.offset() + ts.token().length()});
         }
         
-        StatementTree statement = target.getKind() == Kind.LABELED_STATEMENT ? ((LabeledStatementTree) target).getStatement() : target;
+//        no labels:        
+//        StatementTree statement = target.getKind() == Kind.LABELED_STATEMENT ? ((LabeledStatementTree) target).getStatement() : target;
+        ExpressionTree statement = target;
         Tree block = null;
         
-        switch (statement.getKind()) {
-            case SWITCH:
-                block = statement;
-                break;
+        switch (statement.getJavaFXKind()) {
             case WHILE_LOOP:
-                if (((WhileLoopTree) statement).getStatement().getKind() == Kind.BLOCK)
+                if (((WhileLoopTree) statement).getStatement().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION)
                     block = ((WhileLoopTree) statement).getStatement();
                 break;
-            case FOR_LOOP:
-                if (((ForLoopTree) statement).getStatement().getKind() == Kind.BLOCK)
-                    block = ((ForLoopTree) statement).getStatement();
-                break;
-            case DO_WHILE_LOOP:
-                if (((DoWhileLoopTree) statement).getStatement().getKind() == Kind.BLOCK)
-                    block = ((DoWhileLoopTree) statement).getStatement();
+            case FOR_EXPRESSION_FOR:
+                if (((ForExpressionTree) statement).getBodyExpression().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION)
+                    block = ((ForExpressionTree) statement).getBodyExpression();
                 break;
         }
         

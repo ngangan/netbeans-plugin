@@ -39,9 +39,9 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.ModifiersTree;
+import com.sun.javafx.api.tree.Tree;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
@@ -90,15 +90,15 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
                     break;
             }
         }
-        TreePath parentPath = path.getParentPath();
+        JavaFXTreePath parentPath = path.getParentPath();
         Tree parent = parentPath.getLeaf();
-        TreePath grandParentPath = parentPath.getParentPath();
+        JavaFXTreePath grandParentPath = parentPath.getParentPath();
         Tree grandParent = grandParentPath != null ? grandParentPath.getLeaf() : null;
-        if (parent.getKind() == Tree.Kind.CLASS) {
+        if (parent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
             addClassModifiers(m);
-        } else if (parent.getKind() != Tree.Kind.VARIABLE || grandParent == null || grandParent.getKind() == Tree.Kind.CLASS) {
+        } else if (parent.getJavaFXKind() != Tree.JavaFXKind.VARIABLE || grandParent == null || grandParent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
             addMemberModifiers(m, false);
-        } else if (parent.getKind() == Tree.Kind.VARIABLE && grandParent.getKind() == Tree.Kind.METHOD) {
+        } else if (parent.getJavaFXKind() == Tree.JavaFXKind.VARIABLE && grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
             addMemberModifiers(m, true);
         } else {
             localResult(null);

@@ -39,7 +39,7 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -70,7 +70,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
             return null;
         }
         // note: this is probably wrong
-        TypeMirror type = controller.getTrees().getTypeMirror(new TreePath(path, t.getExpression()));
+        TypeMirror type = controller.getTrees().getTypeMirror(new JavaFXTreePath(path, t.getExpression()));
         // it should instead extract the name of the attribute and extract
         //   the type from the named attribute
         if (LOGGABLE) log("  smart == " + type);

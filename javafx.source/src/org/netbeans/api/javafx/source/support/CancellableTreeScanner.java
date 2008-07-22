@@ -40,15 +40,15 @@
  */
 package org.netbeans.api.javafx.source.support;
 
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreeScanner;
+import com.sun.javafx.api.tree.JavaFXTreeScanner;
+import com.sun.javafx.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
  * @author Jan Lahoda
  */
-public class CancellableTreeScanner<R,P> extends TreeScanner<R,P> {
+public class CancellableTreeScanner<R,P> extends JavaFXTreeScanner<R,P> {
 
     private final AtomicBoolean internalCanceled;
     private final AtomicBoolean canceled;

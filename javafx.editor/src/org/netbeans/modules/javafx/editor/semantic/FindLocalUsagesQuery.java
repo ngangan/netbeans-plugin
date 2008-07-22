@@ -43,14 +43,11 @@ package org.netbeans.modules.javafx.editor.semantic;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionValueTree;
-import com.sun.javafx.api.tree.JavaFXVariableTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.VariableTree;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -85,7 +82,7 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
         return usages;
     }
 
-    private void handlePotentialVariable(TreePath tree) {
+    private void handlePotentialVariable(JavaFXTreePath tree) {
         Element el = info.getTrees().getElement(tree);
         
         if (toFind.equals(el)) {
@@ -109,15 +106,6 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
     }
     
     @Override
-    public Void visitMethod(MethodTree tree, Stack<Tree> d) {
-        handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        handleJavadoc(el);
-        super.visitMethod(tree, d);
-        return null;
-    }
-    
-    @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree tree, Stack<Tree> d) {
         handlePotentialVariable(getCurrentPath());
 //        Element el = info.getTrees().getElement(getCurrentPath());
@@ -134,17 +122,6 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
     }
     
     @Override
-    public Void visitVariable(JavaFXVariableTree tree, Stack<Tree> d) {
-        handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        if (el != null && el.getKind().isField()) {
-//            handleJavadoc(el);
-//        }
-        super.visitVariable(tree, d);
-        return null;
-    }
-
-    @Override
     public Void visitVariable(VariableTree tree, Stack<Tree> d) {
         handlePotentialVariable(getCurrentPath());
 //        Element el = info.getTrees().getElement(getCurrentPath());
@@ -155,15 +132,6 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
         return null;
     }
     
-    @Override
-    public Void visitClass(ClassTree tree, Stack<Tree> d) {
-        handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        handleJavadoc(el);
-        super.visitClass(tree, d);
-        return null;
-    }
-
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree tree, Stack<Tree> d) {
         handlePotentialVariable(getCurrentPath());

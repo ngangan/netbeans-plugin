@@ -40,9 +40,9 @@
  */
 package org.netbeans.modules.javafx.navigation;
 
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.javafx.api.tree.JavaFXTree.JavaFXKind;
-import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.source.util.TreePath;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -129,7 +129,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         }
 
         // Find the TreePath for the caret position
-        TreePath tp = compilationInfo.getTreeUtilities().pathFor(lastPosition);
+        JavaFXTreePath tp = compilationInfo.getTreeUtilities().pathFor(lastPosition);
         // if cancelled, return
         if (isCancelled()) {
             return;
@@ -158,7 +158,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         canceled = false;
     }
 
-    private void updateNavigatorSelection(CompilationInfo ci, TreePath tp) {
+    private void updateNavigatorSelection(CompilationInfo ci, JavaFXTreePath tp) {
         // Try to find the declaration we are in
         final Element e = outerElement(ci, tp);
 
@@ -181,35 +181,28 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
     }
 
-    private static Element outerElement(CompilationInfo ci, TreePath tp) {
+    private static Element outerElement(CompilationInfo ci, JavaFXTreePath tp) {
         Element e = null;
 
         while (tp != null) {
             final Tree leaf = tp.getLeaf();
-            if (leaf.getKind() == Tree.Kind.OTHER && leaf instanceof JavaFXTree) {
-                final JavaFXKind jfxk = ((JavaFXTree) leaf).getJavaFXKind();
-                if (jfxk == JavaFXKind.CLASS_DECLARATION || jfxk == JavaFXKind.FUNCTION_DEFINITION) {
+            switch (leaf.getJavaFXKind()) {
+                case CLASS_DECLARATION:
+                case FUNCTION_DEFINITION:
+                case COMPILATION_UNIT:
                     e = ci.getTrees().getElement(tp);
-                }
-            } else {
-                switch (leaf.getKind()) {
-                    case METHOD:
-                    case CLASS:
-                    case COMPILATION_UNIT:
-                        e = ci.getTrees().getElement(tp);
-                        break;
-                    case VARIABLE:
-                        e = ci.getTrees().getElement(tp);
+                    break;
+                case VARIABLE:
+                    e = ci.getTrees().getElement(tp);
 
-                        if (SpaceMagicUtils.hasSpiritualInvocation(e)) {
-                            return e;
-                        }
-                        
-                        if (e != null && !e.getKind().isField()) {
-                            e = null;
-                        }
-                        break;
-                }
+                    if (SpaceMagicUtils.hasSpiritualInvocation(e)) {
+                        return e;
+                    }
+
+                    if (e != null && !e.getKind().isField()) {
+                        e = null;
+                    }
+                    break;
             }
             if (e != null) {
                 break;

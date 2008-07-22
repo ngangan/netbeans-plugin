@@ -53,7 +53,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class SwitchTreeEnvironment extends JavaFXCompletionEnvironment<SwitchTree> {
+public class SwitchTreeEnvironment extends JavaFXCompletionEnvironment{}/*<SwitchTree> {
     
     private static final Logger logger = Logger.getLogger(SwitchTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -88,3 +88,4 @@ public class SwitchTreeEnvironment extends JavaFXCompletionEnvironment<SwitchTre
         }
     }
 }
+*/

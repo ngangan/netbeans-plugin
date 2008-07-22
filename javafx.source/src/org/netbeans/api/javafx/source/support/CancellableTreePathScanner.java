@@ -41,7 +41,7 @@
 package org.netbeans.api.javafx.source.support;
 
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -84,7 +84,7 @@ public class CancellableTreePathScanner<R,P> extends JavaFXTreePathScanner<R,P> 
 
     /** @inheritDoc
      */
-    public R scan(Tree tree, P p) {
+    public @Override R scan(Tree tree, P p) {
         if (isCanceled())
             return null;
         
@@ -93,7 +93,7 @@ public class CancellableTreePathScanner<R,P> extends JavaFXTreePathScanner<R,P> 
 
     /** @inheritDoc
      */
-    public R scan(Iterable<? extends Tree> trees, P p) {
+    public @Override R scan(Iterable<? extends Tree> trees, P p) {
         if (isCanceled())
             return null;
         

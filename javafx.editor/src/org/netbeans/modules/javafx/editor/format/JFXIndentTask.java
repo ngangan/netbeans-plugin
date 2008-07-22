@@ -41,7 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.format;
 
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -281,7 +281,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                             log.info("The " + phase + " phase has been reached ... OK!");
                         final int offset = context.startOffset();
                         final TreeUtilities tu = controller.getTreeUtilities();
-                        final TreePath path = tu.pathFor(context.startOffset());
+                        final JavaFXTreePath path = tu.pathFor(context.startOffset());
                         final int position = (int) controller.getTrees().getSourcePositions()
                                 .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
                         int dot = offset == 0 ? 0 : position < 0 ? 0 : context.lineIndent(context.lineStartOffset(position));

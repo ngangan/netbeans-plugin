@@ -40,13 +40,11 @@
  */
 package org.netbeans.modules.javafx.debug;
 
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ActionMap;
@@ -199,7 +197,7 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
         }
 
         public void run(CompilationInfo info) {
-            manager.setRootContext(TreeNode.getTree(info, new TreePath(info.getCompilationUnit())));
+            manager.setRootContext(TreeNode.getTree(info, new JavaFXTreePath(info.getCompilationUnit())));
         }
         
     }

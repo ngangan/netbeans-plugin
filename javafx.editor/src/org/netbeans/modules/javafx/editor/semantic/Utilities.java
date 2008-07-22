@@ -40,18 +40,16 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.util.ArrayList;
@@ -103,14 +101,14 @@ public class Utilities {
     }
     
     private static Tree normalizeLastLeftTree(Tree lastLeft) {
-        while (lastLeft != null && lastLeft.getKind() == Kind.ARRAY_TYPE) {
+/*        while (lastLeft != null && lastLeft.getJavaFXKind() == JavaFXKind.ARRAY_TYPE) {
             lastLeft = ((ArrayTypeTree) lastLeft).getType();
         }
-        
+  */      
         return lastLeft;
     }
     
-    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, Tree decl, Tree lastLeft, List<? extends Tree> firstRight, String name, CompilationUnitTree cu, SourcePositions positions) {
+    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, Tree decl, Tree lastLeft, List<? extends Tree> firstRight, String name, UnitTree cu, SourcePositions positions) {
         int declStart = (int) positions.getStartPosition(cu, decl);
         
         lastLeft = normalizeLastLeftTree(lastLeft);
@@ -151,7 +149,7 @@ public class Utilities {
         return findTokenWithText(info, name, start, end);
     }
     
-    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, MemberSelectTree tree, CompilationUnitTree cu, SourcePositions positions) {
+    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, MemberSelectTree tree, UnitTree cu, SourcePositions positions) {
         int start = (int)positions.getStartPosition(cu, tree);
         int endPosition = (int)positions.getEndPosition(cu, tree);
         
@@ -181,46 +179,30 @@ public class Utilities {
         return null;
     }
     
-    private static final Map<Class, List<Kind>> class2Kind;
+    private static final Map<Class, List<JavaFXKind>> class2Kind;
     
     static {
-        class2Kind = new HashMap<Class, List<Kind>>();
+        class2Kind = new HashMap<Class, List<JavaFXKind>>();
         
-        for (Kind k : Kind.values()) {
+        for (JavaFXKind k : JavaFXKind.values()) {
             Class c = k.asInterface();
-            List<Kind> kinds = class2Kind.get(c);
+            List<JavaFXKind> kinds = class2Kind.get(c);
             
             if (kinds == null) {
-                class2Kind.put(c, kinds = new ArrayList<Kind>());
+                class2Kind.put(c, kinds = new ArrayList<JavaFXKind>());
             }
             
             kinds.add(k);
         }
     }
     
-    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, TreePath decl) {
+    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, JavaFXTreePath decl) {
         TreeUtilities tu = new TreeUtilities(info);
         if (tu.isSynthetic(decl))
             return null;
         
         Tree leaf = decl.getLeaf();
-        
-        if (class2Kind.get(MethodTree.class).contains(leaf.getKind())) {
-            MethodTree method = (MethodTree) leaf;
-            List<Tree> rightTrees = new ArrayList<Tree>();
-
-            rightTrees.addAll(method.getParameters());
-            rightTrees.addAll(method.getThrows());
-            rightTrees.add(method.getBody());
-
-            Name name = method.getName();
-            
-            if (method.getReturnType() == null)
-                name = ((ClassTree) decl.getParentPath().getLeaf()).getSimpleName();
-            
-            return findIdentifierSpanImpl(info, leaf, method.getReturnType(), rightTrees, name.toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
-        }
-        
+                
         if (leaf instanceof JFXFunctionDefinition) {
             // XXX: should use FunctionDefinitionTree, but it lacks the API
             JFXFunctionDefinition function = (JFXFunctionDefinition) leaf;
@@ -233,12 +215,12 @@ public class Utilities {
             Name name = function.getName();
 
             if (function.getJFXReturnType() == null)
-                name = ((ClassTree) decl.getParentPath().getLeaf()).getSimpleName();
+                name = ((ClassDeclarationTree) decl.getParentPath().getLeaf()).getSimpleName();
 
             return findIdentifierSpanImpl(info, leaf, function.getJFXReturnType(), rightTrees, name.toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
-        if (class2Kind.get(VariableTree.class).contains(leaf.getKind())) {
+        if (class2Kind.get(VariableTree.class).contains(leaf.getJavaFXKind())) {
             VariableTree var = (VariableTree) leaf;
             List<Tree> rightTrees = new ArrayList<Tree>();
 
@@ -249,18 +231,18 @@ public class Utilities {
             return findIdentifierSpanImpl(info, leaf, var.getModifiers(), rightTrees, var.getName().toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
-        if (class2Kind.get(MemberSelectTree.class).contains(leaf.getKind())) {
+        if (class2Kind.get(MemberSelectTree.class).contains(leaf.getJavaFXKind())) {
             return findIdentifierSpanImpl(info, (MemberSelectTree) leaf, info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
-        if (class2Kind.get(ClassTree.class).contains(leaf.getKind())) {
-            String name = ((ClassTree) leaf).getSimpleName().toString();
+        if (class2Kind.get(ClassDeclarationTree.class).contains(leaf.getJavaFXKind())) {
+            String name = ((ClassDeclarationTree) leaf).getSimpleName().toString();
             
             if (name.length() == 0)
                 return null;
             
             SourcePositions positions = info.getTrees().getSourcePositions();
-            CompilationUnitTree cu = info.getCompilationUnit();
+            UnitTree cu = info.getCompilationUnit();
             int start = (int)positions.getStartPosition(cu, leaf);
             int end   = (int)positions.getEndPosition(cu, leaf);
             
@@ -272,14 +254,14 @@ public class Utilities {
         }
         
         
-        if (leaf instanceof JavaFXTree && JavaFXTree.JavaFXKind.CLASS_DECLARATION == ((JavaFXTree)leaf).getJavaFXKind()) {
+        if (JavaFXKind.CLASS_DECLARATION == leaf.getJavaFXKind()) {
             String name = ((JFXClassDeclaration) leaf).getName().toString();
             
             if (name.length() == 0)
                 return null;
             
             SourcePositions positions = info.getTrees().getSourcePositions();
-            CompilationUnitTree cu = info.getCompilationUnit();
+            UnitTree cu = info.getCompilationUnit();
             int start = (int)positions.getStartPosition(cu, leaf);
             int end   = (int)positions.getEndPosition(cu, leaf);
             
@@ -293,7 +275,7 @@ public class Utilities {
         throw new IllegalArgumentException("Only MethodDecl, VariableDecl and ClassDecl are accepted by this method.");
     }
 
-    public static int[] findIdentifierSpan( final TreePath decl, final CompilationInfo info, final Document doc) {
+    public static int[] findIdentifierSpan( final JavaFXTreePath decl, final CompilationInfo info, final Document doc) {
         final int[] result = new int[] {-1, -1};
         doc.render(new Runnable() {
             public void run() {
@@ -308,7 +290,7 @@ public class Utilities {
         return result;
     }
     
-    public static Token<JFXTokenId> findIdentifierSpan(final CompilationInfo info, final Document doc, final TreePath decl) {
+    public static Token<JFXTokenId> findIdentifierSpan(final CompilationInfo info, final Document doc, final JavaFXTreePath decl) {
         @SuppressWarnings("unchecked")
         final Token<JFXTokenId>[] result = new Token[1];
         doc.render(new Runnable() {
@@ -320,7 +302,7 @@ public class Utilities {
         return result[0];
     }
     
-    private static int findBodyStartImpl(Tree cltree, CompilationUnitTree cu, SourcePositions positions, Document doc) {
+    private static int findBodyStartImpl(Tree cltree, UnitTree cu, SourcePositions positions, Document doc) {
         int start = (int)positions.getStartPosition(cu, cltree);
         int end   = (int)positions.getEndPosition(cu, cltree);
         
@@ -358,9 +340,9 @@ public class Utilities {
         return (-1);
     }
     
-    public static int findBodyStart(final Tree cltree, final CompilationUnitTree cu, final SourcePositions positions, final Document doc) {
-        Kind kind = cltree.getKind();
-        if (kind != Kind.CLASS && kind != Kind.METHOD)
+    public static int findBodyStart(final Tree cltree, final UnitTree cu, final SourcePositions positions, final Document doc) {
+        JavaFXKind kind = cltree.getJavaFXKind();
+        if (kind != JavaFXKind.CLASS_DECLARATION && kind != JavaFXKind.FUNCTION_DEFINITION)
             throw new IllegalArgumentException("Unsupported kind: "+ kind);
         final int[] result = new int[1];
         
@@ -373,7 +355,7 @@ public class Utilities {
         return result[0];
     }
     
-    private static int findLastBracketImpl(MethodTree tree, CompilationUnitTree cu, SourcePositions positions, Document doc) {
+    private static int findLastBracketImpl(FunctionDefinitionTree tree, UnitTree cu, SourcePositions positions, Document doc) {
         int start = (int)positions.getStartPosition(cu, tree);
         int end   = (int)positions.getEndPosition(cu, tree);
         
@@ -405,7 +387,7 @@ public class Utilities {
         return (-1);
     }
     
-    public static int findLastBracket(final MethodTree tree, final CompilationUnitTree cu, final SourcePositions positions, final Document doc) {
+    public static int findLastBracket(final FunctionDefinitionTree tree, final UnitTree cu, final SourcePositions positions, final Document doc) {
         final int[] result = new int[1];
         
         doc.render(new Runnable() {
@@ -417,15 +399,14 @@ public class Utilities {
         return result[0];
     }
     
-    private static Token<JFXTokenId> createHighlightImpl(CompilationInfo info, Document doc, TreePath tree) {
+    private static Token<JFXTokenId> createHighlightImpl(CompilationInfo info, Document doc, JavaFXTreePath tree) {
         Tree leaf = tree.getLeaf();
 //        SourcePositions positions = info.getTrees().getSourcePositions();
 //        CompilationUnitTree cu = info.getCompilationUnit();
         
         //XXX: do not use instanceof:
-        if (leaf instanceof MethodTree || 
-                leaf instanceof VariableTree || 
-                leaf instanceof ClassTree || 
+        if (leaf instanceof VariableTree || 
+/*                leaf instanceof ClassTree || */
                 leaf instanceof JFXClassDeclaration || 
                 leaf instanceof JFXFunctionDefinition || 
                 leaf instanceof MemberSelectTree) {
@@ -453,7 +434,7 @@ public class Utilities {
         return null;
     }
     
-    public static Token<JFXTokenId> getToken(final CompilationInfo info, final Document doc, final TreePath tree) {
+    public static Token<JFXTokenId> getToken(final CompilationInfo info, final Document doc, final JavaFXTreePath tree) {
         @SuppressWarnings("unchecked")
         final Token<JFXTokenId>[] result = new Token[1];
         
@@ -480,10 +461,10 @@ public class Utilities {
     }
     
     public static boolean isKeyword(Tree tree) {
-        if (tree.getKind() == Kind.IDENTIFIER) {
+        if (tree.getJavaFXKind() == JavaFXKind.IDENTIFIER) {
             return keywords.contains(((IdentifierTree) tree).getName().toString());
         }
-        if (tree.getKind() == Kind.MEMBER_SELECT) {
+        if (tree.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) {
             return keywords.contains(((MemberSelectTree) tree).getIdentifier().toString());
         }
         

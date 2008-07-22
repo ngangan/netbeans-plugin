@@ -54,7 +54,7 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  *
  * @author David Strupl
  */
-public class BlockEnvironment extends JavaFXCompletionEnvironment<BlockTree> {
+public class BlockEnvironment extends JavaFXCompletionEnvironment{}/*<BlockTree> {
     
     private static final Logger logger = Logger.getLogger(BlockEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -89,3 +89,4 @@ public class BlockEnvironment extends JavaFXCompletionEnvironment<BlockTree> {
         }
     }
 }
+*/

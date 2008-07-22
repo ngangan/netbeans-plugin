@@ -38,10 +38,9 @@
  */
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.File;
 import java.io.IOException;
@@ -93,11 +92,11 @@ public class JavaFXSourceUtils {
                         TypeElement fxapplet = elements.getTypeElement("javafx.ui.Applet");     //NOI18N
                         TypeElement applet = elements.getTypeElement("java.applet.Applet");     //NOI18N
                         TypeElement japplet = elements.getTypeElement("javax.swing.JApplet");   //NOI18N
-                        CompilationUnitTree cu = control.getCompilationUnit();
+                        UnitTree cu = control.getCompilationUnit();
                         List<? extends Tree> topLevels = cu.getTypeDecls();
                         for (Tree topLevel : topLevels) {
-                            if (((JavaFXTree) topLevel).getJavaFXKind() == JavaFXTree.JavaFXKind.CLASS_DECLARATION) {
-                                TypeElement type = (TypeElement) trees.getElement(TreePath.getPath(cu, topLevel));
+                            if (((Tree) topLevel).getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+                                TypeElement type = (TypeElement) trees.getElement(JavaFXTreePath.getPath(cu, topLevel));
                                 if (type != null) {
                                     Set<Modifier> modifiers = type.getModifiers();
                                     if (modifiers.contains(Modifier.PUBLIC) &&

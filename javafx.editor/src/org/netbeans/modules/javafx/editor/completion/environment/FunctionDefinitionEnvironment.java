@@ -39,16 +39,16 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TryTree;
-import com.sun.source.util.TreePath;
-import com.sun.tools.javac.tree.JCTree.JCStatement;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXType;
 import com.sun.tools.javafx.tree.JFXVar;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Modifier;
@@ -100,7 +100,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             }
         } else if (retType != null && headerText.trim().length() == 0) {
             if (LOGGABLE) log("  insideExpression for retType:");
-            insideExpression(new TreePath(path, retType));
+            insideExpression(new JavaFXTreePath(path, retType));
             return;
         }
         int bodyPos = (int) sourcePositions.getStartPosition(root, def.getBodyExpression());
@@ -110,9 +110,9 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             insideFunctionBlock(def.getBodyExpression().getStatements());
         } 
     }
-    void insideFunctionBlock(com.sun.tools.javac.util.List<JCStatement> statements) throws IOException {
-        StatementTree last = null;
-        for (StatementTree stat : statements) {
+    void insideFunctionBlock(List<ExpressionTree> statements) throws IOException {
+        ExpressionTree last = null;
+        for (ExpressionTree stat : statements) {
             int pos = (int) sourcePositions.getStartPosition(root, stat);
             if (pos == Diagnostic.NOPOS || offset <= pos) {
                 break;
@@ -120,7 +120,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             last = stat;
         }
         if (last == null) {
-        } else if (last.getKind() == Tree.Kind.TRY) {
+        } else if (last.getJavaFXKind() == Tree.JavaFXKind.TRY) {
             if (((TryTree) last).getFinallyBlock() == null) {
                 addKeyword(CATCH_KEYWORD, null, false);
                 addKeyword(FINALLY_KEYWORD, null, false);

@@ -40,6 +40,7 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javafx.api.JavafxcTask;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
@@ -62,7 +63,7 @@ class CompilationInfoImpl {
     static final Logger LOGGER = Logger.getLogger(CompilationInfoImpl.class.getName());
     
     JavaFXSource.Phase phase = JavaFXSource.Phase.MODIFIED;
-    private CompilationUnitTree compilationUnit;    
+    private UnitTree compilationUnit;    
 
     private JavafxcTaskImpl cTask;
     final JavaFXSource source;
@@ -88,7 +89,7 @@ class CompilationInfoImpl {
      * 
      * @throws java.lang.IllegalStateException  when the phase is less than {@link JavaFXSource.Phase#PARSED}
      */
-    CompilationUnitTree getCompilationUnit() {
+    UnitTree getCompilationUnit() {
 //        if (this.jfo == null) {
 //            throw new IllegalStateException ();
 //        }
@@ -139,7 +140,7 @@ class CompilationInfoImpl {
         this.phase = phase;
     }
 
-    void setCompilationUnit(CompilationUnitTree compilationUnit) {
+    void setCompilationUnit(UnitTree compilationUnit) {
         assert this.compilationUnit == null;
         this.compilationUnit = compilationUnit;
     }

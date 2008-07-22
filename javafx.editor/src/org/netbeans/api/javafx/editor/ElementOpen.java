@@ -38,10 +38,10 @@
  */
 package org.netbeans.api.javafx.editor;
 
-import org.netbeans.modules.javafx.editor.*;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
+import org.netbeans.modules.javafx.editor.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -101,7 +101,7 @@ public final class ElementOpen {
                 }
                 System.err.println("real=" + real);
 
-                TreePath elpath = controller.getPath(real);
+                JavaFXTreePath elpath = controller.getPath(real);
                 Tree tree = elpath != null ? elpath.getLeaf() : null;
 
                 if (tree != null) {

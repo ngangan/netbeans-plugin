@@ -39,11 +39,10 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.ErroneousTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.ErroneousTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.VariableTree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,9 +66,9 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
     protected void inside(VariableTree t) throws IOException {
         if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset);
         VariableTree var = t;
-        boolean isLocal = path.getParentPath().getLeaf().getKind() != Tree.Kind.CLASS;
+        boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
         Tree type = var.getType();
-        int typePos = type.getKind() == Tree.Kind.ERRONEOUS && ((ErroneousTree) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+        int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((ErroneousTree) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos);
         if (offset <= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
@@ -93,7 +92,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             if (LOGGABLE) log("  getSmartType no initializer");
             return null;
         }
-        final TreePath treePath = new TreePath(path, t.getInitializer());
+        final JavaFXTreePath treePath = new JavaFXTreePath(path, t.getInitializer());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type);
         if (type == null) {

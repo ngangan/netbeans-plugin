@@ -39,12 +39,12 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.logging.Level;
@@ -105,7 +105,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         }
         if (!afterDot) {
             if (expEndPos <= offset) {
-                insideExpression(new TreePath(path, fa.getExpression()));
+                insideExpression(new JavaFXTreePath(path, fa.getExpression()));
             }
             addPackages("");
             if (LOGGABLE) log("  returning as afterDot==false");
@@ -113,16 +113,17 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         }
 
         if (lastNonWhitespaceTokenId != JFXTokenId.STAR) {
-            TreePath parentPath = path.getParentPath();
+            JavaFXTreePath parentPath = path.getParentPath();
             Tree parent = parentPath != null ? parentPath.getLeaf() : null;
             if (LOGGABLE) log("  parent == " + parent);
             ExpressionTree exp = fa.getExpression();
             if (LOGGABLE) log("   exp == " + exp);
-            TreePath expPath = new TreePath(path, exp);
+            JavaFXTreePath expPath = new JavaFXTreePath(path, exp);
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
             if (LOGGABLE) log("   type == " + type);
             if (type != null) {
-                if (parent.getKind() == Tree.Kind.METHOD && ((MethodTree)parent).getDefaultValue() == fa) {
+                /* XXX[pn]: getDefaultValue -> annotation -> not in JavaFX
+                if (parent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((FunctionDefinitionTree)parent).getDefaultValue() == fa) {
                     if (LOGGABLE) log("   inside method");
                     Element el = controller.getTrees().getElement(expPath);
                     if (type.getKind() == TypeKind.ERROR && el.getKind().isClass()) {
@@ -134,7 +135,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     else if (type.getKind() == TypeKind.DECLARED)
                         addMemberConstantsAndTypes((DeclaredType)type, el);
                     return;
-                }
+                }*/
                 if (LOGGABLE) log("   type.getKind() == " + type.getKind());
                 switch (type.getKind()) {
                     case TYPEVAR:
@@ -175,7 +176,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                             }
                         }
                 }
-            } else if (parent.getKind() == Tree.Kind.COMPILATION_UNIT && ((CompilationUnitTree)parent).getPackageName() == fa) {
+            } else if (parent.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT && ((UnitTree)parent).getPackageName() == fa) {
                 PackageElement pe = controller.getElements().getPackageElement(fullName(exp));
                 if (pe != null) {
                     addPackageContent(pe, EnumSet.of(ElementKind.PACKAGE), null, false);

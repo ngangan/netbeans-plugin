@@ -49,7 +49,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class IfTreeEnvironment extends JavaFXCompletionEnvironment<IfTree> {
+public class IfTreeEnvironment extends JavaFXCompletionEnvironment{}/*<IfTree> {
     
     private static final Logger logger = Logger.getLogger(IfTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -71,3 +71,4 @@ public class IfTreeEnvironment extends JavaFXCompletionEnvironment<IfTree> {
         }
     }
 }
+*/

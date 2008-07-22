@@ -40,7 +40,7 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
-import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
