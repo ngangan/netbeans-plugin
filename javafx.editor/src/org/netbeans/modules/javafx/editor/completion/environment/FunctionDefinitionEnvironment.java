@@ -47,14 +47,10 @@ import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXType;
 import com.sun.tools.javafx.tree.JFXVar;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 

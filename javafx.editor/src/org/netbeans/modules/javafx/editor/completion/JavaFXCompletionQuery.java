@@ -432,33 +432,12 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case IMPORT:
                     result = new ImportTreeEnvironment();
                     break;
-/*                case CLASS:
-                    result = new ClassTreeEnvironment();
-                    break;*/
                 case VARIABLE:
                     result = new VariableTreeEnvironment();
                     break;
-/*                case METHOD:
-                    result = new MethodTreeEnvironment();
-                    break;*/
                 case MODIFIERS:
                     result = new ModifiersTreeEnvironment();
                     break;
-/*                case ANNOTATION:
-                    break;
-                case TYPE_PARAMETER:
-                    break;
-                case PARAMETERIZED_TYPE:
-                    break;
-                case UNBOUNDED_WILDCARD:
-                case EXTENDS_WILDCARD:
-                case SUPER_WILDCARD:
-                    TreePath parentPath = path.getParentPath();
-
-                    break;*/
-/*                case BLOCK:
-                    result = new BlockEnvironment();
-                    break;*/
                 case MEMBER_SELECT:
                     result = new MemberSelectTreeEnvironment();
                     break;
@@ -467,28 +446,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                     break;
                 case INSTANTIATE_NEW:
                     break;
-/*                case NEW_CLASS:
-                    break;
-                case ASSERT:*/
                 case RETURN:
                 case THROW:
                     break;
                 case CATCH:
                     break;
-/*                case IF: XXX[pn]: CONDITIONAL_EXPRESSION branch should handle this!
-                    result = new IfTreeEnvironment();
-                    break;*/
                 case WHILE_LOOP:
                     result = new WhileLoopTreeEnvironment();
                     break;
-/*                case FOR_LOOP:
-                    break;
-                case SWITCH:
-                    result = new SwitchTreeEnvironment();
-                    break;
-                case CASE:
-                    result = new CaseTreeEnvironment();
-                    break;*/
                 case PARENTHESIZED:
                     result = new ParenthesizedTreeEnvironment();
                     break;
@@ -497,12 +462,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case INSTANCE_OF:
                     result = new InstanceOfTreeEnvironment();
                     break;
-/*                case ARRAY_ACCESS:
-                    result = new ArrayAccessTreeEnvironment();
-                    break;
-                case NEW_ARRAY:
-                    result = new NewArrayTreeEnvironment();
-                    break;*/
                 case ASSIGNMENT:
                     result = new AssignmentTreeEnvironment();
                     break;
@@ -511,9 +470,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case REMAINDER_ASSIGNMENT:
                 case PLUS_ASSIGNMENT:
                 case MINUS_ASSIGNMENT:
-/*                case LEFT_SHIFT_ASSIGNMENT:
-                case RIGHT_SHIFT_ASSIGNMENT:
-                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:*/
                 case AND_ASSIGNMENT:
                 case XOR_ASSIGNMENT:
                 case OR_ASSIGNMENT:
@@ -534,7 +490,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case EQUAL_TO:
                 case GREATER_THAN:
                 case GREATER_THAN_EQUAL:
-//                case LEFT_SHIFT:
                 case LESS_THAN:
                 case LESS_THAN_EQUAL:
                 case MINUS:
@@ -543,17 +498,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 case OR:
                 case PLUS:
                 case REMAINDER:
-//                case RIGHT_SHIFT:
-//                case UNSIGNED_RIGHT_SHIFT:
                 case XOR:
                     result = new BinaryTreeEnvironment();
                     break;
                 case CONDITIONAL_EXPRESSION:
                     break;
-/*                case EXPRESSION_STATEMENT:
-                    // ???
-                    break;
-*/
                 case BIND_EXPRESSION:
                     break;
                 case BLOCK_EXPRESSION:
@@ -607,8 +556,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                     break;
                 case SEQUENCE_SLICE:
                     break;
-/*                case SET_ATTRIBUTE_TO_OBJECT:
-                    break;*/
                 case STRING_EXPRESSION:
                     result = new StringExpressionEnvironment();
                     break;
