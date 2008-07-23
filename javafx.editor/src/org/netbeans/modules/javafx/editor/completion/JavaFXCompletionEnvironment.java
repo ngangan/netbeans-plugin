@@ -376,7 +376,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     String s = fetic.getVariable().getName().toString();
                     if (LOGGABLE) log("    adding(2) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, fetic));
-                    if (smart != null && tm.getKind() == smart.getKind()) {
+                    if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(s, offset, true));
                     }
                     if (JavaFXCompletionProvider.startsWith(s, prefix)) {
