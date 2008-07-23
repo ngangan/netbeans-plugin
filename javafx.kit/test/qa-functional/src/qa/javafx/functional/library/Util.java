@@ -15,11 +15,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import javax.swing.JButton;
+import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 import org.netbeans.jellytools.MainWindowOperator;
-import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.JProgressBarOperator;
 
@@ -199,6 +200,14 @@ public class Util {
                 JTextComponent textComponent = (JTextComponent) comp;
                 System.out.println(blank + "[text]");
                 System.out.println(textComponent.getText());
+            } else if (comp instanceof JList) {
+                JList list = (JList) comp;
+                
+                ListModel model = list.getModel();
+                for(int i =0; i < model.getSize(); i++ ){
+                    System.out.println(blank + "[list] " + i + ", " + model.getElementAt(i) );
+                }
+                
             } else if (comp instanceof JTable) {
                 JTable table = (JTable) comp;
                 TableModel tableModel = table.getModel();
