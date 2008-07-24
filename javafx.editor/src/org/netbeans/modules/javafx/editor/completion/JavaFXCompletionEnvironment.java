@@ -150,7 +150,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * This method should be overriden in subclasses
      */
     protected void inside(T t) throws IOException {
-        if (LOGGABLE) log("NOT IMPLEMENTED inside " + t);
+        if (LOGGABLE) log("NOT IMPLEMENTED " + t.getJavaFXKind() + " inside " + t);
     }
 
     public int getOffset() {

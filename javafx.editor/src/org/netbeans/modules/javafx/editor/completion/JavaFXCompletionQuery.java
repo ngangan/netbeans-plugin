@@ -423,158 +423,158 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
         JavaFXCompletionEnvironment result = null;
-            JavaFXKind k = t.getJavaFXKind();
-            if (LOGGABLE) log("JavaFXKind: " + k);
-            switch (k) {
-                case COMPILATION_UNIT:
-                    result = new CompilationUnitEnvironment();
-                    break;
-                case IMPORT:
-                    result = new ImportTreeEnvironment();
-                    break;
-                case VARIABLE:
-                    result = new VariableTreeEnvironment();
-                    break;
-                case MODIFIERS:
-                    result = new ModifiersTreeEnvironment();
-                    break;
-                case MEMBER_SELECT:
-                    result = new MemberSelectTreeEnvironment();
-                    break;
-                case METHOD_INVOCATION:
-                    result = new MethodInvocationTreeEnvironment();
-                    break;
-                case INSTANTIATE_NEW:
-                    break;
-                case RETURN:
-                case THROW:
-                    break;
-                case CATCH:
-                    break;
-                case WHILE_LOOP:
-                    result = new WhileLoopTreeEnvironment();
-                    break;
-                case PARENTHESIZED:
-                    result = new ParenthesizedTreeEnvironment();
-                    break;
-                case TYPE_CAST:
-                    break;
-                case INSTANCE_OF:
-                    result = new InstanceOfTreeEnvironment();
-                    break;
-                case ASSIGNMENT:
-                    result = new AssignmentTreeEnvironment();
-                    break;
-                case MULTIPLY_ASSIGNMENT:
-                case DIVIDE_ASSIGNMENT:
-                case REMAINDER_ASSIGNMENT:
-                case PLUS_ASSIGNMENT:
-                case MINUS_ASSIGNMENT:
-                case AND_ASSIGNMENT:
-                case XOR_ASSIGNMENT:
-                case OR_ASSIGNMENT:
-                    result = new CompoundAssignmentTreeEnvironment();
-                    break;
-                case PREFIX_INCREMENT:
-                case PREFIX_DECREMENT:
-                case UNARY_PLUS:
-                case UNARY_MINUS:
-                case BITWISE_COMPLEMENT:
-                case LOGICAL_COMPLEMENT:
-                    // TODO: ???
-                    break;
-                case AND:
-                case CONDITIONAL_AND:
-                case CONDITIONAL_OR:
-                case DIVIDE:
-                case EQUAL_TO:
-                case GREATER_THAN:
-                case GREATER_THAN_EQUAL:
-                case LESS_THAN:
-                case LESS_THAN_EQUAL:
-                case MINUS:
-                case MULTIPLY:
-                case NOT_EQUAL_TO:
-                case OR:
-                case PLUS:
-                case REMAINDER:
-                case XOR:
-                    result = new BinaryTreeEnvironment();
-                    break;
-                case CONDITIONAL_EXPRESSION:
-                    break;
-                case BIND_EXPRESSION:
-                    break;
-                case BLOCK_EXPRESSION:
-                    result = new BlockExpressionEnvironment();
-                    break;
-                case CLASS_DECLARATION:
-                    result = new ClassDeclarationEnvironment();
-                    break;
-                case FOR_EXPRESSION_FOR:
-                    result = new ForExpressionEnvironment();
-                    break;
-                case FOR_EXPRESSION_IN_CLAUSE:
-                    result = new ForExpressionInClauseEnvironment();
-                    break;
-                case FUNCTION_DEFINITION:
-                    result = new FunctionDefinitionEnvironment();
-                    break;
-                case FUNCTION_VALUE:
-                    break;
-                case INIT_DEFINITION:
-                    break;
-                case INSTANTIATE_OBJECT_LITERAL:
-                    result = new InstantiateEnvironment();
-                    break;
-                case INTERPOLATE:
-                    break;
-                case INTERPOLATE_VALUE:
-                    break;
-                case KEYFRAME_LITERAL:
-                    break;
-                case OBJECT_LITERAL_PART:
-                    result = new ObjectLiteralPartEnvironment();
-                    break;
-                case ON_REPLACE:
-                    break;
-                case POSTINIT_DEFINITION:
-                    break;
-                case SEQUENCE_DELETE:
-                    break;
-                case SEQUENCE_EMPTY:
-                    result = new SequenceEmptyEnvironment();
-                    break;
-                case SEQUENCE_EXPLICIT:
-                    result = new SequenceExplicitEnvironment();
-                    break;
-                case SEQUENCE_INDEXED:
-                    break;
-                case SEQUENCE_INSERT:
-                    break;
-                case SEQUENCE_RANGE:
-                    break;
-                case SEQUENCE_SLICE:
-                    break;
-                case STRING_EXPRESSION:
-                    result = new StringExpressionEnvironment();
-                    break;
-                case TIME_LITERAL:
-                    break;
-                case TRIGGER_WRAPPER:
-                    break;
-                case TYPE_ANY:
-                    break;
-                case TYPE_CLASS:
-                    //result = new ClassDeclarationEnvironment();
-                    break;
-                case TYPE_FUNCTIONAL:
-                    break;
-                case TYPE_UNKNOWN:
-                    break;
-            }
+        JavaFXKind k = t.getJavaFXKind();
+        if (LOGGABLE) log("JavaFXKind: " + k);
+        switch (k) {
+            case COMPILATION_UNIT:
+                result = new CompilationUnitEnvironment();
+                break;
+            case IMPORT:
+                result = new ImportTreeEnvironment();
+                break;
+            case VARIABLE:
+                result = new VariableTreeEnvironment();
+                break;
+            case MODIFIERS:
+                result = new ModifiersTreeEnvironment();
+                break;
+            case MEMBER_SELECT:
+                result = new MemberSelectTreeEnvironment();
+                break;
+            case METHOD_INVOCATION:
+                result = new MethodInvocationTreeEnvironment();
+                break;
+            case INSTANTIATE_NEW:
+                break;
+            case RETURN:
+            case THROW:
+                break;
+            case CATCH:
+                break;
+            case WHILE_LOOP:
+                result = new WhileLoopTreeEnvironment();
+                break;
+            case PARENTHESIZED:
+                result = new ParenthesizedTreeEnvironment();
+                break;
+            case TYPE_CAST:
+                break;
+            case INSTANCE_OF:
+                result = new InstanceOfTreeEnvironment();
+                break;
+            case ASSIGNMENT:
+                result = new AssignmentTreeEnvironment();
+                break;
+            case MULTIPLY_ASSIGNMENT:
+            case DIVIDE_ASSIGNMENT:
+            case REMAINDER_ASSIGNMENT:
+            case PLUS_ASSIGNMENT:
+            case MINUS_ASSIGNMENT:
+            case AND_ASSIGNMENT:
+            case XOR_ASSIGNMENT:
+            case OR_ASSIGNMENT:
+                result = new CompoundAssignmentTreeEnvironment();
+                break;
+            case PREFIX_INCREMENT:
+            case PREFIX_DECREMENT:
+            case UNARY_PLUS:
+            case UNARY_MINUS:
+            case BITWISE_COMPLEMENT:
+            case LOGICAL_COMPLEMENT:
+                // TODO: ???
+                break;
+            case AND:
+            case CONDITIONAL_AND:
+            case CONDITIONAL_OR:
+            case DIVIDE:
+            case EQUAL_TO:
+            case GREATER_THAN:
+            case GREATER_THAN_EQUAL:
+            case LESS_THAN:
+            case LESS_THAN_EQUAL:
+            case MINUS:
+            case MULTIPLY:
+            case NOT_EQUAL_TO:
+            case OR:
+            case PLUS:
+            case REMAINDER:
+            case XOR:
+                result = new BinaryTreeEnvironment();
+                break;
+            case CONDITIONAL_EXPRESSION:
+                break;
+            case BIND_EXPRESSION:
+                break;
+            case BLOCK_EXPRESSION:
+                result = new BlockExpressionEnvironment();
+                break;
+            case CLASS_DECLARATION:
+                result = new ClassDeclarationEnvironment();
+                break;
+            case FOR_EXPRESSION_FOR:
+                result = new ForExpressionEnvironment();
+                break;
+            case FOR_EXPRESSION_IN_CLAUSE:
+                result = new ForExpressionInClauseEnvironment();
+                break;
+            case FUNCTION_DEFINITION:
+                result = new FunctionDefinitionEnvironment();
+                break;
+            case FUNCTION_VALUE:
+                break;
+            case INIT_DEFINITION:
+                break;
+            case INSTANTIATE_OBJECT_LITERAL:
+                result = new InstantiateEnvironment();
+                break;
+            case INTERPOLATE:
+                break;
+            case INTERPOLATE_VALUE:
+                break;
+            case KEYFRAME_LITERAL:
+                break;
+            case OBJECT_LITERAL_PART:
+                result = new ObjectLiteralPartEnvironment();
+                break;
+            case ON_REPLACE:
+                break;
+            case POSTINIT_DEFINITION:
+                break;
+            case SEQUENCE_DELETE:
+                break;
+            case SEQUENCE_EMPTY:
+                result = new SequenceEmptyEnvironment();
+                break;
+            case SEQUENCE_EXPLICIT:
+                result = new SequenceExplicitEnvironment();
+                break;
+            case SEQUENCE_INDEXED:
+                break;
+            case SEQUENCE_INSERT:
+                break;
+            case SEQUENCE_RANGE:
+                break;
+            case SEQUENCE_SLICE:
+                break;
+            case STRING_EXPRESSION:
+                result = new StringExpressionEnvironment();
+                break;
+            case TIME_LITERAL:
+                break;
+            case TRIGGER_WRAPPER:
+                break;
+            case TYPE_ANY:
+                break;
+            case TYPE_CLASS:
+                //result = new ClassDeclarationEnvironment();
+                break;
+            case TYPE_FUNCTIONAL:
+                break;
+            case TYPE_UNKNOWN:
+                break;
+        }
 
-            if (result == null) {
+        if (result == null) {
             result = new JavaFXCompletionEnvironment();
         }
         result.init(offset, prefix, controller, path, controller.getTrees().getSourcePositions(), this);
