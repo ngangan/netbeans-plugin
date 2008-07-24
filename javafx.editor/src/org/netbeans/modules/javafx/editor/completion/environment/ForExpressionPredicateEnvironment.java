@@ -47,21 +47,20 @@ import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
- *
+ * seq[x | condition]
  * @author David Strupl
  */
-public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXForExpression> {
+public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironment<JFXForExpression> {
     
-    private static final Logger logger = Logger.getLogger(ForExpressionEnvironment.class.getName());
+    private static final Logger logger = Logger.getLogger(ForExpressionPredicateEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
     protected void inside(JFXForExpression foe) throws IOException {
-        if (LOGGABLE) log("inside JFXForExpression " + foe);
+        if (LOGGABLE) log("inside ForExpressionPredicateEnvironment " + foe);
         if (LOGGABLE) log("  prefix: " + prefix);
         int start = (int)sourcePositions.getStartPosition(root, foe);
         if (LOGGABLE) log("  offset: " + offset);
@@ -69,22 +68,23 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
-        boolean afterFor = false;
-        boolean afterLParen = false;
-        while (ts.moveNext()) {
+        boolean afterPipe = false;
+        boolean afterLBracket = false;
+        WHILE: while (ts.moveNext()) {
             if (ts.offset() >= offset) {
                 break;
             }
             switch (ts.token().id()) {
-                case FOR:
-                    afterFor = true;
+                case PIPE:
+                    afterPipe = true;
                     break;
-                case LPAREN:
-                    if (afterLParen) {
-                        if (LOGGABLE) log("   too many parens");
+                case LBRACKET:
+                    if (afterLBracket) {
+                        if (LOGGABLE) log("  second L bracket --> bad luck ");
                         return;
+                    } else {
+                        afterLBracket = true;
                     }
-                    afterLParen = true;
                     break;
                 case WS:
                 case LINE_COMMENT:
@@ -96,23 +96,24 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
                     break;
                 default:
                     if (LOGGABLE) log("  default: " + ts.token().id());
-                    // there is too much, return nothing
-                    return;
+                    if (afterPipe) {
+                        break WHILE;
+                    } else {
+                        if (LOGGABLE) log("   there is too much, return nothing");
+                        return;
+                    }
             }
+        }
+        if (LOGGABLE) log("  afterPipe: " + afterPipe);
+        if (afterPipe) {
+            if (LOGGABLE) log("  NOT IMPLEMENTED: boolean condition ");
+            return;
         }
         if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier);
         if (afterIdentifier) {
-            addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false));
+            if (LOGGABLE) log("  NOT IMPLEMENTED: suggest ending the variable name and | after");
             return;
         } 
-        if (afterLParen) {
-            if (prefix != null && prefix.length() > 0) {
-                // ok the user has already typed something
-                if (LOGGABLE) log("  NOT IMPLEMENTED: suggest ending the variable name and \"in \" after");
-            } else {
-                if (LOGGABLE) log("  NOT IMPLEMENTED: suggest a variable name");
-            }
-        }
     }
 
     private static void log(String s) {

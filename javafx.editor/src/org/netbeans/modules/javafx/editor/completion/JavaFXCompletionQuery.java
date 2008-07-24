@@ -445,6 +445,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new MethodInvocationTreeEnvironment();
                 break;
             case INSTANTIATE_NEW:
+                result = new InstantiateNewEnvironment();
                 break;
             case RETURN:
             case THROW:
@@ -513,6 +514,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 break;
             case FOR_EXPRESSION_FOR:
                 result = new ForExpressionEnvironment();
+                break;
+            case FOR_EXPRESSION_PREDICATE:
+                result = new ForExpressionPredicateEnvironment();
                 break;
             case FOR_EXPRESSION_IN_CLAUSE:
                 result = new ForExpressionInClauseEnvironment();
