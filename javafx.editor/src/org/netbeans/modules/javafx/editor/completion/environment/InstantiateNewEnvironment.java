@@ -46,43 +46,26 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
  *
  * @author David Strupl
  */
-public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInstanciate> {
+public class InstantiateNewEnvironment extends JavaFXCompletionEnvironment<JFXInstanciate> {
     
-    private static final Logger logger = Logger.getLogger(InstantiateEnvironment.class.getName());
+    private static final Logger logger = Logger.getLogger(InstantiateNewEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
     protected void inside(JFXInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
-        if (LOGGABLE) log("inside InstantiateEnvironment " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n");
+        if (LOGGABLE) log("inside InstantiateNewEnvironment " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n");
         if (pos < 0) {
             return;
         }
-        String s = it.getIdentifier().toString();
-        if (LOGGABLE) log("  s == " + s);
-        TypeElement te = findTypeElement(s);
-        if (LOGGABLE) log("  te == " + te);
-        if (te == null) {
-            return;
-        }
-        TypeMirror tm = te.asType();
-        if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind()));
-        if (tm == null) {
-            return;
-        }
-        if (LOGGABLE) log(" TODO: missing check whether we are not after the closing bracket!"); 
-        addMembers(tm, false, true, ":");
+        addLocalAndImportedTypes(null, null, null, false, getSmartType(it));
     }
 
     public TypeMirror getSmartType(JFXInstanciate it) throws IOException {
