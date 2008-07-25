@@ -482,7 +482,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case UNARY_MINUS:
             case BITWISE_COMPLEMENT:
             case LOGICAL_COMPLEMENT:
-                // TODO: ???
+                result = new UnaryTreeEnvironment();
                 break;
             case AND:
             case CONDITIONAL_AND:

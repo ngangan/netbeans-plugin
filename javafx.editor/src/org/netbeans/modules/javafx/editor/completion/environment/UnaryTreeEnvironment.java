@@ -39,18 +39,15 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.ErroneousTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
+import com.sun.javafx.api.tree.UnaryTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -59,42 +56,27 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  *
  * @author David Strupl
  */
-public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<VariableTree> {
-
-    private static final Logger logger = Logger.getLogger(VariableTreeEnvironment.class.getName());
+public class UnaryTreeEnvironment extends JavaFXCompletionEnvironment<UnaryTree> {
+    
+    private static final Logger logger = Logger.getLogger(UnaryTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VariableTree t) throws IOException {
-        if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset);
-        VariableTree var = t;
-        boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
-        Tree type = var.getType();
-        int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((ErroneousTree) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
-        if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos);
-        if (offset <= typePos) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
-            if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
-                addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
-                addBasicTypes();
-            }
-            return;
-        }
-        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
-        if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id()));
-        if ((last != null) && (last.token().id() == JFXTokenId.EQ)) {
-            localResult(getSmartType(t));
-            addValueKeywords();
+    protected void inside(UnaryTree t) throws IOException {
+        if (LOGGABLE) log("inside UnaryTree " + t);
+        UnaryTree ui = (UnaryTree) getPath().getLeaf();
+        localResult(getSmartType(ui));
+        addValueKeywords();
+    }
+
+    private static void log(String s) {
+        if (LOGGABLE) {
+            logger.fine(s);
         }
     }
 
-    private TypeMirror getSmartType(VariableTree t) throws IOException {
-        if (t.getInitializer() == null) {
-            if (LOGGABLE) log("  getSmartType no initializer");
-            return null;
-        }
-        final JavaFXTreePath treePath = new JavaFXTreePath(path, t.getInitializer());
+    private TypeMirror getSmartType(UnaryTree ui) {
+        final JavaFXTreePath treePath = new JavaFXTreePath(path, ui.getExpression());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type);
         if (type == null) {
@@ -108,11 +90,6 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         } 
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(2) == " + type);
         return type;
-    }
-
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
+        
     }
 }
