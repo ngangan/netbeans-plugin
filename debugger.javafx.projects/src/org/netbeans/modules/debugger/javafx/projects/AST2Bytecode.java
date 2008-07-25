@@ -41,35 +41,18 @@
 
 package org.netbeans.modules.debugger.javafx.projects;
 
-import com.sun.corba.se.impl.protocol.InfoOnlyServantCacheLocalCRDImpl;
-import com.sun.javafx.api.JavafxcTask;
-import com.sun.source.tree.ArrayAccessTree;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ConditionalExpressionTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.InstanceOfTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.LineMap;
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ParenthesizedTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TypeCastTree;
-import com.sun.source.tree.UnaryTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.Trees;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.ArrayType;
@@ -78,13 +61,10 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import org.netbeans.api.javafx.source.CompilationController;
 //import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.TreeUtilities;
 
-import com.sun.tools.javac.util.Context;
 
 
 import com.sun.tools.javafx.code.JavafxVarSymbol;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.spi.debugger.javafx.EditorContext;
 import org.openide.ErrorManager;
 
@@ -102,7 +82,7 @@ class AST2Bytecode {
     }
     
     static EditorContext.Operation[] matchSourceTree2Bytecode(
-            CompilationUnitTree cu, CompilationController ci,
+            UnitTree cu, CompilationController ci,
             List<Tree> treeNodes, ExpressionScanner.ExpressionsInfo info,
             byte[] bytecodes, int[] indexes, byte[] constantPool,
             OperationCreationDelegate opCreationDelegate,
@@ -124,10 +104,13 @@ class AST2Bytecode {
         int to = indexes[indexesIndex + 1];
         for (int treeIndex = 0; treeIndex < length; treeIndex++) {
             Tree node = treeNodes.get(treeIndex);
-            Tree.Kind kind = node.getKind();
+//            Tree.Kind kind = node.getKind();
+            Tree.JavaFXKind kind = node.getJavaFXKind();
             EditorContext.Operation op = null;
-            if (kind.equals(Tree.Kind.METHOD_INVOCATION) ||
-                kind.equals(Tree.Kind.NEW_CLASS)) {
+//            if (kind.equals(Tree.Kind.METHOD_INVOCATION) ||
+//                kind.equals(Tree.Kind.NEW_CLASS)) {
+            if (kind.equals(Tree.JavaFXKind.METHOD_INVOCATION) ||
+                kind.equals(Tree.JavaFXKind.CLASS_DECLARATION)) {
                 
                 int opcode;
                 do {
@@ -150,15 +133,15 @@ class AST2Bytecode {
                     }
                 } while (true);
                 if (from < to) { // We have the method call
-                    if (!ci.getTreeUtilities().isSynthetic(ci.getTrees().getPath(cu, node))) {
-                        int pos = (int) sp.getStartPosition(cu, node);
+                    if (!ci.getTreeUtilities().isSynthetic(ci.getTrees().getPath((UnitTree)cu, node))) {
+                        int pos = (int) sp.getStartPosition((UnitTree)cu, node);
                         EditorContext.Position startPosition =
                                 opCreationDelegate.createPosition(
                                         pos,
                                         (int) lineMap.getLineNumber(pos),
                                         (int) lineMap.getColumnNumber(pos)
                                 );
-                        pos = (int) sp.getEndPosition(cu, node);
+                        pos = (int) sp.getEndPosition((UnitTree)cu, node);
                         EditorContext.Position endPosition =
                                 opCreationDelegate.createPosition(
                                         pos,
@@ -169,10 +152,14 @@ class AST2Bytecode {
                         String methodName;
                         String methodClassType;
                         boolean getStartPosFromMethodLength = false;
-                        if (kind.equals(Tree.Kind.NEW_CLASS)) {
-                            identifier = ((NewClassTree) node).getIdentifier();
+//                        if (kind.equals(Tree.Kind.NEW_CLASS)) {
+                        if (kind.equals(Tree.JavaFXKind.CLASS_DECLARATION)) {
+//                            identifier = ((NewClassTree) node).getIdentifier();
+                            identifier = null;//((ClassDeclarationTree)node).get
                             methodName = "<init>";
-                            TreePath iPath = TreePath.getPath(cu, identifier);
+//                            TreePath iPath = TreePath.getPath(cu, identifier);
+//                            TypeMirror type = trees.getTypeMirror(iPath);
+                            JavaFXTreePath iPath = JavaFXTreePath.getPath((UnitTree)cu, identifier);
                             TypeMirror type = trees.getTypeMirror(iPath);
                             if (type.getKind() == TypeKind.ERROR) {
                                 // There are errors, give it up.
@@ -184,10 +171,11 @@ class AST2Bytecode {
                             methodClassType = getBinaryName(te);
                         } else {
                             //identifier = ((MemberSelectTree) ((MethodInvocationTree) node).getMethodSelect()).getIdentifier();
-                            identifier = ((MethodInvocationTree) node).getMethodSelect();
-                            if (identifier.getKind() == Tree.Kind.IDENTIFIER) {
+//                            identifier = ((MethodInvocationTree) node).getMethodSelect();
+                            identifier = ((FunctionInvocationTree)node).getMethodSelect();
+                            if (identifier.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER) {
                                 methodName = ((IdentifierTree) identifier).getName().toString();
-                                TreePath iPath = TreePath.getPath(cu, identifier);
+                                JavaFXTreePath iPath = JavaFXTreePath.getPath((UnitTree)cu, identifier);
                                 TypeElement te = trees.getScope(iPath).getEnclosingClass();
                                 if (te == null) {
                                     // No enclosing class? Some error, give it up.
@@ -199,7 +187,7 @@ class AST2Bytecode {
                                 methodName = ((MemberSelectTree) identifier).getIdentifier().toString();
                                 getStartPosFromMethodLength = true;
                                 ExpressionTree exp = ((MemberSelectTree) identifier).getExpression();
-                                TreePath expPath = TreePath.getPath(cu, exp);
+                                JavaFXTreePath expPath = JavaFXTreePath.getPath((UnitTree)cu, exp);
                                 TypeMirror type = trees.getTypeMirror(expPath);
                                 if (type.getKind() == TypeKind.ERROR) {
                                     // There are errors, give it up.
@@ -234,7 +222,7 @@ class AST2Bytecode {
                                 methodClassType = getBinaryName(te)+array;
                             }
                         }
-                        pos = (int) sp.getEndPosition(cu, identifier);
+                        pos = (int) sp.getEndPosition((UnitTree)cu, identifier);
                         EditorContext.Position methodEndPosition =
                                 opCreationDelegate.createPosition(
                                         pos,
@@ -244,7 +232,7 @@ class AST2Bytecode {
                         if (getStartPosFromMethodLength) {
                             pos = pos - methodName.length();
                         } else {
-                            pos = (int) sp.getStartPosition(cu, identifier);
+                            pos = (int) sp.getStartPosition((UnitTree)cu, identifier);
                         }
                         EditorContext.Position methodStartPosition =
                                 opCreationDelegate.createPosition(
