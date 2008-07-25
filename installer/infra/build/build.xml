@@ -443,7 +443,7 @@
 
         <if property="do.build.javafx">
              <get
-            	src="${javafx.builds.host}/hudson/view/JavaFX/job/JavaFX_Preview_NB_Plugin_NB61_cont/lastSuccessfulBuild/buildNumber"
+            	src="${javafx.builds.host}/lastSuccessfulBuild/buildNumber"
             	dest="${temp.file}"/>
              <loadfile property="javafx.build.number"
           	    srcFile="${temp.file}">

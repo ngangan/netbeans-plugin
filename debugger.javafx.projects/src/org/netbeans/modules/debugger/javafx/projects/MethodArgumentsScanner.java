@@ -41,17 +41,18 @@
 
 package org.netbeans.modules.debugger.javafx.projects;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.ExpressionTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.FunctionValueTree;
+import com.sun.javafx.api.tree.JavaFXTreeScanner;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TypeFunctionalTree;
+import com.sun.javafx.api.tree.TypeTree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
 import com.sun.source.tree.LineMap;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TypeParameterTree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreeScanner;
 import java.util.List;
 import org.netbeans.spi.debugger.javafx.EditorContext.MethodArgument;
 
@@ -60,10 +61,10 @@ import org.netbeans.spi.debugger.javafx.EditorContext.MethodArgument;
  * 
  * @author Martin Entlicher
  */
-class MethodArgumentsScanner extends TreeScanner<MethodArgument[], Object> {
+class MethodArgumentsScanner extends JavaFXTreeScanner<MethodArgument[], Object> {
     
     private int offset;
-    private CompilationUnitTree tree;
+    private UnitTree tree;
     private SourcePositions positions;
     private LineMap lineMap;
     private boolean methodInvocation;
@@ -72,7 +73,7 @@ class MethodArgumentsScanner extends TreeScanner<MethodArgument[], Object> {
     private MethodArgument[] arguments;
     
     /** Creates a new instance of MethodArgumentsScanner */
-    public MethodArgumentsScanner(int offset, CompilationUnitTree tree,
+    public MethodArgumentsScanner(int offset, UnitTree tree,
                                   SourcePositions positions, boolean methodInvocation,
                                   AST2Bytecode.OperationCreationDelegate positionDelegate) {
         this.offset = offset;
@@ -92,7 +93,7 @@ class MethodArgumentsScanner extends TreeScanner<MethodArgument[], Object> {
     }*/
     
     @Override
-    public MethodArgument[] visitMethodInvocation(MethodInvocationTree node, Object p) {
+    public MethodArgument[] visitMethodInvocation(FunctionInvocationTree node, Object p) {
         if (!methodInvocation || offset != positions.getEndPosition(tree, node.getMethodSelect())) {
             return super.visitMethodInvocation(node, p);
             /*MethodArgument[] r = scan(node.getTypeArguments(), p);
@@ -111,9 +112,9 @@ class MethodArgumentsScanner extends TreeScanner<MethodArgument[], Object> {
         arguments = composeArguments(args, argTypes);
         return arguments;
     }
-    
+/*    
     @Override
-    public MethodArgument[] visitNewClass(NewClassTree node, Object p) {
+    public MethodArgument[] visitNewClass(ClassTree node, Object p) {
         if (!methodInvocation || offset != positions.getEndPosition(tree, node.getIdentifier())) {
             return super.visitNewClass(node, p);
         }
@@ -122,7 +123,35 @@ class MethodArgumentsScanner extends TreeScanner<MethodArgument[], Object> {
         arguments = composeArguments(args, argTypes);
         return arguments;
     }
-
+ */
+    @Override
+    public MethodArgument[] visitFunctionValue(FunctionValueTree node, Object p) {
+        if (methodInvocation || !(offset >= lineMap.getLineNumber(positions.getStartPosition(tree, node)) &&
+                                 (offset <= lineMap.getLineNumber(positions.getEndPosition(tree, node))))) {
+            return super.visitFunctionValue(node, p);
+        }
+        List<? extends VariableTree> args = node.getParameters();
+//        List<? extends TypeTree> argTypes = node.getType();
+        int n = args.size();
+        arguments = new MethodArgument[n];
+        for (int i = 0; i < n; i++) {
+            VariableTree var = args.get(i);
+            long startOffset = positions.getStartPosition(tree, var);
+            long endOffset = positions.getEndPosition(tree, var);
+            arguments[i] = new MethodArgument(var.getName().toString(),
+                                              var.getType().toString(),
+                                              positionDelegate.createPosition(
+                                                (int) startOffset,
+                                                (int) lineMap.getLineNumber(startOffset),
+                                                (int) lineMap.getColumnNumber(startOffset)),
+                                              positionDelegate.createPosition(
+                                                (int) endOffset,
+                                                (int) lineMap.getLineNumber(endOffset),
+                                                (int) lineMap.getColumnNumber(endOffset)));
+        }
+        return arguments;
+  }
+/*
     @Override
     public MethodArgument[] visitMethod(MethodTree node, Object p) {
         if (methodInvocation || !(offset >= lineMap.getLineNumber(positions.getStartPosition(tree, node)) &&
@@ -151,7 +180,7 @@ class MethodArgumentsScanner extends TreeScanner<MethodArgument[], Object> {
         return arguments;
         //return composeArguments(args, argTypes);
     }
-    
+  */  
     MethodArgument[] getArguments() {
         return arguments;
     }

@@ -41,86 +41,49 @@
 
 package org.netbeans.modules.debugger.javafx.projects;
 
-import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.ArrayAccessTree;
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.AssertTree;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.BreakTree;
-import com.sun.source.tree.CaseTree;
-import com.sun.source.tree.CatchTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ConditionalExpressionTree;
-import com.sun.source.tree.ContinueTree;
-import com.sun.source.tree.DoWhileLoopTree;
-import com.sun.source.tree.EmptyStatementTree;
-import com.sun.source.tree.EnhancedForLoopTree;
-import com.sun.source.tree.ErroneousTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.ForLoopTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.InstanceOfTree;
-import com.sun.source.tree.LabeledStatementTree;
-import com.sun.source.tree.LineMap;
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.ParenthesizedTree;
-import com.sun.source.tree.PrimitiveTypeTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.SwitchTree;
-import com.sun.source.tree.SynchronizedTree;
-import com.sun.source.tree.ThrowTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TreeVisitor;
-import com.sun.source.tree.TryTree;
-import com.sun.source.tree.TypeCastTree;
-import com.sun.source.tree.TypeParameterTree;
-import com.sun.source.tree.UnaryTree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.tree.WhileLoopTree;
-import com.sun.source.tree.WildcardTree;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreeScanner;
+import com.sun.javafx.api.tree.AssignmentTree;
+import com.sun.javafx.api.tree.BinaryTree;
+import com.sun.javafx.api.tree.CompoundAssignmentTree;
+import com.sun.javafx.api.tree.ConditionalExpressionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.InstanceOfTree;
+import com.sun.javafx.api.tree.JavaFXTreeScanner;
+import com.sun.javafx.api.tree.ModifiersTree;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TypeCastTree;
+import com.sun.javafx.api.tree.UnaryTree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
+import com.sun.javafx.api.tree.WhileLoopTree;
+import com.sun.source.tree.AnnotationTree;          //TODO XXX From javac
+import com.sun.source.tree.LineMap;                 //TODO XXX From javac
+import com.sun.source.tree.ParameterizedTypeTree;   //TODO XXX From javac
+import com.sun.source.tree.StatementTree;           //TODO XXX From javac
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeSet;
 
 /**
  * A tree scanner, which collects expressions on a given line.
  * 
  * @author Martin Entlicher
  */
-class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.ExpressionsInfo> {
+class ExpressionScanner extends JavaFXTreeScanner<List<Tree>, ExpressionScanner.ExpressionsInfo> {
     
     private int lineNumber;
-    private CompilationUnitTree tree;
+    private UnitTree tree;
     private SourcePositions positions;
     private LineMap lineMap;
     private boolean checkBounds = true;
 
-    public ExpressionScanner(int lineNumber, CompilationUnitTree tree, SourcePositions positions) {
+    public ExpressionScanner(int lineNumber, UnitTree tree, SourcePositions positions) {
         this.tree = tree;
         this.lineNumber = lineNumber;
         this.positions = positions;
@@ -187,7 +150,7 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         return null;
     }
 
-    public List<Tree> visitMethodInvocation(MethodInvocationTree node, ExpressionScanner.ExpressionsInfo p) {
+    public List<Tree> visitMethodInvocation(FunctionInvocationTree node, ExpressionScanner.ExpressionsInfo p) {
 	List<Tree> result = scan(node.getTypeArguments(), p);
         result = reduce(result, scan(node.getMethodSelect(), p));
         result = reduce(result, scan(node.getArguments(), p));
@@ -197,13 +160,13 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         result.add(node);
         return result;
     }
-
+/*
     public List<Tree> visitAssert(AssertTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> result = scan(node.getCondition(), p);
         result = reduce(result, scan(node.getDetail(), p));
         return result;
     }
-
+*/
     public List<Tree> visitAssignment(AssignmentTree node, ExpressionScanner.ExpressionsInfo p) {
         return scan(node.getVariable(), node.getExpression(), p);
     }
@@ -222,12 +185,13 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
     //public List<Tree> visitBreak(BreakTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
+/*    
     public List<Tree> visitCase(CaseTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> result = scan(node.getExpression(), p);
         result = reduce(result, scan(node.getStatements(), p));
         return result;
     }
-
+*/
     //public List<Tree> visitCatch(CatchTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
@@ -255,8 +219,8 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
 
     //public List<Tree> visitContinue(ContinueTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
-
-    public List<Tree> visitDoWhileLoop(DoWhileLoopTree node, ExpressionScanner.ExpressionsInfo p) {
+/*
+    public List<Tree> visitWhileLoop(WhileLoopTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> statements = scan(node.getStatement(), p);
         List<Tree> cond = null;
         if (acceptsTree(node.getCondition())) {
@@ -268,10 +232,10 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
         return reduce(statements, cond);
     }
-
+*/
     //public List<Tree> visitErroneous(ErroneousTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
-
+/*
     public List<Tree> visitExpressionStatement(ExpressionStatementTree node, ExpressionScanner.ExpressionsInfo p) {
         if (acceptsTree(node)) {
             return scan(node.getExpression(), p);
@@ -279,7 +243,8 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
             return null;
         }
     }
-
+*/
+/*    
     public List<Tree> visitEnhancedForLoop(EnhancedForLoopTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> expr = null;
         if (acceptsTree(node.getExpression())) {
@@ -293,7 +258,8 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
         return reduce(expr, bodyr);
     }
-
+*/
+/* TODO Make visitForExpression and ForExpressionInClause    
     public List<Tree> visitForLoop(ForLoopTree node, ExpressionScanner.ExpressionsInfo p) {
         if (!isCurrentTree(node)) {
             return null;
@@ -345,10 +311,10 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
         return reduce(reduce(reduce(initr, condr), bodyr), updtr);
     }
-
+*/
     //public List<Tree> visitIdentifier(IdentifierTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
-
+/*
     public List<Tree> visitIf(IfTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> cond = null;
         Tree lastCond = null;
@@ -376,14 +342,14 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
         return reduce(reduce(cond, thenr), elser);
     }
-
+*/
     //public List<Tree> visitImport(ImportTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
-
+/*
     public List<Tree> visitArrayAccess(ArrayAccessTree node, ExpressionScanner.ExpressionsInfo p) {
         return scan(node.getExpression(), node.getIndex(), p);
     }
-
+*/
     //public List<Tree> visitLabeledStatement(LabeledStatementTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
@@ -393,17 +359,19 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
     //public List<Tree> visitMethod(MethodTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
+    @Override
     public List<Tree> visitModifiers(ModifiersTree node, ExpressionScanner.ExpressionsInfo p) {
         return null;
     }
-
+/*
     public List<Tree> visitNewArray(NewArrayTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> result = scan(node.getType(), p);
         result = reduce(result, scan(node.getDimensions(), p));
         result = reduce(result, scan(node.getInitializers(), p));
         return result;
     }
-
+ */
+/*
     public List<Tree> visitNewClass(NewClassTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> result = scan(node.getEnclosingExpression(), node.getIdentifier(), p);
         result = reduce(result, scan(node.getArguments(), p));
@@ -414,6 +382,7 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         result.add(node);
         return result;
     }
+*/
 
     //public List<Tree> visitParenthesized(ParenthesizedTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
@@ -426,7 +395,7 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
 
     //public List<Tree> visitEmptyStatement(EmptyStatementTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
-
+/*
     public List<Tree> visitSwitch(SwitchTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> result = null;
         if (acceptsTree(node)) {
@@ -434,7 +403,8 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
         return reduce(result, scan(node.getCases(), p));
     }
-
+*/
+/*    
     public List<Tree> visitSynchronized(SynchronizedTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> result = null;
         if (acceptsTree(node)) {
@@ -442,7 +412,7 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
         return reduce(result, scan(node.getBlock(), p));
     }
-
+*/
     //public List<Tree> visitThrow(ThrowTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
@@ -459,6 +429,7 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
     //public List<Tree> visitArrayType(ArrayTypeTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
+    @Override
     public List<Tree> visitTypeCast(TypeCastTree node, ExpressionScanner.ExpressionsInfo p) {
         return scan(node.getExpression(), p);
     }
@@ -469,14 +440,17 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
     //public List<Tree> visitTypeParameter(TypeParameterTree node, ExpressionScanner.ExpressionsInfo p) {
     //}
 
+    @Override
     public List<Tree> visitInstanceOf(InstanceOfTree node, ExpressionScanner.ExpressionsInfo p) {
         return scan(node.getExpression(), node.getType(), p);
     }
 
+    @Override
     public List<Tree> visitUnary(UnaryTree node, ExpressionScanner.ExpressionsInfo p) {
         return scan(node.getExpression(), p);
     }
 
+    @Override
     public List<Tree> visitVariable(VariableTree node, ExpressionScanner.ExpressionsInfo p) {
         if (acceptsTree(node)) {
             return scan(node.getInitializer(), p);
@@ -485,6 +459,7 @@ class ExpressionScanner extends TreeScanner<List<Tree>, ExpressionScanner.Expres
         }
     }
 
+    @Override
     public List<Tree> visitWhileLoop(WhileLoopTree node, ExpressionScanner.ExpressionsInfo p) {
         List<Tree> cond = null;
         if (acceptsTree(node.getCondition())) {

@@ -41,14 +41,16 @@
 
 package org.netbeans.modules.debugger.javafx.projects;
 
-import com.sun.javafx.api.tree.JavaFXTree;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.Scope;
+import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.Scope;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.VariableTree;
-import com.sun.source.util.TreeScanner;
 
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
@@ -61,33 +63,17 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.StyledDocument;
 import javax.swing.JEditorPane;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.TreeVisitor;
-import com.sun.source.util.SourcePositions;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
-import com.sun.source.util.Trees;
-
-import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.code.JavafxVarSymbol;
 import javax.lang.model.util.Elements;
 import javax.lang.model.element.Element;
@@ -100,9 +86,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 //import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 //import org.netbeans.api.java.source.ElementUtilities;
 //import org.netbeans.api.java.source.SourceUtils;
@@ -111,7 +95,6 @@ import org.netbeans.modules.editor.highlights.spi.Highlight;
 
 import org.openide.ErrorManager;
 import org.openide.cookies.EditorCookie;
-import org.openide.cookies.LineCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.URLMapper;
@@ -129,18 +112,12 @@ import org.openide.windows.TopComponent;
 
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.Task;
-//import org.netbeans.api.java.source.TreeMaker;
-import org.netbeans.api.javafx.source.TreeUtilities;
-//import org.netbeans.api.java.source.WorkingCopy;
 
 import org.netbeans.editor.JumpList;
 import org.netbeans.api.debugger.javafx.LineBreakpoint;
 import org.netbeans.spi.debugger.javafx.EditorContext;
 
 import org.netbeans.spi.debugger.javafx.SourcePathProvider;
-import org.netbeans.spi.java.classpath.support.ClassPathSupport;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -980,7 +957,9 @@ public class EditorContextImpl extends EditorContext {
                     }
  */
                     //TODO XXX Remove it , because it is related to Java
-                    if (tree.getKind() == Tree.Kind.METHOD) {
+//                    if (tree.getKind() == Tree.Kind.METHOD) {
+                    //TODO XXX CHECK IT OUT
+                    if (tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
                         Element el = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), tree));
                     
                         //Element el = ci.getTrees().getElement(ci.getTreeUtilities().pathFor(offset));
@@ -1228,7 +1207,7 @@ public class EditorContextImpl extends EditorContext {
                         return ;
                     }
                     Tree methodTree = ci.getTrees().getTree(method);
-                    CompilationUnitTree cu = ci.getCompilationUnit();
+                    UnitTree cu = ci.getCompilationUnit();
                     ExpressionScanner scanner = new ExpressionScanner(lineNumber, cu, ci.getTrees().getSourcePositions());
                     ExpressionScanner.ExpressionsInfo info = new ExpressionScanner.ExpressionsInfo();
                     List<Tree> expTrees = methodTree.accept(scanner, info);
@@ -1264,7 +1243,7 @@ public class EditorContextImpl extends EditorContext {
             }
             Map<Tree, Operation> nodeOperations = new HashMap<Tree, Operation>();
             CompilationController ci = ciPtr[0];
-            CompilationUnitTree cu = ci.getCompilationUnit();
+            UnitTree cu = ci.getCompilationUnit();
             List<Tree> expTrees = expTreesPtr[0];
             ops[0] = AST2Bytecode.matchSourceTree2Bytecode(
                     cu,
@@ -1285,7 +1264,7 @@ public class EditorContextImpl extends EditorContext {
     }
     
     private void assignNextOperations(Tree methodTree,
-                                      CompilationUnitTree cu,
+                                      UnitTree cu,
                                       CompilationController ci,
                                       BytecodeProvider bytecodeProvider,
                                       List<Tree> treeNodes,
@@ -1399,7 +1378,7 @@ public class EditorContextImpl extends EditorContext {
                         return ;
                     }
                     Tree methodTree = ci.getTrees().getTree(method);
-                    CompilationUnitTree cu = ci.getCompilationUnit();
+                    UnitTree cu = ci.getCompilationUnit();
                     MethodArgumentsScanner scanner =
                             new MethodArgumentsScanner(offset, cu, ci.getTrees().getSourcePositions(), true,
                                                        new OperationCreationDelegateImpl());
@@ -1450,7 +1429,7 @@ public class EditorContextImpl extends EditorContext {
                         return ;
                     }
                     Tree methodTree = ci.getTrees().getTree(clazz);
-                    CompilationUnitTree cu = ci.getCompilationUnit();
+                    UnitTree cu = ci.getCompilationUnit();
                     MethodArgumentsScanner scanner =
                             new MethodArgumentsScanner(methodLineNumber, cu, ci.getTrees().getSourcePositions(), false,
                                                        new OperationCreationDelegateImpl());
@@ -1542,7 +1521,7 @@ public class EditorContextImpl extends EditorContext {
      * @return the visitor value or <code>null</code>.
      */
     public <R,D> R parseExpression(final String expression, String url, final int line,
-                                   final TreePathScanner<R,D> visitor, final D context,
+                                   final JavaFXTreePathScanner<R,D> visitor, final D context,
                                    final SourcePathProvider sp) {
         return null;
     }
@@ -1741,7 +1720,7 @@ public class EditorContextImpl extends EditorContext {
                         boolean isMemberClass = false;
                         if (selectedIdentifier != null) {
                             Tree tree = ci.getTreeUtilities().pathFor(currentOffset).getLeaf();
-                            if (tree.getKind() == Tree.Kind.MEMBER_SELECT) {
+                            if (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
                                 MemberSelectTree mst = (MemberSelectTree) tree;
                                 el = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), mst.getExpression()));
                                 TypeMirror tm = el.asType();
@@ -1752,10 +1731,10 @@ public class EditorContextImpl extends EditorContext {
                             }
                         } 
                         if (!isMemberClass) {
-                            TreePath currentPath = ci.getTreeUtilities().pathFor(currentOffset);
+                            JavaFXTreePath currentPath = ci.getTreeUtilities().pathFor(currentOffset);
                             Tree tree = currentPath.getLeaf();
                             TypeElement te;
-                            if (tree.getKind() == Tree.Kind.CLASS) {
+                            if (tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
                                 te = (TypeElement) ci.getTrees().getElement(currentPath);
                             } else {
                                 Scope scope = ci.getTreeUtilities().scopeFor(currentOffset);
@@ -1803,12 +1782,12 @@ public class EditorContextImpl extends EditorContext {
                             if (offset < 0) offset = 0;
                         }
                         Tree tree = ci.getTreeUtilities().pathFor(offset).getLeaf();
-                        if (tree.getKind() == Tree.Kind.VARIABLE) {
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
                             el = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), tree));
                             if (el.getKind() == ElementKind.FIELD || el.getKind() == ElementKind.ENUM_CONSTANT) {
                                 currentElementPtr[0] = ((VariableTree) tree).getName().toString();
                             }
-                        } else if (tree.getKind() == Tree.Kind.IDENTIFIER && selectedIdentifier != null) {
+                        } else if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER && selectedIdentifier != null) {
                             IdentifierTree it = (IdentifierTree) tree;
                             String fieldName = it.getName().toString();
                             Scope scope = ci.getTreeUtilities().scopeFor(offset);
@@ -1822,7 +1801,7 @@ public class EditorContextImpl extends EditorContext {
                                 }
                             }
                             
-                        } else if (tree.getKind() == Tree.Kind.MEMBER_SELECT && selectedIdentifier != null) {
+                        } else if (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT && selectedIdentifier != null) {
                             MemberSelectTree mst = (MemberSelectTree) tree;
                             String fieldName = mst.getIdentifier().toString();
                             el = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), mst.getExpression()));

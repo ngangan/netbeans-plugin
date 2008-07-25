@@ -41,10 +41,9 @@
 
 package org.netbeans.modules.debugger.javafx.projects;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.util.TreePathScanner;
-import com.sun.source.util.Trees;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
@@ -53,7 +52,7 @@ import javax.lang.model.util.Elements;
  * 
  * @author martin
  */
-class ClassScanner extends TreePathScanner<TypeElement, Void> {
+class ClassScanner extends JavaFXTreePathScanner<TypeElement, Void>{//TreePathScanner<TypeElement, Void> {
     
 //    private Trees trees;
     private JavafxcTrees trees;
@@ -78,13 +77,13 @@ class ClassScanner extends TreePathScanner<TypeElement, Void> {
     }
 
     @Override
-    public TypeElement visitClass(ClassTree arg0, Void arg1) {
+    public TypeElement visitClassDeclaration(ClassDeclarationTree arg0, Void arg1) {
         TypeElement typeElement = (TypeElement) trees.getElement(getCurrentPath());
         String binaryName = elements.getBinaryName(typeElement).toString();
         if (match(binaryName)) {
             return typeElement;
         } else {
-            return super.visitClass(arg0, arg1);
+            return super.visitClassDeclaration(arg0, arg1);
         }
     }
 
