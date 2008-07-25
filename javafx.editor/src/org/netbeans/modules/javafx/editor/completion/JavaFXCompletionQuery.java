@@ -424,6 +424,13 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         Tree t = path.getLeaf();
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
+        result = createEnvironment(k);
+        result.init(offset, prefix, controller, path, controller.getTrees().getSourcePositions(), this);
+        return result;
+    }
+    
+    static JavaFXCompletionEnvironment createEnvironment(JavaFXKind k) {
+        JavaFXCompletionEnvironment result = null;
         if (LOGGABLE) log("JavaFXKind: " + k);
         switch (k) {
             case COMPILATION_UNIT:
@@ -581,10 +588,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (result == null) {
             result = new JavaFXCompletionEnvironment();
         }
-        result.init(offset, prefix, controller, path, controller.getTrees().getSourcePositions(), this);
+        
         return result;
     }
-
+            
     private static void log(String s) {
         if (LOGGABLE) {
             logger.fine(s);
