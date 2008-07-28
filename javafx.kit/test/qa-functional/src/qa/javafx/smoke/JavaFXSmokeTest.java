@@ -30,6 +30,8 @@ import org.netbeans.junit.NbTestSuite;
 
 import qa.javafx.functional.library.JavaFXTestCase;
 import qa.javafx.functional.library.MouseRobot;
+import qa.javafx.functional.library.project.EditorOperator;
+import qa.javafx.functional.library.project.JavaFXProject;
 
 /**
  *
@@ -150,21 +152,16 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     }
 
     public void testProjectCreation() {
-        NewProjectWizardOperator projectWizard = NewProjectWizardOperator.invoke();
-        projectWizard.selectCategory("JavaFX");
-        projectWizard.selectProject("JavaFX Script Application");
-        projectWizard.next();
-        new JTextFieldOperator(projectWizard, 0).setText(PROJECT_NAME_HELLO_WORLD);
-        new JTextFieldOperator(projectWizard, 1).setText(System.getProperty("netbeans.user"));
-        projectWizard.finish();
+        JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME_HELLO_WORLD);
+
 
     }
 
     public void testMainFile() {
         try {
-            Node projectNode = new Node(ProjectsTabOperator.invoke().tree(), PROJECT_NAME_HELLO_WORLD);
-            Node mainFileNode = new Node(projectNode, "Source Packages|helloworld|Main.fx");
-            assertNotNull("Main fx file has not been found", mainFileNode);
+            JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+            assertNotNull("Main fx file has not been found", project.getFileNode("helloworld|Main.fx"));
+            
             
             TopComponentOperator mainFile = new TopComponentOperator("Main.fx");
         } catch (TimeoutExpiredException e) {
@@ -208,44 +205,26 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     }
 
     public void testProjectBuilding() {
-        JMenuBarOperator menuBar = new JMenuBarOperator(MainWindowOperator.getDefault());
-        menuBar.pushMenuNoBlock("Window|Output|Output");
-
-
-        ProjectRootNode projectNode = new ProjectRootNode(ProjectsTabOperator.invoke().tree(), PROJECT_NAME_HELLO_WORLD);
-        projectNode.buildProject();
-        Util.sleep(1000);
-
-        OutputTabOperator output = new OutputTabOperator(PROJECT_NAME_HELLO_WORLD + " (jar) ");
-
-        String outputText = output.getText();
-
-        int timeout = 120;
-
-        while (!(outputText.contains(BUILD_FAILED) || outputText.contains(BUILD_SUCCESSFUL) || timeout < 0)) {
-            outputText = output.getText();
-            timeout--;
-            Util.sleep(1000);
-        }
-
-
-        //System.out.println("[output] " + outputText);
-        assertTrue("Project is not built!", outputText.contains(BUILD_SUCCESSFUL));
-
-
+        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        project.build();
+        
+        
+        System.out.println("Project name: '" + project.getName()  +"'");
+        assertTrue("Project is not built!", project.getOutput().isCompiled());
     }
     
     public void testEditor() {
 
-        TopComponentOperator main = new TopComponentOperator("Main.fx");
-        JTextComponentOperator textComponent = new JTextComponentOperator(main);
-        textComponent.setText("");
-        Util.sleep(1000);
+        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        EditorOperator editor = project.getMainEditor();
+        editor.setText();
         
         String sample = "samples/helloworld/HelloWorld.fx";
         String text = Util.getSampleText(sample);
         assertNotNull("Sample \"" + sample + "\" was not found", text);
-        textComponent.setText(text);
+        editor.setText(text);
+        
+        
     }
     
 

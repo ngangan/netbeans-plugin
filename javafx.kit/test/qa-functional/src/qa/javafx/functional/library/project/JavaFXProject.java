@@ -36,26 +36,45 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package qa.javafx.functional.library.project;
+
+import org.netbeans.jellytools.actions.OpenAction;
+import org.netbeans.jellytools.nodes.Node;
 
 /**
  *
  * @author Alexandr Scherbatiy
  */
-
 public class JavaFXProject extends JavaProject {
-    
-    public JavaFXProject(String name){
+
+    public JavaFXProject(String name) {
         super(name, ProjectType.JAVAFX_APPLICATION);
     }
 
-    public JavaFXProject(JavaProject javaProject){
+    public JavaFXProject(JavaProject javaProject) {
         this(javaProject.getName());
     }
-    
-    public static JavaFXProject createProject(String name){
+
+    public static JavaFXProject createProject(String name) {
         return new JavaFXProject(JavaProject.createProject(name, ProjectType.JAVAFX_APPLICATION));
     }
- 
+
+    public String getMainFile() {
+        return "Main.fx";
+    }
+
+    
+    public EditorOperator openMainFile() {
+        String pack = getName().toLowerCase();
+        String mainFile = pack.replace('.', '|') + "|" + getMainFile();
+        Node mainFileNode = new Node(getSrcNode(), mainFile);
+        new OpenAction().performPopup(mainFileNode);
+
+        return new EditorOperator("Main.fx");
+
+    }
+    
+    public EditorOperator getMainEditor() {
+        return new EditorOperator(getMainFile());
+    }
 }

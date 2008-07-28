@@ -39,6 +39,7 @@
 package qa.javafx.functional.library.project;
 
 import javax.swing.JDialog;
+import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.NbDialogOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputTabOperator;
@@ -51,6 +52,7 @@ import org.netbeans.jellytools.nodes.ProjectRootNode;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
+import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.junit.ide.ProjectSupport;
 import qa.javafx.functional.library.Constant;
@@ -248,17 +250,25 @@ public class JavaProject extends Project {
         return new Node(getProjectNode(), "Source Packages");
     }
 
-    public EditorOperator openMainFile() {
-        String pack = getName().toLowerCase();
-        String mainFile = pack.replace('.', '|') + "|Main.fx";
-        Node mainFileNode = new Node(getSrcNode(), mainFile);
-        new OpenAction().performPopup(mainFileNode);
+    public Node getFileNode(String file) {
+        return new Node(getSrcNode(), file);
+    }
+    
+    
 
-        return new EditorOperator("Main.fx");
+    public EditorOperator getEditor(String fileName) {
+//        String pack = getName().toLowerCase();
+//        String mainFile = pack.replace('.', '|') + "|Main.fx";
+//        Node mainFileNode = new Node(getSrcNode(), mainFile);
+//        new OpenAction().performPopup(mainFileNode);
+//        new TopComponentOperator("Main.fx");
+
+        return new EditorOperator(fileName);
 
 
     }
-
+    
+    
     public void profile() {
         rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_PROFILE);
         JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_ENABLE_PROFILING, false, true);
@@ -311,23 +321,32 @@ public class JavaProject extends Project {
     }
 
     public Output getOutput() {
-        return new Output();
+        
+        new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
+        return new Output(getName() + " (jar) ");
     }
 
-    public class Output {
+    public class Output extends OutputTabOperator{
 
-        OutputTabOperator output = new OutputTabOperator(getName() + " (jar) ");
+        //OutputTabOperator output = new OutputTabOperator(getName() + " (jar) ");
 
+        public Output(String name){
+            super(name);
+        }
+        
         public boolean isCompiled() {
+            
+        int timeout = 120;
+        String outputText = getText();
+
+        while (!(outputText.contains(BUILD_FAILED) || outputText.contains(BUILD_SUCCESSFUL) || timeout < 0)) {
+            outputText = getText();
+            timeout--;
+            Util.sleep(1000);
+        }
+            
             return getText().contains(BUILD_SUCCESSFUL);
         }
 
-        public String getText() {
-            return output.getText();
-        }
-
-        public OutputTabOperator getOutputOperator() {
-            return output;
-        }
     }
 }
