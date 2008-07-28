@@ -39,17 +39,12 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.UnaryTree;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
+import javax.lang.model.element.TypeElement;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
@@ -75,21 +70,11 @@ public class UnaryTreeEnvironment extends JavaFXCompletionEnvironment<UnaryTree>
         }
     }
 
-    private TypeMirror getSmartType(UnaryTree ui) {
-        final JavaFXTreePath treePath = new JavaFXTreePath(path, ui.getExpression());
-        TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type);
-        if (type == null) {
-            return null;
-        }
-        
-        // handle sequences as their element type
-        JavafxTypes types = controller.getJavafxTypes();
-        if (types.isSequence((Type) type)) {
-            type = types.elementType((Type) type);
-        } 
-        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(2) == " + type);
+    private TypeMirror getSmartType(UnaryTree ut) {
+        TypeElement te = controller.getElements().getTypeElement("java.lang.Integer");
+        if (LOGGABLE) log("   int == " + te);
+        TypeMirror type = te.asType();
+        if (LOGGABLE) log("   getSmartType returning " + type);
         return type;
-        
     }
 }

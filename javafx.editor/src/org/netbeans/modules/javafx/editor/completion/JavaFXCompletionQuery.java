@@ -486,7 +486,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new CompoundAssignmentTreeEnvironment();
                 break;
             case PREFIX_INCREMENT:
+            case POSTFIX_INCREMENT:
             case PREFIX_DECREMENT:
+            case POSTFIX_DECREMENT:
             case UNARY_PLUS:
             case UNARY_MINUS:
             case BITWISE_COMPLEMENT:
