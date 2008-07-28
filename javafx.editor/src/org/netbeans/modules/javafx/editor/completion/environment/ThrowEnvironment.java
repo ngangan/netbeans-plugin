@@ -39,12 +39,7 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.ThrowTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
