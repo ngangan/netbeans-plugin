@@ -460,6 +460,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new ThrowEnvironment();
                 break;
             case CATCH:
+                result = new CatchEnvironment();
                 break;
             case WHILE_LOOP:
                 result = new WhileLoopTreeEnvironment();
