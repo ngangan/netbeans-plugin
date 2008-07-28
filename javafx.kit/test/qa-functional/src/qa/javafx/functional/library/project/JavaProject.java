@@ -289,27 +289,32 @@ public class JavaProject extends Project {
 
 
     }
-    public void debug() {
-        rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_DEBUG);
-        JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_DEBUG_PROJECT, false, true);
-
-        System.out.println("[debugger] dialog: " + dialog);
-        if (dialog != null) {
-            //JemmyProperties.setCurrentTimeout("DialogWaiter.WaitDialogTimeout", 60000);
-            //new JDialogOperator(dialog).waitClosed();
-            //Util.sleep(5000);
-            ProjectSupport.waitScanFinished();
-            new JDialogOperator(dialog).waitClosed();
-            
-            
-        }
-
-    }
     
-    public void finishDebugger() {
-        //rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_PROFILE);
-        new Action("Run|Finish Debugger Session", null).perform();
+    
+    public DebuggerOperator getDebugger(){
+        return new DebuggerOperator(this);
     }
+//    public void debug() {
+//        rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_DEBUG);
+//        JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_DEBUG_PROJECT, false, true);
+//
+//        System.out.println("[debugger] dialog: " + dialog);
+//        if (dialog != null) {
+//            //JemmyProperties.setCurrentTimeout("DialogWaiter.WaitDialogTimeout", 60000);
+//            //new JDialogOperator(dialog).waitClosed();
+//            //Util.sleep(5000);
+//            ProjectSupport.waitScanFinished();
+//            new JDialogOperator(dialog).waitClosed();
+//            
+//            
+//        }
+//
+//    }
+//    
+//    public void finishDebugger() {
+//        //rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_PROFILE);
+//        new Action("Run|Finish Debugger Session", null).perform();
+//    }
     
     
     public void build() {

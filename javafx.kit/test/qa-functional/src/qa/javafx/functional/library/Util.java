@@ -21,6 +21,7 @@ import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 import org.netbeans.jellytools.MainWindowOperator;
+import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.JProgressBarOperator;
 
@@ -48,6 +49,9 @@ public class Util {
     private static final int WAIT_TIME = 2000;
 
     public static String WORK_DIR = System.getProperty(XTEST_WORK_DIR);
+    
+    public static final long MAX_WAIT_TIME = 300000;
+    
     
     public static String getXtestDataPath() {
         return System.getProperty(XTEST_DATA) + "/data";
@@ -241,6 +245,23 @@ public class Util {
     }
 
 
+    public static void waitScanFinished(){
+        
+        try{Thread.sleep( 3000 ); }catch(Exception e) {}
+        
+        long waitTime = 50;
+        long waitCount = MAX_WAIT_TIME / waitTime;
+        
+        for(long time=0; time < waitCount; time++){
+            try{Thread.sleep( waitTime ); }catch(Exception e) {}
+            
+            Object scanning = JProgressBarOperator.findJProgressBar((Container)MainWindowOperator.getDefault().getSource());
+            if(scanning == null) { return; }
+        }
+        throw new TimeoutExpiredException("Scaning isn't finished in "+ MAX_WAIT_TIME+ " ms");
+    }
+    
+    
 // =================== Utility Operations  ===================
     
     public static void sleep() {

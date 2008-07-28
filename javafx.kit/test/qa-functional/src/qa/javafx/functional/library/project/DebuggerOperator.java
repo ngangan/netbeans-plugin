@@ -36,43 +36,53 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.debugger;
 
+package qa.javafx.functional.library.project;
+
+import javax.swing.JDialog;
+import org.netbeans.jellytools.modules.debugger.actions.FinishDebuggerAction;
+import org.netbeans.jemmy.operators.JDialogOperator;
+import org.netbeans.junit.ide.ProjectSupport;
 import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.JavaFXTestCase;
 import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.DebuggerOperator;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
 
 /**
  *
- * @author Alexandr Scherbatiy sunflower@netbeans.org
+ * @author andromeda
  */
+public class DebuggerOperator {
+    
+    JavaProject project;
+    
+    public DebuggerOperator(JavaProject project){
+        this.project = project;
+    }
+    
+    public void debug(){
+        //new DebugAction().performMenu(project.getProjectNode());
+        //ProjectSupport.waitScanFinished();
+        //System.out.println("[debugger] Wait scan finished");
+        Util.waitScanFinished();
 
-public class JavaFXDebuggerTest extends JavaFXTestCase {
+        //System.out.println("[debugger] start");
 
-    public JavaFXDebuggerTest(String name) {
-        super(name);
+        Util.sleep(1000);
+        project.getProjectNode().performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_DEBUG);
+        //ProjectSupport.waitScanFinished();
+
+//        System.out.println("[debugger] looking for the dialog");
+//        
+//        JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_DEBUG_PROJECT, false, true);
+//        System.out.println("[debugger] dialog: " + dialog);
+//
+//        if (dialog != null ) {
+//            new JDialogOperator(dialog).waitClosed();
+//        }
+        
+
     }
 
-    public void testDebugger() {
-        JavaFXProject project  = JavaFXProject.createProject("SmokeDebugger");
-        
-        EditorOperator editor = project.openMainFile();
-        String code = Util.getSampleText(Constant.SMOKE_DEBUGGER_FILE_PATH);
-        editor.setText(code);
-        
-        DebuggerOperator debugger = project.getDebugger();
-        
-        debugger.debug();
-        
-        //project.debug();
-        
-        Util.sleep(3000);
-        
-        //project.finishDebugger();
-        
-        debugger.finish();
+    public void finish(){
+        new FinishDebuggerAction().perform();
     }
 }
