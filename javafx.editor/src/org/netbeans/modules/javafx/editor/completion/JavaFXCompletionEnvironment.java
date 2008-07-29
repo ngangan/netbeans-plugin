@@ -660,9 +660,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (!modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT)) {
                 kws.add(ABSTRACT_KEYWORD);
             }
-            if (!modifiers.contains(STATIC)) {
-                kws.add(STATIC_KEYWORD);
-            }
             kws.add(READONLY_KEYWORD);
         }
         for (String kw : kws) {

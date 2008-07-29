@@ -137,7 +137,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String RETURN_KEYWORD = "return";
     public static final String REVERSE_KEYWORD = "reverse";
     public static final String SIZEOF_KEYWORD = "sizeof";
-    public static final String STATIC_KEYWORD = "static";
     public static final String STEP_KEYWORD = "step";
     public static final String SUPER_KEYWORD = "super";
     public static final String THEN_KEYWORD = "then";
