@@ -570,9 +570,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     @SuppressWarnings("fallthrough")
     protected void addKeywordsForStatement() {
+        if (LOGGABLE) log("addKeywordsForStatement");
         for (String kw : STATEMENT_KEYWORDS) {
+            String postfix = " (";
+            if (TRY_KEYWORD.equals(kw)) {
+                postfix = " {";
+            }
             if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, null, query.anchorOffset, false));
+                addResult(JavaFXCompletionItem.createKeywordItem(kw, postfix, query.anchorOffset, false));
             }
         }
         for (String kw : STATEMENT_SPACE_KEYWORDS) {
@@ -581,14 +586,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
         if (JavaFXCompletionProvider.startsWith(RETURN_KEYWORD, prefix)) {
-            JavaFXTreePath mth = JavaFXCompletionProvider.getPathElementOfKind(Tree.JavaFXKind.FUNCTION_DEFINITION, getPath());
+            JavaFXTreePath mth = JavaFXCompletionProvider.getPathElementOfKind(Tree.JavaFXKind.FUNCTION_DEFINITION, path);
+            if (LOGGABLE) log("   mth == " + mth);
             String postfix = SPACE;
             if (mth != null) {
-                 // XXX[pn]: is this right?
                 Tree rt = ((FunctionDefinitionTree) mth.getLeaf()).getFunctionValue().getType();
-                if (rt == null) {
+                if (LOGGABLE) log("    rt == " + rt + "   kind == " + (rt == null?"":rt.getJavaFXKind()));
+                if ((rt == null) || (rt.getJavaFXKind() == JavaFXKind.TYPE_UNKNOWN)) {
                     postfix = SEMI;
                 }
+                // TODO: handle Void return type ...
             }
             addResult(JavaFXCompletionItem.createKeywordItem(RETURN_KEYWORD, postfix, query.anchorOffset, false));
         }

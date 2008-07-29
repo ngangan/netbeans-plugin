@@ -77,8 +77,8 @@ public class TypeCastEnvironment extends JavaFXCompletionEnvironment<JFXTypeCast
             }
             return;
         }
-        addKeyword(INSTANCEOF_KEYWORD, prefix, false);
-        addKeyword(AS_KEYWORD, prefix, false);
+        addKeyword(INSTANCEOF_KEYWORD, SPACE, false);
+        addKeyword(AS_KEYWORD, SPACE, false);
         // TODO: show something more here?
     }
 
