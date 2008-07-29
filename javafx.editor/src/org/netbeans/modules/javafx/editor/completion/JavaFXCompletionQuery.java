@@ -469,6 +469,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new ParenthesizedTreeEnvironment();
                 break;
             case TYPE_CAST:
+                result = new TypeCastEnvironment();
                 break;
             case INSTANCE_OF:
                 result = new InstanceOfTreeEnvironment();
