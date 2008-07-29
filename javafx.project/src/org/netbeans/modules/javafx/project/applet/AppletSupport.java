@@ -581,9 +581,9 @@ public class AppletSupport {
         writer.println("        <resources>"); // NOI18N
         //TODO XXX hardcoded Java version
 
-        writer.println("            <j2se version=\"1.6+\" href=\"http://java.sun.com/products/autodl/j2se\">"); // NOI18N
+        writer.println("            <j2se version=\"1.6+\" href=\"http://java.sun.com/products/autodl/j2se\"/>"); // NOI18N
 
-        writer.println("            <jar href=\"" + distJar + "\">"); // NOI18N
+        writer.println("            <jar href=\"" + distJar + "\"/>"); // NOI18N
 
         String mainJar = "";
         for (int i = 0; i < libs.length; i++) {
@@ -592,7 +592,7 @@ public class AppletSupport {
             } else {
                 mainJar = "";
             }
-            writer.println("            <jar href=\"lib/" + libs[i] + "\"" + mainJar + ">"); // NOI18N
+            writer.println("            <jar href=\"lib/" + libs[i] + "\"" + mainJar + "/>"); // NOI18N
         }
         writer.println("        </resources>"); // NOI18N
         writer.println("        <applet-desc"); // NOI18N
@@ -600,7 +600,7 @@ public class AppletSupport {
         writer.println("            main-class=\"" + APPLET_MAIN_CLASS + "\""); // NOI18N
         writer.println("            width=\"300\""); // NOI18N
         writer.println("            height=\"300\">"); // NOI18N
-        writer.println("            <param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
+        writer.println("            <param name=\"ApplicationClass\" value=\"" + name + "\"/>"); // NOI18N
         writer.println("        </applet-desc>"); // NOI18N
         writer.println("    </jnlp>"); // NOI18N
         writer.flush();
