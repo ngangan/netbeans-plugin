@@ -583,11 +583,39 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case TYPE_ANY:
                 break;
             case TYPE_CLASS:
-                //result = new ClassDeclarationEnvironment();
                 break;
             case TYPE_FUNCTIONAL:
                 break;
             case TYPE_UNKNOWN:
+                break;
+            case BREAK:
+                break;
+            case CONTINUE:
+                break;
+            case IDENTIFIER:
+                break;
+            case EMPTY_STATEMENT:
+                break;
+            case TRY:
+                break;
+            case INT_LITERAL:
+            case LONG_LITERAL:
+            case FLOAT_LITERAL:
+            case DOUBLE_LITERAL:
+            case BOOLEAN_LITERAL:
+            case CHAR_LITERAL:
+            case STRING_LITERAL:
+            case NULL_LITERAL:
+                break;
+            case ERRONEOUS:
+                break;
+            case SIZEOF:
+                break;
+            case REVERSE:
+                break;
+            case INDEXOF:
+                break;
+            case OTHER:
                 break;
         }
 
