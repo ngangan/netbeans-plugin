@@ -43,6 +43,7 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.InstanceOfTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.tree.JFXTypeCast;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.type.TypeMirror;
@@ -55,14 +56,14 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  *
  * @author David Strupl
  */
-public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<InstanceOfTree> {
+public class TypeCastEnvironment extends JavaFXCompletionEnvironment<JFXTypeCast> {
     
-    private static final Logger logger = Logger.getLogger(InstanceOfTreeEnvironment.class.getName());
+    private static final Logger logger = Logger.getLogger(TypeCastEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(InstanceOfTree t) {
-        if (LOGGABLE) log("inside InstanceOfTree " + t);
+    protected void inside(JFXTypeCast t) {
+        if (LOGGABLE) log("inside JFXTypeCast " + t);
         ExpressionTree exp = t.getExpression();
         Tree type = t.getType();
         int typePos = (int)sourcePositions.getStartPosition(root, t.getType());
@@ -70,8 +71,9 @@ public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<Insta
         if (offset >= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
-            if ((last != null) && (last.token().id() == JFXTokenId.INSTANCEOF)){
+            if ((last != null) && (last.token().id() == JFXTokenId.AS)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
+                addBasicTypes();
             }
             return;
         }

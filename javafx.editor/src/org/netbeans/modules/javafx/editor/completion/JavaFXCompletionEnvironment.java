@@ -238,11 +238,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         query.results.add(i);
     }
 
-    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) throws IOException {
+    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) {
         addMembers(type, methods, fields, null);
     }
     
-    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) throws IOException {
+    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) {
         if (LOGGABLE) log("addMembers: " + type);
         JavafxcTrees trees = controller.getTrees();
         JavaFXTreePath p = new JavaFXTreePath(root);
@@ -307,7 +307,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected void localResult(TypeMirror smart) throws IOException {
+    protected void localResult(TypeMirror smart) {
         addLocalMembersAndVars(smart);
         addLocalAndImportedTypes(null, null, null, false, smart);
     }
@@ -316,7 +316,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("addMemberConstantsAndTypes: " + type + " elem: " + elem);
     }
 
-    protected void addLocalMembersAndVars(TypeMirror smart) throws IOException {
+    protected void addLocalMembersAndVars(TypeMirror smart) {
         if (LOGGABLE) log("addLocalMembersAndVars: " + prefix);
 //        controller.toPhase(Phase.ANALYZED);
 
@@ -509,7 +509,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) throws IOException {
+    protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) {
         if (LOGGABLE) log("NOT IMPLEMENTED: getSubtypesOf " + baseType);
         return Collections.emptyList();
     }
@@ -519,7 +519,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addKeyword(String kw, String postfix, boolean smartType) {
-        if (JavaFXCompletionProvider.startsWith(kw, getPrefix())) {
+        if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
             addResult(JavaFXCompletionItem.createKeywordItem(kw, postfix, query.anchorOffset, smartType));
         }
     }
@@ -613,7 +613,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected void addValueKeywords() throws IOException {
+    protected void addValueKeywords() {
         if (JavaFXCompletionProvider.startsWith(FALSE_KEYWORD, prefix)) {
             addResult(JavaFXCompletionItem.createKeywordItem(FALSE_KEYWORD, null, query.anchorOffset, false));
         }
@@ -774,7 +774,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
     
-    protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) throws IOException {
+    protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) {
         if (LOGGABLE) log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
         JavaFXTreePath p = new JavaFXTreePath(root);
@@ -801,7 +801,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             final EnumSet<ElementKind> kinds, final DeclaredType baseType, 
             final Set<? extends Element> toExclude,
             boolean insideNew, TypeMirror smart, JavafxcScope originalScope,
-            PackageElement myPackage,boolean simpleNameOnly) throws IOException {
+            PackageElement myPackage,boolean simpleNameOnly) {
         final Elements elements = controller.getElements();
         JavafxcTrees trees = controller.getTrees();
         for (Element local : from) {
