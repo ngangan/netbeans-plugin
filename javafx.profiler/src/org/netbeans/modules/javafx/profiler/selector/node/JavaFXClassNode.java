@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -40,80 +40,63 @@
 
 package org.netbeans.modules.javafx.profiler.selector.node;
 
-import javax.swing.ImageIcon;
-import org.netbeans.api.java.source.ElementHandle;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import java.util.Comparator;
+import javax.lang.model.element.Element;
+import org.netbeans.lib.profiler.client.ClientUtils;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.java.source.ElementHandle;
+import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
-import org.netbeans.modules.profiler.selector.spi.nodes.ClassChildren;
+import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 
 /**
  *
  * @author cms
  */
 public class JavaFXClassNode extends ContainerNode {
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
 
     private ClasspathInfo cpInfo;
     private ElementHandle<TypeElement> classHandle;
-    private boolean anonymous;
-    
-    public static final Comparator COMPARATOR = new Comparator<JavaFXClassNode>() {
-        public int compare(JavaFXClassNode o1, JavaFXClassNode o2) {
-            return o1.toString().compareTo(o2.toString());
-        }
-    };
 
-
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
-//    private final ClientUtils.SourceCodeSelection signature;
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    /** Creates a new instance of JavaFXClassNode */
-    public JavaFXClassNode(final ClasspathInfo cpInfo, final Icon icon, final TypeElement classElement, final ContainerNode parent) {
-        this(cpInfo, icon, classElement, classElement.getSimpleName().toString(), parent);
+    /** Creates a new instance of AbstractClassNode */
+    public JavaFXClassNode(ClasspathInfo cpInfo, Icon icon, Element classElement, ContainerNode parent) {
+        super(classElement.getSimpleName().toString(), icon, parent);
+        this.classElement = classElement;
         this.cpInfo = cpInfo;
-        this.classHandle = ElementHandle.create(classElement);
-//        this.anonymous = classElement.getNestingKind().compareTo(NestingKind.ANONYMOUS) == 0;
-//        signature = new ClientUtils.SourceCodeSelection(ElementUtilities.getBinaryName(classElement), "*", ""); // NOI18N
-    }
-
-    public JavaFXClassNode(final ClasspathInfo cpInfo, final Icon icon, final TypeElement classElement, final String className,
-                     final ContainerNode parent) {
-        super(className, icon, parent);
-        this.cpInfo = cpInfo;
-        this.classHandle = ElementHandle.create(classElement);        
-//        this.anonymous = classElement.getNestingKind().compareTo(NestingKind.ANONYMOUS) == 0;
-//        signature = new ClientUtils.SourceCodeSelection(ElementUtilities.getBinaryName(classElement), "*", ""); // NOI18N
-    }
-
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-//    public ClientUtils.SourceCodeSelection getSignature() {
-//        return signature;
-//    }
-
-    protected SelectorChildren getChildren() {
-        return new ClassChildren();
-    }
-    
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
-    public boolean isAnonymous() {
-        return anonymous;
+// TBD !!!!!!!!!!!!!!!!!        
+//       signature = new ClientUtils.SourceCodeSelection(ElementUtilities.getBinaryName(classElement), "*", ""); // NOI18N
+//        this.classHandle = ElementHandle.create(classElement);
     }
 
     public ElementHandle<TypeElement> getClassHandle() {
         return classHandle;
     }
 
+    public Element getClassElement() {
+        return classElement;
+    }
     public ClasspathInfo getCpInfo() {
         return cpInfo;
     }
+
+    public static final Comparator COMPARATOR = new Comparator<JavaFXClassNode>() {
+        public int compare(JavaFXClassNode o1, JavaFXClassNode o2) {
+            return o1.toString().compareTo(o2.toString());
+        }
+    };
+
+    private Element classElement;
+
+    @Override
+    public ClientUtils.SourceCodeSelection getSignature() {
+// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        
+        return new ClientUtils.SourceCodeSelection(((TypeElement)classElement).getQualifiedName().toString(),
+                                                         JavaFXProjectUtilities.MAGIC_METHOD_NAME, JavaFXProjectUtilities.MAGIC_METHOD_SIGNATURE);
+    }
+
+    protected SelectorChildren getChildren() {
+        return new JavaFXClassChildren();
+    }    
 }

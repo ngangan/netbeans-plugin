@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -59,23 +59,20 @@ import org.openide.filesystems.FileObject;
  * @author cms
  */
 public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
-    //~ Enumerations -------------------------------------------------------------------------------------------------------------
-
+    
+    JavaFXProject project;
     public static enum PackageType {//~ Enumeration constant initializers ------------------------------------------------------------------------------------
 
         Libraries, Source;
     }
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     private final JavaFXProjectPackages.PackageType packageType;
     private final Set<SearchScope> scope = new HashSet<SearchScope>();
     private final boolean subprojects;
 
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
-    public JavaFXProjectPackages(final JavaFXProjectPackages.PackageType type, final boolean includeSubprojects) {
+    public JavaFXProjectPackages(final JavaFXProjectPackages.PackageType type, final JavaFXProject project, final boolean includeSubprojects) {
         this.packageType = type;
+        this.project = project;
 
         switch (type) {
             case Source:
@@ -91,13 +88,10 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
         this.subprojects = includeSubprojects;
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     protected List<SelectorNode> prepareChildren(ContainerNode parent) {
         List<SelectorNode> pkgs = new ArrayList<SelectorNode>();
 
-        JavaFXProject project = (JavaFXProject)parent.getProject();
-        ClasspathInfo cpInfo = JavaFXProjectUtilities.createClassPathInfo((JavaFXProject)project);        
+        ClasspathInfo cpInfo = JavaFXProjectUtilities.createClassPathInfo((JavaFXProject)project);
         
         FileObject[] roots = project.getFOSourceRoots();
 
@@ -126,7 +120,7 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
                 if (!files[i].isFolder()) {
                     if (JavaFXProjectUtilities.SOURCES_TYPE_JAVA.equalsIgnoreCase(files[i].getExt()) ||
                         JavaFXProjectUtilities.SOURCES_TYPE_JAVAFX.equalsIgnoreCase(files[i].getExt())) {
-                        JavaFXPackageNode node = new JavaFXPackageNode(cpInfo, root, parent, scope);
+                        JavaFXPackageNode node = new JavaFXPackageNode(cpInfo, root, parent, scope, project);
                         if (!pkgs.contains(node))
                             pkgs.add(node);
                     }

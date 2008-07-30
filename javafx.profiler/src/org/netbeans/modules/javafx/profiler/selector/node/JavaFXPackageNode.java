@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -60,6 +60,7 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -67,14 +68,11 @@ import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 
 /**
  *
- * cms
+ * @author cms
  */
 public class JavaFXPackageNode extends ContainerNode {
-    //~ Inner Classes ------------------------------------------------------------------------------------------------------------
-
-    private class PackageChildren extends SelectorChildren<JavaFXPackageNode> {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
+    
+    private static class JavaFXPackageChildren extends SelectorChildren<JavaFXPackageNode> {
         protected List<SelectorNode> prepareChildren(JavaFXPackageNode parent) {
             List<SelectorNode> nodes = new ArrayList<SelectorNode>();
             List<JavaFXClassNode> classes = getClasses(parent);
@@ -85,48 +83,42 @@ public class JavaFXPackageNode extends ContainerNode {
 
         private List<JavaFXClassNode> getClasses(final JavaFXPackageNode parent) {
             final List<JavaFXClassNode> nodes = new ArrayList<JavaFXClassNode>();
-            FileObject[] files = fo.getChildren();
-            for (int i = 0; i < files.length; i++)
-                if (!files[i].isFolder()) {
-              JavaFXSource source = JavaFXSource.forFileObject(files[i]);                               
-                    try {
-                        source.runUserActionTask(new CancellableTask<CompilationController>() {
-                                public void cancel() {
-                                }
+            FileObject[] files = parent.getFO().getChildren();
+            JavaFXSource js = JavaFXSource.forFileObject(files[0]);                               
 
-                                public void run(CompilationController controller)
-                                         throws Exception {
-                                    if (JavaFXSource.Phase.ELEMENTS_RESOLVED.compareTo(controller.toPhase(JavaFXSource.Phase.ELEMENTS_RESOLVED))<=0) {
-                                    
-                                        PackageElement pelem = controller.getElements().getPackageElement(parent.getName());
+            try {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
+                        public void cancel() {
+                        }
 
+                        public void run(CompilationController controller)
+                                 throws Exception {
+                            if (JavaFXSource.Phase.ELEMENTS_RESOLVED.compareTo(controller.toPhase(JavaFXSource.Phase.ELEMENTS_RESOLVED))<=0) {
+                            
+                                PackageElement pelem = controller.getElements().getPackageElement(parent.getName());
 
-                                        if (pelem != null) {
-                                            for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
-                                                if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
-                                                    nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
-                                                }
-                                            }
-                                        } else {
-                                            LOGGER.log(Level.FINEST, "Package name {0} resulted into a NULL element", parent.getName()); // NOI18N
+                                if (pelem != null) {
+                                    for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
+                                        if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
+                                            nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
                                         }
                                     }
+                                } else {
+                                    LOGGER.log(Level.FINEST, "Package name {0} resulted into a NULL element", parent.getName()); // NOI18N
                                 }
-                            }, true);
-                    } catch (IOException ex) {
-                        LOGGER.severe(ex.getLocalizedMessage());
-                    }
-                }
-
+                            }
+                        }
+                    }, true);
+            } catch (IOException ex) {
+                LOGGER.severe(ex.getLocalizedMessage());
+            }
             Collections.sort(nodes, JavaFXClassNode.COMPARATOR);
 
             return nodes;
         }
-
     }
-
-    //~ Static fields/initializers -----------------------------------------------------------------------------------------------
-
+            
+            
     public static final String DEFAULT_NAME = "<default>"; // NOI18N
     static final Comparator COMPARATOR = new Comparator<JavaFXPackageNode>() {
         public int compare(JavaFXPackageNode o1, JavaFXPackageNode o2) {
@@ -140,30 +132,31 @@ public class JavaFXPackageNode extends ContainerNode {
 
     private static final Logger LOGGER = Logger.getLogger(JavaFXPackageNode.class.getName());
 
-    //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     private final ClientUtils.SourceCodeSelection signature;
     private final ClasspathInfo cpInfo;
     private final Set<SearchScope> scope;
     private final String name;
-    private static FileObject fo;    
-
-    //~ Constructors -------------------------------------------------------------------------------------------------------------
-
+    private final FileObject fo;
+    private final JavaFXProject project;
+    
     /** Creates a new instance of JavaFXPackageNode */
-    public JavaFXPackageNode(final ClasspathInfo cpInfo, FileObject fobj, final ContainerNode parent, final Set<SearchScope> scope) {
-        super(stripName(defaultizeName(fobj.getName())), IconResource.PACKAGE_ICON, parent);        
-        fo = fobj;
+    public JavaFXPackageNode(final ClasspathInfo cpInfo, final FileObject fo, final ContainerNode parent, final Set<SearchScope> scope, final JavaFXProject project) {
+        super(stripName(defaultizeName(fo.getName())), IconResource.PACKAGE_ICON, parent);        
+        this.project = project;
+        this.fo = fo;
         name = fo.getName();        
         this.cpInfo = cpInfo;
+        // this.name = name;
         this.signature = new ClientUtils.SourceCodeSelection(name + ".*", null, null); // NOI18N
         this.scope = scope;
     }
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public String getName() {
         return name;
+    }
+    
+    private FileObject getFO() {
+        return fo;
     }
 
     @Override
@@ -172,7 +165,7 @@ public class JavaFXPackageNode extends ContainerNode {
     }
 
     protected SelectorChildren getChildren() {
-        return new PackageChildren();
+        return new JavaFXPackageChildren();
     }
 
     ClasspathInfo getCpInfo() {

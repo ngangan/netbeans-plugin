@@ -68,6 +68,8 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     private static final String LIBRARIES_STRING = NbBundle.getMessage(JavaFXSelectionTreeBuilderImpl.class,
                                                                        "SelectionTreeBuilderImpl_LibrariesString"); // NOI18N
                                                                                                                     // -----
+    
+    private JavaFXProject project;
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
 
@@ -84,6 +86,8 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     }
 
     public boolean isPreferred(Project project) {
+        if (project instanceof JavaFXProject)
+            this.project = (JavaFXProject)project;
         return project instanceof JavaFXProject;
     }
 
@@ -126,7 +130,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         protected SelectorChildren getChildren() {
-            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Libraries, includeSubprojects);
+            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Libraries, project, includeSubprojects);
         }
     }
 
@@ -146,7 +150,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
         //~ Methods --------------------------------------------------------------------------------------------------------------
 
         protected SelectorChildren getChildren() {
-            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Source, includeSubprojects);
+            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Source, project, includeSubprojects);
         }
     }
 

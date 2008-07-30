@@ -82,6 +82,8 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static final String SOURCES_TYPE_JAVAFX = "fx";         // NOI18N
     public static final String SOURCES_TYPE_JAVA   = "java";       // NOI18N
     public static final String JAVAFX_MIME_TYPE    = "text/x-fx";  // NOI18N
+    public static final String MAGIC_METHOD_NAME    = "javafx$run$";  // NOI18N
+    public static final String MAGIC_METHOD_SIGNATURE    = "Sequence";  // NOI18N
 
     public static ClientUtils.SourceCodeSelection[] getProjectDefaultRoots(Project project, String[][] projectPackagesDescr) {
         computeProjectPackages(project, true, projectPackagesDescr);
@@ -353,42 +355,68 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     }
     
     public static FileObject getFile(Element handle, final JavaFXProject project) {
-            String[] signature = getSignature(handle);
-            assert signature.length >= 1;
-            String pkgName, className = null;
-            int index = signature[0].lastIndexOf('.');                          //NOI18N
-            pkgName = FileObjects.convertPackage2Folder(signature[0].substring(0,index));
-            className = signature[0].substring(index+1);
-            
-            final ClasspathInfo cpInfo = createClassPathInfo(project);
-            
-            ClassPath bCP = cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT);
-            ClassPath cCP = cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE);
-            ClassPath sourcePath = cpInfo.getClassPath(ClasspathInfo.PathKind.SOURCE);            
-            
-            List<FileObject> fos = bCP.findAllResources(pkgName);
-            fos.addAll(cCP.findAllResources(pkgName));
-            fos.addAll(sourcePath.findAllResources(pkgName));
-            
-            for (FileObject fo : fos) {
-                LinkedList<FileObject> folders = new LinkedList<FileObject>(sourcePath.findAllResources(pkgName));
-                // TBD make sure if this is case sensitive really
-                boolean caseSensitive = true;
-                int ind = className.indexOf('$'); //NOI18N
-                String sourceFileName = ind == -1 ? className : className.substring(0, ind);
-                folders.addFirst(fo);
-                for (FileObject folder : folders) {
-                    FileObject[] children = folder.getChildren();
-                    for (FileObject child : children) {
-                        if (((caseSensitive && child.getName().equals (sourceFileName)) ||
-                            (!caseSensitive && child.getName().equalsIgnoreCase (sourceFileName))) &&
-                            (child.isData() && isJavaFXFile(child))) {
-                            return child;
-                        }
+        String[] signature = getSignature(handle);
+        assert signature.length >= 1;
+        String pkgName, className = null;
+        int index = signature[0].lastIndexOf('.');                          //NOI18N
+        pkgName = FileObjects.convertPackage2Folder(signature[0].substring(0,index));
+        className = signature[0].substring(index+1);
+
+        final ClasspathInfo cpInfo = createClassPathInfo(project);
+
+        ClassPath bCP = cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT);
+        ClassPath cCP = cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE);
+        ClassPath sourcePath = cpInfo.getClassPath(ClasspathInfo.PathKind.SOURCE);            
+
+        List<FileObject> fos = bCP.findAllResources(pkgName);
+        fos.addAll(cCP.findAllResources(pkgName));
+        fos.addAll(sourcePath.findAllResources(pkgName));
+
+        for (FileObject fo : fos) {
+            LinkedList<FileObject> folders = new LinkedList<FileObject>(sourcePath.findAllResources(pkgName));
+            // TBD make sure if this is case sensitive really
+            boolean caseSensitive = true;
+            int ind = className.indexOf('$'); //NOI18N
+            String sourceFileName = ind == -1 ? className : className.substring(0, ind);
+            folders.addFirst(fo);
+            for (FileObject folder : folders) {
+                FileObject[] children = folder.getChildren();
+                for (FileObject child : children) {
+                    if (((caseSensitive && child.getName().equals (sourceFileName)) ||
+                        (!caseSensitive && child.getName().equalsIgnoreCase (sourceFileName))) &&
+                        (child.isData() && isJavaFXFile(child))) {
+                        return child;
                     }
                 }
             }
-            return null;
+        }
+        return null;
+    }
+/*    TBD !!!!!!!!!!!!!!!!!!
+    public static String getBinaryName(Element element, Element parent) {
+            if (owner == null) return name;
+
+            if (((owner.kind != ERR)) && ((owner.kind & (VAR | MTH)) != 0 || (owner.kind == TYP && owner.type.tag == TYPEVAR))) return name;
+
+            Name prefix = owner.getQualifiedName();
+
+            if (prefix == null || prefix == prefix.table.empty) return name; else  return prefix.append('.', name);
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (owner == null || (owner.kind & (VAR | MTH)) != 0 || (owner.kind == TYP && owner.type.tag == TYPEVAR)) return name;
+
+            char sep = owner.kind == TYP ? '$' : '.';
+
+            Name prefix = owner.flatName();
+
+            if (prefix == null || prefix == prefix.table.empty) return name; else  return prefix.append(sep, name);
+    }
+  */  
+    
+    public static String getBinaryName (TypeElement element) throws IllegalArgumentException {
+        if (element instanceof Symbol.TypeSymbol) {
+            return ((Symbol.TypeSymbol)element).flatName().toString();
+        }
+        throw new IllegalArgumentException();
     }
     
     private static String[] getSignature(Element element) {
@@ -408,5 +436,5 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         sb.append(nameChars,0,charLength);
             
         return new String[] { sb.toString() };
-    }
+    }    
 }
