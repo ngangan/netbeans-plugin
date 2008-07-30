@@ -257,10 +257,10 @@ public class AppletSupport {
             writer = new PrintWriter(jnlpFile.getOutputStream(lock));
             ClassPath sp = ClassPath.getClassPath(appletFile, ClassPath.SOURCE);
             String path = FileUtil.getRelativePath(sp.findOwnerRoot(appletFile), appletFile);
-            String codebase = FileUtil.getRelativePath(buildDir, classesDir);
+            String codebase = FileUtil.toFile(distDir).toURI().toString();//FileUtil.getRelativePath(buildDir, classesDir);
 
             if (codebase == null) {
-                codebase = classesDir.getURL().toString();
+                codebase = distDir.getURL().toString();
             }
             String appletJavaScript = ep.getProperty(JavaFXProjectProperties.APPLET_JAVASCRIPT);
             if (appletFile.getExt().equals("fx")) {
@@ -286,10 +286,10 @@ public class AppletSupport {
                 }
 
                 path = path.substring(0, path.length() - 3);
-                fillInJNLPFile(writer, path.replaceAll("/", "."), codebase, true, list, distJAR);
+                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, true, list, distJAR);
             } else {
                 path = path.substring(0, path.length() - 5);
-                fillInJNLPFile(writer, path.replaceAll("/", "."), codebase, false, null, null);
+                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, false, null, null);
             }
         } finally {
             lock.releaseLock();
@@ -561,12 +561,15 @@ public class AppletSupport {
      * @param file is a file to be filled
      * @param name is name of the applet                                     
      */
-    private static void fillInJNLPFile(PrintWriter writer, String name, String codebase, boolean isFX, String[] libs, String distJar) {
+    private static void fillInJNLPFile(PrintWriter writer, String name, String jnlpFileName,String codebase, boolean isFX, String[] libs, String distJar) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); // NOI18N
-
-        writer.println("    <jnlp href=\"" + name + "\">"); // NOI18N
+        if (codebase == null) {
+            writer.println("    <jnlp href=\"" + jnlpFileName + "\">"); // NOI18N
+        } else {
+            writer.println("    <jnlp href=\"" + jnlpFileName + "\" codebase=\""+codebase+"\">"); // NOI18N
+        }
 
         writer.println("        <information>"); // NOI18N
 
