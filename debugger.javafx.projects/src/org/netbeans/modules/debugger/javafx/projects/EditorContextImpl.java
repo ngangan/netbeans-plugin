@@ -722,9 +722,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -833,9 +833,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -907,9 +907,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -1105,9 +1105,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -1191,9 +1191,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         ops[0] = new Operation[] {};
@@ -1363,9 +1363,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -1415,9 +1415,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -1466,7 +1466,7 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.PARSED).compareTo(Phase.PARSED) < 0) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.PARSED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -1708,9 +1708,9 @@ public class EditorContextImpl extends EditorContext {
                 public void cancel() {
                 }
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.RESOLVED).compareTo(Phase.RESOLVED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.RESOLVED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;

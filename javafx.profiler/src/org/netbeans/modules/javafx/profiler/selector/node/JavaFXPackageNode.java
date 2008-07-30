@@ -93,7 +93,7 @@ public class JavaFXPackageNode extends ContainerNode {
 
                         public void run(CompilationController controller)
                                  throws Exception {
-                            if (JavaFXSource.Phase.ELEMENTS_RESOLVED.compareTo(controller.toPhase(JavaFXSource.Phase.ELEMENTS_RESOLVED))<=0) {
+                            if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
                             
                                 PackageElement pelem = controller.getElements().getPackageElement(parent.getName());
 

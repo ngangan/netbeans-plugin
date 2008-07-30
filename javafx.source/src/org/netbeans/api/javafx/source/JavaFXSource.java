@@ -98,8 +98,6 @@ public final class JavaFXSource {
         MODIFIED,
         PARSED,
         ANALYZED,
-        ELEMENTS_RESOLVED,
-        RESOLVED,   
         UP_TO_DATE;
         
         public boolean lessThan(Phase p) {
@@ -237,6 +235,10 @@ public final class JavaFXSource {
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
         }
+        if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.UP_TO_DATE)) {
+            cc.setPhase(Phase.UP_TO_DATE);
+        }
+        
         return phase;
     }
 

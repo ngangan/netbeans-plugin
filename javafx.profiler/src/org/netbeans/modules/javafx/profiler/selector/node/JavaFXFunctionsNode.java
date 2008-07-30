@@ -81,7 +81,7 @@ public class JavaFXFunctionsNode extends ContainerNode {
 
                         public void run(CompilationController controller)
                                  throws Exception {
-                            if (JavaFXSource.Phase.ELEMENTS_RESOLVED.compareTo(controller.toPhase(JavaFXSource.Phase.ELEMENTS_RESOLVED))<=0) {
+                            if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);

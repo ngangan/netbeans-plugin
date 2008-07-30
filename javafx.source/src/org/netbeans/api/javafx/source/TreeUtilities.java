@@ -333,7 +333,7 @@ public final class TreeUtilities {
     }
 
     public ExpressionTree getBreakContinueTarget(JavaFXTreePath breakOrContinue) throws IllegalArgumentException {
-        if (info.getPhase().compareTo(Phase.RESOLVED) < 0)
+        if (info.getPhase().lessThan(Phase.ANALYZED))
             throw new IllegalArgumentException("Not in correct Phase. Required: Phase.RESOLVED, got: Phase." + info.getPhase().toString());
         
         Tree leaf = breakOrContinue.getLeaf();
