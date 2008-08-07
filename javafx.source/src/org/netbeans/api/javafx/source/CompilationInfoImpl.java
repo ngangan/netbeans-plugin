@@ -145,7 +145,7 @@ class CompilationInfoImpl {
         this.compilationUnit = compilationUnit;
     }
 
-    JavafxcTask getJavafxcTask() {
+    JavafxcTaskImpl getJavafxcTask() {
         if (cTask == null) {
             cTask = source.createJavafxcTask(new DiagnosticListenerImpl());
         }
