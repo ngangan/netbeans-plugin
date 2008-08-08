@@ -39,45 +39,25 @@
 
 package org.netbeans.modules.javafx.profiler.utilities;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
-import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.spi.project.SubprojectProvider;
-import org.openide.filesystems.FileObject;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.openide.filesystems.FileUtil;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
-import javax.lang.model.element.Element;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.Name;
-import java.util.Iterator;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
-import org.netbeans.lib.profiler.utils.VMUtils;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVisitor;
 import org.netbeans.api.javafx.source.CompilationInfo;
-
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -106,9 +86,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.TypeVisitor;
 import javax.lang.model.type.WildcardType;
-
-
-
 
 /**
  *
@@ -429,7 +406,8 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         }
         return null;
     }
-/*    TBD !!!!!!!!!!!!!!!!!!
+
+    /*    TBD !!!!!!!!!!!!!!!!!!
     public static String getBinaryName(Element element, Element parent) {
             if (owner == null) return name;
 
@@ -483,8 +461,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 case STATIC_INIT:
 
                     //case INSTANCE_INIT: // not supported
-// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                    
-String bredt = method.getKind().toString();
                     String paramsVMSignature = getParamsSignature(method.getParameters(), ci);
                     String retTypeVMSignature = VMUtils.typeToVMSignature(getRealTypeName(method.getReturnType(), ci));
 
