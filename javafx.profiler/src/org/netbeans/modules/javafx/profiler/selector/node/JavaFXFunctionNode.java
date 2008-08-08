@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
@@ -90,7 +91,9 @@ public class JavaFXFunctionNode extends SelectorNode {
                     public void run(CompilationController controller)
                              throws Exception {
 // TBD !!!!!!!!!!!!!!!!!! need to have getVMMethodSignature implemented
-// signature.setValue(SourceUtils.getVMMethodSignature(method, controller));                                                
+// signature.setValue(SourceUtils.getVMMethodSignature(method, controller));     
+if (method instanceof ExecutableElement)                        
+                        signature = JavaFXProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
                     }
                 }, true);
         } catch (IOException ex) {
@@ -99,8 +102,11 @@ public class JavaFXFunctionNode extends SelectorNode {
 
         if (signature != null) {
 // TBD !!!!!!!!!!!!!!!!!! implement binary names
+String caca = getEnclosingClass(method).getQualifiedName().toString();
+String maka = method.getSimpleName().toString();
+String sig = signature;        
         rootMethod = new ClientUtils.SourceCodeSelection(getEnclosingClass(method).getQualifiedName().toString(),
-                                                         method.getSimpleName().toString(), "");
+                                                         method.getSimpleName().toString(), signature);
 
 //                    ElementUtilities.getBinaryName(getEnclosingClass(method)),
 //                                                             method.getSimpleName().toString(), signature.getValue());

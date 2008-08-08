@@ -78,7 +78,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(this.getClass(), "BuilderDisplayName"); // NOI18N
+        return NbBundle.getMessage(JavaFXSelectionTreeBuilderImpl.class, "BuilderDisplayName"); // NOI18N
     }
 
     public String getID() {

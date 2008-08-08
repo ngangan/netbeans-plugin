@@ -51,6 +51,11 @@ import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 
+
+// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+import java.util.logging.Logger;
+
+
 /**
  *
  * @author cms
@@ -59,6 +64,9 @@ public class JavaFXClassNode extends ContainerNode {
 
     private ClasspathInfo cpInfo;
     private ElementHandle<TypeElement> classHandle;
+// TBD CMS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+private static final Logger LOGGER = Logger.getLogger(JavaFXClassNode.class.getName());
+    
 
     /** Creates a new instance of AbstractClassNode */
     public JavaFXClassNode(ClasspathInfo cpInfo, Icon icon, Element classElement, ContainerNode parent) {
@@ -91,7 +99,8 @@ public class JavaFXClassNode extends ContainerNode {
 
     @Override
     public ClientUtils.SourceCodeSelection getSignature() {
-// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        
+// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
+// only javafx$run$ selected so far        
         return new ClientUtils.SourceCodeSelection(((TypeElement)classElement).getQualifiedName().toString(),
                                                          JavaFXProjectUtilities.MAGIC_METHOD_NAME, JavaFXProjectUtilities.MAGIC_METHOD_SIGNATURE);
     }
