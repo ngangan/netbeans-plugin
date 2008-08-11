@@ -39,6 +39,7 @@
 
 package org.netbeans.modules.javafx.profiler.utilities;
 
+import com.sun.tools.javac.code.Kinds;
 import java.util.LinkedList;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -55,6 +56,7 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.TypeTags;
 import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.Name;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -313,6 +315,14 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
             return null;
         }
         
+        if (className.indexOf('$') != -1) {
+            try {
+                new Integer(className.substring(className.indexOf('$') + 1, className.length()));
+                className = className.substring(0, className.indexOf('$')); // digit. Assume hidden anonymous inner class                
+            } catch (NumberFormatException e) {
+            }
+        }
+    
         TypeElement mainClass = controller.getElements().getTypeElement(className.replace('$', '.')); // NOI18N
 
         if (mainClass != null) {
@@ -407,25 +417,23 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return null;
     }
 
-    /*    TBD !!!!!!!!!!!!!!!!!!
     public static String getBinaryName(Element element, Element parent) {
-            if (owner == null) return name;
+        Symbol owner = (Symbol)parent;
+        Name name = ((Symbol)element).getQualifiedName();
 
-            if (((owner.kind != ERR)) && ((owner.kind & (VAR | MTH)) != 0 || (owner.kind == TYP && owner.type.tag == TYPEVAR))) return name;
+        if (owner == null || (owner.kind & (Kinds.VAR | Kinds.MTH)) != 0 || 
+                (owner.kind == Kinds.TYP && owner.type.tag == TypeTags.TYPEVAR)) 
+            return name.toString();
 
-            Name prefix = owner.getQualifiedName();
+        char sep = owner.kind == Kinds.TYP ? '$' : '.';
+        name = ((Symbol)element).getSimpleName();
+        
+        Name prefix = owner.flatName();
 
-            if (prefix == null || prefix == prefix.table.empty) return name; else  return prefix.append('.', name);
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            if (owner == null || (owner.kind & (VAR | MTH)) != 0 || (owner.kind == TYP && owner.type.tag == TYPEVAR)) return name;
-
-            char sep = owner.kind == TYP ? '$' : '.';
-
-            Name prefix = owner.flatName();
-
-            if (prefix == null || prefix == prefix.table.empty) return name; else  return prefix.append(sep, name);
+        if (prefix == null || prefix == prefix.table.empty) return name.toString(); 
+        else  return prefix.append(sep, name).toString();
     }
-  */  
+    
     
     public static String getBinaryName (TypeElement element) throws IllegalArgumentException {
         if (element instanceof Symbol.TypeSymbol) {
@@ -596,4 +604,3 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         }
     }    
 }
-

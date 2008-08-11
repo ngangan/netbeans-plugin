@@ -53,7 +53,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
-import org.netbeans.api.java.source.ElementUtilities;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -74,7 +73,6 @@ public class JavaFXFunctionNode extends SelectorNode {
 
 
     private ClientUtils.SourceCodeSelection rootMethod;
-// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
     private String signature = "signature";
 
     /** Creates a new instance of MethodNode */
@@ -90,9 +88,7 @@ public class JavaFXFunctionNode extends SelectorNode {
 
                     public void run(CompilationController controller)
                              throws Exception {
-// TBD !!!!!!!!!!!!!!!!!! need to have getVMMethodSignature implemented
-// signature.setValue(SourceUtils.getVMMethodSignature(method, controller));     
-if (method instanceof ExecutableElement)                        
+                    if (method instanceof ExecutableElement)                        
                         signature = JavaFXProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
                     }
                 }, true);
@@ -101,11 +97,7 @@ if (method instanceof ExecutableElement)
         }
 
         if (signature != null) {
-// TBD !!!!!!!!!!!!!!!!!! implement binary names
-String caca = getEnclosingClass(method).getQualifiedName().toString();
-String maka = method.getSimpleName().toString();
-String sig = signature;        
-        rootMethod = new ClientUtils.SourceCodeSelection(getEnclosingClass(method).getQualifiedName().toString(),
+        rootMethod = new ClientUtils.SourceCodeSelection(JavaFXProjectUtilities.getBinaryName((Element)getEnclosingClass(method), (Element)getEnclosingClass(getEnclosingClass(method))),
                                                          method.getSimpleName().toString(), signature);
 
 //                    ElementUtilities.getBinaryName(getEnclosingClass(method)),

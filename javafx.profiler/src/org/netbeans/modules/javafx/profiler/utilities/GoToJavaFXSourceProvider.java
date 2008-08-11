@@ -41,7 +41,6 @@ package org.netbeans.modules.javafx.profiler.utilities;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -60,7 +59,6 @@ import org.openide.loaders.DataObjectNotFoundException;
 public class GoToJavaFXSourceProvider implements GoToSourceProvider {
     public boolean openSource(final Project project, final String className, final String methodName, final String signature) {
         final JavaFXSource js = JavaFXProjectUtilities.getSources((JavaFXProject)project);
-        final AtomicBoolean result = new AtomicBoolean(false);
         final CountDownLatch latch = new CountDownLatch(1);
         
         try {
