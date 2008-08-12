@@ -84,7 +84,7 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
-        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0pre1/lib/javafxc.jar", "org.netbeans.modules.javafx", false);
+        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0dev/lib/javafxc.jar", "org.netbeans.modules.javafx", false);
         if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
             fxPath = InstalledFileLocator.getDefault().locate("lib/javafxc.jar", "org.netbeans.modules.javafx", false);
         if (fxPath != null && fxPath.isFile()) try {
@@ -93,7 +93,7 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
-        if (sources == null || javadoc == null) {
+        if ((fxPath!= null) && (sources == null || javadoc == null)) {
             List<URL> src = new ArrayList<URL>(), jdc = new ArrayList<URL>();
             findSourcesAndJavadoc(src, jdc, javaHome, fxPath.getParentFile().getParentFile());
             if (sources == null) sources = src;
