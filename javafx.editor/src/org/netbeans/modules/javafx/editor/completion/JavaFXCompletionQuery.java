@@ -455,6 +455,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 break;
             case RETURN:
                 result = new ReturnEnvironment();
+                break;
             case THROW:
                 result = new ThrowEnvironment();
                 break;
