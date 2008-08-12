@@ -41,10 +41,10 @@
 
 package org.netbeans.modules.debugger.javafx.expr;
 
+import com.sun.javafx.api.tree.Tree;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.Value;
 import com.sun.jdi.InvocationException;
-import com.sun.source.tree.Tree;
 
 import java.util.*;
 import java.text.MessageFormat;

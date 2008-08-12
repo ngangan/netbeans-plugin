@@ -19,7 +19,8 @@
 
 package org.netbeans.modules.debugger.javafx.expr;
 
-import com.sun.source.tree.Tree;
+//import com.sun.source.tree.Tree;
+import com.sun.javafx.api.tree.Tree;
 import java.util.Collection;
 
 /**

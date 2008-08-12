@@ -52,6 +52,8 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.VariableTree;
 
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -75,6 +77,8 @@ import javax.swing.text.StyledDocument;
 import javax.swing.JEditorPane;
 
 import com.sun.tools.javafx.code.JavafxVarSymbol;
+import com.sun.tools.javafx.main.JavafxCompiler;
+import java.util.LinkedList;
 import javax.lang.model.util.Elements;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -86,6 +90,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 //import org.netbeans.api.java.classpath.ClassPath;
+import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
 //import org.netbeans.api.java.source.ElementUtilities;
@@ -115,9 +120,14 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 
 import org.netbeans.editor.JumpList;
 import org.netbeans.api.debugger.javafx.LineBreakpoint;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.spi.debugger.javafx.EditorContext;
 
 import org.netbeans.spi.debugger.javafx.SourcePathProvider;
+import org.netbeans.spi.java.classpath.support.ClassPathSupport;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.RequestProcessor;
 
 /**
@@ -1211,7 +1221,7 @@ public class EditorContextImpl extends EditorContext {
                     ExpressionScanner scanner = new ExpressionScanner(lineNumber, cu, ci.getTrees().getSourcePositions());
                     ExpressionScanner.ExpressionsInfo info = new ExpressionScanner.ExpressionsInfo();
                     List<Tree> expTrees = methodTree.accept(scanner, info);
-                    
+
                     //com.sun.source.tree.ExpressionTree expTree = scanner.getExpressionTree();
                     if (expTrees == null || expTrees.size() == 0) {
                         ops[0] = new Operation[] {};
@@ -1498,7 +1508,6 @@ public class EditorContextImpl extends EditorContext {
          */
     }
     
-/* TODO XXX
     private JavaFXSource getJavaFXSource(SourcePathProvider sp) {
         String[] roots = sp.getOriginalSourceRoots();
         List<FileObject> sourcePathFiles = new ArrayList<FileObject>();
@@ -1512,22 +1521,25 @@ public class EditorContextImpl extends EditorContext {
         ClassPath bootPath = ClassPathSupport.createClassPath(new FileObject[] {});
         ClassPath classPath = ClassPathSupport.createClassPath(new FileObject[] {});
         ClassPath sourcePath = ClassPathSupport.createClassPath(sourcePathFiles.toArray(new FileObject[] {}));
-        return JavaFXSource.create(ClasspathInfo.create(bootPath, classPath, sourcePath), new FileObject[] {});
+        
+        Collection<FileObject> co = new LinkedList<FileObject>();
+        JavaFXSource javafxSource = JavaFXSource.create(ClasspathInfo.create(bootPath, classPath, sourcePath), co);
+        return javafxSource;
+        //return JavaFXSource.create(ClasspathInfo.create(bootPath, classPath, sourcePath), new FileObject[] {});
     }
- */   
     /**
      * Parse the expression into AST tree and traverse is via the provided visitor.
      *
      * @return the visitor value or <code>null</code>.
-     */
+     *
     public <R,D> R parseExpression(final String expression, String url, final int line,
                                    final JavaFXTreePathScanner<R,D> visitor, final D context,
                                    final SourcePathProvider sp) {
         return null;
     }
-/* TODO XXX
+     */
     public <R,D> R parseExpression(final String expression, String url, final int line,
-                                   final TreePathScanner<R,D> visitor, final D context,
+                                   final JavaFXTreePathScanner<R,D> visitor, final D context,
                                    final SourcePathProvider sp) {
         JavaFXSource js = null;
         if (url != null) {
@@ -1541,8 +1553,9 @@ public class EditorContextImpl extends EditorContext {
         if (js == null) {
             js = getJavaFXSource(sp);
         }
-        final TreePath[] treePathPtr = new TreePath[] { null };
+        final JavaFXTreePath[] treePathPtr = new JavaFXTreePath[] { null };
         final Tree[] treePtr = new Tree[] { null };
+
         try {
             js.runUserActionTask(new Task<CompilationController>() {
                 public void run(CompilationController ci) throws Exception {
@@ -1550,39 +1563,42 @@ public class EditorContextImpl extends EditorContext {
                         return;
                     Scope scope = null;
                     int offset = 0;
-                    StyledDocument doc = (StyledDocument) ci.getDocument();
+                    StyledDocument doc = (StyledDocument) ci.getJavaFXSource().getDocument();
                     if (doc != null) {
                         offset = findLineOffset(doc, line);
                         scope = ci.getTreeUtilities().scopeFor(offset);
                     }
                     SourcePositions[] sourcePtr = new SourcePositions[] { null };
-                    Tree tree = ci.getTreeUtilities().parseExpression(
-                            expression,
-                            sourcePtr
-                    );
+// TODO XXX issue #132748                   
+                    Tree tree = ci.getCompilationUnit();
+//                    Tree tree = ci.getTreeUtilities().parseExpression(
+//                            expression,
+//                            sourcePtr
+//                    );
                     if (scope != null) {
-                        ci.getTreeUtilities().attributeTree(tree, scope);
+//TODO XXX attributeTree not implemented in TreeUtilities                        
+//                        ci.getTreeUtilities().attributeTree(tree, scope);
                     }
                     try {
                         //context.setTrees(ci.getTrees());
                         java.lang.reflect.Method setTreesMethod =
-                                context.getClass().getMethod("setTrees", new Class[] { Trees.class });
+                                context.getClass().getMethod("setTrees", new Class[] { JavafxcTrees.class });
                         setTreesMethod.invoke(context, ci.getTrees());
                     } catch (Exception ex) {}
                     try {
                         //context.setCompilationUnit(ci.getCompilationUnit());
                         java.lang.reflect.Method setCompilationUnitMethod =
-                                context.getClass().getMethod("setCompilationUnit", new Class[] { CompilationUnitTree.class });
+                                context.getClass().getMethod("setCompilationUnit", new Class[] { UnitTree.class });
                         setCompilationUnitMethod.invoke(context, ci.getCompilationUnit());
                     } catch (Exception ex) {}
-                    TreePath treePath = null;
+                    JavaFXTreePath treePath = null;
                     try {
                         //context.setTrees(ci.getTrees());
                         java.lang.reflect.Method setTreePathMethod =
-                                context.getClass().getMethod("setTreePath", new Class[] { TreePath.class });
+                                context.getClass().getMethod("setTreePath", new Class[] { JavaFXTreePath.class });
                         if (doc != null) {
                             treePath = ci.getTreeUtilities().pathFor(offset);
-                            treePath = new TreePath(treePath, tree);
+                            treePath = new JavaFXTreePath(treePath, tree);
                             setTreePathMethod.invoke(context, treePath);
                         }
                     } catch (Exception ex) { return;}
@@ -1590,7 +1606,7 @@ public class EditorContextImpl extends EditorContext {
                     treePtr[0] = tree;
                 }
             }, false);
-            TreePath treePath = treePathPtr[0];
+            JavaFXTreePath treePath = treePathPtr[0];
             Tree tree = treePtr[0];
             R retValue;
             if (treePath != null) {
@@ -1604,7 +1620,7 @@ public class EditorContextImpl extends EditorContext {
             return null;
         }
     }
-*/
+
     /**
      * Adds a property change listener.
      *

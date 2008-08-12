@@ -41,6 +41,35 @@
 
 package org.netbeans.modules.debugger.javafx.expr;
 
+import com.sun.javafx.api.tree.AssignmentTree;
+import com.sun.javafx.api.tree.BinaryTree;
+import com.sun.javafx.api.tree.BlockExpressionTree;
+import com.sun.javafx.api.tree.BreakTree;
+import com.sun.javafx.api.tree.CatchTree;
+import com.sun.javafx.api.tree.CompoundAssignmentTree;
+import com.sun.javafx.api.tree.ConditionalExpressionTree;
+import com.sun.javafx.api.tree.ContinueTree;
+import com.sun.javafx.api.tree.ErroneousTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.InstanceOfTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.LiteralTree;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.ModifiersTree;
+import com.sun.javafx.api.tree.ParenthesizedTree;
+import com.sun.javafx.api.tree.ReturnTree;
+import com.sun.javafx.api.tree.ThrowTree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
+import com.sun.javafx.api.tree.TypeCastTree;
+import com.sun.javafx.api.tree.UnaryTree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
+import com.sun.javafx.api.tree.WhileLoopTree;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.ArrayType;
@@ -83,58 +112,6 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import com.sun.jdi.VirtualMachine;
 
-import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.ArrayAccessTree;
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.AssertTree;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.BreakTree;
-import com.sun.source.tree.CaseTree;
-import com.sun.source.tree.CatchTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ConditionalExpressionTree;
-import com.sun.source.tree.ContinueTree;
-import com.sun.source.tree.DoWhileLoopTree;
-import com.sun.source.tree.EmptyStatementTree;
-import com.sun.source.tree.EnhancedForLoopTree;
-import com.sun.source.tree.ErroneousTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.ForLoopTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.InstanceOfTree;
-import com.sun.source.tree.LabeledStatementTree;
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.ParenthesizedTree;
-import com.sun.source.tree.PrimitiveTypeTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.SwitchTree;
-import com.sun.source.tree.SynchronizedTree;
-import com.sun.source.tree.ThrowTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TryTree;
-import com.sun.source.tree.TypeCastTree;
-import com.sun.source.tree.TypeParameterTree;
-import com.sun.source.tree.UnaryTree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.tree.WhileLoopTree;
-import com.sun.source.tree.WildcardTree;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,7 +142,7 @@ import org.openide.util.NbBundle;
  * 
  * @author Martin Entlicher
  */
-public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext> {
+public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationContext> {
 
     private static final Logger loggerMethod = Logger.getLogger("org.netbeans.modules.debugger.javafx.invokeMethod"); // NOI18N
     private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI8N
@@ -175,13 +152,13 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
     public EvaluatorVisitor() {
     }
 
-    @Override
-    public Mirror visitAnnotation(AnnotationTree arg0, EvaluationContext evaluationContext) {
-        return null;
-    }
+//    @Override 
+//    public Mirror visitAnnotation(AnnotationTree arg0, EvaluationContext evaluationContext) {
+//        return null;
+//    }
 
     @Override
-    public Mirror visitMethodInvocation(MethodInvocationTree arg0, EvaluationContext evaluationContext) {
+    public Mirror visitMethodInvocation(FunctionInvocationTree arg0, EvaluationContext evaluationContext) {
         if (!evaluationContext.canInvokeMethods()) {
             Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);
         }
@@ -193,8 +170,8 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         Boolean isStatic = null;
         ExpressionTree expression = arg0.getMethodSelect();
         Element elm;
-        TreePath currentPath = getCurrentPath();
-        if (expression.getKind() == Tree.Kind.MEMBER_SELECT) {
+        JavaFXTreePath currentPath = getCurrentPath();
+        if (expression.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
             MemberSelectTree mst = (MemberSelectTree) expression;
             object = mst.getExpression().accept(this, evaluationContext);
             methodName = mst.getIdentifier().toString();
@@ -202,7 +179,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                 Assert2.error(arg0, "methodCallOnNull", methodName);
             }
             if (currentPath != null) {
-                TreePath memberSelectPath = TreePath.getPath(currentPath, mst);
+                JavaFXTreePath memberSelectPath = JavaFXTreePath.getPath(currentPath, mst);
                 if (memberSelectPath == null) memberSelectPath = currentPath;
                 elm = evaluationContext.getTrees().getElement(memberSelectPath);
             } else {
@@ -210,7 +187,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
             }
         } else {
             if (currentPath != null) {
-                TreePath methodInvokePath = TreePath.getPath(currentPath, arg0);
+                JavaFXTreePath methodInvokePath = JavaFXTreePath.getPath(currentPath, arg0);
                 if (methodInvokePath == null) methodInvokePath = currentPath;
                 elm = evaluationContext.getTrees().getElement(methodInvokePath);
                 methodName = elm.getSimpleName().toString();
@@ -670,12 +647,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return false;
     }
 
-    
-    @Override
-    public Mirror visitAssert(AssertTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO No in JavaFX                    
+//    @Override
+//    public Mirror visitAssert(AssertTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitAssignment(AssignmentTree arg0, EvaluationContext evaluationContext) {
@@ -692,7 +669,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         Mirror var = arg0.getVariable().accept(this, evaluationContext);
         Mirror exp = arg0.getExpression().accept(this, evaluationContext);
         VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
-        Tree.Kind kind = arg0.getKind();
+        Tree.JavaFXKind kind = arg0.getJavaFXKind();
         if (var instanceof BooleanValue) {
             boolean v = ((BooleanValue) var).value();
             boolean e = ((BooleanValue) exp).value();
@@ -753,8 +730,8 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                     v &= e; break;
                 case DIVIDE_ASSIGNMENT:
                     v /= e; break;
-                case LEFT_SHIFT_ASSIGNMENT:
-                    v <<= e; break;
+//                case LEFT_SHIFT_ASSIGNMENT:
+//                    v <<= e; break;
                 case MINUS_ASSIGNMENT:
                     v -= e; break;
                 case MULTIPLY_ASSIGNMENT:
@@ -765,10 +742,10 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                     v += e; break;
                 case REMAINDER_ASSIGNMENT:
                     v %= e; break;
-                case RIGHT_SHIFT_ASSIGNMENT:
-                    v >>= e; break;
-                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
-                    v >>>= e; break;
+//                case RIGHT_SHIFT_ASSIGNMENT:
+//                    v >>= e; break;
+//                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
+//                    v >>>= e; break;
                 case XOR_ASSIGNMENT:
                     v ^= e; break;
                 default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
@@ -785,8 +762,8 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                     v &= e; break;
                 case DIVIDE_ASSIGNMENT:
                     v /= e; break;
-                case LEFT_SHIFT_ASSIGNMENT:
-                    v <<= e; break;
+//                case LEFT_SHIFT_ASSIGNMENT:
+//                    v <<= e; break;
                 case MINUS_ASSIGNMENT:
                     v -= e; break;
                 case MULTIPLY_ASSIGNMENT:
@@ -797,10 +774,10 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                     v += e; break;
                 case REMAINDER_ASSIGNMENT:
                     v %= e; break;
-                case RIGHT_SHIFT_ASSIGNMENT:
-                    v >>= e; break;
-                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
-                    v >>>= e; break;
+//                case RIGHT_SHIFT_ASSIGNMENT:
+//                    v >>= e; break;
+//                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
+//                    v >>>= e; break;
                 case XOR_ASSIGNMENT:
                     v ^= e; break;
                 default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
@@ -829,7 +806,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         Mirror left = arg0.getLeftOperand().accept(this, evaluationContext);
         Mirror right = arg0.getRightOperand().accept(this, evaluationContext);
         VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
-        Tree.Kind kind = arg0.getKind();
+        Tree.JavaFXKind kind = arg0.getJavaFXKind();
         if (left instanceof ObjectReference) {
             left = unboxIfCan(arg0, (ObjectReference) left, evaluationContext);
         }
@@ -943,12 +920,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                         v = l + r; break;
                     case REMAINDER:
                         v = l % r; break;
-                    case LEFT_SHIFT:
-                        v = l << r; break;
-                    case RIGHT_SHIFT:
-                        v = l >> r; break;
-                    case UNSIGNED_RIGHT_SHIFT:
-                        v = l >>> r; break;
+//                    case LEFT_SHIFT:
+//                        v = l << r; break;
+//                    case RIGHT_SHIFT:
+//                        v = l >> r; break;
+//                    case UNSIGNED_RIGHT_SHIFT:
+//                        v = l >>> r; break;
                     case AND:
                         v = l & r; break;
                     case OR:
@@ -993,12 +970,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                         v = l + r; break;
                     case REMAINDER:
                         v = l % r; break;
-                    case LEFT_SHIFT:
-                        v = l << r; break;
-                    case RIGHT_SHIFT:
-                        v = l >> r; break;
-                    case UNSIGNED_RIGHT_SHIFT:
-                        v = l >>> r; break;
+//                    case LEFT_SHIFT:
+//                        v = l << r; break;
+//                    case RIGHT_SHIFT:
+//                        v = l >> r; break;
+//                    case UNSIGNED_RIGHT_SHIFT:
+//                        v = l >>> r; break;
                     case AND:
                         v = l & r; break;
                     case OR:
@@ -1027,7 +1004,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
             //}
         }
         if (((left == null || left instanceof StringReference) && (right == null || right instanceof StringReference))
-            && kind == Tree.Kind.PLUS) {
+            && kind == Tree.JavaFXKind.PLUS) {
             String s1 = (left == null) ? null : ((StringReference) left).value();
             String s2 = (right == null) ? null : ((StringReference) right).value();
             switch (kind) {
@@ -1036,7 +1013,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
                 default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
             }
         }
-        if ((left instanceof StringReference || right instanceof StringReference) && kind == Tree.Kind.PLUS) {
+        if ((left instanceof StringReference || right instanceof StringReference) && kind == Tree.JavaFXKind.PLUS) {
             String s1 = (left instanceof StringReference) ? ((StringReference) left).value() : toString(arg0, left, evaluationContext);
             String s2 = (right instanceof StringReference) ? ((StringReference) right).value() : toString(arg0, right, evaluationContext);
             return vm.mirrorOf(s1 + s2);
@@ -1051,7 +1028,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
     }
 
     @Override
-    public Mirror visitBlock(BlockTree arg0, EvaluationContext evaluationContext) {
+    public Mirror visitBlockExpression(BlockExpressionTree arg0, EvaluationContext evaluationContext) {
         Assert2.error(arg0, "unsupported");
         return null;
     }
@@ -1062,11 +1039,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitCase(CaseTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//No in JavaFX                    
+//    @Override
+//    public Mirror visitCase(CaseTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitCatch(CatchTree arg0, EvaluationContext evaluationContext) {
@@ -1074,11 +1052,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitClass(ClassTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitClass(ClassTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitConditionalExpression(ConditionalExpressionTree arg0, EvaluationContext evaluationContext) {
@@ -1100,11 +1079,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitDoWhileLoop(DoWhileLoopTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitDoWhileLoop(DoWhileLoopTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitErroneous(ErroneousTree arg0, EvaluationContext evaluationContext) {
@@ -1112,22 +1092,23 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitExpressionStatement(ExpressionStatementTree arg0, EvaluationContext evaluationContext) {
-        return arg0.getExpression().accept(this, evaluationContext);
-    }
-
-    @Override
-    public Mirror visitEnhancedForLoop(EnhancedForLoopTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
-
-    @Override
-    public Mirror visitForLoop(ForLoopTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitExpressionStatement(ExpressionStatementTree arg0, EvaluationContext evaluationContext) {
+//        return arg0.getExpression().accept(this, evaluationContext);
+//    }
+//
+//    @Override
+//    public Mirror visitEnhancedForLoop(EnhancedForLoopTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
+//
+//    @Override
+//    public Mirror visitForLoop(ForLoopTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
     
     private Mirror getIdentifierByName(IdentifierTree arg0, EvaluationContext evaluationContext) {
         String name = arg0.getName().toString();
@@ -1179,10 +1160,10 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
 
     @Override
     public Mirror visitIdentifier(IdentifierTree arg0, EvaluationContext evaluationContext) {
-        TreePath currentPath = getCurrentPath();
+        JavaFXTreePath currentPath = getCurrentPath();
         Element elm = null;
         if (currentPath != null) {
-            TreePath identifierPath = TreePath.getPath(currentPath, arg0);
+            JavaFXTreePath identifierPath = JavaFXTreePath.getPath(currentPath, arg0);
             if (identifierPath == null) identifierPath = getCurrentPath();
             elm = evaluationContext.getTrees().getElement(identifierPath);
             if (elm instanceof TypeElement && ((TypeElement) elm).asType() instanceof ErrorType) {
@@ -1348,11 +1329,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return findEnclosedObject(object, type);
     }
 
-    @Override
-    public Mirror visitIf(IfTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitIf(IfTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitImport(ImportTree arg0, EvaluationContext evaluationContext) {
@@ -1360,28 +1342,29 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitArrayAccess(ArrayAccessTree arg0, EvaluationContext evaluationContext) {
-        Mirror array = arg0.getExpression().accept(this, evaluationContext);
-        if (array == null) {
-            Assert2.error(arg0, "arrayIsNull", arg0.getExpression());
-        }
-        Mirror index = arg0.getIndex().accept(this, evaluationContext);
-        if (!(index instanceof PrimitiveValue)) {
-            Assert2.error(arg0, "arraySizeBadType", index);
-        }
-        int i = ((PrimitiveValue) index).intValue();
-        if (i >= ((ArrayReference) array).length()) {
-            Assert2.error(arg0, "arrayIndexOutOfBounds", array, i);
-        }
-        return ((ArrayReference) array).getValue(i);
-    }
-
-    @Override
-    public Mirror visitLabeledStatement(LabeledStatementTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitArrayAccess(ArrayAccessTree arg0, EvaluationContext evaluationContext) {
+//        Mirror array = arg0.getExpression().accept(this, evaluationContext);
+//        if (array == null) {
+//            Assert2.error(arg0, "arrayIsNull", arg0.getExpression());
+//        }
+//        Mirror index = arg0.getIndex().accept(this, evaluationContext);
+//        if (!(index instanceof PrimitiveValue)) {
+//            Assert2.error(arg0, "arraySizeBadType", index);
+//        }
+//        int i = ((PrimitiveValue) index).intValue();
+//        if (i >= ((ArrayReference) array).length()) {
+//            Assert2.error(arg0, "arrayIndexOutOfBounds", array, i);
+//        }
+//        return ((ArrayReference) array).getValue(i);
+//    }
+//
+//    @Override
+//    public Mirror visitLabeledStatement(LabeledStatementTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitLiteral(LiteralTree arg0, EvaluationContext evaluationContext) {
@@ -1428,11 +1411,12 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         throw new UnsupportedOperationException("Unsupported value: "+value);
     }
 
-    @Override
-    public Mirror visitMethod(MethodTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitMethod(MethodTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitModifiers(ModifiersTree arg0, EvaluationContext evaluationContext) {
@@ -1440,99 +1424,100 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitNewArray(NewArrayTree arg0, EvaluationContext evaluationContext) {
-        Type type;
-        Tree typeTree = arg0.getType();
-        if (typeTree == null) {
-            if (newArrayType == null) {
-                throw new IllegalStateException("No type info for "+arg0);
-            }
-            type = newArrayType;
-        } else {
-            type = (Type) arg0.getType().accept(this, evaluationContext);
-        }
-        List<? extends ExpressionTree> dimensionTrees = arg0.getDimensions();
-        int numDimensions = dimensionTrees.size();
-        if (numDimensions > 0) {
-            int[] dimensions = new int[numDimensions];
-            ArrayType[] arrayTypes = new ArrayType[numDimensions];
-            String arrayClassName = type.name()+"[]";
-            for (int i = 0; i < numDimensions; i++, arrayClassName += "[]") {
-                dimensions[i] = ((PrimitiveValue) dimensionTrees.get(numDimensions - 1 - i).accept(this, evaluationContext)).intValue();
-                List<ReferenceType> classes = type.virtualMachine().classesByName(arrayClassName);
-                if (classes.size() == 0) {
-                    Assert2.error(arg0, "unknownType", arrayClassName);
-                }
-                arrayTypes[i] = (ArrayType) classes.get(0);
-            }
-            return constructNewArray(arrayTypes, dimensions, numDimensions - 1);
-        } else {
-            List<? extends ExpressionTree> initializerTrees = arg0.getInitializers();
-            return constructNewArray(arg0, type, initializerTrees, evaluationContext);
-        }
-    }
-    
-    private ArrayReference constructNewArray(ArrayType[] arrayTypes, int[] dimensions, int dimension) {
-        ArrayReference array = arrayTypes[dimension].newInstance(dimensions[dimension]);
-        if (dimension > 0) {
-            List<ArrayReference> elements = new ArrayList<ArrayReference>(dimensions[dimension]);
-            for (int i = 0; i < dimensions[dimension]; i++) {
-                ArrayReference subArray = constructNewArray(arrayTypes, dimensions, dimension - 1);
-                elements.add(subArray);
-            }
-            try {
-                array.setValues(elements);
-            } catch (InvalidTypeException ex) {
-                throw new IllegalStateException("ArrayType "+arrayTypes[dimension]+" can not have "+elements+" elements.");
-            } catch (ClassNotLoadedException ex) {
-                throw new IllegalStateException(new InvalidExpressionException (ex));
-            }
-        }
-        return array;
-    }
-    
-    private ArrayReference constructNewArray(NewArrayTree arg0, Type type, List<? extends ExpressionTree> initializerTrees, EvaluationContext evaluationContext) {
-        int n = initializerTrees.size();
-        List<Value> elements = new ArrayList<Value>(n);
-        for (int i = 0; i < n; i++) {
-            ExpressionTree exp = initializerTrees.get(i);
-            newArrayType = getSubArrayType(arg0, type);
-            // might call visitNewArray()
-            Value element = (Value) exp.accept(this, evaluationContext);
-            elements.add(element);
-        }
-        int depth = 1;
-        ArrayReference array = getArrayType(arg0, type, depth).newInstance(n);
-        autoboxElements(arg0, type, elements, evaluationContext);
-        try {
-            array.setValues(elements);
-        } catch (InvalidTypeException ex) {
-            throw new IllegalStateException("ArrayType "+getArrayType(arg0, type, depth)+" can not have "+elements+" elements.");
-        } catch (ClassNotLoadedException ex) {
-            throw new IllegalStateException(new InvalidExpressionException (ex));
-        }
-        return array;
-    }
-    
-    private static final String BRACKETS = "[][][][][][][][][][][][][][][][][][][][]"; // NOI8N
-    
-    private ArrayType getArrayType(NewArrayTree arg0, Type type, int depth) {
-        String arrayClassName;
-        if (depth < BRACKETS.length()/2) {
-            arrayClassName = type.name() + BRACKETS.substring(0, 2*depth);
-        } else {
-            arrayClassName = type.name() + BRACKETS;
-            for (int i = BRACKETS.length()/2; i < depth; i++) {
-                arrayClassName += "[]"; // NOI8N
-            }
-        }
-        List<ReferenceType> classes = type.virtualMachine().classesByName(arrayClassName);
-        if (classes.size() == 0) {
-            Assert2.error(arg0, "unknownType", arrayClassName);
-        }
-        return (ArrayType) classes.get(0);
-    }
+//TODO
+//    @Override
+//    public Mirror visitNewArray(NewArrayTree arg0, EvaluationContext evaluationContext) {
+//        Type type;
+//        Tree typeTree = arg0.getType();
+//        if (typeTree == null) {
+//            if (newArrayType == null) {
+//                throw new IllegalStateException("No type info for "+arg0);
+//            }
+//            type = newArrayType;
+//        } else {
+//            type = (Type) arg0.getType().accept(this, evaluationContext);
+//        }
+//        List<? extends ExpressionTree> dimensionTrees = arg0.getDimensions();
+//        int numDimensions = dimensionTrees.size();
+//        if (numDimensions > 0) {
+//            int[] dimensions = new int[numDimensions];
+//            ArrayType[] arrayTypes = new ArrayType[numDimensions];
+//            String arrayClassName = type.name()+"[]";
+//            for (int i = 0; i < numDimensions; i++, arrayClassName += "[]") {
+//                dimensions[i] = ((PrimitiveValue) dimensionTrees.get(numDimensions - 1 - i).accept(this, evaluationContext)).intValue();
+//                List<ReferenceType> classes = type.virtualMachine().classesByName(arrayClassName);
+//                if (classes.size() == 0) {
+//                    Assert2.error(arg0, "unknownType", arrayClassName);
+//                }
+//                arrayTypes[i] = (ArrayType) classes.get(0);
+//            }
+//            return constructNewArray(arrayTypes, dimensions, numDimensions - 1);
+//        } else {
+//            List<? extends ExpressionTree> initializerTrees = arg0.getInitializers();
+//            return constructNewArray(arg0, type, initializerTrees, evaluationContext);
+//        }
+//    }
+//    
+//    private ArrayReference constructNewArray(ArrayType[] arrayTypes, int[] dimensions, int dimension) {
+//        ArrayReference array = arrayTypes[dimension].newInstance(dimensions[dimension]);
+//        if (dimension > 0) {
+//            List<ArrayReference> elements = new ArrayList<ArrayReference>(dimensions[dimension]);
+//            for (int i = 0; i < dimensions[dimension]; i++) {
+//                ArrayReference subArray = constructNewArray(arrayTypes, dimensions, dimension - 1);
+//                elements.add(subArray);
+//            }
+//            try {
+//                array.setValues(elements);
+//            } catch (InvalidTypeException ex) {
+//                throw new IllegalStateException("ArrayType "+arrayTypes[dimension]+" can not have "+elements+" elements.");
+//            } catch (ClassNotLoadedException ex) {
+//                throw new IllegalStateException(new InvalidExpressionException (ex));
+//            }
+//        }
+//        return array;
+//    }
+//    
+//    private ArrayReference constructNewArray(NewArrayTree arg0, Type type, List<? extends ExpressionTree> initializerTrees, EvaluationContext evaluationContext) {
+//        int n = initializerTrees.size();
+//        List<Value> elements = new ArrayList<Value>(n);
+//        for (int i = 0; i < n; i++) {
+//            ExpressionTree exp = initializerTrees.get(i);
+//            newArrayType = getSubArrayType(arg0, type);
+//            // might call visitNewArray()
+//            Value element = (Value) exp.accept(this, evaluationContext);
+//            elements.add(element);
+//        }
+//        int depth = 1;
+//        ArrayReference array = getArrayType(arg0, type, depth).newInstance(n);
+//        autoboxElements(arg0, type, elements, evaluationContext);
+//        try {
+//            array.setValues(elements);
+//        } catch (InvalidTypeException ex) {
+//            throw new IllegalStateException("ArrayType "+getArrayType(arg0, type, depth)+" can not have "+elements+" elements.");
+//        } catch (ClassNotLoadedException ex) {
+//            throw new IllegalStateException(new InvalidExpressionException (ex));
+//        }
+//        return array;
+//    }
+//    
+//    private static final String BRACKETS = "[][][][][][][][][][][][][][][][][][][][]"; // NOI8N
+//    
+//    private ArrayType getArrayType(NewArrayTree arg0, Type type, int depth) {
+//        String arrayClassName;
+//        if (depth < BRACKETS.length()/2) {
+//            arrayClassName = type.name() + BRACKETS.substring(0, 2*depth);
+//        } else {
+//            arrayClassName = type.name() + BRACKETS;
+//            for (int i = BRACKETS.length()/2; i < depth; i++) {
+//                arrayClassName += "[]"; // NOI8N
+//            }
+//        }
+//        List<ReferenceType> classes = type.virtualMachine().classesByName(arrayClassName);
+//        if (classes.size() == 0) {
+//            Assert2.error(arg0, "unknownType", arrayClassName);
+//        }
+//        return (ArrayType) classes.get(0);
+//    }
     
     private Type getSubArrayType(Tree arg0, Type type) {
         String name = type.name();
@@ -1579,120 +1564,121 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitNewClass(NewClassTree arg0, EvaluationContext evaluationContext) {
-        TreePath currentPath = getCurrentPath();
-        TypeMirror cType;
-        if (currentPath != null) {
-            TreePath identifierPath = TreePath.getPath(currentPath, arg0);
-            if (identifierPath == null) identifierPath = currentPath;
-            Element elm = evaluationContext.getTrees().getElement(identifierPath);
-            if (elm == null) {
-                // Unresolved class
-                Assert2.error(arg0, "unknownType", arg0.getIdentifier());
-            }
-            if (elm.asType().getKind() == TypeKind.ERROR) {
-                cType = null;
-            } else {
-                if (elm.getKind() != ElementKind.CONSTRUCTOR) {
-                    throw new IllegalStateException("Element "+elm+" is of "+elm.getKind()+" kind. Tree = "+arg0);
-                }
-                ExecutableElement cElem = (ExecutableElement) elm;
-                cType = cElem.asType();
-            }
-        } else {
-            cType = null;
-        }
-        ExpressionTree classIdentifier = arg0.getIdentifier();
-        Mirror clazz = classIdentifier.accept(this, evaluationContext);
-        ClassType classType = (ClassType) clazz;
-        //ReferenceType classType = getClassType(arg0, cType, evaluationContext);
-        List<? extends ExpressionTree> args = arg0.getArguments();
-        List<Value> argVals = new ArrayList<Value>(args.size());
-        for (ExpressionTree arg : args) {
-            Mirror argValue = arg.accept(this, evaluationContext);
-            if (!(argValue instanceof Value)) {
-                Assert2.error(arg, "Not a value");
-            }
-            argVals.add((Value) argValue);
-        }
-        List<? extends TypeMirror> paramTypes = null;
-        String firstParamSignature = null;
-        List<Type> argTypes = null;
-        if (cType != null) {
-            paramTypes = ((ExecutableType) cType).getParameterTypes();
-            ObjectReference thisObject = evaluationContext.getFrame().thisObject();
-            if (thisObject != null) {
-                List<ReferenceType> nestedTypes = ((ReferenceType) thisObject.type()).nestedTypes();
-                for (ReferenceType nested : nestedTypes) {
-                    if (!nested.isStatic() && nested.equals(classType)) {
-                        argVals.add(0, thisObject);
-                        firstParamSignature = thisObject.type().signature();
-                    }
-                }
-            }
-        } else {
-            argTypes = new ArrayList<Type>(argVals.size());
-            for (Value value : argVals) {
-                if (value == null) {
-                    argTypes.add(evaluationContext.getDebugger().getVirtualMachine().classesByName("java.lang.Object").get(0));
-                } else {
-                    argTypes.add(value.type());
-                }
-            }
-            ObjectReference thisObject = evaluationContext.getFrame().thisObject();
-            if (thisObject != null) {
-                List<ReferenceType> nestedTypes = ((ReferenceType) thisObject.type()).nestedTypes();
-                for (ReferenceType nested : nestedTypes) {
-                    if (!nested.isStatic() && nested.equals(classType)) {
-                        argVals.add(0, thisObject);
-                        argTypes.add(0, thisObject.type());
-                    }
-                }
-            }
-        }
-        try {
-            if (loggerMethod.isLoggable(Level.FINE)) {
-                loggerMethod.fine("STARTED : "+classType+"."+"<init>"+" ("+argVals+") in thread "+evaluationContext.getFrame().thread());
-            }
-            evaluationContext.methodToBeInvoked();
-            Method constructorMethod = getConcreteMethodAndReportProblems(arg0, classType, "<init>", firstParamSignature, paramTypes, argTypes);
-            return classType.newInstance(evaluationContext.getFrame().thread(),
-                                         constructorMethod,
-                                         argVals,
-                                         ObjectReference.INVOKE_SINGLE_THREADED);
-        } catch (InvalidTypeException itex) {
-            throw new IllegalStateException(new InvalidExpressionException (itex));
-        } catch (ClassNotLoadedException cnlex) {
-            throw new IllegalStateException(new InvalidExpressionException (cnlex));
-        } catch (IncompatibleThreadStateException itsex) {
-            InvalidExpressionException ieex = new InvalidExpressionException (itsex);
-            ieex.initCause(itsex);
-            throw new IllegalStateException(ieex);
-        } catch (InvocationException iex) {
-            InvalidExpressionException ieex = new InvalidExpressionException (iex);
-            ieex.initCause(iex);
-            throw new IllegalStateException(ieex);
-        } catch (UnsupportedOperationException uoex) {
-            InvalidExpressionException ieex = new InvalidExpressionException (uoex);
-            ieex.initCause(uoex);
-            throw new IllegalStateException(ieex);
-        } catch (ObjectCollectedException ocex) {
-            throw new IllegalStateException(new InvalidExpressionException(NbBundle.getMessage(
-                Evaluator.class, "CTL_EvalError_collected")));
-        } finally {
-            try {
-                evaluationContext.methodInvokeDone();
-            } catch (IncompatibleThreadStateException itsex) {
-                InvalidExpressionException ieex = new InvalidExpressionException (itsex);
-                ieex.initCause(itsex);
-                throw new IllegalStateException(ieex);
-            }
-            if (loggerMethod.isLoggable(Level.FINE)) {
-                loggerMethod.fine("FINISHED: "+classType+"."+"<init>"+" ("+argVals+") in thread "+evaluationContext.getFrame().thread());
-            }
-        }
-    }
+//TODO Check for substitute in JavaFX
+//    @Override
+//    public Mirror visitNewClass(NewClassTree arg0, EvaluationContext evaluationContext) {
+//        TreePath currentPath = getCurrentPath();
+//        TypeMirror cType;
+//        if (currentPath != null) {
+//            TreePath identifierPath = TreePath.getPath(currentPath, arg0);
+//            if (identifierPath == null) identifierPath = currentPath;
+//            Element elm = evaluationContext.getTrees().getElement(identifierPath);
+//            if (elm == null) {
+//                // Unresolved class
+//                Assert2.error(arg0, "unknownType", arg0.getIdentifier());
+//            }
+//            if (elm.asType().getKind() == TypeKind.ERROR) {
+//                cType = null;
+//            } else {
+//                if (elm.getKind() != ElementKind.CONSTRUCTOR) {
+//                    throw new IllegalStateException("Element "+elm+" is of "+elm.getKind()+" kind. Tree = "+arg0);
+//                }
+//                ExecutableElement cElem = (ExecutableElement) elm;
+//                cType = cElem.asType();
+//            }
+//        } else {
+//            cType = null;
+//        }
+//        ExpressionTree classIdentifier = arg0.getIdentifier();
+//        Mirror clazz = classIdentifier.accept(this, evaluationContext);
+//        ClassType classType = (ClassType) clazz;
+//        //ReferenceType classType = getClassType(arg0, cType, evaluationContext);
+//        List<? extends ExpressionTree> args = arg0.getArguments();
+//        List<Value> argVals = new ArrayList<Value>(args.size());
+//        for (ExpressionTree arg : args) {
+//            Mirror argValue = arg.accept(this, evaluationContext);
+//            if (!(argValue instanceof Value)) {
+//                Assert2.error(arg, "Not a value");
+//            }
+//            argVals.add((Value) argValue);
+//        }
+//        List<? extends TypeMirror> paramTypes = null;
+//        String firstParamSignature = null;
+//        List<Type> argTypes = null;
+//        if (cType != null) {
+//            paramTypes = ((ExecutableType) cType).getParameterTypes();
+//            ObjectReference thisObject = evaluationContext.getFrame().thisObject();
+//            if (thisObject != null) {
+//                List<ReferenceType> nestedTypes = ((ReferenceType) thisObject.type()).nestedTypes();
+//                for (ReferenceType nested : nestedTypes) {
+//                    if (!nested.isStatic() && nested.equals(classType)) {
+//                        argVals.add(0, thisObject);
+//                        firstParamSignature = thisObject.type().signature();
+//                    }
+//                }
+//            }
+//        } else {
+//            argTypes = new ArrayList<Type>(argVals.size());
+//            for (Value value : argVals) {
+//                if (value == null) {
+//                    argTypes.add(evaluationContext.getDebugger().getVirtualMachine().classesByName("java.lang.Object").get(0));
+//                } else {
+//                    argTypes.add(value.type());
+//                }
+//            }
+//            ObjectReference thisObject = evaluationContext.getFrame().thisObject();
+//            if (thisObject != null) {
+//                List<ReferenceType> nestedTypes = ((ReferenceType) thisObject.type()).nestedTypes();
+//                for (ReferenceType nested : nestedTypes) {
+//                    if (!nested.isStatic() && nested.equals(classType)) {
+//                        argVals.add(0, thisObject);
+//                        argTypes.add(0, thisObject.type());
+//                    }
+//                }
+//            }
+//        }
+//        try {
+//            if (loggerMethod.isLoggable(Level.FINE)) {
+//                loggerMethod.fine("STARTED : "+classType+"."+"<init>"+" ("+argVals+") in thread "+evaluationContext.getFrame().thread());
+//            }
+//            evaluationContext.methodToBeInvoked();
+//            Method constructorMethod = getConcreteMethodAndReportProblems(arg0, classType, "<init>", firstParamSignature, paramTypes, argTypes);
+//            return classType.newInstance(evaluationContext.getFrame().thread(),
+//                                         constructorMethod,
+//                                         argVals,
+//                                         ObjectReference.INVOKE_SINGLE_THREADED);
+//        } catch (InvalidTypeException itex) {
+//            throw new IllegalStateException(new InvalidExpressionException (itex));
+//        } catch (ClassNotLoadedException cnlex) {
+//            throw new IllegalStateException(new InvalidExpressionException (cnlex));
+//        } catch (IncompatibleThreadStateException itsex) {
+//            InvalidExpressionException ieex = new InvalidExpressionException (itsex);
+//            ieex.initCause(itsex);
+//            throw new IllegalStateException(ieex);
+//        } catch (InvocationException iex) {
+//            InvalidExpressionException ieex = new InvalidExpressionException (iex);
+//            ieex.initCause(iex);
+//            throw new IllegalStateException(ieex);
+//        } catch (UnsupportedOperationException uoex) {
+//            InvalidExpressionException ieex = new InvalidExpressionException (uoex);
+//            ieex.initCause(uoex);
+//            throw new IllegalStateException(ieex);
+//        } catch (ObjectCollectedException ocex) {
+//            throw new IllegalStateException(new InvalidExpressionException(NbBundle.getMessage(
+//                Evaluator.class, "CTL_EvalError_collected")));
+//        } finally {
+//            try {
+//                evaluationContext.methodInvokeDone();
+//            } catch (IncompatibleThreadStateException itsex) {
+//                InvalidExpressionException ieex = new InvalidExpressionException (itsex);
+//                ieex.initCause(itsex);
+//                throw new IllegalStateException(ieex);
+//            }
+//            if (loggerMethod.isLoggable(Level.FINE)) {
+//                loggerMethod.fine("FINISHED: "+classType+"."+"<init>"+" ("+argVals+") in thread "+evaluationContext.getFrame().thread());
+//            }
+//        }
+//    }
     
     @Override
     public Mirror visitParenthesized(ParenthesizedTree arg0, EvaluationContext evaluationContext) {
@@ -1718,11 +1704,11 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
     
     @Override
     public Mirror visitMemberSelect(MemberSelectTree arg0, EvaluationContext evaluationContext) {
-        TreePath currentPath = getCurrentPath();
+        JavaFXTreePath currentPath = getCurrentPath();
         Element elm = null;
         if (currentPath != null) {
             // We have the path and resolved elements
-            TreePath memberSelectPath = TreePath.getPath(currentPath, arg0);
+            JavaFXTreePath memberSelectPath = JavaFXTreePath.getPath(currentPath, arg0);
             if (memberSelectPath == null) memberSelectPath = currentPath;
             elm = evaluationContext.getTrees().getElement(memberSelectPath);
             if (elm instanceof TypeElement && ((TypeElement) elm).asType() instanceof ErrorType) {
@@ -1870,23 +1856,24 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         }
     }
 
-    @Override
-    public Mirror visitEmptyStatement(EmptyStatementTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
-
-    @Override
-    public Mirror visitSwitch(SwitchTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
-
-    @Override
-    public Mirror visitSynchronized(SynchronizedTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitEmptyStatement(EmptyStatementTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
+//
+//    @Override
+//    public Mirror visitSwitch(SwitchTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
+//
+//    @Override
+//    public Mirror visitSynchronized(SynchronizedTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitThrow(ThrowTree arg0, EvaluationContext evaluationContext) {
@@ -1895,7 +1882,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
     }
 
     @Override
-    public Mirror visitCompilationUnit(CompilationUnitTree arg0, EvaluationContext evaluationContext) {
+    public Mirror visitCompilationUnit(UnitTree arg0, EvaluationContext evaluationContext) {
         Assert2.error(arg0, "unsupported");
         return null;
     }
@@ -1906,24 +1893,25 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return null;
     }
 
-    @Override
-    public Mirror visitParameterizedType(ParameterizedTypeTree arg0, EvaluationContext evaluationContext) {
-        return arg0.getType().accept(this, evaluationContext);
-    }
-
-    @Override
-    public Mirror visitArrayType(ArrayTypeTree arg0, EvaluationContext evaluationContext) {
-        Type type = (Type) arg0.getType().accept(this, evaluationContext);
-        if (type == null) return null;
-        String arrayClassName = type.name()+"[]";
-        List<ReferenceType> aTypes = type.virtualMachine().classesByName(arrayClassName);
-        if (aTypes.size() > 0) {
-            return aTypes.get(0);
-        } else {
-            Assert2.error(arg0, "unknownType", arrayClassName);
-            return null;
-        }
-    }
+//TODO
+//    @Override
+//    public Mirror visitParameterizedType(ParameterizedTypeTree arg0, EvaluationContext evaluationContext) {
+//        return arg0.getType().accept(this, evaluationContext);
+//    }
+//
+//    @Override
+//    public Mirror visitArrayType(ArrayTypeTree arg0, EvaluationContext evaluationContext) {
+//        Type type = (Type) arg0.getType().accept(this, evaluationContext);
+//        if (type == null) return null;
+//        String arrayClassName = type.name()+"[]";
+//        List<ReferenceType> aTypes = type.virtualMachine().classesByName(arrayClassName);
+//        if (aTypes.size() > 0) {
+//            return aTypes.get(0);
+//        } else {
+//            Assert2.error(arg0, "unknownType", arrayClassName);
+//            return null;
+//        }
+//    }
 
     @Override
     public Mirror visitTypeCast(TypeCastTree arg0, EvaluationContext evaluationContext) {
@@ -1962,37 +1950,39 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         return expression;
     }
 
-    @Override
-    public Mirror visitPrimitiveType(PrimitiveTypeTree arg0, EvaluationContext evaluationContext) {
-        TypeKind type = arg0.getPrimitiveTypeKind();
-        VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
-        switch(type) {
-            case BOOLEAN:
-                return vm.mirrorOf(true).type();
-            case BYTE:
-                return vm.mirrorOf((byte) 0).type();
-            case CHAR:
-                return vm.mirrorOf('a').type();
-            case DOUBLE:
-                return vm.mirrorOf(0.).type();
-            case FLOAT:
-                return vm.mirrorOf(0f).type();
-            case INT:
-                return vm.mirrorOf(0).type();
-            case LONG:
-                return vm.mirrorOf(0l).type();
-            case SHORT:
-                return vm.mirrorOf((short) 0).type();
-            default:
-                throw new IllegalStateException("Tree = "+arg0);
-        }
-    }
+//TODO
+//    @Override
+//    public Mirror visitPrimitiveType(PrimitiveTypeTree arg0, EvaluationContext evaluationContext) {
+//        TypeKind type = arg0.getPrimitiveTypeKind();
+//        VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
+//        switch(type) {
+//            case BOOLEAN:
+//                return vm.mirrorOf(true).type();
+//            case BYTE:
+//                return vm.mirrorOf((byte) 0).type();
+//            case CHAR:
+//                return vm.mirrorOf('a').type();
+//            case DOUBLE:
+//                return vm.mirrorOf(0.).type();
+//            case FLOAT:
+//                return vm.mirrorOf(0f).type();
+//            case INT:
+//                return vm.mirrorOf(0).type();
+//            case LONG:
+//                return vm.mirrorOf(0l).type();
+//            case SHORT:
+//                return vm.mirrorOf((short) 0).type();
+//            default:
+//                throw new IllegalStateException("Tree = "+arg0);
+//        }
+//    }
 
-    @Override
-    public Mirror visitTypeParameter(TypeParameterTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitTypeParameter(TypeParameterTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     @Override
     public Mirror visitInstanceOf(InstanceOfTree arg0, EvaluationContext evaluationContext) {
@@ -2011,7 +2001,7 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
     public Mirror visitUnary(UnaryTree arg0, EvaluationContext evaluationContext) {
         Mirror expression = arg0.getExpression().accept(this, evaluationContext);
         VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
-        Tree.Kind kind = arg0.getKind();
+        Tree.JavaFXKind kind = arg0.getJavaFXKind();
         if (expression instanceof BooleanValue) {
             boolean v = ((BooleanValue) expression).value();
             switch (kind) {
@@ -2234,18 +2224,18 @@ public class EvaluatorVisitor extends TreePathScanner<Mirror, EvaluationContext>
         Assert2.error(arg0, "unsupported");
         return null;
     }
-
-    @Override
-    public Mirror visitWildcard(WildcardTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
-
-    @Override
-    public Mirror visitOther(Tree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
-        return null;
-    }
+//TODO
+//    @Override
+//    public Mirror visitWildcard(WildcardTree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
+//
+//    @Override
+//    public Mirror visitOther(Tree arg0, EvaluationContext evaluationContext) {
+//        Assert2.error(arg0, "unsupported");
+//        return null;
+//    }
 
     private void setToMirror(Tree var, Value value, EvaluationContext evaluationContext) {
         VariableInfo varInfo = evaluationContext.getVariables().get(var);

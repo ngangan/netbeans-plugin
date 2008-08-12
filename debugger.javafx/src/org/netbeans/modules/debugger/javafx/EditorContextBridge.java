@@ -40,9 +40,9 @@
  */
 package org.netbeans.modules.debugger.javafx;
 
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.jdi.AbsentInformationException;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TreeVisitor;
 import com.sun.source.util.TreePathScanner;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -91,7 +91,7 @@ public class EditorContextBridge {
      * Returns the parsed expression tree or <code>null</code>.
      *
      * @return the parsed expression tree or <code>null</code>
-     *
+     */
     public static Tree getExpressionTree(final String expression, String url, final int line) {
         // TODO: return getContext ().getExpressionTree ();
         try {
@@ -110,7 +110,6 @@ public class EditorContextBridge {
             return null;
         }
     }
-     */
     
     /**
      * Parse the expression into AST tree and traverse is via the provided visitor.
@@ -118,14 +117,14 @@ public class EditorContextBridge {
      * @return the visitor value or <code>null</code>.
      */
     public static <R,D> R parseExpression(String expression, String url, final int line,
-                                          TreePathScanner<R,D> visitor, D context,
+                                          JavaFXTreePathScanner<R,D> visitor, D context,
                                           SourcePathProvider sp) {
         
         // TODO: return getContext ().parseExpression ();
         try {
             return (R) getContext ().getClass().getMethod(
                     "parseExpression",
-                    new Class[] { String.class, String.class, Integer.TYPE, TreePathScanner.class, Object.class, SourcePathProvider.class }).
+                    new Class[] { String.class, String.class, Integer.TYPE, JavaFXTreePathScanner.class, Object.class, SourcePathProvider.class }).
                         invoke(getContext(), new Object[] { expression, url, line, visitor, context, sp });
         } catch (java.lang.reflect.InvocationTargetException itex) {
             Throwable tex = itex.getTargetException();

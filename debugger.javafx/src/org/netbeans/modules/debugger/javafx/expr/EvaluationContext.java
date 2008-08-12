@@ -41,19 +41,18 @@
 
 package org.netbeans.modules.debugger.javafx.expr;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.jdi.Field;
 import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.LocalVariable;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.ThreadReference;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.Trees;
 
+import com.sun.tools.javafx.api.JavafxcTrees;
 import java.util.*;
-import javax.lang.model.element.TypeElement;
 import org.netbeans.modules.debugger.javafx.JavaFXDebuggerImpl;
 
 
@@ -78,9 +77,9 @@ public class EvaluationContext {
     private Runnable methodInvokePreproc;
     private JavaFXDebuggerImpl debugger;
     
-    private Trees trees;
-    private CompilationUnitTree compilationUnitTree;
-    private TreePath treePath;
+    private JavafxcTrees trees;
+    private UnitTree compilationUnitTree;
+    private JavaFXTreePath treePath;
     private Map<Tree, VariableInfo> variables = new HashMap<Tree, VariableInfo>();
 
     /**
@@ -142,27 +141,27 @@ public class EvaluationContext {
         return debugger;
     }
     
-    public void setTrees(Trees trees) {
+    public void setTrees(JavafxcTrees trees) {
         this.trees = trees;
     }
     
-    Trees getTrees() {
+    JavafxcTrees getTrees() {
         return trees;
     }
     
-    public void setCompilationUnit(CompilationUnitTree compilationUnitTree) {
+    public void setCompilationUnit(UnitTree compilationUnitTree) {
         this.compilationUnitTree = compilationUnitTree;
     }
     
-    CompilationUnitTree getCompilationUnit() {
+    UnitTree getCompilationUnit() {
         return compilationUnitTree;
     }
     
-    public void setTreePath(TreePath treePath) {
+    public void setTreePath(JavaFXTreePath treePath) {
         this.treePath = treePath;
     }
     
-    TreePath getTreePath() {
+    JavaFXTreePath getTreePath() {
         return treePath;
     }
     
