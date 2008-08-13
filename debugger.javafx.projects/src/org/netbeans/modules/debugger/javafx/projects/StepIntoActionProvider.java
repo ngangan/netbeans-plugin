@@ -69,7 +69,7 @@ import org.openide.util.WeakListeners;
 */
 public class StepIntoActionProvider extends ActionsProviderSupport {
 
-//    private MethodBreakpoint breakpoint;
+    private MethodBreakpoint breakpoint;
     Listener listener;
     
     {
