@@ -76,18 +76,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ErrorType;
-import javax.lang.model.type.ExecutableType;
-import javax.lang.model.type.NoType;
-import javax.lang.model.type.NullType;
-import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.TypeVisitor;
-import javax.lang.model.type.WildcardType;
 
 /**
  *
@@ -100,6 +91,9 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static final String JAVAFX_MIME_TYPE    = "text/x-fx";  // NOI18N
     public static final String MAGIC_METHOD_NAME    = "javafx$run$";  // NOI18N
     public static final String MAGIC_METHOD_SIGNATURE    = "(Lcom/sun/javafx/runtime/sequence/Sequence;)Ljava/lang/Object;";  // NOI18N
+    public static final String INTERFACE_NAME_SUFFIX = "$Intf";  // NOI18N
+    public static final String JAVAFX_PREFIX = "javafx.";  // NOI18N
+    
 
     public static ClientUtils.SourceCodeSelection[] getProjectDefaultRoots(Project project, String[][] projectPackagesDescr) {
         computeProjectPackages(project, true, projectPackagesDescr);
@@ -467,11 +461,8 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 case METHOD:
                 case CONSTRUCTOR:
                 case STATIC_INIT:
-
-                    //case INSTANCE_INIT: // not supported
                     String paramsVMSignature = getParamsSignature(method.getParameters(), ci);
                     String retTypeVMSignature = VMUtils.typeToVMSignature(getRealTypeName(method.getReturnType(), ci));
-
                     return "(" + paramsVMSignature + ")" + retTypeVMSignature; //NOI18N
                 default:
                     return null;
@@ -509,15 +500,12 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 // VOID type, return "void" - will be converted later by VMUtils.typeToVMSignature
                 return type.toString();
             case DECLARED:
-
                 // Java class (also parametrized - "ArrayList<String>" or "ArrayList<T>"), need to generate correct innerclass signature using "$"
-//                return ElementUtilities.getBinaryName(getDeclaredType(type));
-            case ARRAY:
-
-                // Array means "String[]" or "T[]" and also varargs "Object ... args"
-//                return getRealTypeName(((ArrayType) type).getComponentType(), ci) + "[]"; // NOI18N
+                if (getDeclaredType(type) instanceof Symbol.TypeSymbol) {
+                    String flatName = ((Symbol.TypeSymbol)getDeclaredType(type)).flatName().toString();                    
+                    return flatName.startsWith(JAVAFX_PREFIX) ? flatName.concat(INTERFACE_NAME_SUFFIX) : flatName;
+                }
             case TYPEVAR:
-
                 // TYPEVAR means "T" or "<T extends String>" or "<T extends List&Runnable>"
                 List<?extends TypeMirror> subTypes = ci.getTypes().directSupertypes(type);
 
@@ -535,72 +523,15 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                     return getRealTypeName(subTypes.get(0), ci);
                 }
             case WILDCARD:
-
                 // WILDCARD means "<?>" or "<? extends Number>" or "<? super T>", shouldn't occur here
                 throw new IllegalArgumentException("Unexpected WILDCARD parameter: " + type); // NOI18N
             default:
-
                 // Unexpected parameter type
                 throw new IllegalArgumentException("Unexpected type parameter: " + type + " of kind " + typeKind); // NOI18N
         }
     }    
     
     private static TypeElement getDeclaredType(TypeMirror type) {
-        return type.accept(declaredTypeResolver, null);
+        return (TypeElement) ((DeclaredType)type).asElement();
     }
-    
-    private static final DeclaredTypeResolver declaredTypeResolver = new DeclaredTypeResolver();
-    
-    
-    private static final class DeclaredTypeResolver implements TypeVisitor<TypeElement, Void> {
-        //~ Methods --------------------------------------------------------------------------------------------------------------
-
-        public TypeElement visit(TypeMirror t, Void p) {
-            return null;
-        }
-
-        public TypeElement visit(TypeMirror t) {
-            return null;
-        }
-
-        public TypeElement visitArray(ArrayType t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitDeclared(DeclaredType t, Void p) {
-            return (TypeElement) t.asElement();
-        }
-
-        public TypeElement visitError(ErrorType t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitExecutable(ExecutableType t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitNoType(NoType t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitNull(NullType t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitPrimitive(PrimitiveType t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitTypeVariable(TypeVariable t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitUnknown(TypeMirror t, Void p) {
-            return null;
-        }
-
-        public TypeElement visitWildcard(WildcardType t, Void p) {
-            return null;
-        }
-    }    
 }

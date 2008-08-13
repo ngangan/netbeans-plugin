@@ -99,9 +99,6 @@ public class JavaFXFunctionNode extends SelectorNode {
         if (signature != null) {
         rootMethod = new ClientUtils.SourceCodeSelection(JavaFXProjectUtilities.getBinaryName((Element)getEnclosingClass(method), (Element)getEnclosingClass(getEnclosingClass(method))),
                                                          method.getSimpleName().toString(), signature);
-
-//                    ElementUtilities.getBinaryName(getEnclosingClass(method)),
-//                                                             method.getSimpleName().toString(), signature.getValue());
         }
     }
 
