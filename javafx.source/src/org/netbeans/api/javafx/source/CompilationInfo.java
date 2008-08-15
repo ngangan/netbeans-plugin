@@ -49,8 +49,8 @@ import com.sun.tools.javafx.comp.JavafxEnter;
 import com.sun.tools.javafx.comp.JavafxEnv;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXScript;
 import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JFXUnit;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JavafxTreeScanner;
 import java.util.ArrayList;
@@ -135,11 +135,11 @@ public class CompilationInfo {
                 }
             }
 
-            public @Override void visitUnit( JFXUnit that) {
+            public @Override void visitScript( JFXScript that) {
                 if (that.packge == sym) {
                     result = that;
                 } else {
-                    super.visitUnit(that);
+                    super.visitScript(that);
                 }
             }
 

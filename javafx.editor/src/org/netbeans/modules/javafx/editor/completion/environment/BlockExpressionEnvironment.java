@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TryTree;
-import com.sun.tools.javafx.tree.JFXBlockExpression;
+import com.sun.tools.javafx.tree.JFXBlock;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,14 +54,14 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  *
  * @author David Strupl
  */
-public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXBlockExpression> {
+public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXBlock> {
 
     private static final Logger logger = Logger.getLogger(BlockExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXBlockExpression bl) throws IOException {
-        if (LOGGABLE) log("inside JFXBlockExpression " + bl);
+    protected void inside(JFXBlock bl) throws IOException {
+        if (LOGGABLE) log("inside JFXBlock " + bl);
         ExpressionTree last = null;
         for (ExpressionTree stat : bl.getStatements()) {
             int pos = (int) sourcePositions.getStartPosition(root, stat);
