@@ -188,4 +188,19 @@ public class JavaFXSourceUtils {
 
         return (TypeElement) element.getEnclosingElement(); // Wrong
     }
+
+    public static FileObject getFile(Element element, final ClasspathInfo cpInfo) {
+        final ElementHandle<? extends Element> handle = ElementHandle.create(element);
+        return getFile(element, cpInfo);
+    }
+    
+    public static FileObject getFile(final ElementHandle<? extends Element> handle, final ClasspathInfo cpInfo) {
+        if (handle == null || cpInfo == null) {
+            throw new IllegalArgumentException("Cannot pass null as an argument of the JavaFXSourceUtils.getFile");  //NOI18N
+        }
+        
+        // TODO
+        return null;
+    }
+
 }

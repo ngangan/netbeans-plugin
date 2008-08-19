@@ -40,12 +40,15 @@
  */
 package org.netbeans.api.javafx.source;
 
+import com.sun.javadoc.Doc;
 import com.sun.javafx.api.JavafxcTask;
 import com.sun.source.tree.Scope;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.javac.code.Symbol.PackageSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
@@ -55,6 +58,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafxdoc.DocEnv;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.lang.model.element.Element;
@@ -64,17 +68,18 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import org.netbeans.modules.javafx.source.JavadocEnv;
 
 /**
  *
  * @author Jan Lahoda, Dusan Balek, Tomas Zezula
  */
 public final class ElementUtilities {
-    
+
     private final Context ctx;
 //    private final ElementsService delegate;
     private final CompilationInfo info;
-    
+
     /** Creates a new instance of ElementUtilities */
     ElementUtilities(final CompilationInfo info) {
         assert info != null;
@@ -83,7 +88,7 @@ public final class ElementUtilities {
         this.ctx = ((JavafxcTaskImpl) task).getContext();
 //        this.delegate = ElementsService.instance(ctx);
     }
-    
+
     /**
      * Returns the type element within which this member or constructor
      * is declared. Does not accept pakages
@@ -112,7 +117,6 @@ public final class ElementUtilities {
 //	
 //	return (TypeElement)element.getEnclosingElement(); // Wrong
 //    }
-    
     /**
      * 
      * The outermost TypeElement which indirectly encloses this element.
@@ -120,14 +124,12 @@ public final class ElementUtilities {
 //    public TypeElement outermostTypeElement(Element element) {
 //        return delegate.outermostTypeElement(element);
 //    }
-    
     /**
      * Returns the implementation of a method in class origin; null if none exists.
      */
 //    public Element getImplementationOf(ExecutableElement method, TypeElement origin) {
 //        return delegate.getImplementationOf(method, origin);
 //    }
-    
     /**Returns true if the given element is syntetic.
      * 
      *  @param element to check
@@ -136,7 +138,7 @@ public final class ElementUtilities {
     public boolean isSynthetic(Element element) {
         return (((Symbol) element).flags() & Flags.SYNTHETIC) != 0 || (((Symbol) element).flags() & Flags.GENERATEDCONSTR) != 0;
     }
-    
+
     /**
      * Returns true if this element represents a method which overrides a
      * method in one of its superclasses.
@@ -144,7 +146,6 @@ public final class ElementUtilities {
 //    public boolean overridesMethod(ExecutableElement element) {
 //        return delegate.overridesMethod(element);
 //    }
-    
     /**
      * Returns a binary name of a type.
      * @param element for which the binary name should be returned
@@ -159,40 +160,42 @@ public final class ElementUtilities {
 //            throw new IllegalArgumentException ();
 //        } 
 //    }
-    
-    /**Get javadoc for given element.
+    /**
+     * Get javadoc for given element.
      */
-//    public Doc javaDocFor(Element element) {
-//        if (element != null) {
-//            DocEnv env = DocEnv.instance(ctx);
-//            switch (element.getKind()) {
+    public Doc javaDocFor(Element element) {
+        if (element != null) {
+            DocEnv env = DocEnv.instance(ctx);
+            switch (element.getKind()) {
 //                case ANNOTATION_TYPE:
-//                case CLASS:
-//                case ENUM:
+                case CLASS:
+                case ENUM:
 //                case INTERFACE:
 //                    return env.getClassDoc((ClassSymbol)element);
-//                case ENUM_CONSTANT:
-//                case FIELD:
-//                    return env.getFieldDoc((VarSymbol)element);
-//                case METHOD:
+                case ENUM_CONSTANT:
+                // XXX not public ?
+                case FIELD:
+                    return env.getFieldDoc((VarSymbol) element);
+                case METHOD:
 //                    if (element.getEnclosingElement().getKind() == ElementKind.ANNOTATION_TYPE)
 //                        return env.getAnnotationTypeElementDoc((MethodSymbol)element);
-//                    return env.getMethodDoc((MethodSymbol)element);
-//                case CONSTRUCTOR:
-//                    return env.getConstructorDoc((MethodSymbol)element);
-//                case PACKAGE:
-//                    return env.getPackageDoc((PackageSymbol)element);
-//            }
-//        }
-//        return null;
-//    }
-    
-    /**Find a {@link Element} corresponding to a given {@link Doc}.
+                    return env.getFunctionDoc((MethodSymbol) element);
+                case CONSTRUCTOR:
+                    return env.getConstructorDoc((MethodSymbol) element);
+                case PACKAGE:
+                    return env.getPackageDoc((PackageSymbol) element);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find a {@link Element} corresponding to a given {@link Doc}.
      */
-//    public Element elementFor(Doc doc) {
-//        return (doc instanceof JavadocEnv.ElementHolder) ? ((JavadocEnv.ElementHolder)doc).getElement() : null;
-//    }
-    
+    public Element elementFor(Doc doc) {
+        return (doc instanceof JavadocEnv.ElementHolder) ? ((JavadocEnv.ElementHolder) doc).getElement() : null;
+    }
+
     /**
      * Returns all members of a type, whether inherited or
      * declared directly.  For a class the result also includes its
@@ -213,7 +216,7 @@ public final class ElementUtilities {
                 case DECLARED:
                     HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
                     Types types = JavafxTypes.instance(ctx);
-                    TypeElement te = (TypeElement)((DeclaredType)type).asElement();
+                    TypeElement te = (TypeElement) ((DeclaredType) type).asElement();
                     for (Element member : elements.getAllMembers(te)) {
                         if (acceptor == null || acceptor.accept(member, type)) {
                             CharSequence name = member.getSimpleName();
@@ -229,13 +232,15 @@ public final class ElementUtilities {
                         }
                     }
                     if (te.getKind().isClass()) {
-                        VarSymbol thisPseudoMember = new VarSymbol(Flags.FINAL | Flags.HASINIT, Name.Table.instance(ctx)._this, (ClassType)te.asType(), (ClassSymbol)te);
-                        if (acceptor == null || acceptor.accept(thisPseudoMember, type))
+                        VarSymbol thisPseudoMember = new VarSymbol(Flags.FINAL | Flags.HASINIT, Name.Table.instance(ctx)._this, (ClassType) te.asType(), (ClassSymbol) te);
+                        if (acceptor == null || acceptor.accept(thisPseudoMember, type)) {
                             members.add(thisPseudoMember);
+                        }
                         if (te.getSuperclass().getKind() == TypeKind.DECLARED) {
-                            VarSymbol superPseudoMember = new VarSymbol(Flags.FINAL | Flags.HASINIT, Name.Table.instance(ctx)._super, (ClassType)te.getSuperclass(), (ClassSymbol)te);
-                            if (acceptor == null || acceptor.accept(superPseudoMember, type))
+                            VarSymbol superPseudoMember = new VarSymbol(Flags.FINAL | Flags.HASINIT, Name.Table.instance(ctx)._super, (ClassType) te.getSuperclass(), (ClassSymbol) te);
+                            if (acceptor == null || acceptor.accept(superPseudoMember, type)) {
                                 members.add(superPseudoMember);
+                            }
                         }
                     }
                 case BOOLEAN:
@@ -248,25 +253,25 @@ public final class ElementUtilities {
                 case SHORT:
                 case VOID:
                     Type t = Symtab.instance(ctx).classType;
-                    com.sun.tools.javac.util.List<Type> typeargs = Source.instance(ctx).allowGenerics() ?
-                        com.sun.tools.javac.util.List.of((Type)type) :
-                        com.sun.tools.javac.util.List.<Type>nil();
+                    com.sun.tools.javac.util.List<Type> typeargs = Source.instance(ctx).allowGenerics() ? com.sun.tools.javac.util.List.of((Type) type) : com.sun.tools.javac.util.List.<Type>nil();
                     t = new ClassType(t.getEnclosingType(), typeargs, t.tsym);
-                    Element classPseudoMember = new VarSymbol(Flags.STATIC | Flags.PUBLIC | Flags.FINAL, Name.Table.instance(ctx)._class, t, ((Type)type).tsym);
-                    if (acceptor == null || acceptor.accept(classPseudoMember, type))
+                    Element classPseudoMember = new VarSymbol(Flags.STATIC | Flags.PUBLIC | Flags.FINAL, Name.Table.instance(ctx)._class, t, ((Type) type).tsym);
+                    if (acceptor == null || acceptor.accept(classPseudoMember, type)) {
                         members.add(classPseudoMember);
+                    }
                     break;
                 case ARRAY:
-                    for (Element member : elements.getAllMembers((TypeElement)((Type)type).tsym)) {
-                        if (acceptor == null || acceptor.accept(member, type))
+                    for (Element member : elements.getAllMembers((TypeElement) ((Type) type).tsym)) {
+                        if (acceptor == null || acceptor.accept(member, type)) {
                             members.add(member);
+                        }
                     }
                     break;
             }
         }
         return members;
     }
-    
+
     /**Return members declared in the given scope.
      */
     public Iterable<? extends Element> getLocalMembersAndVars(Scope scope, ElementAcceptor acceptor) {
@@ -276,10 +281,10 @@ public final class ElementUtilities {
         Elements elements = info.getElements();
         Types types = JavafxTypes.instance(ctx);
         TypeElement cls;
-        while(scope != null) {
+        while (scope != null) {
             final Iterable<? extends Element> localElements = scope.getLocalElements();
             if ((cls = scope.getEnclosingClass()) != null) {
-                for (Element local : localElements)
+                for (Element local : localElements) {
                     if (acceptor == null || acceptor.accept(local, null)) {
                         CharSequence name = local.getSimpleName();
                         ArrayList<Element> h = hiders.get(name);
@@ -292,6 +297,7 @@ public final class ElementUtilities {
                             h.add(local);
                         }
                     }
+                }
                 TypeMirror type = cls.asType();
                 for (Element member : elements.getAllMembers(cls)) {
                     if (acceptor == null || acceptor.accept(member, type)) {
@@ -310,7 +316,7 @@ public final class ElementUtilities {
             } else {
                 for (Element local : localElements) {
                     if (!local.getKind().isClass() && !local.getKind().isInterface() &&
-                        (acceptor == null || acceptor.accept(local, local.getEnclosingElement().asType()))) {
+                            (acceptor == null || acceptor.accept(local, local.getEnclosingElement().asType()))) {
                         CharSequence name = local.getSimpleName();
                         ArrayList<Element> h = hiders.get(name);
                         if (!isHidden(local, h, types)) {
@@ -353,7 +359,6 @@ public final class ElementUtilities {
 //        }
 //        return members;
 //    }
-    
     /**Return {@link TypeElement}s:
      * <ul>
      *    <li>which are imported</li>
@@ -422,10 +427,10 @@ public final class ElementUtilities {
 //        }
 //        return members;
 //    }
-
     /**Filter {@link Element}s
      */
     public static interface ElementAcceptor {
+
         /**Is the given element accepted.
          * 
          * @param e element to test
@@ -439,18 +444,18 @@ public final class ElementUtilities {
         if (hiders != null) {
             for (Element hider : hiders) {
                 if (hider == member || (hider.getClass() == member.getClass() && //TODO: getClass() should not be used here
-                    hider.getSimpleName() == member.getSimpleName() &&
-                    ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR))))
-//                if (hider == member || (hider.getClass() == member.getClass() && //TODO: getClass() should not be used here
-//                    hider.getSimpleName() == member.getSimpleName() &&
-//                    ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR)
-//                    || types.isSubsignature((ExecutableType)hider.asType(), (ExecutableType)member.asType()))))
-		    return true;
+                        hider.getSimpleName() == member.getSimpleName() &&
+                        ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR)))) //                if (hider == member || (hider.getClass() == member.getClass() && //TODO: getClass() should not be used here
+                //                    hider.getSimpleName() == member.getSimpleName() &&
+                //                    ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR)
+                //                    || types.isSubsignature((ExecutableType)hider.asType(), (ExecutableType)member.asType()))))
+                {
+                    return true;
+                }
             }
         }
         return false;
     }
-    
     /**
      * Returns true if the element is declared (directly or indirectly) local
      * to a method or variable initializer.  Also true for fields of inner 
@@ -459,7 +464,6 @@ public final class ElementUtilities {
 //    public boolean isLocal(Element element) {
 //        return delegate.isLocal(element);
 //    }
-    
     /**
      * Returns true if a method specified by name and type is defined in a
      * class type.
@@ -467,14 +471,12 @@ public final class ElementUtilities {
 //    public boolean alreadyDefinedIn(CharSequence name, ExecutableType method, TypeElement enclClass) {
 //        return delegate.alreadyDefinedIn(name, method, enclClass);
 //    }
-    
     /**
      * Returns true if a type element has the specified element as a member.
      */
 //    public boolean isMemberOf(Element e, TypeElement type) {
 //        return delegate.isMemberOf(e, type);
 //    }                
-    
     /**
      * Returns the parent method which the specified method overrides, or null
      * if the method does not override a parent class method.
@@ -489,7 +491,6 @@ public final class ElementUtilities {
 //    public boolean implementsMethod(ExecutableElement element) {
 //        return delegate.implementsMethod(element);
 //    }
-    
     /**Find all methods in given type and its supertypes, which are not implemented.
      * 
      * @param type to inspect
@@ -502,8 +503,6 @@ public final class ElementUtilities {
 //    }
 
     // private implementation --------------------------------------------------
-
-
 //    private List<? extends ExecutableElement> findUnimplementedMethods(TypeElement impl, TypeElement element) {
 //        List<ExecutableElement> undef = new ArrayList<ExecutableElement>();
 //        if (element.getModifiers().contains(Modifier.ABSTRACT)) {
@@ -558,7 +557,6 @@ public final class ElementUtilities {
 //        }
 //        return undef;
 //    }
-    
 //    private DeclaredType findCommonSubtype(DeclaredType type1, DeclaredType type2, Env<AttrContext> env) {
 //        List<DeclaredType> subtypes1 = getSubtypes(type1, env);
 //        List<DeclaredType> subtypes2 = getSubtypes(type2, env);
@@ -573,7 +571,6 @@ public final class ElementUtilities {
 //        }
 //        return null;
 //    }
-    
     // TODO classindex for FX will be in future
 //    private List<DeclaredType> getSubtypes(DeclaredType baseType, Env<AttrContext> env) {
 //        LinkedList<DeclaredType> subtypes = new LinkedList<DeclaredType>();
