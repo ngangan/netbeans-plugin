@@ -1,6 +1,6 @@
 package fxprj1;
 
-import javafx.gui.*;
+import javafx.ext.swing.Label;
 
 var x = new Label();
 x.text = "x";
