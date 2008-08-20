@@ -61,15 +61,23 @@ import com.sun.tools.javafx.tree.JFXBreak;
 import com.sun.tools.javafx.tree.JFXContinue;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.Random;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
+import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileSystem;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
@@ -356,7 +364,81 @@ public final class TreeUtilities {
         }
     }
 
-    public boolean isAccessible(Scope scope, Element member, TypeMirror type) {
+    /**
+     * Parses and analyzes given expression.
+     * @param expr String expression to be parsed and analyzed
+     * @param pos position in the source where the expression would occur
+     * @return parsed expression tree or <code>null</code> if it was not
+     *         successfull
+     */
+    public ExpressionTree parseExpression(String expr, int pos) {
+        if (LOGGABLE) log("parseExpression pos= " + pos + " : " + expr);
+        try {
+            Document d = info.getJavaFXSource().getDocument();
+            String start = d.getText(0, pos);
+            if (LOGGABLE) log("  start = " + start);
+            String end = d.getText(pos, d.getLength()-pos);
+            if (LOGGABLE) log("  end = " + end);
+            FileSystem fs = FileUtil.createMemoryFileSystem();
+            final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
+            Writer w = new OutputStreamWriter(fo.getOutputStream());
+            w.write(start);
+            w.write(expr);
+            w.write(end);
+            w.close();
+            if (LOGGABLE) log("  source written to " + fo);
+            ClasspathInfo cp = ClasspathInfo.create(info.getFileObject());
+            JavaFXSource s = JavaFXSource.create(cp, Collections.singleton(fo));
+            if (LOGGABLE) log("  jfxsource obtained " + s);
+            CompilationInfoImpl ci = new CompilationInfoImpl(s);
+            s.moveToPhase(Phase.ANALYZED, ci, false);
+            CompilationController cc = new CompilationController(ci);
+            JavaFXTreePath p = cc.getTreeUtilities().pathFor(pos+1);
+            if (p == null) {
+                if (LOGGABLE) log("  path for returned null");
+                return null;
+            }
+            SourcePositions sp = cc.getTrees().getSourcePositions();
+            if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p = " + p.getLeaf());
+            // first loop will try to find our expression
+            while ((p != null) && (! (p.getLeaf() instanceof ExpressionTree))) {
+                if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (2) = " + p.getLeaf());
+                p = p.getParentPath();
+            }
+            // the second while loop will try to find as big expression as possible
+            JavaFXTreePath pp = p.getParentPath();
+            if (LOGGABLE && pp != null) {
+                log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf());
+                log("   start == " + sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf()));
+                log("   end == " + sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf()));
+                log("   pos == " + pos);
+                log("   pos+length == " + (pos+expr.length()));
+                log("   (pp.getLeaf() instanceof ExpressionTree)" + (pp.getLeaf() instanceof ExpressionTree));
+            }
+            while ((pp != null) && ((pp.getLeaf() instanceof ExpressionTree)) &&
+                    (sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf())>=pos) &&
+                    (sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf())<=(pos+expr.length()))) {
+                if (LOGGABLE) log(pp.getLeaf().getClass().getName() + "   p (3) = " + pp.getLeaf());
+                p = pp;
+                pp = pp.getParentPath();
+                if (LOGGABLE) {
+                    log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf());
+                    log("   start == " + sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf()));
+                    log("   end == " + sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf()));
+                    log("   (pp.getLeaf() instanceof ExpressionTree)" + (pp.getLeaf() instanceof ExpressionTree));
+                }
+            }
+            if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (4) = " + p.getLeaf());
+            return (ExpressionTree)p.getLeaf();
+        } catch (Exception x) {
+            logger.log(Level.FINE, "Exception during parseExpression", x);
+        }
+        return null;
+    }
+
+    
+    public boolean isAccessible(Scope 
+            scope, Element member, TypeMirror type) {
         if (scope instanceof JavafxcScope && member instanceof Symbol && type instanceof Type) {
 //            Resolve resolve = Resolve.instance(info.impl.getContext());
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
