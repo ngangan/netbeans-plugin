@@ -66,6 +66,7 @@ import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
@@ -196,6 +197,7 @@ public final class JavaFXSource {
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));
         Context context = task.getContext();
         //Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
+        JavadocEnv.preRegister(context, cpInfo);
         
         return task;
   }
