@@ -110,7 +110,10 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
             </and>
         </condition>
         <condition property="no.javadoc.preview">
-            <isfalse value="${javadoc.preview}"/>
+            <and>
+                <isset property="javadoc.preview"/>
+                <isfalse value="${javadoc.preview}"/>
+            </and>
         </condition>
         <property name="run.jvmargs" value=""/>
         <property name="javac.compilerargs" value=""/>
@@ -119,13 +122,6 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
             <and>
                 <istrue value="${no.dependencies}"/>
             </and>
-        </condition>
-        <condition property="have.java.sources">
-            <resourcecount count="0" when="gt">
-                <fileset dir="${src.dir}" excludes="${excludes}" includes="${includes}">
-                    <filename name="**/*.java"/>
-                </fileset>
-            </resourcecount>
         </condition>
         <property name="javac.debug" value="true"/>
         <property name="javadoc.preview" value="true"/>
@@ -167,9 +163,10 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="${javac.debug}" name="debug"/>
+            <attribute default="" name="sourcepath"/>
             <element name="customize" optional="true"/>
             <sequential>
-                <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" sourcepath="" srcdir="@{srcdir}" target="${javac.target}">
+                <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" sourcepath="@{sourcepath}" srcdir="@{srcdir}" target="${javac.target}">
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
@@ -387,7 +384,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
     <target depends="init,deps-jar,-pre-pre-compile" name="-do-compile-single">
         <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
         <javafxproject3:force-recompile/>
-        <javafxproject3:javac excludes="" includes="${javac.includes}"/>
+        <javafxproject3:javac excludes="" includes="${javac.includes}" sourcepath="${src.dir}"/>
     </target>
     <target name="-post-compile-single">
         <!-- Empty placeholder for easier customization. -->
@@ -472,7 +469,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
         </javafxproject1:java-run>
     </target>
     <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-post-jar" description="Build." name="jar"/>
-    <target depends="init,compile" name="run-single">
+    <target depends="init,compile-single" name="run-single">
         <fail unless="run.class">Must select one file in the IDE or set run.class</fail>
         <javafxproject1:java-run classname="${run.class}"/>
     </target>
@@ -514,9 +511,9 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 JAVADOC SECTION
                 ===============
             -->
-    <target depends="init" if="have.java.sources" name="-javadoc-build">
+    <target depends="init" name="-javadoc-build">
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc additionalparam="${javadoc.additionalparam}" author="${javadoc.author}" destdir="${dist.javadoc.dir}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}">
+        <javadoc additionalparam="${javadoc.additionalparam}" author="${javadoc.author}" charset="UTF-8" destdir="${dist.javadoc.dir}" docencoding="UTF-8" encoding="${javadoc.encoding.used}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}">
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
@@ -566,7 +563,7 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
     <target depends="init,compile,-pre-pre-compile-test,-pre-compile-test-single" if="have.tests" name="-do-compile-test-single">
         <fail unless="javac.includes">Must select some files in the IDE or set javac.includes</fail>
         <javafxproject3:force-recompile destdir="${build.test.classes.dir}"/>
-        <javafxproject3:javac classpath="${javac.test.classpath}" debug="true" destdir="${build.test.classes.dir}" excludes="" includes="${javac.includes}" srcdir="${test.src.dir}"/>
+        <javafxproject3:javac classpath="${javac.test.classpath}" debug="true" destdir="${build.test.classes.dir}" excludes="" includes="${javac.includes}" sourcepath="${test.src.dir}" srcdir="${test.src.dir}"/>
         <copy todir="${build.test.classes.dir}">
             <fileset dir="${test.src.dir}" excludes="${build.classes.excludes},${excludes}" includes="${includes}"/>
         </copy>
@@ -641,6 +638,25 @@ JavaFX SDK is working only on top of JDK 6 (or higher).
                 <arg value="${applet.url}"/>
             </customize>
         </javafxproject1:java-run>
+    </target>
+    <target depends="init,compile,-do-jar-with-libraries" name="run-applet-in-browser">
+        <fail unless="applet.url">Must select one file in the IDE or set applet.url</fail>
+        <condition property="browser" value="open">
+            <os family="mac"/>
+        </condition>
+        <condition property="browser" value="firefox">
+            <os family="unix"/>
+        </condition>
+        <condition property="browser" value="cmd.exe">
+            <os family="windows"/>
+        </condition>
+        <condition property="browser.args" value="/C start">
+            <os family="windows"/>
+        </condition>
+        <property name="browser.args" value=""/>
+        <exec executable="${browser}" spawn="true">
+            <arg line="${browser.args} ${applet.url}"/>
+        </exec>
     </target>
     <!--
                 =========================

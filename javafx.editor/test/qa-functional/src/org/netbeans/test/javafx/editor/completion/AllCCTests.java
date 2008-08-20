@@ -53,7 +53,11 @@ public class AllCCTests extends CompletionTestPerformer {
     public AllCCTests(String name) {
         super(name);
     }
-  
+
+
+    /*
+     * Baseline Smoke test
+     */
     public void testFX1() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
@@ -65,5 +69,324 @@ public class AllCCTests extends CompletionTestPerformer {
                 15, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
+
+    /*
+     * Import Level Tests
+     */
+    public void testFXImport() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import ", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImport.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+ /*   Fails
+    public void testFXImportJava() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import java.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJava.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+*/
+    
+ /*   Fails
+    public void testFXImportJavaFX() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFX.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+  */
+    
+    public void testFXImportJavaFXAnimation() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.animation.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXAnimation.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXApplication() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.application.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXApplication.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+ /*   Fails
+    public void testFXImportJavaFXAsync() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.async.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXAsync.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+*/
+    
+    public void testFXImportJavaFXExt() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.ext.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXExt.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+ /*   Fails
+    public void testFXImportJavaFXExtSwing() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.ext.swing.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXExtSwing.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+*/
+    
+    public void testFXImportJavaFXFXUnit() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.fxunit.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXFXUnit.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+    public void testFXImportJavaFXInput() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.input.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXInput.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+    public void testFXImportJavaFXLang() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.lang.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXLang.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+    public void testFXImportJavaFXReflect() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.reflect.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXReflect.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+ /*   Fails
+    public void testFXImportJavaFXScene() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXScene.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+*/
+    
+    public void testFXImportJavaFXSceneEffect() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.effect.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneEffect.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXSceneEffectLight() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.effect.light.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneEffectLight.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXSceneGeometry() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.geometry.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneGeometry.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXSceneImage() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.image.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneImage.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXSceneLayout() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.layout.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneLayout.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXSceneMedia() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.media.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneMedia.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXScenePaint() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.paint.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXScenePaint.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+ /*   Fails
+    public void testFXImportJavaFXSceneText() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.text.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneText.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+*/
+    
+    public void testFXImportJavaFXSceneTransform() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.scene.transform.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXSceneTransform.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXImportJavaFXUtil() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "import javafx.util.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXUtil.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    /*
+     * Package level Tests
+     */
+    public void testFXPackageEmpty() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "packages/FXTestEmpty.fx",
+                1, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXPackage() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "packages/FXTestPackage.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
     
 }
