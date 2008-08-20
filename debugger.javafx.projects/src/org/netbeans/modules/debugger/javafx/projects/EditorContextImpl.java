@@ -50,9 +50,7 @@ import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.source.tree.VariableTree;
 
-import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
@@ -77,7 +75,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.JEditorPane;
 
 import com.sun.tools.javafx.code.JavafxVarSymbol;
-import com.sun.tools.javafx.main.JavafxCompiler;
+import com.sun.tools.javafx.tree.JFXVar;
 import java.util.LinkedList;
 import javax.lang.model.util.Elements;
 import javax.lang.model.element.Element;
@@ -90,7 +88,6 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 //import org.netbeans.api.java.classpath.ClassPath;
-import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
 //import org.netbeans.api.java.source.ElementUtilities;
@@ -1801,7 +1798,7 @@ public class EditorContextImpl extends EditorContext {
                         if (tree.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
                             el = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), tree));
                             if (el.getKind() == ElementKind.FIELD || el.getKind() == ElementKind.ENUM_CONSTANT) {
-                                currentElementPtr[0] = ((VariableTree) tree).getName().toString();
+                                currentElementPtr[0] = ((JFXVar) tree).getName().toString();
                             }
                         } else if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER && selectedIdentifier != null) {
                             IdentifierTree it = (IdentifierTree) tree;
@@ -1830,7 +1827,7 @@ public class EditorContextImpl extends EditorContext {
                                     }
                                 }
                             }
-                        }
+                        } 
                     }
                     if (elementPtr != null) {
                         elementPtr[0] = el;
