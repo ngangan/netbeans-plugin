@@ -1,11 +1,9 @@
 Cursor
 CustomNode
-Font
-FontStyle
 Group
 HorizontalAlignment
 Node
-Orientation
+Point2D
 VerticalAlignment
 effect
 geometry

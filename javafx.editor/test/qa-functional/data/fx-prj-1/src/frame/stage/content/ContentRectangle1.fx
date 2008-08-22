@@ -3,10 +3,8 @@ package frame.stage.content;
 
 import javafx.application.Frame;
 import javafx.application.Stage;
+import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.scene.geometry.Arc;
-import javafx.scene.geometry.ArcType;
-import javafx.scene.geometry.Circle;
 
 Frame {
     title: "MyApplication"
@@ -18,10 +16,12 @@ Frame {
     visible: true
 
     stage: Stage {
-        
         content: [
-            Arc {
+            Rectangle {
                 
+                x: 10, y: 10
+                width: 140, height: 90
+                fill: Color.BLACK
             }
         ]
     }

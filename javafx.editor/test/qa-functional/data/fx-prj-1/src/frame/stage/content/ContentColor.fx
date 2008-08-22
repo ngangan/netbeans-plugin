@@ -20,7 +20,9 @@ Frame {
     stage: Stage {
         
         content: [
-            Arc {
+            Circle {
+                centerX: 100, centerY: 100
+                radius: 40
                 
             }
         ]
