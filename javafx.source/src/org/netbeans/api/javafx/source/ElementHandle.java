@@ -97,7 +97,7 @@ public class ElementHandle<T extends Element> {
     private ElementKind kind;
     private String[] signatures;
 
-    private ElementHandle(final ElementKind kind, String[] signatures) {
+    public ElementHandle(final ElementKind kind, String[] signatures) {
         assert kind != null;
         assert signatures != null;
         this.kind = kind;
