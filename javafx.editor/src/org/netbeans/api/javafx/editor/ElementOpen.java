@@ -55,6 +55,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
@@ -148,43 +149,11 @@ public final class ElementOpen {
     }
 
     private static FileObject getFile(Element elem, final CompilationInfo comp) {
-        assert elem != null;
-        assert comp != null;
-
-        try {
-            FileObject ref = comp.getJavaFXSource().getFileObject();
-            TypeElement tel = getEnclosingClassElement(elem);
-            Symbol.ClassSymbol cs = (Symbol.ClassSymbol) tel;
-            String name = cs.className().replace('.', '/') + ".fx"; // NOI18N
-
-            ClasspathInfo cpi = ClasspathInfo.create(ref);
-            ClassPath[] all = new ClassPath[]{
-                cpi.getClassPath(ClasspathInfo.PathKind.BOOT),
-                cpi.getClassPath(ClasspathInfo.PathKind.COMPILE),
-                cpi.getClassPath(ClasspathInfo.PathKind.SOURCE)
-            };
-
-            for (ClassPath cp : all) { // cp never null
-                for (FileObject binRoot : cp.getRoots()) {
-                    FileObject fo = binRoot.getFileObject(name);
-                    if (fo != null) {
-                        return fo;
-                    }
-                    SourceForBinaryQuery.Result res = SourceForBinaryQuery.findSourceRoots(binRoot.getURL());
-                    for (FileObject srcRoot : res.getRoots()) {
-                        fo = srcRoot.getFileObject(name);
-                        if (fo != null) {
-                            return fo;
-                        }
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            Exceptions.printStackTrace(e);
-        }
-        return null;
+        FileObject ref = comp.getJavaFXSource().getFileObject();
+        ClasspathInfo cpi = ClasspathInfo.create(ref);
+        return JavaFXSourceUtils.getFile(elem, cpi);
     }
+    
     // All of the following code is a hack to call through to the java
     // implementation of open support, where we need to pass "their"
     // implementation of Element/ElementHandle.

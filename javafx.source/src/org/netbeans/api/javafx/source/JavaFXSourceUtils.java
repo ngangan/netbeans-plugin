@@ -54,6 +54,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.project.libraries.Library;
 import org.netbeans.api.project.libraries.LibraryManager;
 import org.openide.filesystems.FileObject;
@@ -191,15 +193,45 @@ public class JavaFXSourceUtils {
 
     public static FileObject getFile(Element element, final ClasspathInfo cpInfo) {
         final ElementHandle<? extends Element> handle = ElementHandle.create(element);
-        return getFile(element, cpInfo);
+        return getFile(handle, cpInfo);
     }
     
     public static FileObject getFile(final ElementHandle<? extends Element> handle, final ClasspathInfo cpInfo) {
         if (handle == null || cpInfo == null) {
             throw new IllegalArgumentException("Cannot pass null as an argument of the JavaFXSourceUtils.getFile");  //NOI18N
         }
-        
-        // TODO
+
+        try {
+            String[] signature = handle.getSignatures();
+            assert signature.length >= 1;
+
+            String name = signature[0].replace('.', '/') + ".fx"; // NOI18N
+
+            ClassPath[] all = new ClassPath[]{
+                cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT),
+                cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE),
+                cpInfo.getClassPath(ClasspathInfo.PathKind.SOURCE)
+            };
+
+            for (ClassPath cp : all) { // cp never null
+                for (FileObject binRoot : cp.getRoots()) {
+                    FileObject fo = binRoot.getFileObject(name);
+                    if (fo != null) {
+                        return fo;
+                    }
+                    SourceForBinaryQuery.Result res = SourceForBinaryQuery.findSourceRoots(binRoot.getURL());
+                    for (FileObject srcRoot : res.getRoots()) {
+                        fo = srcRoot.getFileObject(name);
+                        if (fo != null) {
+                            return fo;
+                        }
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            Exceptions.printStackTrace(e);
+        }
         return null;
     }
 
