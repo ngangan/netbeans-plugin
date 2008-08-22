@@ -15,6 +15,7 @@ var
 while
 FXTestPackage
 String
+applications
 classes
 com
 declarations
