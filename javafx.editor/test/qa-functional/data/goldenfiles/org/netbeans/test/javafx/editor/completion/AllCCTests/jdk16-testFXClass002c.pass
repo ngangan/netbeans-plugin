@@ -13,8 +13,10 @@ throw
 try
 var
 while
-FXTestPackage
+FXTestClass002
+FXTestClassVar1
 String
+System
 classes
 com
 declarations

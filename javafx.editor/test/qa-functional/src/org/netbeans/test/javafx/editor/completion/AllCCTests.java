@@ -111,7 +111,7 @@ public class AllCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-  */
+*/
     
     public void testFXImportJavaFXAnimation() throws Exception {
         new CompletionTest().test(
@@ -137,7 +137,7 @@ public class AllCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
- /*   Fails
+// /*   Fails
     public void testFXImportJavaFXAsync() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
@@ -149,7 +149,6 @@ public class AllCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-*/
     
     public void testFXImportJavaFXExt() throws Exception {
         new CompletionTest().test(
@@ -163,7 +162,7 @@ public class AllCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
- /*   Fails
+// /*   Fails
     public void testFXImportJavaFXExtSwing() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
@@ -175,7 +174,6 @@ public class AllCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-*/
     
     public void testFXImportJavaFXFXUnit() throws Exception {
         new CompletionTest().test(
@@ -225,7 +223,7 @@ public class AllCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
- /*   Fails
+// /*   Fails
     public void testFXImportJavaFXScene() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
@@ -237,7 +235,6 @@ public class AllCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-*/
     
     public void testFXImportJavaFXSceneEffect() throws Exception {
         new CompletionTest().test(
@@ -323,7 +320,7 @@ public class AllCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
- /*   Fails
+// /*   Fails
     public void testFXImportJavaFXSceneText() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
@@ -335,7 +332,6 @@ public class AllCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-*/
     
     public void testFXImportJavaFXSceneTransform() throws Exception {
         new CompletionTest().test(
@@ -388,5 +384,162 @@ public class AllCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
+    /*
+     * Declaration level tests
+     */
+    public void testFXTopLvlVar1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "var ", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "declarations/TopLvlVar1.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXTopLvlVar2() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "declarations/TopLvlVar2.fx",
+                8, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    /*
+     * Class level completion
+     */
+    public void testFXClass001() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass001.fx",
+                4, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXClass002a() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass002.fx",
+                9, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXClass002b() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass002.fx",
+                11, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXClass002c() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass002.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXClassPublic() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "public ", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass001.fx",
+                4, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+ /*   Fails
+    public void testFXClassVar1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "var a : ", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClassVar1.fx",
+                4, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+  */
+    
+    /*
+     * Frame Level Tests
+     */
+    public void testFXFrame001() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/Frame001.fx",
+                11, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    /*
+     * Stage Level Tests
+     */
+    public void testFXStage() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/Stage001.fx",
+                19, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContent() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/Stage001.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentArc1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentArc1.fx",
+                25, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
     
 }

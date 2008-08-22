@@ -178,19 +178,17 @@ public class CompletionTest extends java.lang.Object {
         //Strip everything after # to prevent platform specific data in .ref
         //output raw if # is not present
         String tempStart, tempEnd;
-        int pound;
         for (int i = 0; i < array.length; i++) {
             CompletionItem completionItem = array[i];
 //             out.println(getStringFromCharSequence(completionItem.getSortText()));
 
-             tempStart = getStringFromCharSequence(completionItem.getSortText());
-             try {
-                 pound = tempStart.indexOf("#");             
-                 tempEnd = tempStart.substring(0, pound);
-             } catch (StringIndexOutOfBoundsException e) {
-                 tempEnd = tempStart; //swallow StringOutOfBounds when # is missing
-             }
-             out.println(tempEnd);
+            tempStart = getStringFromCharSequence(completionItem.getSortText());
+            try {
+                tempEnd = tempStart.substring(0, tempStart.indexOf("#"));
+            } catch (StringIndexOutOfBoundsException e) {
+                tempEnd = tempStart; //swallow StringOutOfBounds when # is missing
+            }
+            out.println(tempEnd);
         }
     }
     
