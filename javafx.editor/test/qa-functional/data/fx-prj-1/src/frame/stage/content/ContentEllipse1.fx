@@ -3,10 +3,8 @@ package frame.stage.content;
 
 import javafx.application.Frame;
 import javafx.application.Stage;
+import javafx.scene.geometry.Ellipse;
 import javafx.scene.paint.Color;
-import javafx.scene.geometry.Arc;
-import javafx.scene.geometry.ArcType;
-import javafx.scene.geometry.Circle;
 
 Frame {
     title: "MyApplication"
@@ -18,10 +16,12 @@ Frame {
     visible: true
 
     stage: Stage {
-        
         content: [
-            Arc {
+            Ellipse {
                 
+                centerX: 100, centerY: 100
+                radiusX: 40, radiusY: 15
+                fill: Color.GREEN
             }
         ]
     }

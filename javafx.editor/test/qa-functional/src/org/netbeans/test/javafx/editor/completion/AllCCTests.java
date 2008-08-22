@@ -474,6 +474,30 @@ public class AllCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
+    public void testFXClass003a() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass003.fx",
+                11, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXClass003b() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass003.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
  /*   Fails
     public void testFXClassVar1() throws Exception {
         new CompletionTest().test(
@@ -538,7 +562,127 @@ public class AllCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentArc1.fx",
-                25, // line number where the cursor should be
+                24, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentCircle1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentCircle1.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentEllipse1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentEllipse1.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentImage1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentImage1.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentImage2() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentImage1.fx",
+                23, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentLine1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentLine1.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentPolygon1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentPolygon1.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentRectangle1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentRectangle1.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentText1() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentText1.fx",
+                22, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentText2() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentText1.fx",
+                24, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
+    public void testFXStageContentColor() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "fill: Color.", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "frame/stage/content/ContentColor.fx",
+                26, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     

@@ -3,10 +3,8 @@ package frame.stage.content;
 
 import javafx.application.Frame;
 import javafx.application.Stage;
-import javafx.scene.paint.Color;
-import javafx.scene.geometry.Arc;
-import javafx.scene.geometry.ArcType;
-import javafx.scene.geometry.Circle;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 
 Frame {
     title: "MyApplication"
@@ -18,10 +16,13 @@ Frame {
     visible: true
 
     stage: Stage {
-        
         content: [
-            Arc {
+            ImageView {
                 
+                image: Image {
+                    
+                    url: "{__DIR__}/myPicture.png"
+                }
             }
         ]
     }
