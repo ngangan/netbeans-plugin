@@ -47,8 +47,10 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.openide.cookies.OpenCookie;
@@ -57,6 +59,9 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
         
 public class GoToJavaFXSourceProvider implements GoToSourceProvider {
+    // field to indicate whether source find was successfull
+    private boolean found = false;
+    
     public boolean openSource(final Project project, final String className, final String methodName, final String signature) {
         final JavaFXSource js = JavaFXProjectUtilities.getSources((JavaFXProject)project);
         final CountDownLatch latch = new CountDownLatch(1);
@@ -75,7 +80,8 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                         if ((methodName != null) && (methodName.length() > 0)) {
                             // if a method name has been specified try to resolve the method
                             if (classElement != null) {
-                                destinationElement = JavaFXProjectUtilities.resolveMethodByName(classElement, methodName, signature);
+                                ElementHandle eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, signature});
+                                destinationElement = eh.resolve(controller);
                             }
                         }
 
@@ -95,12 +101,15 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                                         // opens the source code on the found method position
                                         try {
                                             FileObject fo = JavaFXProjectUtilities.getFile(openElement, (JavaFXProject)project);
+                                            // object not found
+                                            if (fo == null) return;
                                             DataObject od = DataObject.find(fo);
                                             OpenCookie oc = od.getCookie(OpenCookie.class);
 
                                             if (oc != null) {
                                                 oc.open();                
                                                 latch.countDown();                                                
+                                                found = true;
                                             }
                                         } catch (DataObjectNotFoundException donfe) {
                                             ProfilerLogger.log(donfe);            
@@ -116,6 +125,6 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
             ProfilerLogger.log(ex);
         }             
 
-        return true;        
+        return found;        
     }
 }

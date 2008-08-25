@@ -327,27 +327,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return mainClass;
     }
 
-    /**
-     * Resolves a method by its name, signature and parent class
-     * @param parentClass The parent class
-     * @param methodName The method name
-     * @param signature The VM signature of the method
-     * @return Returns an ExecutableElement representing the method or null
-     */
-    public static ExecutableElement resolveMethodByName(TypeElement parentClass, String methodName, String signature) {
-        if ((parentClass == null) || (methodName == null) || (signature == null)) {
-            return null;
-        }
-
-        ExecutableElement foundMethod = null;
-        boolean found = false;
-
-        List<ExecutableElement> methods = null;
-        // TBD Not implemented so far
-        
-        return foundMethod;
-    }
-    
     private static List<FileObject> getSourceFiles(JavaFXProject project) {
         FileObject[] roots = project.getFOSourceRoots();
 
