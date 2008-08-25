@@ -45,6 +45,8 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.editor.ElementOpen;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.navigation.SpaceMagicUtils;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
@@ -55,10 +57,12 @@ import org.openide.util.*;
  * Similar to editor's go to declaration action.
  *
  * @author tim, Dafe Simonek
+ * @author Anton Chechel - javafx modifications
  */
 public final class OpenAction extends AbstractAction {
 
-    private Element element;
+    private CompilationInfo compilationInfo; // TODO weak reference
+    private ElementHandle<? extends Element> elementHandle;
     private FileObject fileObject;
     private String displayName;
     private long offset;
@@ -67,8 +71,9 @@ public final class OpenAction extends AbstractAction {
 //        this(element, fileObject, null, -1);
 //    }
 
-    public OpenAction(Element element, FileObject fileObject, String displayName, long offset) {
-        this.element = element;
+    public OpenAction(CompilationInfo compilationInfo, ElementHandle<? extends Element> elementHandle, FileObject fileObject, String displayName, long offset) {
+        this.compilationInfo = compilationInfo;
+        this.elementHandle = elementHandle;
         this.fileObject = fileObject;
         this.displayName = displayName;
         this.offset = offset;
@@ -83,11 +88,11 @@ public final class OpenAction extends AbstractAction {
             }
         } else {
             try {
-                if (SpaceMagicUtils.hasSpiritualInvocation(element)) {
+                if (SpaceMagicUtils.hasSpiritualInvocation(elementHandle, compilationInfo)) {
                     // space magic here, can't be opened via element
                     ElementOpen.open(fileObject, (int) offset);
                 } else {
-                    ElementOpen.open(fileObject, element);
+                    ElementOpen.open(fileObject, elementHandle);
                 }
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
@@ -99,4 +104,5 @@ public final class OpenAction extends AbstractAction {
     public boolean isEnabled() {
         return true;
     }
+    
 }

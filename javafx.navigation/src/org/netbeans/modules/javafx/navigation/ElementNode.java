@@ -52,6 +52,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.Action;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.navigation.actions.OpenAction;
 import org.netbeans.modules.javafx.source.ui.Icons;
 import org.openide.filesystems.FileObject;
@@ -65,15 +67,18 @@ import org.openide.util.datatransfer.PasteType;
 /** Node representing an Element
  *
  * @author Petr Hrebejk
+ * @author Anton Chechel - javafx modifications
  */
 public class ElementNode extends AbstractNode {
 
     private static Node WAIT_NODE;
+    
+    private CompilationInfo info; // TODO weak reference
     private OpenAction openAction;
     private Description description;
 
-    public ElementNode(Description description) {
-        super(description.subs == null ? Children.LEAF : new ElementChilren(description.subs, description.ui.getFilters()), null);
+    public ElementNode(Description description, CompilationInfo info) {
+        super(description.subs == null ? Children.LEAF : new ElementChilren(info, description.subs, description.ui.getFilters()), null);
         this.description = description;
         setDisplayName(description.name);
     }
@@ -164,7 +169,7 @@ public class ElementNode extends AbstractNode {
 
     private synchronized Action getOpenAction() {
         if (openAction == null) {
-            openAction = new OpenAction(description.element, description.ui.getFileObject(), description.name, description.pos);
+            openAction = new OpenAction(info, description.elementHandle, description.ui.getFileObject(), description.name, description.pos);
         }
         return openAction;
     }
@@ -191,7 +196,7 @@ public class ElementNode extends AbstractNode {
     }
 
     public ElementNode getNodeForElement(Element e) {
-        if (getDescritption().element != null && getDescritption().element.toString().equals(e.toString())) {
+        if (getDescritption().elementHandle != null && getDescritption().elementHandle.toString().equals(e.toString())) {
             return this;
         }
 
@@ -257,13 +262,15 @@ public class ElementNode extends AbstractNode {
     }
 
     private static final class ElementChilren extends Children.Keys<Description> {
+        
+        private CompilationInfo info; // TODO weak reference
 
-        public ElementChilren(Set<Description> descriptions, ClassMemberFilters filters) {
+        public ElementChilren(CompilationInfo info, Set<Description> descriptions, ClassMemberFilters filters) {
             resetKeys(descriptions, filters);
         }
 
         protected Node[] createNodes(Description key) {
-            return new Node[]{new ElementNode(key)};
+            return new Node[]{new ElementNode(key, info)};
         }
 
         void resetKeys(Set<Description> descriptions, ClassMemberFilters filters) {
@@ -271,55 +278,52 @@ public class ElementNode extends AbstractNode {
         }
     }
 
-    /** Stores all interesting data about given element.
+    /**
+     * Stores all interesting data about given element.
      */
     static class Description {
 
         public static final Comparator<Description> ALPHA_COMPARATOR = new DescriptionComparator(true);
         public static final Comparator<Description> POSITION_COMPARATOR = new DescriptionComparator(false);
+        
         ClassMemberPanelUI ui;
         FileObject fileObject; // For the root description
         final String name;
-        final Element element;
+        final ElementHandle elementHandle;
         final ElementKind kind;
         Set<Modifier> modifiers;
         Set<Description> subs;
         String htmlHeader;
         long pos;
         boolean isInherited;
+        
         Description(ClassMemberPanelUI ui) {
             this.ui = ui;
             this.name = null;
-            this.element = null;
+            this.elementHandle = null;
             this.kind = null;
             this.isInherited = false;
         }
 
-        Description(ClassMemberPanelUI ui,
-                String name,
-                Element element,
-                ElementKind kind,
-                boolean inherited) {
+        Description(ClassMemberPanelUI ui, String name, ElementHandle element, ElementKind kind, boolean inherited) {
             this.ui = ui;
             this.name = name;
-            this.element = element;
+            this.elementHandle = element;
             this.kind = kind;
             this.isInherited = inherited;
         }
 
         @Override
         public boolean equals(Object o) {
-
             if (o == null) {
                 return false;
             }
-
+            
             if (!(o instanceof Description)) {
                 return false;
             }
-
+            
             Description d = (Description) o;
-
             if (kind != d.kind) {
                 return false;
             }
@@ -328,7 +332,7 @@ public class ElementNode extends AbstractNode {
                 return false;
             }
 
-            if (!this.element.getSimpleName().equals(d.element.getSimpleName())) {
+            if (!this.elementHandle.signatureEquals(d.elementHandle)) {
                 return false;
             }
 
@@ -341,12 +345,10 @@ public class ElementNode extends AbstractNode {
 
             hash = 29 * hash + (this.name != null ? this.name.hashCode() : 0);
             hash = 29 * hash + (this.kind != null ? this.kind.hashCode() : 0);
-            hash = 29 * hash + this.element.getSimpleName().hashCode();
             return hash;
         }
 
         private static class DescriptionComparator implements Comparator<Description> {
-
             boolean alpha;
 
             DescriptionComparator(boolean alpha) {
@@ -354,7 +356,6 @@ public class ElementNode extends AbstractNode {
             }
 
             public int compare(Description d1, Description d2) {
-
                 if (alpha) {
                     return alphaCompare(d1, d2);
                 } else {
@@ -367,6 +368,7 @@ public class ElementNode extends AbstractNode {
                     if (d1.isInherited && d2.isInherited) {
                         return alphaCompare(d1, d2);
                     }
+
                     return d1.pos == d2.pos ? 0 : d1.pos < d2.pos ? -1 : 1;
                 }
             }
@@ -422,4 +424,5 @@ public class ElementNode extends AbstractNode {
             return NbBundle.getMessage(ElementNode.class, "LBL_WaitNode"); // NOI18N
         }
     }
+    
 }

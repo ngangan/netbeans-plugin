@@ -74,6 +74,7 @@ import javax.lang.model.type.WildcardType;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.navigation.ElementNode.Description;
 
 /** 
@@ -83,10 +84,11 @@ import org.netbeans.modules.javafx.navigation.ElementNode.Description;
  */
 public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
-    private ClassMemberPanelUI ui;
-    private final AtomicBoolean canceled = new AtomicBoolean();
     private static final String TYPE_COLOR = "#707070";
     private static final String INHERITED_COLOR = "#7D694A";
+
+    private ClassMemberPanelUI ui;
+    private final AtomicBoolean canceled = new AtomicBoolean();
 
     public ElementScanningTask(ClassMemberPanelUI ui) {
         this.ui = ui;
@@ -143,7 +145,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         if (!canceled.get()) {
-            ui.refresh(rootDescription);
+            ui.refresh(rootDescription, info);
         }
     }
 
@@ -273,7 +275,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         final boolean inherited = isParentInherited || (null != parent && !parent.equals(e.getEnclosingElement()));
         final ElementKind kind = e.getKind();
         final ElementKind spaceMagicKind = kind == ElementKind.LOCAL_VARIABLE ? ElementKind.FIELD : kind;
-        Description d = new Description(ui, name, e, spaceMagicKind, inherited);
+        Description d = new Description(ui, name, ElementHandle.create(e), spaceMagicKind, inherited);
         final JavafxTypes javafxTypes = info.getJavafxTypes();
 
         if (e instanceof TypeElement) {

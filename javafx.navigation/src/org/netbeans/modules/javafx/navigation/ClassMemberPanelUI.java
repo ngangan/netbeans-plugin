@@ -39,12 +39,16 @@
 package org.netbeans.modules.javafx.navigation;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import javax.lang.model.element.Element;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -53,6 +57,13 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
+import javax.swing.tree.TreePath;
+import org.netbeans.api.javafx.editor.ElementJavadoc;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.navigation.ElementNode.Description;
 import org.netbeans.modules.javafx.navigation.actions.FilterSubmenuAction;
 import org.netbeans.modules.javafx.navigation.actions.SortActionSupport.SortByNameAction;
@@ -61,6 +72,7 @@ import org.netbeans.modules.javafx.navigation.base.FiltersManager;
 import org.netbeans.modules.javafx.navigation.base.TapPanel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.explorer.view.Visualizer;
 import org.openide.filesystems.FileObject;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
@@ -162,8 +174,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         }
     }
 
-    public void refresh(final Description description) {
-
+    public void refresh(final Description description, final CompilationInfo info) {
         final ElementNode rootNode = getRootNode();
 
         if (rootNode != null && rootNode.getDescritption().fileObject.equals(description.fileObject)) {
@@ -182,14 +193,13 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
 
                 public void run() {
                     elementView.setRootVisible(false);
-                    manager.setRootContext(new ElementNode(description));
+                    manager.setRootContext(new ElementNode(description, info));
                     boolean scrollOnExpand = getScrollOnExpand();
                     setScrollOnExpand(false);
                     elementView.expandAll();
                     setScrollOnExpand(scrollOnExpand);
                 }
             });
-
         }
     }
 
@@ -215,6 +225,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
     public FileObject getFileObject() {
         return getRootNode().getDescritption().fileObject;
     }
+    
     // FilterChangeListener ----------------------------------------------------
     public void filterStateChanged(ChangeEvent e) {
         ElementNode root = getRootNode();
@@ -248,59 +259,58 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
     private MyBeanTreeView createBeanTreeView() {
         return new MyBeanTreeView();
     }
+    
     // ExplorerManager.Provider imlementation ----------------------------------
     public ExplorerManager getExplorerManager() {
         return manager;
     }
 
-//    protected ElementJavadoc getJavaDocFor(ElementNode node) {
-//        ElementNode root = getRootNode();
-//        if (root == null) {
-//            return null;
-//        }
-//
-//        ElementHandle<? extends Element> eh = node.getDescritption().elementHandle;
-//
-//        final JavaFXSource js = JavaFXSource.forFileObject(root.getDescritption().fileObject);
-//        if (js == null) {
-//            return null;
-//        }
-//        JavaDocCalculator calculator = new JavaDocCalculator(eh);
-//        final CompilationInfo[] ci = new CompilationInfo[1];
-//
-//        try {
-//            js.runUserActionTask(calculator, true);
-//        } catch (IOException ioE) {
-//            Exceptions.printStackTrace(ioE);
-//            return null;
-//        }
-//
-//        return calculator.doc;
-//
-//    }
+    protected ElementJavadoc getJavaDocFor(ElementNode node) {
+        ElementNode root = getRootNode();
+        if (root == null) {
+            return null;
+        }
 
-//    private static class JavaDocCalculator implements Task<CompilationController> {
-//
-//        private ElementHandle<? extends Element> handle;
-//        private ElementJavadoc doc;
-//
-//        public JavaDocCalculator(ElementHandle<? extends Element> handle) {
-//            this.handle = handle;
-//        }
-//
-//        public void run(CompilationController cc) throws Exception {
-//            cc.toPhase(JavaFXSource.Phase.UP_TO_DATE);
-//
-//            Element e = handle.resolve(cc);
-//            doc = ElementJavadoc.create(cc, e);
-//        }
-//    };
+        ElementHandle<? extends Element> eh = node.getDescritption().elementHandle;
 
-//    private class MyBeanTreeView extends BeanTreeView implements ToolTipManagerEx.ToolTipProvider {
-    private class MyBeanTreeView extends BeanTreeView {
+        final JavaFXSource js = JavaFXSource.forFileObject(root.getDescritption().fileObject);
+        if (js == null) {
+            return null;
+        }
+        JavaDocCalculator calculator = new JavaDocCalculator(eh);
 
+        try {
+            js.runUserActionTask(calculator, true);
+        } catch (IOException ioE) {
+            Exceptions.printStackTrace(ioE);
+            return null;
+        }
+
+        return calculator.doc;
+
+    }
+
+    private static class JavaDocCalculator implements Task<CompilationController> {
+
+        private ElementHandle<? extends Element> handle;
+        private ElementJavadoc doc;
+
+        public JavaDocCalculator(ElementHandle<? extends Element> handle) {
+            this.handle = handle;
+        }
+
+        public void run(CompilationController cc) throws Exception {
+            cc.toPhase(JavaFXSource.Phase.UP_TO_DATE);
+
+            Element e = handle.resolve(cc);
+            doc = ElementJavadoc.create(cc, e);
+        }
+    };
+
+    private class MyBeanTreeView extends BeanTreeView implements ToolTipManagerEx.ToolTipProvider {
+//    private class MyBeanTreeView extends BeanTreeView {
         public MyBeanTreeView() {
-//            new ToolTipManagerEx(this);
+            new ToolTipManagerEx(this);
         }
 
         public boolean getScrollOnExpand() {
@@ -315,103 +325,104 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
             return tree;
         }
 
-//        public String getToolTipText(Point loc) {
-//            ElementJavadoc doc = getDocumentation(loc);
-//            return null == doc ? null : doc.getText();
-//            return "tooltip"; // TODO
-//        }
+        public String getToolTipText(Point loc) {
+            ElementJavadoc doc = getDocumentation(loc);
+            return null == doc ? null : doc.getText();
+        }
 
-//        private ElementJavadoc getDocumentation(Point loc) {
-//            TreePath path = tree.getPathForLocation(loc.x, loc.y);
-//            if (null == path) {
-//                return null;
-//            }
-//            Node node = Visualizer.findNode(path.getLastPathComponent());
-//            if (node instanceof ElementNode) {
+        private ElementJavadoc getDocumentation(Point loc) {
+            TreePath path = tree.getPathForLocation(loc.x, loc.y);
+            if (null == path) {
+                return null;
+            }
+            Node node = Visualizer.findNode(path.getLastPathComponent());
+            if (node instanceof ElementNode) {
 //                return getJavaDocFor((ElementNode) node);
-//            }
-//            return null;
-//        }
+            }
+            return null;
+        }
 
-//        public Rectangle getToolTipSourceBounds(Point loc) {
-//            ElementNode root = getRootNode();
-//            if (root == null) {
-//                return null;
-//            }
-//            TreePath path = tree.getPathForLocation(loc.x, loc.y);
-//            return null == path ? null : tree.getPathBounds(path);
-//        }
-//
-//        public Point getToolTipLocation(Point mouseLocation, Dimension tipSize) {
-//            Point screenLocation = getLocationOnScreen();
-//            Rectangle sBounds = getGraphicsConfiguration().getBounds();
-//            Dimension compSize = getSize();
-//            Point res = new Point();
-//            Rectangle tooltipSrcRect = getToolTipSourceBounds(mouseLocation);
-//
-//            Point viewPosition = getViewport().getViewPosition();
-//            screenLocation.x -= viewPosition.x;
-//            screenLocation.y -= viewPosition.y;
-//
-//            //first try bottom right
-//            res.x = screenLocation.x + compSize.width;
-//            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
-//
-//            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y + tipSize.height <= sBounds.y + sBounds.height) {
-//                return res;
-//            }
-//
-//            //upper right
-//            res.x = screenLocation.x + compSize.width;
-//            res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
-//
-//            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y >= sBounds.y) {
-//                return res;
-//            }
-//
-//            //lower left
-//            res.x = screenLocation.x - tipSize.width;
-//            res.y = screenLocation.y + tooltipSrcRect.y;
-//
-//            if (res.x >= sBounds.x && res.y + tipSize.height <= sBounds.y + sBounds.height) {
-//                return res;
-//            }
-//
-//            //upper left
-//            res.x = screenLocation.x - tipSize.width;
-//            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height - tipSize.height;
-//
-//            if (res.x >= sBounds.x && res.y >= sBounds.y) {
-//                return res;
-//            }
-//
-//            //give up (who's got such a small display anyway?)
-//            res.x = screenLocation.x + tooltipSrcRect.x;
-//            if (sBounds.y + sBounds.height - (screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height) > screenLocation.y + tooltipSrcRect.y - sBounds.y) {
-//                res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
-//            } else {
-//                res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
-//            }
-//
-//            return res;
-//        }
-//
-//        public void invokeUserAction(final MouseEvent me) {
-//            SwingUtilities.invokeLater(new Runnable() {
-//
-//                public void run() {
-//                    if (null != me) {
-////                        ElementJavadoc doc = getDocumentation(me.getPoint());
-////                        JavadocTopComponent tc = JavadocTopComponent.findInstance();
-////                        if (null != tc) {
-////                            tc.open();
-////                            tc.setJavadoc(doc);
-////                            tc.requestActive();
-////                        }
-//                    }
-//                }
-//            });
-//        }        //#123940 start
+        public Rectangle getToolTipSourceBounds(Point loc) {
+            ElementNode root = getRootNode();
+            if (root == null) {
+                return null;
+            }
+            TreePath path = tree.getPathForLocation(loc.x, loc.y);
+            return null == path ? null : tree.getPathBounds(path);
+        }
+
+        public Point getToolTipLocation(Point mouseLocation, Dimension tipSize) {
+            Point screenLocation = getLocationOnScreen();
+            Rectangle sBounds = getGraphicsConfiguration().getBounds();
+            Dimension compSize = getSize();
+            Point res = new Point();
+            Rectangle tooltipSrcRect = getToolTipSourceBounds(mouseLocation);
+
+            Point viewPosition = getViewport().getViewPosition();
+            screenLocation.x -= viewPosition.x;
+            screenLocation.y -= viewPosition.y;
+
+            //first try bottom right
+            res.x = screenLocation.x + compSize.width;
+            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
+
+            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y + tipSize.height <= sBounds.y + sBounds.height) {
+                return res;
+            }
+
+            //upper right
+            res.x = screenLocation.x + compSize.width;
+            res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
+
+            if (res.x + tipSize.width <= sBounds.x + sBounds.width && res.y >= sBounds.y) {
+                return res;
+            }
+
+            //lower left
+            res.x = screenLocation.x - tipSize.width;
+            res.y = screenLocation.y + tooltipSrcRect.y;
+
+            if (res.x >= sBounds.x && res.y + tipSize.height <= sBounds.y + sBounds.height) {
+                return res;
+            }
+
+            //upper left
+            res.x = screenLocation.x - tipSize.width;
+            res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height - tipSize.height;
+
+            if (res.x >= sBounds.x && res.y >= sBounds.y) {
+                return res;
+            }
+
+            //give up (who's got such a small display anyway?)
+            res.x = screenLocation.x + tooltipSrcRect.x;
+            if (sBounds.y + sBounds.height - (screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height) > screenLocation.y + tooltipSrcRect.y - sBounds.y) {
+                res.y = screenLocation.y + tooltipSrcRect.y + tooltipSrcRect.height;
+            } else {
+                res.y = screenLocation.y + tooltipSrcRect.y - tipSize.height;
+            }
+
+            return res;
+        }
+
+        public void invokeUserAction(final MouseEvent me) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    if (null != me) {
+                        ElementJavadoc doc = getDocumentation(me.getPoint());
+//                        JavadocTopComponent tc = JavadocTopComponent.findInstance();
+//                        if (null != tc) {
+//                            tc.open();
+//                            tc.setJavadoc(doc);
+//                            tc.requestActive();
+//                        }
+                    }
+                }
+            });
+        }
+        
+        //#123940 start
         private boolean inHierarchy;
         private boolean doExpandAll;
 
@@ -455,4 +466,5 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
             }
         }
     }
+    
 }

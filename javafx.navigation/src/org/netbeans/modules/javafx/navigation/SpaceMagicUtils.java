@@ -52,6 +52,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
 
 /**
  * Only quintessentially pure space magic is here.
@@ -63,6 +64,10 @@ public final class SpaceMagicUtils {
     public static final String MAGIC_FUNCTION = "javafx$run$";
     
     private SpaceMagicUtils() {
+    }
+
+    public static boolean hasSpiritualInvocation(ElementHandle<? extends Element> elementHandle, CompilationInfo compilationInfo) {
+        return hasSpiritualInvocation(elementHandle.resolve(compilationInfo));
     }
 
     /**
