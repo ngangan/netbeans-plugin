@@ -39,7 +39,6 @@
 
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.JavafxcTask;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.model.JavacElements;
@@ -123,6 +122,31 @@ public class ElementHandle<T extends Element> {
     
     public String[] getSignatures() {
         return signatures.clone();
+    }
+    
+    /**
+     * Tests if the handle has the same signature as the parameter.
+     * The handles with the same signatures are resolved into the same
+     * element in the same {@link javax.tools.JavaCompiler} task, but may be resolved into
+     * the different {@link Element}s in the different {@link javax.tools.JavaCompiler} tasks.
+     * @param handle to be checked
+     * @return true if the handles resolve into the same {@link Element}s
+     * in the same {@link javax.tools.JavaCompiler} task.
+     */
+    public boolean signatureEquals (final ElementHandle<? extends Element> handle) {
+         if (!isSameKind (this.kind, handle.kind) || this.signatures.length != handle.signatures.length) {
+             return false;
+         }
+         for (int i=0; i<signatures.length; i++) {
+             if (!signatures[i].equals(handle.signatures[i])) {
+                 return false;
+             }
+         }
+         return true;
+    }
+
+    private static boolean isSameKind (ElementKind k1, ElementKind k2) {
+        return k1 == k2 || (k1 == ElementKind.OTHER && k2.isClass()) || (k2 == ElementKind.OTHER && k1.isClass());
     }
     
     private T resolveImpl (final JavafxcTaskImpl jt) {
