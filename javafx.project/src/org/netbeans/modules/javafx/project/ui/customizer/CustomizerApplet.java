@@ -16,10 +16,18 @@ public class CustomizerApplet extends javax.swing.JPanel {
     public CustomizerApplet(JavaFXProjectProperties uiProperties) {
         initComponents();
         
+        uiProperties.javaScriptModel.setMnemonic(javaScriptCheckBox.getMnemonic());
         javaScriptCheckBox.setModel(uiProperties.javaScriptModel);
+        
+        uiProperties.jnlpFileModel.setMnemonic(jnlpFileCheckBox.getMnemonic());
         jnlpFileCheckBox.setModel(uiProperties.jnlpFileModel);
+        
+        uiProperties.draggableModel.setMnemonic(draggableCheckBox.getMnemonic());
         draggableCheckBox.setModel(uiProperties.draggableModel);
+        
+        uiProperties.runAppletInBrowser.setMnemonic(runInBrowserCheckBox.getMnemonic());
         runInBrowserCheckBox.setModel(uiProperties.runAppletInBrowser);
+        
         javaArgumentsTextField.setDocument(uiProperties.javaArgumentsDocument);
         boolean isSelected = javaScriptCheckBox.getModel().isSelected();
         noteLabel.setVisible(false);
@@ -64,7 +72,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(499, 239));
         setLayout(new java.awt.GridBagLayout());
 
-        javaScriptCheckBox.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(javaScriptCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.text")); // NOI18N
         javaScriptCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -75,7 +83,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(15, 10, 0, 2);
         add(javaScriptCheckBox, gridBagConstraints);
 
-        jnlpFileCheckBox.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jnlpFileCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.text")); // NOI18N
         jnlpFileCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -95,7 +103,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 9, 0);
         add(descriptionLabel, gridBagConstraints);
 
-        draggableCheckBox.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.draggableCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(draggableCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.draggableCheckBox.text")); // NOI18N
         draggableCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.draggableCheckBox.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -117,7 +125,8 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 12);
         add(javaArgumentsTextField, gridBagConstraints);
 
-        javaArgumentsLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaArgumentsLabel.text")); // NOI18N
+        javaArgumentsLabel.setLabelFor(javaArgumentsTextField);
+        org.openide.awt.Mnemonics.setLocalizedText(javaArgumentsLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaArgumentsLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -136,7 +145,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
         add(jLabel1, gridBagConstraints);
 
-        runInBrowserCheckBox.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.runInBrowserCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(runInBrowserCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.runInBrowserCheckBox.text")); // NOI18N
         runInBrowserCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 runInBrowserCheckBoxActionPerformed(evt);
