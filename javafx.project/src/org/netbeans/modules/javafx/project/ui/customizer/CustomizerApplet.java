@@ -158,6 +158,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         add(runInBrowserCheckBox, gridBagConstraints);
+        runInBrowserCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.runInBrowserCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
 
         noteLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.noteLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
