@@ -44,7 +44,11 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
+import com.sun.tools.javafxdoc.JavafxdocEnter;
+import com.sun.tools.javafxdoc.Messager;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -114,6 +118,8 @@ public final class JavaFXSource {
         LOW,
         MIN
     };
+
+    private static final PrintWriter DEV_NULL = new PrintWriter(new DevNullWriter(), false);
 
     // flags:
     public static final int INVALID = 1;
@@ -196,7 +202,8 @@ public final class JavaFXSource {
         
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));
         Context context = task.getContext();
-        //Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
+        Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
+        JavafxdocEnter.preRegister(context);       
         JavadocEnv.preRegister(context, cpInfo);
         
         return task;
@@ -623,4 +630,13 @@ out:            for (Iterator<Collection<Request>> it = CompilationJob.finishedR
         }        
     }
 
+    private static final class DevNullWriter extends Writer {
+        public void write(char[] cbuf, int off, int len) throws IOException {
+        }
+        public void flush() throws IOException {
+        }
+        public void close() throws IOException {
+        }
+    }
+    
 }

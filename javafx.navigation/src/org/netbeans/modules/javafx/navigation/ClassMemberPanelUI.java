@@ -337,7 +337,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
             }
             Node node = Visualizer.findNode(path.getLastPathComponent());
             if (node instanceof ElementNode) {
-//                return getJavaDocFor((ElementNode) node);
+                return getJavaDocFor((ElementNode) node);
             }
             return null;
         }

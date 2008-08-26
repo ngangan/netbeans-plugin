@@ -353,7 +353,6 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
      *
      *  @param event  the event in question
      */
-    @Override
     public void mouseEntered(MouseEvent event) {
         initiateToolTip(event);
     }
@@ -414,7 +413,6 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
      *
      *  @param event  the event in question
      */
-    @Override
     public void mouseExited(MouseEvent event) {
         boolean shouldHide = true;
         if (insideComponent == null) {
@@ -483,7 +481,6 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
      *
      *  @param event  the event in question
      */
-    @Override
     public void mousePressed(MouseEvent event) {
         hideTipWindow();
         enterTimer.stop();
@@ -499,7 +496,6 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
      *
      *  @param event  the event in question
      */
-    @Override
     public void mouseDragged(MouseEvent event) {
     }
 
@@ -510,7 +506,6 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
      *
      *  @param event  the event in question
      */
-    @Override
     public void mouseMoved(MouseEvent event) {
         if (tipShowing) {
             checkForTipChange(event);
@@ -609,7 +604,6 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
    * solely on mouse-entered to initiate the tooltip.
    */
     private class MoveBeforeEnterListener extends MouseMotionAdapter {
-        @Override
         public void mouseMoved(MouseEvent e) {
 	    initiateToolTip(e);
 	}

@@ -62,9 +62,11 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.xml.XMLUtil;
 
-/** Utility class for viewing Javdoc comments as HTML.
+/**
+ * Utility class for viewing Javdoc comments as HTML.
  *
  * @author Dusan Balek, Petr Hrebejk
+ * @author Anton Chechel - javafx modifications
  */
 public class ElementJavadoc {
     
@@ -132,7 +134,7 @@ public class ElementJavadoc {
             if (fo != null && fo.isFolder() && linkDoc.getKind() == ElementKind.PACKAGE) {
                 fo = fo.getFileObject("package-info", "fx"); //NOI18N
             }
-            // TODO
+            // no file object - no sources (in contrast to java)
 //            JavaFXSource js = fo != null ? JavaFXSource.forFileObject(fo) : JavaFXSource.create(cpInfo);
             JavaFXSource js = fo != null ? JavaFXSource.forFileObject(fo) : null;
             if (js != null) {
