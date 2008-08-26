@@ -77,6 +77,7 @@ made subject to such option by the copyright holder.
                 <package>com.sun.tools.javafx.script</package>
                 <package>com.sun.tools.javafx.tree</package>
                 <package>com.sun.tools.javafx.util</package>
+                <package>com.sun.tools.javafxdoc</package>
                 <package>javax.lang.model</package>
                 <package>javax.lang.model.element</package>
                 <package>javax.lang.model.type</package>
@@ -88,6 +89,10 @@ made subject to such option by the copyright holder.
             <class-path-extension>
                 <runtime-relative-path>ext/compiler/lib/javafxc.jar</runtime-relative-path>
                 <binary-origin>external/compiler/javafxc.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/compiler/lib/javafxdoc.jar</runtime-relative-path>
+                <binary-origin>external/compiler/javafxdoc.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

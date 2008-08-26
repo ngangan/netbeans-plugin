@@ -166,10 +166,6 @@
                 <package>org.netbeans.modules.javafx.source.classpath</package>
                 <package>org.netbeans.modules.javafx.source.ui</package>
             </public-packages>
-            <class-path-extension>
-                <runtime-relative-path>ext/compiler/lib/javafxdoc.jar</runtime-relative-path>
-                <binary-origin>external/compiler/javafxdoc.jar</binary-origin>
-            </class-path-extension>
         </data>
     </configuration>
 </project>
