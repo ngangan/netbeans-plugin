@@ -157,6 +157,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 2, 0, 2);
         add(iconLabel, gridBagConstraints);
+        iconLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         codebaseLabel.setLabelFor(codebaseComboBox);
         org.openide.awt.Mnemonics.setLocalizedText(codebaseLabel, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel.text")); // NOI18N
@@ -167,6 +168,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(8, 2, 0, 2);
         add(codebaseLabel, gridBagConstraints);
+        codebaseLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         iconTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -176,6 +178,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
         add(iconTextField, gridBagConstraints);
+        iconTextField.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconTextField.AccessibleContext.accessibleDescription")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.browseButton.text")); // NOI18N
         browseButton.addActionListener(new java.awt.event.ActionListener() {
@@ -189,6 +192,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(browseButton, gridBagConstraints);
+        browseButton.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.browseButton.AccessibleContext.accessibleDescription")); // NOI18N
 
         codebaseComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -212,6 +216,8 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 6, 0, 0);
         add(codebaseTextField, gridBagConstraints);
+        codebaseTextField.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseTextField.AccessibleContext.accessibleName")); // NOI18N
+        codebaseTextField.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseTextField.AccessibleContext.accessibleDescription")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(offlineCheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.offlineCheckBox.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -222,6 +228,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
         add(offlineCheckBox, gridBagConstraints);
+        offlineCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.offlineCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
 
         panelDescLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.panelDescLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -242,6 +249,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
         add(signedCheckBox, gridBagConstraints);
+        signedCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.signedCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(pack200CheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.pack200CheckBox.text")); // NOI18N
         pack200CheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.pack200CheckBox.toolTipText")); // NOI18N

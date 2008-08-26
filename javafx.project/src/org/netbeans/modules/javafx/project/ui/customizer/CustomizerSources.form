@@ -375,6 +375,9 @@
               <ResourceString bundle="org/netbeans/modules/javafx/project/ui/customizer/Bundle.properties" key="CustomizerSources.includeExcludeButton" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Iinvokes the Configure Includes &amp; Excludes dialog which allows you to specify the packages you want to include in your project."/>
+          </AccessibilityProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="includeExcludeButtonActionPerformed"/>
           </Events>
@@ -396,6 +399,9 @@
               <ResourceString bundle="org/netbeans/modules/javafx/project/ui/customizer/Bundle.properties" key="TXT_Encoding" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Encoding determines how the IDE interprets characters beyond the ASCII character set."/>
+          </AccessibilityProperties>
           <AuxValues>
             <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
           </AuxValues>
