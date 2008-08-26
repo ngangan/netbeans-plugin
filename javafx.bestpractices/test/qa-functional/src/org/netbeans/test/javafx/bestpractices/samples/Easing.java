@@ -32,23 +32,28 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  * 
- * Contributor(s): lfitzgerald
+ * Contributor(s):
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+
 package org.netbeans.test.javafx.bestpractices.samples;
 
+/**
+ *
+ * @author Lark
+ */
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
-public class ColorWheel extends JavaFXTestCase {
+public class Easing extends JavaFXTestCase {
 
-    public String _type = "Color";
-    public String _project = "Color Wheel";
-    public String _projectPath = "Color Wheel|Source Packages|color|ColorWheel.fx";
+    public String _type = "Input"; //Type of Sample
+    public String _project = "Easing";
+    public String _projectPath = "Easing|Source Packages|input|Easing.fx";
     
-    public ColorWheel(String name) {
+    public Easing (String name) {
         super(name);
     }
 

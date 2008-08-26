@@ -32,23 +32,28 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  * 
- * Contributor(s): lfitzgerald
+ * Contributor(s):
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+
 package org.netbeans.test.javafx.bestpractices.samples;
 
+/**
+ *
+ * @author Lark
+ */
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
-public class ColorWheel extends JavaFXTestCase {
+public class SmokeParticleSystem extends JavaFXTestCase {
 
-    public String _type = "Color";
-    public String _project = "Color Wheel";
-    public String _projectPath = "Color Wheel|Source Packages|color|ColorWheel.fx";
+    public String _type = "Simulation"; //Type of Sample
+    public String _project = "Smoke Particle System";
+    public String _projectPath = "Smoke Particle System|Source Packages|particles|SmokeParticleSystem.fx";
     
-    public ColorWheel(String name) {
+    public SmokeParticleSystem (String name) {
         super(name);
     }
 
@@ -74,4 +79,5 @@ public class ColorWheel extends JavaFXTestCase {
     }
 
 }
+
 
