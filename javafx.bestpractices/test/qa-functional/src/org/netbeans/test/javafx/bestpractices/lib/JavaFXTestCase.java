@@ -50,7 +50,7 @@ public class JavaFXTestCase extends JellyTestCase {
 
 //    public static final String PROJECT_NAME_HELLO_WORLD = "HelloWorld";
 //    public static final String PREVIEW_FRAME_TITLE = "Hello World JavaFX";
-    public static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
+    public static final String BUILD_SUCCESS = "BUILD SUCCESS";
     public static final String BUILD_FAILED = "BUILD FAILED";
     public static final String SAMPLE_PATH = "Samples|JavaFX|Best Practices|";
     public static final String COMPILE_FILE = "Compile File";

@@ -38,57 +38,43 @@
  */
 package org.netbeans.test.javafx.bestpractices.samples;
 
-import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jemmy.QueueTool;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.jellytools.nodes.Node;
-import org.netbeans.jemmy.operators.JPopupMenuOperator;
+import org.netbeans.test.javafx.bestpractices.lib.Util;
 
 public class ColorWheel extends JavaFXTestCase {
 
-    public String Color = "Color";
-    public String color = "color";
-    public String file = "ColorWheel.fx";
-    public String color_wheel = "Color Wheel|Source Packages|color|ColorWheel.fx";
+    public String _color = "Color";
+    public String _colorWheel = "Color Wheel";
+    public String _colorWheelPath = "Color Wheel|Source Packages|color|ColorWheel.fx";
     
     public ColorWheel(String name) {
         super(name);
     }
 
+    /** Create Sample Project and Verify that Project exists */
     public void testColorWheelCreate() {
-        NewProjectWizardOperator projectWizard = NewProjectWizardOperator.invoke();
-        projectWizard.selectCategory(SAMPLE_PATH + Color);
-        projectWizard.selectProject(Color);
-        projectWizard.next();
-        projectWizard.finish();
-        new QueueTool().waitEmpty();
+        if ((Util.createSampleProject(SAMPLE_PATH, _color, _colorWheel)).equals(false)) {
+            fail("Project " + _colorWheel + " was not found.");
+        }
     }
 
+    /** Compile Single File and Verify Success */
     public void testColorWheelCompile() {
-        ProjectsTabOperator pto = new ProjectsTabOperator();
-        Node projectNode = new Node(pto.invoke().tree(), color_wheel);
-        JPopupMenuOperator item = projectNode.callPopup();
-        item.pushMenuNoBlock(COMPILE_FILE);
-        new QueueTool().waitEmpty();
-        
-        OutputOperator oo = new OutputOperator();
-        String output = oo.getText();
-        CharSequence cs = new String("BUILD SUCCESS");
-        if (!output.contains(cs)) {
-            fail("Build Failed to compile: " + output);
-        };
-
+        if (Util.compileProjectFile(_colorWheelPath).equals(false)) {
+            fail("Build Failed to compile: " + new OutputOperator().getText());
+        }
     }
-    
+
+    /** Close Sample Project and Output window*/
     public void testCloseProject() {
-        ProjectsTabOperator pto = new ProjectsTabOperator();
-        new QueueTool().waitEmpty();
-        Node projectNode = new Node(pto.invoke().tree(), color_wheel);
-        JPopupMenuOperator item = projectNode.callPopup();
-        item.pushMenuNoBlock(CLOSE);
-        new QueueTool().waitEmpty();
+        Boolean status = false;
+        if (Util.closeProject(_colorWheel).equals(false)) {
+            fail("Project " + _colorWheel + " did not close properly.");
+        }
     }
 
 }
