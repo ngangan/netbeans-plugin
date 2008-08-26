@@ -111,6 +111,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(9, 0, 0, 0);
         add(titleLabel, gridBagConstraints);
+        titleLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.titleLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         vendorLabel.setLabelFor(vendorTextField);
         org.openide.awt.Mnemonics.setLocalizedText(vendorLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.vendorLabel.text")); // NOI18N
@@ -120,6 +121,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 0, 0);
         add(vendorLabel, gridBagConstraints);
+        vendorLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.vendorLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         descLabel.setLabelFor(descTextArea);
         org.openide.awt.Mnemonics.setLocalizedText(descLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.descLabel.text")); // NOI18N
@@ -129,6 +131,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(7, 0, 0, 0);
         add(descLabel, gridBagConstraints);
+        descLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.descLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         homepageLabel.setLabelFor(homepageTextField);
         org.openide.awt.Mnemonics.setLocalizedText(homepageLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.homepageLabel.text")); // NOI18N
@@ -138,6 +141,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
         add(homepageLabel, gridBagConstraints);
+        homepageLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.homepageLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         splashLabel.setLabelFor(splashTextField);
         org.openide.awt.Mnemonics.setLocalizedText(splashLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.splashLabel.text")); // NOI18N
@@ -149,6 +153,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
         add(splashLabel, gridBagConstraints);
+        splashLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.splashLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         titleTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.titleTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -207,6 +212,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(3, 6, 0, 0);
         add(browseButton, gridBagConstraints);
+        browseButton.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.browseButton.AccessibleContext.accessibleDescription")); // NOI18N
 
         descTextArea.setColumns(20);
         descTextArea.setRows(4);

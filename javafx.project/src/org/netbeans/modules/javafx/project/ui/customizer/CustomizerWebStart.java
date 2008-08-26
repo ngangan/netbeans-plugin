@@ -127,6 +127,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         signedCheckBox = new javax.swing.JCheckBox();
         pack200CheckBox = new javax.swing.JCheckBox();
         enablePack200CheckBox = new javax.swing.JCheckBox();
+        codebaseLabel1 = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(499, 339));
         setPreferredSize(new java.awt.Dimension(499, 339));
@@ -265,6 +266,17 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
         add(enablePack200CheckBox, gridBagConstraints);
+
+        codebaseLabel1.setLabelFor(codebaseTextField);
+        org.openide.awt.Mnemonics.setLocalizedText(codebaseLabel1, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 2, 0, 2);
+        add(codebaseLabel1, gridBagConstraints);
+        codebaseLabel1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel1.AccessibleContext.accessibleDescription")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
 
     private void codebaseComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_codebaseComboBoxActionPerformed
@@ -345,6 +357,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         iconTextField.setEnabled(b);
         browseButton.setEnabled(b);
         codebaseLabel.setEnabled(b);
+        codebaseLabel1.setEnabled(b);
         codebaseComboBox.setEnabled(b);
         codebaseTextField.setEnabled(b);
         offlineCheckBox.setEnabled(b);
@@ -356,6 +369,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     private javax.swing.JButton browseButton;
     private javax.swing.JComboBox codebaseComboBox;
     private javax.swing.JLabel codebaseLabel;
+    private javax.swing.JLabel codebaseLabel1;
     private javax.swing.JTextField codebaseTextField;
     private javax.swing.JCheckBox enableCheckBox;
     private javax.swing.JCheckBox enablePack200CheckBox;
