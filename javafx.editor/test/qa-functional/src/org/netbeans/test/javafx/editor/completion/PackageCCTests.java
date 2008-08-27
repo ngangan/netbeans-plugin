@@ -47,28 +47,40 @@ import org.netbeans.spi.editor.completion.CompletionProvider;
  *
  * @author David Strupl
  */
-public class AllCCTests extends CompletionTestPerformer {
+public class PackageCCTests extends CompletionTestPerformer {
     
     /** Creates a new instance of AllCCTests */
-    public AllCCTests(String name) {
+    public PackageCCTests(String name) {
         super(name);
     }
 
     /*
      * 
-     * Baseline Smoke test
+     * Package level Tests
      * 
      */
-    public void testFX1() throws Exception {
+    public void testFXPackageEmpty() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
                 "fx-prj-1",
-                "fxprj1/FXTest1.fx",
-                15, // line number where the cursor should be
+                "packages/FXTestEmpty.fx",
+                1, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-
+    
+    public void testFXPackage() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "packages/FXTestPackage.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    
 }
