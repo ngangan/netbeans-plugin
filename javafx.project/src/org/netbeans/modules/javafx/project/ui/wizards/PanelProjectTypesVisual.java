@@ -165,6 +165,7 @@ public class PanelProjectTypesVisual extends SettingsPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         add(jRadioButton1, gridBagConstraints);
+        jRadioButton1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(PanelProjectTypesVisual.class, "PanelProjectTypesVisual.jRadioButton1.AccessibleContext.accessibleDescription")); // NOI18N
 
         buttonGroup1.add(jRadioButton2);
         org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getMessage(PanelProjectTypesVisual.class, "PanelProjectTypesVisual.jRadioButton2.text")); // NOI18N
@@ -184,6 +185,7 @@ public class PanelProjectTypesVisual extends SettingsPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         add(jRadioButton2, gridBagConstraints);
+        jRadioButton2.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(PanelProjectTypesVisual.class, "PanelProjectTypesVisual.jRadioButton2.AccessibleContext.accessibleDescription")); // NOI18N
 
         buttonGroup1.add(jRadioButton3);
         org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(PanelProjectTypesVisual.class, "PanelProjectTypesVisual.jRadioButton3.text")); // NOI18N

@@ -82,15 +82,17 @@ public class BestPracticesVisualPanel extends javax.swing.JPanel implements Docu
         projectFolderLabel = new javax.swing.JLabel();
         projectFolderTextField = new javax.swing.JTextField();
 
-        projectNameLabel.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectNameLabel.text")); // NOI18N
+        projectNameLabel.setLabelFor(projectNameTextField);
+        org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectNameLabel.text")); // NOI18N
 
         projectNameTextField.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectNameTextField.text")); // NOI18N
 
-        projectLocationLabel.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectLocationLabel.text")); // NOI18N
+        projectLocationLabel.setLabelFor(projectLocationTextField);
+        org.openide.awt.Mnemonics.setLocalizedText(projectLocationLabel, org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectLocationLabel.text")); // NOI18N
 
         projectLocationTextField.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectLocationTextField.text")); // NOI18N
 
-        browseButton.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.browseButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.browseButton.text")); // NOI18N
         browseButton.setActionCommand(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.browseButton.actionCommand")); // NOI18N
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -98,7 +100,8 @@ public class BestPracticesVisualPanel extends javax.swing.JPanel implements Docu
             }
         });
 
-        projectFolderLabel.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectFolderLabel.text")); // NOI18N
+        projectFolderLabel.setLabelFor(projectFolderTextField);
+        org.openide.awt.Mnemonics.setLocalizedText(projectFolderLabel, org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectFolderLabel.text")); // NOI18N
 
         projectFolderTextField.setText(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectFolderTextField.text")); // NOI18N
         projectFolderTextField.setEnabled(false);
@@ -140,6 +143,11 @@ public class BestPracticesVisualPanel extends javax.swing.JPanel implements Docu
                     .add(projectFolderTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(216, Short.MAX_VALUE))
         );
+
+        projectNameLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectNameLabel.AccessibleContext.accessibleDescription")); // NOI18N
+        projectLocationLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectLocationLabel.AccessibleContext.accessibleDescription")); // NOI18N
+        browseButton.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.browseButton.AccessibleContext.accessibleDescription")); // NOI18N
+        projectFolderLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.projectFolderLabel.AccessibleContext.accessibleDescription")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
 
 private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
