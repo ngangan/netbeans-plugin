@@ -13,6 +13,7 @@ import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
+import org.netbeans.jellytools.actions.ActionNoBlock;
 import org.netbeans.jellytools.actions.SaveAllAction;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jemmy.QueueTool;
@@ -72,13 +73,28 @@ public class Util {
             OutputOperator oo = new OutputOperator();
             new QueueTool().waitEmpty();
             String output = oo.getText();
-            CharSequence cs = new String("BUILD SUCCESS");
-            if (!output.contains(cs)) {
+            CharSequence sucess = new String("BUILD SUCCESS");
+            CharSequence warning = new String("warnings");
+            if ((!output.contains(sucess)) || (output.contains(warning))) {
                 return false;
             }
             return true;
         } catch (org.netbeans.jemmy.TimeoutExpiredException e) {
-            return false; //output window not found
+            //open it and try again
+            new ActionNoBlock("Window|Output|Output", null).perform();
+            new QueueTool().waitEmpty();
+            try {
+                OutputOperator oo = new OutputOperator();
+                new QueueTool().waitEmpty();
+                String output = oo.getText();
+                CharSequence cs = new String("BUILD SUCCESS");
+                if (!output.contains(cs)) {
+                    return false;
+                }
+                return true;
+            } catch (org.netbeans.jemmy.TimeoutExpiredException e2) {
+                return false; //output window not found
+            }
         }
     }
 

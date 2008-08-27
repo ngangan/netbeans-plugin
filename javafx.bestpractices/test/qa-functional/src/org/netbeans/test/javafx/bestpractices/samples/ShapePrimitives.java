@@ -51,7 +51,7 @@ public class ShapePrimitives extends JavaFXTestCase {
 
     public String _type = "Forms"; //Type of Sample
     public String _project = "Shape Primitives";
-    public String _projectPath = "Points and Lines|Source Packages|forms|ShapePrimitives.fx";
+    public String _projectPath = "Shape Primitives|Source Packages|forms|ShapePrimitives.fx";
     
     public ShapePrimitives(String name) {
         super(name);
