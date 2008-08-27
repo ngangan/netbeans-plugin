@@ -66,18 +66,21 @@ made subject to such option by the copyright holder.
 
 
     <target name="run-tests">
-
+        
         
         <echo message="[test] run..."/>
 
         <echo message="[test] Smoke"/>
-
+        
         <ant target="all" dir="."/>
 
         <echo message="[test] Editor"/>
-
+        
         <ant target="all" dir="../../javafx.editor/test"/>
-
+        
+        <echo message="[test] Best Practices"/>
+        
+        <ant target="all" dir="../../javafx.bestpractices/test"/>
 
     </target>
 
