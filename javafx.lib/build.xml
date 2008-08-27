@@ -45,6 +45,7 @@ made subject to such option by the copyright holder.
     <import file="../../nbbuild/templates/projectized.xml"/>
 
     <target name="netbeans-extra" depends="init, add-reprise">
+	<mkdir dir="external/compiler"/>
         <get src="${jfxcompiler.jar.url}" dest="${jfxcompiler.jar}" usetimestamp="true" verbose="true"/>
         <get src="${jfxdoc.jar.url}" dest="${jfxdoc.jar}" usetimestamp="true" verbose="true"/>
 <!--        
