@@ -47,28 +47,65 @@ import org.netbeans.spi.editor.completion.CompletionProvider;
  *
  * @author David Strupl
  */
-public class AllCCTests extends CompletionTestPerformer {
+public class ApplicationCCTests extends CompletionTestPerformer {
     
     /** Creates a new instance of AllCCTests */
-    public AllCCTests(String name) {
+    public ApplicationCCTests(String name) {
         super(name);
     }
 
     /*
      * 
-     * Baseline Smoke test
+     * Application level testing
      * 
      */
-    public void testFX1() throws Exception {
+    public void testFXApplication1a() throws Exception {
         new CompletionTest().test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
                 "fx-prj-1",
-                "fxprj1/FXTest1.fx",
-                15, // line number where the cursor should be
+                "applications/FXTestApplication1.fx",
+                5, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
+    public void testFXApplication1b() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication1.fx",
+                7, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+    public void testFXApplication1c() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication1.fx",
+                9, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+    public void testFXApplication1d() throws Exception {
+        new CompletionTest().test(
+                outputWriter, logWriter, 
+                "", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication1.fx",
+                14, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+
+    
 }
