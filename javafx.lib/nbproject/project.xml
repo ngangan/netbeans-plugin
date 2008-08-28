@@ -63,6 +63,7 @@ made subject to such option by the copyright holder.
                 <package>com.sun.scenario.scenegraph</package>
                 <package>com.sun.source.tree</package>
                 <package>com.sun.source.util</package>
+                <package>com.sun.javadoc</package>
                 <package>com.sun.tools.javac.tree</package>
                 <package>com.sun.tools.javac.jvm</package>
                 <package>com.sun.tools.javac.model</package>
