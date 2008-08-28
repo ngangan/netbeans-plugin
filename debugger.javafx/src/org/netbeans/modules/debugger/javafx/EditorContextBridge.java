@@ -118,14 +118,14 @@ public class EditorContextBridge {
      */
     public static <R,D> R parseExpression(String expression, String url, final int line,
                                           JavaFXTreePathScanner<R,D> visitor, D context,
-                                          SourcePathProvider sp) {
+                                          SourcePathProvider sp,int pos) {
         
         // TODO: return getContext ().parseExpression ();
         try {
             return (R) getContext ().getClass().getMethod(
                     "parseExpression",
-                    new Class[] { String.class, String.class, Integer.TYPE, JavaFXTreePathScanner.class, Object.class, SourcePathProvider.class }).
-                        invoke(getContext(), new Object[] { expression, url, line, visitor, context, sp });
+                    new Class[] { String.class, String.class, Integer.TYPE, JavaFXTreePathScanner.class, Object.class, SourcePathProvider.class, Integer.TYPE }).
+                        invoke(getContext(), new Object[] { expression, url, line, visitor, context, sp, pos });
         } catch (java.lang.reflect.InvocationTargetException itex) {
             Throwable tex = itex.getTargetException();
             if (tex instanceof RuntimeException) {

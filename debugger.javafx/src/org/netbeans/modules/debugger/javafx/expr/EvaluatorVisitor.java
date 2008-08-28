@@ -1161,6 +1161,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     @Override
     public Mirror visitIdentifier(IdentifierTree arg0, EvaluationContext evaluationContext) {
         JavaFXTreePath currentPath = getCurrentPath();
+        VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
         Element elm = null;
         if (currentPath != null) {
             JavaFXTreePath identifierPath = JavaFXTreePath.getPath(currentPath, arg0);
@@ -1179,8 +1180,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             case INTERFACE:
                 TypeElement te = (TypeElement) elm;
                 //TODO XXX
-                String className = "className";//ElementUtilities.getBinaryName(te);
-                VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
+                String className =  te.getSimpleName().toString();//"className";//ElementUtilities.getBinaryName(te);
+//                className = className.substring(className.lastIndexOf("."),className.length());
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() > 0) {
                     return classes.get(0);
@@ -1224,7 +1225,22 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 }
                 if (field.isStatic()) {
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field));
-                    return declaringType.getValue(field);
+                    Value v = declaringType.getValue(field);
+                    if (v instanceof ObjectReference) {
+                        ObjectReference ref =  (ObjectReference)v;
+                        ReferenceType rt = ref.referenceType();
+                        if (rt != null) {
+                            Field f = rt.fieldByName("$value");
+                            if (f != null) {
+                                Value val = ref.getValue(f);
+                                if (val instanceof PrimitiveValue) {
+                                    return getPrimitiveValue((PrimitiveValue)val,vm);
+                                }
+                                return val;
+                            }
+                        }
+                    }
+                    return v;
                 }
                 ObjectReference thisObject = evaluationContext.getFrame().thisObject();
                 if (thisObject != null) {
@@ -2215,8 +2231,156 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     @Override
     public Mirror visitVariable(VariableTree arg0, EvaluationContext evaluationContext) {
         // Variable declaration
-        Assert2.error(arg0, "unsupported");
-        return null;
+        /*
+        Mirror expression = arg0.getInitializer().accept(this, evaluationContext);
+        VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
+         */
+        JavaFXTreePath currentPath = getCurrentPath();
+        VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
+        Element elm = null;
+        if (currentPath != null) {
+            JavaFXTreePath identifierPath = JavaFXTreePath.getPath(currentPath, arg0);
+            if (identifierPath == null) identifierPath = getCurrentPath();
+            elm = evaluationContext.getTrees().getElement(identifierPath);
+            if (elm instanceof TypeElement && ((TypeElement) elm).asType() instanceof ErrorType) {
+                currentPath = null; // Elements not resolved correctly
+            }
+        }
+        if (currentPath == null) {
+            Mirror expression = arg0.getInitializer().accept(this, evaluationContext);
+            return expression;
+        }
+        switch(elm.getKind()) {
+            case CLASS:
+            case ENUM:
+            case INTERFACE:
+                TypeElement te = (TypeElement) elm;
+                //TODO XXX
+                String className =  te.getSimpleName().toString();//"className";//ElementUtilities.getBinaryName(te);
+                List<ReferenceType> classes = vm.classesByName(className);
+                if (classes.size() > 0) {
+                    return classes.get(0);
+                }
+                Assert2.error(arg0, "unknownType", className);
+            case ENUM_CONSTANT:
+                return getEnumConstant(arg0, (VariableElement) elm, evaluationContext);
+            case FIELD:
+                VariableElement ve = (VariableElement) elm;
+                String fieldName = ve.getSimpleName().toString();
+                if (fieldName.equals("this")) {
+                    return evaluationContext.getFrame().thisObject();
+                }
+                if (fieldName.equals("super")) {
+                    ReferenceType thisType = evaluationContext.getFrame().location().declaringType();
+                    if (thisType instanceof ClassType) {
+                        ClassType superClass = ((ClassType) thisType).superclass();
+                        ObjectReference thisObject = evaluationContext.getFrame().thisObject();
+                        if (thisObject == null) {
+                            return superClass;
+                        } else {
+                            return thisObject;
+                        }
+                    }
+                }
+                Element enclosing = ve.getEnclosingElement();
+                String enclosingClass = null;
+                if (enclosing.getKind() == ElementKind.CLASS) {
+                    TypeElement enclosingClassElement = (TypeElement) enclosing;
+                    //TODO XXX
+                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);
+                }
+                ReferenceType declaringType = evaluationContext.getFrame().location().declaringType();
+                if (enclosingClass != null) {
+                    ReferenceType dt = findEnclosingType(declaringType, enclosingClass);
+                    if (dt != null) declaringType = dt;
+                }
+                Field field = declaringType.fieldByName(fieldName);
+                if (field == null) {
+                    Assert2.error(arg0, "unknownVariable", fieldName);
+                }
+                if (field.isStatic()) {
+                    evaluationContext.getVariables().put(arg0, new VariableInfo(field));
+                    Value v = declaringType.getValue(field);
+                    if (v instanceof ObjectReference) {
+                        ObjectReference ref =  (ObjectReference)v;
+                        ReferenceType rt = ref.referenceType();
+                        if (rt != null) {
+                            Field f = rt.fieldByName("$value");
+                            if (f != null) {
+                                Value val = ref.getValue(f);
+                                if (val instanceof PrimitiveValue) {
+                                    return getPrimitiveValue((PrimitiveValue)val,vm);
+                                }
+                                return val;
+                            }
+                        }
+                    }
+                    return v;
+                }
+                ObjectReference thisObject = evaluationContext.getFrame().thisObject();
+                if (thisObject != null) {
+                    if (field.isPrivate()) {
+                        ObjectReference to = findEnclosedObject(thisObject, declaringType);
+                        if (to != null) thisObject = to;
+                    } else {
+                        if (!instanceOf(thisObject.referenceType(), declaringType)) {
+                            ObjectReference to = findEnclosedObject(thisObject, declaringType);
+                            if (to != null) thisObject = to;
+                        }
+                    }
+                    evaluationContext.getVariables().put(arg0, new VariableInfo(field, thisObject));
+                    return thisObject.getValue(field);
+                } else {
+                    Assert2.error(arg0, "accessInstanceVariableFromStaticContext", fieldName);
+                    throw new IllegalStateException("No current instance available.");
+                }
+            case LOCAL_VARIABLE:
+            case EXCEPTION_PARAMETER:
+                ve = (VariableElement) elm;
+                String varName = ve.getSimpleName().toString();
+                try {
+                    LocalVariable lv = evaluationContext.getFrame().visibleVariableByName(varName);
+                    if (lv == null) {
+                        Assert2.error(arg0, "unknownVariable", varName);
+                    }
+                    evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
+                    return evaluationContext.getFrame().getValue(lv);
+                } catch (AbsentInformationException aiex) {
+                    return (Value) Assert2.error(arg0, "unknownVariable", varName);
+                }
+            case PARAMETER:
+                ve = (VariableElement) elm;
+                String paramName = ve.getSimpleName().toString();
+                StackFrame frame = evaluationContext.getFrame();
+                try {
+                    LocalVariable lv = frame.visibleVariableByName(paramName);
+                    if (lv == null) {
+                        Assert2.error(arg0, "unknownVariable", paramName);
+                    }
+                    evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
+                    return frame.getValue(lv);
+                } catch (AbsentInformationException aiex) {
+                    try {
+                        org.netbeans.api.debugger.javafx.LocalVariable[] lvs;
+                        lvs = new CallStackFrameImpl(frame, 0, evaluationContext.getDebugger()).getMethodArguments();
+                        if (lvs != null) {
+                            for (org.netbeans.api.debugger.javafx.LocalVariable lv : lvs) {
+                                if (paramName.equals(lv.getName())) {
+                                    return ((JDIVariable) lv).getJDIValue();
+                                }
+                            }
+                        }
+                    } catch (NativeMethodException nmex) {
+                        // ignore - no arguments available
+                    }
+                    return (Value) Assert2.error(arg0, "unknownVariable", paramName);
+                }
+            case PACKAGE:
+                return (Value) Assert2.error(arg0, "notExpression");
+            default:
+                throw new UnsupportedOperationException("Not supported element kind:"+elm.getKind()+" Tree = '"+arg0+"'");
+        }
+
     }
 
     @Override
@@ -2443,6 +2607,35 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         evaluationContext.methodToBeInvoked();
     }
     
+    
+    private static Mirror getPrimitiveValue(PrimitiveValue value, VirtualMachine vm) {
+        if (value instanceof IntegerValue) {
+            return vm.mirrorOf(((IntegerValue)value).value());
+        }
+        if (value instanceof ByteValue) {
+            return vm.mirrorOf(((ByteValue)value).value());
+        }
+        if (value instanceof CharValue) {
+            return vm.mirrorOf(((CharValue)value).value());
+        }
+        if (value instanceof LongValue) {
+            return vm.mirrorOf(((LongValue)value).value());
+        }
+        if (value instanceof BooleanValue) {
+            return vm.mirrorOf(((BooleanValue)value).value());
+        }
+        if (value instanceof FloatValue) {
+            return vm.mirrorOf(((FloatValue)value).value());
+        }
+        if (value instanceof DoubleValue) {
+            return vm.mirrorOf(((DoubleValue)value).value());
+        }
+        if (value instanceof StringReference) {
+            return vm.mirrorOf(((StringReference)value).value());
+        }
+        return value;
+    }
+
     private static Mirror unboxIfCan(Tree arg0, ObjectReference r, EvaluationContext evaluationContext) {
         String name = ((ReferenceType) r.type()).name();
         boolean methodCalled = false;

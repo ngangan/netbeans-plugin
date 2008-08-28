@@ -180,7 +180,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
             value = null;
         } else {
             // evaluate expression to Value
-            Value evaluatedValue = debugger.evaluateIn (expression);
+            Value evaluatedValue = debugger.evaluateIn (expression,0);
             if (oldV != null && evaluatedValue != null) {
                 Type type = oldV.type();
                 if (!type.equals(evaluatedValue.type())) {

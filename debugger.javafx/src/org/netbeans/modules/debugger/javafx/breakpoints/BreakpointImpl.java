@@ -91,7 +91,7 @@ import org.openide.util.RequestProcessor;
  */
 public abstract class BreakpointImpl implements Executor, PropertyChangeListener {
     
-    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.JavaFX.breakpoints"); // NOI18N
+    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.breakpoints"); // NOI18N
 
     private JavaFXDebuggerImpl    debugger;
     private JavaFXBreakpoint      breakpoint;
@@ -598,7 +598,7 @@ public abstract class BreakpointImpl implements Executor, PropertyChangeListener
         com.sun.jdi.Value value = getDebugger ().evaluateIn (
             compiledCondition, 
             frame,
-            frameDepth
+            frameDepth,0
         );
         try {
             return ((com.sun.jdi.BooleanValue) value).booleanValue ();

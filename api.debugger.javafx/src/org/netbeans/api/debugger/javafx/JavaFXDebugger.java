@@ -339,6 +339,16 @@ public abstract class JavaFXDebugger {
     throws InvalidExpressionException;
 
     /**
+     * Evaluates given expression in the current context.
+     *
+     * @param expression a expression to be evaluated
+     *  
+     * @return current value of given expression
+     */
+    public abstract Variable evaluate (String expression, int pos) 
+    throws InvalidExpressionException;
+
+    /**
      * Waits till the Virtual Machine is started and returns 
      * {@link DebuggerStartException} if some problem occurres.
      *

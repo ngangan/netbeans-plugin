@@ -78,12 +78,21 @@ public class TreeEvaluator {
     private int frameIndex;
     private String currentPackage;
     private Operators operators;
+    private int position;
     
     private static final Logger loggerMethod = Logger.getLogger("org.netbeans.modules.debugger.javafx.invokeMethod"); // NOI18N
     
     TreeEvaluator(Expression2 expression, EvaluationContext context) {
         this.expression = expression;
         this.evaluationContext = context;
+    }
+    TreeEvaluator(Expression2 expression, EvaluationContext context, int pos) {
+        this.expression = expression;
+        this.evaluationContext = context;
+        this.position = pos;
+    }
+    public void setPosition(int pos) {
+        this.position = pos;
     }
 
     /**
@@ -120,7 +129,7 @@ public class TreeEvaluator {
         try {
             Mirror mirror = EditorContextBridge.parseExpression(expression.getExpression(), url, line,
                                                               new EvaluatorVisitor(), evaluationContext,
-                                                              evaluationContext.getDebugger().getEngineContext().getContext());
+                                                              evaluationContext.getDebugger().getEngineContext().getContext(),position);
             if (mirror instanceof Value || mirror == null) {
                 return (Value) mirror;
             } else {
