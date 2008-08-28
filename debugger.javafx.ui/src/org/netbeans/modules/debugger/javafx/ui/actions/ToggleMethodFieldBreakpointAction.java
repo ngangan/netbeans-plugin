@@ -146,6 +146,7 @@ public class ToggleMethodFieldBreakpointAction extends AbstractAction {//impleme
         } catch (java.awt.IllegalComponentStateException icsex) {
             fex = icsex;
         }
+        if ("".equals(className[0])){ fieldName[0] = null; }
         final String methodName;
         final String methodSignature;
         java.awt.IllegalComponentStateException mex;

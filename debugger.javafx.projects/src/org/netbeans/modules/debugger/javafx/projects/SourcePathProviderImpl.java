@@ -70,9 +70,7 @@ import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
 import org.netbeans.api.project.ui.OpenProjects;
-import org.netbeans.spi.java.classpath.ClassPathProvider;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 
 import org.openide.filesystems.FileObject;
@@ -93,7 +91,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
     private static boolean          verbose = 
         System.getProperty ("netbeans.debugger.sourcepathproviderimpl") != null;
     
-    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.JavaFX.projects");
+    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.projects");
     
     private static final Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");
     private static final Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");

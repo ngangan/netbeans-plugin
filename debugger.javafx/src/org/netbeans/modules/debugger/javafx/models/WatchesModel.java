@@ -387,7 +387,7 @@ public class WatchesModel implements TreeModel {
             JavaFXWatch jw = null;
             try {
                 Expression expr = getParsedExpression();
-                Value v = debugger.evaluateIn (expr);
+                Value v = debugger.evaluateIn (expr,0);
                 //if (v instanceof ObjectReference)
                 //    jw = new JavaFXObjectWatchImpl (debugger, w, (ObjectReference) v);
                 if (v instanceof PrimitiveValue) {

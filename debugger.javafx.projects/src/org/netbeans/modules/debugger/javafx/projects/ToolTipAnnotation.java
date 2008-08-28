@@ -145,7 +145,7 @@ public class ToolTipAnnotation extends Annotation implements Runnable {
                 }
             }
             if (v == null) {
-                v = d.evaluate (expression);
+                v = d.evaluate (expression,offset);
             }
             String type = v.getType ();
             String value = v.getValue ();

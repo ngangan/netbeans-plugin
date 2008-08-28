@@ -51,6 +51,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 
+import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
@@ -1537,7 +1538,7 @@ public class EditorContextImpl extends EditorContext {
      */
     public <R,D> R parseExpression(final String expression, String url, final int line,
                                    final JavaFXTreePathScanner<R,D> visitor, final D context,
-                                   final SourcePathProvider sp) {
+                                   final SourcePathProvider sp, final int pos) {
         JavaFXSource js = null;
         if (url != null) {
             try {
@@ -1566,8 +1567,13 @@ public class EditorContextImpl extends EditorContext {
                         scope = ci.getTreeUtilities().scopeFor(offset);
                     }
                     SourcePositions[] sourcePtr = new SourcePositions[] { null };
-// TODO XXX issue #132748                   
-                    Tree tree = ci.getCompilationUnit();
+// TODO XXX issue #132748        
+                    Tree tree;
+                    if (pos == 0) {
+                        tree = ci.getTreeUtilities().parseExpression(expression, offset);
+                    } else {
+                        tree = ci.getTreeUtilities().parseExpression(expression, pos);
+                    }
 //                    Tree tree = ci.getTreeUtilities().parseExpression(
 //                            expression,
 //                            sourcePtr
@@ -1749,6 +1755,13 @@ public class EditorContextImpl extends EditorContext {
                             TypeElement te;
                             if (tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
                                 te = (TypeElement) ci.getTrees().getElement(currentPath);
+//                            } else if (tree.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT){
+//                                //It is mean tyhat we have global variable and need to set name of the file as classname
+//                                //TODO XXX Durty Hack
+//                                String packageName = ci.getTrees().getElement(currentPath).getSimpleName().toString();
+//                                String className = ci.getFileObject().getName();
+//                                currentElementPtr[0] = packageName+"."+className;
+//                                te = null;
                             } else {
                                 Scope scope = ci.getTreeUtilities().scopeFor(currentOffset);
 //                                JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(currentOffset);
@@ -1798,7 +1811,7 @@ public class EditorContextImpl extends EditorContext {
                         if (tree.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
                             el = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), tree));
                             if (el.getKind() == ElementKind.FIELD || el.getKind() == ElementKind.ENUM_CONSTANT) {
-                                currentElementPtr[0] = ((JFXVar) tree).getName().toString();
+                                currentElementPtr[0] = ((VariableTree) tree).getName().toString();
                             }
                         } else if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER && selectedIdentifier != null) {
                             IdentifierTree it = (IdentifierTree) tree;

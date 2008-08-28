@@ -383,7 +383,7 @@ public final class TreeUtilities {
             final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
             Writer w = new OutputStreamWriter(fo.getOutputStream());
             w.write(start);
-            w.write(expr);
+//            w.write(expr);
             w.write(end);
             w.close();
             if (LOGGABLE) log("  source written to " + fo);

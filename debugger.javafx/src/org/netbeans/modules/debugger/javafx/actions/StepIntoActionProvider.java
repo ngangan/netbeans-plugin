@@ -83,8 +83,8 @@ implements Executor, PropertyChangeListener {
     
     public static final String SS_STEP_OUT = "SS_ACTION_STEPOUT";
     
-    private static final Logger smartLogger = Logger.getLogger("org.netbeans.modules.debugger.JavaFX.smartstepping"); // NOI18N
-    private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.JavaFX.jdievents"); // NOI18N
+    private static final Logger smartLogger = Logger.getLogger("org.netbeans.modules.debugger.javafx.smartstepping"); // NOI18N
+    private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.jdievents"); // NOI18N
         
     private StepRequest stepRequest;
     private String position;

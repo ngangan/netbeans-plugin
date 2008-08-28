@@ -266,7 +266,19 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
      */
     public Variable evaluate (String expression)
     throws InvalidExpressionException {
-        Value v = evaluateIn (expression);
+        return evaluate(expression,0);
+    }
+
+    /**
+     * Evaluates given expression in the current context.
+     *
+     * @param expression a expression to be evaluated
+     *
+     * @return current value of given expression
+     */
+    public Variable evaluate (String expression, int pos)
+    throws InvalidExpressionException {
+        Value v = evaluateIn (expression,pos);
         return getLocalsTreeModel ().getVariable (v);
     }
 
@@ -592,18 +604,18 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     /**
      * Used by AbstractVariable.
      */
-    public Value evaluateIn (String expression) throws InvalidExpressionException {
+    public Value evaluateIn (String expression, int pos) throws InvalidExpressionException {
         Expression expr = null;
         try {
             expr = Expression.parse (expression, Expression.LANGUAGE_JAVA_1_5);
-            return evaluateIn (expr);
+            return evaluateIn (expr, pos);
         } catch (ParseException e) {
             InvalidExpressionException iee = new InvalidExpressionException(e.getMessage());
             iee.initCause(e);
             throw iee;
         }
     }
-    
+
     //PATCH 48174
     public void setAltCSF(StackFrame sf) {
         altCSF = sf;
@@ -616,7 +628,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     /**
      * Used by WatchesModel & BreakpointImpl.
      */
-    public Value evaluateIn (Expression expression) 
+    public Value evaluateIn (Expression expression, int pos) 
     throws InvalidExpressionException {
         synchronized (LOCK) {
             
@@ -625,7 +637,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
             if (csf != null) {
                 JavaFXThread frameThread = csf.getThread();
                 try {
-                    Value value = evaluateIn (expression, csf.getStackFrame (), csf.getFrameDepth());
+                    Value value = evaluateIn (expression, csf.getStackFrame (), csf.getFrameDepth(), pos);
                     try {
                         csf.getThread();
                     } catch (InvalidStackFrameException isfex) {
@@ -651,7 +663,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                         altCSF = null; // Already invalid
                     } else {
                         // TODO XXX : Can be resumed in the mean time !!!!
-                        return evaluateIn (expression, altCSF, 0);
+                        return evaluateIn (expression, altCSF, 0, pos);
                     }
                 } catch (InvalidStackFrameException isfex) {
                     // Will be thrown when the altCSF is invalid
@@ -672,7 +684,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     /**
      * Used by BreakpointImpl.
      */
-    public  Value evaluateIn (Expression expression, final StackFrame frame, int frameDepth) 
+    public  Value evaluateIn (Expression expression, final StackFrame frame, int frameDepth, int pos) 
     throws InvalidExpressionException {
         synchronized (LOCK) {
             if (frame == null)
@@ -720,6 +732,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                                 this
                             )
                         );
+                        evaluator2.setPosition(pos);
                     try {
                         return evaluator2.evaluate ();
                     } finally {
