@@ -79,6 +79,7 @@ public class ElementNode extends AbstractNode {
 
     public ElementNode(Description description, CompilationInfo info) {
         super(description.subs == null ? Children.LEAF : new ElementChilren(info, description.subs, description.ui.getFilters()), null);
+        this.info = info;
         this.description = description;
         setDisplayName(description.name);
     }
