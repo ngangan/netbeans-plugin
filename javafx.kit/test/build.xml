@@ -82,6 +82,9 @@ made subject to such option by the copyright holder.
         
         <ant target="all" dir="../../javafx.bestpractices/test"/>
 
+        <echo message="[test] Weather"/>
+        
+        <ant target="all" dir="../../javafx.weather2/test"/>
     </target>
 
 
