@@ -53,7 +53,6 @@ import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
 import org.openide.loaders.SaveAsCapable;
-import org.openide.nodes.CookieSet.Factory;
 import org.openide.nodes.Node;
 import org.openide.nodes.Node.Cookie;
 import org.openide.text.CloneableEditor;
@@ -77,7 +76,7 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
                 createJavaFXEditorSupport().saveAs( folder, fileName );
             }
         });
-        getCookieSet().add(JavaFXEditorSupport.class, new Factory() {
+        getCookieSet().add(JavaFXEditorSupport.class, new org.openide.nodes.CookieSet.Factory() {
             public <T extends Cookie> T createCookie(Class<T> klass) {
                 return klass.cast(createJavaFXEditorSupport());
             }

@@ -42,13 +42,10 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import org.netbeans.modules.javafx.editor.*;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -58,7 +55,6 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
 
 /**
  *

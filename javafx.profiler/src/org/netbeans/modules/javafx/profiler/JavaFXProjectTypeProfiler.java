@@ -92,6 +92,7 @@ import java.util.Properties;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.lib.profiler.marker.Mark;
 
 /**
  * @author Tomas Hurka
