@@ -55,7 +55,6 @@ import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.DebuggerManagerListener;
 import org.netbeans.api.debugger.Session;
 import org.netbeans.api.debugger.Watch;
-import org.netbeans.api.debugger.javafx.MethodBreakpoint;
 import org.netbeans.api.project.Project;
 import org.netbeans.spi.debugger.ActionsProviderSupport;
 import org.netbeans.spi.project.ActionProvider;
@@ -69,7 +68,7 @@ import org.openide.util.WeakListeners;
 */
 public class StepIntoActionProvider extends ActionsProviderSupport {
 
-    private MethodBreakpoint breakpoint;
+//    private MethodBreakpoint breakpoint;
     Listener listener;
     
     {
