@@ -517,8 +517,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 break;
             case CONDITIONAL_EXPRESSION:
                 break;
-            case BIND_EXPRESSION:
-                break;
             case BLOCK_EXPRESSION:
                 result = new BlockExpressionEnvironment();
                 break;

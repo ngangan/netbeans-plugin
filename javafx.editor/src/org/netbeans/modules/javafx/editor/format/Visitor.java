@@ -709,7 +709,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof AssignmentTree
                 || tree instanceof UnaryTree
                 || tree instanceof BinaryTree
-                || tree instanceof BindExpressionTree
                 || tree instanceof CatchTree
                 || tree instanceof ConditionalExpressionTree
                 || tree instanceof ObjectLiteralPartTree
