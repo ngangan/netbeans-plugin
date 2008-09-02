@@ -47,14 +47,14 @@ made subject to such option by the copyright holder.
     <import file="../../nbbuild/templates/projectized.xml"/>
 
 
-    <property name="jfxl.jfxc.home" value="E:\\SunWork\\jfxc\\trunk"/>
-    <property name="jfxl.antlr.grammarv3" value="v3"/>
+    <property name="jfxl.jfxc.home" value="E:\\SunWork\\jfxc\\main"/>
+    <property name="jfxl.antlr.grammar" value="v4Lexer"/>
     <property name="jfxl.jfxc.grammar"
-              value="${jfxl.jfxc.home}/src/share/classes/com/sun/tools/javafx/antlr/${jfxl.antlr.grammarv3}.g"/>
-    <property name="jfxl.lexer.grammar" value="${basedir}/${jfxl.antlr.grammarv3}.g"/>
+              value="${jfxl.jfxc.home}/src/share/classes/com/sun/tools/javafx/antlr/${jfxl.antlr.grammar}.g"/>
+    <property name="jfxl.lexer.grammar" value="${basedir}/${jfxl.antlr.grammar}.g"/>
 
 
-    <property name="jfxl.antlr.dir" value="${jfxl.jfxc.home}/tools/antlr-2008-01-14.10"/>
+    <property name="jfxl.antlr.dir" value="${jfxl.jfxc.home}/tools/antlr-3.1"/>
 
     <path id="jfxl.antlr.classpath">
          <fileset dir="${jfxl.antlr.dir}">
@@ -82,7 +82,7 @@ made subject to such option by the copyright holder.
         <java classname="org.netbeans.lib.javafx.lexer.GrammarVerifier" resultproperty="antlr.verify.output"
               fork="true" logError="true">
             <classpath refid="jfxl.grammarVerifierCp" />
-            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}.tokens"/>
+            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammar}.tokens"/>
         </java>
         <fail message="Grammar verification failed.">
             <condition>
@@ -103,11 +103,13 @@ made subject to such option by the copyright holder.
         <copy file="${jfxl.lexer.grammar}" todir="${jfxl.antlr.generated.dir}"/>
         <replace dir="${jfxl.antlr.generated.dir}">
             <include name="*.g"/>
+            <!--<replacefilter token="package com.sun.tools.javafx.antlr;" value="package org.netbeans.lib.javafx.lexer;" />-->
+            <!--<replacefilter token="AbstractGeneratedLexerV4 " value="org.netbeans.lib.javafx.lexer.Lexer" />-->
             <replacetoken><![CDATA[package com.sun.tools.javafx.antlr;]]></replacetoken>
             <replacevalue><![CDATA[package org.netbeans.lib.javafx.lexer;]]></replacevalue>
         </replace>
 
-        <echo message="Generating lexer from ${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}.g"/>
+        <echo message="Generating lexer from ${jfxl.antlr.generated.dir}/${jfxl.antlr.grammar}.g"/>
         <property name="info.antrl.classpath" refid="jfxl.antlr.classpath" />
         <echo message="Antlr classpath = ${info.antrl.classpath}" />
         <java classname="org.antlr.Tool" fork="true" resultproperty="antlr.output" newenvironment="true" failonerror="true">
@@ -119,7 +121,7 @@ made subject to such option by the copyright holder.
             </classpath>
             <arg value="-o"/>
             <arg value="${jfxl.antlr.generated.dir}"/>
-            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}.g"/>
+            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammar}.g"/>
             <jvmarg value="-Xmx256m"/>
         </java>
         <fail message="Grammar compilation has failed.">
@@ -129,7 +131,7 @@ made subject to such option by the copyright holder.
                 </not>
             </condition>
         </fail>
-        <delete file="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}Parser.java" />
+        <delete file="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammar}Parser.java" />
     </target>
 
     <target name="pre-compile" if="compile.grammar">
@@ -142,7 +144,7 @@ made subject to such option by the copyright holder.
         </fail>
         <condition property="lexerNotUptodate">
             <not>
-                <uptodate srcfile="${jfxl.jfxc.grammar}" targetfile="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammarv3}Lexer.java"/>
+                <uptodate srcfile="${jfxl.jfxc.grammar}" targetfile="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammar}.java"/>
             </not>
         </condition>
         <antcall target="_antlrgen"/>

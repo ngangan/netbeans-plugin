@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  * @todo documentation
  */
-public class JFXLexer implements org.netbeans.spi.lexer.Lexer {
+public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
     private static Logger log = Logger.getLogger(JFXLexer.class.getName());
     private Lexer lexer;
     private TokenFactory<JFXTokenId> tokenFactory;
@@ -71,7 +71,11 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer {
     public JFXLexer(LexerRestartInfo<JFXTokenId> info) throws IOException {
         super();
         if (log.isLoggable(Level.FINE)) log.fine("Creating new lexer");
-        this.lexer = new v3Lexer();
+        if (System.getProperty("javafx.lexer.forcev3") != null) {
+            this.lexer = new v3Lexer();
+        } else {
+            this.lexer = new v4Lexer();
+        }
         this.info = info;
     }
 
