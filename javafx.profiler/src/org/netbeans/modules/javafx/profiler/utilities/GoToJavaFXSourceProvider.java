@@ -39,8 +39,10 @@
 
 package org.netbeans.modules.javafx.profiler.utilities;
 
+import com.sun.tools.javac.code.Symbol;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -53,19 +55,20 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.openide.cookies.OpenCookie;
-import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
+import org.netbeans.api.javafx.editor.ElementOpen;
+
         
 public class GoToJavaFXSourceProvider implements GoToSourceProvider {
     // field to indicate whether source find was successfull
-    private boolean found = false;
-    
-    public boolean openSource(final Project project, final String className, final String methodName, final String signature) {
+    final AtomicBoolean result = new AtomicBoolean(false);
+
+    public boolean openSource(final Project project, final String className, final String methodName, String signature) {
         final JavaFXSource js = JavaFXProjectUtilities.getSources((JavaFXProject)project);
         final CountDownLatch latch = new CountDownLatch(1);
-        
+
+        // cut interface suffix out of the signature
+        final String sig = JavaFXProjectUtilities.cutIntfSuffix(signature);
+
         try {
             // use the prepared javasource repository and perform a task
             js.runUserActionTask(new Task<CompilationController>() {
@@ -77,10 +80,14 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
 
                         // resolve the class by name
                         TypeElement classElement = JavaFXProjectUtilities.resolveClassByName(className, controller);
+                        // only fx classes supported; others to be opened via GoToJavaSourceProvider
+                        if (!controller.getJavafxTypes().isJFXClass((Symbol) classElement))
+                            return;
+                        
                         if ((methodName != null) && (methodName.length() > 0)) {
                             // if a method name has been specified try to resolve the method
                             if (classElement != null) {
-                                ElementHandle eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, signature});
+                                ElementHandle eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
                                 destinationElement = eh.resolve(controller);
                             }
                         }
@@ -94,26 +101,18 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                             ProfilerLogger.debug("Opening element: " + destinationElement); // NOI18N
 
                             final Element openElement = destinationElement;
-                            
+                            final CompilationController cc = controller;
+
                             SwingUtilities.invokeLater(new Runnable() {
                                     // manipulates the TopComponent - must be executed in EDT
                                     public void run() {
                                         // opens the source code on the found method position
-                                        try {
-                                            FileObject fo = JavaFXProjectUtilities.getFile(openElement, (JavaFXProject)project);
-                                            // object not found
-                                            if (fo == null) return;
-                                            DataObject od = DataObject.find(fo);
-                                            OpenCookie oc = od.getCookie(OpenCookie.class);
-
-                                            if (oc != null) {
-                                                oc.open();                
-                                                latch.countDown();                                                
-                                                found = true;
-                                            }
-                                        } catch (DataObjectNotFoundException donfe) {
-                                            ProfilerLogger.log(donfe);            
-                                        }                                                    
+                                        try {                                            
+                                            result.set(ElementOpen.open(cc, openElement));
+                                            latch.countDown();
+                                        } catch (Exception e) {
+                                            ProfilerLogger.log(e);
+                                        }
                                     }
                                 });
                         } else {
@@ -123,8 +122,13 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                 }, false);
         } catch (IOException ex) {
             ProfilerLogger.log(ex);
-        }             
+        }
 
-        return found;        
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return result.get();
     }
 }

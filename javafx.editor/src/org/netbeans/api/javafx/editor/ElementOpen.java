@@ -43,6 +43,7 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import org.netbeans.modules.javafx.editor.*;
 import java.lang.reflect.Constructor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -65,18 +66,20 @@ public final class ElementOpen {
     private ElementOpen() {
     }
 
-    public static void open(final FileObject srcFile, int offset) throws Exception {
-        GoToSupport.doOpen(srcFile, (int) offset);
+    public static boolean open(final FileObject srcFile, int offset) throws Exception {
+        return GoToSupport.doOpen(srcFile, (int) offset);
     }
     
-    public static void open(final FileObject srcFile, final ElementHandle elh) throws Exception {
+    public static boolean open(final FileObject srcFile, final ElementHandle elh) throws Exception {
+        final AtomicBoolean result = new AtomicBoolean(false);
+
         if (srcFile == null) {
-            return;
+            return false;
         }
 
         JavaFXSource js = JavaFXSource.forFileObject(srcFile);
         if (js == null) {
-            return;
+            return false;
         }
         
         js.runUserActionTask(new Task<CompilationController>() {
@@ -97,12 +100,12 @@ public final class ElementOpen {
                     long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
 
                     if (startPos != -1l) {
-                        GoToSupport.doOpen(srcFile, (int) startPos);
+                        result.set(GoToSupport.doOpen(srcFile, (int) startPos));
                     }
                 }
             }
         }, true);
-        
+        return result.get();
     }
     
 
@@ -113,21 +116,21 @@ public final class ElementOpen {
      * @param cpInfo ClasspathInfo which should be used for the search
      * @param el     declaration to open
      */
-    public static void open(final FileObject srcFile, final Element el) throws Exception {
+    public static boolean open(final FileObject srcFile, final Element el) throws Exception {
         ElementHandle elh = ElementHandle.create(el);
-        open(srcFile, elh);
+        return open(srcFile, elh);
     }
     
-    public static void open(final CompilationInfo comp, final Element el) throws Exception {
+    public static boolean open(final CompilationInfo comp, final Element el) throws Exception {
         TypeElement tel = getEnclosingClassElement(el);
         ElementHandle elh = ElementHandle.create(el);
 
         if (!comp.getJavafxTypes().isJFXClass((Symbol) tel)) { // java
-            openThroughJavaSupport(comp.getJavaFXSource().getFileObject(), elh);
+            return openThroughJavaSupport(comp.getJavaFXSource().getFileObject(), elh);
         }
         // Find the source file
         final FileObject srcFile = getFile(el, comp);
-        open(srcFile, el);
+        return open(srcFile, el);
     }
 
 
@@ -156,7 +159,7 @@ public final class ElementOpen {
     // All of the Element serialization logic is copied and adapted from
     // javasource's ElementHandle and ClassFileUtils
     @SuppressWarnings("unchecked")
-    private static void openThroughJavaSupport(FileObject reference, ElementHandle elh) throws Exception {
+    private static boolean openThroughJavaSupport(FileObject reference, ElementHandle elh) throws Exception {
         org.netbeans.api.java.source.ClasspathInfo cpi =
                 org.netbeans.api.java.source.ClasspathInfo.create(reference);
         // Load the right version of the ElementKind class and convert our instance to it
@@ -170,7 +173,7 @@ public final class ElementOpen {
         ehCtor.setAccessible(true);
         org.netbeans.api.java.source.ElementHandle eh = (org.netbeans.api.java.source.ElementHandle) ehCtor.newInstance(ekInstance, sig);
 
-        org.netbeans.api.java.source.ui.ElementOpen.open(cpi, eh);
+        return org.netbeans.api.java.source.ui.ElementOpen.open(cpi, eh);
     }
 
 }

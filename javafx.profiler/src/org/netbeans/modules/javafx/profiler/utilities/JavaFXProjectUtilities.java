@@ -138,6 +138,16 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         }
     }
 
+    public static String cutIntfSuffix(String signature) {
+        if (signature == null)
+            return null;
+
+        return signature.indexOf(INTERFACE_NAME_SUFFIX) != -1 ?
+                signature.substring(0, signature.indexOf(INTERFACE_NAME_SUFFIX)).
+        concat(signature.substring(signature.indexOf(INTERFACE_NAME_SUFFIX) +
+        INTERFACE_NAME_SUFFIX.length(), signature.length())) : signature;
+    }
+
     private static void addSubpackages(Collection<String> packages, String prefix, FileObject packageFO) {
         if (!packageFO.isFolder()) { // not a folder
             return;
@@ -352,7 +362,24 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     }
     
     public static FileObject getFile(Element handle, final JavaFXProject project) {
-        String[] signature = getSignature(handle);
+        assert handle != null;
+        assert handle instanceof TypeElement;
+        TypeElement te = (TypeElement) handle;
+        StringBuilder sb = new StringBuilder ();
+        Name name = ((Symbol.ClassSymbol)te).flatname;
+        assert name != null;
+        int nameLength = name.len;
+        char[] nameChars = new char[512]; //Initial storage
+        
+        if (nameChars.length < nameLength) {
+            nameChars = new char[nameLength];
+        }
+
+        int charLength = Convert.utf2chars(name.table.names, name.index, nameChars, 0, nameLength);
+        sb.append(nameChars,0,charLength);
+            
+        String[] signature = new String[] { sb.toString() };
+
         assert signature.length >= 1;
         String pkgName, className = null;
         int index = signature[0].lastIndexOf('.');                          //NOI18N
@@ -406,33 +433,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         if (prefix == null || prefix == prefix.table.empty) return name.toString(); 
         else  return prefix.append(sep, name).toString();
     }
-    
-    
-    public static String getBinaryName (TypeElement element) throws IllegalArgumentException {
-        if (element instanceof Symbol.TypeSymbol) {
-            return ((Symbol.TypeSymbol)element).flatName().toString();
-        }
-        throw new IllegalArgumentException();
-    }
-    
-    private static String[] getSignature(Element element) {
-        assert element != null;
-        assert element instanceof TypeElement;
-        TypeElement te = (TypeElement) element;
-        StringBuilder sb = new StringBuilder ();
-        Name name = ((Symbol.ClassSymbol)te).flatname;
-        assert name != null;
-        int nameLength = name.len;
-        char[] nameChars = new char[512]; //Initial storage
-        
-        if (nameChars.length < nameLength) {
-            nameChars = new char[nameLength];
-        }
-        int charLength = Convert.utf2chars(name.table.names, name.index, nameChars, 0, nameLength);
-        sb.append(nameChars,0,charLength);
-            
-        return new String[] { sb.toString() };
-    }    
     
     public static String getVMMethodSignature(ExecutableElement method, CompilationInfo ci) {
         try {
