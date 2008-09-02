@@ -54,6 +54,7 @@ made subject to such option by the copyright holder.
                 <include name="**/JavaFXProjectTest.class"/>
                 <include name="**/JavaFXProfilerTest.class"/>
                 <include name="**/JavaFXDebuggerTest.class"/>
+                <include name="**/JavaFXNavigatorTest.class"/>
 
 
             </patternset>
