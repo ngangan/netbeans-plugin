@@ -35,6 +35,10 @@ public class GrammarVerifier {
             while ((line = r.readLine()) != null) {
                 if (line.startsWith("\'")) continue;
                 String[] elements = line.split("=");
+                if (elements.length < 2) {
+                    System.err.println("Zero elements: '" + line + "'");
+                    continue;
+                }
                 map.put(elements[0].trim(), Integer.parseInt(elements[1].trim()));
             }
 

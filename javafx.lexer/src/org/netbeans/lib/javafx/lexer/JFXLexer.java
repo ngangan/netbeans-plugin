@@ -71,11 +71,12 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
     public JFXLexer(LexerRestartInfo<JFXTokenId> info) throws IOException {
         super();
         if (log.isLoggable(Level.FINE)) log.fine("Creating new lexer");
-        if (System.getProperty("javafx.lexer.forcev3") != null) {
+        this.lexer = new v3Lexer();
+        /*if (System.getProperty("javafx.lexer.forcev3") != null) {
             this.lexer = new v3Lexer();
         } else {
             this.lexer = new v4Lexer();
-        }
+        }*/
         this.info = info;
     }
 
