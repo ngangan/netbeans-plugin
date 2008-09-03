@@ -741,8 +741,8 @@ class JavaFXActionProvider implements ActionProvider {
             fos = findTestSources(context, false);
             return fos != null && fos.length == 1;
         //TODO XXX Need to disable it. Otherwise 2 debug sessions started
-        }else if (command.equals(COMMAND_DEBUG_STEP_INTO)) {
-            return false;
+//        }else if (command.equals(COMMAND_DEBUG_STEP_INTO)) {
+//            return false;
         } else {
             // other actions are global
             return true;
