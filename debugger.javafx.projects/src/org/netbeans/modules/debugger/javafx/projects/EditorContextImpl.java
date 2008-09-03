@@ -737,7 +737,6 @@ public class EditorContextImpl extends EditorContext {
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
                     }
-//                    Elements elms = ci.getElements();
                     Elements elms = ci.getElements();                    
                     TypeElement classElement = getTypeElement(ci, className, null);
                     if (classElement == null) return ;
@@ -1564,7 +1563,7 @@ public class EditorContextImpl extends EditorContext {
                     StyledDocument doc = (StyledDocument) ci.getJavaFXSource().getDocument();
                     if (doc != null) {
                         offset = findLineOffset(doc, line);
-                        scope = ci.getTreeUtilities().scopeFor(offset);
+//                        scope = ci.getTreeUtilities().scopeFor(offset);
                     }
                     SourcePositions[] sourcePtr = new SourcePositions[] { null };
 // TODO XXX issue #132748        
@@ -1755,13 +1754,13 @@ public class EditorContextImpl extends EditorContext {
                             TypeElement te;
                             if (tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
                                 te = (TypeElement) ci.getTrees().getElement(currentPath);
-//                            } else if (tree.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT){
-//                                //It is mean tyhat we have global variable and need to set name of the file as classname
-//                                //TODO XXX Durty Hack
-//                                String packageName = ci.getTrees().getElement(currentPath).getSimpleName().toString();
-//                                String className = ci.getFileObject().getName();
-//                                currentElementPtr[0] = packageName+"."+className;
-//                                te = null;
+                            } else if (tree.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT){
+                                //It is mean tyhat we have global variable and need to set name of the file as classname
+                                //TODO XXX Durty Hack
+                                String packageName = ci.getTrees().getElement(currentPath).getSimpleName().toString();
+                                String className = ci.getFileObject().getName();
+                                currentElementPtr[0] = packageName+"."+className;
+                                te = null;
                             } else {
                                 Scope scope = ci.getTreeUtilities().scopeFor(currentOffset);
 //                                JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(currentOffset);

@@ -46,11 +46,13 @@ import com.sun.javafx.api.tree.BinaryTree;
 import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.BreakTree;
 import com.sun.javafx.api.tree.CatchTree;
+import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.CompoundAssignmentTree;
 import com.sun.javafx.api.tree.ConditionalExpressionTree;
 import com.sun.javafx.api.tree.ContinueTree;
 import com.sun.javafx.api.tree.ErroneousTree;
 import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
@@ -112,6 +114,7 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import com.sun.jdi.VirtualMachine;
 
+import com.sun.tools.apt.mirror.type.ClassTypeImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -132,7 +135,9 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 import javax.lang.model.type.TypeVariable;
+import org.netbeans.api.debugger.javafx.ClassVariable;
 import org.netbeans.api.debugger.javafx.InvalidExpressionException;
+import org.netbeans.api.debugger.javafx.JavaFXClassType;
 import org.netbeans.modules.debugger.javafx.expr.EvaluationContext.VariableInfo;
 import org.netbeans.modules.debugger.javafx.models.CallStackFrameImpl;
 import org.openide.util.NbBundle;
@@ -1058,6 +1063,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //        Assert2.error(arg0, "unsupported");
 //        return null;
 //    }
+    @Override
+    public Mirror visitClassDeclaration(ClassDeclarationTree arg0, EvaluationContext evaluationContext) {
+        Assert2.error(arg0, "unsupported");
+        return null;
+    }
 
     @Override
     public Mirror visitConditionalExpression(ConditionalExpressionTree arg0, EvaluationContext evaluationContext) {
@@ -1174,14 +1184,18 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (currentPath == null) {
             return getIdentifierByName(arg0, evaluationContext);
         }
+        if (elm==null) {
+            Assert2.error(arg0, "unknownType");
+            return null;
+        }
         switch(elm.getKind()) {
             case CLASS:
             case ENUM:
             case INTERFACE:
                 TypeElement te = (TypeElement) elm;
-                //TODO XXX
-                String className =  te.getSimpleName().toString();//"className";//ElementUtilities.getBinaryName(te);
-//                className = className.substring(className.lastIndexOf("."),className.length());
+                String mainClassName = evaluationContext.getFrame().location().declaringType().name();
+                //TODO XXX HACK
+                String className = mainClassName+"$"+currentPath.getLeaf().toString();
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() > 0) {
                     return classes.get(0);
@@ -1867,11 +1881,18 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 return classes.get(0);
             case PACKAGE:
                 return (Value) Assert2.error(arg0, "notExpression");
+            case METHOD:
+                return (Value) Assert2.error(arg0, "notExpression");
             default:
                 throw new UnsupportedOperationException("Not supported yet."+" Tree = '"+arg0+"', element kind = "+elm.getKind());
         }
     }
 
+    @Override
+    public Mirror visitFunctionDefinition(FunctionDefinitionTree arg0, EvaluationContext evaluationContext) {
+        Assert2.error(arg0, "unsupported");
+        return null;
+    }
 //TODO
 //    @Override
 //    public Mirror visitEmptyStatement(EmptyStatementTree arg0, EvaluationContext evaluationContext) {
@@ -2255,8 +2276,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             case ENUM:
             case INTERFACE:
                 TypeElement te = (TypeElement) elm;
-                //TODO XXX
-                String className =  te.getSimpleName().toString();//"className";//ElementUtilities.getBinaryName(te);
+                String mainClassName = evaluationContext.getFrame().location().declaringType().name();
+                //TODO XXX HACK
+                String className = mainClassName+"$"+currentPath.getLeaf().toString();
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() > 0) {
                     return classes.get(0);
