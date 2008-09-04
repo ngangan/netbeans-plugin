@@ -57,6 +57,7 @@ import org.netbeans.api.debugger.Properties.Reader;
 import org.netbeans.api.debugger.Session;
 import org.netbeans.api.debugger.Watch;
 
+import org.netbeans.api.debugger.javafx.FieldBreakpoint;
 import org.netbeans.api.debugger.javafx.JavaFXBreakpoint;
 import org.netbeans.api.debugger.javafx.LineBreakpoint;
 import org.openide.ErrorManager;
@@ -99,6 +100,22 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
                     }
                 } catch (MalformedURLException ex) {
                     ErrorManager.getDefault().notify(ex);
+                }
+//TODO XXX This case needed because Field Breakpoints is not stored in Properties correctly
+// Field name and Class name is absent, so we need to remove incorrect breakpoints
+            } else if(breakpoints[i] instanceof FieldBreakpoint) {
+                FieldBreakpoint fb = (FieldBreakpoint)breakpoints[i];
+                if (fb.getClassName()==null || fb.getFieldName()==null) {
+                    Breakpoint[] breakpoints2 = new Breakpoint[breakpoints.length-1];
+                    if (i>0) {
+                        System.arraycopy(breakpoints, 0, breakpoints2, 0, i);
+                    }
+                    if (i < breakpoints2.length) {
+                        System.arraycopy(breakpoints, i + 1, breakpoints2, i, breakpoints2.length - i);
+                    }
+                    breakpoints = breakpoints2;
+                    i--;
+                    continue;
                 }
             }
             breakpoints[i].addPropertyChangeListener(this);
