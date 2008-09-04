@@ -89,10 +89,17 @@ public interface JavaFXClassType extends VariableType {
     
     /**
      * Provide a list of static fields declared in this type.
-     * @return the list of {@link org.netbeans.api.debugger.jpda.Field} objects
+     * @return the list of {@link org.netbeans.api.debugger.javafx.Field} objects
      *         representing static fields.
      */
     List<Field> staticFields();
+
+    /**
+     * Provide a list of JavaFX fields declared in this type.
+     * @return the list of {@link org.netbeans.api.debugger.javafx.Field} objects
+     *         representing static fields.
+     */
+    List<Field> staticJavaFXFields();
     
     /**
      * Retrieves the number of instances this class.

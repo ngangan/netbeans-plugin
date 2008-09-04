@@ -165,6 +165,46 @@ public class JavaFXClassTypeImpl implements JavaFXClassType {
         return staticFields;
     }
     
+    public List<Field> staticJavaFXFields() {
+        List<com.sun.jdi.Field> allFieldsOrig = classType.allFields();
+        List<Field> staticFields = new ArrayList<Field>();
+        for (int i = 0; i < allFieldsOrig.size(); i++) {
+            Value value = null;
+            com.sun.jdi.Field origField = allFieldsOrig.get(i);
+            if (origField.isStatic()) {
+                if (loggerValue.isLoggable(Level.FINE)) {
+                    loggerValue.fine("STARTED : "+classType+".getValue("+origField+")");
+                }
+                value = classType.getValue(origField);
+                if (loggerValue.isLoggable(Level.FINE)) {
+                    loggerValue.fine("FINISHED: "+classType+".getValue("+origField+") = "+value);
+                }
+                if (value instanceof PrimitiveValue) {
+                    staticFields.add(new FieldVariable(debugger, (PrimitiveValue) value, origField, "", (ObjectReference) null));
+                } else if (value instanceof ObjectReference) {
+                    ObjectReference ref = (ObjectReference) value;
+                    ReferenceType rt = ref.referenceType();
+                        if (rt != null) {
+                            com.sun.jdi.Field f = rt.fieldByName("$value");
+                            if (f != null) {
+                                Value val = ref.getValue(f);
+                                if (val instanceof PrimitiveValue) {
+                                    staticFields.add(new FieldVariable(debugger, (PrimitiveValue) val, origField, "", (ObjectReference) null));
+                                } else {
+                                    staticFields.add(new ObjectFieldVariable(debugger, (ObjectReference) val, origField, "", (ObjectReference) null));
+                                }
+                            }
+                        } else {
+                            staticFields.add(new ObjectFieldVariable(debugger, (ObjectReference) value, origField, "", (ObjectReference) null));
+                        }
+                } else {
+                    staticFields.add(new ObjectFieldVariable(debugger, (ObjectReference) value, origField, "", (ObjectReference) null));
+                }
+            }
+        }
+        return staticFields;
+    }
+    
     public long getInstanceCount() {//boolean refresh) {
         if (Java6Methods.isJDK6()) {
             /*synchronized (this) {

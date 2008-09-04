@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.debugger.javafx.projects;
 
+import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
@@ -89,6 +90,10 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 //import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.debugger.DebuggerEngine;
+import org.netbeans.api.debugger.DebuggerManager;
+import org.netbeans.api.debugger.javafx.JavaFXDebugger;
+import org.netbeans.api.debugger.javafx.JavaFXThread;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
 //import org.netbeans.api.java.source.ElementUtilities;
@@ -1552,34 +1557,25 @@ public class EditorContextImpl extends EditorContext {
         }
         final JavaFXTreePath[] treePathPtr = new JavaFXTreePath[] { null };
         final Tree[] treePtr = new Tree[] { null };
-
         try {
             js.runUserActionTask(new Task<CompilationController>() {
                 public void run(CompilationController ci) throws Exception {
-                    if (ci.toPhase(Phase.PARSED).compareTo(Phase.PARSED) < 0)
+                    if (ci.toPhase(Phase.ANALYZED).compareTo(Phase.ANALYZED) < 0)
                         return;
-                    Scope scope = null;
+//                    Scope scope = null;
                     int offset = 0;
                     StyledDocument doc = (StyledDocument) ci.getJavaFXSource().getDocument();
                     if (doc != null) {
                         offset = findLineOffset(doc, line);
 //                        scope = ci.getTreeUtilities().scopeFor(offset);
                     }
-                    SourcePositions[] sourcePtr = new SourcePositions[] { null };
-// TODO XXX issue #132748        
                     Tree tree;
                     if (pos == 0) {
                         tree = ci.getTreeUtilities().parseExpression(expression, offset);
                     } else {
-                        tree = ci.getTreeUtilities().parseExpression(expression, pos);
-                    }
-//                    Tree tree = ci.getTreeUtilities().parseExpression(
-//                            expression,
-//                            sourcePtr
-//                    );
-                    if (scope != null) {
-//TODO XXX attributeTree not implemented in TreeUtilities                        
-//                        ci.getTreeUtilities().attributeTree(tree, scope);
+                        JavaFXTreePath p = ci.getTreeUtilities().pathFor(pos);
+                        tree=(ExpressionTree)p.getLeaf();
+//                        tree = ci.getTreeUtilities().parseExpression(expression, pos);
                     }
                     try {
                         //context.setTrees(ci.getTrees());
