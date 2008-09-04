@@ -49,13 +49,16 @@ made subject to such option by the copyright holder.
                     <file name="TreeNavigatorProviderImpl.instance">
                         <attr name="position" intvalue="200"/>
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                        <attr name="instanceOf" stringvalue="org.netbeans.spi.navigator.NavigatorPanel"/>
                     </file>
                     <file name="ElementNavigatorProviderImpl.instance">
                         <attr name="position" intvalue="300"/>
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                        <attr name="instanceOf" stringvalue="org.netbeans.spi.navigator.NavigatorPanel"/>
                     </file>
                     <file name="ErrorNavigatorProviderImpl.instance">
                         <attr name="position" intvalue="400"/>
+                        <attr name="instanceOf" stringvalue="org.netbeans.spi.navigator.NavigatorPanel"/>
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
                     </file>
                 </folder>

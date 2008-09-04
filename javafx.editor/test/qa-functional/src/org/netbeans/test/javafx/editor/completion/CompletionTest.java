@@ -222,7 +222,7 @@ public class CompletionTest extends java.lang.Object {
         editor.grabFocus();
         editor.getCaret().setDot(lineOffset);
         doc.insertString(lineOffset, assign, null);
-        reparseDocument((DataObject) doc.getProperty(doc.StreamDescriptionProperty));
+        reparseDocument((DataObject) doc.getProperty(BaseDocument.StreamDescriptionProperty));
         completionQuery(out, log, editor, unsorted, queryType);
     }
     
@@ -263,7 +263,7 @@ public class CompletionTest extends java.lang.Object {
             } finally {
                 testFile.setModified(false);
                 String fileName = testFileName.substring(testFileName.lastIndexOf('/')+1);
-                new EditorOperator(fileName).close();
+                new EditorOperator(fileName).close(false);
                 //((CloseCookie) testFile.getCookie(CloseCookie.class)).close();
             }
         } catch (Exception e) {
@@ -326,10 +326,10 @@ public class CompletionTest extends java.lang.Object {
                 } catch (InterruptedException e) {
                     e.printStackTrace(log);
                 }
-            };
+            }
             
             log.println("Waiting spent: " + (System.currentTimeMillis() - start) + "ms.");
-        };
+        }
         
         if (panes == null)
             throw new IllegalStateException("The editor was not opened. The timeout was: " + OPENING_TIMEOUT + "ms.");
@@ -393,7 +393,7 @@ public class CompletionTest extends java.lang.Object {
                 return true;
             }
             try {
-                Thread.currentThread().sleep(100);
+                Thread.sleep(100);
             } catch (InterruptedException ex) {
                 time=0;
             }
