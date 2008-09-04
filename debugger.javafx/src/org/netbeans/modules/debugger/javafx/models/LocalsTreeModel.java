@@ -58,10 +58,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.WeakHashMap;
+import org.netbeans.api.debugger.javafx.Field;
 import org.netbeans.modules.debugger.javafx.JavaFXDebuggerImpl;
 import org.netbeans.api.debugger.javafx.JavaFXClassType;
 import org.netbeans.api.debugger.javafx.JavaFXDebugger;
@@ -469,7 +471,12 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                         Math.max (from - shift - 1, 0),
                         Math.max (to - shift - 1, 0)
                     );
-                    Object[] result = new Object [avs.length + shift + 1];
+//TODO XXX Here Locals list will be extended with JavaFX variables from static part
+                    JavaFXClassType javafxClassType = debugger.getClassType(classType);
+                    List<Field> fieldsList = javafxClassType.staticJavaFXFields();
+                    int staticVarSize = fieldsList.size();
+//TODO XXX
+                    Object[] result = new Object [avs.length + shift + 1+staticVarSize];
                     if (from < 1 && retValShift > 0) {
                         result[0] = returnVariable;
                     }
@@ -479,9 +486,15 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                     }
                     if (from < 1 + shift) {
                         //result [0] = new ThisVariable (debugger, classType.classObject(), "");
-                        result[shift] = debugger.getClassType(classType);
+                        result[shift] = javafxClassType;//debugger.getClassType(classType);
                     }
-                    System.arraycopy (avs, 0, result, 1 + shift, avs.length);
+                    Iterator it = fieldsList.iterator();
+                    int i = 1;
+                    while(it.hasNext()) {
+                        result[shift+i]= it.next();
+                        i++;
+                    }
+                    System.arraycopy (avs, 0, result, 1 + shift+i-1, avs.length);
                     return result;
                 } else {
                     Object[] avs = null;

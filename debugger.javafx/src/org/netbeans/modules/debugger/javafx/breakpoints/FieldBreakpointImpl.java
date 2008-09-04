@@ -108,7 +108,8 @@ public class FieldBreakpointImpl extends ClassBasedBreakpoint {
     }
     
     protected void classLoaded (ReferenceType referenceType) {
-        Field f = referenceType.fieldByName (breakpoint.getFieldName ());
+       //TODO XXX HACK All fields starts from $ for now
+        Field f = referenceType.fieldByName ("$"+breakpoint.getFieldName ());
         if (f == null) {
             setValidity(VALIDITY.INVALID,
                     NbBundle.getMessage(FieldBreakpointImpl.class, "MSG_NoField", referenceType.name(), breakpoint.getFieldName ()));

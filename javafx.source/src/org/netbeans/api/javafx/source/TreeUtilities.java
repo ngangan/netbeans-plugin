@@ -383,7 +383,7 @@ public final class TreeUtilities {
             final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
             Writer w = new OutputStreamWriter(fo.getOutputStream());
             w.write(start);
-//            w.write(expr);
+            w.write("\n" + expr+"\n");
             w.write(end);
             w.close();
             if (LOGGABLE) log("  source written to " + fo);
@@ -393,7 +393,7 @@ public final class TreeUtilities {
             CompilationInfoImpl ci = new CompilationInfoImpl(s);
             s.moveToPhase(Phase.ANALYZED, ci, false);
             CompilationController cc = new CompilationController(ci);
-            JavaFXTreePath p = cc.getTreeUtilities().pathFor(pos+1);
+            JavaFXTreePath p = cc.getTreeUtilities().pathFor(pos+3);
             if (p == null) {
                 if (LOGGABLE) log("  path for returned null");
                 return null;

@@ -1233,9 +1233,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     ReferenceType dt = findEnclosingType(declaringType, enclosingClass);
                     if (dt != null) declaringType = dt;
                 }
-                Field field = declaringType.fieldByName(fieldName);
+                Field field = declaringType.fieldByName("$"+fieldName);
                 if (field == null) {
-                    Assert2.error(arg0, "unknownVariable", fieldName);
+                    Assert2.error(arg0, "unknownVariable", "$"+fieldName);
                 }
                 if (field.isStatic()) {
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field));
@@ -1830,11 +1830,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     if (fieldName.equals("class")) {
                         return clazz.classObject();
                     }
-                    Field f = clazz.fieldByName(fieldName);
+                    Field f = clazz.fieldByName("$"+fieldName);
                     if (f != null) {
                         return clazz.getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", fieldName);
+                        Assert2.error(arg0, "unknownField", "$"+fieldName);
                         return null;
                     }
                 }
@@ -1843,11 +1843,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     if (fieldName.equals("class")) {
                         return intrfc.classObject();
                     }
-                    Field f = intrfc.fieldByName(fieldName);
+                    Field f = intrfc.fieldByName("$"+fieldName);
                     if (f != null) {
                         return intrfc.getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", fieldName);
+                        Assert2.error(arg0, "unknownField", "$"+fieldName);
                         return null;
                     }
                 }
@@ -1856,11 +1856,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         return expression.virtualMachine().mirrorOf(((ArrayReference) expression).length());
                     }
                     ReferenceType type = ((ObjectReference) expression).referenceType();
-                    Field f = type.fieldByName(fieldName);
+                    Field f = type.fieldByName("$"+fieldName);
                     if (f != null) {
                         return ((ObjectReference) expression).getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", fieldName);
+                        Assert2.error(arg0, "unknownField", "$"+fieldName);
                         return null;
                     }
                 }
@@ -2271,6 +2271,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             Mirror expression = arg0.getInitializer().accept(this, evaluationContext);
             return expression;
         }
+        if (elm==null) {
+            Assert2.error(arg0, "element is null");
+            return null;
+        }
         switch(elm.getKind()) {
             case CLASS:
             case ENUM:
@@ -2316,9 +2320,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     ReferenceType dt = findEnclosingType(declaringType, enclosingClass);
                     if (dt != null) declaringType = dt;
                 }
-                Field field = declaringType.fieldByName(fieldName);
+                Field field = declaringType.fieldByName("$"+fieldName);
                 if (field == null) {
-                    Assert2.error(arg0, "unknownVariable", fieldName);
+                    Assert2.error(arg0, "unknownVariable", "$"+fieldName);
                 }
                 if (field.isStatic()) {
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field));
