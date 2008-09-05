@@ -50,7 +50,7 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFile
     List<SimpleJavaFileObject> buffers = new ArrayList<SimpleJavaFileObject>();
 
     /** JavaFX Script source file extension. */
-    private final static String EXT = ".fx";
+    private final static String EXT = ".fx";                                            //NOI18
 
     private Map<String, byte[]> classBytes;
     
@@ -124,7 +124,7 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFile
 	String binaryName;
         
 	public String getBinaryName() {
-	    return binaryName.equals("__FX_SCRIPT__.fx") ? "__FX_SCRIPT__" : binaryName;
+	    return binaryName.equals("__FX_SCRIPT__.fx") ? "__FX_SCRIPT__" : binaryName;        //NOI18
 	}
 
         StringInputBuffer(String name, String code) {
@@ -256,9 +256,9 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFile
 					      Kind kind) throws IOException {
 	if (kind == Kind.CLASS) {
 	    URL res = 
-		parentClassLoader.getResource(className.replace('.', '/') + ".class");
+		parentClassLoader.getResource(className.replace('.', '/') + ".class");                      //NOI18
 	    if (res != null) {
-		System.out.println("creating class resource "+className);
+		System.out.println("creating class resource "+className);                                   //NOI18
 		return new ClassResource(res);
 	    }
 	}
@@ -292,18 +292,18 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFile
 	    results.add(o);
 	}
         
-	String prefix = packageName.equals("") ? "" : packageName + ".";
+	String prefix = packageName.equals("") ? "" : packageName + ".";                                //NOI18
 	for (SimpleJavaFileObject b : buffers) {
-	    String name = b.getName().replace("/", ".");
+	    String name = b.getName().replace("/", ".");                                                //NOI18
 	    name = name.substring(1, name.length() - (name.endsWith(EXT) ? EXT.length() : 0));
 	    if (prefix.length() == 0) {
-		if (!name.contains(".")) {
+		if (!name.contains(".")) {                                                              //NOI18
 		    results.add(b);
 		}
 	    } else {
 		if (name.startsWith(prefix)) {
 		    name = name.substring(prefix.length());
-		    if (!name.contains(".")) {
+		    if (!name.contains(".")) {                                                          //NOI18
 			results.add(b);
 		    }
 		}
@@ -338,12 +338,12 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFile
         } else {
             try {
                 final StringBuilder newUri = new StringBuilder();
-                newUri.append("mfm:///");
+                newUri.append("mfm:///");                                                                       //NOI18
                 newUri.append(name.replace('.', '/'));
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {
-                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source");
+                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source");                          //NOI18
             }
         }
     }

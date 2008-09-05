@@ -58,5 +58,5 @@ class DiagnosticCollector implements DiagnosticListener{
     public void report(Diagnostic diagnostic) {
         diagnostics.add(diagnostic);                
     }
-    
+   
 }

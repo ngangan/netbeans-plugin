@@ -43,11 +43,9 @@ package org.netbeans.modules.javafx.editor;
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.editor.*;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.javafx.preview.JavaFXModel;
 import org.netbeans.modules.lexer.editorbridge.LexerEditorKit;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
-import org.openide.util.HelpCtx.Provider;
 import org.openide.util.NbBundle;
 
 import javax.swing.*;
@@ -55,10 +53,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
 import java.util.Map;
+import org.netbeans.modules.javafx.preview.Bridge;
+import org.openide.util.actions.CallableSystemAction;
 
 /**
  *
@@ -66,9 +64,9 @@ import java.util.Map;
  */
 public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.HelpCtx.Provider{
 
-    public static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
-    public static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
-    public static final String FX_MIME_TYPE = "text/x-fx";
+    private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
+    private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
+    private static final String FX_MIME_TYPE = "text/x-fx";
 
     public JavaFXEditorKit() {
         super(FX_MIME_TYPE);
@@ -121,7 +119,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     }
 
 
-    public static class ToggleFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
+    public class ToggleFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
         ResetFXPreviewExecution resetAction = null;
 
         @Override
@@ -138,54 +136,42 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            JavaFXDocument doc = getJavaFXDocument(target);
-            if (doc != null) {
-                if(doc.executionAllowed()) {
-                    doc.enableExecution(false);
-                    JavaFXModel.destroyAC(JavaFXModel.getProject(doc));
-                    putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
-                } else {
+            if (target != null) {
+                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
+                if (doc != null) {
                     doc.enableExecution(true);
                     putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("disable-fx-preview-execution"));
-                    JavaFXModel.previewReq(doc, false);
                 }
             }
         }
 
-        private JavaFXDocument getJavaFXDocument(JTextComponent comp){
-            Component c = comp;
-            while (c != null) {
-                if (c instanceof JavaFXDocument.PreviewSplitPane){
-                    return ((JavaFXDocument.PreviewSplitPane)c).getDocument();
-                }
-                c = c.getParent();
-            }
-            return null;
-        }
 
         public java.awt.Component getToolbarPresenter() {
             PreviewButton b = new PreviewButton();
             b.setSelected(false);
             b.setAction(this);
-            b.putClientProperty("hideActionText", Boolean.TRUE); //NOI18N
+            b.setEnabled(Bridge.isStarted());
+            b.putClientProperty("enablePreviewMark", Boolean.TRUE); //NOI18N
             b.setText("");
             return b;
         }
 
-         private static final class PreviewButton extends JToggleButton implements ChangeListener{
-
-
+         private  final class PreviewButton extends JToggleButton implements ChangeListener{
+             
+            public PreviewButton() {
+                super();
+                Bridge.addStartListener(this);
+            }
+            
             public void stateChanged(ChangeEvent evt) {
-                boolean selected = isSelected();
-                super.setContentAreaFilled(selected);
-                super.setBorderPainted(selected);
+                setEnabled(Bridge.isStarted());
             }
 
             @Override
             public void setBorderPainted(boolean arg0) {
-                    if(!isSelected()){
-                        super.setBorderPainted(arg0);
-                    }
+                if(!isSelected()){
+                    super.setBorderPainted(arg0);
+                }
             }
 
             @Override
@@ -236,26 +222,16 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            JavaFXDocument doc = getJavaFXDocument(target);
-            JavaFXModel.destroyAC(JavaFXModel.getProject(doc));
-            JavaFXModel.previewReq(doc, true);
+            if (target != null) {
+                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
+            }
+            Bridge.restart();
         }
 
-        private JavaFXDocument getJavaFXDocument(JTextComponent comp){
-            Component c = comp;
-            while (c != null) {
-                if (c instanceof JavaFXDocument.PreviewSplitPane){
-                    return ((JavaFXDocument.PreviewSplitPane)c).getDocument();
-                }
-                c = c.getParent();
-            }
-            return null;
-        }
 
         public java.awt.Component getToolbarPresenter() {
             JButton b = new JButton(this);
             b.setAction(this);
-            b.putClientProperty("hideActionText", Boolean.TRUE);             //NOI18N
             b.putClientProperty("resetPreviewMark", Boolean.TRUE);                  //NOI18N
             b.setText("");
             b.setEnabled(false);
