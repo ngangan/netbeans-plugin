@@ -77,7 +77,8 @@ import sun.awt.AppContext;
 
 
 public class Preview {
-    PreviewSideDispatchingServer previewSideDispatcherServer = null;
+    private PreviewSideDispatchingServer previewSideDispatcherServer = null;
+    private boolean permissionToExitIsGranted = false;
        
     class PreviewSideDispatchingServer extends UnicastRemoteObject implements PreviewSideDispatchingServerFace {
         private HashMap<Integer, PreviewSideServer> previewSideServers = new HashMap<Integer, PreviewSideServer>();
@@ -114,6 +115,15 @@ public class Preview {
                 registry.rebind(PREVIEW_SIDE + " " + hashCode, stub);                                                                       //NOI18
             } catch (Exception ex) {
                 ex.printStackTrace();
+            }
+        }
+        
+        public void processExitVM(ThreadGroup tg) {
+            for (PreviewSideServer previewSideServer : previewSideServers.values()) {
+                if (previewSideServer.getThreadGroup() == tg) {
+                    previewSideServer.cleanDesktop();
+                    break;
+                }
             }
         }
         
@@ -161,6 +171,7 @@ public class Preview {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
+                    permissionToExitIsGranted = true;
                     System.exit(0);
                 }
             }.start();
@@ -206,6 +217,23 @@ public class Preview {
         
         public Object getAC() {
             return acTread.getAC();
+        }
+
+        public ThreadGroup getThreadGroup() {
+            return acTread.getTG();
+        }
+        
+        public EventQueue getEventQueue() {
+            return acTread.getEQ();
+        }
+        
+        public void cleanDesktop() {
+            acTread.executeOnEDT(new Runnable() {
+                public void run() {
+                    desktopPane.removeAll();
+                    desktopPane.repaint();
+                }
+            });
         }
 
         public void setNBServer(NBSideServerFace nbServer) {
@@ -283,13 +311,23 @@ public class Preview {
             private String lf = null;
             private Object ac = null;
             EventQueue eq = null;
+            ThreadGroup tg = null;
             public ACThread(ThreadGroup tg, String lf) {
                 super(tg, "SACT");                          //NOI18
+                this.tg = tg;
                 this.lf = lf;
             }
             
             public Object getAC() {
                 return ac;
+            }
+            
+            public EventQueue getEQ() {
+                return eq;
+            }
+            
+            public ThreadGroup getTG() {
+                return tg;
             }
             
             public void disposeAC() {
@@ -468,9 +506,17 @@ public class Preview {
         try {
             URL.setURLStreamHandlerFactory( (URLStreamHandlerFactory) new MFOURLStreamHanfler.Factory());
             System.setSecurityManager(new RMISecurityManager() {
+
                 @Override
                 public void checkPermission(Permission perm) {
+                    if (perm.getName().contains("exitVM")) {
+                        if (!permissionToExitIsGranted) {
+                            previewSideDispatcherServer.processExitVM(Thread.currentThread().getThreadGroup());
+                            throw new SecurityException("Attempt to exit from Preview JVM");
+                        }
+                    }
                 }
+                
                 @Override
                 public void checkPermission(Permission perm, Object context) {
                 }

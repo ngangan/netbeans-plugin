@@ -135,7 +135,7 @@ public class Bridge extends ModuleInstall {
                 System.getProperty(NB_HOME) + "/modules/org-openide-windows.jar" + File.pathSeparator +                                         // NOI18
                 System.getProperty(NB_HOME) + "/lib/org-openide-util.jar" + File.pathSeparator +                                                // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-text.jar" + "\" " +                                                         // NOI18
-        "" + //-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                                 // NOI18
+        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                                 // NOI18
         classs;
         
         nb = new NbProcessDescriptor(exePath, args);
