@@ -76,13 +76,13 @@ public class ProxyFileManager implements JavaFileManager {
     private static final Logger LOG = Logger.getLogger(ProxyFileManager.class.getName());
     
     /** Creates a new instance of ProxyFileManager */
-    public ProxyFileManager(JavaFileManager bootPath, JavaFileManager classPath, JavaFileManager sourcePath/*, JavaFileManager outputhPath*/) {
+    public ProxyFileManager(JavaFileManager bootPath, JavaFileManager classPath, JavaFileManager sourcePath, JavaFileManager outputhPath) {
         assert bootPath != null;
         assert classPath != null;
         this.bootPath = bootPath;
         this.classPath = classPath;
         this.sourcePath = sourcePath;
-        this.outputhPath = null; //XXX outputhPath;
+        this.outputhPath = outputhPath;
     }
     
     private JavaFileManager[] getFileManager (Location location) {
