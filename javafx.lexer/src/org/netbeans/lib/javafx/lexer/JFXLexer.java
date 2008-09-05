@@ -124,6 +124,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
         if (JFXTokenId.COMMENT == id && text.startsWith("/**")) {
             id = JFXTokenId.DOC_COMMENT;
         }
+        assert id != null;
         return tokenFactory.createToken(id, text != null ? text.length() : 0,
                 lexer.getSharedState().failed ? PartType.START : PartType.COMPLETE);
     }
