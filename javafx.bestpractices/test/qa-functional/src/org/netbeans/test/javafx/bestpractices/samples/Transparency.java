@@ -43,15 +43,20 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
+
 
 public class Transparency extends JavaFXTestCase {
 
     public String _type = "Image"; //Type of Sample
     public String _project = "Transparency";
     public String _projectPath = "Transparency|Source Packages|image|Transparency.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+
     
     public Transparency(String name) {
         super(name);
@@ -76,6 +81,10 @@ public class Transparency extends JavaFXTestCase {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }
+    }
+
+    public static Test suite() {
+        return NbModuleSuite.create(Transparency.class, ".*", ".*", TESTS);
     }
 
 }
