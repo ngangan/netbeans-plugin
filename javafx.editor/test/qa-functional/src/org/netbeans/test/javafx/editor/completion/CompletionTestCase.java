@@ -54,10 +54,9 @@ import org.netbeans.api.editor.mimelookup.MimePath;
 import org.openide.filesystems.FileObject;
 import org.netbeans.editor.*;
 import org.netbeans.jellytools.EditorOperator;
-import org.netbeans.junit.ide.ProjectSupport;
 import org.netbeans.modules.editor.completion.CompletionImpl;
 import org.netbeans.modules.editor.completion.CompletionResultSetImpl;
-import org.netbeans.modules.javafx.editor.completion.*;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -116,13 +115,15 @@ import org.openide.util.Lookup;
  * @author  Jan Lahoda
  * @version 1.0
  */
-public class CompletionTest extends java.lang.Object {
+public class CompletionTestCase extends java.lang.Object {
     
     private static final long OPENING_TIMEOUT = 60 * 1000;
     private static final long SLEEP_TIME = 1000;
+    private CompletionTestPerformer testCase;
     
     /** Creates new CompletionTest */
-    public CompletionTest() {
+    public CompletionTestCase(CompletionTestPerformer testCase) {
+        this.testCase = testCase;
     }
     
     private class ResultReadyResolver implements ValueResolver {
@@ -155,11 +156,11 @@ public class CompletionTest extends java.lang.Object {
             CompletionProvider completionProvider = it.next();
             if(completionProvider instanceof JavaFXCompletionProvider) jcp = (JavaFXCompletionProvider) completionProvider;
         }
-        if(jcp==null) log.println("JavaCompletionProvider not found");
+        if(jcp==null) log.println("JavaFXCompletionProvider not found");
         CompletionTask task = jcp.createTask(queryType, editor);
         CompletionResultSetImpl result =  completion.createTestResultSet(task,queryType);
         task.query(result.getResultSet());
-        waitMaxMilisForValue(5000, new ResultReadyResolver(result), Boolean.TRUE);
+        waitMaxMilisForValue(15000, new ResultReadyResolver(result), Boolean.TRUE);
         if(!result.isFinished()) log.println("Result is not finished");
         List<? extends  CompletionItem> list = result.getItems();
         CompletionItem[] array = list.toArray(new CompletionItem[]{});
@@ -175,21 +176,47 @@ public class CompletionTest extends java.lang.Object {
                 }
             });
         }
-        //Strip everything after # to prevent platform specific data in .ref
-        //output raw if # is not present
-        String tempStart, tempEnd;
         for (int i = 0; i < array.length; i++) {
             CompletionItem completionItem = array[i];
-//             out.println(getStringFromCharSequence(completionItem.getSortText()));
-
-            tempStart = getStringFromCharSequence(completionItem.getSortText());
-            try {
-                tempEnd = tempStart.substring(0, tempStart.indexOf("#"));
-            } catch (StringIndexOutOfBoundsException e) {
-                tempEnd = tempStart; //swallow StringOutOfBounds when # is missing
-            }
-            out.println(tempEnd);
+             out.println(getStringFromCharSequence(completionItem.getSortText()));                                    
         }
+        /*Completion completion = ExtUtilities.getCompletion(editor);
+        if (completion != null) {
+            CompletionQuery completionQuery = completion.getQuery();
+            if (completionQuery != null) {
+                CompletionQuery.Result query = completionQuery.query(editor, editor.getCaret().getDot(), support);
+         
+                if (query != null) {
+                    List list = query.getData();
+         
+                    if (list != null) {
+         
+                        String[] texts = new String[list.size()];
+                        for (int cntr = 0; cntr < list.size(); cntr++) {
+                            texts[cntr] = list.get(cntr).toString();
+                        };
+                        if (sort)
+                            Arrays.sort(texts);
+         
+                        for (int cntr = 0; cntr < texts.length; cntr++) {
+                            out.println(texts[cntr].toString());
+                        };
+                    } else {
+                        log.println("CompletionTest: query.getData() == null");
+                        throw new IllegalStateException("CompletionTest: query.getData() == null");
+                    }
+                } else {
+                    log.println("CompletionTest: completionQuery.query(pane, end, support) == null");
+                    throw new IllegalStateException("CompletionTest: completionQuery.query(pane, end, support) == null");
+                }
+            } else {
+                log.println("CompletionTest: completion.getQuery() == null");
+                throw new IllegalStateException("CompletionTest: completion.getQuery() == null");
+            }
+        } else {
+            log.println("CompletionTest: ExtUtilities.getCompletion(pane) == null");
+            throw new IllegalStateException("CompletionTest: ExtUtilities.getCompletion(pane) == null");
+        }*/
     }
     
     private String getStringFromCharSequence(CharSequence chs) {
@@ -222,7 +249,7 @@ public class CompletionTest extends java.lang.Object {
         editor.grabFocus();
         editor.getCaret().setDot(lineOffset);
         doc.insertString(lineOffset, assign, null);
-        reparseDocument((DataObject) doc.getProperty(BaseDocument.StreamDescriptionProperty));
+        reparseDocument((DataObject) doc.getProperty(doc.StreamDescriptionProperty));
         completionQuery(out, log, editor, unsorted, queryType);
     }
     
@@ -263,7 +290,7 @@ public class CompletionTest extends java.lang.Object {
             } finally {
                 testFile.setModified(false);
                 String fileName = testFileName.substring(testFileName.lastIndexOf('/')+1);
-                new EditorOperator(fileName).close(false);
+                new EditorOperator(fileName).close();
                 //((CloseCookie) testFile.getCookie(CloseCookie.class)).close();
             }
         } catch (Exception e) {
@@ -274,13 +301,13 @@ public class CompletionTest extends java.lang.Object {
     
     private FileObject getTestFile(File dataDir, String projectName, String testFile, PrintWriter log) throws IOException, InterruptedException {
         File projectFile = new File(dataDir, projectName);
-        FileObject project = FileUtil.toFileObject(projectFile);
-        Object prj= ProjectSupport.openProject(projectFile);
-        
-        if (prj == null)
-            throw new IllegalStateException("Given directory \"" + project + "\" does not contain a project.");
-        
-        log.println("Project found: " + prj);
+        FileObject project = FileUtil.toFileObject(projectFile);                
+        testCase.openDataProjects(projectName);
+//        Object prj= ProjectSupport.openProject(projectFile);        
+//        if (prj == null)
+//            throw new IllegalStateException("Given directory \"" + project + "\" does not contain a project.");
+//        
+//        log.println("Project found: " + prj);
         
         FileObject test = project.getFileObject("src/" + testFile);
         
@@ -326,10 +353,10 @@ public class CompletionTest extends java.lang.Object {
                 } catch (InterruptedException e) {
                     e.printStackTrace(log);
                 }
-            }
+            };
             
             log.println("Waiting spent: " + (System.currentTimeMillis() - start) + "ms.");
-        }
+        };
         
         if (panes == null)
             throw new IllegalStateException("The editor was not opened. The timeout was: " + OPENING_TIMEOUT + "ms.");
@@ -372,8 +399,7 @@ public class CompletionTest extends java.lang.Object {
             sc.save();
         }
     }
-    
-    /** Method will wait max. <code> maxMiliSeconds </code> miliseconds for the <code> requiredValue </code>
+     /** Method will wait max. <code> maxMiliSeconds </code> miliseconds for the <code> requiredValue </code>
      *  gathered by <code> resolver </code>.
      *
      *  @param maxMiliSeconds maximum time to wait for requiredValue
@@ -401,8 +427,8 @@ public class CompletionTest extends java.lang.Object {
         }
         return false;
     }
-    
-    /** Interface for value resolver needed for i.e. waitMaxMilisForValue method.  
+
+    /** Interface for value resolver needed for i.e. waitMaxMilisForValue method.
      *  For more details, please look at {@link #waitMaxMilisForValue()}.
      */
     public static interface ValueResolver{
@@ -410,4 +436,5 @@ public class CompletionTest extends java.lang.Object {
         Object getValue();
     }
 
+   
 }

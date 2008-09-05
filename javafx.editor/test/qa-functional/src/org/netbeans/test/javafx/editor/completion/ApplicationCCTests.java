@@ -41,6 +41,8 @@
 
 package org.netbeans.test.javafx.editor.completion;
 
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 
 /**
@@ -60,7 +62,7 @@ public class ApplicationCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXApplication1a() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -72,7 +74,7 @@ public class ApplicationCCTests extends CompletionTestPerformer {
     }
 
     public void testFXApplication1b() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -84,7 +86,7 @@ public class ApplicationCCTests extends CompletionTestPerformer {
     }
 
     public void testFXApplication1c() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -96,7 +98,7 @@ public class ApplicationCCTests extends CompletionTestPerformer {
     }
 
     public void testFXApplication1d() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -107,5 +109,9 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(
+                NbModuleSuite.createConfiguration(ApplicationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+    }
     
 }

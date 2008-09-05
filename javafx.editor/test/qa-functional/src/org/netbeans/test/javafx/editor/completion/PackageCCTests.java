@@ -41,6 +41,8 @@
 
 package org.netbeans.test.javafx.editor.completion;
 
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 
 /**
@@ -60,7 +62,7 @@ public class PackageCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXPackageEmpty() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -72,7 +74,7 @@ public class PackageCCTests extends CompletionTestPerformer {
     }
     
     public void testFXPackage() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -81,6 +83,10 @@ public class PackageCCTests extends CompletionTestPerformer {
                 "packages/FXTestPackage.fx",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    public static Test suite() {
+        return NbModuleSuite.create(
+                NbModuleSuite.createConfiguration(PackageCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
     }
     
 }

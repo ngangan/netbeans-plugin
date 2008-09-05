@@ -41,6 +41,8 @@
 
 package org.netbeans.test.javafx.editor.completion;
 
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 
 /**
@@ -60,7 +62,7 @@ public class FrameCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXFrame001() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -77,7 +79,7 @@ public class FrameCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXStage() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -89,7 +91,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContent() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -101,7 +103,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentArc1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -113,7 +115,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentCircle1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -125,7 +127,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentEllipse1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -137,7 +139,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentImage1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -149,7 +151,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentImage2() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -161,7 +163,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentLine1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -173,7 +175,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentPolygon1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -185,7 +187,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentRectangle1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -197,7 +199,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentText1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -209,7 +211,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentText2() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -221,7 +223,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     
     public void testFXStageContentColor() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "fill: Color.", // what should be typed in the editor
                 false, 
@@ -233,7 +235,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
 
     public void testFXStageContentLinearGradient1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -242,6 +244,10 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "frame/stage/content/LinearGradient1.fx",
                 23, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    public static Test suite() {
+        return NbModuleSuite.create(
+                NbModuleSuite.createConfiguration(FrameCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
     }
 
 }

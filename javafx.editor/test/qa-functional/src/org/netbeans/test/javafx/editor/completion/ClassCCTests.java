@@ -41,6 +41,8 @@
 
 package org.netbeans.test.javafx.editor.completion;
 
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 
 /**
@@ -60,7 +62,7 @@ public class ClassCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXClass001() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -72,7 +74,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     }
     
     public void testFXClass002a() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -84,7 +86,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     }
     
     public void testFXClass002b() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -96,7 +98,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     }
     
     public void testFXClass002c() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -108,7 +110,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     }
     
     public void testFXClassPublic() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "public ", // what should be typed in the editor
                 false, 
@@ -120,7 +122,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     }
     
     public void testFXClass003a() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -132,7 +134,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     }
     
     public void testFXClass003b() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -145,7 +147,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     
 // /*   Fails
     public void testFXClassVar1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "var a : ", // what should be typed in the editor
                 false, 
@@ -155,5 +157,9 @@ public class ClassCCTests extends CompletionTestPerformer {
                 4, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-    
+        public static Test suite() {
+        return NbModuleSuite.create(
+                NbModuleSuite.createConfiguration(ClassCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+    }
+
 }

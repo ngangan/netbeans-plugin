@@ -41,6 +41,8 @@
 
 package org.netbeans.test.javafx.editor.completion;
 
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 
 /**
@@ -60,7 +62,7 @@ public class ImportCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXImport() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import ", // what should be typed in the editor
                 false, 
@@ -73,7 +75,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     
 // /*   Fails
     public void testFXImportJava() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import java.", // what should be typed in the editor
                 false, 
@@ -86,7 +88,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     
 // /*   Fails
     public void testFXImportJavaFX() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.", // what should be typed in the editor
                 false, 
@@ -98,7 +100,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXAnimation() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.animation.", // what should be typed in the editor
                 false, 
@@ -110,7 +112,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXApplication() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.application.", // what should be typed in the editor
                 false, 
@@ -123,7 +125,7 @@ public class ImportCCTests extends CompletionTestPerformer {
 
 // /*   Fails
     public void testFXImportJavaFXAsync() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.async.", // what should be typed in the editor
                 false, 
@@ -135,7 +137,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXExt() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.ext.", // what should be typed in the editor
                 false, 
@@ -148,7 +150,7 @@ public class ImportCCTests extends CompletionTestPerformer {
 
 // /*   Fails
     public void testFXImportJavaFXExtSwing() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.ext.swing.", // what should be typed in the editor
                 false, 
@@ -160,7 +162,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXFXUnit() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.fxunit.", // what should be typed in the editor
                 false, 
@@ -172,7 +174,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
 
     public void testFXImportJavaFXInput() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.input.", // what should be typed in the editor
                 false, 
@@ -184,7 +186,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
 
     public void testFXImportJavaFXLang() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.lang.", // what should be typed in the editor
                 false, 
@@ -196,7 +198,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
 
     public void testFXImportJavaFXReflect() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.reflect.", // what should be typed in the editor
                 false, 
@@ -209,7 +211,7 @@ public class ImportCCTests extends CompletionTestPerformer {
 
 // /*   Fails
     public void testFXImportJavaFXScene() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.", // what should be typed in the editor
                 false, 
@@ -221,7 +223,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneEffect() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.effect.", // what should be typed in the editor
                 false, 
@@ -233,7 +235,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneEffectLight() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.effect.light.", // what should be typed in the editor
                 false, 
@@ -245,7 +247,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneGeometry() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.geometry.", // what should be typed in the editor
                 false, 
@@ -257,7 +259,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneImage() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.image.", // what should be typed in the editor
                 false, 
@@ -269,7 +271,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneLayout() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.layout.", // what should be typed in the editor
                 false, 
@@ -281,7 +283,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneMedia() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.media.", // what should be typed in the editor
                 false, 
@@ -293,7 +295,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXScenePaint() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.paint.", // what should be typed in the editor
                 false, 
@@ -306,7 +308,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     
 // /*   Fails
     public void testFXImportJavaFXSceneText() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.text.", // what should be typed in the editor
                 false, 
@@ -318,7 +320,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXSceneTransform() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.scene.transform.", // what should be typed in the editor
                 false, 
@@ -330,7 +332,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     
     public void testFXImportJavaFXUtil() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "import javafx.util.", // what should be typed in the editor
                 false, 
@@ -339,6 +341,10 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "imports/FXTestImportJavaFXUtil.fx",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
+    }
+    public static Test suite() {
+        return NbModuleSuite.create(
+                NbModuleSuite.createConfiguration(ImportCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
     }
     
 }

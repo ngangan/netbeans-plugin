@@ -41,6 +41,8 @@
 
 package org.netbeans.test.javafx.editor.completion;
 
+import junit.framework.Test;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 
 /**
@@ -60,7 +62,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
      * 
      */
     public void testFXTopLvlVar1() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "var ", // what should be typed in the editor
                 false, 
@@ -72,7 +74,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
     }
     
     public void testFXTopLvlVar2() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -84,7 +86,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
     }
     
     public void testFXAnimation001a() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -96,7 +98,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
     }
     
     public void testFXAnimation001b() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -108,7 +110,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
     }
     
     public void testFXAnimation001c() throws Exception {
-        new CompletionTest().test(
+        new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
                 "", // what should be typed in the editor
                 false, 
@@ -118,5 +120,9 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 12, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-    
+    public static Test suite() {
+        return NbModuleSuite.create(
+                NbModuleSuite.createConfiguration(DeclarationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+    }
+
 }

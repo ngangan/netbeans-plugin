@@ -42,11 +42,11 @@
 package org.netbeans.test.javafx.editor.completion;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
-import org.netbeans.junit.NbTestCase;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.netbeans.jellytools.JellyTestCase;
 import org.netbeans.junit.diff.LineDiff;
 
 /**This class is automatically generated from <I>config.txt</I> using bash
@@ -59,21 +59,32 @@ import org.netbeans.junit.diff.LineDiff;
  *
  * @see CompletionTest
  */
-public class CompletionTestPerformer extends NbTestCase {
-    
-    
+public class CompletionTestPerformer extends JellyTestCase {
+
+
     // automatic generation of golden files
     protected boolean generateGoldenFiles = false;
-    
+
     protected PrintWriter outputWriter  = null;
-    
+
     protected PrintWriter logWriter = null;
-    
+
+
+    private static CompletionTestPerformer instance;
+
+    public static void openProject(String name) {
+        try {
+            instance.openDataProjects(name);
+        } catch (IOException ex) {
+            fail("Project cannot be opened");
+        }
+    }
     /** Need to be defined because of JUnit */
     public CompletionTestPerformer(String name) {
         super(name);
+        instance = this;
     }
-    
+
     @Override
     protected void setUp() {
         log("CompletionTestPerformer.setUp started.");
@@ -82,20 +93,20 @@ public class CompletionTestPerformer extends NbTestCase {
         log("CompletionTestPerformer.setUp finished.");
         log("Test "+getName()+  "started");
     }
-    
-    
+
+
     @Override
     protected void tearDown() throws Exception{
         log("Test "+getName()+" finished");
         log("CompletionTestPerformer.tearDown");
-        outputWriter.flush();        
-        String goldenName = getJDKVersionCode() + "-" + getName() + ".pass";        
+        outputWriter.flush();
+        String goldenName = getJDKVersionCode() + "-" + getName() + ".pass";
         File ref = new File(getWorkDir(), this.getName() + ".ref");
         if(generateGoldenFiles) {
             BufferedReader br = null;
             FileWriter fw = null;
             try {
-                String newGoldenName = "qa-functional/data/goldenfiles/"+this.getClass().getName().replace('.', '/')+ "/" + goldenName;
+                String newGoldenName = "data/goldenfiles/"+this.getClass().getName().replace('.', '/')+ "/" + goldenName;
                 File newGolden = new File(getDataDir().getParentFile().getParentFile().getParentFile(),newGoldenName);
                 newGolden.getParentFile().mkdirs();
                 br = new BufferedReader(new FileReader(ref));
@@ -113,34 +124,34 @@ public class CompletionTestPerformer extends NbTestCase {
                     fail(ioe.getMessage());
                 }
             }
-            fail("Generating golden files");            
+            fail("Generating golden files");
         }
         File golden =  getGoldenFile(goldenName);
         File diff = new File(getWorkDir(), this.getName() + ".diff");
         logWriter.flush();
         assertFile("Output does not match golden file.", golden, ref, diff, new LineDiff(false));
-        
+
     }
     private String getJDKVersionCode() {
         String specVersion = System.getProperty("java.version");
-        
+
         if (specVersion.startsWith("1.4"))
             return "jdk14";
-        
+
         if (specVersion.startsWith("1.5"))
             return "jdk15";
-        
+
         if (specVersion.startsWith("1.6"))
             return "jdk16";
-        
+
         throw new IllegalStateException("Specification version: " + specVersion + " not recognized.");
     }
-    
+
     private File resolveGoldenFile(String proposedGoldenFileName) {
         if ("@".equals(proposedGoldenFileName.trim()))
             return getGoldenFile(getJDKVersionCode() + "-" + getName() + ".pass");
         else
             return getGoldenFile(getJDKVersionCode() + "-" + proposedGoldenFileName + ".pass");
     }
-       
+
 }
