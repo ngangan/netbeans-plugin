@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.weather2.sample;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.weather2.sample.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.weather2.sample.lib.Util;
 
@@ -51,7 +53,8 @@ public class Weather extends JavaFXTestCase {
 
     public String _project = "JavaFX Weather Application";
     public String _projectName = "WeatherFXApplication";
-            public String _projectPath = "WeatherFXApplication|Source Packages|weatherfx|WeatherApp.fx";
+    public String _projectPath = "WeatherFXApplication|Source Packages|weatherfx|WeatherApp.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Weather (String name) {
         super(name);
@@ -78,5 +81,8 @@ public class Weather extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Weather.class, ".*", ".*", TESTS);
+    }
 }
 
