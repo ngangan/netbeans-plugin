@@ -64,19 +64,14 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
     private Lexer lexer;
     private TokenFactory<JFXTokenId> tokenFactory;
     protected LexerInput lexerInput;
-    protected JFXTokenId lastType;
     private LexerRestartInfo<JFXTokenId> info;
     private long st;
 
     public JFXLexer(LexerRestartInfo<JFXTokenId> info) throws IOException {
         super();
         if (log.isLoggable(Level.FINE)) log.fine("Creating new lexer");
-        this.lexer = new v3Lexer();
-        /*if (System.getProperty("javafx.lexer.forcev3") != null) {
-            this.lexer = new v3Lexer();
-        } else {
-            this.lexer = new v4Lexer();
-        }*/
+//        this.lexer = new v3Lexer();
+        this.lexer = new v4Lexer();
         this.info = info;
     }
 
@@ -87,7 +82,8 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             reader.setLexerInput(lexerInput);
 
             ANTLRReaderStream input = new ANTLRInputStream(reader);
-            lexer = new v3Lexer(input);
+//            lexer = new v3Lexer(input);
+            lexer = new v4Lexer(input);
             final LexerState ls = (LexerState) info.state();
             if (ls != null) {
                 final Lexer.BraceQuoteTracker bqt = ls.getTracker(lexer);
@@ -125,13 +121,13 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             }
         }
         String text = token.getText();
-        lastType = getId(token);
-        return tokenFactory.createToken(lastType, text != null ? text.length() : 0,
+        return tokenFactory.createToken(getId(token), text != null ? text.length() : 0,
                 lexer.getSharedState().failed ? PartType.START : PartType.COMPLETE);
     }
 
     private JFXTokenId getId(org.antlr.runtime.Token token) {
-        return JFXTokenId.getId(token.getType());
+        JFXTokenId jfxTokenId = JFXTokenId.getId(token.getType());
+        return jfxTokenId;
     }
 
     public Object state() {
