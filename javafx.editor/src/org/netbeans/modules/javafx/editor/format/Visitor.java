@@ -86,16 +86,16 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private boolean disableContinuosIndent;
 
 
-    Visitor(CompilationInfo info, Context ctx, int startOffset, Project project) {
-        this(info, ctx, project);
+    Visitor(CompilationInfo info, Context ctx, int startOffset) {
+        this(info, ctx);
         indentOffset = startOffset;
     }
 
-    Visitor(CompilationInfo info, Context ctx, Project project) {
+    Visitor(CompilationInfo info, Context ctx) {
         this.info = info;
         this.ctx = ctx;
         tu = new TreeUtilities(info);
-        cs = CodeStyle.getDefault(project);
+        cs = CodeStyle.getDefault(ctx.document());
         li = new DocumentLinesIterator(ctx);
     }
 

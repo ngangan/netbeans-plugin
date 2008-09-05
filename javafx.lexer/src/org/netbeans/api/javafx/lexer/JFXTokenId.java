@@ -449,14 +449,9 @@ public enum JFXTokenId implements TokenId {
         @Override
         protected LanguageEmbedding<?> embedding(Token<JFXTokenId> token, LanguagePath languagePath, InputAttributes inputAttributes) {
             switch (token.id()) {
-                case COMMENT:
-                    final StringBuilder tt = token.text() != null ? new StringBuilder(token.text()) : null;
-                    if (tt != null && tt.toString().trim().startsWith("/**")) {
-                        return LanguageEmbedding.create(JavadocTokenId.language(), 3,
+                case DOC_COMMENT:
+                    return LanguageEmbedding.create(JavadocTokenId.language(), 3,
                                 (token.partType() == PartType.COMPLETE) ? 2 : 0);
-                    } else {
-                        return null;
-                    }
                 case QUOTE_LBRACE_STRING_LITERAL:
                     return LanguageEmbedding.create(JFXStringTokenId.language(), 1, 0);
                 case RBRACE_QUOTE_STRING_LITERAL:
