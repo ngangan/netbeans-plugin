@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.navigation;
 
+import java.util.List;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
@@ -55,12 +56,22 @@ import org.openide.filesystems.FileObject;
  */
 public class CaretListeningFactory extends CaretAwareJavaSourceTaskFactory {
     
+    private static CaretListeningFactory INSTANCE;
+
     public CaretListeningFactory() {
         super(Phase.ANALYZED, Priority.LOW);
+        INSTANCE = this;
     }
 
     public CancellableTask<CompilationInfo> createTask(FileObject fileObject) {
         return new CaretListeningTask(this, fileObject);
     }
     
+    static void runAgain() {
+        List<FileObject> fileObjects = INSTANCE.getFileObjects();
+        CaretListeningTask.resetLastEH();
+        if ( !fileObjects.isEmpty() ) {
+            INSTANCE.reschedule(fileObjects.iterator().next());
+        }
+    }
 }

@@ -58,7 +58,7 @@ import java.util.logging.Level;
  * @todo documentation
  */
 public enum JFXTokenId implements TokenId {
-/* v4Lexer tokens.
+/* v4Lexer tokens. */
 	LAZY("keyword", 39),
 	COMMA("separator", 85),
 	DEF("keyword", 18),
@@ -192,9 +192,9 @@ public enum JFXTokenId implements TokenId {
 	NOT("keyword", 43),
 	TRY("keyword-directive", 69),
 	RBRACE_QUOTE_STRING_LITERAL("string", 115),    
-    UNKNOWN("error", 200);  */
+    UNKNOWN("error", 200);
 
-    /*v3.g lexer*/
+    /*v3.g lexer
     EXPR_LIST("error", 120),
 	LAZY("keyword", 69),
 	COMMA("separator", 83),
@@ -360,7 +360,7 @@ public enum JFXTokenId implements TokenId {
 	TRY("keyword-directive", 41),
 	NOT("keyword", 25),
 	RBRACE_QUOTE_STRING_LITERAL("string", 147),
-    UNKNOWN("error", 200);
+    UNKNOWN("error", 200);                      */
 
     public static final String UNIVERSAL_CATEGORY = "future-literal";
     private final String primaryCategory;

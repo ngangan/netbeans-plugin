@@ -1,32 +1,32 @@
 /*
  * Copyright (c) 2007, Sun Microsystems, Inc.
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
  *    the documentation and/or other materials provided with the distribution.
- *  * Neither the name of Sun Microsystems, Inc. nor the names of its 
- *    contributors may be used to endorse or promote products derived 
+ *  * Neither the name of Sun Microsystems, Inc. nor the names of its
+ *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
  * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 package color;
 
 import javafx.scene.Group;
@@ -56,7 +56,7 @@ var C6 = Color.rgb(  25, 255, 200 );
 
 var Y_AXIS = false;
 var X_AXIS = true;
-        
+
 Frame {
     stage : Stage {
         content: [
@@ -67,7 +67,7 @@ Frame {
             GradientBox { x : 100, y : 100, size :  75, c1 : C4, c2 : C6, axis : Y_AXIS }
        ]
     }
-    
+
     visible : true
     title : "Gradient Sample"
     width : 208
@@ -76,35 +76,35 @@ Frame {
 }
 
 class GradientBox extends CustomNode {
-    attribute x : Number;
-    attribute y : Number;
-    attribute size : Number;
-    attribute c1 : Color;
-    attribute c2 : Color;
-    attribute axis : Boolean;
-    
-    private attribute fill : LinearGradient;
-    private attribute node : Node;
-   
+    var x : Number;
+    var y : Number;
+    var size : Number;
+    var c1 : Color;
+    var c2 : Color;
+    var axis : Boolean;
+
+    var fill : LinearGradient;
+    var node : Node;
+
     init {
         var xx : Number;
         var yy : Number;
-        if( axis ) { 
+        if( axis ) {
             xx = 1; yy = 0.1;
-        } else { 
+        } else {
             xx = 0.1; yy = 1;
         }
         fill = LinearGradient {
-           startX : 0, startY : 0, 
-           endX : bind xx, endY : bind yy
+           startX : 0, startY : 0,
+           endX : xx, endY : yy
            stops: [
-               Stop { offset: 0, color: bind c1 },
-               Stop { offset: 1, color: bind c2 }
+               Stop { offset: 0, color: c1 },
+               Stop { offset: 1, color: c2 }
            ]
         };
     }
-    
-    function create() : Node {
+
+    override function create() : Node {
         return Group {
             content : Rectangle {
                 x: bind x
@@ -114,5 +114,5 @@ class GradientBox extends CustomNode {
                 fill: bind fill
             }
         };
-    }   
+    }
 }

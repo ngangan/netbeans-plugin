@@ -40,6 +40,10 @@
 package org.netbeans.modules.javafx.dataloader;
 
 import java.io.IOException;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.modules.editor.NbEditorUtilities;
+import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.netbeans.modules.javafx.preview.Bridge;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
@@ -179,11 +183,20 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         protected @Override CloneableEditor createCloneableEditor() {
             return new JavaFXEditor(this);
         }
-        
+       
         public @Override boolean close(boolean ask) {
             return super.close(ask);
         }
 
+        @Override
+        protected boolean canClose() {
+            return super.canClose();
+        }
+        
+        @Override
+        protected void notifyClosed() {
+            Bridge.closePreview((JavaFXDocument) getDocument());
+        }
     }
     
     private static final class JavaFXEditor extends CloneableEditor {
@@ -196,7 +209,6 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         public JavaFXEditor(JavaFXEditorSupport sup) {
             super(sup);
         }
-        
     }
     
     /**

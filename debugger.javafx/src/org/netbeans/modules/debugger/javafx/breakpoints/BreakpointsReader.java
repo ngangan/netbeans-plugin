@@ -298,7 +298,6 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
             properties.setString("sourceRoot", findCachedSourceRoot(lb));
             return;
         } else 
-/*
         if (object instanceof MethodBreakpoint) {
             MethodBreakpoint mb = (MethodBreakpoint) object;
             properties.setArray (
@@ -397,7 +396,6 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
             );
             return;
         }
- */
         return;
     }
 

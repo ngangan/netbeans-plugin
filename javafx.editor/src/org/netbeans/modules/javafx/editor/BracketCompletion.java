@@ -261,6 +261,7 @@ class BracketCompletion {
                             case WS:
                             case COMMENT:
                             case LINE_COMMENT:
+                            case DOC_COMMENT:
                                 // skip
                                 ignore = true;
                                 break;
@@ -670,7 +671,7 @@ class BracketCompletion {
         // eol - true if the caret is at the end of line (ignoring whitespaces)
         boolean eol = lastNonWhite < dotPos;
 
-        if (token == JFXTokenId.COMMENT || token == JFXTokenId.LINE_COMMENT) {
+        if (isComment(token)) {
             return false;
         } else if (token == JFXTokenId.WS && eol && dotPos - 1 > 0) {
             // check if the caret is at the very end of the line comment
@@ -714,6 +715,10 @@ class BracketCompletion {
         }
 
         return false;
+    }
+
+    private static boolean isComment(JFXTokenId token) {
+        return token == JFXTokenId.COMMENT || token == JFXTokenId.LINE_COMMENT || token == JFXTokenId.DOC_COMMENT;
     }
 
     private static boolean insideString(JFXTokenId token) {

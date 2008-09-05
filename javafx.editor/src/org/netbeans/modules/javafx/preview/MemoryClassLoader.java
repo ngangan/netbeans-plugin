@@ -56,7 +56,7 @@ class MemoryClassLoader extends ClassLoader {
 
     Map<String, byte[]> classBytes;
     ClassLoader compositeClassLoader;
-    static ClassLoader bootClassLoader = null;
+    ClassLoader bootClassLoader = null;
 
     public MemoryClassLoader(ClassPath[] classPaths) {
         classBytes = new HashMap<String, byte[]>();
@@ -80,6 +80,12 @@ class MemoryClassLoader extends ClassLoader {
 //            bootClassLoader = new URLClassLoader(bootCP, this.getClass().getClassLoader().getParent(), null);
 //        compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP), bootClassLoader, null);
 //    }
+    
+    public MemoryClassLoader(URL[] sourceCP, URL[] executeCP, ClassLoader bootClassLoader) {
+        classBytes = new HashMap<String, byte[]>();
+        this.bootClassLoader = bootClassLoader;
+        compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP), bootClassLoader, null);
+    }
     
     public MemoryClassLoader(URL[] sourceCP, URL[] executeCP, URL[] bootCP) {
         classBytes = new HashMap<String, byte[]>();

@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.preview;
 import javax.swing.*;
 import java.awt.*;
 
+
 public class AutoResizableDesktopPane extends JDesktopPane {
     private DesktopManager manager;
 
@@ -49,6 +50,13 @@ public class AutoResizableDesktopPane extends JDesktopPane {
         manager = new DesktopManager(this);
         setDesktopManager(manager);
         setDragMode(JDesktopPane.LIVE_DRAG_MODE);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        if (isVisible())
+            manager.resizeDesktop();
     }
 
     public Component add(JInternalFrame frame) {
@@ -73,10 +81,10 @@ public class AutoResizableDesktopPane extends JDesktopPane {
     }
 
     public void checkDesktopSize() {
-        if (getParent() != null && isVisible()) manager.resizeDesktop();
+        if (getParent() != null && isVisible())
+            manager.resizeDesktop();
     }
 }
-
 class DesktopManager extends DefaultDesktopManager {
     private AutoResizableDesktopPane desktop;
 

@@ -103,6 +103,7 @@ public final class JavaFXSource {
         MODIFIED,
         PARSED,
         ANALYZED,
+        CODE_GENERATED,
         UP_TO_DATE;
         
         public boolean lessThan(Phase p) {
@@ -193,11 +194,11 @@ public final class JavaFXSource {
 
     JavafxcTaskImpl createJavafxcTask(DiagnosticListener<JavaFileObject> diagnosticListener) {
         JavafxcTool tool = JavafxcTool.create();
-        JavaFileManager fileManager = cpInfo.getFileManager();
+        JavaFileManager fileManager = cpInfo.getFileManager(tool);
         JavaFileObject jfo = (JavaFileObject) SourceFileObject.create(files.iterator().next(), null); // XXX
         
         List<String> options = new ArrayList<String>();
-        options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
+        //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
         options.add("-XDdisableStringFolding"); //NOI18N
         
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));
@@ -244,7 +245,20 @@ public final class JavaFXSource {
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
         }
-        if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.UP_TO_DATE)) {
+        
+        if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.CODE_GENERATED)) {
+            if (cancellable && CompilationJob.currentRequest.isCanceled()) {
+                return Phase.MODIFIED;
+            }
+
+            long start = System.currentTimeMillis();
+            Iterable <? extends JavaFileObject> bytes = cc.getJavafxcTask().generate();
+            cc.setClassBytes(bytes);
+            cc.setPhase(Phase.CODE_GENERATED);
+            long end = System.currentTimeMillis();
+            Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
+        }
+        if (cc.phase == Phase.CODE_GENERATED && !phase.lessThan(Phase.UP_TO_DATE)) {
             cc.setPhase(Phase.UP_TO_DATE);
         }
         
@@ -480,7 +494,6 @@ out:            for (Iterator<Collection<Request>> it = CompilationJob.finishedR
             }          
         }
     }
-    
 
     public void resetState(boolean invalidate, boolean updateIndex) {
         boolean invalid;

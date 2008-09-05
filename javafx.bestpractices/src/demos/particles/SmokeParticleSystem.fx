@@ -1,30 +1,30 @@
 /*
  * Copyright (c) 2007, Sun Microsystems, Inc.
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
  *    the documentation and/or other materials provided with the distribution.
- *  * Neither the name of Sun Microsystems, Inc. nor the names of its 
- *    contributors may be used to endorse or promote products derived 
+ *  * Neither the name of Sun Microsystems, Inc. nor the names of its
+ *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
  * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package particles;
@@ -51,7 +51,7 @@ import java.util.Random;
  * @author Michal Skvor
  */
 
-Frame {                    
+Frame {
     stage : Stage {
         fill : Color.BLACK
         content : CustomCanvas {}
@@ -64,12 +64,12 @@ Frame {
     closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-public class CustomCanvas extends CustomNode {
+class CustomCanvas extends CustomNode {
 
-    private attribute acc : Number;
-    private attribute timeline : Timeline;
-    private attribute parts : Particle[];
-    private attribute random : Random;;    
+    var acc : Number;
+    var timeline : Timeline;
+    var parts : Particle[];
+    var random : Random;;
 
     function update() : Void {
         insert Particle {
@@ -90,16 +90,16 @@ public class CustomCanvas extends CustomNode {
         }
     }
 
-    public function create(): Node {
+    public override function create(): Node {
         random = new Random();
         timeline = Timeline {
             repeatCount: Timeline.INDEFINITE
-            keyFrames : 
+            keyFrames :
                 KeyFrame {
                     time : 16.6ms
                     action: function() {
                         update();
-                    }                
+                    }
                 }
             };
         timeline.start();
@@ -113,7 +113,7 @@ public class CustomCanvas extends CustomNode {
                     blocksMouse : true
 
                     onMouseMoved : function( e : MouseEvent ): Void {
-                        acc = ( e.getX() - 100 ) / 1000;
+                        acc = ( e.x - 100 ) / 1000;
                     }
                 },
                 Line {
@@ -143,30 +143,30 @@ public class CustomCanvas extends CustomNode {
     }
 }
 
-public class Particle extends CustomNode {
-    attribute x : Number;
-    attribute y : Number;
-    attribute vx : Number;
-    attribute vy : Number;
-    attribute timer : Number;
-    attribute acc : Number;
-    
-    function create(): Node {
+class Particle extends CustomNode {
+    var x : Number;
+    var y : Number;
+    var vx : Number;
+    var vy : Number;
+    var timer : Number;
+    var acc : Number;
+
+    override function create(): Node {
         return ImageView {
-            transform: [ Translate{ x : bind x, y : bind y } ]
+            transforms: [ Translate{ x : bind x, y : bind y } ]
             image : Image { url: "{__DIR__}/../resources/texture.png" }
             opacity: bind timer / 100
         };
     }
- 
+
     function update(): Void {
         timer -= 2.5;
         x += vx;
         y += vy;
         vx += acc;
     }
-    
+
     function isdead(): Boolean {
        return timer <= 0;
-    }    
+    }
 }

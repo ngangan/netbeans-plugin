@@ -161,14 +161,14 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         });
     }
 
-    public void selectElementNode(Element e) {
+    public void selectElementNode( ElementHandle<Element> eh ) {
         ElementNode root = getRootNode();
-        if (root == null) {
+        if ( root == null ) {
             return;
         }
-        ElementNode node = root.getNodeForElement(e);
+        ElementNode node = root.getNodeForElement(eh);
         try {
-            manager.setSelectedNodes(new Node[]{node == null ? getRootNode() : node});
+            manager.setSelectedNodes(new Node[]{ node == null ? getRootNode() : node });
         } catch (PropertyVetoException propertyVetoException) {
             Exceptions.printStackTrace(propertyVetoException);
         }
@@ -411,12 +411,12 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
                 public void run() {
                     if (null != me) {
                         ElementJavadoc doc = getDocumentation(me.getPoint());
-//                        JavadocTopComponent tc = JavadocTopComponent.findInstance();
-//                        if (null != tc) {
-//                            tc.open();
-//                            tc.setJavadoc(doc);
-//                            tc.requestActive();
-//                        }
+                        JavadocTopComponent tc = JavadocTopComponent.findInstance();
+                        if (null != tc) {
+                            tc.open();
+                            tc.setJavadoc(doc);
+                            tc.requestActive();
+                        }
                     }
                 }
             });

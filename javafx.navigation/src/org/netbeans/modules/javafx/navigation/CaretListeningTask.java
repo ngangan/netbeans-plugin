@@ -41,18 +41,17 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.source.util.TreePath;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.swing.SwingUtilities;
+import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -69,28 +68,38 @@ import org.openide.util.Exceptions;
  * and javadoc in the Javadoc window.
  *
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
+ * @author Anton Chechel - javafx changes
  */
 public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
     private CaretListeningFactory caretListeningFactory;
     private FileObject fileObject;
     private boolean canceled;
-    private static Element lastEhForNavigator;
-    private static final Set<JFXTokenId> TOKENS_TO_SKIP = EnumSet.of(
-            JFXTokenId.WS,
+    private static ElementHandle<Element> lastEh;
+    private static ElementHandle<Element> lastEhForNavigator;
+    private static final Set<JFXTokenId> TOKENS_TO_SKIP = EnumSet.of(JFXTokenId.WS,
             JFXTokenId.COMMENT,
             JFXTokenId.LINE_COMMENT);
+//            JFXTokenId.JAVADOC_COMMENT);
 
     CaretListeningTask(CaretListeningFactory whichElementJavaSourceTaskFactory, FileObject fileObject) {
         this.caretListeningFactory = whichElementJavaSourceTaskFactory;
         this.fileObject = fileObject;
     }
 
+    static void resetLastEH() {
+        lastEh = null;
+    }
+
     public void run(CompilationInfo compilationInfo) {
         resume();
 
         boolean navigatorShouldUpdate = ClassMemberPanel.getInstance() != null; // XXX set by navigator visible
-        if (isCancelled()) {
+        boolean javadocShouldUpdate = JavadocTopComponent.shouldUpdate();
+//        boolean declarationShouldUpdate = DeclarationTopComponent.shouldUpdate();
+
+        if (isCancelled() || (!navigatorShouldUpdate && !javadocShouldUpdate)) {
+//        if ( isCancelled() || ( !navigatorShouldUpdate && !javadocShouldUpdate && !declarationShouldUpdate ) ) {
             return;
         }
 
@@ -98,10 +107,15 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
         TokenHierarchy tokens = compilationInfo.getTokenHierarchy();
         TokenSequence ts = tokens.tokenSequence();
+        boolean inJavadoc = false;
         int offset = ts.move(lastPosition);
         if (ts.moveNext() && ts.token() != null) {
+
             Token token = ts.token();
             TokenId tid = token.id();
+            if (tid == JFXTokenId.DOC_COMMENT) {
+                inJavadoc = true;
+            }
 
             if (shouldGoBack(token.toString(), offset < 0 ? 0 : offset)) {
                 if (ts.movePrevious()) {
@@ -140,6 +154,102 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             updateNavigatorSelection(compilationInfo, tp);
         }
 
+        // Get Element
+        Element element = compilationInfo.getTrees().getElement(tp);
+
+        // if cancelled or no element, return
+        if (isCancelled()) {
+            return;
+        }
+
+        if (element == null) {
+            element = outerElement(compilationInfo, tp);
+        }
+
+        // if is canceled or no element
+        if (isCancelled() || element == null) {
+            return;
+        }
+        
+        final ElementHandle<Element> eh = ElementHandle.create(element);
+        // Don't update when element is the same
+        if (lastEh != null && lastEh.signatureEquals(eh) && !inJavadoc) {
+            // System.out.println("  stoped because os same eh");
+            return;
+        } else {
+            switch (element.getKind()) {
+                case PACKAGE:
+                case CLASS:
+                case INTERFACE:
+                case ENUM:
+                case ANNOTATION_TYPE:
+                case METHOD:
+                case CONSTRUCTOR:
+                case INSTANCE_INIT:
+                case STATIC_INIT:
+                case FIELD:
+                case ENUM_CONSTANT:
+                    lastEh = eh;
+                    // Different element clear data
+//                setDeclaration(""); // NOI18N
+                    setJavadoc(null); // NOI18N
+                    break;
+                case PARAMETER:
+                    element = element.getEnclosingElement(); // Take the enclosing method
+                    lastEh = ElementHandle.create(element);
+//                setDeclaration(""); // NOI18N
+                    setJavadoc(null); // NOI18N
+                    break;
+                case LOCAL_VARIABLE:
+                    lastEh = null; // ElementHandle not supported
+//                setDeclaration(Utils.format(element)); // NOI18N
+                    setJavadoc(null); // NOI18N
+                    return;
+                default:
+                    // clear
+//                setDeclaration(""); // NOI18N
+                    setJavadoc(null); // NOI18N
+                    return;
+            }
+        }
+
+        // Compute and set javadoc
+        if (javadocShouldUpdate) {
+            computeAndSetJavadoc(compilationInfo, element);
+        }
+
+        if (isCancelled()) {
+            return;
+        }
+
+    // Compute and set declaration
+//        if ( declarationShouldUpdate ) {
+//            computeAndSetDeclaration(compilationInfo, element);
+//        }
+
+    }
+
+//    private void setDeclaration(final String declaration) {
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                DeclarationTopComponent declarationTopComponent = DeclarationTopComponent.findInstance();
+//                if (declarationTopComponent != null && declarationTopComponent.isOpened()) {
+//                    declarationTopComponent.setDeclaration(declaration);
+//                }
+//            }
+//        });
+//    }
+
+    private void setJavadoc(final ElementJavadoc javadoc) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                JavadocTopComponent javadocTopComponent = JavadocTopComponent.findInstance();
+                if (javadocTopComponent != null && javadocTopComponent.isOpened()) {
+                    javadocTopComponent.setJavadoc(javadoc);
+                }
+            }
+        });
     }
 
     /**
@@ -158,22 +268,138 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         canceled = false;
     }
 
+    private void computeAndSetJavadoc(CompilationInfo compilationInfo, Element element) {
+
+        if (isCancelled()) {
+            return;
+        }
+        setJavadoc(ElementJavadoc.create(compilationInfo, element));
+    }
+
+//    private void computeAndSetDeclaration(CompilationInfo compilationInfo, Element element ) {
+//
+//        if ( element.getKind() == ElementKind.PACKAGE ) {
+//            setDeclaration("package " + element.toString() + ";");
+//            return;
+//        }
+//
+//        if ( isCancelled() ) {
+//            return;
+//        }
+//
+//        Tree tree = compilationInfo.getTrees().getTree(element);
+//
+//        if ( isCancelled()) {
+//            return;
+//        }
+//
+//        if ( tree != null ) {
+//            String declaration = unicodeToUtf(tree.toString());
+//            if (element.getKind() ==  ElementKind.CONSTRUCTOR) {
+//                String constructorName = element.getEnclosingElement().getSimpleName().toString();
+//                declaration = declaration.replaceAll(Pattern.quote("<init>"), Matcher.quoteReplacement(constructorName));
+//            } else if (element.getKind() ==  ElementKind.METHOD) {
+//                if (declaration != null) {
+//                    ExecutableElement executableElement = (ExecutableElement) element;
+//                    AnnotationValue annotationValue = executableElement.getDefaultValue();
+//                    if (annotationValue != null) {
+//                        int lastSemicolon = declaration.lastIndexOf(";"); // NOI18N
+//                        if (lastSemicolon == -1) {
+//							declaration += " default " + String.valueOf(annotationValue) + ";"; // NOI18N
+//                        } else {
+//                            declaration = declaration.substring(0, lastSemicolon) +
+//							    " default " + String.valueOf(annotationValue) +  // NOI18N
+//							    declaration.substring(lastSemicolon);
+//                        }
+//                    }
+//                }
+//            } else if ( element.getKind() == ElementKind.FIELD ) {
+//                declaration = declaration + ";"; // NOI18N
+//            }
+//            setDeclaration(declaration);
+//            return;
+//        }
+//    }
+
+//    private String unicodeToUtf(String s) {
+//
+//        char buf[] = new char[s.length()];
+//        s.getChars(0, s.length(), buf, 0);
+//
+//        int j = 0;
+//        for (int i = 0; i < buf.length; i++) {
+//
+//            if (buf[i] == '\\') {
+//                i++;
+//                char ch = buf[i];
+//                if (ch == 'u') {
+//                    do {
+//                        i++;
+//                        ch = buf[i];
+//                    } while (ch == 'u');
+//
+//                    int limit = i + 3;
+//                    if (limit < buf.length) {
+//                        int d = digit(16, buf[i]);
+//                        int code = d;
+//                        while (i < limit && d >= 0) {
+//                            i++;
+//                            ch = buf[i];
+//                            d = digit(16, ch);
+//                            code = (code << 4) + d;
+//                        }
+//                        if (d >= 0) {
+//                            ch = (char) code;
+//                            buf[j] = ch;
+//                            j++;
+//                        //unicodeConversionBp = bp;
+//                        // return;
+//                        }
+//                    }
+//                // lexError(bp, "illegal.unicode.esc");
+//                } else {
+//                    i--;
+//                    j++;
+//                // buf = '\\';
+//                }
+//            } else {
+//                buf[j] = buf[i];
+//                j++;
+//            }
+//        }
+//
+//        return new String(buf, 0, j);
+//    }
+
+//    private int digit(int base, char ch) {
+//        char c = ch;
+//        int result = Character.digit(c, base);
+//        if (result >= 0 && c > 0x7f) {
+//            // lexError(pos+1, "illegal.nonascii.digit");
+//            ch = "0123456789abcdef".charAt(result);
+//        }
+//        return result;
+//    }
+
     private void updateNavigatorSelection(CompilationInfo ci, JavaFXTreePath tp) {
         // Try to find the declaration we are in
-        final Element e = outerElement(ci, tp);
+        Element e = outerElement(ci, tp);
 
         if (e != null) {
-            if (lastEhForNavigator != null && e.getSimpleName().equals(lastEhForNavigator.getSimpleName())) {
+            final ElementHandle<Element> eh = ElementHandle.create(e);
+
+            if (lastEhForNavigator != null && eh.signatureEquals(lastEhForNavigator)) {
                 return;
             }
 
-            lastEhForNavigator = e;
+            lastEhForNavigator = eh;
+
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
                     final ClassMemberPanel cmp = ClassMemberPanel.getInstance();
                     if (cmp != null) {
-                        cmp.selectElement(e);
+                        cmp.selectElement(eh);
                     }
                 }
             });
@@ -185,16 +411,14 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         Element e = null;
 
         while (tp != null) {
-            final Tree leaf = tp.getLeaf();
-            switch (leaf.getJavaFXKind()) {
-                case CLASS_DECLARATION:
+            switch (tp.getLeaf().getJavaFXKind()) {
                 case FUNCTION_DEFINITION:
+                case CLASS_DECLARATION:
                 case COMPILATION_UNIT:
                     e = ci.getTrees().getElement(tp);
                     break;
                 case VARIABLE:
                     e = ci.getTrees().getElement(tp);
-
                     if (SpaceMagicUtils.hasSpiritualInvocation(e)) {
                         return e;
                     }
@@ -214,18 +438,15 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     }
 
     private void skipTokens(TokenSequence ts, Set<JFXTokenId> typesToSkip) {
-
         while (ts.moveNext()) {
             if (!typesToSkip.contains(ts.token().id())) {
                 return;
             }
         }
-
         return;
     }
 
     private boolean shouldGoBack(String s, int offset) {
-
         int nlBefore = 0;
         int nlAfter = 0;
 
@@ -248,6 +469,6 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         }
 
         return offset < (s.length() - offset);
-
     }
+    
 }

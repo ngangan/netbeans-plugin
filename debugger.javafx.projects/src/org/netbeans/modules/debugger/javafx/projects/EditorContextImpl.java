@@ -77,7 +77,6 @@ import javax.swing.text.StyledDocument;
 import javax.swing.JEditorPane;
 
 import com.sun.tools.javafx.code.JavafxVarSymbol;
-import com.sun.tools.javafx.tree.JFXVar;
 import java.util.LinkedList;
 import javax.lang.model.util.Elements;
 import javax.lang.model.element.Element;
@@ -89,15 +88,8 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
-//import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.debugger.DebuggerEngine;
-import org.netbeans.api.debugger.DebuggerManager;
-import org.netbeans.api.debugger.javafx.JavaFXDebugger;
-import org.netbeans.api.debugger.javafx.JavaFXThread;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
-//import org.netbeans.api.java.source.ElementUtilities;
-//import org.netbeans.api.java.source.SourceUtils;
 import org.netbeans.editor.Coloring;
 import org.netbeans.modules.editor.highlights.spi.Highlight;
 

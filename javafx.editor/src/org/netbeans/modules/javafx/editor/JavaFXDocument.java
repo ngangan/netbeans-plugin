@@ -41,38 +41,36 @@
 
 package org.netbeans.modules.javafx.editor;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
-import java.util.ArrayList;
-import javax.swing.ImageIcon;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.JToggleButton;
+import javax.swing.JToggleButton.ToggleButtonModel;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentEvent.EventType;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.javafx.preview.AutoResizableDesktopPane;
-import org.netbeans.modules.javafx.preview.JavaFXModel;
-import org.netbeans.modules.javafx.preview.MirroringPanel;
+import org.netbeans.modules.javafx.preview.PreviewCodeGenerate;
+import org.netbeans.modules.javafx.preview.Bridge;
+import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -80,40 +78,29 @@ import org.openide.loaders.DataObject;
  */
 public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     
-    private JPanel panel = null;
-     private JEditorPane pane = null;
-    private JPanel panelEmpty = null;
-    private PreviewSplitPane split = null;
+    private JEditorPane pane = null;
     private Component editor = null;
-    private JScrollPane scroll = null;
-    private static JPanel nothingPanel = null;
-    private static JPanel compilePanel = null;
-    private static JPanel runtimeErrorPanel = null;
-    private static final String vrongJavaVersion = "Please, use version 1.6 of Java to enable Preview. Current version is: ";   // NOI18N
     boolean executionEnabled = false;
     boolean errorAndSyntaxEnabled = false;
+    private Point previewLocation = new Point(0, 0);
+    private Dimension previewSize = new Dimension(200, 200);
+    
+    static{
+        Bridge.start();
+    }
     
     public JavaFXDocument(Class kitClass) {
         super(kitClass);
-        nothingPanel = getSloganPanel(loadIcon("org/netbeans/modules/javafx/editor/resources/blank.png"), "Nothing to show...");                 // NOI18N
-        compilePanel = getSloganPanel(loadIcon("org/netbeans/modules/javafx/editor/resources/clock.gif"), "Compile...");                         // NOI18N
-        runtimeErrorPanel = getSloganPanel(loadIcon("org/netbeans/modules/javafx/editor/resources/error.png"), "Unexpected runtime errors...");  // NOI18N
     }
     
-    @Override
-    public void write(Writer writer, int pos, int len) throws IOException, BadLocationException {
-        super.write(writer, pos, len);
-        JavaFXModel.fireDependenciesChange(this);
-    }
-
     public JComponent getEditor() {
         return (JComponent) pane;
     }
+
     
     @Override
     public Component createEditor(JEditorPane pane) {
-        JavaFXModel.addDocument(this);
-        
+       
         DocumentListener changeListener = new DocumentListener(){
             public void removeUpdate(DocumentEvent e) {
                 sourceChanged();
@@ -124,66 +111,14 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
             }
             
             public void changedUpdate(DocumentEvent e) {
-                int i = 0;
             }
         };
         addDocumentListener(changeListener);
-        
+
         editor = super.createEditor(pane);
         this.pane = pane;
         
-        final JavaFXDocument doc = this;
-        
-        FocusListener focusListener = new FocusListener() {
-            public void focusGained(FocusEvent e) {
-                doc.createDocumentEvent(0, 0, EventType.CHANGE);
-            }
-
-            public void focusLost(FocusEvent e) {
-            }
-        };
-        
-        pane.addFocusListener(focusListener);
-        
-        Class clQEP = null;
-        try {  
-            clQEP = Class.forName("org.openide.text.QuietEditorPane");
-        } catch (ClassNotFoundException e) {}
-        
-        if (!pane.getClass().equals(clQEP)) {
-            return editor;
-        } else {
-            panelEmpty = new JPanel();
-            panelEmpty.setMinimumSize(new Dimension(0, 0));
-            panelEmpty.setMaximumSize(new Dimension(0, 0));
-            
-            panel = new PreviewPanel(this);
-            panel.setBackground(Color.WHITE);
-
-            scroll = new JScrollPane();
-            scroll.setWheelScrollingEnabled(true);
-            scroll.setAutoscrolls(true);
-//            split = new PreviewSplitPane(this, JSplitPane.VERTICAL_SPLIT, scroll, editor);
-            split = new PreviewSplitPane(this);
-            split.setOrientation(JSplitPane.VERTICAL_SPLIT);
-
-            if (executionEnabled) {
-                split.setTopComponent(scroll);
-                split.setDividerSize(divSize);
-                split.setDividerLocation(divLoc);
-            } else {
-                split.setDividerSize(0);
-                split.setDividerLocation(0);
-                split.setTopComponent(panelEmpty);
-            }
-            split.setActionMap(pane.getActionMap());
-            
-            scroll.setViewportView(panel);
-            split.setRightComponent(editor);
-            
-            return split;
-            
-        }
+        return editor;
     }
 
     public DataObject getDataObject(){
@@ -192,7 +127,6 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     
     public void  sourceChanged(){
         synchronized(this){
-            JavaFXModel.sourceChanged(this);
         }
     }
     
@@ -204,92 +138,7 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
         }
     }
     
-    public void setCompile() {
-        renderPreview(compilePanel);
-    }
-    
-    public void setNothing() {
-        renderPreview(nothingPanel);
-    }
-    
-    public static JPanel getNothingPane() {
-        return nothingPanel;
-    }
-    
-    public static JPanel getErrorPane() {
-        return runtimeErrorPanel;
-    }
-
-    public static JComponent getVrongVersion() {
-        JTextArea jta = new JTextArea();
-        jta.setForeground(Color.decode("#a40000"));
-        jta.append(vrongJavaVersion + System.getProperty("java.runtime.version"));
-        return jta;
-    }
-    
-    static public JPanel getSloganPanel(ImageIcon icon, String text) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        JLabel label = new JLabel(icon);
-        label.setText(text);
-        label.setVerticalTextPosition(SwingConstants.BOTTOM);
-        label.setHorizontalTextPosition(SwingConstants.CENTER);
-        label.setVerticalAlignment(SwingConstants.CENTER);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(label, BorderLayout.CENTER);
-        return panel;
-    }
-    
-    static private ImageIcon loadIcon(String resource) {
-        try {
-            InputStream is = JavaFXModel.class.getClassLoader().getResourceAsStream(resource);
-            int b = is.read();
-            ArrayList <Byte> list = new ArrayList <Byte> ();
-            while (b != -1) {
-                list.add(Byte.valueOf((byte)b));
-                b = is.read();
-            }
-            byte[] array = new byte[list.size()];
-            int i = 0;
-            for (Byte B : list) {
-                array[i++] = B.byteValue();
-            }
-            return new ImageIcon(Toolkit.getDefaultToolkit().createImage(array));
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-            
-    public void renderPreview(final JComponent comp){
-        JavaFXModel.setResultComponent(this, comp);
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                if (panel != null){
-                    if (panel.getComponentCount() > 0){
-                        for (Component component: panel.getComponents()) {
-                            if (component instanceof MirroringPanel)
-                                ((MirroringPanel)component).cleanup();
-                        }
-                        panel.remove(0);
-                    }else{
-                        panel.setLayout(new BorderLayout());
-                    }
-                    if (comp != null){
-                        panel.add(comp);
-                        if (comp instanceof AutoResizableDesktopPane)
-                            ((AutoResizableDesktopPane)comp).checkDesktopSize();
-                    }
-                    split.revalidate();
-                    split.validate();
-                    split.repaint();
-                }
-            }
-        });
-    }
-    
-    private int divLoc = 150;
-    private int divSize = 8;
-    
+   
     public void enableErrorAndSyntax(boolean enabled){
         errorAndSyntaxEnabled = enabled;
     }
@@ -297,56 +146,58 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     public boolean errorAndSyntaxAllowed(){
         return errorAndSyntaxEnabled;
     }
+    
+    public void setPreviewPlacement(Point previewLocation, Dimension previewSize) { 
+        this.previewLocation = previewLocation;
+        this.previewSize = previewSize;
+    }
+    
+    public Point getPreviewLocation() { 
+        return previewLocation;
+    }
+    
+    public Dimension getPreviewSize() { 
+        return previewSize;
+    }
             
     public void enableExecution(boolean enabled) {
-        executionEnabled = enabled;
         for (Component component : createToolbar(pane).getComponents()) {
-            if (component instanceof JButton)
-                if (((JButton)component).getClientProperty("resetPreviewMark") == Boolean.TRUE) {                  //NOI18N
+            if (component instanceof JToggleButton) {
+                if (((JToggleButton)component).getClientProperty("enablePreviewMark") == Boolean.TRUE) {    //NOI18N
+                    ((JToggleButton)component).setSelected(enabled);
+                }
+            }
+            if (component instanceof JButton) {
+                if (((JButton)component).getClientProperty("resetPreviewMark") == Boolean.TRUE) {     //NOI18N
                     component.setEnabled(enabled);
                 }
+            }
         }
-        if (enabled) {
-            split.setTopComponent(scroll);
-            split.setDividerSize(divSize);
-            split.setDividerLocation(divLoc);
-        } else {
-            if (panel != null)
-                if (panel.getComponentCount() > 0) {
-                    for (Component component: panel.getComponents()) {
-                        if (component instanceof MirroringPanel)
-                            ((MirroringPanel)component).cleanup();
+        if (!enabled) {
+            executionEnabled = false;
+            Bridge.closePreview(this);
+        }
+        else {
+            if (executionEnabled && (executionEnabled == enabled)) {
+                Bridge.moveToFront(this);
+            } else {
+                executionEnabled = true;
+                final JavaFXSource js = JavaFXSource.forDocument(this);
+                try {
+                    js.runUserActionTask(new Task<CompilationController>() {
+                        public void run(CompilationController controller) throws Exception {
+                            controller.toPhase(Phase.CODE_GENERATED);
+                            PreviewCodeGenerate.process(controller);
                         }
+                    }, true);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
-            divLoc = split.getDividerLocation();
-            split.setDividerSize(0);
-            split.setDividerLocation(0);
-            split.setTopComponent(panelEmpty);
+            }
         }
-        split.validate();
     }
     
     public boolean executionAllowed(){
         return executionEnabled;
-    }
-    
-    public class PreviewSplitPane extends JSplitPane{
-        private JavaFXDocument doc;
-
-        public PreviewSplitPane(JavaFXDocument doc){
-            super();
-            this.doc = doc;
-        }
-        
-        public JavaFXDocument getDocument(){
-            return doc;
-        }
-    }
-    
-    public class PreviewPanel extends JPanel{
-        public PreviewPanel(JavaFXDocument doc){
-            super();
-            putClientProperty(java.awt.print.Printable.class, NbEditorUtilities.getFileObject(doc).getNameExt());
-        }
-    }
+    }    
 }

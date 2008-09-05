@@ -39,7 +39,9 @@
 
 package org.netbeans.api.javafx.source;
 
+import com.sun.tools.javafx.api.JavafxcTool;
 import java.net.URL;
+import java.nio.charset.Charset;
 import javax.swing.event.ChangeListener;
 import javax.tools.JavaFileManager;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -144,7 +146,7 @@ public class ClasspathInfo {
         return l;
     }
 */    
-    synchronized JavaFileManager getFileManager() {
+    synchronized JavaFileManager getFileManager(JavafxcTool tool) {
         if (fileManager == null) {
 /*            List<URL> userJavaClasses = null;
             try {
@@ -161,7 +163,8 @@ public class ClasspathInfo {
             fileManager = new ProxyFileManager (
                     new CachingFileManager(bootPath), // cacheFile, ignoreExcludes
                     new CachingFileManager(compilePath), // ignoreExcludes
-                    new SourceFileManager(cachedSrcPath)
+                    new SourceFileManager(cachedSrcPath),
+                    new MemoryFileManager()
             );
         }
         return this.fileManager;

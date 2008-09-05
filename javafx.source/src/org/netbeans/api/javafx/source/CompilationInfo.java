@@ -61,6 +61,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.openide.filesystems.FileObject;
 
@@ -209,7 +210,10 @@ public class CompilationInfo {
      */
     public UnitTree getCompilationUnit() {
         return impl.getCompilationUnit();
-
+    }
+    
+    public Iterable <? extends JavaFileObject> getClassBytes() {
+        return impl.getClassBytes();
     }
 
     public TokenHierarchy getTokenHierarchy() {

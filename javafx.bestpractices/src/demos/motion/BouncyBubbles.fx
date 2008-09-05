@@ -1,30 +1,30 @@
 /*
  * Copyright (c) 2007, Sun Microsystems, Inc.
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
  *    the documentation and/or other materials provided with the distribution.
- *  * Neither the name of Sun Microsystems, Inc. nor the names of its 
- *    contributors may be used to endorse or promote products derived 
+ *  * Neither the name of Sun Microsystems, Inc. nor the names of its
+ *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
  * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package motion;
@@ -55,7 +55,7 @@ var height : Number = 200;
 
 var timer : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
-    keyFrames : 
+    keyFrames :
         KeyFrame {
             time : 16ms
             action : function() : Void {
@@ -67,7 +67,7 @@ var timer : Timeline = Timeline {
         }
 };
 var rnd : Random = new Random();
-    
+
 for( i in [1..12] ) {
     insert Bubble {
         x : rnd.nextInt( width ), y : rnd.nextInt( height ), radius : rnd.nextInt( 10 ) + 10
@@ -90,46 +90,46 @@ Frame {
 
 timer.start();
 
-public class Bubble extends CustomNode {
-    
-    public attribute x : Number;
-    public attribute y : Number;
-    public attribute radius : Number;
-    public attribute color : Color = Color.WHITE;
-    
-    public attribute vx : Number;
-    public attribute vy : Number;
-    
+class Bubble extends CustomNode {
+
+    public var x : Number;
+    public var y : Number;
+    public var radius : Number;
+    public var color : Color = Color.WHITE;
+
+    public var vx : Number;
+    public var vy : Number;
+
     public function collide( bubbles : Bubble[], spring : Number, width : Number, height : Number ): Void {
         for( bubble in bubbles ) {
             var dx : Number = bubble.x - x;
             var dy : Number = bubble.y - y;
-            
+
             var distance : Number = Math.sqrt( dx * dx + dy * dy );
             var minDist : Number = bubble.radius + radius;
-            
+
             if( distance < minDist ) {
                 var angle : Number = Math.atan2( dy, dx );
                 var tx : Number = x + Math.cos( angle ) * minDist;
                 var ty : Number = y + Math.sin( angle ) * minDist;
-                
+
                 var ax : Number = ( tx - bubble.x ) * spring;
                 var ay : Number = ( ty - bubble.y ) * spring;
-                
+
                 vx -= ax;
                 vy -= ay;
-                
+
                 bubble.vx += ax;
                 bubble.vy += ay;
             }
         }
     }
-    
+
     public function move( gravity : Number, width : Number, height : Number ): Void {
         vy += gravity;
         x += vx;
         y += vy;
-        
+
         if( x + radius > 200 ) {
             x = width - radius;
             vx *= - 0.9;
@@ -145,8 +145,8 @@ public class Bubble extends CustomNode {
             vy *= -0.9;
         }
     }
-    
-    public function create(): Node {
+
+    public override function create(): Node {
         return Circle {
             centerX : bind x, centerY : bind y, radius : bind radius
             fill : bind color

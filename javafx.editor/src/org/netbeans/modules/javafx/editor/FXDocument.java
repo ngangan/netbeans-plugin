@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.editor;
 
-import javax.swing.JComponent;
 import javax.swing.text.Document;
 
 /**
@@ -51,7 +50,6 @@ import javax.swing.text.Document;
 public interface FXDocument extends Document{
     public boolean executionAllowed();
     public void enableExecution(boolean enabled);
-    public void renderPreview(final JComponent comp);
     public String getSourceToRender();
     public void  sourceChanged();
     public void enableErrorAndSyntax(boolean enabled);

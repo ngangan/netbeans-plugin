@@ -1182,6 +1182,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             final Token<JFXTokenId> t = ts.token();
             switch (t.id()) {
                 case COMMENT:
+                case DOC_COMMENT:
                     return ts.offset();
                 case WS:
                     continue;
