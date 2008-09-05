@@ -1,30 +1,30 @@
 /*
  * Copyright (c) 2007, Sun Microsystems, Inc.
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
  *    the documentation and/or other materials provided with the distribution.
- *  * Neither the name of Sun Microsystems, Inc. nor the names of its 
- *    contributors may be used to endorse or promote products derived 
+ *  * Neither the name of Sun Microsystems, Inc. nor the names of its
+ *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
  * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 package input;
@@ -47,44 +47,44 @@ import java.lang.Math;
  */
 
 var easing : Ball = Ball {};
-    
+
 Frame {
     stage : Stage {
         content : [
-            Rectangle {  
+            Rectangle {
                 width : 200, height : 200
                 fill : Color{ red: 0.2, green : 0.2, blue : 0.2 }
-                
+
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    easing.targetX = e.getX();
-                    easing.targetY = e.getY();
+                    easing.targetX = e.x;
+                    easing.targetY = e.y;
                 }
             },
             easing
         ]
 
     };
-    
+
     visible : true
     title : "Easing"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }    
+    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 class Ball extends CustomNode {
-    attribute x : Number;
-    attribute y : Number;
-    public attribute targetX : Number = 100;
-    public attribute targetY : Number = 100;
-    
-    attribute easing : Number = 0.05;
-    
+    var x : Number;
+    var y : Number;
+    public var targetX : Number = 100;
+    public var targetY : Number = 100;
+
+    var easing : Number = 0.05;
+
     init {
         timer.start();
     }
-    
-    attribute timer : Timeline = Timeline {
+
+    var timer : Timeline = Timeline {
         repeatCount: Timeline.INDEFINITE
         keyFrames :
             KeyFrame {
@@ -102,12 +102,12 @@ class Ball extends CustomNode {
             }
         }
     };
-    
-    public function create(): Node {
+
+    public override function create(): Node {
         return Circle {
             centerX : bind x
             centerY : bind y
-            radius : 33 / 2 
+            radius : 33 / 2
             fill : Color.WHITE
         };
     }
