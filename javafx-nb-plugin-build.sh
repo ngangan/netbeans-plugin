@@ -1,4 +1,18 @@
+#########################################################################
+# This script is purposed to start JavaFX Netbeans
+# Plugin builds. Before this script will start, 
+# it is necessary to start command
+#
+# $ hg clone http://hg.netbeans.org/javafx $WORKSPACE/main/contrib
+#
+#  (c) Eugenia Shuiskaja, SUN Microsystems, Sep 2008
+#########################################################################
+
 #!/bin/bash
+#
+# Check the pre-defined variables
+
+export 
 
 #Get or renew the Netbeans repo
 ###########################
@@ -14,10 +28,8 @@ fi
 ###########################
 
 cd  $WORKSPACE/main
-rm -rf contrib
 rm -rf nbbuild
 hg up -C
-hg clone http://hg.netbeans.org/javafx contrib
 
 ##########################
 #Start the build 
