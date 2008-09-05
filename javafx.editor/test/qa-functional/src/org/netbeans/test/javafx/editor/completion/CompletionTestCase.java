@@ -176,47 +176,19 @@ public class CompletionTestCase extends java.lang.Object {
                 }
             });
         }
+        String tempStart, tempEnd;
         for (int i = 0; i < array.length; i++) {
             CompletionItem completionItem = array[i];
-             out.println(getStringFromCharSequence(completionItem.getSortText()));                                    
-        }
-        /*Completion completion = ExtUtilities.getCompletion(editor);
-        if (completion != null) {
-            CompletionQuery completionQuery = completion.getQuery();
-            if (completionQuery != null) {
-                CompletionQuery.Result query = completionQuery.query(editor, editor.getCaret().getDot(), support);
-         
-                if (query != null) {
-                    List list = query.getData();
-         
-                    if (list != null) {
-         
-                        String[] texts = new String[list.size()];
-                        for (int cntr = 0; cntr < list.size(); cntr++) {
-                            texts[cntr] = list.get(cntr).toString();
-                        };
-                        if (sort)
-                            Arrays.sort(texts);
-         
-                        for (int cntr = 0; cntr < texts.length; cntr++) {
-                            out.println(texts[cntr].toString());
-                        };
-                    } else {
-                        log.println("CompletionTest: query.getData() == null");
-                        throw new IllegalStateException("CompletionTest: query.getData() == null");
-                    }
-                } else {
-                    log.println("CompletionTest: completionQuery.query(pane, end, support) == null");
-                    throw new IllegalStateException("CompletionTest: completionQuery.query(pane, end, support) == null");
-                }
-            } else {
-                log.println("CompletionTest: completion.getQuery() == null");
-                throw new IllegalStateException("CompletionTest: completion.getQuery() == null");
+//             out.println(getStringFromCharSequence(completionItem.getSortText()));
+
+            tempStart = getStringFromCharSequence(completionItem.getSortText());
+            try {
+                tempEnd = tempStart.substring(0, tempStart.indexOf("#"));
+            } catch (StringIndexOutOfBoundsException e) {
+                tempEnd = tempStart; //swallow StringOutOfBounds when # is missing
             }
-        } else {
-            log.println("CompletionTest: ExtUtilities.getCompletion(pane) == null");
-            throw new IllegalStateException("CompletionTest: ExtUtilities.getCompletion(pane) == null");
-        }*/
+            out.println(tempEnd);
+        }
     }
     
     private String getStringFromCharSequence(CharSequence chs) {
@@ -249,7 +221,7 @@ public class CompletionTestCase extends java.lang.Object {
         editor.grabFocus();
         editor.getCaret().setDot(lineOffset);
         doc.insertString(lineOffset, assign, null);
-        reparseDocument((DataObject) doc.getProperty(doc.StreamDescriptionProperty));
+        reparseDocument((DataObject) doc.getProperty(BaseDocument.StreamDescriptionProperty));
         completionQuery(out, log, editor, unsorted, queryType);
     }
     
@@ -303,11 +275,6 @@ public class CompletionTestCase extends java.lang.Object {
         File projectFile = new File(dataDir, projectName);
         FileObject project = FileUtil.toFileObject(projectFile);                
         testCase.openDataProjects(projectName);
-//        Object prj= ProjectSupport.openProject(projectFile);        
-//        if (prj == null)
-//            throw new IllegalStateException("Given directory \"" + project + "\" does not contain a project.");
-//        
-//        log.println("Project found: " + prj);
         
         FileObject test = project.getFileObject("src/" + testFile);
         
@@ -316,22 +283,6 @@ public class CompletionTestCase extends java.lang.Object {
         
         return test;
     }
-    
-    //    public static void main(String[] args) throws Exception {
-    //        PrintWriter out = new PrintWriter(System.out);
-    //        PrintWriter log = new PrintWriter(System.err);
-    //        new CompletionTest().test(out, log, "int[] a; a.", false, "org/netbeans/test/editor/completion/data/testfiles/CompletionTestPerformer/TestFile.java", 20);
-    //        out.flush();
-    //        log.flush();
-    //    }
-    
-    //Utility methods:
-    //    private static void checkEditorCookie(DataObject od) {
-    //        EditorCookie ec =(EditorCookie) od.getCookie(EditorCookie.class);
-    //
-    //        if (ec == null)
-    //            throw new IllegalStateException("Given file (\"" + od.getName() + "\") does not have EditorCookie.");
-    //    }
     
     private static JEditorPane getAnEditorPane(DataObject file, PrintWriter log) throws Exception {
         EditorCookie  cookie = (EditorCookie)file.getCookie(EditorCookie.class);
@@ -353,26 +304,16 @@ public class CompletionTestCase extends java.lang.Object {
                 } catch (InterruptedException e) {
                     e.printStackTrace(log);
                 }
-            };
+            }
             
             log.println("Waiting spent: " + (System.currentTimeMillis() - start) + "ms.");
-        };
+        }
         
         if (panes == null)
             throw new IllegalStateException("The editor was not opened. The timeout was: " + OPENING_TIMEOUT + "ms.");
         
         return panes[0];
     }
-    
-    //    private static boolean isSomePaneOpened(DataObject file) {
-    //        EditorCookie cookie = (EditorCookie) file.getCookie(EditorCookie.class);
-    //
-    //        if (cookie == null) {
-    //            return false;
-    //        }
-    //
-    //        return cookie.getOpenedPanes() != null;
-    //    }
     
     private static void reparseDocument(DataObject file) throws IOException {
         saveDocument(file);
@@ -435,6 +376,4 @@ public class CompletionTestCase extends java.lang.Object {
         /** Returns checked value */
         Object getValue();
     }
-
-   
 }
