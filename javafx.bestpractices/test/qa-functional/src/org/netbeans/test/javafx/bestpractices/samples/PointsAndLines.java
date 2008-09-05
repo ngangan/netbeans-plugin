@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class PointsAndLines extends JavaFXTestCase {
     public String _type = "Forms"; //Type of Sample
     public String _project = "Points and Lines";
     public String _projectPath = "Points and Lines|Source Packages|forms|PointsAndLines.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public PointsAndLines(String name) {
         super(name);
@@ -78,4 +81,7 @@ public class PointsAndLines extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(PointsAndLines.class, ".*", ".*", TESTS);
+    }
 }

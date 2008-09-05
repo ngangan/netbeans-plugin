@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Rotate extends JavaFXTestCase {
     public String _type = "Transform"; //Type of Sample
     public String _project = "Rotate";
     public String _projectPath = "Rotate|Source Packages|transform|Rotate.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Rotate (String name) {
         super(name);
@@ -78,4 +81,7 @@ public class Rotate extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Rotate.class, ".*", ".*", TESTS);
+    }
 }

@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Bounce extends JavaFXTestCase {
     public String _type = "Game"; //Type of Sample
     public String _project = "Bounce";
     public String _projectPath = "Bounce|Source Packages|game|Bounce.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Bounce(String name) {
         super(name);
@@ -78,5 +81,8 @@ public class Bounce extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Bounce.class, ".*", ".*", TESTS);
+    }
 }
 

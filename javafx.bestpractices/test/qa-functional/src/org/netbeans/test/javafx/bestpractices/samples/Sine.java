@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Sine extends JavaFXTestCase {
     public String _type = "Math"; //Type of Sample
     public String _project = "Sine";
     public String _projectPath = "Sine|Source Packages|math|Sine.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Sine (String name) {
         super(name);
@@ -78,6 +81,9 @@ public class Sine extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Sine.class, ".*", ".*", TESTS);
+    }
 }
 
 

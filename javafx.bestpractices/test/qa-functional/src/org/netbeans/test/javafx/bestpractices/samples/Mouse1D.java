@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Mouse1D extends JavaFXTestCase {
     public String _type = "Input"; //Type of Sample
     public String _project = "Mouse 1D";
     public String _projectPath = "Mouse 1D|Source Packages|input|Mouse1D.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Mouse1D (String name) {
         super(name);
@@ -78,5 +81,8 @@ public class Mouse1D extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Mouse1D.class, ".*", ".*", TESTS);
+    }
 }
 

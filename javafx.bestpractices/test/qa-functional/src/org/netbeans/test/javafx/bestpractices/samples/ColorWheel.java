@@ -38,7 +38,9 @@
  */
 package org.netbeans.test.javafx.bestpractices.samples;
 
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -47,6 +49,7 @@ public class ColorWheel extends JavaFXTestCase {
     public String _type = "Color";
     public String _project = "Color Wheel";
     public String _projectPath = "Color Wheel|Source Packages|color|ColorWheel.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public ColorWheel(String name) {
         super(name);
@@ -73,5 +76,8 @@ public class ColorWheel extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(ColorWheel.class, ".*", ".*", TESTS);
+    }
 }
 

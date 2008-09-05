@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Translate extends JavaFXTestCase {
     public String _type = "Transform"; //Type of Sample
     public String _project = "Translate";
     public String _projectPath = "Translate|Source Packages|transform|Translate.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Translate (String name) {
         super(name);
@@ -78,5 +81,8 @@ public class Translate extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Translate.class, ".*", ".*", TESTS);
+    }
 }
 

@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Displaying extends JavaFXTestCase {
     public String _type = "Image"; //Type of Sample
     public String _project = "Displaying";
     public String _projectPath = "Displaying|Source Packages|image|Displaying.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Displaying(String name) {
         super(name);
@@ -78,6 +81,9 @@ public class Displaying extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Displaying.class, ".*", ".*", TESTS);
+    }
 }
 
 

@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Distance2D extends JavaFXTestCase {
     public String _type = "Math"; //Type of Sample
     public String _project = "Distance 2D";
     public String _projectPath = "Distance 2D|Source Packages|math|Distance2D.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Distance2D (String name) {
         super(name);
@@ -78,5 +81,8 @@ public class Distance2D extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Distance2D.class, ".*", ".*", TESTS);
+    }
 }
 

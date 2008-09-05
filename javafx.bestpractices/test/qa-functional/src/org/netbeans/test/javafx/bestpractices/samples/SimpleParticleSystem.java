@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class SimpleParticleSystem extends JavaFXTestCase {
     public String _type = "Simulation"; //Type of Sample
     public String _project = "Simple Particle System";
     public String _projectPath = "Simple Particle System|Source Packages|particles|SimpleParticleSystem.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public SimpleParticleSystem (String name) {
         super(name);
@@ -78,6 +81,9 @@ public class SimpleParticleSystem extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(SimpleParticleSystem.class, ".*", ".*", TESTS);
+    }
 }
 
 

@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class BackgroundImage extends JavaFXTestCase {
     public String _type = "Image"; //Type of Sample
     public String _project = "Background Image";
     public String _projectPath = "Background Image|Source Packages|image|BackgroundImage.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public BackgroundImage(String name) {
         super(name);
@@ -78,5 +81,8 @@ public class BackgroundImage extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(BackgroundImage.class, ".*", ".*", TESTS);
+    }
 }
 

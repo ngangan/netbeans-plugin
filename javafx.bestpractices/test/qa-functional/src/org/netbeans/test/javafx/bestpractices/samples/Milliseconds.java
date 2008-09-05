@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class Milliseconds extends JavaFXTestCase {
     public String _type = "Input"; //Type of Sample
     public String _project = "Milliseconds";
     public String _projectPath = "Milliseconds|Source Packages|input|Milliseconds.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public Milliseconds (String name) {
         super(name);
@@ -78,5 +81,8 @@ public class Milliseconds extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(Milliseconds.class, ".*", ".*", TESTS);
+    }
 }
 

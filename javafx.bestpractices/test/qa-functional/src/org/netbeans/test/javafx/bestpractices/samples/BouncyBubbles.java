@@ -43,7 +43,9 @@ package org.netbeans.test.javafx.bestpractices.samples;
  *
  * @author Lark
  */
+import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
+import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.bestpractices.lib.Util;
 
@@ -52,6 +54,7 @@ public class BouncyBubbles extends JavaFXTestCase {
     public String _type = "Motion"; //Type of Sample
     public String _project = "Bouncy Bubbles";
     public String _projectPath = "Bouncy Bubbles|Source Packages|motion|BouncyBubbles.fx";
+    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
     
     public BouncyBubbles (String name) {
         super(name);
@@ -78,6 +81,9 @@ public class BouncyBubbles extends JavaFXTestCase {
         }
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(BouncyBubbles.class, ".*", ".*", TESTS);
+    }
 }
 
 
