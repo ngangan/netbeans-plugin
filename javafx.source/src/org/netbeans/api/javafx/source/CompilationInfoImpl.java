@@ -64,6 +64,7 @@ class CompilationInfoImpl {
     
     JavaFXSource.Phase phase = JavaFXSource.Phase.MODIFIED;
     private UnitTree compilationUnit;    
+    private Iterable <? extends JavaFileObject> classBytes;
 
     private JavafxcTaskImpl cTask;
     final JavaFXSource source;
@@ -144,12 +145,22 @@ class CompilationInfoImpl {
         assert this.compilationUnit == null;
         this.compilationUnit = compilationUnit;
     }
+    void setClassBytes(Iterable <? extends JavaFileObject> bytes) {
+        assert this.classBytes == null;
+        this.classBytes = bytes;
+    }
 
     JavafxcTaskImpl getJavafxcTask() {
         if (cTask == null) {
             cTask = source.createJavafxcTask(new DiagnosticListenerImpl());
         }
         return cTask;
+    }
+    
+    Iterable <? extends JavaFileObject> getClassBytes() {
+        if (phase.lessThan(JavaFXSource.Phase.CODE_GENERATED))
+            throw new IllegalStateException("Cannot call getCompilationInfo() if current phase < JavaFXSource.CODE_GENERATED. You must call toPhase(Phase.CODE_GENERATED) first.");//NOI18N
+        return classBytes;
     }
     
     Context getContext() {
