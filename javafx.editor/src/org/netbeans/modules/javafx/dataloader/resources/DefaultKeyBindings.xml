@@ -44,4 +44,6 @@ made subject to such option by the copyright holder.
 
 <bindings>
     <bind actionName="goto-source" key="DS-B"/>
+    <bind actionName="toggle-fx-preview-execution" key="DOS-F11"/>
+    <bind actionName="toggle-reset-fx-preview-execution" key="DOS-F12"/>
 </bindings>
