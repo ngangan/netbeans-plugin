@@ -42,7 +42,37 @@ made subject to such option by the copyright holder.
 -->
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
-  <folder name="Projects">
+    <folder name="Actions">
+        <folder name="BpelNodes">
+            <folder name="Profile">
+                <file name="org-netbeans-modules-javafx-profiler-actions-AddProfilingRootMethodAction.instance"/>
+                <!--file name="org-netbeans-modules-javafx-profiler-actions-SelectRootMethodsAction.instance"/-->
+            </folder>
+        </folder>
+    </folder>
+    <folder name="Editors">
+        <folder name="text">
+            <folder name="x-fx">
+                <folder name="Popup">
+                    <folder name="Profiling">
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.profiler.Bundle"/>
+                        <attr name="position" intvalue="1956"/>
+                        <file name="org-netbeans-modules-javafx-profiler-actions-AddProfilingRootMethodAction.shadow">
+                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.profiler.Bundle"/>
+                            <attr name="originalFile" stringvalue="Actions/BpelNodes/Profile/org-netbeans-modules-javafx-profiler-actions-AddProfilingRootMethodAction.instance"/>
+                            <attr name="position" intvalue="100"/>
+                        </file>
+                        <!--file name="org-netbeans-modules-javafx-profiler-actions-SelectRootMethodsAction.shadow">
+                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.profiler.Bundle"/>
+                            <attr name="originalFile" stringvalue="Actions/BpelNodes/Profile/org-netbeans-modules-javafx-profiler-actions-SelectRootMethodsAction.instance"/>
+                            <attr name="position" intvalue="200"/>
+                        </file-->
+                    </folder>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+    <folder name="Projects">
     <folder name="org-netbeans-modules-javafx-project">
       <folder name="Lookup">
         <file name="org.netbeans.modules.javafx.profiler.LookupProviderImpl.instance"/>

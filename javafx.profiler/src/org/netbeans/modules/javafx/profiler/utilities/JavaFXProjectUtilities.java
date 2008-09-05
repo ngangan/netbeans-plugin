@@ -40,9 +40,12 @@
 package org.netbeans.modules.javafx.profiler.utilities;
 
 import com.sun.tools.javac.code.Kinds;
+import java.io.IOException;
 import java.util.LinkedList;
+import javax.lang.model.util.Elements;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
@@ -79,9 +82,14 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import org.netbeans.api.javafx.source.CancellableTask;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.source.tree.ClassTree;
+import javax.lang.model.element.ElementKind;
+import org.netbeans.modules.profiler.utils.OutputParameter;
 
-/**
- *
+/* 
  * @author cms
  */
 public class JavaFXProjectUtilities extends ProjectUtilities {
@@ -93,7 +101,40 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static final String MAGIC_METHOD_SIGNATURE    = "(Lcom/sun/javafx/runtime/sequence/Sequence;)Ljava/lang/Object;";  // NOI18N
     public static final String INTERFACE_NAME_SUFFIX = "$Intf";  // NOI18N
     public static final String JAVAFX_PREFIX = "javafx.";  // NOI18N
-    
+
+    public static String getEnclosingClassName(FileObject profiledClassFile, final int position) {
+        final OutputParameter<String> result = new OutputParameter<String>(null);
+
+        if (isJavaFXFile(profiledClassFile)) {
+            JavaFXSource js = JavaFXSource.forFileObject(profiledClassFile);
+
+            if (js == null) {
+                return null; // not java source
+            }
+
+            try {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
+                        public void cancel() {
+                        }
+
+                        public void run(final CompilationController controller)
+                                 throws Exception {
+                            controller.toPhase(Phase.ANALYZED);
+                            TypeElement parentClass = controller.getTreeUtilities().scopeFor(position).getEnclosingClass();
+
+                            if (parentClass != null) {
+                                // no enclosing class found (i.e. cursor at import)
+                                result.setValue(getBinaryName(parentClass, parentClass.getEnclosingElement()));
+                            }
+                        }
+                    }, true);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return result.getValue();
+    }
 
     public static ClientUtils.SourceCodeSelection[] getProjectDefaultRoots(Project project, String[][] projectPackagesDescr) {
         computeProjectPackages(project, true, projectPackagesDescr);
@@ -146,6 +187,49 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 signature.substring(0, signature.indexOf(INTERFACE_NAME_SUFFIX)).
         concat(signature.substring(signature.indexOf(INTERFACE_NAME_SUFFIX) +
         INTERFACE_NAME_SUFFIX.length(), signature.length())) : signature;
+    }
+
+    public static String getToplevelClassName(FileObject profiledClassFile) {
+        final String[] result = new String[1];
+
+        if (isJavaFXFile(profiledClassFile)) {
+            JavaFXSource js = JavaFXSource.forFileObject(profiledClassFile);
+
+            if (js == null) {
+                return null; // not java source
+            }
+
+            try {
+                js.runUserActionTask(new CancellableTask<CompilationController>() {
+                        public void cancel() {
+                        }
+
+                        public void run(final CompilationController controller)
+                                 throws Exception {
+                            // Controller has to be in some advanced phase, otherwise controller.getCompilationUnit() == null
+                            controller.toPhase(Phase.ANALYZED);
+
+                            JavaFXTreePathScanner<String, Void> scanner = new JavaFXTreePathScanner<String, Void>() {
+                                public String visitClassDeclaration(ClassTree node, Void p) {
+                                    try {
+                                        TypeElement classElement = (TypeElement) controller.getTrees().getElement(getCurrentPath());
+                                        return getBinaryName(classElement, classElement.getEnclosingElement());
+                                    } catch (NullPointerException e) {
+                                        ProfilerLogger.log(e);
+                                        return "";
+                                    }
+                                }
+                            };
+
+                            result[0] = scanner.scan(controller.getCompilationUnit(), null);
+                        }
+                    }, true);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return result[0];
     }
 
     private static void addSubpackages(Collection<String> packages, String prefix, FileObject packageFO) {
@@ -512,5 +596,177 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     
     private static TypeElement getDeclaredType(TypeMirror type) {
         return (TypeElement) ((DeclaredType)type).asElement();
+    }
+    
+    public static ResolvedMethod resolveMethodAtPosition(final FileObject fo, final int position) {
+        // Get JavaSource for given FileObject
+        JavaFXSource js = JavaFXSource.forFileObject(fo);
+
+        if (js == null) {
+            return null; // not java source
+        }
+
+        // Final holder of resolved method
+        final OutputParameter<ResolvedMethod> resolvedMethod = new OutputParameter(null);
+
+        // Resolve the method
+        try {
+            js.runUserActionTask(new CancellableTask<CompilationController>() {
+
+                public void cancel() {
+                }
+
+                public void run(CompilationController ci) throws Exception {
+                    ci.toPhase(Phase.ANALYZED);
+
+                    JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
+                    if (path == null) {
+                        return;
+                    }
+                    
+                    Element element = ci.getTrees().getElement(path);
+                    if ((element != null) && ((element.getKind() == ElementKind.METHOD) || (element.getKind() == ElementKind.CONSTRUCTOR) || (element.getKind() == ElementKind.STATIC_INIT))) {
+                        ExecutableElement method = (ExecutableElement) element;
+                        TypeElement classElement = (TypeElement)method.getEnclosingElement();
+
+                        String vmClassName = getBinaryName(classElement, classElement.getEnclosingElement());
+                        String vmMethodName = method.getSimpleName().toString();
+                        String vmMethodSignature = getVMMethodSignature(method, ci);
+                        resolvedMethod.setValue(new ResolvedMethod(method, vmClassName, vmMethodName, vmMethodSignature));
+                    }
+                }
+            }, true);
+        } catch (IOException ioex) {
+            ProfilerLogger.log(ioex);
+            ioex.printStackTrace();
+
+            return null;
+        }
+
+        return resolvedMethod.getValue();
+    }
+    
+        public static ResolvedClass resolveClassAtPosition(final FileObject fo, final int position, final boolean resolveField) {
+        // Get JavaFXSource for given FileObject
+        JavaFXSource js = JavaFXSource.forFileObject(fo);
+
+        if (js == null) {
+            return null; // not java source
+        }
+
+        // Final holder of resolved method
+        final OutputParameter<ResolvedClass> resolvedClass = new OutputParameter(null);
+
+        // Resolve the method
+        try {
+            js.runUserActionTask(new CancellableTask<CompilationController>() {
+                    public void cancel() {
+                    }
+
+                    public void run(CompilationController ci)
+                             throws Exception {
+                        ci.toPhase(Phase.ANALYZED);
+
+                        JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
+
+                        if (path == null) {
+                            return;
+                        }
+
+                        Element element = ci.getTrees().getElement(path);
+
+                        if (element == null) {
+                            return;
+                        }
+
+                        // resolve class/enum at cursor
+                        if ((element.getKind() == ElementKind.CLASS) || (element.getKind() == ElementKind.ENUM)) {
+                            TypeElement jclass = (TypeElement) element;
+                            String vmClassName = getBinaryName(jclass, jclass.getEnclosingElement());
+                            resolvedClass.setValue(new ResolvedClass(jclass, vmClassName));
+
+                            return;
+                        }
+
+                        // resolve field at cursor
+                        if (resolveField
+                                && ((element.getKind() == ElementKind.FIELD) || (element.getKind() == ElementKind.LOCAL_VARIABLE))
+                                && (element.asType().getKind() == TypeKind.DECLARED)) {
+                            TypeElement jclass = getDeclaredType(element.asType());
+                            String vmClassName = getBinaryName(jclass, jclass.getEnclosingElement());
+                            resolvedClass.setValue(new ResolvedClass(jclass, vmClassName));
+
+                            return;
+                        }
+                    }
+                }, true);
+        } catch (IOException ioex) {
+            ProfilerLogger.log(ioex);
+            ioex.printStackTrace();
+
+            return null;
+        }
+
+        return resolvedClass.getValue();
+    }
+        
+    public static class ResolvedClass {
+        //~ Instance fields ------------------------------------------------------------------------------------------------------
+
+        private String vmClassName;
+        private TypeElement jclass;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        ResolvedClass(TypeElement jclass, String className) {
+            this.jclass = jclass;
+            this.vmClassName = className;
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        public TypeElement getJClass() {
+            return jclass;
+        }
+
+        public String getVMClassName() {
+            return vmClassName;
+        }
+    }
+
+    public static class ResolvedMethod {
+        //~ Instance fields ------------------------------------------------------------------------------------------------------
+
+        private ExecutableElement method;
+        private String vmClassName;
+        private String vmMethodName;
+        private String vmMethodSignature;
+
+        //~ Constructors ---------------------------------------------------------------------------------------------------------
+
+        ResolvedMethod(ExecutableElement method, String className, String methodName, String methodSignature) {
+            this.method = method;
+            this.vmClassName = className;
+            this.vmMethodName = methodName;
+            this.vmMethodSignature = methodSignature;
+        }
+
+        //~ Methods --------------------------------------------------------------------------------------------------------------
+
+        public ExecutableElement getMethod() {
+            return method;
+        }
+
+        public String getVMClassName() {
+            return vmClassName;
+        }
+
+        public String getVMMethodName() {
+            return vmMethodName;
+        }
+
+        public String getVMMethodSignature() {
+            return vmMethodSignature;
+        }
     }
 }
