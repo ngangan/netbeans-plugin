@@ -128,7 +128,7 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
             if (seq.moveNext()) {
                 int offset = -1;
                 final TokenId id = seq.token().id();
-                if (id == JFXTokenId.STRING_LITERAL || id == JFXTokenId.COMMENT || id == JFXTokenId.LINE_COMMENT) {
+                if (id == JFXTokenId.STRING_LITERAL || isComment((JFXTokenId) id)) {
                     offset = BracesMatcherSupport.matchChar(
                             context.getDocument(),
                             backward ? originOffset : originOffset + 1,
@@ -183,6 +183,11 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
         }
 
         return null;
+    }
+
+
+    private static boolean isComment(JFXTokenId id) {
+        return id == JFXTokenId.COMMENT || id == JFXTokenId.LINE_COMMENT || id == JFXTokenId.DOC_COMMENT;
     }
 
     // -----------------------------------------------------

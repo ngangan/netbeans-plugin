@@ -394,7 +394,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                         if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset);
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
                     }
-                    if (token.id() == JFXTokenId.COMMENT) {
+                    if (token.id() == JFXTokenId.COMMENT || token.id() == JFXTokenId.DOC_COMMENT) {
                         Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
                         if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]");

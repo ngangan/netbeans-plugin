@@ -188,7 +188,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                 } else
                 if (t.id() == JFXTokenId.RBRACE || t.id() == JFXTokenId.RPAREN || t.id() == JFXTokenId.RBRACKET) {
                     level -= getIndentStepLevel();
-                } else if (t.id() == JFXTokenId.COMMENT) {
+                } else if (t.id() == JFXTokenId.COMMENT || t.id() == JFXTokenId.DOC_COMMENT) {
                     level -= getIndentStepLevel();
                 }
                 t = ts.moveNext() ? ts.token() : null;
