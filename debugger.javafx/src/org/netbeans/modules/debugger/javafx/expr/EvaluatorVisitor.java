@@ -1856,9 +1856,27 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         return expression.virtualMachine().mirrorOf(((ArrayReference) expression).length());
                     }
                     ReferenceType type = ((ObjectReference) expression).referenceType();
-                    Field f = type.fieldByName("$"+fieldName);
-                    if (f != null) {
-                        return ((ObjectReference) expression).getValue(f);
+                    String ext = "$"+type.name().replace('.', '$')+"$";
+                    Field f = type.fieldByName(ext+fieldName);
+                    if (f != null){
+                        Value v = ((ObjectReference)expression).getValue(f);
+                        if (v instanceof ObjectReference) {
+                            ObjectReference ref =  (ObjectReference)v;
+                            ReferenceType rt = ref.referenceType();
+                            if (rt != null) {
+                                Field vf = rt.fieldByName("$value");
+                                if (vf != null) {
+                                    Value val = ref.getValue(vf);
+                                    if (val instanceof PrimitiveValue) {
+                                        return getPrimitiveValue((PrimitiveValue)val,expression.virtualMachine());
+                                    }
+                                    return val;
+                                }
+                            }
+                        }
+                        return v;
+//                    if (f != null) {
+//                        return ((ObjectReference) expression).getValue(f);
                     } else {
                         Assert2.error(arg0, "unknownField", "$"+fieldName);
                         return null;

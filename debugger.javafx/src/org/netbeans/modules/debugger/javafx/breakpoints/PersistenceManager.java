@@ -101,8 +101,8 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
                 } catch (MalformedURLException ex) {
                     ErrorManager.getDefault().notify(ex);
                 }
-//TODO XXX This case needed because Field Breakpoints is not stored in Properties correctly
-// Field name and Class name is absent, so we need to remove incorrect breakpoints
+//This case needed in case Field Breakpoints is not stored in Properties correctly
+//If Field name and Class name is absent, so we need to remove incorrect breakpoints
             } else if(breakpoints[i] instanceof FieldBreakpoint) {
                 FieldBreakpoint fb = (FieldBreakpoint)breakpoints[i];
                 if (fb.getClassName()==null || fb.getFieldName()==null) {
