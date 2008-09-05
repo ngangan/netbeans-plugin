@@ -38,40 +38,31 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.modules.javafx.navigation.actions;
 
-package org.netbeans.modules.javafx.navigation;
-
-import java.util.List;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.CaretAwareJavaSourceTaskFactory;
-import org.openide.filesystems.FileObject;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import org.netbeans.modules.javafx.navigation.JavadocTopComponent;
+import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
 
 /**
- * This factory creates tasks sensitive to the caret position in open Java editor.
- *
+ * Action which shows Javadoc component.
+ * 
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  */
-public class CaretListeningFactory extends CaretAwareJavaSourceTaskFactory {
-    
-    private static CaretListeningFactory INSTANCE;
+public class JavadocAction extends AbstractAction {
 
-    public CaretListeningFactory() {
-        super(Phase.ANALYZED, Priority.LOW);
-        INSTANCE = this;
+    public JavadocAction() {
+        super(NbBundle.getMessage(JavadocAction.class, "CTL_JavadocAction"));
+        putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(JavadocTopComponent.ICON_PATH, true)));
     }
 
-    public CancellableTask<CompilationInfo> createTask(FileObject fileObject) {
-        return new CaretListeningTask(this, fileObject);
-    }
-    
-    static void runAgain() {
-        List<FileObject> fileObjects = INSTANCE.getFileObjects();
-        CaretListeningTask.resetLastEH();
-        if ( !fileObjects.isEmpty() ) {
-            INSTANCE.reschedule(fileObjects.iterator().next());
-        }
+    public void actionPerformed(ActionEvent evt) {
+        TopComponent win = JavadocTopComponent.findInstance();
+        win.open();
+        win.requestActive();
     }
 }

@@ -171,9 +171,8 @@ public final class ElementUtilities {
                 case CLASS:
                 case ENUM:
 //                case INTERFACE:
-//                    return env.getClassDoc((ClassSymbol)element);
+                    return env.getClassDoc((ClassSymbol) element);
                 case ENUM_CONSTANT:
-                // XXX not public ?
                 case FIELD:
                     return env.getFieldDoc((VarSymbol) element);
                 case METHOD:

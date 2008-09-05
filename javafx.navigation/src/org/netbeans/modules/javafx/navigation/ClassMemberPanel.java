@@ -43,6 +43,7 @@ package org.netbeans.modules.javafx.navigation;
 
 import javax.lang.model.element.Element;
 import javax.swing.JComponent;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -50,6 +51,7 @@ import org.openide.util.NbBundle;
 /**
  *
  * @author Tomas Zezula
+ * @author Anton Chechel - javafx modifications
  */
 public class ClassMemberPanel implements NavigatorPanel {
 
@@ -94,8 +96,8 @@ public class ClassMemberPanel implements NavigatorPanel {
         return getClassMemberPanelUI();
     }
 
-    public void selectElement(Element e) {
-        getClassMemberPanelUI().selectElementNode(e);
+    public void selectElement(ElementHandle<Element> eh) {
+        getClassMemberPanelUI().selectElementNode(eh);
     }
     
     private synchronized ClassMemberPanelUI getClassMemberPanelUI() {
