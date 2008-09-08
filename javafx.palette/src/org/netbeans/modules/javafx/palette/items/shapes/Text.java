@@ -60,8 +60,8 @@ public class Text implements ActiveEditorDrop {
         
         // Imports
         Util.addImport( targetComponent, "javafx.scene.text.Text" );
-        Util.addImport( targetComponent, "javafx.scene.Font" );
-        Util.addImport( targetComponent, "javafx.scene.FontStyle" );
+        Util.addImport( targetComponent, "javafx.scene.text.Font" );
+//        Util.addImport( targetComponent, "javafx.scene.FontStyle" );
         
         return true;
     }

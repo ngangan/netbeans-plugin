@@ -69,20 +69,9 @@ import org.openide.xml.XMLUtil;
  * @author Anton Chechel - javafx modifications
  */
 public class ElementJavadoc {
-    
-    private static final String API = "/api";                                   //NOI18N
-    private static final Set<String> LANGS = Collections.<String>unmodifiableSet(new HashSet<String>(Arrays.<String>asList(Locale.getISOLanguages())));
-    
-    private ElementJavadoc() {
-    }
 
-    private ClasspathInfo cpInfo;
-    //private Doc doc;
-    private String content = null;
-    private Hashtable<String, ElementHandle<? extends Element>> links = new Hashtable<String, ElementHandle<? extends Element>>();
-    private int linkCounter = 0;
-    private URL docURL = null;
-    private AbstractAction goToSource = null;
+    private static final String API = "/api"; // NOI18N
+    private static final Set<String> LANGS = Collections.<String>unmodifiableSet(new HashSet<String>(Arrays.<String>asList(Locale.getISOLanguages())));
 
     private static final String PARAM_TAG = "@param"; //NOI18N
     private static final String RETURN_TAG = "@return"; //NOI18N
@@ -94,11 +83,22 @@ public class ElementJavadoc {
     private static final String CODE_TAG = "@code"; //NOI18N
     private static final String DEPRECATED_TAG = "@deprecated"; //NOI18N
     private static final String VALUE_TAG = "@value"; //NOI18N
-    
+
+    private ElementJavadoc() {
+    }
+
+    private ClasspathInfo cpInfo;
+    //private Doc doc;
+    private String content = null;
+    private Hashtable<String, ElementHandle<? extends Element>> links = new Hashtable<String, ElementHandle<? extends Element>>();
+    private int linkCounter = 0;
+    private URL docURL = null;
+    private AbstractAction goToSource = null;
+
     /** Creates an object describing the Javadoc of given element. The object
      * is capable of getting the text formated into HTML, resolve the links,
      * jump to external javadoc.
-     * 
+     *
      * @param compilationInfo CompilationInfo
      * @param element Element the javadoc is required for
      * @return ElementJavadoc describing the jaadoc
@@ -106,8 +106,8 @@ public class ElementJavadoc {
     public static final ElementJavadoc create(CompilationInfo compilationInfo, Element element) {
         return new ElementJavadoc(compilationInfo, element, null);
     }
-    
-    /** Gets the javadoc comment formated as HTML.      
+
+    /** Gets the javadoc comment formated as HTML.
      * @return HTML text of the javadoc
      */
     public String getText() {
@@ -116,12 +116,12 @@ public class ElementJavadoc {
 
     /** Gets URL of the external javadoc.
      * @return Text of the Javadoc comment formated as HTML
-     */ 
+     */
     public URL getURL() {
         return docURL;
     }
 
-    /** Resolves a link contained in the Javadoc comment to a n object 
+    /** Resolves a link contained in the Javadoc comment to a n object
      * describing the linked javadoc
      * @param link Link which has to be resolved
      * @return ElementJavadoc describing the javadoc of liked element
@@ -140,21 +140,25 @@ public class ElementJavadoc {
             if (js != null) {
                 js.runUserActionTask(new Task<CompilationController>() {
                     public void run(CompilationController controller) throws IOException {
-                        controller.toPhase(Phase.ANALYZED);
+                        if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                            return;
+                        }
                         if (linkDoc != null) {
                             ret[0] = new ElementJavadoc(controller, linkDoc.resolve(controller), null);
                         } else {
                             int idx = link.indexOf('#'); //NOI18N
                             URI uri = URI.create(idx < 0 ? link : link.substring(0, idx));
                             if (uri != null) {
-                                if (!uri.isAbsolute())
+                                if (!uri.isAbsolute()) {
                                     uri = uri.normalize();
+                                }
                                 String path = uri.toString();
                                 int startIdx = path.lastIndexOf(".."); //NOI18N
                                 startIdx = startIdx < 0 ? 0 : startIdx + 3;
                                 int endIdx = path.lastIndexOf('.'); //NOI18N
-                                if (endIdx >= 0)
+                                if (endIdx >= 0) {
                                     path = path.substring(startIdx, endIdx);
+                                }
                                 String clsName = path.replace('/', '.'); //NOI18N
                                 Element e = controller.getElements().getTypeElement(clsName);
                                 if (e != null) {
@@ -172,9 +176,10 @@ public class ElementJavadoc {
                                     ret[0] = new ElementJavadoc(controller, e, new URL(docURL, link));
                                 } else {
                                     //external URL
-                                    if( uri.isAbsolute() )
-                                        ret[0] = new ElementJavadoc( uri.toURL() );
-                                } 
+                                    if (uri.isAbsolute()) {
+                                        ret[0] = new ElementJavadoc(uri.toURL());
+                                    }
+                                }
                             }
                         }
                     }
@@ -186,7 +191,6 @@ public class ElementJavadoc {
         return ret[0];
     }
 
-    
     /** Gets action capable of juming to source of the Element this Javadoc
      * belongs to.
      * @return Action going to the source of the Element described by this javadoc.
@@ -194,7 +198,7 @@ public class ElementJavadoc {
     public Action getGotoSourceAction() {
         return goToSource;
     }
-    
+
     private ElementJavadoc(CompilationInfo compilationInfo, Element element, URL url) {
         ElementUtilities eu = compilationInfo.getElementUtilities();
         this.cpInfo = compilationInfo.getJavaFXSource().getCpInfo();
@@ -208,6 +212,7 @@ public class ElementJavadoc {
                 final FileObject fo = JavaFXSourceUtils.getFile(handle, cpInfo);
                 if (fo != null) {
                     goToSource = new AbstractAction() {
+
                         public void actionPerformed(ActionEvent evt) {
                             try {
                                 ElementOpen.open(fo, handle);
@@ -224,7 +229,7 @@ public class ElementJavadoc {
         }
         this.content = prepareContent(eu, doc, localized);
     }
-    
+
     private ElementJavadoc(URL url) {
         assert url != null;
         this.content = null;
@@ -232,7 +237,7 @@ public class ElementJavadoc {
     }
 
     // Private section ---------------------------------------------------------
-    private boolean isLocalized (final URL docURL, final Element element) {
+    private static boolean isLocalized(final URL docURL, final Element element) {
         if (docURL == null) {
             return false;
         }
@@ -243,28 +248,28 @@ public class ElementJavadoc {
                 return false;
             }
         }
-        String pkgBinName = ((PackageElement)pkg).getQualifiedName().toString();
+        String pkgBinName = ((PackageElement) pkg).getQualifiedName().toString();
         String surl = docURL.toString();
         int index = surl.lastIndexOf('/');      //NOI18N
         if (index < 0) {
             return false;
         }
-        index-=(pkgBinName.length()+1);
+        index -= (pkgBinName.length() + 1);
         if (index < 0) {
             return false;
         }
-        index-=API.length();        
-        if (index < 0 || !surl.regionMatches(index,API,0,API.length())) {
+        index -= API.length();
+        if (index < 0 || !surl.regionMatches(index, API, 0, API.length())) {
             return false;
         }
-        int index2 = surl.lastIndexOf('/', index-1);  //NOI18N
+        int index2 = surl.lastIndexOf('/', index - 1);  //NOI18N
         if (index2 < 0) {
             return false;
         }
-        String lang = surl.substring(index2+1, index);        
+        String lang = surl.substring(index2 + 1, index);
         return LANGS.contains(lang);
     }
-           
+
     /**
      * Creates javadoc content
      * @param eu element utilities to find out elements
@@ -276,30 +281,31 @@ public class ElementJavadoc {
         StringBuilder sb = new StringBuilder();
         if (doc != null) {
             if (doc instanceof ProgramElementDoc) {
-                sb.append(getContainingClassOrPackageHeader(eu, (ProgramElementDoc)doc));
+                sb.append(getContainingClassOrPackageHeader(eu, (ProgramElementDoc) doc));
             }
             if (doc.isMethod() || doc.isConstructor() || doc.isAnnotationTypeElement()) {
-                sb.append(getMethodHeader(eu, (ExecutableMemberDoc)doc));
+                sb.append(getMethodHeader(eu, (ExecutableMemberDoc) doc));
             } else if (doc.isField() || doc.isEnumConstant()) {
-                sb.append(getFieldHeader(eu, (FieldDoc)doc));
+                sb.append(getFieldHeader(eu, (FieldDoc) doc));
             } else if (doc.isClass() || doc.isInterface() || doc.isAnnotationType()) {
-                sb.append(getClassHeader(eu, (ClassDoc)doc));
+                sb.append(getClassHeader(eu, (ClassDoc) doc));
             } else if (doc instanceof PackageDoc) {
-                sb.append(getPackageHeader(eu, (PackageDoc)doc));
+                sb.append(getPackageHeader(eu, (PackageDoc) doc));
             }
             sb.append("<p>"); //NOI18N
             if (!useJavadoc) {
                 Tag[] inlineTags = doc.inlineTags();
                 if (doc.isMethod()) {
-                    MethodDoc mdoc = (MethodDoc)doc;
+                    MethodDoc mdoc = (MethodDoc) doc;
                     List<Tag> inheritedTags = null;
                     if (inlineTags.length == 0) {
                         inheritedTags = new ArrayList<Tag>();
                     } else {
                         for (Tag tag : inlineTags) {
                             if (INHERIT_DOC_TAG.equals(tag.kind())) {
-                                if (inheritedTags == null)
+                                if (inheritedTags == null) {
                                     inheritedTags = new ArrayList<Tag>();
+                                }
                             }
                         }
                     }
@@ -310,11 +316,12 @@ public class ElementJavadoc {
                             inheritedReturnTags = new ArrayList<Tag>();
                         } else {
                             List<Tag> tags = new ArrayList<Tag>();
-                            for(Tag tag : returnTags) {
-                                for(Tag t : tag.inlineTags()) {
+                            for (Tag tag : returnTags) {
+                                for (Tag t : tag.inlineTags()) {
                                     if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                        if (inheritedReturnTags == null)
+                                        if (inheritedReturnTags == null) {
                                             inheritedReturnTags = new ArrayList<Tag>();
+                                        }
                                     }
                                     tags.add(t);
                                 }
@@ -329,20 +336,23 @@ public class ElementJavadoc {
                     Parameter[] parameters = mdoc.parameters();
                     if (parameters.length > 0) {
                         paramTags = new LinkedHashMap<Integer, List<Tag>>();
-                        for (int i = 0; i < parameters.length; i++)
+                        for (int i = 0; i < parameters.length; i++) {
                             paramPos.add(i);
+                        }
                     }
-                    for(ParamTag tag : mdoc.paramTags()) {
+                    for (ParamTag tag : mdoc.paramTags()) {
                         Integer pos = paramPos(mdoc, tag);
                         if (paramPos.remove(pos)) {
                             List<Tag> tags = new ArrayList<Tag>();
                             paramTags.put(pos, tags);
-                            for(Tag t : tag.inlineTags()) {
+                            for (Tag t : tag.inlineTags()) {
                                 if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                    if (inheritedParamTags == null)
-                                        inheritedParamTags = new LinkedHashMap<Integer,ParamTag>();
-                                    if (inheritedParamInlineTags == null)
+                                    if (inheritedParamTags == null) {
+                                        inheritedParamTags = new LinkedHashMap<Integer, ParamTag>();
+                                    }
+                                    if (inheritedParamInlineTags == null) {
                                         inheritedParamInlineTags = new LinkedHashMap<Integer, List<Tag>>();
+                                    }
                                     paramPos.add(pos);
                                 } else {
                                     tags.add(t);
@@ -351,29 +361,34 @@ public class ElementJavadoc {
                         }
                     }
                     if (!paramPos.isEmpty()) {
-                        if (inheritedParamTags == null)
-                            inheritedParamTags = new LinkedHashMap<Integer,ParamTag>();
-                        if (inheritedParamInlineTags == null)
+                        if (inheritedParamTags == null) {
+                            inheritedParamTags = new LinkedHashMap<Integer, ParamTag>();
+                        }
+                        if (inheritedParamInlineTags == null) {
                             inheritedParamInlineTags = new LinkedHashMap<Integer, List<Tag>>();
+                        }
                     }
                     Set<String> throwsTypes = new HashSet<String>();
                     List<ThrowsTag> throwsTags = new ArrayList<ThrowsTag>();
                     Map<String, List<Tag>> throwsInlineTags = new HashMap<String, List<Tag>>();
                     Map<String, ThrowsTag> inheritedThrowsTags = null;
                     Map<String, List<Tag>> inheritedThrowsInlineTags = null;
-                    for (Type exc : mdoc.thrownExceptionTypes())
+                    for (Type exc : mdoc.thrownExceptionTypes()) {
                         throwsTypes.add(exc.typeName());
-                    for(ThrowsTag tag : mdoc.throwsTags()) {
+                    }
+                    for (ThrowsTag tag : mdoc.throwsTags()) {
                         throwsTypes.remove(tag.exceptionName());
                         List<Tag> tags = new ArrayList<Tag>();
                         throwsTags.add(tag);
                         throwsInlineTags.put(tag.exceptionName(), tags);
-                        for(Tag t : tag.inlineTags()) {
+                        for (Tag t : tag.inlineTags()) {
                             if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                if (inheritedThrowsTags == null)
+                                if (inheritedThrowsTags == null) {
                                     inheritedThrowsTags = new LinkedHashMap<String, ThrowsTag>();
-                                if (inheritedThrowsInlineTags == null)
+                                }
+                                if (inheritedThrowsInlineTags == null) {
                                     inheritedThrowsInlineTags = new HashMap<String, List<Tag>>();
+                                }
                                 throwsTypes.add(tag.exceptionName());
                             } else {
                                 tags.add(t);
@@ -381,28 +396,32 @@ public class ElementJavadoc {
                         }
                     }
                     if (!throwsTypes.isEmpty()) {
-                        if (inheritedThrowsTags == null)
+                        if (inheritedThrowsTags == null) {
                             inheritedThrowsTags = new LinkedHashMap<String, ThrowsTag>();
-                        if (inheritedThrowsInlineTags == null)
+                        }
+                        if (inheritedThrowsInlineTags == null) {
                             inheritedThrowsInlineTags = new HashMap<String, List<Tag>>();
+                        }
                     }
                     if (inheritedTags != null && inheritedTags.isEmpty() ||
                             inheritedReturnTags != null && inheritedReturnTags.isEmpty() ||
                             paramPos != null && !paramPos.isEmpty() ||
-                            throwsTypes != null && !throwsTypes.isEmpty())
+                            throwsTypes != null && !throwsTypes.isEmpty()) {
                         inheritedDocFor(mdoc, mdoc.containingClass(), inheritedTags, inheritedReturnTags,
                                 paramPos, inheritedParamTags, inheritedParamInlineTags,
                                 throwsTypes, inheritedThrowsTags, inheritedThrowsInlineTags);
+                    }
                     if (inheritedTags != null && !inheritedTags.isEmpty()) {
                         if (inlineTags.length == 0) {
                             inlineTags = inheritedTags.toArray(new Tag[inheritedTags.size()]);
                         } else {
                             List<Tag> tags = new ArrayList<Tag>();
                             for (Tag tag : inlineTags) {
-                                if (INHERIT_DOC_TAG.equals(tag.kind()))
+                                if (INHERIT_DOC_TAG.equals(tag.kind())) {
                                     tags.addAll(inheritedTags);
-                                else
+                                } else {
                                     tags.add(tag);
+                                }
                             }
                             inlineTags = tags.toArray(new Tag[tags.size()]);
                         }
@@ -412,12 +431,13 @@ public class ElementJavadoc {
                             returnTags = inheritedReturnTags.toArray(new Tag[inheritedReturnTags.size()]);
                         } else {
                             List<Tag> tags = new ArrayList<Tag>();
-                            for(Tag tag : returnTags) {
-                                for(Tag t : tag.inlineTags()) {
-                                    if (INHERIT_DOC_TAG.equals(t.kind()))
+                            for (Tag tag : returnTags) {
+                                for (Tag t : tag.inlineTags()) {
+                                    if (INHERIT_DOC_TAG.equals(t.kind())) {
                                         tags.addAll(inheritedReturnTags);
-                                    else
+                                    } else {
                                         tags.add(t);
+                                    }
                                 }
                             }
                             returnTags = tags.toArray(new Tag[tags.size()]);
@@ -433,18 +453,20 @@ public class ElementJavadoc {
                                 List<Tag> inTags = paramTags.get(paramTag.parameterName());
                                 inTags.clear();
                                 for (Tag tag : paramTag.inlineTags()) {
-                                    if (INHERIT_DOC_TAG.equals(tag.kind()))
+                                    if (INHERIT_DOC_TAG.equals(tag.kind())) {
                                         inTags.addAll(tags);
-                                    else
+                                    } else {
                                         inTags.add(tag);
+                                    }
                                 }
                             }
                         }
                         for (Integer pos : inheritedParamTags.keySet()) {
                             ppos.add(pos);
                             List<Tag> tags = inheritedParamInlineTags.get(pos);
-                            if (tags != null && !tags.isEmpty())
+                            if (tags != null && !tags.isEmpty()) {
                                 paramTags.put(pos, tags);
+                            }
                         }
                     }
                     if (inheritedThrowsTags != null && !inheritedThrowsTags.isEmpty()) {
@@ -455,18 +477,20 @@ public class ElementJavadoc {
                                 List<Tag> inTags = throwsInlineTags.get(throwsTag.exceptionName());
                                 inTags.clear();
                                 for (Tag tag : throwsTag.inlineTags()) {
-                                    if (INHERIT_DOC_TAG.equals(tag.kind()))
+                                    if (INHERIT_DOC_TAG.equals(tag.kind())) {
                                         inTags.addAll(tags);
-                                    else
+                                    } else {
                                         inTags.add(tag);
+                                    }
                                 }
                             }
                         }
                         for (Map.Entry<String, ThrowsTag> entry : inheritedThrowsTags.entrySet()) {
                             throwsTags.add(entry.getValue());
                             List<Tag> tags = inheritedThrowsInlineTags.get(entry.getKey());
-                            if (tags != null && !tags.isEmpty())
+                            if (tags != null && !tags.isEmpty()) {
                                 throwsInlineTags.put(entry.getKey(), tags);
+                            }
                         }
                     }
                     if (inlineTags.length > 0 || doc.tags().length > 0) {
@@ -490,24 +514,25 @@ public class ElementJavadoc {
                 }
             }
             String jdText = docURL != null ? HTMLJavadocParser.getJavadocText(docURL, false) : null;
-            if (jdText != null)
+            if (jdText != null) {
                 sb.append(jdText);
-            else
+            } else {
                 sb.append(NbBundle.getMessage(ElementJavadoc.class, "javadoc_content_not_found")); //NOI18N
+            }
             sb.append("</p>"); //NOI18N
             return sb.toString();
         }
         sb.append(NbBundle.getMessage(ElementJavadoc.class, "javadoc_content_not_found")); //NOI18N
         return sb.toString();
     }
-    
+
     private CharSequence getContainingClassOrPackageHeader(ElementUtilities eu, ProgramElementDoc peDoc) {
         StringBuilder sb = new StringBuilder();
         ClassDoc cls = peDoc.containingClass();
         if (cls != null) {
             Element e = eu.elementFor(cls);
             if (e != null) {
-                switch(e.getEnclosingElement().getKind()) {
+                switch (e.getEnclosingElement().getKind()) {
                     case ANNOTATION_TYPE:
                     case CLASS:
                     case ENUM:
@@ -530,16 +555,17 @@ public class ElementJavadoc {
         }
         return sb;
     }
-    private String makeNameLineBreakable(String name) {
-        return name.replace(".", /* ZERO WIDTH SPACE */".&#x200B;");
+
+    private static String makeNameLineBreakable(String name) {
+        return name.replace(".", /* ZERO WIDTH SPACE */ ".&#x200B;");
     }
-    
+
     private CharSequence getMethodHeader(ElementUtilities eu, ExecutableMemberDoc mdoc) {
         StringBuilder sb = new StringBuilder();
         sb.append("<p><tt>"); //NOI18N
         sb.append(getAnnotations(eu, mdoc.annotations()));
         int len = sb.length();
-        sb.append(Modifier.toString(mdoc.modifierSpecifier() &~ Modifier.NATIVE));
+        sb.append(Modifier.toString(mdoc.modifierSpecifier() & ~Modifier.NATIVE));
         len = sb.length() - len;
         TypeVariable[] tvars = mdoc.typeParameters();
         if (tvars.length > 0) {
@@ -563,7 +589,7 @@ public class ElementJavadoc {
                 sb.append(' '); //NOI18N
                 len++;
             }
-            len += appendType(eu, sb, ((MethodDoc)mdoc).returnType(), false, false);
+            len += appendType(eu, sb, ((MethodDoc) mdoc).returnType(), false, false);
         }
         String name = mdoc.name();
         len += name.length();
@@ -572,35 +598,37 @@ public class ElementJavadoc {
             sb.append('('); //NOI18N
             len++;
             Parameter[] params = mdoc.parameters();
-            for(int i = 0; i < params.length; i++) {
+            for (int i = 0; i < params.length; i++) {
                 boolean varArg = i == params.length - 1 && mdoc.isVarArgs();
                 appendType(eu, sb, params[i].type(), varArg, false);
                 sb.append(' ').append(params[i].name()); //NOI18N
                 String dim = params[i].type().dimension();
                 if (dim.length() > 0) {
-                    if (varArg)
+                    if (varArg) {
                         dim = dim.substring(2) + "..."; //NOI18N
+                    }
                 }
                 if (i < params.length - 1) {
                     sb.append(",\n"); //NOI18N
                     appendSpace(sb, len);
                 }
             }
-            sb.append(')'); //NOI18N            
+            sb.append(')'); //NOI18N
         }
         Type[] exs = mdoc.thrownExceptionTypes();
         if (exs.length > 0) {
             sb.append("\nthrows "); //NOI18N
             for (int i = 0; i < exs.length; i++) {
                 appendType(eu, sb, exs[i], false, false);
-                if (i < exs.length - 1)
+                if (i < exs.length - 1) {
                     sb.append(", "); //NOI18N
+                }
             }
         }
         sb.append("</tt></p>"); //NOI18N
         return sb;
     }
-    
+
     private CharSequence getFieldHeader(ElementUtilities eu, FieldDoc fdoc) {
         StringBuilder sb = new StringBuilder();
         sb.append("<p><tt>"); //NOI18N
@@ -608,40 +636,45 @@ public class ElementJavadoc {
         int len = sb.length();
         sb.append(fdoc.modifiers());
         len = sb.length() - len;
-        if (len > 0)
+        if (len > 0) {
             sb.append(' '); //NOI18N
+        }
         appendType(eu, sb, fdoc.type(), false, false);
         sb.append(" <b>").append(fdoc.name()).append("</b>"); //NOI18N
         sb.append("</tt></p>"); //NOI18N
         return sb;
     }
-    
+
     private CharSequence getClassHeader(ElementUtilities eu, ClassDoc cdoc) {
         StringBuilder sb = new StringBuilder();
         sb.append("<p><tt>"); //NOI18N
         sb.append(getAnnotations(eu, cdoc.annotations()));
         int mods = cdoc.modifierSpecifier() & ~Modifier.INTERFACE;
-        if (cdoc.isEnum())
+        if (cdoc.isEnum()) {
             mods &= ~Modifier.FINAL;
+        }
         sb.append(Modifier.toString(mods));
-        if (sb.length() > 0)
+        if (sb.length() > 0) {
             sb.append(' '); //NOI18N
-        if (cdoc.isAnnotationType())
+        }
+        if (cdoc.isAnnotationType()) {
             sb.append("@interface "); //NOI18N
-        else if (cdoc.isEnum())
+        } else if (cdoc.isEnum()) {
             sb.append("enum "); //NOI18N
-        else if (cdoc.isInterface())
+        } else if (cdoc.isInterface()) {
             sb.append("interface "); //NOI18N
-        else
-            sb.append("class "); //NOI18N            
+        } else {
+            sb.append("class "); //NOI18N
+        }
         sb.append("<b>").append(cdoc.simpleTypeName()); //NOI18N
         TypeVariable[] tvars = cdoc.typeParameters();
         if (tvars.length > 0) {
             sb.append("&lt;"); //NOI18N
             for (int i = 0; i < tvars.length; i++) {
                 appendType(eu, sb, tvars[i], false, true);
-                if (i < tvars.length - 1)
+                if (i < tvars.length - 1) {
                     sb.append(","); //NOI18N
+                }
             }
             sb.append("&gt;"); //NOI18N
         }
@@ -653,22 +686,23 @@ public class ElementJavadoc {
                     sb.append("\nextends "); //NOI18N
                     appendType(eu, sb, supercls, false, false);
                 }
-                
+
             }
             Type[] ifaces = cdoc.interfaceTypes();
             if (ifaces.length > 0) {
                 sb.append(cdoc.isInterface() ? "\nextends " : "\nimplements "); //NOI18N
                 for (int i = 0; i < ifaces.length; i++) {
                     appendType(eu, sb, ifaces[i], false, false);
-                    if (i < ifaces.length - 1)
+                    if (i < ifaces.length - 1) {
                         sb.append(", "); //NOI18N
+                    }
                 }
             }
         }
         sb.append("</tt></p>"); //NOI18N
         return sb;
     }
-    
+
     private CharSequence getPackageHeader(ElementUtilities eu, PackageDoc pdoc) {
         StringBuilder sb = new StringBuilder();
         sb.append("<p><tt>"); //NOI18N
@@ -677,7 +711,7 @@ public class ElementJavadoc {
         sb.append("</tt></p>"); //NOI18N
         return sb;
     }
-    
+
     private CharSequence getAnnotations(ElementUtilities eu, AnnotationDesc[] annotations) {
         StringBuilder sb = new StringBuilder();
         for (AnnotationDesc annotationDesc : annotations) {
@@ -692,8 +726,9 @@ public class ElementJavadoc {
                         createLink(sb, eu.elementFor(ated), ated.name());
                         sb.append('='); //NOI18N
                         appendAnnotationValue(eu, sb, pairs[i].value());
-                        if (i < pairs.length - 1)
+                        if (i < pairs.length - 1) {
                             sb.append(","); //NOI18N
+                        }
                     }
                     sb.append(')'); //NOI18N
                 }
@@ -702,27 +737,30 @@ public class ElementJavadoc {
         }
         return sb;
     }
-    
+
     private void appendAnnotationValue(ElementUtilities eu, StringBuilder sb, AnnotationValue av) {
         Object value = av.value();
         if (value instanceof AnnotationValue[]) {
-            int length = ((AnnotationValue[])value).length;
-            if (length > 1)
+            int length = ((AnnotationValue[]) value).length;
+            if (length > 1) {
                 sb.append('{'); //NOI18N
-            for(int i = 0; i < ((AnnotationValue[])value).length; i++) {
-                appendAnnotationValue(eu, sb, ((AnnotationValue[])value)[i]);
-                if (i < ((AnnotationValue[])value).length - 1)
-                    sb.append(","); //NOI18N
             }
-            if (length > 1)
+            for (int i = 0; i < ((AnnotationValue[]) value).length; i++) {
+                appendAnnotationValue(eu, sb, ((AnnotationValue[]) value)[i]);
+                if (i < ((AnnotationValue[]) value).length - 1) {
+                    sb.append(","); //NOI18N
+                }
+            }
+            if (length > 1) {
                 sb.append('}'); //NOI18N
+            }
         } else if (value instanceof Doc) {
-            createLink(sb, eu.elementFor((Doc)value), ((Doc)value).name());
+            createLink(sb, eu.elementFor((Doc) value), ((Doc) value).name());
         } else {
             sb.append(value.toString());
         }
-    } 
-    
+    }
+
     private CharSequence getMethodTags(ElementUtilities eu, MethodDoc doc, Tag[] returnTags, Map<Integer, List<Tag>> paramInlineTags,
             List<ThrowsTag> throwsTags, Map<String, List<Tag>> throwsInlineTags) {
         StringBuilder ret = new StringBuilder();
@@ -736,7 +774,7 @@ public class ElementJavadoc {
             for (Integer pos : paramInlineTags.keySet()) {
                 par.append("<code>").append(parameters[pos].name()).append("</code>"); //NOI18N
                 List<Tag> tags = paramInlineTags.get(pos);
-                Tag[] its = tags.toArray(new Tag[tags.size()]);                
+                Tag[] its = tags.toArray(new Tag[tags.size()]);
                 if (its.length > 0) {
                     CharSequence cs = inlineTags(eu, doc, its);
                     if (cs.length() > 0) {
@@ -744,7 +782,7 @@ public class ElementJavadoc {
                         par.append(cs);
                     }
                 }
-                par.append("<br>"); //NOI18N            
+                par.append("<br>"); //NOI18N
             }
         }
         StringBuilder thr = new StringBuilder();
@@ -759,7 +797,7 @@ public class ElementJavadoc {
                 }
                 thr.append("</code>"); //NOI18N
                 List<Tag> tags = throwsInlineTags.get(throwsTag.exceptionName());
-                Tag[] its = tags == null ? throwsTag.inlineTags() : tags.toArray(new Tag[tags.size()]);                
+                Tag[] its = tags == null ? throwsTag.inlineTags() : tags.toArray(new Tag[tags.size()]);
                 if (its.length > 0) {
                     CharSequence cs = inlineTags(eu, doc, its);
                     if (cs.length() > 0) {
@@ -774,7 +812,7 @@ public class ElementJavadoc {
         String since = null;
         for (Tag tag : doc.tags()) {
             if (SEE_TAG.equals(tag.kind())) {
-                SeeTag stag = (SeeTag)tag;
+                SeeTag stag = (SeeTag) tag;
                 ClassDoc refClass = stag.referencedClass();
                 String className = stag.referencedClassName();
                 String memberName = stag.referencedMemberName();
@@ -821,7 +859,7 @@ public class ElementJavadoc {
         }
         return sb;
     }
-    
+
     private CharSequence getTags(ElementUtilities eu, Doc doc) {
         StringBuilder see = new StringBuilder();
         StringBuilder par = new StringBuilder();
@@ -830,7 +868,7 @@ public class ElementJavadoc {
         String since = null;
         for (Tag tag : doc.tags()) {
             if (PARAM_TAG.equals(tag.kind()) && !doc.isMethod()) {
-                par.append("<code>").append(((ParamTag)tag).parameterName()).append("</code>"); //NOI18N
+                par.append("<code>").append(((ParamTag) tag).parameterName()).append("</code>"); //NOI18N
                 Tag[] its = tag.inlineTags();
                 if (its.length > 0) {
                     par.append(" - "); //NOI18N
@@ -839,11 +877,12 @@ public class ElementJavadoc {
                 par.append("<br>"); //NOI18N
             } else if (THROWS_TAG.equals(tag.kind()) && !doc.isMethod()) {
                 thr.append("<code>"); //NOI18N
-                Type exType = ((ThrowsTag)tag).exceptionType();
-                if (exType != null)
+                Type exType = ((ThrowsTag) tag).exceptionType();
+                if (exType != null) {
                     createLink(thr, eu.elementFor(exType.asClassDoc()), exType.simpleTypeName());
-                else
-                    thr.append(((ThrowsTag)tag).exceptionName());
+                } else {
+                    thr.append(((ThrowsTag) tag).exceptionName());
+                }
                 thr.append("</code>"); //NOI18N
                 Tag[] its = tag.inlineTags();
                 if (its.length > 0) {
@@ -855,7 +894,7 @@ public class ElementJavadoc {
                 ret.append(inlineTags(eu, doc, tag.inlineTags()));
                 ret.append("<br>"); //NOI18N
             } else if (SEE_TAG.equals(tag.kind())) {
-                SeeTag stag = (SeeTag)tag;
+                SeeTag stag = (SeeTag) tag;
                 ClassDoc refClass = stag.referencedClass();
                 String className = stag.referencedClassName();
                 String memberName = stag.referencedMemberName();
@@ -902,7 +941,7 @@ public class ElementJavadoc {
         }
         return sb;
     }
-    
+
     private CharSequence getDeprecatedTag(ElementUtilities eu, Doc doc) {
         StringBuilder sb = new StringBuilder();
         for (Tag tag : doc.tags()) {
@@ -913,22 +952,23 @@ public class ElementJavadoc {
         }
         return sb;
     }
-    
+
     private CharSequence inlineTags(ElementUtilities eu, Doc doc, Tag[] tags) {
         StringBuilder sb = new StringBuilder();
         for (Tag tag : tags) {
             if (SEE_TAG.equals(tag.kind())) {
-                SeeTag stag = (SeeTag)tag;
+                SeeTag stag = (SeeTag) tag;
                 if (VALUE_TAG.equals(tag.name())) {
                     Doc mdoc = stag.referencedMember();
-                    if (mdoc == null && tag.text().length() == 0)
+                    if (mdoc == null && tag.text().length() == 0) {
                         mdoc = stag.holder();
+                    }
                     if (mdoc != null && mdoc.isField()) {
                         try {
-                            sb.append(XMLUtil.toElementContent(((FieldDoc)mdoc).constantValueExpression()));
+                            sb.append(XMLUtil.toElementContent(((FieldDoc) mdoc).constantValueExpression()));
                         } catch (IOException ioe) {
                         }
-                    }                    
+                    }
                 } else {
                     ClassDoc refClass = stag.referencedClass();
                     String memberName = stag.referencedMemberName();
@@ -952,9 +992,10 @@ public class ElementJavadoc {
                 }
             } else if (INHERIT_DOC_TAG.equals(tag.kind())) {
                 if (doc.isMethod()) {
-                    MethodDoc mdoc = ((MethodDoc)doc).overriddenMethod();
-                    if (mdoc != null)
+                    MethodDoc mdoc = ((MethodDoc) doc).overriddenMethod();
+                    if (mdoc != null) {
                         sb.append(inlineTags(eu, mdoc, mdoc.inlineTags()));
+                    }
                 }
             } else if (CODE_TAG.equals(tag.kind())) {
                 sb.append("<code>"); //NOI18N
@@ -966,7 +1007,7 @@ public class ElementJavadoc {
         }
         return sb;
     }
-    
+
     private CharSequence getFragment(Element e) {
         StringBuilder sb = new StringBuilder();
         if (!e.getKind().isClass() && !e.getKind().isInterface()) {
@@ -976,39 +1017,41 @@ public class ElementJavadoc {
                 sb.append(e.getSimpleName());
             }
             if (e.getKind() == ElementKind.METHOD || e.getKind() == ElementKind.CONSTRUCTOR) {
-                ExecutableElement ee = (ExecutableElement)e;
+                ExecutableElement ee = (ExecutableElement) e;
                 sb.append('('); //NOI18N
                 for (Iterator<? extends VariableElement> it = ee.getParameters().iterator(); it.hasNext();) {
                     VariableElement param = it.next();
                     appendType(sb, param.asType(), ee.isVarArgs() && !it.hasNext());
-                    if (it.hasNext())
+                    if (it.hasNext()) {
                         sb.append(", ");
+                    }
                 }
                 sb.append(')'); //NOI18N
             }
         }
         return sb;
     }
-    
-    private void appendType(StringBuilder sb, TypeMirror type, boolean varArg) {
+
+    private static void appendType(StringBuilder sb, TypeMirror type, boolean varArg) {
         switch (type.getKind()) {
             case ARRAY:
-                appendType(sb, ((ArrayType)type).getComponentType(), false);
+                appendType(sb, ((ArrayType) type).getComponentType(), false);
                 sb.append(varArg ? "..." : "[]"); //NOI18N
                 break;
             case DECLARED:
-                sb.append(((TypeElement)((DeclaredType)type).asElement()).getQualifiedName());
+                sb.append(((TypeElement) ((DeclaredType) type).asElement()).getQualifiedName());
                 break;
             default:
                 sb.append(type);
         }
     }
 
-    private void appendSpace(StringBuilder sb, int length) {
-        while (length-- >= 0)
-            sb.append(' '); //NOI18N            
+    private static void appendSpace(StringBuilder sb, int length) {
+        while (length-- >= 0) {
+            sb.append(' '); //NOI18N
+        }
     }
-    
+
     private int appendType(ElementUtilities eu, StringBuilder sb, Type type, boolean varArg, boolean typeVar) {
         int len = 0;
         WildcardType wt = type.asWildcardType();
@@ -1046,8 +1089,9 @@ public class ElementJavadoc {
             } else {
                 String tName = type.simpleTypeName();
                 ClassDoc cd = type.asClassDoc();
-                if (cd != null && cd.isAnnotationType())
+                if (cd != null && cd.isAnnotationType()) {
                     tName = "@" + tName; //NOI18N
+                }
                 len += createLink(sb, eu.elementFor(type.asClassDoc()), tName);
                 ParameterizedType pt = type.asParameterizedType();
                 if (pt != null) {
@@ -1069,14 +1113,15 @@ public class ElementJavadoc {
         }
         String dim = type.dimension();
         if (dim.length() > 0) {
-            if (varArg)
+            if (varArg) {
                 dim = dim.substring(2) + "..."; //NOI18N
+            }
             sb.append(dim);
             len += dim.length();
         }
         return len;
     }
-    
+
     private int createLink(StringBuilder sb, Element e, String text) {
         if (e != null && e.asType().getKind() != TypeKind.ERROR) {
             String link = "*" + linkCounter++; //NOI18N
@@ -1084,12 +1129,13 @@ public class ElementJavadoc {
             sb.append("<a href='").append(link).append("'>"); //NOI18N
         }
         sb.append(text);
-        if (e != null)
+        if (e != null) {
             sb.append("</a>"); //NOI18N
+        }
         return text.length();
     }
-    
-    private void inheritedDocFor(MethodDoc mdoc, ClassDoc cdoc, List<Tag> inlineTags, List<Tag> returnTags,
+
+    private static void inheritedDocFor(MethodDoc mdoc, ClassDoc cdoc, List<Tag> inlineTags, List<Tag> returnTags,
             Set<Integer> paramPos, Map<Integer, ParamTag> paramTags, Map<Integer, List<Tag>> paramInlineTags,
             Set<String> throwsTypes, Map<String, ThrowsTag> throwsTags, Map<String, List<Tag>> throwsInlineTags) {
         for (ClassDoc ifaceDoc : cdoc.interfaces()) {
@@ -1099,8 +1145,9 @@ public class ElementJavadoc {
                     if (inlineTags != null && inlineTags.isEmpty()) {
                         for (Tag tag : methodDoc.inlineTags()) {
                             if (INHERIT_DOC_TAG.equals(tag.kind())) {
-                                if (inheritedInlineTags == null)
+                                if (inheritedInlineTags == null) {
                                     inheritedInlineTags = new ArrayList<Tag>();
+                                }
                             } else {
                                 inlineTags.add(tag);
                             }
@@ -1108,11 +1155,12 @@ public class ElementJavadoc {
                     }
                     List<Tag> inheritedReturnTags = null;
                     if (returnTags != null && returnTags.isEmpty()) {
-                        for(Tag tag : methodDoc.tags(RETURN_TAG)) {
-                            for(Tag t : tag.inlineTags()) {
+                        for (Tag tag : methodDoc.tags(RETURN_TAG)) {
+                            for (Tag t : tag.inlineTags()) {
                                 if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                    if (inheritedReturnTags == null)
+                                    if (inheritedReturnTags == null) {
                                         inheritedReturnTags = new ArrayList<Tag>();
+                                    }
                                 } else {
                                     returnTags.add(t);
                                 }
@@ -1123,20 +1171,23 @@ public class ElementJavadoc {
                     Map<Integer, ParamTag> inheritedParamTags = null;
                     Map<Integer, List<Tag>> inheritedParamInlineTags = null;
                     if (paramTags != null && paramPos != null && !paramPos.isEmpty()) {
-                        for(ParamTag tag : methodDoc.paramTags()) {
+                        for (ParamTag tag : methodDoc.paramTags()) {
                             Integer pos = paramPos(methodDoc, tag);
                             if (paramPos.remove(pos)) {
                                 List<Tag> tags = new ArrayList<Tag>();
                                 paramTags.put(pos, tag);
                                 paramInlineTags.put(pos, tags);
-                                for(Tag t : tag.inlineTags()) {
+                                for (Tag t : tag.inlineTags()) {
                                     if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                        if (inheritedParamPos == null)
+                                        if (inheritedParamPos == null) {
                                             inheritedParamPos = new HashSet<Integer>();
-                                        if (inheritedParamTags == null)
-                                            inheritedParamTags = new LinkedHashMap<Integer,ParamTag>();
-                                        if (inheritedParamInlineTags == null)
+                                        }
+                                        if (inheritedParamTags == null) {
+                                            inheritedParamTags = new LinkedHashMap<Integer, ParamTag>();
+                                        }
+                                        if (inheritedParamInlineTags == null) {
                                             inheritedParamInlineTags = new LinkedHashMap<Integer, List<Tag>>();
+                                        }
                                         inheritedParamPos.add(pos);
                                     } else {
                                         tags.add(t);
@@ -1149,19 +1200,22 @@ public class ElementJavadoc {
                     Map<String, ThrowsTag> inheritedThrowsTags = null;
                     Map<String, List<Tag>> inheritedThrowsInlineTags = null;
                     if (throwsTags != null && throwsTypes != null && !throwsTypes.isEmpty()) {
-                        for(ThrowsTag tag : methodDoc.throwsTags()) {
+                        for (ThrowsTag tag : methodDoc.throwsTags()) {
                             if (throwsTypes.remove(tag.exceptionName())) {
                                 List<Tag> tags = new ArrayList<Tag>();
                                 throwsTags.put(tag.exceptionName(), tag);
                                 throwsInlineTags.put(tag.exceptionName(), tags);
-                                for(Tag t : tag.inlineTags()) {
+                                for (Tag t : tag.inlineTags()) {
                                     if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                        if (inheritedThrowsTypes == null)
+                                        if (inheritedThrowsTypes == null) {
                                             inheritedThrowsTypes = new HashSet<String>();
-                                        if (inheritedThrowsTags == null)
+                                        }
+                                        if (inheritedThrowsTags == null) {
                                             inheritedThrowsTags = new LinkedHashMap<String, ThrowsTag>();
-                                        if (inheritedThrowsInlineTags == null)
+                                        }
+                                        if (inheritedThrowsInlineTags == null) {
                                             inheritedThrowsInlineTags = new HashMap<String, List<Tag>>();
+                                        }
                                         inheritedThrowsTypes.add(tag.exceptionName());
                                     } else {
                                         tags.add(t);
@@ -1171,27 +1225,30 @@ public class ElementJavadoc {
                         }
                     }
                     if (inheritedInlineTags != null || inheritedReturnTags != null ||
-                            inheritedParamPos != null && inheritedParamTags != null)
+                            inheritedParamPos != null && inheritedParamTags != null) {
                         inheritedDocFor(mdoc, ifaceDoc, inheritedInlineTags, inheritedReturnTags,
                                 inheritedParamPos, inheritedParamTags, inheritedParamInlineTags,
                                 inheritedThrowsTypes, inheritedThrowsTags, inheritedThrowsInlineTags);
+                    }
                     if (inheritedInlineTags != null && !inheritedInlineTags.isEmpty()) {
                         inlineTags.clear();
                         for (Tag tag : methodDoc.inlineTags()) {
-                            if (INHERIT_DOC_TAG.equals(tag.kind()))
+                            if (INHERIT_DOC_TAG.equals(tag.kind())) {
                                 inlineTags.addAll(inheritedInlineTags);
-                            else
+                            } else {
                                 inlineTags.add(tag);
+                            }
                         }
                     }
                     if (inheritedReturnTags != null && !inheritedReturnTags.isEmpty()) {
                         returnTags.clear();
-                        for(Tag tag : methodDoc.tags(RETURN_TAG)) {
-                            for(Tag t : tag.inlineTags()) {
-                                if (INHERIT_DOC_TAG.equals(t.kind()))
+                        for (Tag tag : methodDoc.tags(RETURN_TAG)) {
+                            for (Tag t : tag.inlineTags()) {
+                                if (INHERIT_DOC_TAG.equals(t.kind())) {
                                     returnTags.addAll(inheritedReturnTags);
-                                else
+                                } else {
                                     returnTags.add(t);
+                                }
                             }
                         }
                     }
@@ -1199,11 +1256,12 @@ public class ElementJavadoc {
                         for (Integer pos : inheritedParamTags.keySet()) {
                             List<Tag> tags = paramInlineTags.get(pos);
                             tags.clear();
-                            for(Tag t : paramTags.get(pos).inlineTags()) {
-                                if (INHERIT_DOC_TAG.equals(t.kind()))
+                            for (Tag t : paramTags.get(pos).inlineTags()) {
+                                if (INHERIT_DOC_TAG.equals(t.kind())) {
                                     tags.addAll(inheritedParamInlineTags.get(pos));
-                                else
+                                } else {
                                     tags.add(t);
+                                }
                             }
                         }
                     }
@@ -1211,11 +1269,12 @@ public class ElementJavadoc {
                         for (String param : inheritedThrowsTags.keySet()) {
                             List<Tag> tags = throwsInlineTags.get(param);
                             tags.clear();
-                            for(Tag t : throwsTags.get(param).inlineTags()) {
-                                if (INHERIT_DOC_TAG.equals(t.kind()))
+                            for (Tag t : throwsTags.get(param).inlineTags()) {
+                                if (INHERIT_DOC_TAG.equals(t.kind())) {
                                     tags.addAll(inheritedParamInlineTags.get(param));
-                                else
+                                } else {
                                     tags.add(t);
+                                }
                             }
                         }
                     }
@@ -1223,20 +1282,22 @@ public class ElementJavadoc {
                 }
             }
             if ((inlineTags == null || !inlineTags.isEmpty()) &&
-                    (returnTags == null || !returnTags.isEmpty()) && 
+                    (returnTags == null || !returnTags.isEmpty()) &&
                     (paramPos == null || paramPos.isEmpty()) &&
-                    (throwsTypes == null || throwsTypes.isEmpty()))
+                    (throwsTypes == null || throwsTypes.isEmpty())) {
                 return;
+            }
         }
         for (ClassDoc ifaceDoc : cdoc.interfaces()) {
             inheritedDocFor(mdoc, ifaceDoc, inlineTags, returnTags,
                     paramPos, paramTags, paramInlineTags,
                     throwsTypes, throwsTags, throwsInlineTags);
             if ((inlineTags == null || !inlineTags.isEmpty()) &&
-                    (returnTags == null || !returnTags.isEmpty()) && 
+                    (returnTags == null || !returnTags.isEmpty()) &&
                     (paramPos == null || paramPos.isEmpty()) &&
-                    (throwsTypes == null || throwsTypes.isEmpty()))
+                    (throwsTypes == null || throwsTypes.isEmpty())) {
                 return;
+            }
         }
         if (cdoc.superclass() != null) { //NOI18N
             for (MethodDoc methodDoc : cdoc.superclass().methods(false)) {
@@ -1245,8 +1306,9 @@ public class ElementJavadoc {
                     if (inlineTags != null && inlineTags.isEmpty()) {
                         for (Tag tag : methodDoc.inlineTags()) {
                             if (INHERIT_DOC_TAG.equals(tag.kind())) {
-                                if (inheritedInlineTags == null)
+                                if (inheritedInlineTags == null) {
                                     inheritedInlineTags = new ArrayList<Tag>();
+                                }
                             } else {
                                 inlineTags.add(tag);
                             }
@@ -1254,11 +1316,12 @@ public class ElementJavadoc {
                     }
                     List<Tag> inheritedReturnTags = null;
                     if (returnTags != null && returnTags.isEmpty()) {
-                        for(Tag tag : methodDoc.tags(RETURN_TAG)) {
-                            for(Tag t : tag.inlineTags()) {
+                        for (Tag tag : methodDoc.tags(RETURN_TAG)) {
+                            for (Tag t : tag.inlineTags()) {
                                 if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                    if (inheritedReturnTags == null)
+                                    if (inheritedReturnTags == null) {
                                         inheritedReturnTags = new ArrayList<Tag>();
+                                    }
                                 } else {
                                     returnTags.add(t);
                                 }
@@ -1269,20 +1332,23 @@ public class ElementJavadoc {
                     Map<Integer, ParamTag> inheritedParamTags = null;
                     Map<Integer, List<Tag>> inheritedParamInlineTags = null;
                     if (paramTags != null && paramPos != null && !paramPos.isEmpty()) {
-                        for(ParamTag tag : methodDoc.paramTags()) {
+                        for (ParamTag tag : methodDoc.paramTags()) {
                             Integer pos = paramPos(methodDoc, tag);
                             if (paramPos.remove(pos)) {
                                 List<Tag> tags = new ArrayList<Tag>();
                                 paramTags.put(pos, tag);
                                 paramInlineTags.put(pos, tags);
-                                for(Tag t : tag.inlineTags()) {
+                                for (Tag t : tag.inlineTags()) {
                                     if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                        if (inheritedParamNames == null)
+                                        if (inheritedParamNames == null) {
                                             inheritedParamNames = new HashSet<Integer>();
-                                        if (inheritedParamTags == null)
+                                        }
+                                        if (inheritedParamTags == null) {
                                             inheritedParamTags = new LinkedHashMap<Integer, ParamTag>();
-                                        if (inheritedParamInlineTags == null)
+                                        }
+                                        if (inheritedParamInlineTags == null) {
                                             inheritedParamInlineTags = new LinkedHashMap<Integer, List<Tag>>();
+                                        }
                                         inheritedParamNames.add(pos);
                                     } else {
                                         tags.add(t);
@@ -1295,19 +1361,22 @@ public class ElementJavadoc {
                     Map<String, ThrowsTag> inheritedThrowsTags = null;
                     Map<String, List<Tag>> inheritedThrowsInlineTags = null;
                     if (throwsTags != null && throwsTypes != null && !throwsTypes.isEmpty()) {
-                        for(ThrowsTag tag : methodDoc.throwsTags()) {
+                        for (ThrowsTag tag : methodDoc.throwsTags()) {
                             if (throwsTypes.remove(tag.exceptionName())) {
                                 List<Tag> tags = new ArrayList<Tag>();
                                 throwsTags.put(tag.exceptionName(), tag);
                                 throwsInlineTags.put(tag.exceptionName(), tags);
-                                for(Tag t : tag.inlineTags()) {
+                                for (Tag t : tag.inlineTags()) {
                                     if (INHERIT_DOC_TAG.equals(t.kind())) {
-                                        if (inheritedThrowsTypes == null)
+                                        if (inheritedThrowsTypes == null) {
                                             inheritedThrowsTypes = new HashSet<String>();
-                                        if (inheritedThrowsTags == null)
+                                        }
+                                        if (inheritedThrowsTags == null) {
                                             inheritedThrowsTags = new LinkedHashMap<String, ThrowsTag>();
-                                        if (inheritedThrowsInlineTags == null)
+                                        }
+                                        if (inheritedThrowsInlineTags == null) {
                                             inheritedThrowsInlineTags = new HashMap<String, List<Tag>>();
+                                        }
                                         inheritedThrowsTypes.add(tag.exceptionName());
                                     } else {
                                         tags.add(t);
@@ -1317,27 +1386,30 @@ public class ElementJavadoc {
                         }
                     }
                     if (inheritedInlineTags != null || inheritedReturnTags != null ||
-                            inheritedParamNames != null && inheritedParamTags != null)
+                            inheritedParamNames != null && inheritedParamTags != null) {
                         inheritedDocFor(mdoc, cdoc.superclass(), inheritedInlineTags, inheritedReturnTags,
                                 inheritedParamNames, inheritedParamTags, inheritedParamInlineTags,
                                 inheritedThrowsTypes, inheritedThrowsTags, inheritedThrowsInlineTags);
+                    }
                     if (inheritedInlineTags != null && !inheritedInlineTags.isEmpty()) {
                         inlineTags.clear();
                         for (Tag tag : methodDoc.inlineTags()) {
-                            if (INHERIT_DOC_TAG.equals(tag.kind()))
+                            if (INHERIT_DOC_TAG.equals(tag.kind())) {
                                 inlineTags.addAll(inheritedInlineTags);
-                            else
+                            } else {
                                 inlineTags.add(tag);
+                            }
                         }
                     }
                     if (inheritedReturnTags != null && !inheritedReturnTags.isEmpty()) {
                         returnTags.clear();
-                        for(Tag tag : methodDoc.tags(RETURN_TAG)) {
-                            for(Tag t : tag.inlineTags()) {
-                                if (INHERIT_DOC_TAG.equals(t.kind()))
+                        for (Tag tag : methodDoc.tags(RETURN_TAG)) {
+                            for (Tag t : tag.inlineTags()) {
+                                if (INHERIT_DOC_TAG.equals(t.kind())) {
                                     returnTags.addAll(inheritedReturnTags);
-                                else
+                                } else {
                                     returnTags.add(t);
+                                }
                             }
                         }
                     }
@@ -1345,11 +1417,12 @@ public class ElementJavadoc {
                         for (Integer pos : inheritedParamTags.keySet()) {
                             List<Tag> tags = paramInlineTags.get(pos);
                             tags.clear();
-                            for(Tag t : paramTags.get(pos).inlineTags()) {
-                                if (INHERIT_DOC_TAG.equals(t.kind()))
+                            for (Tag t : paramTags.get(pos).inlineTags()) {
+                                if (INHERIT_DOC_TAG.equals(t.kind())) {
                                     tags.addAll(inheritedParamInlineTags.get(pos));
-                                else
+                                } else {
                                     tags.add(t);
+                                }
                             }
                         }
                     }
@@ -1357,11 +1430,12 @@ public class ElementJavadoc {
                         for (String param : inheritedThrowsTags.keySet()) {
                             List<Tag> tags = throwsInlineTags.get(param);
                             tags.clear();
-                            for(Tag t : throwsTags.get(param).inlineTags()) {
-                                if (INHERIT_DOC_TAG.equals(t.kind()))
+                            for (Tag t : throwsTags.get(param).inlineTags()) {
+                                if (INHERIT_DOC_TAG.equals(t.kind())) {
                                     tags.addAll(inheritedParamInlineTags.get(param));
-                                else
+                                } else {
                                     tags.add(t);
+                                }
                             }
                         }
                     }
@@ -1371,21 +1445,23 @@ public class ElementJavadoc {
             if (inlineTags != null && inlineTags.isEmpty() ||
                     returnTags != null && returnTags.isEmpty() ||
                     paramPos != null && !paramPos.isEmpty() ||
-                    throwsTypes != null && !throwsTypes.isEmpty())
+                    throwsTypes != null && !throwsTypes.isEmpty()) {
                 inheritedDocFor(mdoc, cdoc.superclass(), inlineTags, returnTags,
                         paramPos, paramTags, paramInlineTags,
                         throwsTypes, throwsTags, throwsInlineTags);
+            }
         }
     }
-    
-    private int paramPos(MethodDoc methodDoc, ParamTag paramTag) {
+
+    private static int paramPos(MethodDoc methodDoc, ParamTag paramTag) {
         Parameter[] parameters = methodDoc.parameters();
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-            if (parameter.name().equals(paramTag.parameterName()))
+            if (parameter.name().equals(paramTag.parameterName())) {
                 return i;
+            }
         }
         return -1;
-
     }
+
 }

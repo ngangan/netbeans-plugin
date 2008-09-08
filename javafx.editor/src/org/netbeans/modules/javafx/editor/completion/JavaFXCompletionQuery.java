@@ -91,7 +91,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String AND_KEYWORD = "and";
     public static final String AS_KEYWORD = "as";
     public static final String ASSERT_KEYWORD = "assert";
-    public static final String ATTRIBUTE_KEYWORD = "attribute";
     public static final String BEFORE_KEYWORD = "before";
     public static final String BIND_KEYWORD = "bind";
     public static final String BOUND_KEYWORD = "bound";
@@ -100,6 +99,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String CLASS_KEYWORD = "class";
     public static final String CONTINUE_KEYWORD = "continue";
     public static final String DELETE_KEYWORD = "delete";
+    public static final String DEF_KEYWORD = "def";
     public static final String ELSE_KEYWORD = "else";
     public static final String EXCLUSIVE_KEYWORD = "exclusive";
     public static final String EXTENDS_KEYWORD = "extends";
@@ -129,10 +129,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String OVERRIDE_KEYWORD = "override";
     public static final String PACKAGE_KEYWORD = "package";
     public static final String POSTINIT_KEYWORD = "postinit";
-    public static final String PRIVATE_KEYWORD = "private";
     public static final String PROTECTED_KEYWORD = "protected";
     public static final String PUBLIC_KEYWORD = "public";
-    public static final String READONLY_KEYWORD = "readonly";
+    public static final String PUBLIC_INIT_KEYWORD = "public-init";
+    public static final String PUBLIC_READ_KEYWORD = "public-read";
     public static final String REPLACE_KEYWORD = "replace";
     public static final String RETURN_KEYWORD = "return";
     public static final String REVERSE_KEYWORD = "reverse";
@@ -167,12 +167,12 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     };
     public static final String[] CLASS_BODY_KEYWORDS = new String[]{
         ABSTRACT_KEYWORD,
-        ATTRIBUTE_KEYWORD, 
+        DEF_KEYWORD,
         FUNCTION_KEYWORD,
         INIT_KEYWORD,
         POSTINIT_KEYWORD,
-        PRIVATE_KEYWORD, PROTECTED_KEYWORD, PUBLIC_KEYWORD,
-        READONLY_KEYWORD
+        PUBLIC_KEYWORD, PROTECTED_KEYWORD, PACKAGE_KEYWORD, PUBLIC_INIT_KEYWORD, PUBLIC_READ_KEYWORD,
+        VAR_KEYWORD
     };
 
     static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}");
@@ -351,11 +351,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             throw new IllegalStateException("init method not called before resolveCompletion");
         }
         
-        final Tree leaf = env.getPath().getLeaf();
+        Phase resPhase = controller.toPhase(Phase.ANALYZED);
         
-        controller.toPhase(Phase.ANALYZED);
-        
-        if (! env.isTreeBroken()) {
+        if  ((!resPhase.lessThan(Phase.ANALYZED)) && (! env.isTreeBroken())) {
+            Tree leaf = env.getPath().getLeaf();
             env.inside(leaf);
         } else {
             env.useCrystalBall();

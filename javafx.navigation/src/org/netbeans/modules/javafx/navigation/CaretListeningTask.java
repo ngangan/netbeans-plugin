@@ -79,8 +79,8 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private static ElementHandle<Element> lastEhForNavigator;
     private static final Set<JFXTokenId> TOKENS_TO_SKIP = EnumSet.of(JFXTokenId.WS,
             JFXTokenId.COMMENT,
-            JFXTokenId.LINE_COMMENT);
-//            JFXTokenId.JAVADOC_COMMENT);
+            JFXTokenId.LINE_COMMENT,
+            JFXTokenId.DOC_COMMENT);
 
     CaretListeningTask(CaretListeningFactory whichElementJavaSourceTaskFactory, FileObject fileObject) {
         this.caretListeningFactory = whichElementJavaSourceTaskFactory;
@@ -136,10 +136,14 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         }
 
         try {
-            // TODO dirty hack
-            ((CompilationController) compilationInfo).toPhase(Phase.ANALYZED);
+             // TODO dirty hack
+            CompilationController cc = (CompilationController) compilationInfo;
+            if (cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                return;
+            }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
+            return;
         }
 
         // Find the TreePath for the caret position
@@ -386,20 +390,28 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         Element e = outerElement(ci, tp);
 
         if (e != null) {
-            final ElementHandle<Element> eh = ElementHandle.create(e);
-
-            if (lastEhForNavigator != null && eh.signatureEquals(lastEhForNavigator)) {
+            final ElementHandle[] eh = new ElementHandle[1];
+            try {
+                eh[0]  = ElementHandle.create(e);
+            } catch (IllegalArgumentException iae) {
+                // can't convert to element handler (incomplete element)
+            }
+            if (eh[0] == null) {
+                return;
+            }
+            
+            if (lastEhForNavigator != null && eh[0].signatureEquals(lastEhForNavigator)) {
                 return;
             }
 
-            lastEhForNavigator = eh;
+            lastEhForNavigator = eh[0];
 
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
                     final ClassMemberPanel cmp = ClassMemberPanel.getInstance();
                     if (cmp != null) {
-                        cmp.selectElement(eh);
+                        cmp.selectElement(eh[0]);
                     }
                 }
             });

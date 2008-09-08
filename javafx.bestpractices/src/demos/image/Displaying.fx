@@ -53,7 +53,7 @@ Frame {
             },
             ImageView {
                 image : img
-                transform : [
+                transforms : [
                     Translate { x : width / 2 },
                     Scale { x : 0.5, y : 0.5 }]
             }

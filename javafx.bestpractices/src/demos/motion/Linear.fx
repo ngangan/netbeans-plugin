@@ -59,7 +59,7 @@ Frame {
     stage : Stage {
         fill : Color.DARKGRAY
         content : Line {
-            transform : [ Translate { y : bind y }]
+            transforms : [ Translate { y : bind y }]
             endX : 200
             stroke : Color.WHITE
         }

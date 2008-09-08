@@ -70,7 +70,7 @@ var timeline : Timeline = Timeline {
 
 for( i in [0..4] ) {
     insert Circle {
-        transform : [ Rotate{ angle : angle + 45, x : 130, y : 65 } ]
+        transforms : [ Rotate{ angle : angle + 45, x : 130, y : 65 } ]
             fill : Color.BLACK
             radius : bind diameter / 2
     } into circles;

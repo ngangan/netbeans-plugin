@@ -52,6 +52,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.ErrorType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
@@ -71,7 +72,6 @@ import javax.lang.model.type.TypeMirror;
  * javafxSource.runUserActionTask(new Task&lt;CompilationController>() {
  *     public void run(CompilationController compilationController) {
  *         compilationController.toPhase(Phase.ANALYZED);
-*XXX
  *         CompilationUnitTree cu = compilationController.getTree();
  *         List&lt;? extends Tree> types = getTypeDecls(cu);
  *         Tree tree = getInterestingElementTree(types);
@@ -112,7 +112,9 @@ public class ElementHandle<T extends Element> {
      */
     @SuppressWarnings ("unchecked")     // NOI18N
     public T resolve (final CompilationInfo compilationInfo) {
-        assert compilationInfo != null;
+        if (compilationInfo == null) throw new IllegalArgumentException();
+        assert compilationInfo.impl != null;
+
         return resolveImpl (compilationInfo.impl.getJavafxcTask());
     }
 
@@ -393,8 +395,17 @@ public class ElementHandle<T extends Element> {
                 sb.append(';');	    // NOI18N
                 break;
             }
+            case ERROR: {                
+                TypeElement te = (TypeElement) ((ErrorType) type).asElement();
+                if (te != null) {
+                    sb.append('L');
+                    encodeClassName(te, sb,'/');
+                    sb.append(';');	    // NOI18N
+                    break;
+                } // else fall through
+            }
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(type.getKind().toString());
         }
     }
 

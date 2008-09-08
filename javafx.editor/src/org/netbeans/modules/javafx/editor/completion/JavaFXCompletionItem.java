@@ -1138,7 +1138,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 js.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(CompilationController controller) throws IOException {
-                        controller.toPhase(Phase.ANALYZED);
+                        if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                            if (LOGGABLE) log ("Cannot show code completion due to compiler exception - should be already logged.");
+                            return;
+                        }
                         TypeElement eleme = elem;
                         if (type != null) {
                             eleme = (TypeElement)type.asElement();
