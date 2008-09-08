@@ -658,16 +658,17 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("addMemberModifiers");
         List<String> kws = new ArrayList<String>();
         if (isLocal) {
+            // TODO:
         } else {
-            if (!modifiers.contains(PUBLIC) && !modifiers.contains(PROTECTED) && !modifiers.contains(PRIVATE)) {
-                kws.add(PUBLIC_KEYWORD);
-                kws.add(PROTECTED_KEYWORD);
-                kws.add(PRIVATE_KEYWORD);
-            }
+            kws.add(PUBLIC_KEYWORD);
+            kws.add(PROTECTED_KEYWORD);
+            kws.add(PACKAGE_KEYWORD);
+            kws.add(PUBLIC_INIT_KEYWORD);
+            kws.add(PUBLIC_READ_KEYWORD);
+            // TODO: check this:
             if (!modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT)) {
                 kws.add(ABSTRACT_KEYWORD);
             }
-            kws.add(READONLY_KEYWORD);
         }
         for (String kw : kws) {
             if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
