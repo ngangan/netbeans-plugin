@@ -66,12 +66,12 @@ Frame {
         fill : Color.GRAY
         content : [
             Rectangle {
-                transform : [ javafx.scene.transform.Translate { x : bind xPos, y : 60 }]
+                transforms : [ javafx.scene.transform.Translate { x : bind xPos, y : 60 }]
                 width : 40, height : 40
                 fill : Color.WHITE
             },
             Rectangle {
-                transform : [ javafx.scene.transform.Translate { x : bind 2 * xPos, y : 100 }]
+                transforms : [ javafx.scene.transform.Translate { x : bind 2 * xPos, y : 100 }]
                 width : 40, height : 40
                 fill : Color.BLACK
             }
