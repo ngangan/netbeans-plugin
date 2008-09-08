@@ -1102,7 +1102,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (LOGGABLE) log("    scan finished");
                     JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos);
                     if (LOGGABLE) log("    env == " + env);
-                    fakeController.toPhase(Phase.ANALYZED);
+                    if (fakeController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                        if (LOGGABLE) log("    fake failed to analyze -- returning");
+                        return;
+                    }
                     if (LOGGABLE) log("    fake analyzed");
                     if (! env.isTreeBroken()) {
                         if (LOGGABLE) log("    fake non-broken tree");

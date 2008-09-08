@@ -353,9 +353,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         
         final Tree leaf = env.getPath().getLeaf();
         
-        controller.toPhase(Phase.ANALYZED);
+        Phase resPhase = controller.toPhase(Phase.ANALYZED);
         
-        if (! env.isTreeBroken()) {
+        if  ((!resPhase.lessThan(Phase.ANALYZED)) && (! env.isTreeBroken())) {
             env.inside(leaf);
         } else {
             env.useCrystalBall();
