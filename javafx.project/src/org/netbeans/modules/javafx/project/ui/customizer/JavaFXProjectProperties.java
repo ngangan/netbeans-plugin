@@ -63,6 +63,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -80,6 +82,7 @@ import org.netbeans.modules.javafx.platform.platformdefinition.Util;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.javafx.project.JavaFXProjectType;
 import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
+import org.netbeans.modules.javafx.project.applet.AppletSupport;
 import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
 import org.netbeans.spi.java.project.support.ui.IncludeExcludeVisualizer;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
@@ -192,6 +195,9 @@ public class JavaFXProjectProperties {
     public static final String APPLET_DRAGGABLE = "applet.draggable";
     public static final String APPLET_ARGUMENTS = "applet.java.arguments";
     public static final String APPLET_RUN_IN_BROWSER="applet.run.in.browser";
+    public static final String APPLET_WIDTH = "applet.width";
+    public static final String APPLET_HEIGHT = "applet.height";
+
     // Properties stored in the PRIVATE.PROPERTIES
     public static final String APPLICATION_ARGS = "application.args"; // NOI18N
     public static final String JAVADOC_PREVIEW="javadoc.preview"; // NOI18N
@@ -292,6 +298,8 @@ public class JavaFXProjectProperties {
     ButtonModel draggableModel;
     ButtonModel runAppletInBrowser;
     Document javaArgumentsDocument;
+    SpinnerModel widthModel;
+    SpinnerModel heightModel;
     
     // CustomizerRunTest
 
@@ -436,6 +444,8 @@ public class JavaFXProjectProperties {
         draggableModel = projectGroup.createToggleButtonModel(evaluator, APPLET_DRAGGABLE);
         javaArgumentsDocument = projectGroup.createStringDocument(evaluator, APPLET_ARGUMENTS);
         runAppletInBrowser = projectGroup.createToggleButtonModel(evaluator, APPLET_RUN_IN_BROWSER);
+        widthModel = AppletSupport.createSpinnerModel(evaluator, APPLET_WIDTH);
+        heightModel = AppletSupport.createSpinnerModel(evaluator, APPLET_HEIGHT);
         // CustomizerRun
         RUN_CONFIGS = readRunConfigs();
         activeConfig = evaluator.getProperty("config");
@@ -544,10 +554,14 @@ public class JavaFXProjectProperties {
         }
 
         projectProperties.putAll(additionalProperties);
-
+        //Applet
+        if (widthModel!=null && heightModel!=null){
+            projectProperties.put(APPLET_WIDTH, widthModel.getValue().toString());
+            projectProperties.put(APPLET_HEIGHT, heightModel.getValue().toString());
+        }
         projectProperties.put(INCLUDES, includes);
         projectProperties.put(EXCLUDES, excludes);
-        
+
         // Store the property changes into the project
         updateHelper.putProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH, projectProperties );
         updateHelper.putProperties( AntProjectHelper.PRIVATE_PROPERTIES_PATH, privateProperties );

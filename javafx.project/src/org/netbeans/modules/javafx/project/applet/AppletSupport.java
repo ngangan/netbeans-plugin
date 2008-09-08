@@ -51,6 +51,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
@@ -68,6 +70,7 @@ import org.netbeans.api.java.classpath.*;
 import org.netbeans.api.java.platform.*;
 import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
 import org.netbeans.spi.project.support.ant.EditableProperties;
+import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 
 /** Support for execution of applets.
  *
@@ -90,6 +93,8 @@ public class AppletSupport {
     private final static String POLICY_FILE_NAME = "applet";
     private final static String POLICY_FILE_EXT = "policy";
     private final static String APPLET_MAIN_CLASS = "javafx.application.Applet";
+    private final static int defaultWidth=200;
+    private final static int defaultHeight=150;
 
     private AppletSupport() {
     }
@@ -185,6 +190,13 @@ public class AppletSupport {
             String jnlpFileName = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP)) ? htmlFile.getName() + "." + JNLP_EXT : null;
             String draggable = ep.getProperty(JavaFXProjectProperties.APPLET_DRAGGABLE);
             String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
+            int width = defaultWidth;
+            int height = defaultHeight;
+            try {
+                width = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_WIDTH));
+                height = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_HEIGHT));
+            }catch(NumberFormatException nfe) {
+            }
             if (appletFile.getExt().equals("fx")) {
                 JavaFXProject project = (JavaFXProject) getProject(appletFile);
 		if (project == null) {
@@ -216,19 +228,19 @@ public class AppletSupport {
 //                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
                 path = path.substring(0, path.length() - 3);
                 if (isJavaScript && isInBrowser) {
-                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName); // NOI18N
+                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
 
                 } else {
-                    fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName); // NOI18N
+                    fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
 
                 }
             } else {
                 path = path.substring(0, path.length() - 5);
                 if (isJavaScript && isInBrowser) {
-                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName); // NOI18N
+                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName, width,height); // NOI18N
 
                 } else {
-                    fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName); // NOI18N
+                    fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName,width,height); // NOI18N
 
                 }
             }
@@ -263,6 +275,14 @@ public class AppletSupport {
                 codebase = distDir.getURL().toString();
             }
             String appletJavaScript = ep.getProperty(JavaFXProjectProperties.APPLET_JAVASCRIPT);
+            int width = defaultWidth;
+            int height = defaultHeight;
+            try {
+                width = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_WIDTH));
+                height = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_HEIGHT));
+            }catch(NumberFormatException nfe) {
+
+            }
             if (appletFile.getExt().equals("fx")) {
                 JavaFXProject project = (JavaFXProject) getProject(appletFile);
 
@@ -286,10 +306,10 @@ public class AppletSupport {
                 }
 
                 path = path.substring(0, path.length() - 3);
-                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, true, list, distJAR);
+                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, true, list, distJAR, width, height);
             } else {
                 path = path.substring(0, path.length() - 5);
-                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, false, null, null);
+                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, false, null, null, width, height);
             }
         } finally {
             lock.releaseLock();
@@ -399,7 +419,7 @@ public class AppletSupport {
      * @param file is a file to be filled
      * @param name is name of the applet                                     
      */
-    private static void fillInFile(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args, String jnlpFileName) {
+    private static void fillInFile(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args, String jnlpFileName, int width, int height) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<HTML>"); // NOI18N
@@ -425,7 +445,7 @@ public class AppletSupport {
         writer.println("<P>"); // NOI18N
 
         if (jnlpFileName != null) {
-            writer.println("<APPLET width=350 height=200>");
+            writer.println("<APPLET width="+width+" height="+height+">");
             writer.println("    <param name=\"jnlp_href\" value=\"" + jnlpFileName + "\">");
         } else {
             if (codebase == null) {
@@ -438,14 +458,14 @@ public class AppletSupport {
             if (isFX) {
                 writer.print("\"" + APPLET_MAIN_CLASS + "\""); // NOI18N
 
-                writer.println(" width=350 height=200>"); // NOI18N
+                writer.println(" width="+width+" height="+height+">"); // NOI18N
 
                 writer.println("    <param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
 
             } else {
                 writer.print("\"" + name + "\""); // NOI18N
 
-                writer.println(" width=350 height=200>"); // NOI18N
+                writer.println(" width="+width+" height="+height+">"); // NOI18N
 
             }
         }
@@ -477,7 +497,7 @@ public class AppletSupport {
      * @param file is a file to be filled
      * @param name is name of the applet                                     
      */
-    private static void fillInFileJavaScript(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args, String jnlpFileName) {
+    private static void fillInFileJavaScript(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args, String jnlpFileName,int width, int height) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<HTML>"); // NOI18N
@@ -520,8 +540,8 @@ public class AppletSupport {
             }
             if (isFX) {
                 writer.println("'" + APPLET_MAIN_CLASS + "',");
-                writer.println("            width: 375,");
-                writer.println("            height: 375");
+                writer.println("            width: "+width+",");
+                writer.println("            height: "+height);
                 writer.println("    };");
                 writer.println("    var parameters = {");
                 writer.println("        ApplicationClass:" + "'" + name + "',");
@@ -561,7 +581,7 @@ public class AppletSupport {
      * @param file is a file to be filled
      * @param name is name of the applet                                     
      */
-    private static void fillInJNLPFile(PrintWriter writer, String name, String jnlpFileName,String codebase, boolean isFX, String[] libs, String distJar) {
+    private static void fillInJNLPFile(PrintWriter writer, String name, String jnlpFileName,String codebase, boolean isFX, String[] libs, String distJar, int width, int height) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); // NOI18N
@@ -601,12 +621,21 @@ public class AppletSupport {
         writer.println("        <applet-desc"); // NOI18N
         writer.println("            name=\"" + name + "\""); // NOI18N
         writer.println("            main-class=\"" + APPLET_MAIN_CLASS + "\""); // NOI18N
-        writer.println("            width=\"300\""); // NOI18N
-        writer.println("            height=\"300\">"); // NOI18N
+        writer.println("            width=\""+width+"\""); // NOI18N
+        writer.println("            height=\""+height+"\">"); // NOI18N
         writer.println("            <param name=\"ApplicationClass\" value=\"" + name + "\"/>"); // NOI18N
         writer.println("        </applet-desc>"); // NOI18N
         writer.println("    </jnlp>"); // NOI18N
         writer.flush();
+    }
+
+    public static SpinnerModel createSpinnerModel(PropertyEvaluator evaluator, String propName){
+        String value = evaluator.getProperty(propName);
+        int intValue = 200;
+        if (value != null) {
+            intValue = Integer.valueOf(value).intValue();
+        }
+        return new SpinnerNumberModel(intValue, 0, 1024, 1);
     }
 
     /** fills in policy file with all permissions granted
