@@ -351,11 +351,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             throw new IllegalStateException("init method not called before resolveCompletion");
         }
         
-        final Tree leaf = env.getPath().getLeaf();
-        
         Phase resPhase = controller.toPhase(Phase.ANALYZED);
         
         if  ((!resPhase.lessThan(Phase.ANALYZED)) && (! env.isTreeBroken())) {
+            Tree leaf = env.getPath().getLeaf();
             env.inside(leaf);
         } else {
             env.useCrystalBall();
