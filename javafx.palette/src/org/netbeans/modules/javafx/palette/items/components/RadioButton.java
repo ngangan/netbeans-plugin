@@ -59,7 +59,7 @@ public class RadioButton implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.ext.swing.RadioButton" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.ext.swing.SwingRadioButton" ); // NOI18N
         
         return true;
     }    
