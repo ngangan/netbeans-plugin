@@ -79,8 +79,8 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private static ElementHandle<Element> lastEhForNavigator;
     private static final Set<JFXTokenId> TOKENS_TO_SKIP = EnumSet.of(JFXTokenId.WS,
             JFXTokenId.COMMENT,
-            JFXTokenId.LINE_COMMENT);
-//            JFXTokenId.JAVADOC_COMMENT);
+            JFXTokenId.LINE_COMMENT,
+            JFXTokenId.DOC_COMMENT);
 
     CaretListeningTask(CaretListeningFactory whichElementJavaSourceTaskFactory, FileObject fileObject) {
         this.caretListeningFactory = whichElementJavaSourceTaskFactory;
@@ -136,10 +136,14 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         }
 
         try {
-            // TODO dirty hack
-            ((CompilationController) compilationInfo).toPhase(Phase.ANALYZED);
+             // TODO dirty hack
+            CompilationController cc = (CompilationController) compilationInfo;
+            if (cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                return;
+            }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
+            return;
         }
 
         // Find the TreePath for the caret position
