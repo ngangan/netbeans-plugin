@@ -72,7 +72,6 @@ import javax.lang.model.type.TypeMirror;
  * javafxSource.runUserActionTask(new Task&lt;CompilationController>() {
  *     public void run(CompilationController compilationController) {
  *         compilationController.toPhase(Phase.ANALYZED);
-*XXX
  *         CompilationUnitTree cu = compilationController.getTree();
  *         List&lt;? extends Tree> types = getTypeDecls(cu);
  *         Tree tree = getInterestingElementTree(types);
