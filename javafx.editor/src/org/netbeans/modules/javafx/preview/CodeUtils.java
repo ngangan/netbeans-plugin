@@ -20,6 +20,7 @@ import java.awt.Window;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.tools.Diagnostic;
@@ -224,7 +225,7 @@ public class CodeUtils {
         return frame;
     }
     
-    public static void moveToInner(JDesktopPane jdp, Object frame) {
+    public static void moveToInner(AutoResizableDesktopPane jdp, Object frame) {
         try {
             JInternalFrame intFrame = new JInternalFrame();
             if (frame instanceof Window) {

@@ -41,22 +41,14 @@
 
 package org.netbeans.modules.javafx.editor;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.IOException;
-import java.io.Writer;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JToggleButton;
-import javax.swing.JToggleButton.ToggleButtonModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -68,7 +60,6 @@ import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.javafx.preview.PreviewCodeGenerate;
 import org.netbeans.modules.javafx.preview.Bridge;
-import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 
@@ -80,6 +71,7 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
     
     private JEditorPane pane = null;
     private Component editor = null;
+    private JComponent fakePrintComponent = null;
     boolean executionEnabled = false;
     boolean errorAndSyntaxEnabled = false;
     private Point previewLocation = new Point(0, 0);
@@ -117,10 +109,12 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
 
         editor = super.createEditor(pane);
         this.pane = pane;
-        
+
         return editor;
     }
-
+    
+    
+    
     public DataObject getDataObject(){
         return NbEditorUtilities.getDataObject(this);
     }
@@ -168,7 +162,7 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
                 }
             }
             if (component instanceof JButton) {
-                if (((JButton)component).getClientProperty("resetPreviewMark") == Boolean.TRUE) {     //NOI18N
+                if (((JButton)component).getClientProperty("resetPreviewMark") == Boolean.TRUE || ((JButton)component).getClientProperty("printPreviewMark") == Boolean.TRUE) {     //NOI18N
                     component.setEnabled(enabled);
                 }
             }

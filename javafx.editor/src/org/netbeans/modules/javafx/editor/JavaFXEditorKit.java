@@ -40,6 +40,8 @@
  */
 package org.netbeans.modules.javafx.editor;
 
+import java.awt.Graphics;
+import java.rmi.RemoteException;
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.editor.*;
 import org.netbeans.modules.editor.NbEditorUtilities;
@@ -54,9 +56,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.util.Map;
+import org.netbeans.api.print.PrintManager;
 import org.netbeans.modules.javafx.preview.Bridge;
-import org.openide.util.actions.CallableSystemAction;
+import org.netbeans.modules.javafx.preview.SerializableImage;
 
 /**
  *
@@ -66,6 +70,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
 
     private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
     private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
+    private static final String buttonPrintFXPreview = "print-fx-preview"; //NOI18N
     private static final String FX_MIME_TYPE = "text/x-fx";
 
     public JavaFXEditorKit() {
@@ -104,11 +109,13 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     protected Action[] createActions() {
         Action[] superActions = super.createActions();
         ResetFXPreviewExecution resetAction = new ResetFXPreviewExecution();
+        PrintFXPreview previewAction = new PrintFXPreview();
         Action[] javafxActions = new Action[] {
             new CommentAction("//"),
             new UncommentAction("//"),
-            new ToggleFXPreviewExecution(resetAction),
+            new ToggleFXPreviewExecution(resetAction, previewAction),
             resetAction,
+            previewAction,
             new JavaDefaultKeyTypedAction(),
             new JavaDeleteCharAction(deletePrevCharAction, false),
             new JavaFXGoToDeclarationAction(),
@@ -121,15 +128,17 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
 
     public class ToggleFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
         ResetFXPreviewExecution resetAction = null;
+        PrintFXPreview previewAction = null;
 
         @Override
         protected Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
 
-        public ToggleFXPreviewExecution(ResetFXPreviewExecution resetAction) {
+        public ToggleFXPreviewExecution(ResetFXPreviewExecution resetAction, PrintFXPreview previewAction) {
             super(toggleFXPreviewExecution);
             this.resetAction = resetAction;
+            this.previewAction = previewAction;
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
                     "org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
             putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
@@ -233,6 +242,64 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             JButton b = new JButton(this);
             b.setAction(this);
             b.putClientProperty("resetPreviewMark", Boolean.TRUE);                  //NOI18N
+            b.setText("");
+            b.setEnabled(false);
+            return b;
+        }
+    }
+
+
+    public static class PrintFXPreview extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
+        
+        class JPrintPanel extends JPanel {
+            private BufferedImage offscreenBuffer = null;
+            public JPrintPanel() {
+                super();
+                putClientProperty("print.printable", Boolean.TRUE); // NOI18N
+            }
+
+            public void setImage(SerializableImage image) {
+                offscreenBuffer = image.getBufferedImage();
+                setSize(offscreenBuffer.getWidth(), offscreenBuffer.getHeight());
+            }
+
+            @Override
+            public void print(Graphics g) {
+                 g.drawImage(offscreenBuffer, 0, 0, null);
+            }
+            
+            @Override
+            public boolean isShowing() {
+                return true;
+            }
+        }
+        public PrintFXPreview() {
+            super(buttonPrintFXPreview);
+            putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
+                    "org/netbeans/modules/javafx/editor/resources/print_preview.png"))); // NOI18N
+            putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("print-fx-preview"));
+        }
+
+        public void actionPerformed(ActionEvent evt, JTextComponent target) {
+            if (target != null) {
+                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
+                if (doc != null) {
+                    try {
+                        SerializableImage image = Bridge.getPreview(doc).getPicture();
+                        JPrintPanel printPanel = new JPrintPanel();
+                        printPanel.setImage(image);
+                        PrintManager.printAction(printPanel).actionPerformed(evt);
+                    } catch (RemoteException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        public java.awt.Component getToolbarPresenter() {
+            JButton b = new JButton(this);
+            b.setAction(this);
+            b.putClientProperty("printPreviewMark", Boolean.TRUE);                  //NOI18N
             b.setText("");
             b.setEnabled(false);
             return b;

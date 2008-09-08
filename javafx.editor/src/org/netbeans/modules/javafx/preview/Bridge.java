@@ -256,8 +256,9 @@ public class Bridge extends ModuleInstall {
                         try {
                             js.runUserActionTask(new Task<CompilationController>() {
                                 public void run(CompilationController controller) throws Exception {
-                                    controller.toPhase(Phase.CODE_GENERATED);
-                                    PreviewCodeGenerate.process(controller);
+                                    if (!controller.toPhase(Phase.CODE_GENERATED).lessThan(Phase.CODE_GENERATED)) { 
+                                        PreviewCodeGenerate.process(controller);
+                                    }
                                 }
                             }, true);
                         } catch (Exception exx) {

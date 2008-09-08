@@ -47,12 +47,10 @@ import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.InvocationEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLStreamHandlerFactory;
@@ -60,20 +58,16 @@ import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import org.openide.util.Exceptions;
-import sun.awt.AppContext;
 
 
 public class Preview {
@@ -203,8 +197,7 @@ public class Preview {
         private Point previewLocation = null;
         private Dimension previewSize = null;
         private JComponent comp = null;
-        private JComponent desktopPane = null;
-        private ArrayList<Object> topWindows = new ArrayList<Object>();
+        private AutoResizableDesktopPane desktopPane = null;
 
         PreviewSideServer(NBSideServerFace nbServer, int hashCode, String fileName, String lf, Point previewLocation, Dimension previewSize) throws RemoteException {
             super();
@@ -268,7 +261,7 @@ public class Preview {
             } else {
                 acTread.executeOnEDT(new Runnable() {
                     public void run() {
-                        CodeUtils.moveToInner((JDesktopPane)desktopPane, window);
+                        CodeUtils.moveToInner(desktopPane, window);
                     }
                 });
             }
@@ -278,7 +271,7 @@ public class Preview {
             JComponent component = CodeUtils.parseComponent(object);
             if (component != null) {
                 if (!noWindows) {
-                    CodeUtils.moveToInner((JDesktopPane)desktopPane, component);
+                    CodeUtils.moveToInner(desktopPane, component);
                 } else {
                     comp.remove(desktopPane);
                     comp.add(component);
@@ -467,7 +460,7 @@ public class Preview {
             window.removeWindowListener(this);
             acTread.executeOnEDT(new Runnable() {
                 public void run() {
-                    CodeUtils.moveToInner((JDesktopPane)desktopPane, window);
+                    CodeUtils.moveToInner(desktopPane, window);
                 }
             });
         }
@@ -499,6 +492,22 @@ public class Preview {
         public void windowActivated(WindowEvent e) {
         }
         public void windowDeactivated(WindowEvent e) {
+        }
+
+        public SerializableImage getPicture() throws RemoteException {
+            final SerializableImage offscreenBuffer = new SerializableImage((BufferedImage) desktopPane.createImage(desktopPane.getWidth(), desktopPane.getHeight()));
+            Thread thread = new Thread(acTread.getTG(), new Runnable(){
+                public void run() {
+                    desktopPane.print(offscreenBuffer.getGraphics());
+                }
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            return offscreenBuffer;
         }
     }
 
