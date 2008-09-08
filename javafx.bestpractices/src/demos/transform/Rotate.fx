@@ -74,7 +74,7 @@ Frame {
     stage : Stage {
         fill : Color.GRAY
         content : Rectangle {
-            transform : [ 
+            transforms : [
                 javafx.scene.transform.Rotate { angle : bind angle, x : 100, y : 100 }, 
                 javafx.scene.transform.Translate { x : 43, y : 43 } 
             ]

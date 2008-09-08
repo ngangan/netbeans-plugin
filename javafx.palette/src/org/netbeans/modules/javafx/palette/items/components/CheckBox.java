@@ -59,7 +59,7 @@ public class CheckBox implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.ext.swing.CheckBox" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.ext.swing.SwingCheckBox" ); // NOI18N
         
         return true;
     }    

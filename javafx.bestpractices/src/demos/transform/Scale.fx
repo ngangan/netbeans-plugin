@@ -69,7 +69,7 @@ Frame {
         fill : Color.GRAY
         content : [
             Rectangle {
-                transform : [ 
+                transforms : [
                     javafx.scene.transform.Translate { x : bind 100 - 40 * s / 2, y : bind 100 - 40 * s / 2 },
                     javafx.scene.transform.Scale { x : bind s, y : bind s }
                 ]
