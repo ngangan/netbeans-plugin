@@ -393,7 +393,7 @@ public final class TreeUtilities {
             CompilationInfoImpl ci = new CompilationInfoImpl(s);
             s.moveToPhase(Phase.ANALYZED, ci, false);
             CompilationController cc = new CompilationController(ci);
-            JavaFXTreePath p = cc.getTreeUtilities().pathFor(pos+3);
+            JavaFXTreePath p = cc.getTreeUtilities().pathFor(pos+2);
             if (p == null) {
                 if (LOGGABLE) log("  path for returned null");
                 return null;

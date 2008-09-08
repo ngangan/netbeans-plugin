@@ -1563,7 +1563,7 @@ public class EditorContextImpl extends EditorContext {
                     }
                     Tree tree;
                     if (pos == 0) {
-                        tree = ci.getTreeUtilities().parseExpression(expression, offset);
+                        tree = ci.getTreeUtilities().parseExpression(expression+";", offset);
                     } else {
                         JavaFXTreePath p = ci.getTreeUtilities().pathFor(pos);
                         tree=(ExpressionTree)p.getLeaf();
