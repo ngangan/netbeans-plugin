@@ -144,7 +144,15 @@ public class ElementJavadoc {
                             return;
                         }
                         if (linkDoc != null) {
-                            ret[0] = new ElementJavadoc(controller, linkDoc.resolve(controller), null);
+                            Element e = null;
+                            try {
+                                e = linkDoc.resolve(controller);
+                            } catch (Exception ex) {
+                                // can't convert to element (incomplete element)
+                            }
+                            if (e != null) {
+                                ret[0] = new ElementJavadoc(controller, e, null);
+                            }
                         } else {
                             int idx = link.indexOf('#'); //NOI18N
                             URI uri = URI.create(idx < 0 ? link : link.substring(0, idx));
@@ -208,19 +216,25 @@ public class ElementJavadoc {
             docURL = FXSourceUtils.getJavadoc(element, cpInfo);
             localized = isLocalized(docURL, element);
             if (!localized) {
-                final ElementHandle<? extends Element> handle = ElementHandle.create(element);
-                final FileObject fo = JavaFXSourceUtils.getFile(handle, cpInfo);
-                if (fo != null) {
-                    goToSource = new AbstractAction() {
-
-                        public void actionPerformed(ActionEvent evt) {
-                            try {
-                                ElementOpen.open(fo, handle);
-                            } catch (Exception ex) {
-                                Exceptions.printStackTrace(ex);
+                final ElementHandle[] handle = new ElementHandle[1];
+                try {
+                    handle[0]  = ElementHandle.create(element);
+                } catch (IllegalArgumentException iae) {
+                    // can't convert to element handler (incomplete element)
+                }
+                if (handle[0] != null) {
+                    final FileObject fo = JavaFXSourceUtils.getFile(handle[0], cpInfo);
+                    if (fo != null) {
+                        goToSource = new AbstractAction() {
+                            public void actionPerformed(ActionEvent evt) {
+                                try {
+                                    ElementOpen.open(fo, handle[0]);
+                                } catch (Exception ex) {
+                                    Exceptions.printStackTrace(ex);
+                                }
                             }
-                        }
-                    };
+                        };
+                    }
                 }
                 if (url != null) {
                     docURL = url;
@@ -1125,7 +1139,15 @@ public class ElementJavadoc {
     private int createLink(StringBuilder sb, Element e, String text) {
         if (e != null && e.asType().getKind() != TypeKind.ERROR) {
             String link = "*" + linkCounter++; //NOI18N
-            links.put(link, ElementHandle.create(e));
+            ElementHandle<Element> eh = null;
+            try {
+                eh = ElementHandle.create(e);
+            } catch (IllegalArgumentException iae) {
+                // can't convert to element handler (incomplete element)
+            }
+            if (eh != null) {
+                links.put(link, eh);
+            }
             sb.append("<a href='").append(link).append("'>"); //NOI18N
         }
         sb.append(text);

@@ -175,7 +175,16 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             return;
         }
         
-        final ElementHandle<Element> eh = ElementHandle.create(element);
+        ElementHandle<Element> eh = null;
+        try {
+            eh  = ElementHandle.create(element);
+        } catch (IllegalArgumentException iae) {
+            // can't convert to element handler (incomplete element)
+        }
+        if (eh == null) {
+            return;
+        }
+
         // Don't update when element is the same
         if (lastEh != null && lastEh.signatureEquals(eh) && !inJavadoc) {
             // System.out.println("  stoped because os same eh");
@@ -200,7 +209,16 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                     break;
                 case PARAMETER:
                     element = element.getEnclosingElement(); // Take the enclosing method
-                    lastEh = ElementHandle.create(element);
+                    ElementHandle<Element> eh1 = null;
+                    try {
+                        eh1 = ElementHandle.create(element);
+                    } catch (IllegalArgumentException iae) {
+                        // can't convert to element handler (incomplete element)
+                    }
+                    if (eh1 == null) {
+                        return;
+                    }
+                    lastEh = eh1;
 //                setDeclaration(""); // NOI18N
                     setJavadoc(null); // NOI18N
                     break;

@@ -302,7 +302,15 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         public void run(CompilationController cc) throws Exception {
             cc.toPhase(JavaFXSource.Phase.UP_TO_DATE);
 
-            Element e = handle.resolve(cc);
+            Element e = null;
+            try {
+                e = handle.resolve(cc);
+            } catch (Exception ex) {
+                // can't convert to element (incomplete element)
+            }
+            if (e == null) {
+                return;
+            }
             doc = ElementJavadoc.create(cc, e);
         }
     };

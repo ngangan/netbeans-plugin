@@ -242,7 +242,12 @@ public class JavadocEnv extends DocEnv {
 
                         public void run(CompilationController controller) throws Exception {
                             controller.toPhase(Phase.ANALYZED);
-                            Element e = handle.resolve(controller);
+                            Element e = null;
+                            try {
+                                e = handle.resolve(controller);
+                            } catch (Exception ex) {
+                                // can't convert to element (incomplete element)
+                            }
                             if (e != null) {
                                 ret[0] = controller.getElements().getDocComment(e);
                             }

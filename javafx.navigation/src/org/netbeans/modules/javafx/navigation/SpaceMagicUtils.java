@@ -67,7 +67,13 @@ public final class SpaceMagicUtils {
     }
 
     public static boolean hasSpiritualInvocation(ElementHandle<? extends Element> elementHandle, CompilationInfo compilationInfo) {
-        return hasSpiritualInvocation(elementHandle.resolve(compilationInfo));
+        Element element = null;
+        try {
+            element = elementHandle.resolve(compilationInfo);
+        } catch (Exception e) {
+            // can't convert to element (incomplete element)
+        }
+        return element != null ? hasSpiritualInvocation(element) : false;
     }
 
     /**

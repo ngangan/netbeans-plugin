@@ -275,7 +275,18 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         final boolean inherited = isParentInherited || (null != parent && !parent.equals(e.getEnclosingElement()));
         final ElementKind kind = e.getKind();
         final ElementKind spaceMagicKind = kind == ElementKind.LOCAL_VARIABLE ? ElementKind.FIELD : kind;
-        Description d = new Description(ui, name, ElementHandle.create(e), spaceMagicKind, inherited);
+
+        ElementHandle<Element> eh = null;
+        try {
+            eh  = ElementHandle.create(e);
+        } catch (IllegalArgumentException iae) {
+            // can't convert to element handler (incomplete element)
+        }
+        if (eh == null) {
+            return null;
+        }
+        
+        Description d = new Description(ui, name, eh, spaceMagicKind,inherited);
         final JavafxTypes javafxTypes = info.getJavafxTypes();
 
         if (e instanceof TypeElement) {
