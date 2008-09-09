@@ -80,6 +80,7 @@ import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
 import org.netbeans.modules.javafx.project.classpath.JavaFXProjectClassPathExtender;
 import org.netbeans.modules.javafx.project.classpath.JavaFXProjectClassPathModifier;
 import org.netbeans.modules.javafx.project.queries.BinaryForSourceQueryImpl;
+import org.netbeans.modules.javafx.project.queries.FXFileBuiltQueryImpl;
 import org.netbeans.modules.javafx.project.ui.JavaFXLogicalViewProvider;
 import org.netbeans.modules.javafx.project.ui.customizer.CustomizerProviderImpl;
 import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
@@ -275,7 +276,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             QuerySupport.createSourceLevelQuery(evaluator()),
             new JavaFXSources (this.helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
             QuerySupport.createSharabilityQuery(helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
-            QuerySupport.createFileBuiltQuery(helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
+            new FXFileBuiltQueryImpl(helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
             new RecommendedTemplatesImpl (this.updateHelper),
             new JavaFXProjectClassPathExtender(cpMod),
             buildExtender,
