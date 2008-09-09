@@ -18,9 +18,14 @@ throw
 try
 var
 while
+Duration
+FXTestClass
+FXTestClass001
+FXTestClass002
 FXTestClass003
 FXTestClassVar1
 Foo
+Object
 String
 System
 applications

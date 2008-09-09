@@ -1,9 +1,11 @@
 abstract
-attribute
+def
 function
 init
+package
 postinit
-private
 protected
 public
-readonly
+public-init
+public-read
+var
