@@ -168,8 +168,8 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
             return SEMI;
         }
 
-        protected void checkIntLiteralRange(String text, int pos, int radix) {
-           
+        protected void checkIntLiteralRange(String text, int pos, int radix) {           
+/*
             long value = Convert.string2long(text, radix);
             
             pos = pos - text.length();
@@ -183,6 +183,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                 log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "big", text);
                 
             } 
+*/
         }
 
         // quote context --
