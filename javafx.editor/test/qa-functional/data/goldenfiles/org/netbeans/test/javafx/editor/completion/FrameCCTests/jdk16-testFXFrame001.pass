@@ -1,10 +1,7 @@
-canvasStage
+iconified
 closeAction
 height
-iconified
 icons
-initialized
-isWindowInitialized
 name
 opacity
 resizable
@@ -12,8 +9,5 @@ stage
 title
 visible
 width
-window
-windowStyle
 x
 y
-UNINITIALIZED

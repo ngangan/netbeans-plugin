@@ -69,7 +69,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/Frame001.fx",
-                11, // line number where the cursor should be
+                8, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     

@@ -5,6 +5,7 @@ import javafx.application.Frame;
 import javafx.application.Stage;
 
 Frame {
+    
     title: "MyApplication"
     width: 200
     height: 200

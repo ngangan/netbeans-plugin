@@ -5,7 +5,6 @@ import javafx.application.Frame;
 import javafx.application.Stage;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
-import javafx.scene.FontStyle;
 
 Frame {
     title: "MyApplication"
@@ -23,7 +22,6 @@ Frame {
                 font: Font { 
                     
                     size: 24 
-                    style: FontStyle.PLAIN
                 }
                 x: 10, y: 30
                 content: "HelloWorld"
