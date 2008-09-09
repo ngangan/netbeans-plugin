@@ -59,7 +59,6 @@ Frame {
                 fill : Color.BLACK
 
                 onMousePressed: function( e : MouseEvent ): Void {
-                    java.lang.System.out.println( "{e.button}")
                     if( e.button == MouseButton.PRIMARY ) {
                         buttons[0].fill = Color.BLACK;
                     } else if( e.button == MouseButton.SECONDARY ) {
