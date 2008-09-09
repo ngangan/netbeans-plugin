@@ -43,7 +43,7 @@ import javafx.scene.transform.Scale;
 var width : Number = 200;
 var height : Number = 200;
 
-var img = Image { url : "{__DIR__}/../resources/background.png" };
+var img = Image { url : "{__DIR__}../resources/background.png" };
     
 Frame {
     stage : Stage {

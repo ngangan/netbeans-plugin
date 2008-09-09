@@ -43,13 +43,13 @@ import javafx.scene.transform.Scale;
 
 var x : Number = 40;
 
-var img : Image = Image { url : "{__DIR__}/../resources/overlay.png" };
+var img : Image = Image { url : "{__DIR__}../resources/overlay.png" };
 
 Frame {
     stage : Stage {
         content : [
             ImageView {
-                image : Image { url : "{__DIR__}/../resources/background.png" }
+                image : Image { url : "{__DIR__}../resources/background.png" }
                 onMouseMoved : function( e : MouseEvent ):Void {
                     x = e.x - 100 * 0.5;
                 }

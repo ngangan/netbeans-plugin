@@ -67,7 +67,7 @@ Frame {
     stage : Stage {
         content : [
             ImageView {
-                image : Image { url : "{__DIR__}/../resources/background.png" }
+                image : Image { url : "{__DIR__}../resources/background.png" }
             },
             Group {
                 transforms : Translate { y : bind y }
