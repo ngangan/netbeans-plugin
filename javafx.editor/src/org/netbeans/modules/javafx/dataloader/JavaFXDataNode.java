@@ -46,7 +46,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,9 +54,7 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.queries.FileBuiltQuery;
 import org.netbeans.api.queries.FileBuiltQuery.Status;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
@@ -65,12 +62,14 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
-import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
+
+import static org.openide.util.ImageUtilities.assignToolTipToImage;
+import static org.openide.util.ImageUtilities.loadImage;
+import static org.openide.util.NbBundle.getMessage;
 
 /**
  *
@@ -82,12 +81,19 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     private static final String FX_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
     private static final String CLASS_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
 
-    private static final Image NEEDS_COMPILE = Utilities.loadImage("org/netbeans/modules/java/resources/needs-compile.png"); // NOI18N
+    private static final String NEEDS_COMPILE_BADGE_URL = "org/netbeans/modules/javafx/dataloader/resources/needs-compile.png";
+    private static final Image NEEDS_COMPILE;
     
     private Status status;
     private final AtomicBoolean isCompiled;
     private ChangeListener executableListener;
 //    private final AtomicBoolean isExecutable;
+
+    static{
+        URL needsCompileIconURL = JavaFXDataNode.class.getClassLoader().getResource(NEEDS_COMPILE_BADGE_URL);
+        String needsCompileTP = "<img src=\"" + needsCompileIconURL + "\">&nbsp;" + getMessage(JavaFXDataNode.class, "TP_NeedsCompileBadge");
+        NEEDS_COMPILE = assignToolTipToImage(loadImage(NEEDS_COMPILE_BADGE_URL), needsCompileTP); // NOI18N
+    }
 
     /** Create a node for the Java data object using the default children.
     * @param jdo the data object to represent
@@ -277,14 +283,10 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     }
     
     private Image enhanceIcon(Image i) {
-//        if (isCompiled != null && !isCompiled.get()) {
-//            i = Utilities.mergeImages(i, NEEDS_COMPILE, 16, 0);
-//        }
-/*  all fx files are executable      
-        if (isExecutable != null && isExecutable.get()) {
-            i = Utilities.mergeImages(i, IS_EXECUTABLE_CLASS, 10, 6);
+        if (isCompiled != null && !isCompiled.get()) {
+            i = Utilities.mergeImages(i, NEEDS_COMPILE, 16, 0);
         }
-*/        
+        
         return i;
     }
     
