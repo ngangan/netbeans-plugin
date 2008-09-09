@@ -1,7 +1,9 @@
 INDEFINITE
 autoReverse
+interpolate
 keyFrames
 paused
 repeatCount
 running
+speed
 toggle
