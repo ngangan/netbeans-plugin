@@ -63,13 +63,12 @@ nb.cluster.javafx=\\
        contrib/javafx.palette,\\
        contrib/javafx.navigation
 
-javafx-sdk.win.url=${SDK_URL}/windows-i586/bundles/javafx_sdk-1_0-dev-windows-i586.zip
-javafx-sdk.mac.url=${SDK_URL}/macosx-universal/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
-javafx-sdk.lin.url=${SDK_URL}/linux-i586/bundles/javafx_sdk-1_0-dev-linux-i586.zip
-javafx-sdk.sol.url=${SDK_URL}/solaris-sparc/bundles/javafx_sdk-1_0-dev-solaris-sparc.zip
-jfxcompiler.jar.url=${SDK_URL}/windows-i586/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxc.jar
-jfxdoc.jar.url=${OPEN_COMPILER_URL}/lib/javafxdoc.jara
-jfxdoc.jar.url=http://openjfx.java.sun.com/hudson/job/openjfx-compiler/lastSuccessfulBuild/artifact/openjfx-compiler/dist/lib/javafxdoc.jar
+javafx-sdk.win.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-dev-windows-i586.zip
+javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/lastSuccessfulBuild/artifact/jfx/build/macosx/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
+javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/lastSuccessfulBuild/artifact/jfx/build/linux-i586/release/bundles/javafx_sdk-1_0-dev-linux-i586.zip
+javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/jfx/build/solaris-sparc/release/bundles/javafx_sdk-1_0-dev-solaris-sparc.zip
+jfxcompiler.jar.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/jfx/build/solaris-sparc/release/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxc.jar
+jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxc.jar
 nb.cluster.javafx.dir=javafx2
 
 EOF
@@ -77,7 +76,7 @@ EOF
 # Get Netbeans binary
 ########################## 
 rm -rf nbms/* netbeans
-unzip -o /net/smetiste.czech/space/builds/netbeans/trunk/latest_daily/zip/netbeans-*-*[0-9].zip
+unzip -o /net/smetiste.czech/space/builds/netbeans/trunk/daily/latest/zip/netbeans-*-*[0-9].zip
 
 ant init  build-one-cluster -Done.cluster.name=nb.cluster.javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
 
