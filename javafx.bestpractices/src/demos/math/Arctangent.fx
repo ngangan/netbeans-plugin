@@ -47,7 +47,7 @@ import java.lang.Math;
  * @author Michal Skvor
  */
 
-private var eyes : Eye[] = [
+var eyes : Eye[] = [
     Eye { x : 50, y : 16, size : 40 },
     Eye { x : 64, y : 85, size : 20 },
     Eye { x : 90, y : 200, size : 60 },
