@@ -43,7 +43,6 @@ import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.UnitTree;
@@ -66,8 +65,8 @@ import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.TreeUtilities;
+import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -86,7 +85,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     private static final String ID_FIELD = "field";
     private static final String ID_IDENTIFIER = "identifier";
     private static final String ID_CLASS = "class";
-    
+
     private static final AttributeSet FIELD_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0));
     private static final AttributeSet FIELD_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0), StyleConstants.Italic, Boolean.TRUE);
     private static final AttributeSet METHOD_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE);
@@ -96,10 +95,10 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     private static final AttributeSet IDENTIFIER_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127));
     private static final AttributeSet CLASS_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE);
     private static final AttributeSet CLASS_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE, StyleConstants.Italic, Boolean.TRUE);
-    
+
     private static final Logger LOGGER = Logger.getLogger(SemanticHighlighter.class.getName());
     private static final boolean LOGGABLE = LOGGER.isLoggable(Level.FINE);
-    
+
     private FileObject file;
     private AtomicBoolean cancel = new AtomicBoolean();
     private List<Result> identifiers = new ArrayList<Result>();
@@ -117,35 +116,40 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         process(info);
     }
 
-    private void process(CompilationInfo info) {
+    private boolean process(CompilationInfo info) {
+        DataObject od = null;
         try {
-            DataObject od = DataObject.find(file);
-            EditorCookie ec = od.getLookup().lookup(EditorCookie.class);
-            if (ec == null) {
-                return;
-            }
-            Document doc = ec.getDocument();
-            if (doc == null) {
-                return;
-            }
-
-            List<Result> result = new ArrayList<Result>();
-            UnitTree compilationUnit = info.getCompilationUnit();
-            JavaFXThreeVisitor javaFXThreeVisitor = new JavaFXThreeVisitor(info);
-            javaFXThreeVisitor.scan(compilationUnit, result);
-            setHighlights(doc, result, identifiers);
-            identifiers.clear(); // clear cache
-
+            od = DataObject.find(file);
         } catch (DataObjectNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }
+        EditorCookie ec = od != null ? od.getLookup().lookup(EditorCookie.class) : null;
+        if (ec == null) {
+            return false;
+        }
+        Document doc = ec.getDocument();
+        if (doc == null) {
+            return false;
+        }
+
+        identifiers.clear(); // clear cache
+        List<Result> result = new ArrayList<Result>();
+        UnitTree compilationUnit = info.getCompilationUnit();
+        JavaFXThreeVisitor javaFXThreeVisitor = new JavaFXThreeVisitor(info, doc, cancel);
+        javaFXThreeVisitor.scan(compilationUnit, result);
+        if (cancel.get()) {
+            return true;
+        }
+
+        setHighlights(doc, result, identifiers);
+        return false;
     }
 
     static void setHighlights(Document doc, List<Result> results, List<Result> identifiers) {
         if (results.isEmpty()) {
             return;
         }
-        
+
         OffsetsBag bag = new OffsetsBag(doc, true);
         for (Result result : results) {
             int start = (int) result.start;
@@ -154,10 +158,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             if (start >= 0 && end >= 0) {
                 bag.addHighlight(start, end, getAttributeSet(result));
             } else {
-                if (LOGGABLE) log("* Incorrect positions for highlighting: " + start + ", " + end);
+                if (LOGGABLE) {
+                    log("* Incorrect positions for highlighting: " + start + ", " + end);
+                }
             }
 
-            // highlighting fot variables from cache
+            // highlighting for variables from cache
             if (ID_FIELD.equals(result.identifier)) {
                 for (Result id : identifiers) {
                     final String idText = id.token.text() == null ? "" : id.token.text().toString();
@@ -167,7 +173,6 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     }
                 }
             }
-
         }
 
         getBag(doc).setHighlights(bag);
@@ -204,13 +209,18 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         }
     }
 
-    private class JavaFXThreeVisitor extends JavaFXTreePathScanner<Void, List<Result>> {
+    private class JavaFXThreeVisitor extends CancellableTreePathScanner<Void, List<Result>> {
 
         private CompilationInfo info;
+        private Document doc;
         private TreeUtilities tu;
+        private AtomicBoolean cancel;
 
-        public JavaFXThreeVisitor(CompilationInfo info) {
+        public JavaFXThreeVisitor(final CompilationInfo info, final Document doc, final AtomicBoolean cancel) {
+            super(cancel);
             this.info = info;
+            this.doc = doc;
+            this.cancel = cancel;
             tu = new TreeUtilities(info);
         }
 
@@ -229,7 +239,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
             while (ts.moveNext()) {
                 Token t = ts.token();
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
@@ -257,9 +267,9 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
             Token name = null;
-            
+
             ts.moveEnd();
             boolean metLBrace = false;
             while (ts.movePrevious()) {
@@ -299,7 +309,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
             while (ts.moveNext()) {
                 // do not highlight parameters and local variables
                 if (element != null && !element.getKind().isField()) {
@@ -331,14 +341,14 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
-            
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+
+            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
             while (ts.moveNext()) {
                 // do not highlight parameters and local variables
                 if (element != null && !element.getKind().isField()) {
                     continue;
                 }
-                    
+
                 Token t = ts.token();
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) {
                     start = ts.offset();
@@ -365,8 +375,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
-            
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+
+            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
             while (ts.moveNext()) {
                 Token t = ts.token();
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
@@ -393,12 +403,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             Element element = info.getTrees().getElement(getCurrentPath());
             if (element != null) {
-                TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
 
                 while (ts.moveNext()) {
                     Token t = ts.token();
                     String tokenStr = t.text().toString();
-                    
+
                     if (JFXTokenId.IDENTIFIER.equals(t.id())) {
                         start = ts.offset();
                         JavaFXTreePath subPath = tu.pathFor((int) start);
@@ -426,15 +436,13 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             return super.visitMemberSelect(tree, list);
         }
-
     }
 
     private static class Result {
 
         long start;
         long end;
-        String identifier; // temporary since element doesn't work
-
+        String identifier; // XXX temporary since element doesn't work
         Token token;
         boolean isStatic;
 

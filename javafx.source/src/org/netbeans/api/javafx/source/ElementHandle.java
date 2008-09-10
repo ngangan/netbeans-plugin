@@ -355,6 +355,10 @@ public class ElementHandle<T extends Element> {
     }
 
     private static void encodeType(final TypeMirror type, final StringBuilder sb) {
+        if (type == null) {
+            sb.append('?');
+            return;
+        }
         switch (type.getKind()) {
             case VOID:
                 sb.append('V');	    // NOI18N

@@ -68,6 +68,9 @@ public class CaretListeningFactory extends CaretAwareJavaSourceTaskFactory {
     }
     
     static void runAgain() {
+        if (INSTANCE == null) {
+            return; // somehow global lookup was not initialized yet
+        }
         List<FileObject> fileObjects = INSTANCE.getFileObjects();
         CaretListeningTask.resetLastEH();
         if ( !fileObjects.isEmpty() ) {

@@ -221,7 +221,13 @@ public final class JavaFXSource {
             }
 
             long start = System.currentTimeMillis();
-            Iterable<? extends UnitTree> trees = cc.getJavafxcTask().parse();
+            Iterable<? extends UnitTree> trees = null;
+            try {
+                trees = cc.getJavafxcTask().parse();
+            } catch (RuntimeException parserError) {
+                LOGGER.log(Level.WARNING, "Error in parser", parserError); // NOI18N
+                return cc.phase;
+            }
 //                new JavaFileObject[] {currentInfo.jfo});
             Iterator<? extends UnitTree> it = trees.iterator();
             assert it.hasNext();
@@ -240,7 +246,12 @@ public final class JavaFXSource {
             }
 
             long start = System.currentTimeMillis();
-            cc.getJavafxcTask().analyze();
+            try {
+                cc.getJavafxcTask().analyze();
+            } catch (RuntimeException analyzerError) {
+                LOGGER.log(Level.WARNING, "Error in analyzer", analyzerError); // NOI18N
+                return cc.phase;
+            }
             cc.setPhase(Phase.ANALYZED);
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
@@ -252,7 +263,13 @@ public final class JavaFXSource {
             }
 
             long start = System.currentTimeMillis();
-            Iterable <? extends JavaFileObject> bytes = cc.getJavafxcTask().generate();
+            Iterable <? extends JavaFileObject> bytes = null;
+            try {
+                bytes = cc.getJavafxcTask().generate();
+            } catch (RuntimeException generateError) {
+                LOGGER.log(Level.WARNING, "Error in generate", generateError); // NOI18N
+                return cc.phase;
+            }
             cc.setClassBytes(bytes);
             cc.setPhase(Phase.CODE_GENERATED);
             long end = System.currentTimeMillis();
