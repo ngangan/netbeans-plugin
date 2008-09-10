@@ -184,8 +184,9 @@ public class JavaFXClassTypeImpl implements JavaFXClassType {
                 } else if (value instanceof ObjectReference) {
                     ObjectReference ref = (ObjectReference) value;
                     ReferenceType rt = ref.referenceType();
+                    
                         if (rt != null) {
-                            com.sun.jdi.Field f = rt.fieldByName("$value");
+                            com.sun.jdi.Field f = rt.fieldByName("$value");                 //NOI18N
                             if (f != null) {
                                 Value val = ref.getValue(f);
                                 if (val instanceof PrimitiveValue) {

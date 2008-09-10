@@ -195,6 +195,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 JavaFXTreePath methodInvokePath = JavaFXTreePath.getPath(currentPath, arg0);
                 if (methodInvokePath == null) methodInvokePath = currentPath;
                 elm = evaluationContext.getTrees().getElement(methodInvokePath);
+                if (elm==null) Assert2.error(arg0, "methodCallOnNull: "+arg0.toString());
                 methodName = elm.getSimpleName().toString();
             } else {
                 elm = null;

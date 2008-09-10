@@ -43,6 +43,7 @@ package org.netbeans.modules.debugger.javafx.models;
 
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.BooleanType;
+import com.sun.jdi.BooleanValue;
 import com.sun.jdi.ByteType;
 import com.sun.jdi.ByteValue;
 import com.sun.jdi.CharType;
@@ -297,7 +298,26 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
     public String getType () {
         if (getInnerValue () == null) return "";
         try {
-            return this.getInnerValue().type().name ();
+            Type type = this.getInnerValue().type();
+//if this is PrimitiveType we have to show it as JavaFX type
+            if (type instanceof PrimitiveType) {
+                if (type instanceof IntegerType ||
+                        type instanceof ShortType ||
+                        type instanceof LongType) {
+                    return "Integer";
+                }
+                if (type instanceof BooleanType) {
+                    return "Boolean";
+                }
+                if (type instanceof FloatType) {
+                    return "Number";
+                }
+                if (type instanceof DoubleType) {
+                    return "Number";
+                }
+                return type.name();
+            }
+            return type.name ();
         } catch (VMDisconnectedException vmdex) {
             // The session is gone.
             return NbBundle.getMessage(AbstractVariable.class, "MSG_Disconnected");

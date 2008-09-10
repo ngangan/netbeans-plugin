@@ -637,7 +637,20 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("FINISHED: "+or+".getValue("+f+") = "+v);
         }
-        if ( (v == null) || (v instanceof ObjectReference))
+        if ( (v == null) || (v instanceof ObjectReference)) {
+//Trying to get nested $value field
+            if (v!=null) {
+                ObjectReference ref = (ObjectReference) v;
+                ReferenceType rt = ref.referenceType();
+                if (rt != null) {
+                    com.sun.jdi.Field lf = rt.fieldByName("$value");                 //NOI18N
+                    if (lf != null) {
+                        Value val = ref.getValue(lf);
+                        return new FieldVariable (getDebugger(), (PrimitiveValue) val, f, parentID, or);
+                    }
+                }
+            }
+//END
             return new ObjectFieldVariable (
                 getDebugger(),
                 (ObjectReference) v,
@@ -646,6 +659,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                 JavaFXDebuggerImpl.getGenericSignature(f),
                 or
             );
+        }
         return new FieldVariable (getDebugger(), (PrimitiveValue) v, f, parentID, or);
     }
     
