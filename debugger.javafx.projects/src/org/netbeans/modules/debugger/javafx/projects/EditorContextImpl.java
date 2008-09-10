@@ -1569,6 +1569,9 @@ public class EditorContextImpl extends EditorContext {
                         tree=(ExpressionTree)p.getLeaf();
 //                        tree = ci.getTreeUtilities().parseExpression(expression, pos);
                     }
+                    if (tree == null) {
+                        tree=ci.getCompilationUnit();
+                    }
                     try {
                         //context.setTrees(ci.getTrees());
                         java.lang.reflect.Method setTreesMethod =
