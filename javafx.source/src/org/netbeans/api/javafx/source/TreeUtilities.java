@@ -405,6 +405,10 @@ public final class TreeUtilities {
                 if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (2) = " + p.getLeaf());
                 p = p.getParentPath();
             }
+            if (p == null) {
+                if (LOGGABLE) log("  ExpressionTree not found! Returning null");
+                return null;
+            }
             // the second while loop will try to find as big expression as possible
             JavaFXTreePath pp = p.getParentPath();
             if (LOGGABLE && pp != null) {
