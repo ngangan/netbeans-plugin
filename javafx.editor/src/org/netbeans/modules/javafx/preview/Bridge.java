@@ -5,7 +5,12 @@
 
 package org.netbeans.modules.javafx.preview;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +33,10 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.openide.util.RequestProcessor;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
+import org.openide.windows.OutputWriter;
 
 public class Bridge extends ModuleInstall {
     private static NbProcessDescriptor nb = null;
@@ -37,7 +46,7 @@ public class Bridge extends ModuleInstall {
     @Override
     public boolean closing() {
         try {
-            previewDispatcher.terminate();
+            if (previewDispatcher != null) previewDispatcher.terminate();
         } catch (RemoteException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -140,12 +149,72 @@ public class Bridge extends ModuleInstall {
         
         nb = new NbProcessDescriptor(exePath, args);
         try {
-            nb.exec();
+            Process process = nb.exec();
+            OutHandler processSystemOut = new OutHandler (process);
+            RequestProcessor.getDefault().post(processSystemOut);
         } catch (Throwable ex) {
             Exceptions.printStackTrace(ex);
         }
     }
     
+    static class OutHandler implements Runnable {
+        private Process process = null;
+        private InputOutput io = null;
+        
+        public OutHandler (Process process) {
+            this.process = process;
+        }
+
+        public void run() {
+            InputStream out = process.getInputStream();
+            InputStream err = process.getErrorStream();
+            final Reader outReader = new BufferedReader (new InputStreamReader (out));
+            final Reader errReader = new BufferedReader (new InputStreamReader (err));
+            while (true) {
+                try {
+                    
+                    while ((!outReader.ready()) && (!errReader.ready())) {
+                        try {
+                            Thread.sleep(300);
+                        } catch (InterruptedException e) {
+                            out.close();
+                            err.close();
+                            outReader.close();
+                            errReader.close();
+                            return;
+                        }
+                    }
+                    if (io == null) io = IOProvider.getDefault().getIO(PREVIEW_OUTPUT, false);
+                    io.select();
+                    if (outReader.ready())
+                        readOneBuffer(outReader, io.getOut());
+                    if (errReader.ready())
+                        readOneBuffer(errReader, io.getErr());
+                    
+                    if (Thread.currentThread().isInterrupted()) {
+                        out.close();
+                        err.close();
+                        outReader.close();
+                        errReader.close();
+                        return;
+                    }
+                } catch (IOException ioe) {
+                    return;
+                }
+            }
+        }
+
+        private void readOneBuffer(Reader out, OutputWriter writer) throws IOException {
+            char[] cbuf = new char[255];
+            int read;
+            while (out.ready() && (read = out.read(cbuf)) != -1) {
+                writer.write(cbuf, 0, read);
+            }
+            writer.close();
+        }
+
+    }
+
     static private Registry registry = null;
     static private NBSideDispatchingServer nbDispatcher = null;
     static private PingThread pingThread = null;
@@ -169,7 +238,8 @@ public class Bridge extends ModuleInstall {
     }
     
     public static void start() {
-        new Thread() {
+        
+        RequestProcessor.getDefault().post(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -196,7 +266,7 @@ public class Bridge extends ModuleInstall {
                     Logger.getLogger(Bridge.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }.start();
+        });
     }
     
     static class PingThread extends Thread {
@@ -276,9 +346,10 @@ public class Bridge extends ModuleInstall {
         }.start();
     }
     
-    private static String PREVIEW_SIDE = "PreviewSide";   // NOI18
-    private static String NB_SIDE = "NBSide";             // NOI18
-    private static String NB_HOME = "netbeans.home";      // NOI18
-    private static String JAVA_HOME = "java.home";        // NOI18
-    private static String JAVA = "java";                  // NOI18
+    private static String PREVIEW_SIDE = "PreviewSide";         // NOI18
+    private static String NB_SIDE = "NBSide";                   // NOI18
+    private static String NB_HOME = "netbeans.home";            // NOI18
+    private static String JAVA_HOME = "java.home";              // NOI18
+    private static String JAVA = "java";                        // NOI18
+    private static String PREVIEW_OUTPUT = "Preview Output";    // NOI18
 }

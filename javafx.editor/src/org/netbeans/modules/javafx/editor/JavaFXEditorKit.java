@@ -165,7 +165,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             return b;
         }
 
-         private  final class PreviewButton extends JToggleButton implements ChangeListener{
+         private  final class PreviewButton extends JButton implements ChangeListener{
              
             public PreviewButton() {
                 super();

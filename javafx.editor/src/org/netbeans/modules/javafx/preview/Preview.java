@@ -289,7 +289,7 @@ public class Preview {
 
             scrollComponent = new JScrollPane();
             blockProcessing = true;
-            previewFrame = new JFrame(DESIGN_PREVIEW + " " + fileName); // NOI18
+            previewFrame = new JFrame(DESIGN_PREVIEW + " [" + fileName + "]"); // NOI18
             blockProcessing = false;
             previewFrame.setSize(previewSize);
             previewFrame.setLocation(previewLocation);
@@ -370,7 +370,7 @@ public class Preview {
         
         public void  run(final Object context)  throws RemoteException {
             if (threadGroup == null) {
-                threadGroup = new ThreadGroup("SACG" + instanceCounter++);  //NOI18
+                threadGroup = new ThreadGroup("SACG" + instanceCounter++);      //NOI18
                 acTread = new ACThread(threadGroup, lf);
                 acTread.start();
                 try {

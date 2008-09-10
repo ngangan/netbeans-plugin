@@ -168,9 +168,9 @@ made subject to such option by the copyright holder.
                         <file name="toggle-reset-fx-preview-execution">
                             <attr name="position" intvalue="1200"/>
                         </file>
-                        <file name="print-fx-preview">
+                        <!--<file name="print-fx-preview">
                             <attr name="position" intvalue="1300"/>
-                        </file>
+                        </file>-->
                         <file name="comment">
                             <attr name="position" intvalue="20200"/>
                         </file>
