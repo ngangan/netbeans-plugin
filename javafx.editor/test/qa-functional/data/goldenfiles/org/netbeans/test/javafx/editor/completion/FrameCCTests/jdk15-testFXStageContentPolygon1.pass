@@ -38,6 +38,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+styleClass
 transforms
 translateX
 translateY
