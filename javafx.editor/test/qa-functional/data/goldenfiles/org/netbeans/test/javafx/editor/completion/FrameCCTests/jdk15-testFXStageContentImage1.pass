@@ -34,6 +34,7 @@ pressed
 rotate
 scaleX
 scaleY
+styleClass
 transforms
 translateX
 translateY
