@@ -6,13 +6,15 @@
 package org.netbeans.modules.javafx.preview;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.rmi.AlreadyBoundException;
 
 import java.rmi.registry.*;
 
@@ -22,6 +24,7 @@ import org.openide.util.Exceptions;
 import org.openide.modules.ModuleInstall;
 
 import java.rmi.RemoteException;
+import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import javax.swing.event.ChangeEvent;
@@ -132,8 +135,13 @@ public class Bridge extends ModuleInstall {
         }
         
         String classs = "org/netbeans/modules/javafx/preview/Main";                                                                             //NOI18
-        String path = Bridge.class.getClassLoader().getResource(classs + ".class").getPath();                                                   //NOI18
-        String jarPath = path.substring(0, path.indexOf('!')).substring(5);
+        String path = "";
+        try {
+            path = URLDecoder.decode(Bridge.class.getClassLoader().getResource(classs + ".class").getPath(), new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding());                                   //NOI18
+        } catch (UnsupportedEncodingException uex) {
+            uex.printStackTrace();
+        }
+        String jarPath = path.substring(0, path.indexOf('!')).substring(5);                                                                     //NOI18
         String args = "-Djava.class.path=\"" + System.getProperty("java.class.path") + File.pathSeparator + jarPath + File.pathSeparator +      // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-loaders.jar" + File.pathSeparator +                                         // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-nodes.jar" + File.pathSeparator +                                           // NOI18
@@ -144,8 +152,8 @@ public class Bridge extends ModuleInstall {
                 System.getProperty(NB_HOME) + "/modules/org-openide-windows.jar" + File.pathSeparator +                                         // NOI18
                 System.getProperty(NB_HOME) + "/lib/org-openide-util.jar" + File.pathSeparator +                                                // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-text.jar" + "\" " +                                                         // NOI18
-        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                                 // NOI18
-        classs;
+        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                          // NOI18
+        classs + " " + bridgeInstaceNum;                                                                                                        // NOI18
         
         nb = new NbProcessDescriptor(exePath, args);
         try {
@@ -202,7 +210,7 @@ public class Bridge extends ModuleInstall {
                     return;
                 }
             }
-        }
+        } 
 
         private void readOneBuffer(Reader out, OutputWriter writer) throws IOException {
             char[] cbuf = new char[255];
@@ -237,18 +245,31 @@ public class Bridge extends ModuleInstall {
         }
     }
     
+    private static int bridgeInstaceNum = 0;
     public static void start() {
         
         RequestProcessor.getDefault().post(new Runnable() {
-            @Override
+            //@Override
             public void run() {
                 try {
-                    registry = LocateRegistry.createRegistry(1099);
-
+                    try {
+                        registry = LocateRegistry.createRegistry(1099);
+                    } catch (ExportException ex) {
+                        registry = LocateRegistry.getRegistry(null, 1099);
+                    }
                     nbDispatcher = new NBSideDispatchingServer();
                     UnicastRemoteObject.unexportObject(nbDispatcher, true);
                     NBSideDispatchingServerFace nbSideDispatchingStub = (NBSideDispatchingServerFace) UnicastRemoteObject.exportObject(nbDispatcher, 0);     
-                    registry.rebind(NB_SIDE, nbSideDispatchingStub);
+                    while (true) {
+                        try {
+                            registry.bind(++bridgeInstaceNum + " " + NB_SIDE, nbSideDispatchingStub);
+                            break;
+                        } catch (AlreadyBoundException ex) {
+                        }
+                    }
+                    
+                    NB_SIDE = bridgeInstaceNum + " " + NB_SIDE;
+                    PREVIEW_SIDE = bridgeInstaceNum + " " + PREVIEW_SIDE;
 
                     startClient();
 
@@ -263,7 +284,7 @@ public class Bridge extends ModuleInstall {
                     isStarted = true;
                     notifyStarted();
                 } catch (Exception ex) {
-                    Logger.getLogger(Bridge.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
         });

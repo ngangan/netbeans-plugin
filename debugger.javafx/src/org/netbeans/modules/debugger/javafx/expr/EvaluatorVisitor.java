@@ -1859,6 +1859,18 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     ReferenceType type = ((ObjectReference) expression).referenceType();
                     String ext = "$"+type.name().replace('.', '$')+"$";
                     Field f = type.fieldByName(ext+fieldName);
+                    if (f==null) {
+//Trying to search among all fields
+                        List<Field> fields = type.allFields();
+                        Iterator it = fields.iterator();
+                        while(it.hasNext()) {
+                            f = (Field) it.next();
+                            if (f.toString().indexOf("$"+fieldName)!=-1) {
+                                break;
+                            }
+                            f = null;
+                        }
+                    }
                     if (f != null){
                         Value v = ((ObjectReference)expression).getValue(f);
                         if (v instanceof ObjectReference) {

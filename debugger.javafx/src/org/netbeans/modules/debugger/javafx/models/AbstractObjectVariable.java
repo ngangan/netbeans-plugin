@@ -646,7 +646,9 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                     com.sun.jdi.Field lf = rt.fieldByName("$value");                 //NOI18N
                     if (lf != null) {
                         Value val = ref.getValue(lf);
-                        return new FieldVariable (getDebugger(), (PrimitiveValue) val, f, parentID, or);
+                        if (val instanceof PrimitiveValue) {
+                            return new FieldVariable (getDebugger(), (PrimitiveValue) val, f, parentID, or);
+                        }
                     }
                 }
             }

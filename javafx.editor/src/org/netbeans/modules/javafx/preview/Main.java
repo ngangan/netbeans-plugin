@@ -41,6 +41,6 @@ package org.netbeans.modules.javafx.preview;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        new Preview().start();
+        new Preview().start(Integer.decode(args[0]));
     }
 }
