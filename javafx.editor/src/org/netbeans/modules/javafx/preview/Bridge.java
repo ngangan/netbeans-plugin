@@ -6,11 +6,14 @@
 package org.netbeans.modules.javafx.preview;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.rmi.AlreadyBoundException;
 
 import java.rmi.registry.*;
@@ -132,7 +135,12 @@ public class Bridge extends ModuleInstall {
         }
         
         String classs = "org/netbeans/modules/javafx/preview/Main";                                                                             //NOI18
-        String path = Bridge.class.getClassLoader().getResource(classs + ".class").getPath();                                                   //NOI18
+        String path = "";
+        try {
+            path = URLDecoder.decode(Bridge.class.getClassLoader().getResource(classs + ".class").getPath(), new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding());                                   //NOI18
+        } catch (UnsupportedEncodingException uex) {
+            uex.printStackTrace();
+        }
         String jarPath = path.substring(0, path.indexOf('!')).substring(5);                                                                     //NOI18
         String args = "-Djava.class.path=\"" + System.getProperty("java.class.path") + File.pathSeparator + jarPath + File.pathSeparator +      // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-loaders.jar" + File.pathSeparator +                                         // NOI18
@@ -144,7 +152,7 @@ public class Bridge extends ModuleInstall {
                 System.getProperty(NB_HOME) + "/modules/org-openide-windows.jar" + File.pathSeparator +                                         // NOI18
                 System.getProperty(NB_HOME) + "/lib/org-openide-util.jar" + File.pathSeparator +                                                // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-text.jar" + "\" " +                                                         // NOI18
-        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=y " +                                                          // NOI18
+        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                          // NOI18
         classs + " " + bridgeInstaceNum;                                                                                                        // NOI18
         
         nb = new NbProcessDescriptor(exePath, args);
