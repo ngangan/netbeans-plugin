@@ -41,6 +41,7 @@ package org.netbeans.api.javafx.source;
 
 import org.netbeans.modules.javafx.source.classpath.SourceFileObject;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javac.parser.DocCommentScanner;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
@@ -204,8 +205,14 @@ public final class JavaFXSource {
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));
         Context context = task.getContext();
         Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
-        JavafxdocEnter.preRegister(context);       
+        JavafxdocEnter.preRegister(context);
+//        JavafxSymtab.preRegister(context);
+//        JavadocTodo.preRegister(context);
+//        JavafxTypes.preRegister(context);
         JavadocEnv.preRegister(context, cpInfo);
+        DocCommentScanner.Factory.preRegister(context);
+        // TODO
+//        com.sun.tools.javafxdoc.JavafxdocClassReader.preRegister(context);
         
         return task;
   }
