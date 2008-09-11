@@ -50,7 +50,7 @@ import org.netbeans.spi.editor.completion.CompletionProvider;
  * @author David Strupl
  */
 public class ApplicationCCTests extends CompletionTestPerformer {
-    
+
     /** Creates a new instance of AllCCTests */
     public ApplicationCCTests(String name) {
         super(name);
@@ -109,6 +109,7 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
+    /** For individual running of this class */
     public static Test suite() {
         return NbModuleSuite.create(
                 NbModuleSuite.createConfiguration(ApplicationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
