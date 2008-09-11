@@ -511,7 +511,9 @@ public class Preview {
         }
     }
 
-    public void start() {
+    public void start(int instance) {
+        NB_SIDE = instance + " " +  NB_SIDE;
+        PREVIEW_SIDE = instance +  " " + PREVIEW_SIDE;
         try {
             URL.setURLStreamHandlerFactory( (URLStreamHandlerFactory) new MFOURLStreamHanfler.Factory());
             System.setSecurityManager(new RMISecurityManager() {
