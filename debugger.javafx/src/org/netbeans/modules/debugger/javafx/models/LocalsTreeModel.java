@@ -473,7 +473,8 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                     );
 //TODO XXX Here Locals list will be extended with JavaFX variables from static part
                     JavaFXClassType javafxClassType = debugger.getClassType(classType);
-                    List<Field> fieldsList = javafxClassType.staticJavaFXFields();
+//                    List<Field> fieldsList = javafxClassType.staticJavaFXFields();
+                    List<Field> fieldsList = javafxClassType.staticFields();
                     int staticVarSize = fieldsList.size();
 //TODO XXX
                     Object[] result = new Object [avs.length + shift + 1+staticVarSize];

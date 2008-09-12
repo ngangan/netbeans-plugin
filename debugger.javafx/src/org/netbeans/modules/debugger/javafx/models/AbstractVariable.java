@@ -147,6 +147,17 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
         if (v instanceof ArrayReference)
             return "#" + ((ArrayReference) v).uniqueID () + 
                 "(length=" + ((ArrayReference) v).length () + ")";
+        if (v.type().name().indexOf("javafx.lang.Duration")!=-1) {
+            ObjectReference ref = (ObjectReference) v;
+            ReferenceType rt = ref.referenceType();
+                if (rt != null) {
+                    com.sun.jdi.Field lf = rt.fieldByName("millis");                 //NOI18N
+                    if (lf != null) {
+                        Value val = ref.getValue(lf);
+                        return val.toString()+"ms";
+                    }
+                }
+        }
         return "#" + ((ObjectReference) v).uniqueID ();
     }
 
@@ -351,6 +362,19 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
     // other methods............................................................
     
     protected Value getInnerValue () {
+//TODO XXX Trying to get nested value of this variable
+        if (value instanceof ObjectReference) {
+            ObjectReference ref = (ObjectReference) value;
+            ReferenceType rt = ref.referenceType();
+                if (rt != null) {
+                    com.sun.jdi.Field lf = rt.fieldByName("$value");                 //NOI18N
+                    if (lf != null) {
+                        Value val = ref.getValue(lf);
+                        return val;
+                    }
+                }
+        }
+//END
         return value;
     }
     

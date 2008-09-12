@@ -1868,6 +1868,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                             if (f.toString().indexOf("$"+fieldName)!=-1) {
                                 break;
                             }
+                            if (f.toString().indexOf("."+fieldName)!=-1) {
+                                break;
+                            }
                             f = null;
                         }
                     }
@@ -1891,7 +1894,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                    if (f != null) {
 //                        return ((ObjectReference) expression).getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", "$"+fieldName);
+                        Assert2.error(arg0, "unknownField", fieldName);
                         return null;
                     }
                 }

@@ -398,7 +398,8 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
         if (genericType != null) return genericType;
         if (getInnerValue () == null) return "";
         try {
-            return this.getInnerValue().type().name ();
+//            return this.getInnerValue().type().name ();
+            return  super.getType();
         } catch (VMDisconnectedException vmdex) {
             // The session is gone.
             return NbBundle.getMessage(AbstractVariable.class, "MSG_Disconnected");
@@ -638,20 +639,20 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
             logger.fine("FINISHED: "+or+".getValue("+f+") = "+v);
         }
         if ( (v == null) || (v instanceof ObjectReference)) {
-//Trying to get nested $value field
-            if (v!=null) {
-                ObjectReference ref = (ObjectReference) v;
-                ReferenceType rt = ref.referenceType();
-                if (rt != null) {
-                    com.sun.jdi.Field lf = rt.fieldByName("$value");                 //NOI18N
-                    if (lf != null) {
-                        Value val = ref.getValue(lf);
-                        if (val instanceof PrimitiveValue) {
-                            return new FieldVariable (getDebugger(), (PrimitiveValue) val, f, parentID, or);
-                        }
-                    }
-                }
-            }
+////Trying to get nested $value field
+//            if (v!=null) {
+//                ObjectReference ref = (ObjectReference) v;
+//                ReferenceType rt = ref.referenceType();
+//                if (rt != null) {
+//                    com.sun.jdi.Field lf = rt.fieldByName("$value");                 //NOI18N
+//                    if (lf != null) {
+//                        Value val = ref.getValue(lf);
+//                        if (val instanceof PrimitiveValue) {
+//                            return new FieldVariable (getDebugger(), (PrimitiveValue) val, f, parentID, or);
+//                        }
+//                    }
+//                }
+//            }
 //END
             return new ObjectFieldVariable (
                 getDebugger(),
