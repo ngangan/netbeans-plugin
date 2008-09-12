@@ -249,8 +249,8 @@ made subject to such option by the copyright holder.
             <![CDATA[var ${VariableName newVarName default="var1"} = ${InitExpression default=""};]]>
         </code>
     </codetemplate>
-    <codetemplate abbreviation="serr"><code><![CDATA[System.err.println("${cursor}");]]></code></codetemplate> 
-    <codetemplate abbreviation="sout"><code><![CDATA[System.out.println("${cursor}");]]></code></codetemplate> 
+    <codetemplate abbreviation="serr"><code><![CDATA[java.lang.System.err.println("${cursor}");]]></code></codetemplate>
+    <codetemplate abbreviation="sout"><code><![CDATA[java.lang.System.out.println("${cursor}");]]></code></codetemplate>
         
     
 </codetemplates>
