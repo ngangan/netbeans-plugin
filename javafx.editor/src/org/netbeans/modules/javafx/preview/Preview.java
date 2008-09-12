@@ -51,6 +51,8 @@ import java.awt.event.InvocationEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLStreamHandlerFactory;
@@ -59,6 +61,7 @@ import java.rmi.registry.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -68,6 +71,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import org.openide.util.Exceptions;
+
 
 
 public class Preview {
@@ -121,6 +125,54 @@ public class Preview {
             }
         }
         
+        public <T> T[] copyOf(T[] original, int newLength) {
+            return (T[]) copyOf(original, newLength, original.getClass());
+        }
+        
+        public <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) {
+            T[] copy = ((Object)newType == (Object)Object[].class)
+                ? (T[]) new Object[newLength]
+                : (T[]) Array.newInstance(newType.getComponentType(), newLength);
+            System.arraycopy(original, 0, copy, 0,
+                             Math.min(original.length, newLength));
+            return copy;
+        }
+        
+        Window[] getWindows(Object appContext) {
+            synchronized (Window.class) {
+                try {
+                    Window[] realCopy;
+
+                    Class<?> acc = appContext.getClass();
+                    Method method = acc.getDeclaredMethod("get", new Class[]{Object.class});
+                    method.setAccessible(true);
+                    Vector<WeakReference<Window>> windowList = (Vector<WeakReference<Window>>) method.invoke(appContext, new Object[] {Window.class});
+                    if (windowList != null) {
+                        int fullSize = windowList.size();
+                        int realSize = 0;
+                        Window[] fullCopy = new Window[fullSize];
+                        for (int i = 0; i < fullSize; i++) {
+                            Window w = windowList.get(i).get();
+                            if (w != null) {
+                                fullCopy[realSize++] = w;
+                            }
+                        }
+                        if (fullSize != realSize) {
+                            realCopy = copyOf(fullCopy, realSize);
+                        } else {
+                            realCopy = fullCopy;
+                        }
+                    } else {
+                        realCopy = new Window[0];
+                    }
+                    return realCopy;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            return null;
+        }
+        
         public void processTopWindow(Object _window) {
             Window window = (Window)_window;
             Class<?> acc = null;
@@ -133,9 +185,7 @@ public class Preview {
             for (PreviewSideServer previewSideServer : previewSideServers.values()) {
                 Object ac = previewSideServer.getAC();
                 try {
-                    Method method = Window.class.getDeclaredMethod(GET_WINDOWS, new Class[] {acc});
-                    method.setAccessible(true);
-                    Window[] acWindows = (Window[])method.invoke(null, new Object[] {ac});
+                    Window[] acWindows = getWindows(ac);
                     for (Window acWindow : acWindows) {
                         if (acWindow == window) {
                             previewSideServer.processTopWindow(window);
@@ -189,7 +239,7 @@ public class Preview {
         private JComponent scrollComponent = null;
         private String fileName = null;
         private String lf = null;
-        private ThreadGroup threadGroup = null;
+        private ExceptionAwareThreadGroup threadGroup = null;
         private ACThread acTread = null;
         private PreviewSideServer thiss = this;
         private ClassLoader bootClassLoader = null;
@@ -234,6 +284,7 @@ public class Preview {
         }
 
         public void remove() {
+            threadGroup.skipExceptions(true);
             previewFrame.dispose();
             new Thread(new Runnable() {
                 public void run() {
@@ -247,17 +298,23 @@ public class Preview {
         
         public void processTopWindow(final Window window) {
             if (blockProcessing) return;
+            window.setVisible(false);
             noWindows = false;
             Container contentPane = null;
+            boolean properWindow = false;
             if (window instanceof JFrame) {
+                properWindow = true;
                 if (((JFrame)window).getRootPane() != null)
                     contentPane = ((JFrame)window).getContentPane();
             } else {
-                if (((JDialog)window).getRootPane() != null)
-                    contentPane = ((JDialog)window).getContentPane();
+                if (window instanceof JDialog) {
+                    properWindow = true;
+                    if (((JDialog)window).getRootPane() != null)
+                        contentPane = ((JDialog)window).getContentPane();
+                }
             }
             if (contentPane == null) {
-                window.addWindowListener(this);
+                if (properWindow) window.addWindowListener(this);
             } else {
                 acTread.executeOnEDT(new Runnable() {
                     public void run() {
@@ -368,9 +425,23 @@ public class Preview {
             if (obj != null) thiss.processObject(obj);
         }
         
+        private class ExceptionAwareThreadGroup extends ThreadGroup {
+            private boolean skip = false;
+            public ExceptionAwareThreadGroup(String s) {
+                super(s);
+            }
+            public void skipExceptions(boolean skip) {
+                this.skip = skip;
+            }
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                if (!skip) super.uncaughtException(t, e);
+            }
+        }
+        
         public void  run(final Object context)  throws RemoteException {
             if (threadGroup == null) {
-                threadGroup = new ThreadGroup("SACG" + instanceCounter++);      //NOI18
+                threadGroup = new ExceptionAwareThreadGroup("SACG" + instanceCounter++);      //NOI18
                 acTread = new ACThread(threadGroup, lf);
                 acTread.start();
                 try {

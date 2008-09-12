@@ -7,7 +7,6 @@ package org.netbeans.modules.javafx.preview;
 import java.awt.BorderLayout;
 import java.util.Map;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.lang.reflect.Field;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -20,10 +19,7 @@ import java.awt.Window;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
-import javax.tools.Diagnostic;
 
 public class CodeUtils {
     private static final String[] getComponentNames = {"getComponent", "getJComponent"};                     // NOI18N
@@ -39,7 +35,6 @@ public class CodeUtils {
     private static final String jsgPanelClassName = "com.sun.scenario.scenegraph.JSGPanel";                  // NOI18N
     private static final String sgNodeClassName = "com.sun.scenario.scenegraph.SGNode";                      // NOI18N
     private static final String setSceneMethodName = "setScene";                                             // NOI18N
-    private static DiagnosticCollector diagnostics = new DiagnosticCollector();
     
     public static class Context implements Serializable {
         Context(
@@ -102,10 +97,6 @@ public class CodeUtils {
         }
         return obj;
     }
-    
-    static public List<Diagnostic> getDiagnostics() {
-	return diagnostics.diagnostics;
-    }            
     
     private static URL[] toURLs(ClassPath classPath) {
         URL urls[] = new URL[classPath.getRoots().length];
@@ -236,9 +227,11 @@ public class CodeUtils {
                     intFrame.setTitle(((JFrame)frame).getTitle());
                     intFrame.setJMenuBar(((JFrame)frame).getJMenuBar());
                 } else {
-                    intFrame.setContentPane(((JDialog)frame).getContentPane());
-                    intFrame.setTitle(((JDialog)frame).getTitle());
-                    intFrame.setJMenuBar(((JDialog)frame).getJMenuBar());
+                    if (frame instanceof JDialog) {
+                        intFrame.setContentPane(((JDialog)frame).getContentPane());
+                        intFrame.setTitle(((JDialog)frame).getTitle());
+                        intFrame.setJMenuBar(((JDialog)frame).getJMenuBar());
+                    }
                 }
                 ((Window)frame).dispose();
                 intFrame.setBackground(((Window)frame).getBackground());

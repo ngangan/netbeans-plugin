@@ -182,7 +182,7 @@ made subject to such option by the copyright holder.
                         <!--<file name="print-fx-preview">
                             <attr name="position" intvalue="1300"/>
                         </file>-->
-                        <file name="SeparatorAfterPaste.instance">
+                        <file name="SeparatorAfterReset.instance">
                             <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                             <attr name="position" intvalue="1400"/>
                         </file>
