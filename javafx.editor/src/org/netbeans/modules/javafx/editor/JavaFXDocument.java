@@ -81,8 +81,8 @@ public class JavaFXDocument extends NbEditorDocument implements FXDocument {
         Bridge.start();
     }
     
-    public JavaFXDocument(Class kitClass) {
-        super(kitClass);
+    public JavaFXDocument(String mimeType) {
+        super(mimeType);
     }
     
     public JComponent getEditor() {
