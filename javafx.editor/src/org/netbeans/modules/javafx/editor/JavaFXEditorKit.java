@@ -97,7 +97,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
 
     @Override
     public Document createDefaultDocument(){
-        Document doc = new JavaFXDocument(this.getClass());
+        Document doc = new JavaFXDocument(FX_MIME_TYPE);
         Object mimeType = doc.getProperty("mimeType");
         if (mimeType == null){
             doc.putProperty("mimeType", getContentType());

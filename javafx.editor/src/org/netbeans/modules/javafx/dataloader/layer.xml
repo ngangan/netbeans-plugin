@@ -112,8 +112,11 @@ made subject to such option by the copyright holder.
                         <attr name="instanceOf" stringvalue="org.netbeans.lib.editor.hyperlink.spi.HyperlinkProviderExt"/>
                     </file>
                 </folder>
-                <folder name="CompletionProviders">
-                    <file name="org-netbeans-modules-javafx-editor-JavaFXCompletionProvider.instance"/>
+                
+                <folder name="Macros">
+                    <folder name="Defaults">
+                        <file name="org-netbeans-modules-javafx-editor-macros.xml" url="DefaultMacros.xml"/>
+                    </folder>
                 </folder>
 
                 <folder name="CodeTemplates">
@@ -132,6 +135,12 @@ made subject to such option by the copyright holder.
                 <folder name="FoldManager">
                     <file name="org-netbeans-editor-CustomFoldManager$Factory.instance"/>
                     <file name="org-netbeans-modules-javafx-editor-fold-JavaFXElementFoldManagerFactory.instance"/>
+                </folder>
+                
+                <folder name="Preferences">
+                    <folder name="Defaults">
+                        <file name="org-netbeans-modules-javafx-editor-preferences.xml" url="DefaultPreferences.xml" />
+                    </folder>
                 </folder>
 
                 <folder name="FontsColors">
@@ -154,11 +163,13 @@ made subject to such option by the copyright holder.
                 <folder name="Keybindings">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="keybindings.xml" url="resources/DefaultKeyBindings.xml"/>
+                            <file name="org-netbeans-modules-javafx-editor-keybindings.xml" url="DefaultKeyBindings.xml"/>
+                            <file name="org-netbeans-modules-javafx-editor-keybindings-mac.xml" url="DefaultKeyBindings-Mac.xml">
+                                <attr name="nbeditor-settings-targetOS" stringvalue="OS_MAC"/>
+                            </file>
                         </folder>
                     </folder>
                 </folder>
-
 
                 <folder name="Toolbars">
                     <folder name="Default">
