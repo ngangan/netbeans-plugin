@@ -95,7 +95,13 @@ org.netbeans.api.debugger.javafx.LocalVariable {
     * @return string representation of type of this variable.
     */
     public String getName () {
-        return local.name ();
+        String name = local.name();
+//If variable started from $ need to remove $
+        if (name.charAt(0)=='$' && name.length() > 1) {
+            name = name.substring(1);
+        }
+        return name;
+//        return local.name ();
     }
 
     /**

@@ -92,7 +92,13 @@ org.netbeans.api.debugger.javafx.Field {
     * @return string representation of type of this variable.
     */
     public String getName () {
-        return field.name ();
+        String name = field.name();
+//If variable started from $ need to remove $
+        if (name.charAt(0)=='$' && name.length() > 1) {
+            name = name.substring(1);
+        }
+        return name;
+//        return field.name ();
     }
 
     /**
