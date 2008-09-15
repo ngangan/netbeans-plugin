@@ -238,17 +238,22 @@ public class CodeUtils {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                JInternalFrame w = (JInternalFrame) ((WindowsInternalFrameTitlePane) e.getSource()).getParent();
-                int y = w.getY();
-                int min_y = getNorthPane().getHeight() - 2;
-                if (y >= -min_y) {
-                    super.mouseDragged(e);
-                    y = w.getY();
-                    if (y < -min_y) {
+                if (e.getSource() instanceof WindowsInternalFrameTitlePane) {
+                    JInternalFrame w = (JInternalFrame) ((WindowsInternalFrameTitlePane) e.getSource()).getParent();
+                    int y = w.getY();
+                    int min_y = getNorthPane().getHeight() - 2;
+                    if (y >= -min_y) {
+                        super.mouseDragged(e);
+                        y = w.getY();
+                        if (y < -min_y) {
+                            w.setLocation(w.getX(), -min_y);
+                        }
+                    } else {
                         w.setLocation(w.getX(), -min_y);
                     }
-                } else {
-                    w.setLocation(w.getX(), -min_y);
+                }
+                else {
+                    super.mouseDragged(e);
                 }
             }
         }
