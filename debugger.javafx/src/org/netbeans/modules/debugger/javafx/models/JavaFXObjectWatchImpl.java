@@ -43,9 +43,11 @@ package org.netbeans.modules.debugger.javafx.models;
 
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ClassNotLoadedException;
+import com.sun.jdi.ClassType;
 import com.sun.jdi.Field;
 import com.sun.jdi.InvalidTypeException;
 import com.sun.jdi.ObjectReference;
+import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 
 import org.netbeans.api.debugger.Watch;
@@ -155,7 +157,7 @@ ObjectVariable {
         
         // 2) try to set as a local variable value
         try {
-            LocalVariable local = frame.getLocalVariable(getExpression ());
+            LocalVariable local = frame.getLocalVariable("$"+getExpression ());
             if (local != null) {
                 if (local instanceof Local) {
                     ((Local) local).setValue(value);
@@ -167,14 +169,50 @@ ObjectVariable {
         } catch (AbsentInformationException ex) {
             // no local variable visible in this case
         }
-        
+        // 2,5) try to set as static field
+        ReferenceType clazz = frame.getStackFrame().location().declaringType();
+        Field field1 = clazz.fieldByName("$"+getExpression());
+        if (field1 == null) {
+            throw new InvalidExpressionException (
+                "Can not set value to expression.");
+        }
+        if (field1.isStatic()) {
+            if (clazz instanceof ClassType) {
+                try {
+//In JavaFX All globals are static final
+                    if (field1.isFinal()) {
+                        Value v = clazz.getValue(field1);
+                        if (v instanceof ObjectReference) {
+                            ObjectReference ref = (ObjectReference)v;
+                            ReferenceType rt = ref.referenceType();
+                            if (rt!=null){
+                                Field valueField = rt.fieldByName("$value");
+                                if (valueField!=null) {
+                                    ref.setValue(valueField, value);
+                                }
+                            }
+                        }
+                    } else {
+                        ((ClassType) clazz).setValue(field1, value);
+                    }
+                } catch (InvalidTypeException ex) {
+                    throw new InvalidExpressionException (ex);
+                } catch (ClassNotLoadedException ex) {
+                    throw new InvalidExpressionException (ex);
+                }
+            } else {
+                throw new InvalidExpressionException
+                 ("Can not set value to expression.");
+            }
+        } else {
         // 3) try tu set as a field
         ObjectReference thisObject = frame.getStackFrame ().thisObject ();
-        if (thisObject == null)
-            throw new InvalidExpressionException 
-                ("Can not set value to expression.");
-        Field field = thisObject.referenceType ().fieldByName 
-            (getExpression ());
+        if (thisObject == null) {
+                    throw new InvalidExpressionException
+                     ("Can not set value to expression.");
+        }
+        Field field = thisObject.referenceType ().fieldByName
+            ("$"+getExpression ());
         if (field == null)
             throw new InvalidExpressionException 
                 ("Can not set value to expression.");
@@ -184,6 +222,7 @@ ObjectVariable {
             throw new InvalidExpressionException (ex);
         } catch (ClassNotLoadedException ex) {
             throw new InvalidExpressionException (ex);
+        }
         }
     }
     

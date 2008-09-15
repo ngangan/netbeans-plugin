@@ -168,14 +168,45 @@ implements org.netbeans.api.debugger.javafx.Field {
         try {
             boolean set = false;
             if (objectReference != null) {
-                objectReference.setValue (field, value);
-                set = true;
+                if (field.isFinal()) {
+                    Value v = objectReference.getValue(field);
+                    if (v instanceof ObjectReference){
+                        ObjectReference ref = (ObjectReference)v;
+                        ReferenceType rt = ref.referenceType();
+                        if (rt!=null) {
+                            Field valueField = rt.fieldByName("$value");
+                            if (valueField!=null) {
+                                ref.setValue(valueField, value);
+                                set=true;
+                            }
+                        }
+                    }
+                } else {
+                    objectReference.setValue (field, value);
+                    set = true;
+                }
             } else {
                 ReferenceType rt = field.declaringType();
                 if (rt instanceof ClassType) {
-                    ClassType ct = (ClassType) rt;
-                    ct.setValue(field, value);
-                    set = true;
+//In JavaFX all globals are static final
+                    if (field.isFinal()) {
+                        Value v = rt.getValue(field);
+                        if (v instanceof ObjectReference) {
+                            ObjectReference ref = (ObjectReference)v;
+                            ReferenceType lrt = ref.referenceType();
+                            if (lrt!=null){
+                                Field valueField = lrt.fieldByName("$value");
+                                if (valueField!=null) {
+                                    ref.setValue(valueField, value);
+                                    set=true;
+                                }
+                            }
+                        }
+                    } else {
+                        ClassType ct = (ClassType) rt;
+                        ct.setValue(field, value);
+                        set = true;
+                    }
                 }
             }
             if (!set) {
