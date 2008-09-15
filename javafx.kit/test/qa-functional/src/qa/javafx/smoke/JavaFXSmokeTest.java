@@ -33,28 +33,55 @@ import qa.javafx.functional.library.MouseRobot;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
 
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbTestSuite;
+
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
 public class JavaFXSmokeTest extends JavaFXTestCase {
 
+    static String[] TESTS = {
+        "testLoadModule",
+        "testProjectCreation",
+        "testMainFile",
+        "testPalette",
+        "testProjectBuilding",
+        "testEditor",
+        "testPreview",
+    };
+
+
+
     public JavaFXSmokeTest(String name) {
         super(name);
     }
 
-    public static NbTestSuite suite() {
-        NbTestSuite suite = new NbTestSuite();
-        suite.addTest(new JavaFXSmokeTest("testLoadModule"));
-        suite.addTest(new JavaFXSmokeTest("testProjectCreation"));
-        suite.addTest(new JavaFXSmokeTest("testMainFile"));
-        suite.addTest(new JavaFXSmokeTest("testPalette"));
-        suite.addTest(new JavaFXSmokeTest("testProjectBuilding"));
-        suite.addTest(new JavaFXSmokeTest("testEditor"));
-        suite.addTest(new JavaFXSmokeTest("testPreview"));
-        //suite.addTest(new JavaFXSmokeTest("testProfiler"));
-        return suite;
+//    public static NbTestSuite suite() {
+//        NbTestSuite suite = new NbTestSuite();
+//        suite.addTest(new JavaFXSmokeTest("testLoadModule"));
+//        suite.addTest(new JavaFXSmokeTest("testProjectCreation"));
+//        suite.addTest(new JavaFXSmokeTest("testMainFile"));
+//        suite.addTest(new JavaFXSmokeTest("testPalette"));
+//        suite.addTest(new JavaFXSmokeTest("testProjectBuilding"));
+//        suite.addTest(new JavaFXSmokeTest("testEditor"));
+//        suite.addTest(new JavaFXSmokeTest("testPreview"));
+//        //suite.addTest(new JavaFXSmokeTest("testProfiler"));
+//        return suite;
+//    }
+
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXSmokeTest.class, ".*", ".*", TESTS);
+
     }
+
+    public static void main(String[] args) {
+        TestRunner.run(new NbTestSuite(JavaFXSmokeTest.class));
+    }
+
 
     public void testLoadModule() {
 
