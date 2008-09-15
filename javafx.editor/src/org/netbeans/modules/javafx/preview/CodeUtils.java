@@ -4,6 +4,8 @@
  */
 package org.netbeans.modules.javafx.preview;
 
+import com.sun.java.swing.plaf.windows.WindowsInternalFrameTitlePane;
+import com.sun.java.swing.plaf.windows.WindowsInternalFrameUI;
 import java.awt.BorderLayout;
 import java.util.Map;
 import java.lang.reflect.Method;
@@ -16,10 +18,12 @@ import org.openide.filesystems.FileStateInvalidException;
 import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.Window;
+import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import javax.swing.JDialog;
+import javax.swing.event.MouseInputAdapter;
 
 public class CodeUtils {
     private static final String[] getComponentNames = {"getComponent", "getJComponent"};                     // NOI18N
@@ -216,9 +220,46 @@ public class CodeUtils {
         return frame;
     }
     
+    static class FixedWindowsInternalFrameUI extends WindowsInternalFrameUI {
+
+        public FixedWindowsInternalFrameUI(JInternalFrame w) {
+            super(w);
+        }
+
+        @Override
+        protected MouseInputAdapter createBorderListener(JInternalFrame w) {
+            return new FixedBorderListener();
+        }
+
+        protected class FixedBorderListener extends BorderListener {
+
+            public FixedBorderListener() {
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                JInternalFrame w = (JInternalFrame) ((WindowsInternalFrameTitlePane) e.getSource()).getParent();
+                int y = w.getY();
+                int min_y = getNorthPane().getHeight() - 2;
+                if (y >= -min_y) {
+                    super.mouseDragged(e);
+                    y = w.getY();
+                    if (y < -min_y) {
+                        w.setLocation(w.getX(), -min_y);
+                    }
+                } else {
+                    w.setLocation(w.getX(), -min_y);
+                }
+            }
+        }
+    } 
+    
     public static void moveToInner(AutoResizableDesktopPane jdp, Object frame) {
         try {
             JInternalFrame intFrame = new JInternalFrame();
+            if (intFrame.getUI().getClass() == WindowsInternalFrameUI.class) {
+                intFrame.setUI(new FixedWindowsInternalFrameUI(intFrame));
+            }
             if (frame instanceof Window) {
                 ((Window)frame).setVisible(false);
                 intFrame.setSize(((Window)frame).getSize());
