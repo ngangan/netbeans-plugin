@@ -184,7 +184,7 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
         }
         // try to set as a field
         ReferenceType clazz = frame.getStackFrame().location().declaringType();
-        Field field = clazz.fieldByName(getExpression());
+        Field field = clazz.fieldByName("$"+getExpression());
         if (field == null) {
             throw new InvalidExpressionException (
                 NbBundle.getMessage(JavaFXWatchImpl.class, "MSG_CanNotSetValue", getExpression()));
@@ -192,7 +192,22 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
         if (field.isStatic()) {
             if (clazz instanceof ClassType) {
                 try {
-                    ((ClassType) clazz).setValue(field, value);
+//In JavaFX all globals are static final
+                    if (field.isFinal()) {
+                        Value v = clazz.getValue(field);
+                        if (v instanceof ObjectReference) {
+                            ObjectReference ref = (ObjectReference)v;
+                            ReferenceType rt = ref.referenceType();
+                            if (rt!=null){
+                                Field valueField = rt.fieldByName("$value");
+                                if (valueField!=null) {
+                                    ref.setValue(valueField, value);
+                                }
+                            }
+                        }
+                    } else {
+                        ((ClassType) clazz).setValue(field, value);
+                    }
                 } catch (InvalidTypeException ex) {
                     throw new InvalidExpressionException (ex);
                 } catch (ClassNotLoadedException ex) {
