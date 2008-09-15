@@ -42,7 +42,7 @@ package qa.javafx.functional.library.project;
 import javax.swing.JDialog;
 import org.netbeans.jellytools.modules.debugger.actions.FinishDebuggerAction;
 import org.netbeans.jemmy.operators.JDialogOperator;
-import org.netbeans.junit.ide.ProjectSupport;
+//import org.netbeans.junit.ide.ProjectSupport;
 import qa.javafx.functional.library.Constant;
 import qa.javafx.functional.library.Util;
 
