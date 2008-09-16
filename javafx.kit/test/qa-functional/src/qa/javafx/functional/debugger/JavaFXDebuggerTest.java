@@ -45,6 +45,13 @@ import qa.javafx.functional.library.project.DebuggerOperator;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
 
+
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbTestSuite;
+
+
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
@@ -52,11 +59,30 @@ import qa.javafx.functional.library.project.JavaFXProject;
 
 public class JavaFXDebuggerTest extends JavaFXTestCase {
 
+    static final String[] TESTS = {
+        "testDebugger",
+    };
+
+
     public JavaFXDebuggerTest(String name) {
         super(name);
     }
 
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXDebuggerTest.class, ".*", ".*", TESTS);
+
+    }
+
+     public static void main(String[] args) {
+        TestRunner.run(new NbTestSuite(JavaFXDebuggerTest.class));
+    }
+
+
     public void testDebugger() {
+
+        //System.out.println("Debugger Test!");
+        System.out.println("XTEST_DATA_PATH = " + Util.XTEST_DATA_PATH);
+        
         JavaFXProject project  = JavaFXProject.createProject("SmokeDebugger");
         
         EditorOperator editor = project.openMainFile();

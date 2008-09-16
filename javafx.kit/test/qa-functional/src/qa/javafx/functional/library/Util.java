@@ -38,7 +38,7 @@ public class Util {
     
     protected static final String XTEST_DATA = "xtest.data";
     protected static final String XTEST_WORK_DIR = "xtest.workdir";
-    protected static final String XTEST_DATA_PATH = System.getProperty(XTEST_DATA);
+    public static String XTEST_DATA_PATH = System.getProperty(XTEST_DATA);
 
 
     private static final boolean FLAG_SHOW_DETAIL_INFORMATION = true;
@@ -48,13 +48,14 @@ public class Util {
     private static final int N = 3;
     private static final int WAIT_TIME = 2000;
 
-    public static String WORK_DIR = System.getProperty(XTEST_WORK_DIR);
+    public static String WORK_DIR = "tmp"; //System.getProperty(XTEST_WORK_DIR);
     
     public static final long MAX_WAIT_TIME = 300000;
     
     
     public static String getXtestDataPath() {
-        return System.getProperty(XTEST_DATA) + "/data";
+        //return System.getProperty(XTEST_DATA); // + "/data";
+        return XTEST_DATA_PATH;
     }
 
     public static File getXtestNBMsPath() {
@@ -63,6 +64,7 @@ public class Util {
 
     public static String getSampleText(String example) {
 
+        System.out.println("[util] sample file: \"" + example + "\"");
         
         String sdkVersion = System.getProperty(Constant.JAVAFX_SDK_VERSION_PROPERTY);
         System.out.println("[util] sdk version: " + sdkVersion);
@@ -79,7 +81,8 @@ public class Util {
 
         System.out.println("[util] user data path : " + userDataPath);
         
-        String examplePath = getXtestDataPath() + "/data/" + userDataPath + "/" + example;
+        //String examplePath = getXtestDataPath() + "/data/" + userDataPath + "/" + example;
+        String examplePath = getXtestDataPath() + "/" + userDataPath + "/" + example;
 
         System.out.println("[util] example path : " + examplePath);
 
