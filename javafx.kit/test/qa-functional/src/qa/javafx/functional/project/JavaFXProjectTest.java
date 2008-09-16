@@ -65,10 +65,13 @@ public class JavaFXProjectTest extends JavaFXTestCase {
     }
 
 
-//    public static Test suite() {
-//        return NbModuleSuite.create(JavaFXProjectTest.class, ".*", ".*", TESTS);
-//
-//    }
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXProjectTest.class, ".*", ".*", TESTS);
+    }
+
+     public static void main(String[] args) {
+        TestRunner.run(new NbTestSuite(JavaFXProjectTest.class));
+    }
 
     
     public void testCreateEmptyProject(){
