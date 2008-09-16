@@ -44,15 +44,32 @@ import qa.javafx.functional.library.Util;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
 
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbTestSuite;
+
+
 /**
  *
  * @author andromeda
  */
 public class JavaFXProfilerTest extends JavaFXTestCase {
 
+    static final String[] TESTS = {
+        "testProfiler",
+    };
+
+
     public JavaFXProfilerTest(String name) {
         super(name);
     }
+
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXProfilerTest.class, ".*", ".*", TESTS);
+
+    }
+
 
     public void testProfiler() {
         

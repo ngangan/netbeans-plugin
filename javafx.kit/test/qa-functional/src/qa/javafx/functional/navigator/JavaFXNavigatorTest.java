@@ -45,6 +45,12 @@ import qa.javafx.functional.library.Util;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
 
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbTestSuite;
+
+
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
@@ -52,10 +58,22 @@ import qa.javafx.functional.library.project.JavaFXProject;
 public class JavaFXNavigatorTest extends JavaFXTestCase {
 
     public static String PROJECT_NAME = "TestNavigator";
-    
+
+    static final String[] TESTS = {
+        "testNavigator",
+        "testVariable",
+    };
+
+
     public JavaFXNavigatorTest(String name) {
         super(name);
     }
+
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXNavigatorTest.class, ".*", ".*", TESTS);
+
+    }
+
     
     public void testNavigator(){
         JavaFXProject project  = JavaFXProject.createProject(PROJECT_NAME);
