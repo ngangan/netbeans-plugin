@@ -44,7 +44,6 @@ import com.sun.javafx.api.tree.*;
 import com.sun.tools.javafx.tree.JFXErroneous;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,7 +148,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
     }
     
     private static class FindChildrenTreeVisitor extends JavaFXTreePathScanner<Void, List<Node>> {
-        
+
         private CompilationInfo info;
         
         public FindChildrenTreeVisitor(CompilationInfo info) {
@@ -274,6 +273,18 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             addCorrespondingType(below);
             addCorrespondingComments(below);
             super.visitInterpolateValue(tree, below);
+            
+            d.add(new TreeNode(info, getCurrentPath(), below));
+            return null;
+        }
+
+        @Override
+        public Void visitMissingExpression(ExpressionTree tree, List<Node> d) {
+            List<Node> below = new ArrayList<Node>();
+
+            addCorrespondingType(below);
+            addCorrespondingComments(below);
+            super.visitMissingExpression(tree, below);
             
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
