@@ -2,7 +2,7 @@
 package frame.stage.content;
 
 import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 
@@ -15,7 +15,7 @@ Frame {
     }
     visible: true
 
-    stage: Stage {
+    scene: Scene {
         content: [
             ImageView {
                 

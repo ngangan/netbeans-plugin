@@ -2,7 +2,7 @@
 package frame.stage.content;
 
 import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.geometry.Arc;
 import javafx.scene.geometry.ArcType;
@@ -17,7 +17,7 @@ Frame {
     }
     visible: true
 
-    stage: Stage {
+    scene: Scene {
         
         content: [
             Circle {

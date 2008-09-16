@@ -2,7 +2,7 @@
 package frame.stage.content;
 
 import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.Scene;
 import javafx.scene.geometry.Polygon;
 import javafx.scene.paint.Color;
 
@@ -15,7 +15,7 @@ Frame {
     }
     visible: true
 
-    stage: Stage {
+    scene: Scene {
         content: [
             Polygon {
                 

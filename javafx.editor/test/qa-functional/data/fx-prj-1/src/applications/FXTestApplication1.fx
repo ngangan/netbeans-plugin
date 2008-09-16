@@ -1,9 +1,9 @@
-import javafx.application.Application;
 import javafx.application.Stage;
+import javafx.scene.Scene;
 
-Application {
+Stage {
     
-    stage: Stage {
+    scene: Scene {
         
         content: [ 
             

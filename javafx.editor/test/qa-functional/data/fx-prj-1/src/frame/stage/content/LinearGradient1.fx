@@ -1,7 +1,7 @@
 package frame.stage.content;
 
 import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.Scene;
 import javafx.scene.geometry.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
@@ -15,7 +15,7 @@ Frame {
     }
     visible: true
 
-    stage: Stage {
+    scene: Scene {
         content: [Rectangle {
                 x: 10, y: 10
                 width: 140, height: 90

@@ -1,12 +1,12 @@
 package fxprj1;
 
-import javafx.ext.swing.Label;
+import javafx.ext.swing.SwingLabel;
 
-var x = new Label();
+var x = new SwingLabel();
 x.text = "x";
 x.x = 10;
 
-var y = Label {
+var y = SwingLabel {
     text : "y"
     x : 10
 }
