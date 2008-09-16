@@ -49,6 +49,7 @@ public class Bridge extends ModuleInstall {
     @Override
     public boolean closing() {
         try {
+            if (pingThread != null) pingThread.interrupt();
             if (previewDispatcher != null) previewDispatcher.terminate();
         } catch (RemoteException ex) {
             Exceptions.printStackTrace(ex);
@@ -142,7 +143,7 @@ public class Bridge extends ModuleInstall {
             uex.printStackTrace();
         }
         String jarPath = path.substring(0, path.indexOf('!')).substring(5);                                                                     //NOI18
-        String args = "-Djava.class.path=\"" + System.getProperty("java.class.path") + File.pathSeparator + jarPath + File.pathSeparator +      // NOI18
+        String args = "-Dcom.apple.backgroundOnly=true -Djava.class.path=\"" + System.getProperty("java.class.path") + File.pathSeparator + jarPath + File.pathSeparator +      // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-loaders.jar" + File.pathSeparator +                                         // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-nodes.jar" + File.pathSeparator +                                           // NOI18
                 System.getProperty(NB_HOME) + "/modules/org-openide-execution.jar" + File.pathSeparator +                                       // NOI18
@@ -225,8 +226,8 @@ public class Bridge extends ModuleInstall {
 
     static private Registry registry = null;
     static private NBSideDispatchingServer nbDispatcher = null;
-    static private PingThread pingThread = null;
-    static PreviewSideDispatchingServerFace previewDispatcher = null;
+    static private volatile PingThread pingThread = null;
+    static private volatile PreviewSideDispatchingServerFace previewDispatcher = null;
     private static volatile boolean isStarted = false;
     private static EventListenerList startListeners = new EventListenerList();
     
@@ -303,7 +304,8 @@ public class Bridge extends ModuleInstall {
                         interrupt();
                     }
                 } catch (Throwable ex) {
-                    if (!isInterrupted()) restart();
+                    if (!isInterrupted())
+                        restart();
                     interrupt();
                 }
             }

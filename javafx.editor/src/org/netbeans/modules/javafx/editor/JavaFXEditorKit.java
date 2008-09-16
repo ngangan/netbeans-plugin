@@ -237,9 +237,18 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             Bridge.restart();
         }
 
+        private  final class ResetButton extends JButton implements ChangeListener{
+            public ResetButton() {
+                super();
+                Bridge.addStartListener(this);
+            }
+            public void stateChanged(ChangeEvent e) {
+                setEnabled(Bridge.isStarted());
+            }
+        }
 
         public java.awt.Component getToolbarPresenter() {
-            JButton b = new JButton(this);
+            ResetButton b = new ResetButton();
             b.setAction(this);
             b.putClientProperty("resetPreviewMark", Boolean.TRUE);                  //NOI18N
             b.setText("");

@@ -357,12 +357,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             Tree leaf = env.getPath().getLeaf();
             env.inside(leaf);
         } else {
-            env.useCrystalBall();
+            if (LOGGABLE) log("Completion not resolved: phase: " + resPhase);
         }
         
-        if (LOGGABLE) {
-            if (LOGGABLE) log("Results: " + results);
-        }
+        if (LOGGABLE) log("Results: " + results);
     }
 
     static boolean isJavaIdentifierPart(String text) {

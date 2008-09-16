@@ -59,8 +59,10 @@ public class JavaFXTestCase extends JellyTestCase {
 
     @Override
     protected void setUp() throws Exception {
-        System.setOut(getLog());
+        //System.setOut(getLog());
         System.out.println("[fx test case] setup");
+        Util.XTEST_DATA_PATH = getDataDir().getAbsolutePath();
+        System.out.println("XTEST_DATA_PATH = " + Util.XTEST_DATA_PATH);
     }
 
     public class ClassNameComponentChooser implements ComponentChooser {

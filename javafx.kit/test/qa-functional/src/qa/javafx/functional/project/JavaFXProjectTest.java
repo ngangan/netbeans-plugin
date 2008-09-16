@@ -41,6 +41,12 @@ package qa.javafx.functional.project;
 import qa.javafx.functional.library.JavaFXTestCase;
 import qa.javafx.functional.library.project.JavaFXProject;
 
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbTestSuite;
+
+
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
@@ -49,10 +55,24 @@ import qa.javafx.functional.library.project.JavaFXProject;
 
 public class JavaFXProjectTest extends JavaFXTestCase {
 
+    static final String[] TESTS = {
+        "testCreateEmptyProject",
+    };
+
+
     public JavaFXProjectTest(String name) {
         super(name);
     }
-    
+
+
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXProjectTest.class, ".*", ".*", TESTS);
+    }
+
+     public static void main(String[] args) {
+        TestRunner.run(new NbTestSuite(JavaFXProjectTest.class));
+    }
+
     
     public void testCreateEmptyProject(){
         JavaFXProject project = JavaFXProject.createProject("Test");
