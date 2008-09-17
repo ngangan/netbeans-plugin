@@ -79,7 +79,7 @@ public class JavaFXFunctionNode extends SelectorNode {
     public JavaFXFunctionNode(ClasspathInfo cpInfo, final Element method, JavaFXFunctionsNode parent) {
         super(method.toString(), method.getSimpleName().toString(), getIcon(method), SelectorChildren.LEAF, parent);
 
-        JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(getEnclosingClass(method), (JavaFXProject)parent.getProject()));
+        JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
         
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {

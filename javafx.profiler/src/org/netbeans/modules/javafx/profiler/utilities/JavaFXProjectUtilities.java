@@ -42,7 +42,6 @@ package org.netbeans.modules.javafx.profiler.utilities;
 import com.sun.tools.javac.code.Kinds;
 import java.io.IOException;
 import java.util.LinkedList;
-import javax.lang.model.util.Elements;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
@@ -119,7 +118,9 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
 
                         public void run(final CompilationController controller)
                                  throws Exception {
-                            controller.toPhase(Phase.ANALYZED);
+                            if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                               return;
+                            }
                             TypeElement parentClass = controller.getTreeUtilities().scopeFor(position).getEnclosingClass();
 
                             if (parentClass != null) {
@@ -207,7 +208,9 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                         public void run(final CompilationController controller)
                                  throws Exception {
                             // Controller has to be in some advanced phase, otherwise controller.getCompilationUnit() == null
-                            controller.toPhase(Phase.ANALYZED);
+                            if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                               return;
+                            }
 
                             JavaFXTreePathScanner<String, Void> scanner = new JavaFXTreePathScanner<String, Void>() {
                                 public String visitClassDeclaration(ClassTree node, Void p) {
@@ -421,7 +424,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return mainClass;
     }
 
-    private static List<FileObject> getSourceFiles(JavaFXProject project) {
+    public static List<FileObject> getSourceFiles(JavaFXProject project) {
         FileObject[] roots = project.getFOSourceRoots();
 
         List<FileObject> result = new ArrayList<FileObject>();
@@ -445,7 +448,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return result;
     }
     
-    public static FileObject getFile(Element handle, final JavaFXProject project) {
+    public static FileObject getFile(Element handle, ClasspathInfo cpInfo) {
         assert handle != null;
         assert handle instanceof TypeElement;
         TypeElement te = (TypeElement) handle;
@@ -469,8 +472,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         int index = signature[0].lastIndexOf('.');                          //NOI18N
         pkgName = FileObjects.convertPackage2Folder(signature[0].substring(0,index));
         className = signature[0].substring(index+1);
-
-        final ClasspathInfo cpInfo = createClassPathInfo(project);
 
         ClassPath bCP = cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT);
         ClassPath cCP = cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE);
@@ -617,8 +618,10 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 }
 
                 public void run(CompilationController ci) throws Exception {
-                    ci.toPhase(Phase.ANALYZED);
-
+                    if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                       return;
+                    }
+                    
                     JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
                     if (path == null) {
                         return;
@@ -646,12 +649,12 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return resolvedMethod.getValue();
     }
     
-        public static ResolvedClass resolveClassAtPosition(final FileObject fo, final int position, final boolean resolveField) {
+    public static ResolvedClass resolveClassAtPosition(final FileObject fo, final int position, final boolean resolveField) {
         // Get JavaFXSource for given FileObject
         JavaFXSource js = JavaFXSource.forFileObject(fo);
 
         if (js == null) {
-            return null; // not java source
+            return null; // not javafx source
         }
 
         // Final holder of resolved method
@@ -665,7 +668,9 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
 
                     public void run(CompilationController ci)
                              throws Exception {
-                        ci.toPhase(Phase.ANALYZED);
+                        if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                           return;
+                        }
 
                         JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
 

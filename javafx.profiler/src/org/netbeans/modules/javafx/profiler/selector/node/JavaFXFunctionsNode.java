@@ -73,7 +73,8 @@ public class JavaFXFunctionsNode extends ContainerNode {
             final List<JavaFXFunctionNode> functionNodes = new ArrayList<JavaFXFunctionNode>();
 
             try {
-            JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, (JavaFXProject)parent.getProject()));
+//            JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, (JavaFXProject)parent.getProject()));
+            JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
                 
                 js.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {

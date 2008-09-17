@@ -105,83 +105,83 @@ public final class AddProfilingRootMethodAction extends NodeAction {
 
     protected void performAction(final Node[] nodes) {
         new NBSwingWorker() {
-                protected void doInBackground() {
-                    try {
-                        // Get DataObject
-                        DataObject dobj = (DataObject) nodes[0].getLookup().lookup(DataObject.class);
+            protected void doInBackground() {
+                try {
+                    // Get DataObject
+                    DataObject dobj = (DataObject) nodes[0].getLookup().lookup(DataObject.class);
 
-                        if (dobj == null) {
-                            return;
-                        }
-
-                        // Read current offset in editor
-                        JTextComponent lastFocusedComponent = EditorRegistry.lastFocusedComponent();
-                        
-                        // Read current offset in editor
-                        int currentOffsetInEditor = lastFocusedComponent.getCaretPosition();
-
-                        if (currentOffsetInEditor == -1) {
-                            return;
-                        }
-                        
-                        // Get method at cursor
-                        JavaFXProjectUtilities.ResolvedMethod resolvedMethod = JavaFXProjectUtilities.resolveMethodAtPosition(dobj.getPrimaryFile(),
-                                                                                                        currentOffsetInEditor);
-
-                        if (resolvedMethod == null) {
-                            NetBeansProfiler.getDefaultNB()
-                                            .displayWarning(NbBundle.getMessage(AddProfilingRootMethodAction.class,
-                                                                                "MSG_NoMethodFoundAtPosition")); // NOI18N
-
-                            return;
-                        }
-
-                        ExecutableElement method = resolvedMethod.getMethod();
-
-                        if (method == null) {
-                            return;
-                        }
-
-                        // Resolve owner project
-                        Project project = FileOwnerQuery.getOwner(dobj.getPrimaryFile());
-
-                        // Specify Profiling Settings as a context
-                        ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
-                                                                                      .getProfilingSettings();
-                        List<ProfilingSettings> cpuSettings = new ArrayList();
-
-                        for (ProfilingSettings settings : projectSettings) {
-                            if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
-                                cpuSettings.add(settings);
-                            }
-                        }
-
-                        ProfilingSettings settings = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
-                                                                             cpuSettings.toArray(new ProfilingSettings[cpuSettings
-                                                                                                                       .size()]),
-                                                                             null);
-
-                        if (settings == null) {
-                            return; // cancelled by the user
-                        }
-
-                        settings.addRootMethod(resolvedMethod.getVMClassName(), resolvedMethod.getVMMethodName(),
-                                               resolvedMethod.getVMMethodSignature());
-
-                        if (cpuSettings.contains(settings)) {
-                            ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
-                        } else {
-                            ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
-                            System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
-                            newProjectSettings[projectSettings.length] = settings;
-                            ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
-                        }
-                    } catch (Exception ex) {
-                        ProfilerDialogs.notify(new NotifyDescriptor.Message(NbBundle.getMessage(AddProfilingRootMethodAction.class,
-                                                                                                "MSG_ProblemAddingRootMethod"), // NOI18N
-                                                                            NotifyDescriptor.WARNING_MESSAGE));
+                    if (dobj == null) {
+                        return;
                     }
+
+                    // Read current offset in editor
+                    JTextComponent lastFocusedComponent = EditorRegistry.lastFocusedComponent();
+
+                    // Read current offset in editor
+                    int currentOffsetInEditor = lastFocusedComponent.getCaretPosition();
+
+                    if (currentOffsetInEditor == -1) {
+                        return;
+                    }
+
+                    // Get method at cursor
+                    JavaFXProjectUtilities.ResolvedMethod resolvedMethod = JavaFXProjectUtilities.resolveMethodAtPosition(dobj.getPrimaryFile(),
+                                                                                                    currentOffsetInEditor);
+
+                    if (resolvedMethod == null) {
+                        NetBeansProfiler.getDefaultNB()
+                                        .displayWarning(NbBundle.getMessage(AddProfilingRootMethodAction.class,
+                                                                            "MSG_NoMethodFoundAtPosition")); // NOI18N
+
+                        return;
+                    }
+
+                    ExecutableElement method = resolvedMethod.getMethod();
+
+                    if (method == null) {
+                        return;
+                    }
+
+                    // Resolve owner project
+                    Project project = FileOwnerQuery.getOwner(dobj.getPrimaryFile());
+
+                    // Specify Profiling Settings as a context
+                    ProfilingSettings[] projectSettings = ProfilingSettingsManager.getDefault().getProfilingSettings(project)
+                                                                                  .getProfilingSettings();
+                    List<ProfilingSettings> cpuSettings = new ArrayList();
+
+                    for (ProfilingSettings settings : projectSettings) {
+                        if (org.netbeans.modules.profiler.ui.stp.Utils.isCPUSettings(settings.getProfilingType())) {
+                            cpuSettings.add(settings);
+                        }
+                    }
+
+                    ProfilingSettings settings = IDEUtils.selectSettings(project, ProfilingSettings.PROFILE_CPU_PART,
+                                                                         cpuSettings.toArray(new ProfilingSettings[cpuSettings
+                                                                                                                   .size()]),
+                                                                         null);
+
+                    if (settings == null) {
+                        return; // cancelled by the user
+                    }
+
+                    settings.addRootMethod(resolvedMethod.getVMClassName(), resolvedMethod.getVMMethodName(),
+                                           resolvedMethod.getVMMethodSignature());
+
+                    if (cpuSettings.contains(settings)) {
+                        ProfilingSettingsManager.getDefault().storeProfilingSettings(projectSettings, settings, project);
+                    } else {
+                        ProfilingSettings[] newProjectSettings = new ProfilingSettings[projectSettings.length + 1];
+                        System.arraycopy(projectSettings, 0, newProjectSettings, 0, projectSettings.length);
+                        newProjectSettings[projectSettings.length] = settings;
+                        ProfilingSettingsManager.getDefault().storeProfilingSettings(newProjectSettings, settings, project);
+                    }
+                } catch (Exception ex) {
+                    ProfilerDialogs.notify(new NotifyDescriptor.Message(NbBundle.getMessage(AddProfilingRootMethodAction.class,
+                                                                                            "MSG_ProblemAddingRootMethod"), // NOI18N
+                                                                        NotifyDescriptor.WARNING_MESSAGE));
                 }
-            }.execute();
+            }
+        }.execute();
     }
 }
