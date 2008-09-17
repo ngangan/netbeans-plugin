@@ -71,9 +71,13 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
 
         Iterator<FileObject> files = JavaFXProjectUtilities.getSourceFiles((JavaFXProject)project).iterator();
         JavaFXSource source = null;
+        String cName = className.substring(className.lastIndexOf('.') + 1, className.length());
+        if (cName.indexOf('$') != -1)
+            cName = cName.substring(0, cName.indexOf('$'));
+
         while(files.hasNext()) {
             FileObject fo = files.next();
-            if(fo.getName().equals(className.substring(className.lastIndexOf('.') + 1, className.length()))) {
+            if(fo.getName().equals(cName)) {
                 source = JavaFXSource.forFileObject(fo);
             }
         }
