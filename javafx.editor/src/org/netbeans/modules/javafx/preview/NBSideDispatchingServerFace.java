@@ -44,4 +44,5 @@ import java.rmi.*;
 public interface NBSideDispatchingServerFace extends Remote {
     public void notifyPreviewSideStarted() throws RemoteException;
     public void notifyPreviewSideTerminated() throws RemoteException;
+    public void ping() throws RemoteException;
 }

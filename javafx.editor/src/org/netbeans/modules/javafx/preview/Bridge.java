@@ -45,6 +45,7 @@ public class Bridge extends ModuleInstall {
     private static NbProcessDescriptor nb = null;
     private static HashMap <Document, PreviewSideServerFace> previewSideServerFaces = new HashMap <Document, PreviewSideServerFace>();
     private static HashMap <Document, NBSidePreviewServer> nbSideServers = new HashMap <Document, NBSidePreviewServer>();
+    private static Process process = null;
 
     @Override
     public boolean closing() {
@@ -53,6 +54,7 @@ public class Bridge extends ModuleInstall {
             if (previewDispatcher != null) previewDispatcher.terminate();
         } catch (RemoteException ex) {
             Exceptions.printStackTrace(ex);
+            if (process != null) process.destroy();
         }
         return super.closing();
     }
@@ -158,7 +160,7 @@ public class Bridge extends ModuleInstall {
         
         nb = new NbProcessDescriptor(exePath, args);
         try {
-            Process process = nb.exec();
+            process = nb.exec();
             OutHandler processSystemOut = new OutHandler (process);
             RequestProcessor.getDefault().post(processSystemOut);
         } catch (Throwable ex) {

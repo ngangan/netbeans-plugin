@@ -65,4 +65,7 @@ class NBSideDispatchingServer extends UnicastRemoteObject implements NBSideDispa
     public void clearStartedStatus() {
         previewSideStarted = false;
     }
+
+    public void ping() throws RemoteException {
+    }
 }
