@@ -385,7 +385,18 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-/*
+    @Override
+    public Queue<Adjustment> visitInterpolateValue(InterpolateValueTree node, Queue<Adjustment> adjustments) {
+        try {
+            indentSimpleStructure(node, adjustments);
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
+        super.visitInterpolateValue(node, adjustments);
+        return adjustments; 
+    }
+
+    /*
     @Override
     public Queue<Adjustment> visitSequenceIndexed(SequenceIndexedTree node, Queue<Adjustment> adjustments) {
         try {
