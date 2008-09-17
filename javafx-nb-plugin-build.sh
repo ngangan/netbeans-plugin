@@ -67,7 +67,7 @@ javafx-sdk.win.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/jf
 javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/lastSuccessfulBuild/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
 javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/lastSuccessfulBuild/artifact/jfx/build/linux-i586/release/bundles/javafx_sdk-1_0-dev-linux-i586.zip
 javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/jfx/build/solaris-sparc/release/bundles/javafx_sdk-1_0-dev-solaris-sparc.zip
-jfxcompiler.jar.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/jfx/build/solaris-sparc/release/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxc.jar
+jfxcompiler.jar.url=${SDK_URL}/lastSuccessfulBuild/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxc.jar
 jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
 
