@@ -168,25 +168,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
             return SEMI;
         }
 
-        protected void checkIntLiteralRange(String text, int pos, int radix) {           
-/*
-            long value = Convert.string2long(text, radix);
-            
-            pos = pos - text.length();
-            
-            if (previousTokenType == SUB) {
-                value = -value;
-                if ( value < Integer.MIN_VALUE )
-                    log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "small", new String("-" + text));
-                 
-            } else if (value > Integer.MAX_VALUE) {
-                log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "big", text);
-                
-            } 
-*/
-        }
-
-        // quote context --
+    // quote context --
         static final int CUR_QUOTE_CTX	= 0;	// 0 = use current quote context
         static final int SNG_QUOTE_CTX	= 1;	// 1 = single quote quote context
         static final int DBL_QUOTE_CTX	= 2;	// 2 = double quote quote context
