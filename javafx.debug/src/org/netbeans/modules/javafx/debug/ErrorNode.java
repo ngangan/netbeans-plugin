@@ -52,7 +52,9 @@ public class ErrorNode extends AbstractNode implements OffsetProvider {
         this.info = info;
         this.diag = diag;
         String ss = diag.getMessage(Locale.ENGLISH);
-        setDisplayName(diag.getCode() + " " + diag.getKind() + ": " + ss); //NOI18N
+        setDisplayName(diag.getKind() + "[" +
+                diag.getStartPosition() + "," + diag.getEndPosition() +"],[" +
+                diag.getLineNumber() + "," + diag.getColumnNumber() + "]: " + ss); //NOI18N
         setIconBaseWithExtension("org/netbeans/modules/java/debug/resources/element.png"); //NOI18N
     }
     
