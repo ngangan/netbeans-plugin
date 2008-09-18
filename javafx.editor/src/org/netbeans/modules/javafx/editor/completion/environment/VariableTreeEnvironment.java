@@ -39,12 +39,12 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.ErroneousTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafx.tree.JFXErroneousType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +70,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         VariableTree var = t;
         boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
         Tree type = var.getType();
-        int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((ErroneousTree) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+        int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos);
         if (offset <= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
