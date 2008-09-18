@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,18 +31,56 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
+ *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+package org.netbeans.modules.javafx.profiler.actions;
 
-package org.netbeans.modules.javafx.preview;
+import javax.swing.text.JTextComponent;
+import org.netbeans.api.editor.EditorRegistry;
+import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.profiler.actions.BaseSelectRootMethodsAction;
+import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
+import org.openide.filesystems.FileObject;
 
-import java.rmi.*;
+/**
+ * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.
+ * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
+ */
+final public class SelectJavaFXRootMethodsAction extends BaseSelectRootMethodsAction {
 
-public interface NBSideDispatchingServerFace extends Remote {
-    public void notifyPreviewSideStarted() throws RemoteException;
-    public void notifyPreviewSideTerminated() throws RemoteException;
-    public void ping() throws RemoteException;
+    @Override
+    protected String getFileClassName(FileObject file) {
+        String className = null;
+        // Read current offset in editor
+        JTextComponent lastFocusedComponent = EditorRegistry.lastFocusedComponent();
+
+        // Read current offset in editor
+        int currentOffsetInEditor = lastFocusedComponent.getCaretPosition();
+
+        if (currentOffsetInEditor == -1) {
+            return null;
+        }
+
+        // Try to get class at cursor or type of field at cursor
+        JavaFXProjectUtilities.ResolvedClass resolvedClass = JavaFXProjectUtilities.resolveClassAtPosition(file,
+                currentOffsetInEditor, true);
+
+        if ((resolvedClass != null) && (resolvedClass.getJClass() != null)) {
+            className = resolvedClass.getVMClassName();
+        }
+
+        if (className == null) {
+            // Try to get method enclosing cursor position
+            className = SourceUtils.getEnclosingClassName(file, currentOffsetInEditor);
+        }
+
+        if (className == null) {
+            // Get toplevel class
+            className = SourceUtils.getToplevelClassName(file);
+        }
+        return className;
+    }
 }

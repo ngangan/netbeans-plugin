@@ -62,12 +62,11 @@ public class JavaFXClassNode extends ContainerNode {
     private ElementHandle<TypeElement> classHandle;
 
     /** Creates a new instance of AbstractClassNode */
-    public JavaFXClassNode(ClasspathInfo cpInfo, Icon icon, Element classElement, ContainerNode parent) {
+    public JavaFXClassNode(ClasspathInfo cpInfo, Icon icon, TypeElement classElement, ContainerNode parent) {
         super(classElement.getSimpleName().toString(), icon, parent);
         this.classElement = classElement;
         this.cpInfo = cpInfo;
-// TBD !!!!!!!!!!!!!!!!!        
-//       signature = new ClientUtils.SourceCodeSelection(ElementUtilities.getBinaryName(classElement), "*", ""); // NOI18N
+        signature = new ClientUtils.SourceCodeSelection(JavaFXProjectUtilities.getBinaryName(classElement, classElement.getEnclosingElement()), "*", ""); // NOI18N
 //        this.classHandle = ElementHandle.create(classElement);
     }
 
@@ -88,14 +87,17 @@ public class JavaFXClassNode extends ContainerNode {
         }
     };
 
-    private Element classElement;
+    private TypeElement classElement;
+    private final ClientUtils.SourceCodeSelection signature;
+    
 
     @Override
     public ClientUtils.SourceCodeSelection getSignature() {
 // TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
-// only javafx$run$ selected so far        
-        return new ClientUtils.SourceCodeSelection(((TypeElement)classElement).getQualifiedName().toString(),
-                                                         JavaFXProjectUtilities.MAGIC_METHOD_NAME, JavaFXProjectUtilities.MAGIC_METHOD_SIGNATURE);
+// only javafx$run$ selected so far
+        return signature;
+//        return new ClientUtils.SourceCodeSelection(((TypeElement)classElement).getQualifiedName().toString(),
+//                                                         JavaFXProjectUtilities.MAGIC_METHOD_NAME, JavaFXProjectUtilities.MAGIC_METHOD_SIGNATURE);
     }
 
     protected SelectorChildren getChildren() {

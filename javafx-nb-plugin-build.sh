@@ -67,8 +67,8 @@ javafx-sdk.win.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/jf
 javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/lastSuccessfulBuild/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
 javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/lastSuccessfulBuild/artifact/jfx/build/linux-i586/release/bundles/javafx_sdk-1_0-dev-linux-i586.zip
 javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/jfx/build/solaris-sparc/release/bundles/javafx_sdk-1_0-dev-solaris-sparc.zip
-jfxcompiler.jar.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/jfx/build/solaris-sparc/release/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxc.jar
-jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/javafxdoc.jar
+jfxcompiler.jar.url=${SDK_URL}/lastSuccessfulBuild/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxc.jar
+jfxdoc.jar.url=${SDK_URL}/lastSuccessfulBuild/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
 
 EOF
@@ -81,6 +81,7 @@ unzip -o /net/smetiste.czech/space/builds/netbeans/trunk/daily/latest/zip/netbea
 ant init  build-one-cluster -Done.cluster.name=nb.cluster.javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
 
 ant build-nbms -Dmoduleconfig=javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
+ant generate-uc-catalog -Dcatalog.base.url=${HUDSON_URL}/job/JavaFX_NB_Plugin_NB65_daily/${BUILD_NUMBER}/artifact/main/nbbuild/nbms/javafx2/ -Dcatalog.file=nbms/catalog.xml
 
 #Build rip clusters
 ########################## 

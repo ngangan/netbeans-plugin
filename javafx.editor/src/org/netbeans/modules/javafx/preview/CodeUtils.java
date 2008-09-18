@@ -272,17 +272,18 @@ public class CodeUtils {
                     intFrame.setContentPane(((JFrame)frame).getContentPane());
                     intFrame.setTitle(((JFrame)frame).getTitle());
                     intFrame.setJMenuBar(((JFrame)frame).getJMenuBar());
+                    intFrame.getContentPane().setBackground(((JFrame)frame).getContentPane().getBackground());
                 } else {
                     if (frame instanceof JDialog) {
                         intFrame.setContentPane(((JDialog)frame).getContentPane());
                         intFrame.setTitle(((JDialog)frame).getTitle());
                         intFrame.setJMenuBar(((JDialog)frame).getJMenuBar());
+                        intFrame.getContentPane().setBackground(((JDialog)frame).getContentPane().getBackground());
                     }
                 }
-                ((Window)frame).dispose();
                 intFrame.setBackground(((Window)frame).getBackground());
-                intFrame.getContentPane().setBackground(((Window)frame).getBackground());
                 intFrame.setForeground(((Window)frame).getForeground());
+                ((Window)frame).dispose();
             } else {
                 intFrame.setLayout(new BorderLayout());
                 intFrame.add((JComponent)frame);

@@ -73,7 +73,7 @@ public class JavaFXInnerClassesNode extends ContainerNode {
             final List<JavaFXClassNode> classNodes = new ArrayList<JavaFXClassNode>();
 
             try {
-                JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, (JavaFXProject)parent.getProject()));
+                JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
                 js.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
                         }
@@ -85,8 +85,9 @@ public class JavaFXInnerClassesNode extends ContainerNode {
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);
+String mName = tek.getSimpleName().toString();
                                     if (classElement.equals(tek.getEnclosingElement()) && tek.getKind().isClass()) {
-                                        JavaFXClassNode classNode = new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, tek, parent);
+                                        JavaFXClassNode classNode = new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, (TypeElement)tek, parent);
                                         if (classNode.getSignature() != null) {
                                             classNodes.add(classNode);
                                         }

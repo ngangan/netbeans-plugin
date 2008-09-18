@@ -93,7 +93,8 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
         
         Map<String,String> platformProperties = new HashMap<String,String> ();
         List<URL> sources = new ArrayList<URL>(), javadoc = new ArrayList<URL>();
-        findSourcesAndJavadoc(sources, javadoc, installFolder, fxFolder.getParentFile());
+        findSourcesAndJavadoc(sources, javadoc, installFolder, fxFolder);
+        loadProfileProperties(fxFolder, platformProperties);
         return new NewJavaFXPlatform (name, createAntName(name), Arrays.asList(new URL[] {installFolder.toURI().toURL(), fxFolder.toURI().toURL()}), fxFolder.toURI().toURL(), platformProperties, Collections.<String,String>emptyMap(), sources, javadoc);
     }
 

@@ -84,6 +84,7 @@ public class Preview {
             super();
             this.registry = registry;
             this.nbServer = nbServer;
+            new PingThread().start();
         }
         
         public void stopPreview(int hashCode) throws RemoteException {
@@ -160,6 +161,28 @@ public class Preview {
         }
 
         public void ping() throws RemoteException {
+        }
+        
+        class PingThread extends Thread {
+            @Override
+            public void run() {
+                while (!isInterrupted()) {
+                    try {
+                        if (nbServer != null)
+                            nbServer.ping();
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException ex) {
+                            interrupt();
+                        }
+                    } catch (Throwable ex) {
+                        if (!isInterrupted()) {
+                            permissionToExitIsGranted = true;
+                            System.exit(0);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -562,8 +585,8 @@ public class Preview {
 
     private static int instanceCounter = 0;
     
-    private static String NB_SIDE = "NBSide";                               // NOI18
-    private static String PREVIEW_SIDE = "PreviewSide";                     // NOI18
+    private static String NB_SIDE = "NBSide";                               // NOI18N
+    private static String PREVIEW_SIDE = "PreviewSide";                     // NOI18N
     private static String APC = "sun.awt.AppContext";                       // NOI18N
     private static String DSP = "dispose";                                  // NOI18N
     private static String CNAC = "createNewAppContext";                     // NOI18N

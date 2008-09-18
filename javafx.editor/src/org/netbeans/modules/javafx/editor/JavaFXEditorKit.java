@@ -390,7 +390,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             int dotPos = caret.getDot();
             if (BracketCompletion.posWithinString(doc, dotPos)) {
                 try {
-                    doc.insertString(dotPos, "\" + \"", null); //NOI18N
+                    doc.insertString(dotPos, "\"  \"", null); //NOI18N
                     dotPos += 3;
                     caret.setDot(dotPos);
                     return new Integer(dotPos);

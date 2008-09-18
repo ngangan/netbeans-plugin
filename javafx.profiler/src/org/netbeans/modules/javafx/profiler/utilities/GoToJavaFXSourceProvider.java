@@ -41,6 +41,7 @@ package org.netbeans.modules.javafx.profiler.utilities;
 
 import com.sun.tools.javac.code.Symbol;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.javafx.source.Task;
@@ -52,10 +53,12 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
+import org.openide.filesystems.FileObject;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.api.javafx.editor.ElementOpen;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 
         
 public class GoToJavaFXSourceProvider implements GoToSourceProvider {
@@ -63,7 +66,27 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
     final AtomicBoolean result = new AtomicBoolean(false);
 
     public boolean openSource(final Project project, final String className, final String methodName, String signature) {
-        final JavaFXSource js = JavaFXProjectUtilities.getSources((JavaFXProject)project);
+        if (!(project instanceof JavaFXProject))
+            return false;
+
+        Iterator<FileObject> files = JavaFXProjectUtilities.getSourceFiles((JavaFXProject)project).iterator();
+        JavaFXSource source = null;
+        String cName = className.substring(className.lastIndexOf('.') + 1, className.length());
+        if (cName.indexOf('$') != -1)
+            cName = cName.substring(0, cName.indexOf('$'));
+
+        while(files.hasNext()) {
+            FileObject fo = files.next();
+            if(fo.getName().equals(cName)) {
+                source = JavaFXSource.forFileObject(fo);
+            }
+        }
+
+        if (source == null) {
+            return false;
+        }
+
+        final JavaFXSource js = source;
         final CountDownLatch latch = new CountDownLatch(1);
 
         // cut interface suffix out of the signature
@@ -74,16 +97,19 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
             js.runUserActionTask(new Task<CompilationController>() {
                     public void run(CompilationController controller)
                              throws Exception {
-                        controller.toPhase(JavaFXSource.Phase.ANALYZED);
+                        if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                           return;
+                        }
 
                         Element destinationElement = null;
 
                         // resolve the class by name
                         TypeElement classElement = JavaFXProjectUtilities.resolveClassByName(className, controller);
                         // only fx classes supported; others to be opened via GoToJavaSourceProvider
-                        if (!controller.getJavafxTypes().isJFXClass((Symbol) classElement))
+                        if (!controller.getJavafxTypes().isJFXClass((Symbol) classElement)) {
                             return;
-                        
+                        }
+                            
                         if ((methodName != null) && (methodName.length() > 0)) {
                             // if a method name has been specified try to resolve the method
                             if (classElement != null) {
@@ -96,7 +122,6 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                             // unsuccessful attempt to resolve a method -> use the class instead
                             destinationElement = classElement;
                         }
-
                         if (destinationElement != null) {
                             ProfilerLogger.debug("Opening element: " + destinationElement); // NOI18N
 
