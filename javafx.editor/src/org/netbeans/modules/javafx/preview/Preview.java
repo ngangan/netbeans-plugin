@@ -193,6 +193,7 @@ public class Preview {
         private String lf = null;
         private ExceptionAwareThreadGroup threadGroup = null;
         private ACThread acTread = null;
+        private CheckThread checkTread = null;
         private PreviewSideServer thiss = this;
         private ClassLoader bootClassLoader = null;
         private JFrame previewFrame = null;
@@ -236,8 +237,9 @@ public class Preview {
         }
 
         public void remove() {
+            checkTread.interrupt();
             threadGroup.skipExceptions(true);
-            previewFrame.dispose();
+            if (previewFrame != null) previewFrame.dispose();
             new Thread(new Runnable() {
                 public void run() {
                     acTread.disposeAC();
@@ -376,7 +378,7 @@ public class Preview {
             Object obj = CodeUtils.run(_context, cl);
             if (obj != null) thiss.processObject(obj);
         }
-        
+
         private class ExceptionAwareThreadGroup extends ThreadGroup {
             private boolean skip = false;
             public ExceptionAwareThreadGroup(String s) {
@@ -390,7 +392,32 @@ public class Preview {
                 if (!skip) super.uncaughtException(t, e);
             }
         }
+
+        class CheckThread extends Thread {
+            @Override
+            public void run() {
+                while (!isInterrupted()) {
+                    check = false;
+                    acTread.executeOnEDT(new Runnable() {
+                        public void run() {
+                            check = true;
+                        }
+                    });
+                    try {
+                        Thread.sleep(12000);
+                    } catch (InterruptedException ex) {
+                        interrupt();
+                    }
+                    if (!check && !isInterrupted()) {
+                        System.out.println(EDT_HANGS);
+                        closeRequest();
+                        interrupt();
+                    }
+                }
+            }
+        }
         
+        private volatile boolean check = false;
         public void  run(final Object context)  throws RemoteException {
             if (threadGroup == null) {
                 threadGroup = new ExceptionAwareThreadGroup("SACG" + instanceCounter++);      //NOI18
@@ -412,6 +439,8 @@ public class Preview {
                         body(context, bootClassLoader);
                     }
                 });
+                checkTread = new CheckThread();
+                checkTread.start();
             } else {
                 acTread.executeOnEDT(new Runnable() {
                     public void run() {
@@ -421,54 +450,6 @@ public class Preview {
             }
         };
         
-//        public void  run(Object context)  throws RemoteException {
-//            final Object _context = context;
-//            threadGroup = new ThreadGroup("SACG" + instanceCounter++);
-//            acTread = new ACThread(threadGroup, lf){
-//                @Override
-//                protected void subj() {
-//                    List <Window> initialList = getOwnerlessWindowsList();
-//
-//                    Object obj = CodeManager.run(_context);
-//                    List <Window> suspectedList = getOwnerlessWindowsList();
-//                    suspectedList.removeAll(initialList);
-//
-//                    if (obj != null) {
-//                        comp = CodeManager.parseObj(obj);
-//                    } else {
-//                        if (!suspectedList.isEmpty()) {
-//                            comp = CodeManager.parseObj(suspectedList.get(0));
-//                            suspectedList.remove(0);
-//                        } else
-//                            comp = null;
-//                    }
-//                    for (Window frame : suspectedList) {
-//                        frame.dispose();
-//                    }
-//
-//                    JPanel pane = new JPanel();
-//                    pane.setLayout(new BorderLayout());
-//                    pane.add(comp);
-//                    comp = (JComponent) pane;
-//
-//                    mainFrame.setVisible(true);
-//                    if (tabsComponent == null) {
-//                        tabsComponent = new JScrollPane();
-//                        ((JScrollPane)tabsComponent).setViewportView(comp);
-//                        tabData = new TabData(tabsComponent, new ImageIcon(org.openide.util.Utilities.loadImage("org/netbeans/modules/javafx/dataloader/FX-filetype.png")), fileName, fileName);
-//                        int index = tabbedContainer.getModel().size();
-//                        tabbedContainer.getModel().addTab(index, tabData);
-//                        tabbedContainer.getSelectionModel().setSelectedIndex(index);
-//                        tabbedContainer.addActionListener(thiss);
-//                    } else {
-//                        ((JScrollPane)tabsComponent).setViewportView(comp);
-//                    }
-//                }
-//            };
-//            acTread.start();
-//        };
-        
-
         public void setPreviewPlacement() {
             try {
                 if (previewFrame != null) nbServer.setPreviewPlacement(previewFrame.getLocation(), previewFrame.getSize());
@@ -489,14 +470,23 @@ public class Preview {
         }
         
         public void windowClosing(WindowEvent e) {
-            try {
-                nbServer.setPreviewPlacement(previewFrame.getLocation(), previewFrame.getSize());
-                nbServer.previewWindowClosed();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            checkTread.interrupt();
+            closeRequest();
+        }
+        
+        boolean closed = false;
+        synchronized private void closeRequest() {
+            if (!closed) {
+                closed = true;
+                try {
+                    nbServer.setPreviewPlacement(previewFrame.getLocation(), previewFrame.getSize());
+                    nbServer.previewWindowClosed();
+                } catch (RemoteException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
-
+        
         public void moveToFront() throws RemoteException {
             previewFrame.setAlwaysOnTop(true);
             previewFrame.setAlwaysOnTop(false);
@@ -593,4 +583,5 @@ public class Preview {
     private static String SAST = "sun.awt.SunToolkit";                      // NOI18N
     private static String DESIGN_PREVIEW = "Design Preview";                // NOI18N
     private static String GET_WINDOWS = "getWindows";                       // NOI18N
+    private static String EDT_HANGS = "Preview cancelled due to problems in previewed code.";                      // NOI18N
 }

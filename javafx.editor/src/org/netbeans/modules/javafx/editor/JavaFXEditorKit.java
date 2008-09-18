@@ -149,7 +149,6 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                 JavaFXDocument doc = (JavaFXDocument) target.getDocument();
                 if (doc != null) {
                     doc.enableExecution(true);
-                    putValue(SHORT_DESCRIPTION,NbBundle.getBundle(JavaFXEditorKit.class).getString("disable-fx-preview-execution"));
                 }
             }
         }
