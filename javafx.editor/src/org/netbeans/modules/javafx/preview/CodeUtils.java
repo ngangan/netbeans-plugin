@@ -157,6 +157,7 @@ public class CodeUtils {
         Class<?> paramClass = classLoader.loadClass(secuenceClassName); 
         Class<?> sequencesClass = classLoader.loadClass(secuencesClassName); 
         Method runMethod = mainClass.getDeclaredMethod(runMethodName, paramClass);
+        runMethod.setAccessible(true);
         Class<?> typeinfoClass = classLoader.loadClass(typeInfoClassName); 
         Object commandLineArgs = new String[]{};
         Method makeMethod = sequencesClass.getDeclaredMethod(makeMethodName, typeinfoClass, Object[].class);
