@@ -72,9 +72,6 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
     
     @SuppressWarnings("unchecked")  //Properties cast to Map<String,String>
     static JavaPlatform create(Map<String,String> properties, List<URL> sources, List<URL> javadoc) {
-        if (properties == null) {
-            properties = new HashMap<String,String> ();
-        }
         // XXX java.home??
         File javaHome = FileUtil.normalizeFile(new File(System.getProperty("jdk.home")));       //NOI18N
         List<URL> javaFolders = new ArrayList<URL>();
@@ -84,20 +81,25 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
-        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0dev/lib/javafxc.jar", "org.netbeans.modules.javafx", false);
+        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0dev/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
         if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
-            fxPath = InstalledFileLocator.getDefault().locate("lib/javafxc.jar", "org.netbeans.modules.javafx", false);
+            fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
         if (fxPath != null && fxPath.isFile()) try {
-            fxFolder = fxPath.getParentFile().toURI().toURL();
+            fxPath = fxPath.getParentFile().getParentFile().getParentFile();
+            fxFolder = fxPath.toURI().toURL();
             javaFolders.add(fxFolder);
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
         if ((fxPath!= null) && (sources == null || javadoc == null)) {
             List<URL> src = new ArrayList<URL>(), jdc = new ArrayList<URL>();
-            findSourcesAndJavadoc(src, jdc, javaHome, fxPath.getParentFile().getParentFile());
+            findSourcesAndJavadoc(src, jdc, javaHome, fxPath);
             if (sources == null) sources = src;
             if (javadoc == null) javadoc = jdc;
+        }
+        if (properties == null || properties.size() == 0) {
+            properties = new HashMap<String,String> ();
+            loadProfileProperties(fxPath, properties);
         }
         return new DefaultPlatformImpl(javaFolders, fxFolder, properties, new HashMap(System.getProperties()), sources,javadoc);
     }
