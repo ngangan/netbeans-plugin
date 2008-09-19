@@ -292,7 +292,7 @@ public class CodeUtils {
                         if (((JDialog)frame).getContentPane().getBackground().toString().contentEquals(NOCOLOR)) {
                             intFrame.getContentPane().setBackground(Color.white);
                         } else {
-                            intFrame.getContentPane().setBackground(((JFrame)frame).getContentPane().getBackground());
+                            intFrame.getContentPane().setBackground(((JDialog)frame).getContentPane().getBackground());
                         }
                     }
                 }
