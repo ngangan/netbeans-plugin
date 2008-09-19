@@ -11,6 +11,10 @@
 
 export
 
+cd $WORKSPACE/main
+rm -rf tests/*
+zip -r tests/javafx-test-distribution.zip nbbuild contrib
+
 #Start tests
 cd $WORKSPACE/main/
 rm -rf xtest
