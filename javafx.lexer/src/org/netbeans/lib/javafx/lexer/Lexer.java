@@ -43,11 +43,14 @@ package org.netbeans.lib.javafx.lexer;
 
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javafx.util.MsgSym;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,7 +66,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
     /**
      * The log to be used for error diagnostics.
      */
-    protected Log log;
+    protected Log log = new MyLog(new Context());
     private static Logger logger = Logger.getLogger(Lexer.class.getName());
     private List<Token> tokens = new ArrayList<Token>();
 
@@ -364,6 +367,63 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
          */
         void setBraceDepth(int depth) {
             this.braceDepth = depth;
+        }
+    }
+
+        private static class MyLog extends Log {
+
+
+        static Log instace(Context context) {
+            if (context.get(logKey) != null) {
+                context.put(logKey, (Log)null);
+            }
+            return new MyLog(context);
+        }
+        /**
+         * Construct a log with default settings.
+         *
+         * @param context null
+         */
+        private MyLog(Context context) {
+            super(context);
+        }
+
+        /**
+         * Report an error, unless another error was already reported at same
+         * source position.
+         *
+         * @param key  The key for the localized error message.
+         * @param args Fields of the error message.
+         */
+        @Override
+        public void error(String key, Object... args) {
+            error(null, key, args);
+        }
+
+        /**
+         * Report an error, unless another error was already reported at same
+         * source position.
+         *
+         * @param pos  The source position at which to report the error.
+         * @param key  The key for the localized error message.
+         * @param args Fields of the error message.
+         */
+        @Override
+        public void error(JCDiagnostic.DiagnosticPosition pos, String key, Object... args) {
+            error(pos.getStartPosition(), key, args);
+        }
+
+        /**
+         * Report an error, unless another error was already reported at same
+         * source position.
+         *
+         * @param pos  The source position at which to report the error.
+         * @param key  The key for the localized error message.
+         * @param args Fields of the error message.
+         */
+        @Override
+        public void error(int pos, String key, Object... args) {
+           logger.fine("Lexer error: " + key + " @" + pos + "\tCaused by: " + Arrays.asList(args));
         }
     }
 }

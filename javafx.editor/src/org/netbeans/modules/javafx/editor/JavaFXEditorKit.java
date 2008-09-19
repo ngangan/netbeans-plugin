@@ -45,6 +45,7 @@ import java.rmi.RemoteException;
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.editor.*;
 import org.netbeans.modules.editor.NbEditorUtilities;
+import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.lexer.editorbridge.LexerEditorKit;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
@@ -394,13 +395,15 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     caret.setDot(dotPos);
                     return new Integer(dotPos);
                 } catch (BadLocationException ex) {
+                    
                 }
             } else {
                 try {
                     if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
                         int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
                         doc.insertString(end, "}", null); // NOI18N
-                        doc.getFormatter().indentNewLine(doc, end);
+                        Indent.get(doc).reindent(end);
+//                        doc.getFormatter().indentNewLine(doc, end);
                         caret.setDot(dotPos);
                         return Boolean.TRUE;
                     } else {
@@ -409,7 +412,8 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                         if (c == '[' || c == '(' || c == '{') {
                             if (epsylon.charAt(1) == BracketCompletion.matching(c)) {
                                 doc.insertString(dotPos + 1 , "\n", null);
-                                doc.getFormatter().indentNewLine(doc, dotPos);
+                                Indent.get(doc).reindent(dotPos);
+//                                doc.getFormatter().indentNewLine(doc, dotPos);
                                 caret.setDot(dotPos);
                                 return Boolean.TRUE;
                             }
