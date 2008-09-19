@@ -1,7 +1,7 @@
 
 package frame;
 
-import javafx.application.Frame;
+import javafx.stage.Frame;
 import javafx.scene.Scene;
 
 Frame {

@@ -1,4 +1,4 @@
-import javafx.application.Stage;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 Stage {

@@ -1,9 +1,9 @@
 
 package frame.stage.content;
 
-import javafx.application.Frame;
+import javafx.stage.Frame;
 import javafx.scene.Scene;
-import javafx.scene.geometry.Polyline;
+import javafx.scene.shape.Polyline;
 import javafx.scene.paint.Color;
 
 Frame {
