@@ -110,7 +110,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-    
+
+/*    No longer used, need to migrate to Stage.
     public void testFXImportJavaFXApplication() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
@@ -122,7 +123,7 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-
+*/
 // /*   Fails
     public void testFXImportJavaFXAsync() throws Exception {
         new CompletionTestCase(this).test(
@@ -245,7 +246,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
-    
+
+/* No longer present, renamed to Shape.
     public void testFXImportJavaFXSceneGeometry() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
@@ -257,6 +259,7 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
+ */
     
     public void testFXImportJavaFXSceneImage() throws Exception {
         new CompletionTestCase(this).test(
