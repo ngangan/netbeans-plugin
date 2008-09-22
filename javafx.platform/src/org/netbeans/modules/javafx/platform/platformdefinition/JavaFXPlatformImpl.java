@@ -232,7 +232,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             if (extPathSpec != null) {
                 pathSpec = pathSpec + File.pathSeparator + extPathSpec;
             }
-            cp = Util.createClassPath (pathSpec);
+            cp = Util.createClassPath (pathSpec.replace(';', File.pathSeparatorChar));
             bootstrap = new WeakReference<ClassPath>(cp);
             return cp;
         }
