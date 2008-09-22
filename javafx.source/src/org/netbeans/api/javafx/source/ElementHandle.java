@@ -505,18 +505,16 @@ public class ElementHandle<T extends Element> {
     
     public static ElementHandle fromJava(org.netbeans.api.java.source.ElementHandle eh) {
         try {
-            Object o = eh.getKind(); // java's ElementKind type, can't reference directly
+            Method getKind = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getKind");
+            Object o = getKind.invoke(eh); //eh.getKind() - java's ElementKind type, can't reference directly
 
             ElementKind kind = Enum.valueOf(ElementKind.class, o.toString());
             
             Method getSignature = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getSignature");
+            getSignature.setAccessible(true);
             String[] signatures = (String[]) getSignature.invoke(eh);
             return new ElementHandle(kind, signatures);
-        } catch (NoSuchMethodException noSuchMethodException) {
-        } catch (SecurityException securityException) {
-        } catch (IllegalAccessException illegalAccessException) {
-        } catch (IllegalArgumentException illegalArgumentException) {
-        } catch (InvocationTargetException invocationTargetException) {
+        } catch (Exception e) {
         }
         return null;
     }
