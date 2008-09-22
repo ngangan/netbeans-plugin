@@ -59,7 +59,7 @@ public class Rectangle implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.geometry.Rectangle" );
+        Util.addImport( targetComponent, "javafx.scene.shape.Rectangle" );
         Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         
         return true;

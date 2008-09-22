@@ -59,8 +59,8 @@ public class Frame implements ActiveEditorDrop {
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Util.addImport( targetComponent, "javafx.application.Frame" );
-        Util.addImport( targetComponent, "javafx.application.Stage" );
+        Util.addImport( targetComponent, "javafx.stage.Frame" );
+        Util.addImport( targetComponent, "javafx.scene.Scene" );
                 
         return true;
     }

@@ -59,7 +59,7 @@ public class Circle implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.geometry.Circle" );
+        Util.addImport( targetComponent, "javafx.scene.shape.Circle" );
         Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         return true;
     }    

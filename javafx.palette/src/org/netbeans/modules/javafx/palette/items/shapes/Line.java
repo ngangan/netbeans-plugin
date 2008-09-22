@@ -59,7 +59,7 @@ public class Line implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.geometry.Line" );
+        Util.addImport( targetComponent, "javafx.scene.shape.Line" );
         Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         
         return true;

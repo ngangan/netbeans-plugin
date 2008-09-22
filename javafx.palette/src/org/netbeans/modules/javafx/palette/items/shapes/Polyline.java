@@ -59,7 +59,7 @@ public class Polyline implements ActiveEditorDrop {
         template.insert( targetComponent );
 
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.geometry.Polyline" );        
+        Util.addImport( targetComponent, "javafx.scene.shape.Polyline" );
         Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         
         return true;

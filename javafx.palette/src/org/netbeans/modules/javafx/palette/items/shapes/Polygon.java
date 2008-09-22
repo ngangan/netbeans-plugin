@@ -59,7 +59,7 @@ public class Polygon implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.geometry.Polygon" );
+        Util.addImport( targetComponent, "javafx.scene.shape.Polygon" );
         Util.addImport( targetComponent, "javafx.scene.paint.Color" );
         
         return true;
