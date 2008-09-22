@@ -29,10 +29,10 @@
 
  package forms;
 
-import javafx.scene.geometry.Line;
+import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 
 /**
  * @author Michal Skvor
@@ -45,7 +45,7 @@ var p3 = p2 + d;
 var p4 = p3 + d;
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         fill : Color.BLACK
         content : [
         Line {

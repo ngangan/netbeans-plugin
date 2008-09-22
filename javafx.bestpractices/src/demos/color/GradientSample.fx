@@ -32,12 +32,12 @@ package color;
 import javafx.scene.Group;
 import javafx.scene.CustomNode;
 import javafx.scene.Node;
-import javafx.scene.geometry.Rectangle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import java.lang.System;
 
 /**
@@ -58,7 +58,7 @@ var Y_AXIS = false;
 var X_AXIS = true;
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content: [
             GradientBox { x :   0, y :   0, size : 200, c1 : B1, c2 : B2, axis : Y_AXIS },
             GradientBox { x :  25, y :  25, size :  75, c1 : C1, c2 : C2, axis : Y_AXIS },

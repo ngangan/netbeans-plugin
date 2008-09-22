@@ -29,12 +29,12 @@
 
 package input;
 
-import javafx.input.MouseEvent;
-import javafx.scene.geometry.Rectangle;
-import javafx.scene.geometry.Circle;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -71,7 +71,7 @@ var timer : Timeline = Timeline {
 };
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : [
             Rectangle {
                 width : 200, height : 200

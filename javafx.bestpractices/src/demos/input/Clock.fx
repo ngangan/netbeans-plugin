@@ -32,10 +32,10 @@ package input;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
 import javafx.scene.Group;
-import javafx.scene.geometry.Circle;
-import javafx.scene.geometry.Line;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
@@ -52,7 +52,7 @@ import java.lang.System;
 var clockWork : ClockWork = ClockWork {};
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : clockWork
         }
 
@@ -95,7 +95,7 @@ class ClockWork extends CustomNode {
                     fill : Color.GRAY
                 },
                 Line {
-                    transforms : [ Rotate { angle : bind seconds * 6, x : 100, y : 100 }]
+                    transforms : [ Rotate { angle : bind seconds * 6, pivotX : 100, pivotY : 100 }]
                     startX : 100
                     startY : 30
                     endX : 100
@@ -103,7 +103,7 @@ class ClockWork extends CustomNode {
                     stroke : Color.WHITE
                 },
                 Line {
-                    transforms : [ Rotate { angle : bind minutes * 6, x : 100, y : 100 }]
+                    transforms : [ Rotate { angle : bind minutes * 6, pivotX : 100, pivotY : 100 }]
                     startX : 100
                     startY : 40
                     endX : 100
@@ -112,7 +112,7 @@ class ClockWork extends CustomNode {
                     strokeWidth : 2
                 },
                 Line {
-                    transforms : [ Rotate { angle : bind hours * 30, x : 100, y : 100 }]
+                    transforms : [ Rotate { angle : bind hours * 30, pivotX : 100, pivotY : 100 }]
                     startX : 100
                     startY : 50
                     endX : 100

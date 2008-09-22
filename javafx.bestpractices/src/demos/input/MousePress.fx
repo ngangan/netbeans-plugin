@@ -29,14 +29,14 @@
 
 package input;
 
-import javafx.input.MouseEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.Group;
-import javafx.scene.geometry.Rectangle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
-import javafx.input.MouseButton;
+import javafx.scene.input.MouseButton;
 
 /**
  * @author Michal Skvor
@@ -52,7 +52,7 @@ var buttons : Rectangle[] = [
 ];
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : [
             Rectangle {
                 width : 200, height : 200
