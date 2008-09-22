@@ -34,7 +34,7 @@
             <file name="CustomNode.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CustomNode.xml">
                 <attr name="position" intvalue="300"/>
             </file>
-            <file name="Stage.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stage.xml">
+            <file name="Scene.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Scene.xml">
                 <attr name="position" intvalue="400"/>
             </file>
         </folder>

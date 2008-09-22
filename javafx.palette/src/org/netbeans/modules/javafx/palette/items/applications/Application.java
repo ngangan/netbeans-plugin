@@ -59,8 +59,8 @@ public class Application implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.application.Application" );
-        Util.addImport( targetComponent, "javafx.application.Stage" );
+        Util.addImport( targetComponent, "javafx.stage.Application" );
+        Util.addImport( targetComponent, "javafx.scene.Scene" );
         return true;
     }
 }
