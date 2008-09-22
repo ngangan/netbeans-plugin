@@ -33,10 +33,10 @@ import javafx.scene.Group;
 import javafx.scene.CustomNode;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import javafx.scene.geometry.Arc;
-import javafx.scene.geometry.ArcType;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 
 /**
  * @author Michal Skvor
@@ -108,7 +108,7 @@ class ColorWheel extends CustomNode {
 
 
 Frame {
-    stage : Stage {
+    scene: Scene {
         fill : Color.GRAY
         content : ColorWheel {}
     }

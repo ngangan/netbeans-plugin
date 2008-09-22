@@ -242,13 +242,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return null;
     }
 
-    protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
-        BaseDocument doc = (BaseDocument)c.getDocument();
+    protected void substituteText(JTextComponent c, final int offset, int len, String toAdd) {
+        final BaseDocument doc = (BaseDocument)c.getDocument();
         CharSequence prefix = getInsertPrefix();
         if (prefix == null)
             return;
-        StringBuilder text = new StringBuilder(prefix);
-        int semiPos = toAdd != null && toAdd.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
+        final StringBuilder text = new StringBuilder(prefix);
+        final int semiPos = toAdd != null && toAdd.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
         if (semiPos > -2)
             toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
         if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
@@ -299,25 +299,27 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
 
         // Update the text
-        doc.atomicLock();
-        try {
-            String textToReplace = doc.getText(offset, len);
-            if (textToReplace.contentEquals(text)) {
-                if (semiPos > -1)
-                    doc.insertString(semiPos, ";", null); //NOI18N
-                return;
-            }                
-            Position position = doc.createPosition(offset);
-            Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
-            doc.remove(offset, len);
-            doc.insertString(position.getOffset(), text.toString(), null);
-            if (semiPosition != null)
-                doc.insertString(semiPosition.getOffset(), ";", null);
-        } catch (BadLocationException e) {
-            // Can't update
-        } finally {
-            doc.atomicUnlock();
-        }
+        final int length = len;
+        doc.runAtomic (new Runnable () {
+            public void run () {
+                try {
+                    String textToReplace = doc.getText(offset, length);
+                    if (textToReplace.contentEquals(text)) {
+                        if (semiPos > -1)
+                            doc.insertString(semiPos, ";", null); //NOI18N
+                        return;
+                    }
+                    Position position = doc.createPosition(offset);
+                    Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
+                    doc.remove(offset, length);
+                    doc.insertString(position.getOffset(), text.toString(), null);
+                    if (semiPosition != null)
+                        doc.insertString(semiPosition.getOffset(), ";", null);
+                } catch (BadLocationException e) {
+                    // Can't update
+                }
+            }
+        });
     }
             
     static class KeywordItem extends JavaFXCompletionItem {
@@ -395,14 +397,14 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
         
         @Override
-        protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
+        protected void substituteText(JTextComponent c, final int offset, int len, String toAdd) {
             if (dim == 0) {
                 super.substituteText(c, offset, len, toAdd != null ? toAdd : postfix);
                 return;
             }
-            BaseDocument doc = (BaseDocument)c.getDocument();
+            final BaseDocument doc = (BaseDocument)c.getDocument();
             final StringBuilder text = new StringBuilder();
-            int semiPos = toAdd != null && toAdd.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
+            final int semiPos = toAdd != null && toAdd.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
             if (semiPos > -2)
                 toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
             if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
@@ -452,18 +454,20 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             } catch (BadLocationException e) {
             }
 
-            doc.atomicLock();
-            try {
-                Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
-                if (len > 0)
-                    doc.remove(offset, len);
-                if (semiPosition != null)
-                    doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
-            } catch (BadLocationException e) {
-                // Can't update
-            } finally {
-                doc.atomicUnlock();
-            }
+            final int length = len;
+            doc.runAtomic (new Runnable () {
+                public void run () {
+                    try {
+                        Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
+                        if (length > 0)
+                            doc.remove(offset, length);
+                        if (semiPosition != null)
+                            doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
+                    } catch (BadLocationException e) {
+                        // Can't update
+                    }
+                }
+            });
             CodeTemplateManager ctm = CodeTemplateManager.get(doc);
             if (ctm != null) {
                 ctm.createTemporary(sb.append(text).toString()).insert(c);
@@ -836,7 +840,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
         
         @Override
-        protected void substituteText(final JTextComponent c, int offset, int len, String toAdd) {
+        protected void substituteText(final JTextComponent c, final int offset, int len, String toAdd) {
             if (toAdd == null) {
                 if (isPrimitive) {
                     try {
@@ -873,9 +877,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 String add = "()"; //NOI18N
                 if (toAdd != null && !add.startsWith(toAdd))
                     add += toAdd;
-                BaseDocument doc = (BaseDocument)c.getDocument();
+                final BaseDocument doc = (BaseDocument)c.getDocument();
                 String text = ""; //NOI18N
-                int semiPos = add.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
+                final int semiPos = add.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
                 if (semiPos > -2)
                     add = add.length() > 1 ? add.substring(0, add.length() - 1) : null;
                 JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
@@ -917,19 +921,22 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 } catch (BadLocationException e) {
                 }
 
-                doc.atomicLock();
-                try {
-                    Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
-                    if (len > 0)
-                        doc.remove(offset, len);
-                    doc.insertString(offset, getInsertPrefix().toString(), null);                    
-                    if (semiPosition != null)
-                        doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
-                } catch (BadLocationException e) {
-                    // Can't update
-                } finally {
-                    doc.atomicUnlock();
-                }
+                final int length = len;
+                doc.runAtomic (new Runnable () {
+                    public void run () {
+                        try {
+                            Position semiPosition = semiPos > -1 ? doc.createPosition(semiPos) : null;
+                            if (length > 0)
+                                doc.remove(offset, length);
+                            doc.insertString(offset, getInsertPrefix().toString(), null);
+                            if (semiPosition != null)
+                                doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
+                        } catch (BadLocationException e) {
+                            // Can't update
+                        }
+                    }
+                });
+
                 CodeTemplateManager ctm = CodeTemplateManager.get(doc);
                 if (ctm != null) {
                     StringBuilder sb = new StringBuilder();
@@ -1137,15 +1144,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             try {
                 js.runUserActionTask(new Task<CompilationController>() {
 
-                    public void run(CompilationController controller) throws IOException {
+                    public void run(final CompilationController controller) throws IOException {
                         if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                             if (LOGGABLE) log ("Cannot show code completion due to compiler exception - should be already logged.");
                             return;
                         }
-                        TypeElement eleme = elem;
-                        if (type != null) {
-                            eleme = (TypeElement)type.asElement();
-                        }
+                        final TypeElement eleme = (type != null) ? (TypeElement)type.asElement() : elem;
                         boolean asTemplate = false;
                         StringBuilder sb = new StringBuilder();
                         int cnt = 1;
@@ -1178,44 +1182,48 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                             if (insideNew)
                                 sb.append("${cursor completionInvoke}"); //NOI18N
                             if (finalLen2 > 0) {
-                                doc.atomicLock();
-                                try {
-                                    doc.remove(offset, finalLen2);
-                                } catch (BadLocationException e) {
-                                    // Can't update
-                                } finally {
-                                    doc.atomicUnlock();
-                                }
+                                final int finalLen3 = finalLen2;
+                                doc.runAtomic (new Runnable () {
+                                    public void run () {
+                                        try {
+                                            doc.remove(offset, finalLen3);
+                                        } catch (BadLocationException e) {
+                                            // Can't update
+                                        }
+                                    }
+                                });
                             }
                             CodeTemplateManager ctm = CodeTemplateManager.get(doc);
                             if (ctm != null)
                                 ctm.createTemporary(sb.append(text).toString()).insert(c);
                         } else {
                             // Update the text
-                            doc.atomicLock();
-                            try {
-                                Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
-                                JavaFXTreePath tp = controller.getTreeUtilities().pathFor(offset);
-                                CharSequence cs = simpleName;
-                                if (eleme != null) {
-                                    cs = eleme.getSimpleName(); 
-                                    if (eleme.getEnclosingElement().getKind() == ElementKind.CLASS) {
-                                        cs = eleme.getEnclosingElement().getSimpleName() + "." + eleme.getSimpleName();
+                            final int finalLen3 = finalLen2;
+                            doc.runAtomic (new Runnable () {
+                                public void run () {
+                                    try {
+                                        Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
+                                        JavaFXTreePath tp = controller.getTreeUtilities().pathFor(offset);
+                                        CharSequence cs = simpleName;
+                                        if (eleme != null) {
+                                            cs = eleme.getSimpleName();
+                                            if (eleme.getEnclosingElement().getKind() == ElementKind.CLASS) {
+                                                cs = eleme.getEnclosingElement().getSimpleName() + "." + eleme.getSimpleName();
+                                            }
+                                        }
+                                        if (!insideNew)
+                                            cs = text.insert(0, cs);
+                                        String textToReplace = doc.getText(offset, finalLen3);
+                                        if (textToReplace.contentEquals(cs)) return;
+                                        doc.remove(offset, finalLen3);
+                                        doc.insertString(offset, cs.toString(), null);
+                                        if (semiPosition != null)
+                                            doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
+                                    } catch (BadLocationException e) {
+                                        // Can't update
                                     }
                                 }
-                                if (!insideNew)
-                                    cs = text.insert(0, cs);
-                                String textToReplace = doc.getText(offset, finalLen2);
-                                if (textToReplace.contentEquals(cs)) return;
-                                doc.remove(offset, finalLen2);
-                                doc.insertString(offset, cs.toString(), null);
-                                if (semiPosition != null)
-                                    doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
-                            } catch (BadLocationException e) {
-                                // Can't update
-                            } finally {
-                                doc.atomicUnlock();
-                            }
+                            });
                             if (insideNew && type != null && type.getKind() == TypeKind.DECLARED) {
                                 ExecutableElement ctor = null;
                                 JavafxcTrees trees = controller.getTrees();

@@ -29,11 +29,11 @@
 
 package image;
 
-import javafx.input.MouseEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
 
@@ -43,13 +43,13 @@ import javafx.scene.transform.Scale;
 
 var x : Number = 40;
 
-var img : Image = Image { url : "{__DIR__}/../resources/overlay.png" };
+var img : Image = Image { url : "{__DIR__}../resources/overlay.png" };
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : [
             ImageView {
-                image : Image { url : "{__DIR__}/../resources/background.png" }
+                image : Image { url : "{__DIR__}../resources/background.png" }
                 onMouseMoved : function( e : MouseEvent ):Void {
                     x = e.x - 100 * 0.5;
                 }
