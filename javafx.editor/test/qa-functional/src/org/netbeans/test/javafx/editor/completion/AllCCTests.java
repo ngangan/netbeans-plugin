@@ -69,7 +69,7 @@ public class AllCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "fxprj1/FXTest1.fx",
-                15, // line number where the cursor should be
+                13, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 

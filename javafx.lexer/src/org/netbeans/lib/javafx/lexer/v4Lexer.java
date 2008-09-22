@@ -4311,7 +4311,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                     // E:\\SunWork\\nbjfxp\\localrep\\main\\contrib\\javafx.lexer/src/org/netbeans/lib/javafx/lexer/v4Lexer.g:738:7: 
                     {
                     if ( state.backtracking==0 ) {
-                       log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_EXPONENT_MALFORMED); 
+                       log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_EXPONENT_MALFORMED);
                     }
 
                     }

@@ -51,6 +51,7 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
@@ -69,6 +70,7 @@ import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -78,6 +80,7 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
     
     private JComponent panel;
     private final ExplorerManager manager = new ExplorerManager();
+    private BeanTreeView view;
     
     /**
      * Default constructor for layer instance.
@@ -87,6 +90,19 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (ExplorerManager.PROP_SELECTED_NODES.equals(evt.getPropertyName())) {
                     setHighlights(TreeNavigatorJavaFXSourceFactory.getInstance().getFile(), manager);
+                }
+                if (ExplorerManager.PROP_ROOT_CONTEXT.equals(evt.getPropertyName())) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                           SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    if (view != null) {
+                                        view.expandAll();
+                                    }
+                                }
+                            });
+                        }
+                    }, 50);
                 }
             }
         });
@@ -102,7 +118,7 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
     
     public JComponent getComponent() {
         if (panel == null) {
-            final BeanTreeView view = new BeanTreeView();
+            view = new BeanTreeView();
             view.setRootVisible(true);
             view.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             class Panel extends JPanel implements ExplorerManager.Provider, Lookup.Provider {

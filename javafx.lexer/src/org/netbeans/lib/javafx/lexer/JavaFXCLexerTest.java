@@ -41,7 +41,7 @@
 
 package org.netbeans.lib.javafx.lexer;
 
-import com.sun.tools.javafx.antlr.v3Lexer;
+import com.sun.tools.javafx.antlr.v4Lexer;
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.Lexer;
 import org.antlr.runtime.Token;
@@ -85,9 +85,9 @@ public class JavaFXCLexerTest {
                         ""
         );
         try {
-            Lexer lexer = new v3Lexer(new ANTLRReaderStream(stringReader));
+            Lexer lexer = new v4Lexer(new ANTLRReaderStream(stringReader));
             Token token = lexer.nextToken();
-            while (token.getType() != v3Lexer.EOF) {
+            while (token.getType() != v4Lexer.EOF) {
                 System.out.println(token);
                 token = lexer.nextToken();
             }

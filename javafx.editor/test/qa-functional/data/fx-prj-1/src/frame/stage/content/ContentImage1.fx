@@ -1,7 +1,7 @@
 
 package frame.stage.content;
 
-import javafx.application.Frame;
+import javafx.stage.Frame;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;

@@ -1,12 +1,12 @@
 
 package frame.stage.content;
 
-import javafx.application.Frame;
+import javafx.stage.Frame;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.geometry.Arc;
-import javafx.scene.geometry.ArcType;
-import javafx.scene.geometry.Circle;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
+import javafx.scene.shape.Circle;
 
 Frame {
     title: "MyApplication"

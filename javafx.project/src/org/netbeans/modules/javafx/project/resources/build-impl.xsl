@@ -155,7 +155,10 @@ is divided into following sections:
                     <fail if="platform.invalid">Platform is not correctly set up</fail>
                 </xsl:if>
                 <pathconvert property="platform.fxcp">
-                    <fileset dir="${{platform.fxhome}}">
+                    <fileset dir="${{platform.fxhome}}/lib/shared">
+                        <include name="**/*.jar"/>
+                    </fileset>
+                    <fileset dir="${{platform.fxhome}}/lib/desktop">
                         <include name="**/*.jar"/>
                     </fileset>
                 </pathconvert>    

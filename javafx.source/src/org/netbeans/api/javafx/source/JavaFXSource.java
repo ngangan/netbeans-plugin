@@ -48,6 +48,7 @@ import com.sun.tools.javac.parser.DocCommentScanner;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
+//import com.sun.tools.javafxdoc.JavafxdocClassReader;
 import com.sun.tools.javafxdoc.JavafxdocEnter;
 import com.sun.tools.javafxdoc.Messager;
 import java.io.IOException;
@@ -210,13 +211,9 @@ public final class JavaFXSource {
         Context context = task.getContext();
         Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
         JavafxdocEnter.preRegister(context);
-//        JavafxSymtab.preRegister(context);
-//        JavadocTodo.preRegister(context);
-//        JavafxTypes.preRegister(context);
         JavadocEnv.preRegister(context, cpInfo);
         DocCommentScanner.Factory.preRegister(context);
-        // TODO
-//        com.sun.tools.javafxdoc.JavafxdocClassReader.preRegister(context);
+//        JavafxdocClassReader.preRegister(context);
         
         return task;
   }

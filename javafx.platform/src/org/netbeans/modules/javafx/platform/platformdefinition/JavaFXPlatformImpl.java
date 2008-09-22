@@ -41,14 +41,17 @@
 
 package org.netbeans.modules.javafx.platform.platformdefinition;
 
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.net.URL;
 import java.io.File;
 
+import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Map.Entry;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.platform.Specification;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
@@ -203,12 +206,25 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             ClassPath cp = (bootstrap == null ? null : bootstrap.get());
             if (cp != null)
                 return cp;
-            String pathSpec = getSystemProperties().get(SYSPROP_BOOT_CLASSPATH);
+            String pathSpec = getProperties().get("compile_bootclasspath");
+            if (pathSpec == null || pathSpec.length() == 0) {
+                String prep = getProperties().get("compile_bootclasspath_prepend");
+                prep = prep == null || prep.length() == 0 ? "" :  (prep + File.pathSeparator);
+                String app = getProperties().get("compile_bootclasspath_append");
+                app = app == null || app.length() == 0 ? "" :  (File.pathSeparator + app);
+                pathSpec = prep + getSystemProperties().get(SYSPROP_BOOT_CLASSPATH) + app;
+            }
+
+            //adding here compile classpath to the platform bootstrap as a workaround
+            //using platform standard libraries instead must be fixed and tested first
+            String ccp = getProperties().get("compile_classpath");
+            ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
+            pathSpec = pathSpec + ccp;
+            
+            //adding path to the DLLs here
             if (installFolders.size() == 2) try {
-                String fxRT = new File(installFolders.get(1).toURI()).getAbsolutePath();
+                String fxRT = new File(new File(installFolders.get(1).toURI()), "lib/desktop").getAbsolutePath();
                 pathSpec = pathSpec + File.pathSeparator + fxRT;
-                fxRT = Util.getExtensions(fxRT);
-                if (fxRT != null) pathSpec = fxRT + File.pathSeparator + pathSpec;
             } catch (URISyntaxException e) {
                 Exceptions.printStackTrace(e);
             }
@@ -216,7 +232,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             if (extPathSpec != null) {
                 pathSpec = pathSpec + File.pathSeparator + extPathSpec;
             }
-            cp = Util.createClassPath (pathSpec);
+            cp = Util.createClassPath (pathSpec.replace(';', File.pathSeparatorChar));
             bootstrap = new WeakReference<ClassPath>(cp);
             return cp;
         }
@@ -326,6 +342,32 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
     
     Collection getInstallFolderURLs () {
         return Collections.unmodifiableList(this.installFolders);
+    }
+    
+    protected static void loadProfileProperties(File fxFolder, Map properties) {
+        FileInputStream in = null;
+        try {
+            Properties p = new Properties();
+            in = new FileInputStream(new File(fxFolder, "profiles/desktop.properties"));
+            try {
+                p.load(in);
+                for (Entry e : p.entrySet()) {
+                    String val = e.getValue().toString();
+                    if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
+                    properties.put(e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
+                }
+            } finally {
+                in.close();
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
     
     protected static String filterProbe (String v, final String probePath) {
