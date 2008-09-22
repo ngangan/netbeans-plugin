@@ -42,10 +42,8 @@
 package org.netbeans.lib.javafx.lexer;
 
 import com.sun.tools.javac.util.Log;
-import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.JCDiagnostic;
-import com.sun.tools.javafx.util.MsgSym;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
@@ -66,8 +64,8 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
     /**
      * The log to be used for error diagnostics.
      */
-    protected Log log = new MyLog(new Context());
-    private static Logger logger = Logger.getLogger(Lexer.class.getName());
+    protected static Log log = new MyLog(new Context());
+    private static final Logger logger = Logger.getLogger(Lexer.class.getName());
     private List<Token> tokens = new ArrayList<Token>();
 
 
