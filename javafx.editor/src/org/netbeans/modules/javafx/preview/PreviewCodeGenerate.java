@@ -80,10 +80,12 @@ public class PreviewCodeGenerate implements CancellableTask<CompilationInfo> {
         EditorCookie ec = od.getCookie(EditorCookie.class);
         JavaFXDocument doc = (JavaFXDocument) ec.openDocument();
         if (doc.executionAllowed()) {
-            Map<String, byte[]> classBytes = new HashMap<String, byte[]>();
-            if (classBytes != null) {
+            if (info.getClassBytes() != null) {
+                Map<String, byte[]> classBytes = new HashMap<String, byte[]>();
                 for (JavaFileObject jfo : info.getClassBytes()) {
-                    classBytes.put(((ClassOutputBuffer)jfo).getBinaryName(), ((ClassOutputBuffer)jfo).getClassBytes());
+                    byte[] cb = ((ClassOutputBuffer)jfo).getClassBytes();
+                    if (cb != null)
+                        classBytes.put(((ClassOutputBuffer)jfo).getBinaryName(), cb);
                 }
 
                 ClassPath sourceCP = ClassPath.getClassPath(fo, ClassPath.SOURCE);
