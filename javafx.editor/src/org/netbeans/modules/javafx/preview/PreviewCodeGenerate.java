@@ -78,25 +78,26 @@ public class PreviewCodeGenerate implements CancellableTask<CompilationInfo> {
         FileObject fo = info.getFileObject();
         DataObject od = DataObject.find(fo);
         EditorCookie ec = od.getCookie(EditorCookie.class);
-        JavaFXDocument doc = (JavaFXDocument) ec.openDocument();  
+        JavaFXDocument doc = (JavaFXDocument) ec.openDocument();
         if (doc.executionAllowed()) {
             Map<String, byte[]> classBytes = new HashMap<String, byte[]>();
-            for (JavaFileObject jfo : info.getClassBytes()) {
-                classBytes.put(((ClassOutputBuffer)jfo).getBinaryName(), ((ClassOutputBuffer)jfo).getClassBytes());
-            }
- 
-            ClassPath sourceCP = ClassPath.getClassPath(fo, ClassPath.SOURCE);
-            ClassPath compileCP = ClassPath.getClassPath(fo, ClassPath.COMPILE);
-            ClassPath executeCP = ClassPath.getClassPath(fo, ClassPath.EXECUTE);
-            ClassPath bootCP = ClassPath.getClassPath(fo, ClassPath.BOOT);
+            if (classBytes != null) {
+                for (JavaFileObject jfo : info.getClassBytes()) {
+                    classBytes.put(((ClassOutputBuffer)jfo).getBinaryName(), ((ClassOutputBuffer)jfo).getClassBytes());
+                }
 
-            String className = sourceCP.getResourceName(info.getFileObject(), '.', false);                              // NOI18N
-            String fileName = fo.getNameExt();
+                ClassPath sourceCP = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+                ClassPath compileCP = ClassPath.getClassPath(fo, ClassPath.COMPILE);
+                ClassPath executeCP = ClassPath.getClassPath(fo, ClassPath.EXECUTE);
+                ClassPath bootCP = ClassPath.getClassPath(fo, ClassPath.BOOT);
 
-            final PreviewSideServerFace previewSideServerFace = Bridge.getPreview(doc);
-            if (previewSideServerFace != null)
-                if (classBytes != null)
+                String className = sourceCP.getResourceName(info.getFileObject(), '.', false);                              // NOI18N
+                String fileName = fo.getNameExt();
+
+                final PreviewSideServerFace previewSideServerFace = Bridge.getPreview(doc);
+                if (previewSideServerFace != null)
                     previewSideServerFace.run(new Context(classBytes, className, fileName, toURLs(sourceCP), toURLs(executeCP), toURLs(bootCP)));
+            }
         }
     }
     
