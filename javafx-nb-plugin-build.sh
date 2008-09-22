@@ -22,7 +22,6 @@ if [ -d $WORKSPACE/main/ ]; then
    		 cd $WORKSPACE/main
     		 hg pull
 	else
-		rm -rf $WORKSPACE/main/*
 		hg clone http://hg.netbeans.org/main $WORKSPACE/main
 	fi
 else
