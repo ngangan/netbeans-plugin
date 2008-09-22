@@ -50,7 +50,7 @@ import org.openide.filesystems.FileObject;
 public class JavaFXSourcePreviewTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     public JavaFXSourcePreviewTaskFactory() {
-        super(Phase.CODE_GENERATED, Priority.NORMAL);
+        super(Phase.UP_TO_DATE, Priority.NORMAL);
     }
     
     @Override

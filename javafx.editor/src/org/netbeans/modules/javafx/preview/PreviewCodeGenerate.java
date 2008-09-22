@@ -48,6 +48,7 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassOutputBuffer;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.preview.CodeUtils.Context;
 import org.openide.cookies.EditorCookie;
@@ -80,6 +81,7 @@ public class PreviewCodeGenerate implements CancellableTask<CompilationInfo> {
         EditorCookie ec = od.getCookie(EditorCookie.class);
         JavaFXDocument doc = (JavaFXDocument) ec.openDocument();
         if (doc.executionAllowed()) {
+            info.moveToPhase(Phase.CODE_GENERATED);
             if (info.getClassBytes() != null) {
                 Map<String, byte[]> classBytes = new HashMap<String, byte[]>();
                 for (JavaFileObject jfo : info.getClassBytes()) {

@@ -53,6 +53,7 @@ import com.sun.tools.javafx.tree.JFXScript;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JavafxTreeScanner;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +63,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.openide.filesystems.FileObject;
 
@@ -104,7 +106,11 @@ public class CompilationInfo {
     public JavaFXSource.Phase getPhase() {
         return impl.getPhase();
     }
-
+    
+    public JavaFXSource.Phase moveToPhase(Phase phase) throws IOException {
+        return impl.toPhase(phase);
+    }
+    
     /**
      * Return the {@link com.sun.tools.javafx.api.JavafxcTrees} service of the javafxc represented by this {@link CompilationInfo}.
      * @return javafxc Trees service
