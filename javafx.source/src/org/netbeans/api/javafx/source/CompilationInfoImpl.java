@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -146,7 +147,6 @@ class CompilationInfoImpl {
         this.compilationUnit = compilationUnit;
     }
     void setClassBytes(Iterable <? extends JavaFileObject> bytes) {
-        assert this.classBytes == null;
         this.classBytes = bytes;
     }
 
@@ -173,6 +173,13 @@ class CompilationInfoImpl {
     List<Diagnostic> getDiagnostics() {
         Collection<Diagnostic> errors = ((DiagnosticListenerImpl) cTask.getContext().get(DiagnosticListener.class)).errors.values();
         return new ArrayList<Diagnostic>(errors);
+    }
+    
+    boolean isErrors() {
+        for (Diagnostic diag: getDiagnostics()) {
+            if (diag.getKind() == Kind.ERROR) return true;
+        }
+        return false;
     }
     
     static class DiagnosticListenerImpl implements DiagnosticListener<JavaFileObject> {

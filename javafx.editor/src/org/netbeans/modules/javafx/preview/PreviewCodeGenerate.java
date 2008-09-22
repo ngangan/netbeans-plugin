@@ -95,7 +95,8 @@ public class PreviewCodeGenerate implements CancellableTask<CompilationInfo> {
 
             final PreviewSideServerFace previewSideServerFace = Bridge.getPreview(doc);
             if (previewSideServerFace != null)
-                previewSideServerFace.run(new Context(classBytes, className, fileName, toURLs(sourceCP), toURLs(executeCP), toURLs(bootCP)));
+                if (classBytes != null)
+                    previewSideServerFace.run(new Context(classBytes, className, fileName, toURLs(sourceCP), toURLs(executeCP), toURLs(bootCP)));
         }
     }
     

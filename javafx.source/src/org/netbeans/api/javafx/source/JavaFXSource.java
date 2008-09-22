@@ -109,8 +109,8 @@ public final class JavaFXSource {
         MODIFIED,
         PARSED,
         ANALYZED,
-        CODE_GENERATED,
-        UP_TO_DATE;
+        UP_TO_DATE,
+        CODE_GENERATED;
         
         public boolean lessThan(Phase p) {
             return compareTo(p) < 0;
@@ -275,31 +275,37 @@ public final class JavaFXSource {
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
         }
         
-        if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.CODE_GENERATED)) {
+        if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.UP_TO_DATE)) {
+            cc.setPhase(Phase.UP_TO_DATE);
+        }
+        
+        if (cc.phase == Phase.UP_TO_DATE && !phase.lessThan(Phase.CODE_GENERATED)) {
             if (cancellable && CompilationJob.currentRequest.isCanceled()) {
                 return Phase.MODIFIED;
             }
-
-            long start = System.currentTimeMillis();
-            Iterable <? extends JavaFileObject> bytes = null;
-            try {
-                bytes = cc.getJavafxcTask().generate();
-            } catch (RuntimeException generateError) {
-                LOGGER.log(Level.WARNING, "Error in generate", generateError); // NOI18N
-                return cc.phase;
+            if (!cc.isErrors()) {
+                long start = System.currentTimeMillis();
+                Iterable <? extends JavaFileObject> bytes = null;
+                try {
+                    bytes = cc.getJavafxcTask().generate();
+                } catch (RuntimeException generateError) {
+                    LOGGER.log(Level.WARNING, "Error in generate", generateError); // NOI18N
+                    return cc.phase;
+                }
+                cc.setClassBytes(bytes);
+                cc.setPhase(Phase.CODE_GENERATED);
+                long end = System.currentTimeMillis();
+                Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
+            } else {
+                cc.setClassBytes(null);
+                cc.setPhase(Phase.CODE_GENERATED);
             }
-            cc.setClassBytes(bytes);
-            cc.setPhase(Phase.CODE_GENERATED);
-            long end = System.currentTimeMillis();
-            Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
-        }
-        if (cc.phase == Phase.CODE_GENERATED && !phase.lessThan(Phase.UP_TO_DATE)) {
-            cc.setPhase(Phase.UP_TO_DATE);
+            
         }
         
         return phase;
     }
-
+    
     public FileObject getFileObject() {
         return files.iterator().next();
     }
