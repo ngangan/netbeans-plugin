@@ -17,9 +17,14 @@ export
 #Get or renew the Netbeans repo
 ###########################
 cd $WORKSPACE
-if [ -d $WORKSPACE/main ]; then
-    cd $WORKSPACE/main
-    hg pull
+if [ -d $WORKSPACE/main/ ]; then
+	if [ -d $WORKSPACE/main/.hg ] ; then
+   		 cd $WORKSPACE/main
+    		 hg pull
+	else
+		rm -rf $WORKSPACE/main/*
+		hg clone http://hg.netbeans.org/main $WORKSPACE/main
+	fi
 else
     hg clone http://hg.netbeans.org/main $WORKSPACE/main
 fi
