@@ -51,17 +51,25 @@ import org.openide.util.Lookup;
 /**
  *
  * @author Jan Lahoda, Petr Hrebejk
+ * @author Anton Chechel - javafx modifications
  */
 public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaSourceTaskFactory {
+    
+    private static ClassMemberNavigatorJavaFXSourceFactory instance;
 
     private static final CancellableTask<CompilationInfo> EMPTY_TASK = new CancellableTask<CompilationInfo>() {
         public void cancel() {}
         public void run(CompilationInfo parameter) throws Exception {}
     };
+    
     private ClassMemberPanelUI ui;
+    
+    static {
+        instance = Lookup.getDefault().lookup(ClassMemberNavigatorJavaFXSourceFactory.class);
+    }
 
     static ClassMemberNavigatorJavaFXSourceFactory getInstance() {
-        return Lookup.getDefault().lookup(ClassMemberNavigatorJavaFXSourceFactory.class);
+        return instance;
     }
 
     public ClassMemberNavigatorJavaFXSourceFactory() {
