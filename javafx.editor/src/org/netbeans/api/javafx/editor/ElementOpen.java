@@ -162,18 +162,8 @@ public final class ElementOpen {
     private static boolean openThroughJavaSupport(FileObject reference, ElementHandle elh) throws Exception {
         org.netbeans.api.java.source.ClasspathInfo cpi =
                 org.netbeans.api.java.source.ClasspathInfo.create(reference);
-        // Load the right version of the ElementKind class and convert our instance to it
-        Class ekClass = org.netbeans.api.java.source.ElementHandle.class.getClassLoader().loadClass("javax.lang.model.element.ElementKind");
-        Object ekInstance = Enum.valueOf(ekClass, elh.getKind().name());
-
-        String[] sig = elh.getSignatures();
-        Class strArrClass = sig.getClass();
-
-        Constructor ehCtor = org.netbeans.api.java.source.ElementHandle.class.getDeclaredConstructor(ekClass, strArrClass);
-        ehCtor.setAccessible(true);
-        org.netbeans.api.java.source.ElementHandle eh = (org.netbeans.api.java.source.ElementHandle) ehCtor.newInstance(ekInstance, sig);
-
-        return org.netbeans.api.java.source.ui.ElementOpen.open(cpi, eh);
+        
+        return org.netbeans.api.java.source.ui.ElementOpen.open(cpi, elh.toJava());
     }
 
 }

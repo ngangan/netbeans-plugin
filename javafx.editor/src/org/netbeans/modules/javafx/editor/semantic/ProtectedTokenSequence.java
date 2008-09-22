@@ -66,13 +66,12 @@ public class ProtectedTokenSequence<T extends TokenId> {
             public void run() {
                 if (cancel.get()) {
                     res[0] = false;
-                }
-
-                if (!ts.isValid()) {
+                } else if (!ts.isValid()) {
                     cancel.set(true);
                     res[0] = false;
+                } else {
+                    res[0] = ts.moveNext();
                 }
-                res[0] = ts.moveNext();
             }
         });
         return res[0];
@@ -84,13 +83,12 @@ public class ProtectedTokenSequence<T extends TokenId> {
             public void run() {
                 if (cancel.get()) {
                     res[0] = false;
-                }
-
-                if (!ts.isValid()) {
+                } else if (!ts.isValid()) {
                     cancel.set(true);
                     res[0] = false;
+                } else {
+                    res[0] = ts.movePrevious();
                 }
-                res[0] = ts.movePrevious();
             }
         });
         return res[0];
@@ -101,14 +99,14 @@ public class ProtectedTokenSequence<T extends TokenId> {
             public void run() {
                 if (cancel.get()) {
                     return;
-                }
-
-                if (!ts.isValid()) {
+                } else if (!ts.isValid()) {
                     cancel.set(true);
                     return;
+                } else {
+                    ts.moveEnd();
                 }
-                ts.moveEnd();
             }
         });
     }
+    
 }
