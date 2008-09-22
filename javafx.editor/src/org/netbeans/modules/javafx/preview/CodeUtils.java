@@ -39,6 +39,9 @@ public class CodeUtils {
     private static final String jsgPanelClassName = "com.sun.scenario.scenegraph.JSGPanel";                  // NOI18N
     private static final String sgNodeClassName = "com.sun.scenario.scenegraph.SGNode";                      // NOI18N
     private static final String setSceneMethodName = "setScene";                                             // NOI18N
+    private static final String NOCOLOR = "NOCOLOR";                                                         // NOI18N
+    private static final String typeInfoClassName = "com.sun.javafx.runtime.TypeInfo";                       // NOI18N
+    private static final String stringFieldNameName = "String";                                                         // NOI18N
     
     public static class Context implements Serializable {
         Context(
@@ -150,13 +153,16 @@ public class CodeUtils {
     
     private static Object run(String name, ClassLoader classLoader) throws Exception {
         Thread.currentThread().setContextClassLoader(classLoader);
-        Class<?> mainClass = classLoader.loadClass(name); 
+        Class<?> mainClass = classLoader.loadClass(name);
         Class<?> paramClass = classLoader.loadClass(secuenceClassName); 
         Class<?> sequencesClass = classLoader.loadClass(secuencesClassName); 
         Method runMethod = mainClass.getDeclaredMethod(runMethodName, paramClass);
+        runMethod.setAccessible(true);
+        Class<?> typeinfoClass = classLoader.loadClass(typeInfoClassName); 
         Object commandLineArgs = new String[]{};
-        Method makeMethod = sequencesClass.getDeclaredMethod(makeMethodName, Class.class, Object[].class);
-        Object args = makeMethod.invoke(null, String.class, commandLineArgs);
+        Method makeMethod = sequencesClass.getDeclaredMethod(makeMethodName, typeinfoClass, Object[].class);
+        Field stringField = typeinfoClass.getDeclaredField(stringFieldNameName);
+        Object args = makeMethod.invoke(null, stringField.get(null), commandLineArgs);
         Object obj = runMethod.invoke(null, args);
         return obj;
     }
@@ -272,13 +278,22 @@ public class CodeUtils {
                     intFrame.setContentPane(((JFrame)frame).getContentPane());
                     intFrame.setTitle(((JFrame)frame).getTitle());
                     intFrame.setJMenuBar(((JFrame)frame).getJMenuBar());
-                    intFrame.getContentPane().setBackground(((JFrame)frame).getContentPane().getBackground());
+                    if (((JFrame)frame).getContentPane().getBackground().toString().contentEquals(NOCOLOR)) {
+                        intFrame.getContentPane().setBackground(Color.white);
+                    } else {
+                        intFrame.getContentPane().setBackground(((JFrame)frame).getContentPane().getBackground());
+                    }
+                        
                 } else {
                     if (frame instanceof JDialog) {
                         intFrame.setContentPane(((JDialog)frame).getContentPane());
                         intFrame.setTitle(((JDialog)frame).getTitle());
                         intFrame.setJMenuBar(((JDialog)frame).getJMenuBar());
-                        intFrame.getContentPane().setBackground(((JDialog)frame).getContentPane().getBackground());
+                        if (((JDialog)frame).getContentPane().getBackground().toString().contentEquals(NOCOLOR)) {
+                            intFrame.getContentPane().setBackground(Color.white);
+                        } else {
+                            intFrame.getContentPane().setBackground(((JDialog)frame).getContentPane().getBackground());
+                        }
                     }
                 }
                 intFrame.setBackground(((Window)frame).getBackground());

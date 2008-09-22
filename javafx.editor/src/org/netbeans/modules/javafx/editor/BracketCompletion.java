@@ -145,7 +145,7 @@ class BracketCompletion {
 
         TokenSequence<?> seq = getTokenSequence(doc, dotPos);
 
-        int lastParenPos = dotPos;
+        int lastParenPos = dotPos;                        
         while (seq.moveNext()) {
             if (seq.offset() >= eolPos) break;
             TokenId tid = seq.token().id();
@@ -153,6 +153,8 @@ class BracketCompletion {
             if (tid == JFXTokenId.RPAREN) {
                 lastParenPos = seq.offset();
             } else if (tid == JFXTokenId.WS) {
+                return;
+            } else if (tid == JFXTokenId.LPAREN) {
                 return;
             }
         }

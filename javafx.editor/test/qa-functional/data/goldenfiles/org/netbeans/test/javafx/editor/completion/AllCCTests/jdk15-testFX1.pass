@@ -12,9 +12,11 @@ throw
 try
 var
 while
+Duration
 FXTest1
-Label
+Object
 String
+SwingLabel
 applications
 classes
 com

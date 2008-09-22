@@ -1,9 +1,9 @@
 
 package frame.stage.content;
 
-import javafx.application.Frame;
+import javafx.stage.Frame;
 import javafx.scene.Scene;
-import javafx.scene.geometry.Rectangle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 
 Frame {
