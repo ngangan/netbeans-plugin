@@ -44,7 +44,6 @@ import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import javax.lang.model.element.Element;
@@ -58,8 +57,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ErrorType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
 
 /**
  * Represents a handle for {@link Element} which can be kept and later resolved
