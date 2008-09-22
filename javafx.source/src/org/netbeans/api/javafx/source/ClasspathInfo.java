@@ -62,6 +62,7 @@ public class ClasspathInfo {
     private ClassPath compilePath;
     private ClassPath srcPath;
     private JavaFileManager fileManager;
+    private ClassIndex usagesQuery;
     
     public static ClasspathInfo create(FileObject fo) {
         ClassPath bootPath = ClassPath.getClassPath(fo, ClassPath.BOOT);
@@ -185,6 +186,16 @@ public class ClasspathInfo {
         
     void addChangeListener(ChangeListener change) {
         // TODO
+    }
+
+    public synchronized ClassIndex getClassIndex () {
+        if ( usagesQuery == null ) {
+            usagesQuery = new ClassIndex(
+                    this.bootPath,
+                    this.compilePath,
+                    this.srcPath);
+        }
+        return usagesQuery;
     }
 
 }

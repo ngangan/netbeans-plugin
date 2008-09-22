@@ -29,13 +29,13 @@
 
 package math;
 
-import javafx.input.MouseEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.geometry.Rectangle;
+import javafx.scene.shape.Rectangle;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -78,7 +78,7 @@ var timer : Timeline = Timeline {
 };
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         fill : Color.BLACK
         content : [
             Rectangle {

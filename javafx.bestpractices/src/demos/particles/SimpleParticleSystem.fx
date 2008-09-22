@@ -32,10 +32,10 @@ package particles;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
 import javafx.scene.Group;
-import javafx.scene.geometry.Circle;
+import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -80,7 +80,7 @@ function update() : Void {
 }
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         fill : Color.BLACK
         content : bind parts
     }

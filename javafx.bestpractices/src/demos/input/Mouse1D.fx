@@ -29,11 +29,11 @@
 
 package input;
 
-import javafx.input.MouseEvent;
-import javafx.scene.geometry.Rectangle;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 
 /**
  * @author Michal Skvor
@@ -47,7 +47,7 @@ var leftColor:Color = Color { red : 0.0, green : 0.4, blue : 0.6 };
 var rightColor:Color = Color { red : 0.0, green : 0.2, blue : 0.4 };
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : [
             Rectangle {
                 width : 200, height : 200

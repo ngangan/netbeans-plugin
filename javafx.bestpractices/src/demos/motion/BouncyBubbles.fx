@@ -31,10 +31,10 @@ package motion;
 
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
-import javafx.scene.geometry.Circle;
+import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
@@ -76,7 +76,7 @@ for( i in [1..12] ) {
 }
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         fill : Color.GRAY
         content : bind bubbles
     };

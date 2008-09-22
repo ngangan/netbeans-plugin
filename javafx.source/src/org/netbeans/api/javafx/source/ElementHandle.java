@@ -43,6 +43,9 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -55,6 +58,8 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ErrorType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 
 /**
  * Represents a handle for {@link Element} which can be kept and later resolved
@@ -480,4 +485,39 @@ public class ElementHandle<T extends Element> {
         return signature.length() == 1 && signature.charAt(0) == '[';
     }
 
+    public org.netbeans.api.java.source.ElementHandle toJava() {
+        try {
+            // Load the right version of the ElementKind class and convert our instance to it
+            Class ekClass = org.netbeans.api.java.source.ElementHandle.class.getClassLoader().loadClass("javax.lang.model.element.ElementKind");
+            Object ekInstance = Enum.valueOf(ekClass, getKind().name());
+
+            String[] sig = getSignatures();
+            Class strArrClass = sig.getClass();
+
+            Constructor ehCtor = org.netbeans.api.java.source.ElementHandle.class.getDeclaredConstructor(ekClass, strArrClass);
+            ehCtor.setAccessible(true);
+            org.netbeans.api.java.source.ElementHandle eh = (org.netbeans.api.java.source.ElementHandle) ehCtor.newInstance(ekInstance, sig);
+            return eh;
+        } catch (Exception ex) {
+        }
+        return null;
+    }
+    
+    public static ElementHandle fromJava(org.netbeans.api.java.source.ElementHandle eh) {
+        try {
+            Object o = eh.getKind(); // java's ElementKind type, can't reference directly
+
+            ElementKind kind = Enum.valueOf(ElementKind.class, o.toString());
+            
+            Method getSignature = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getSignature");
+            String[] signatures = (String[]) getSignature.invoke(eh);
+            return new ElementHandle(kind, signatures);
+        } catch (NoSuchMethodException noSuchMethodException) {
+        } catch (SecurityException securityException) {
+        } catch (IllegalAccessException illegalAccessException) {
+        } catch (IllegalArgumentException illegalArgumentException) {
+        } catch (InvocationTargetException invocationTargetException) {
+        }
+        return null;
+    }
 }

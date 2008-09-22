@@ -29,15 +29,15 @@
 
 package math;
 
-import javafx.input.MouseEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.geometry.Rectangle;
-import javafx.scene.geometry.Circle;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
 
@@ -56,7 +56,7 @@ var eyes : Eye[] = [
 ];
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : [
             Rectangle {
                 width : 200, height : 200

@@ -525,6 +525,7 @@ public class Preview {
     }
 
     public void start(int instance) {
+        System.setProperty("apple.awt.UIElement", "true");
         NB_SIDE = instance + " " +  NB_SIDE;
         PREVIEW_SIDE = instance +  " " + PREVIEW_SIDE;
         try {

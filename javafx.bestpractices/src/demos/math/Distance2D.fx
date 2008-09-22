@@ -29,12 +29,12 @@
 
 package math;
 
-import javafx.input.MouseEvent;
-import javafx.scene.geometry.Circle;
-import javafx.scene.geometry.Rectangle;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Frame;
+import javafx.scene.Scene;
 
 import java.lang.Math;
 import java.lang.System;
@@ -72,7 +72,7 @@ for( x in [0..10] ) {
 }
 
 Frame {
-    stage : Stage {
+    scene : Scene {
         content : [
             Rectangle {
                 width : 200, height : 200
