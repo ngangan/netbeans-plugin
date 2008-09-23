@@ -39,6 +39,7 @@
 
 package org.netbeans.api.javafx.source;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.lang.model.element.TypeElement;
@@ -50,7 +51,15 @@ import org.netbeans.api.java.classpath.ClassPath;
  * @author nenik
  */
 public class ClassIndex {
+    //INV: Never null
+    private final ClassPath bootPath;
+    //INV: Never null
+    private final ClassPath classPath;
+    //INV: Never null
+    private final ClassPath sourcePath;
 
+    private final org.netbeans.api.java.source.ClassIndex javaIndex;
+    
     /**
      * Encodes a type of the name kind used by 
      * {@link ClassIndex#getDeclaredTypes} method.
@@ -121,10 +130,12 @@ public class ClassIndex {
         assert bootPath != null;
         assert classPath != null;
         assert sourcePath != null;
-/*        this.bootPath = bootPath;
+        this.bootPath = bootPath;
         this.classPath = classPath;
         this.sourcePath = sourcePath;
-        this.oldBoot = new HashSet<URL>();
+        
+        javaIndex = org.netbeans.api.java.source.ClasspathInfo.create(bootPath, classPath, sourcePath).getClassIndex();
+/*        this.oldBoot = new HashSet<URL>();
         this.oldCompile = new  HashSet<URL>();
         this.oldSources = new HashSet<URL>();
         this.depsIndeces = new HashSet<ClassIndexImpl>();
@@ -155,7 +166,15 @@ public class ClassIndex {
     public Set<ElementHandle<TypeElement>> getDeclaredTypes (final String name, final NameKind kind, final Set<SearchScope> scope) {
         assert name != null;
         assert kind != null;
-        final Set<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();        
+        final Set<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
+
+        // get the partial result from java support:
+        Set<?> javaEl = javaIndex.getDeclaredTypes(name, toJava(kind), toJava(scope));
+        for (Object o : javaEl) {
+            result.add(ElementHandle.fromJava((org.netbeans.api.java.source.ElementHandle)o));
+        }
+        
+        // and TODO add our data:
 //        final Iterable<? extends ClassIndexImpl> queries = this.getQueries (scope);        
 //        final ResultConvertor<ElementHandle<TypeElement>> thConvertor = ResultConvertor.elementHandleConvertor();
 //        try {
@@ -183,7 +202,13 @@ public class ClassIndex {
     public Set<String> getPackageNames (final String prefix, boolean directOnly, final Set<SearchScope> scope) {
         assert prefix != null;
         final Set<String> result = new HashSet<String> ();        
-//        final Iterable<? extends ClassIndexImpl> queries = this.getQueries (scope);
+
+        // get the partial result from java support:
+        result.addAll(javaIndex.getPackageNames(prefix, directOnly, toJava(scope)));
+
+        // and TODO add our data:
+        
+        //        final Iterable<? extends ClassIndexImpl> queries = this.getQueries (scope);
 //        try {
 //            for (ClassIndexImpl query : queries) {
 //                query.getPackageNames (prefix, directOnly, result);
@@ -193,6 +218,16 @@ public class ClassIndex {
 //            return null;
 //        }
         return result;
+    }
+    
+    private static Set<org.netbeans.api.java.source.ClassIndex.SearchScope> toJava(Set<SearchScope> scopes) {
+        Set<org.netbeans.api.java.source.ClassIndex.SearchScope> cScopes = EnumSet.noneOf(org.netbeans.api.java.source.ClassIndex.SearchScope.class);
+        for (SearchScope scope : scopes) cScopes.add(org.netbeans.api.java.source.ClassIndex.SearchScope.valueOf(scope.toString()));
+        return cScopes;
+    }
+
+    private org.netbeans.api.java.source.ClassIndex.NameKind toJava(NameKind kind) {
+        return org.netbeans.api.java.source.ClassIndex.NameKind.valueOf(kind.name());
     }
 
 }
