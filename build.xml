@@ -50,46 +50,48 @@ made subject to such option by the copyright holder.
         <loadproperties srcFile="javafx.sdk.lin/nbproject/project.properties"/>
         <loadproperties srcFile="javafx.sdk.sol/nbproject/project.properties"/>
 
+        <property name="javafx.sdk.pattern" value="javafx-sdk*/**/*.*"/>
+
 	<mkdir dir="zips"/>
 
         <zip destfile="zips/javafx-cluster-win.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0pre1/**"/>
+		<exclude name="${javafx.sdk.pattern}"/>
 		<exclude name="**/*-lin.*"/>
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-mac.*"/>
           </zipfileset>
-          <zipfileset prefix="javafx" src="javafx.sdk.win/${javafx-sdk.win.zip}"/>
+          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.win/${javafx-sdk.win.zip}"/>
         </zip>
 
         <zip destfile="zips/javafx-cluster-mac.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0pre1/**"/>
+		<exclude name="${javafx.sdk.pattern}"/>
 		<exclude name="**/*-lin.*"/>
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-win.*"/>
           </zipfileset>
-          <zipfileset prefix="javafx" src="javafx.sdk.mac/${javafx-sdk.mac.zip}"/>
+          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.mac/${javafx-sdk.mac.zip}"/>
         </zip>
 
         <zip destfile="zips/javafx-cluster-lin.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0pre1/**"/>
+		<exclude name="${javafx.sdk.pattern}"/>
 		<exclude name="**/*-mac.*"/>
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-win.*"/>
           </zipfileset>
-          <zipfileset prefix="javafx" src="javafx.sdk.lin/${javafx-sdk.lin.zip}"/>
+          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.lin/${javafx-sdk.lin.zip}"/>
         </zip>
 
         <zip destfile="zips/javafx-cluster-sol.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
-		<exclude name="javafx-sdk1.0pre1/**"/>
+		<exclude name="${javafx.sdk.pattern}"/>
 		<exclude name="**/*-lin.*"/>
 		<exclude name="**/*-mac.*"/>
 		<exclude name="**/*-win.*"/>
           </zipfileset>
-          <zipfileset prefix="javafx" src="javafx.sdk.sol/${javafx-sdk.sol.zip}"/>
+          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.sol/${javafx-sdk.sol.zip}"/>
         </zip>
 	
     </target>
