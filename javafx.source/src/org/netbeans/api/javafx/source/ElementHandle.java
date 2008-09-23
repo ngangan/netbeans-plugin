@@ -458,7 +458,9 @@ public class ElementHandle<T extends Element> {
         String[] result = new String[3];
         Element enclosingElement = ve.getEnclosingElement();
 
-        assert enclosingElement instanceof TypeElement;
+        if (!(enclosingElement instanceof TypeElement)) {
+	    throw new IllegalArgumentException("Can't handle local variable"); //NOI18N
+	}
         result[0] = encodeClassNameOrArray((TypeElement) enclosingElement);
         result[1] = ve.getSimpleName().toString();
         StringBuilder sb = new StringBuilder();
