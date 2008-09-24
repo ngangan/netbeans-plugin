@@ -25,7 +25,7 @@ cd $WORKSPACE/main
 
 ant -f nbbuild/build.xml build-test-dist -Dtest.fail.on.error=false -Dbuild.compiler.debuglevel=source,lines 
 
-rm -rf tests/*
+rm -rf tests
 mkdir tests
 
 cp nbbuild/build/testdist.zip tests
