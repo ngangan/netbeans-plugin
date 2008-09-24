@@ -154,4 +154,12 @@ public class CompletionTestPerformer extends JellyTestCase {
             return getGoldenFile(getJDKVersionCode() + "-" + proposedGoldenFileName + ".pass");
     }
 
+    public String getWorkDirAsString() {
+        try {
+            java.io.File f = this.getWorkDir();
+            return f.getPath();
+        } catch (java.io.IOException ioe) {
+            return null;
+        }
+    }
 }
