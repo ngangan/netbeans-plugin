@@ -1,5 +1,6 @@
 INDEFINITE
 autoReverse
+forward
 interpolate
 keyFrames
 paused
