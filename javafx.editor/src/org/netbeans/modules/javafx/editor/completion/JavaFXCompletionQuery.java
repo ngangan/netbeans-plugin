@@ -344,7 +344,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     private void resolveCompletion(CompilationController controller) throws IOException {
         JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset);
         results = new HashSet<JavaFXCompletionItem>();
-        anchorOffset = env.getOffset();
+        if (anchorOffset == -1) {
+            anchorOffset = env.getOffset();
+        }
         
         // make sure the init method was called
         if (env.query != this) {
@@ -409,10 +411,33 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 ts.movePrevious();
             }
             int len = offset - ts.offset();
-            if (len > 0 && (ts.token().id() == JFXTokenId.IDENTIFIER || (ts.token().id().primaryCategory().startsWith("keyword")) || ts.token().id().primaryCategory().equals("literal")) && ts.token().length() >= len) {
+            if (LOGGABLE) log("getCompletionEnvironment len = " + len);
+            if (len > 0 &&
+                        (ts.token().id() == JFXTokenId.IDENTIFIER ||
+                        (ts.token().id().primaryCategory().startsWith("keyword")) ||
+                        ts.token().id().primaryCategory().equals("literal")) &&
+                    ts.token().length() >= len) {
                 //TODO: Use isKeyword(...) when available
                 prefix = ts.token().toString().substring(0, len);
                 offset = ts.offset();
+            } else {
+                boolean moved = false;
+                while (ts.token().id() == JFXTokenId.WS) {
+                    if (LOGGABLE) log("     moving back " + ts.token().id());
+                    if (ts.movePrevious()) {
+                        moved = true;
+                    } else {
+                        break;
+                    }
+                }
+                if (moved) {
+                    // the last one was not WS, lets move past it.
+                    ts.moveNext();
+                    // leave the anchor at the caret position
+                    anchorOffset = offset;
+                    // but search at the end of possibly broken tree
+                    offset = ts.offset();
+                }
             }
         }
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
