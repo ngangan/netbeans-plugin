@@ -50,7 +50,7 @@ made subject to such option by the copyright holder.
         <loadproperties srcFile="javafx.sdk.lin/nbproject/project.properties"/>
         <loadproperties srcFile="javafx.sdk.sol/nbproject/project.properties"/>
 
-        <property name="javafx.sdk.pattern" value="javafx-sdk*/**/*.*"/>
+        <property name="javafx.sdk.pattern" value="javafx-sdk*/**"/>
 
 	<mkdir dir="zips"/>
 
