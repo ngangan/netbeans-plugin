@@ -39,6 +39,7 @@
 package org.netbeans.test.javafx.bestpractices.lib;
 
 import java.awt.Component;
+import java.io.IOException;
 import org.netbeans.jellytools.JellyTestCase;
 import org.netbeans.jemmy.ComponentChooser;
 
@@ -59,6 +60,15 @@ public class JavaFXTestCase extends JellyTestCase {
 
     public JavaFXTestCase(String name) {
         super(name);
+    }
+
+    public String getWorkDirAsString() {
+        try {
+            java.io.File f = this.getWorkDir();
+            return f.getPath();
+        } catch (java.io.IOException ioe) {
+            return null;
+        }
     }
 
     @Override

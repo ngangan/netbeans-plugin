@@ -62,7 +62,7 @@ public class ShapePrimitives extends JavaFXTestCase {
 
     /** Create Sample Project and Verify that Project exists */
     public void testCreate() {
-        if ((Util.createSampleProject(SAMPLE_PATH, _type, _project)).equals(false)) {
+        if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }

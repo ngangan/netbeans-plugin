@@ -10,6 +10,7 @@ package org.netbeans.test.javafx.bestpractices.lib;
 
 import java.awt.Container;
 import org.netbeans.jellytools.MainWindowOperator;
+import org.netbeans.jellytools.NewProjectNameLocationStepOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
@@ -37,11 +38,15 @@ public class Util {
     public static final long MAX_WAIT_TIME = 300000;
 
     /** Performs New Project > Samples > JavaFX > Best Practices > ...*/
-    public static Boolean createSampleProject(String path, String type, String projName) {
+    public static Boolean createSampleProject(String path, String type, String projName, String location) {
         NewProjectWizardOperator projectWizard = NewProjectWizardOperator.invoke();
         projectWizard.selectCategory(path + type);
         projectWizard.selectProject(projName);
         projectWizard.next();
+
+        NewProjectNameLocationStepOperator locationWizard = new NewProjectNameLocationStepOperator();
+        locationWizard.txtProjectLocation().setText(location);
+
         projectWizard.finish();
         new QueueTool().waitEmpty();
         waitScanFinished();
