@@ -1,11 +1,10 @@
 animation
-application
 async
 ext
 fxunit
-input
+geometry
 lang
 reflect
 scene
-ui
+stage
 util
