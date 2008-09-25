@@ -1,10 +1,10 @@
 INDEFINITE
 autoReverse
-forward
+currentRate
 interpolate
 keyFrames
 paused
+rate
 repeatCount
 running
-speed
-toggle
+time

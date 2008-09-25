@@ -20,4 +20,4 @@ var anim = Timeline {
     ]   
 }   
 
-anim.start();  
+anim.play();
