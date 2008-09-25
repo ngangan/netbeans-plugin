@@ -444,7 +444,6 @@ public final class TreeUtilities {
     public boolean isAccessible(Scope 
             scope, Element member, TypeMirror type) {
         if (scope instanceof JavafxcScope && member instanceof Symbol && type instanceof Type) {
-//            Resolve resolve = Resolve.instance(info.impl.getContext());
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
             Object env = ((JavafxcScope) scope).getEnv();
             JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
@@ -452,6 +451,18 @@ public final class TreeUtilities {
         } else 
             return false;
     }
+
+        public boolean isAccessible(Scope
+            scope, Element type) {
+        if (scope instanceof JavafxcScope &&  type instanceof Symbol.TypeSymbol) {
+            JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
+            Object env = ((JavafxcScope) scope).getEnv();
+            JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
+	    return resolve.isAccessible(fxEnv, (Symbol.TypeSymbol) type);
+        } else
+            return false;
+    }
+
 
     public boolean isStaticContext(Scope scope) {
         Object env = ((JavafxcScope) scope).getEnv();

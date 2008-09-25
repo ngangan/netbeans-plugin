@@ -92,7 +92,6 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.swing.text.BadLocationException;
 import javax.tools.Diagnostic;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -104,7 +103,6 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.editor.indent.api.IndentUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
@@ -266,7 +264,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             String s = member.getSimpleName().toString();
-            if (!trees.isAccessible(scope, member,dt)) {
+              if (controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
@@ -283,7 +281,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if ("<error>".equals(member.getSimpleName().toString())) {
                 continue;
             }
-            if (!trees.isAccessible(scope, member,dt)) {
+            if (controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
@@ -434,26 +432,35 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     private void addBlockExpressionLocals(BlockExpressionTree bet, JavaFXTreePath tp, TypeMirror smart) {
         if (LOGGABLE) log("  block expression: " + bet + "\n");
         for (ExpressionTree st : bet.getStatements()) {
-            JavaFXTreePath expPath = new JavaFXTreePath(tp, st);
-            if (LOGGABLE) log("    expPath == " + expPath.getLeaf());
-            JavafxcTrees trees = controller.getTrees();
-            Element type = trees.getElement(expPath);
-            if (type == null) {
-                continue;
+            addLocal(st, tp, smart);
+        }
+        addLocal(bet.getValue(), tp, smart);
+    }
+
+    private void addLocal(ExpressionTree st, JavaFXTreePath tp, TypeMirror smart) {
+        if (st == null) {
+            return;
+        }
+        JavaFXTreePath expPath = new JavaFXTreePath(tp, st);
+        if (LOGGABLE) log("    expPath == " + expPath.getLeaf());
+        JavafxcTrees trees = controller.getTrees();
+        Element type = trees.getElement(expPath);
+        if (type == null) {
+            return;
+        }
+        if (LOGGABLE) log("    type.getKind() == " + type.getKind());
+        if (type.getKind() == ElementKind.LOCAL_VARIABLE ||
+                type.getKind() == ElementKind.FIELD) {
+            String s = type.getSimpleName().toString();
+            if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix);
+            TypeMirror tm = trees.getTypeMirror(expPath);
+            if (smart != null && tm.getKind() == smart.getKind()) {
+                addResult(JavaFXCompletionItem.createVariableItem(
+                        s, query.anchorOffset, true));
             }
-            if (LOGGABLE) log("    type.getKind() == " + type.getKind());
-            if (type.getKind() == ElementKind.LOCAL_VARIABLE) {
-                String s = type.getSimpleName().toString();
-                if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix);
-                TypeMirror tm = trees.getTypeMirror(expPath);
-                if (smart != null && tm.getKind() == smart.getKind()) {
-                    addResult(JavaFXCompletionItem.createVariableItem(
-                            s, query.anchorOffset, true));
-                }
-                if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
-                    addResult(JavaFXCompletionItem.createVariableItem(
-                            s, query.anchorOffset, false));
-                }
+            if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                addResult(JavaFXCompletionItem.createVariableItem(
+                        s, query.anchorOffset, false));
             }
         }
     }
@@ -709,7 +716,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         for (Element e : getEnclosedElements(pe)) {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
-                if (!trees.isAccessible(scope, (TypeElement) e)) {
+                if (! controller.getTreeUtilities().isAccessible(scope, e)) {
                     if (LOGGABLE) log("    not accessible " + name);
                     continue;
                 }
@@ -720,7 +727,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (Element ee : e.getEnclosedElements()) {
                     if (ee.getKind().isClass() || ee.getKind() == ElementKind.INTERFACE) {
                         String ename = ee.getSimpleName().toString();
-                        if (!trees.isAccessible(scope, (TypeElement) ee)) {
+                        if (!controller.getTreeUtilities().isAccessible(scope, ee)) {
                             if (LOGGABLE) log("    not accessible " + ename);
                             continue;
                         }
@@ -808,7 +815,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             boolean insideNew, TypeMirror smart, JavafxcScope originalScope,
             PackageElement myPackage,boolean simpleNameOnly) {
         final Elements elements = controller.getElements();
-        JavafxcTrees trees = controller.getTrees();
         for (Element local : from) {
             if (LOGGABLE) log("    local == " + local);
             if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
@@ -818,13 +824,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 DeclaredType dt = (DeclaredType) local.asType();
                 TypeElement te = (TypeElement) local;
                 String name = local.getSimpleName().toString();
-                if (!trees.isAccessible(originalScope, te)) {
+                if (!controller.getTreeUtilities().isAccessible(originalScope, te)) {
                     if (LOGGABLE) log("    not accessible " + name);
                     continue;
                 }
                 Element parent = te.getEnclosingElement();
                 if (parent.getKind() == ElementKind.CLASS) {
-                    if (!trees.isAccessible(originalScope, (TypeElement) parent)) {
+                    if (!controller.getTreeUtilities().isAccessible(originalScope, parent)) {
                         if (LOGGABLE) log("    parent not accessible " + name);
                         continue;
                     }
