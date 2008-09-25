@@ -58,7 +58,6 @@ made subject to such option by the copyright holder.
     <codetemplate abbreviation="pr"><code><![CDATA[public-read ]]></code></codetemplate>
     <codetemplate abbreviation="pi"><code><![CDATA[public-init ]]></code></codetemplate>
     <codetemplate abbreviation="pu"><code><![CDATA[public ]]></code></codetemplate> 
-    <codetemplate abbreviation="su"><code><![CDATA[super]]></code></codetemplate> 
     <codetemplate abbreviation="so"><code><![CDATA[sizeof ]]></code></codetemplate> 
     <codetemplate abbreviation="th"><code><![CDATA[this ]]></code></codetemplate> 
     <codetemplate abbreviation="tw"><code><![CDATA[throw ]]></code></codetemplate> 
@@ -77,16 +76,9 @@ made subject to such option by the copyright holder.
     
     <!--  Array Data Modification Statements -->
     <codetemplate abbreviation="ins"><code><![CDATA[insert ${Expression1} into ${Expression2};]]></code></codetemplate> 
-    <codetemplate abbreviation="insf"><code><![CDATA[insert ${Expression1} as first into ${Expression2};]]></code></codetemplate> 
-    <codetemplate abbreviation="insl"><code><![CDATA[insert ${Expression1} as last into ${Expression2};]]></code></codetemplate> 
     <codetemplate abbreviation="insb"><code><![CDATA[insert ${Expression1} before ${Expression2};]]></code></codetemplate> 
     <codetemplate abbreviation="insa"><code><![CDATA[insert ${Expression1} after ${Expression2};]]></code></codetemplate> 
     <codetemplate abbreviation="de"><code><![CDATA[delete ${VariableOrAttribute}]]></code></codetemplate> 
-    
-    <!--  Querying Arrays Operators -->
-    <codetemplate abbreviation="selfi"><code><![CDATA[select ${Expression1} from ${Expression2} in ${Expression2} ]]></code></codetemplate> 
-    <codetemplate abbreviation="selfiw"><code><![CDATA[select ${Expression1} from ${Expression2} in ${Expression2} where ${Expression4} ]]></code></codetemplate> 
-    <codetemplate abbreviation="fore"><code><![CDATA[foreach (${List default=""}) ${StatementOrBlock default=""  hint="Statement or Block"} ]]></code></codetemplate> 
     
     <!-- Statements -->
     <codetemplate abbreviation="if" contexts="BLOCK,CASE" descriptionId="CT_if">
