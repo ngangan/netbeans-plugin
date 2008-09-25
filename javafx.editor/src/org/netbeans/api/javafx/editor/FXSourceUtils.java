@@ -1,5 +1,6 @@
 package org.netbeans.api.javafx.editor;
 
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.MethodType;
@@ -31,6 +32,7 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
@@ -48,6 +50,37 @@ public final class FXSourceUtils {
     private static final String PACKAGE_SUMMARY = "package-summary"; // NOI18N
 
     private FXSourceUtils() {
+    }
+
+    // TODO move it from GoToSupport
+    public static String getElementTooltip(CompilationInfo info, Element elem) {
+        JavafxTypes types = info.getJavafxTypes();
+        if (elem instanceof VariableElement) {
+            String prefix = "<html>";
+
+            VariableElement var = (VariableElement) elem;
+            ElementKind kind = var.getKind();
+            if (kind == ElementKind.FIELD) {
+                prefix = prefix + var.getEnclosingElement() + ".";
+            }
+
+            Symbol sym = (Symbol) elem;
+            Type type = sym.asType();
+            return prefix + "<b>" + var + "</b> : " + FXSourceUtils.typeToString(types, type);
+        }
+
+        if (elem instanceof TypeElement) {
+            return elem.toString();
+        }
+
+        if (elem instanceof ExecutableElement) {
+            ExecutableElement var = (ExecutableElement) elem;
+            Symbol sym = (Symbol) elem;
+            Type type = sym.asType();
+            return "<html>" + var.getEnclosingElement() + ".<b>" + sym.name.toString() + "</b>" + FXSourceUtils.methodToString(types, (MethodType) type);
+        }
+        
+        return null;
     }
 
     public static String typeToString(JavafxTypes types, Type type) {
@@ -294,5 +327,5 @@ public final class FXSourceUtils {
                 sb.append(type);
         }
     }
-
+    
 }

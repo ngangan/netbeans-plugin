@@ -351,23 +351,23 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         List<? extends VariableElement> params = e.getParameters();
         for (Iterator<? extends VariableElement> it = params.iterator(); it.hasNext();) {
             VariableElement param = it.next();
+            sb.append(param.getSimpleName());
+            sb.append(": "); // NOI18N     
             sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
             sb.append(print(types, param.asType()));
             sb.append("</font>"); // NOI18N
-            sb.append(" "); // NOI18N
-            sb.append(param.getSimpleName());
+//            sb.append(" "); // NOI18N
             if (it.hasNext()) {
                 sb.append(", "); // NOI18N
             }
         }
-
 
         sb.append(")"); // NOI18N
 
         if (e.getKind() != ElementKind.CONSTRUCTOR) {
             TypeMirror rt = e.getReturnType();
             if (rt.getKind() != TypeKind.VOID) {
-                sb.append(" : "); // NOI18N     
+                sb.append(": "); // NOI18N     
                 sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
                 sb.append(print(types, e.getReturnType()));
                 sb.append("</font>"); // NOI18N                    
@@ -388,12 +388,13 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             sb.append("<font color=" + INHERITED_COLOR + ">"); // NOI18N
         }
         sb.append(e.getSimpleName());
+//        sb.append(print(types, e.asType()));
         if (isDeprecated) {
             sb.append("</s>"); // NOI18N
         }
 
         if (e.getKind() != ElementKind.ENUM_CONSTANT) {
-            sb.append(" : "); // NOI18N
+            sb.append(": "); // NOI18N
             sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
             sb.append(print(types, e.asType()));
             sb.append("</font>"); // NOI18N
@@ -412,6 +413,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             sb.append("<font color=" + INHERITED_COLOR + ">"); // NOI18N
         }
         sb.append(e.getSimpleName());
+//        sb.append(print(types, e.asType()));
         if (isDeprecated) {
             sb.append("</s>"); // NOI18N
         }
@@ -424,6 +426,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             for (Iterator<? extends TypeParameterElement> it = typeParams.iterator(); it.hasNext();) {
                 TypeParameterElement tp = it.next();
                 sb.append(tp.getSimpleName());
+//                sb.append(print(types, tp.asType()));
                 try { // XXX Verry ugly -> file a bug against Javac?
                     List<? extends TypeMirror> bounds = tp.getBounds();
                     if (!bounds.isEmpty()) {
