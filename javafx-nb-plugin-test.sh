@@ -15,8 +15,8 @@ export
 cd $WORKSPACE/main/contrib/javafx.kit
 ant test-build
 
-#cd $WORKSPACE/main/contrib/javafx.editor
-#ant test-build
+cd $WORKSPACE/main/contrib/javafx.editor
+ant test-build
 
 cd $WORKSPACE/main/contrib/javafx.bestpractices
 ant test-build
