@@ -21,6 +21,9 @@ ant test-build
 cd $WORKSPACE/main/contrib/javafx.bestpractices
 ant test-build
 
+cd $WORKSPACE/main/contrib/javafx.weather2
+ant test-build
+
 cd $WORKSPACE/main
 
 ant -f nbbuild/build.xml build-test-dist -Dtest.fail.on.error=false -Dbuild.compiler.debuglevel=source,lines 
