@@ -483,6 +483,21 @@ public class ElementHandle<T extends Element> {
     private static boolean isArray (String signature) {
         return signature.length() == 1 && signature.charAt(0) == '[';
     }
+    
+    public @Override String toString () {
+        final StringBuilder result = new StringBuilder ();
+        result.append (this.getClass().getSimpleName());
+        result.append ('[');                                // NOI18N
+        result.append ("kind=" +this.kind.toString());      // NOI18N
+        result.append ("; sigs=");                          // NOI18N
+        for (String sig : this.signatures) {
+            result.append (sig);
+            result.append (' ');                            // NOI18N
+        }
+        result.append (']');                                // NOI18N
+        return result.toString();
+    }
+
 
     public org.netbeans.api.java.source.ElementHandle toJava() {
         try {
