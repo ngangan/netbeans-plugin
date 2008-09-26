@@ -50,8 +50,10 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,7 +88,6 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
     private static final String TYPE_COLOR = "#707070";
     private static final String INHERITED_COLOR = "#7D694A";
-
     private ClassMemberPanelUI ui;
     private final AtomicBoolean canceled = new AtomicBoolean();
 
@@ -188,7 +189,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             if (e != null) {
                 long pos = this.sourcePositions.getStartPosition(cu, node);
                 p.put(e, pos);
-                
+
                 // guesss what? space magic! weeeee! >:-((
                 if (SpaceMagicUtils.isSpiritualMethod(e)) {
                     List<Element> spiritualMembers = SpaceMagicUtils.getSpiritualMembers(info);
@@ -278,15 +279,15 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
         ElementHandle<Element> eh = null;
         try {
-            eh  = ElementHandle.create(e);
+            eh = ElementHandle.create(e);
         } catch (IllegalArgumentException iae) {
             // can't convert to element handler (incomplete element)
         }
         if (eh == null) {
             return null;
         }
-        
-        Description d = new Description(ui, name, eh, spaceMagicKind,inherited);
+
+        Description d = new Description(ui, name, eh, spaceMagicKind, inherited);
         final JavafxTypes javafxTypes = info.getJavafxTypes();
 
         if (e instanceof TypeElement) {
@@ -377,6 +378,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return sb.toString();
     }
 
+    // TODO move it to FXSourceUtils
     private String createHtmlHeader(VariableElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
 
         StringBuilder sb = new StringBuilder();
@@ -396,7 +398,33 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         if (e.getKind() != ElementKind.ENUM_CONSTANT) {
             sb.append(": "); // NOI18N
             sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-            sb.append(print(types, e.asType()));
+            final Type type = (Type) e.asType();
+            if (type instanceof FunctionType) {
+                MethodType mtype = ((FunctionType) type).asMethodType();
+                sb.append("function "); // NOI18N
+
+                sb.append("("); // NOI18N
+                com.sun.tools.javac.util.List<Type> args = mtype.argtypes;
+                for (com.sun.tools.javac.util.List<Type> l = args; l.nonEmpty(); l = l.tail) {
+                    if (l != args) {
+                        sb.append(", "); // NOI18N
+                    }
+//                    ((ExecutableElement) e).getParameters()
+//                    sb.append(l.head.asElement().name); // NOI18N
+                    sb.append(':'); // NOI18N
+                    sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
+                    sb.append(print(types, l.head));
+                    sb.append("</font>"); // NOI18N
+                }
+                sb.append(")"); // NOI18N
+
+                sb.append(": "); // NOI18N     
+                sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
+                sb.append(print(types, mtype.restype));
+                sb.append("</font>"); // NOI18N                    
+            } else {
+                sb.append(print(types, e.asType()));
+            }
             sb.append("</font>"); // NOI18N
         }
 
