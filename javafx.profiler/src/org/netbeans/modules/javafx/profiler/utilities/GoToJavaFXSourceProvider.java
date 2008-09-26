@@ -73,10 +73,7 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
         JavaFXSource source = null;
 
         while(files.hasNext()) {
-            FileObject fo = files.next();
-            source = JavaFXSource.forFileObject(fo);
-            if (source != null)
-                break;
+            if ((source = JavaFXSource.forFileObject(files.next())) != null) break;
         }
 
         final JavaFXSource js = source;
@@ -91,17 +88,13 @@ public class GoToJavaFXSourceProvider implements GoToSourceProvider {
                     public void run(CompilationController controller)
                              throws Exception {
                         if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                           return;
+                            latch.countDown();
                         }
 
                         Element destinationElement = null;
 
                         // resolve the class by name
                         TypeElement classElement = JavaFXProjectUtilities.resolveClassByName(className, controller);
-                        // only fx classes supported; others to be opened via GoToJavaSourceProvider
-                        if (!controller.getJavafxTypes().isJFXClass((Symbol) classElement)) {
-                            return;
-                        }
 
                         if ((methodName != null) && (methodName.length() > 0)) {
                             // if a method name has been specified try to resolve the method

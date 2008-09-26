@@ -408,7 +408,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         
         if (className.indexOf('$') != -1) {
             try {
-                new Integer(className.substring(className.indexOf('$') + 1, className.length()));
+                new Integer(className.substring(className.indexOf('$') + 1, className.indexOf('$') + 2));
                 className = className.substring(0, className.indexOf('$')); // digit. Assume hidden anonymous inner class                
             } catch (NumberFormatException e) {
             }
