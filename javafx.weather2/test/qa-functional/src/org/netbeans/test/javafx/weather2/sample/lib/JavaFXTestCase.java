@@ -59,6 +59,15 @@ public class JavaFXTestCase extends JellyTestCase {
         super(name);
     }
 
+    public String getWorkDirAsString() {
+        try {
+            java.io.File f = this.getWorkDir();
+            return f.getPath();
+        } catch (java.io.IOException ioe) {
+            return null;
+        }
+    }
+
     @Override
     protected void setUp() throws Exception {
         System.setOut(getLog());
