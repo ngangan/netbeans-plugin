@@ -41,6 +41,7 @@ package org.netbeans.api.javafx.source;
 
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
+import com.sun.tools.javac.jvm.Target;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import java.lang.reflect.Constructor;
@@ -126,6 +127,22 @@ public class ElementHandle<T extends Element> {
     
     public String[] getSignatures() {
         return signatures.clone();
+    }
+
+    /**
+     * Returns a qualified name of the {@link TypeElement} represented by this
+     * {@link ElementHandle}. When the {@link ElementHandle} doesn't represent
+     * a {@link TypeElement} it throws a {@link IllegalStateException}
+     * @return the qualified name
+     * @throws an {@link IllegalStateException} when this {@link ElementHandle} 
+     * isn't creatred for the {@link TypeElement}.
+     */
+    public String getQualifiedName () throws IllegalStateException {
+        if ((this.kind.isClass() && !isArray(signatures[0])) || this.kind.isInterface() || this.kind == ElementKind.OTHER) {
+            return this.signatures[0].replace (Target.DEFAULT.syntheticNameChar(),'.');    //NOI18N
+        } else {
+            throw new IllegalStateException ();
+        }
     }
     
     /**
