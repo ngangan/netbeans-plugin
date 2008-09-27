@@ -88,11 +88,11 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
         this.kinds = kinds;
         this.javafxSource = javafxSource;
         this.insideNew = insideNew;
-//        this.name = handle.getQualifiedName();
+        this.name = handle.getQualifiedName();
         int idx = name.lastIndexOf('.'); //NOI18N
         this.simpleName = idx > -1 ? name.substring(idx + 1) : name;
         this.pkgName = idx > -1 ? name.substring(0, idx) : ""; //NOI18N
-        this.sortText = this.simpleName + 1 + "#" + this.pkgName; //NOI18N
+        this.sortText = this.simpleName + 0 + "#" + this.pkgName; //NOI18N
     }
     
     public boolean accept() {
@@ -110,12 +110,13 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                         JavafxcScope scope = controller.getTrees().getScope(controller.getTreeUtilities().pathFor(substitutionOffset));
                         if (!isAnnonInner()) {
                             TypeElement e = handle.resolve(controller);
-                            Elements elements = controller.getElements();
-                            delegate = JavaFXCompletionItem.createTypeItem(
+                            if (e != null) {
+                                delegate = JavaFXCompletionItem.createTypeItem(
                                     e, (DeclaredType)e.asType(),
                                     substitutionOffset,
                                     controller.getElements().isDeprecated(e),
                                     insideNew, false);
+                            }
                         }
                         handle = null;
                     }
