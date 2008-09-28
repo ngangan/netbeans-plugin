@@ -267,7 +267,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             String s = member.getSimpleName().toString();
-              if (controller.getTreeUtilities().isAccessible(scope, member, dt)) {
+              if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
@@ -284,7 +284,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if ("<error>".equals(member.getSimpleName().toString())) {
                 continue;
             }
-            if (controller.getTreeUtilities().isAccessible(scope, member, dt)) {
+            if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
