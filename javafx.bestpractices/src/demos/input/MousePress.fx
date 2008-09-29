@@ -33,7 +33,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.input.MouseButton;
@@ -51,7 +52,7 @@ var buttons : Rectangle[] = [
     Rectangle { x : 35, y : 5, width : 10, height : 20, fill : Color.WHITE }
 ];
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -79,8 +80,8 @@ Frame {
                 }
 
                 onMouseMoved: function( e : MouseEvent ): Void {
-                    mouseX = e.x;
-                    mouseY = e.y;
+                    mouseX = e.sceneX;
+                    mouseY = e.sceneY;
                 }
             },
             Group {
@@ -95,8 +96,9 @@ Frame {
     }
 
     visible : true
-    title : "Mouse Press"
+    decoration : Decoration {
+        title : "Mouse Press"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }

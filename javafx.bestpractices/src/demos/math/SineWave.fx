@@ -29,7 +29,8 @@
 
 package math;
 
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
@@ -74,17 +75,18 @@ for( i in [0..25] ) {
     x += dx;
 }
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.BLACK
         content : dots
     }
 
     visible : true
-    title : "Sine Wave"
+    decoration : Decoration {
+        title : "Sine Wave"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timeline.start();
+timeline.play();

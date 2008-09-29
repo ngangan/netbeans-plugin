@@ -33,7 +33,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
@@ -70,7 +71,7 @@ var timer : Timeline = Timeline {
         }
 };
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -78,11 +79,11 @@ Frame {
                 fill : Color.BLACK
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    mouseX = e.x;
+                    mouseX = e.sceneX;
                     if( mouseX < 100 - esize ) { mouseX = 100 - esize };
                     if( mouseX > 100 + esize ) { mouseX = 100 + esize };
 
-                    mouseY = e.y;
+                    mouseY = e.sceneY;
                     if( mouseY < 100 - esize ) { mouseY = 100 - esize };
                     if( mouseY > 100 + esize ) { mouseY = 100 + esize };
                 }
@@ -101,10 +102,11 @@ Frame {
     }
 
     visible : true
-    title : "Constrain"
+    decoration : Decoration {
+        title : "Constrain"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timer.start();
+timer.play();

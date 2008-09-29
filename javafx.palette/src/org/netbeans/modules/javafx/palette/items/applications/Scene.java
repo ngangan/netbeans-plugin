@@ -53,7 +53,7 @@ import org.openide.util.NbBundle;
 public class Scene implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Frame.class, "TEMPLATE_Scene" ); // NOI18N
+        String code = NbBundle.getMessage( Scene.class, "TEMPLATE_Scene" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );

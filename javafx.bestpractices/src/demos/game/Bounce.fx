@@ -37,7 +37,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 
@@ -111,17 +111,18 @@ for( j in [0..5] ) {
     }
 }
 
-Frame {
+Stage {
     scene : Scene {
         content : bind [
             Rectangle {
-                width : 200, height : 200
+                width : 201, height : 200
                 fill : Color.LIGHTGREY
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    if( e.x < paddle.width / 2 ) { paddle.x = paddle.width / 2; }
-                    else if( e.x > 200 - paddle.width / 2 ) { paddle.x = 200 - paddle.width / 2; }
-                    else { paddle.x = e.x; }
+                    java.lang.System.out.println( "! {e.x},{e.y}" );
+                    if( e.sceneX < paddle.width / 2 ) { paddle.x = paddle.width / 2; }
+                    else if( e.sceneX > 200 - paddle.width / 2 ) { paddle.x = 200 - paddle.width / 2; }
+                    else { paddle.x = e.sceneX; }
                     if( state == STICK ) {
                         ball.x = paddle.x;
                         ball.y = paddle.y - ball.radius;
@@ -130,7 +131,7 @@ Frame {
                 onMousePressed : function( e : MouseEvent ): Void {
                     if( state == STICK ) {
                         state = BOUNCING;
-                        bouncer.start();
+                        bouncer.play();
                     }
                 }
             },
@@ -139,11 +140,8 @@ Frame {
 
     }
 
-    visible : true
-    title : "Bounce Game"
-    width : 209
+    width : 207
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 class Paddle extends CustomNode {

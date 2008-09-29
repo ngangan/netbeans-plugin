@@ -32,7 +32,8 @@ package input;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 
 /**
@@ -44,7 +45,7 @@ var height : Number = 200;
 var mouseX : Number = 0;
 var mouseY : Number = 0;
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -52,8 +53,8 @@ Frame {
                 fill : Color { red : 0.2, green : 0.2, blue :0.2 }
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    mouseX = e.x;
-                    mouseY = e.y;
+                    mouseX = e.sceneX;
+                    mouseY = e.sceneY;
                 }
             },
             Rectangle {
@@ -76,8 +77,9 @@ Frame {
     }
 
     visible : true
-    title : "Mouse 2D"
+    decoration : Decoration {
+        title : "Mouse 2D"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }

@@ -34,7 +34,8 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -49,17 +50,18 @@ import java.lang.System;
 
 var flock : Flock = Flock{};
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.LIGHTGREY
         content : bind flock
     };
 
     visible : true
-    title : "Flocks"
+    decoration : Decoration {
+        title : "Flocks"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 flock.start();
@@ -96,7 +98,7 @@ class Flock extends CustomNode {
     }
 
     public function start(): Void {
-        ticker.start();
+        ticker.play();
     }
 
     public override function create(): Node {

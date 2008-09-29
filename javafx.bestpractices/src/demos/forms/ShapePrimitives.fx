@@ -33,14 +33,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.stage.Decoration;
 
 /**
  * @author Michal Skvor
  */
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.BLACK
         content : [
@@ -72,9 +73,9 @@ Frame {
         ]
     };
 
-    visible : true
-    title : "Shape Primitives"
-    width : 200
+    width : 206
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
+    decoration : Decoration {
+        title : "Shape Primitives"
+    }
 }
