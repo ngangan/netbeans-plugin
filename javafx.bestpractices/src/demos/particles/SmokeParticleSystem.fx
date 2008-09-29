@@ -38,7 +38,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
@@ -51,17 +52,18 @@ import java.util.Random;
  * @author Michal Skvor
  */
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.BLACK
         content : CustomCanvas {}
     }
 
     visible : true
-    title : "Smoke Particle System"
+    decoration : Decoration {
+        title : "Smoke Particle System"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 class CustomCanvas extends CustomNode {
@@ -102,7 +104,7 @@ class CustomCanvas extends CustomNode {
                     }
                 }
             };
-        timeline.start();
+        timeline.play();
 
 
         return Group {
@@ -113,7 +115,7 @@ class CustomCanvas extends CustomNode {
                     blocksMouse : true
 
                     onMouseMoved : function( e : MouseEvent ): Void {
-                        acc = ( e.x - 100 ) / 1000;
+                        acc = ( e.sceneX - 100 ) / 1000;
                     }
                 },
                 Line {

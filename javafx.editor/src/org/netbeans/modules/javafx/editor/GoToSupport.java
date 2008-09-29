@@ -45,15 +45,11 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.MethodType;
 import com.sun.tools.javafx.code.JavafxTypes;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -63,7 +59,6 @@ import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
@@ -139,7 +134,7 @@ public class GoToSupport {
                     if (el == null) return;
  
                     if (tooltip) {
-                        result[0] = getElementTooltip(controller, el);
+                        result[0] = FXSourceUtils.getElementTooltip(controller.getJavafxTypes(), el);
                         return;
                     } else {
                         if (goToSource && el instanceof VariableElement) {
@@ -179,32 +174,6 @@ public class GoToSupport {
         }
     }
     
-    
-    private static String getElementTooltip (CompilationInfo info, Element elem) {
-        JavafxTypes types = info.getJavafxTypes();
-        if (elem instanceof VariableElement) {
-            String prefix = "<html>";
-
-            VariableElement var = (VariableElement)elem;
-            ElementKind kind = var.getKind();
-            if (kind == ElementKind.FIELD) prefix = prefix + var.getEnclosingElement() + ".";
-            
-            Symbol sym = (Symbol)elem;
-            Type type = sym.asType();
-            return prefix + "<b>" + var + "</b> : " + FXSourceUtils.typeToString(types, type);
-        }
-        
-        if (elem instanceof TypeElement) {
-            return elem.toString();
-        }
-        if (elem instanceof ExecutableElement) {
-            ExecutableElement var = (ExecutableElement)elem;
-            Symbol sym = (Symbol)elem;
-            Type type = sym.asType();
-            return "<html>" + var.getEnclosingElement() + ".<b>" + sym.name.toString() + "</b>" + FXSourceUtils.methodToString(types, (MethodType)type);
-        }
-        return null;
-    }
     
     private static final Set<JFXTokenId> USABLE_TOKEN_IDS = EnumSet.of(JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
 

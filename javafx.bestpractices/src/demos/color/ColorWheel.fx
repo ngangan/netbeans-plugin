@@ -35,13 +35,23 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.stage.Decoration;
+
+import javafx.lang.FX;
 
 /**
+ * Application color wheel shows many centric circles each in
+ * different color.
+ *
  * @author Michal Skvor
  */
 
+/**
+ * Definition of visual node which represents the color wheel. Custom
+ * node is base for all custom visual elements.
+ */
 class ColorWheel extends CustomNode {
     var segments : Number = 12;
     var steps : Number = 6;
@@ -49,14 +59,19 @@ class ColorWheel extends CustomNode {
     var valueShift : Number = 0;
     var stripes : Arc[];
 
+    /** create() function which returns our visual representation of the
+     *  color wheel */
     override function create() : Node {
         return Group {
-            content : bind stripes
+            content : bind stripes      // Color arcs filled in init method()
         };
     }
 
+    // Construnctor where we create the color wheel
     init {
+        // Set radius
         var r = radius;
+        // Define step size
         var rStep = radius / steps;
         var colors : Color[];
         for( i in [1..segments + 1] ) {
@@ -106,16 +121,18 @@ class ColorWheel extends CustomNode {
     }
 }
 
-
-Frame {
+// Frame representing view to our application
+Stage {
+    // Visual scene definition
     scene: Scene {
-        fill : Color.GRAY
-        content : ColorWheel {}
+        fill : Color.GRAY           // Our scene will have gray background
+        content : ColorWheel {}     // There will be only color wheel
+                                    // content defined above
     }
 
-    visible : true
-    title : "Color Wheel"
-    width : 209
+    width : 206                     // Width and heiight of the frame
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
+    decoration : Decoration {
+        title : "Color Wheel"
+    }
 }

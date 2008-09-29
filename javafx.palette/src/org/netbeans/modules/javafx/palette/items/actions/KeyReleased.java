@@ -59,7 +59,11 @@ public class KeyReleased implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
+<<<<<<< local
         Imports.addImport( targetComponent, "javafx.input.KeyEvent" ); // NOI18N
+=======
+        Util.addImport( targetComponent, "javafx.scene.input.KeyEvent" ); // NOI18N
+>>>>>>> other
         
         return true;
     }

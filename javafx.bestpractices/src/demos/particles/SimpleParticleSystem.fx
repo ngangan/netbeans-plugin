@@ -34,7 +34,8 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -79,20 +80,20 @@ function update() : Void {
     }
 }
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.BLACK
         content : bind parts
     }
 
-    visible : true
-    title : "Simple Particle System"
+    decoration : Decoration {
+        title : "Simple Particle System"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timeline.start();
+timeline.play();
 
 class Particle extends CustomNode {
     var x : Number;

@@ -13,16 +13,19 @@ export
 
 
 cd $WORKSPACE/main/contrib/javafx.kit
-ant test-build
+ant do-qa-functional-test-build
 
 cd $WORKSPACE/main/contrib/javafx.editor
-ant test-build
+ant do-qa-functional-test-build
+#ant test-build
 
 cd $WORKSPACE/main/contrib/javafx.bestpractices
-ant test-build
+ant do-qa-functional-test-build
+#ant test-build
 
 cd $WORKSPACE/main/contrib/javafx.weather2
-ant test-build
+ant do-qa-functional-test-build
+#ant test-build
 
 cd $WORKSPACE/main
 
