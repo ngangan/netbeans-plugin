@@ -45,7 +45,7 @@ import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
-import org.netbeans.modules.javafx.palette.utils.Imports;
+import org.netbeans.api.javafx.source.Imports;
 
 /**
  *
