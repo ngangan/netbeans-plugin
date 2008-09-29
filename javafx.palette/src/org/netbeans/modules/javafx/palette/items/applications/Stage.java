@@ -50,16 +50,17 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class Application implements ActiveEditorDrop {
+public class Stage implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Application.class, "TEMPLATE_Application"  ); // NOI18N
+        String code = NbBundle.getMessage( Stage.class, "TEMPLATE_Stage"    ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.stage.Application" );
+        Util.addImport( targetComponent, "javafx.stage.Stage" );
+        Util.addImport( targetComponent, "javafx.stage.Decoration" );
         Util.addImport( targetComponent, "javafx.scene.Scene" );
         return true;
     }
