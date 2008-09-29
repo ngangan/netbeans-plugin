@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.actions;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.api.javafx.source.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -59,7 +59,11 @@ public class OnMouseWheelMoved implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
+<<<<<<< local
+        Imports.addImport( targetComponent, "javafx.input.MouseEvent" ); // NOI18N
+=======
         Util.addImport( targetComponent, "javafx.scene.input.MouseEvent" ); // NOI18N
+>>>>>>> other
         
         return true;
     }

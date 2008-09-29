@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.shapes;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.api.javafx.source.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -59,8 +59,8 @@ public class Rectangle implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.shape.Rectangle" );
-        Util.addImport( targetComponent, "javafx.scene.paint.Color" );
+        Imports.addImport( targetComponent, "javafx.scene.shape.Rectangle" );
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" );
         
         return true;
     }

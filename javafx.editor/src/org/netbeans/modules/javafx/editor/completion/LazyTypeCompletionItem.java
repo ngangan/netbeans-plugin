@@ -166,17 +166,14 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
         return null;
     }
 
-    @Override
     public int getSortPriority() {
         return 700;
     }
 
-    @Override
     public CharSequence getSortText() {
         return sortText;
     }
 
-    @Override
     public CharSequence getInsertPrefix() {
         return simpleName;
     }
