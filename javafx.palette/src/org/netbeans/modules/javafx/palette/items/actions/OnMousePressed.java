@@ -59,7 +59,7 @@ public class OnMousePressed implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.input.MouseEvent" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.input.MouseEvent" ); // NOI18N
         
         return true;
     }

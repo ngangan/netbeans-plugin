@@ -59,7 +59,7 @@ public class KeyPressed implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.input.KeyEvent" ); // NOI18N
+        Util.addImport( targetComponent, "javafx.scene.input.KeyEvent" ); // NOI18N
         
         return true;
     }
