@@ -95,9 +95,12 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.ClassIndex.NameKind;
+import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
@@ -264,7 +267,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             String s = member.getSimpleName().toString();
-              if (controller.getTreeUtilities().isAccessible(scope, member, dt)) {
+              if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
@@ -281,7 +284,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if ("<error>".equals(member.getSimpleName().toString())) {
                 continue;
             }
-            if (controller.getTreeUtilities().isAccessible(scope, member, dt)) {
+            if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
                 continue;
             }
@@ -316,7 +319,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addLocalMembersAndVars(TypeMirror smart) {
         if (LOGGABLE) log("addLocalMembersAndVars: " + prefix);
-//        controller.toPhase(Phase.ANALYZED);
 
         final JavafxcTrees trees = controller.getTrees();
         if (smart != null && smart.getKind() == TypeKind.DECLARED) {
@@ -807,6 +809,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
         addPackages("");
+        addAllTypes(kinds, insideNew);
     }
     
     private void addLocalAndImportedTypes(Iterable<? extends Element> from,
@@ -919,14 +922,20 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return null;
     }
     
-    private void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
-        if (LOGGABLE) log("NOT IMPLEMENTED addAllTypes ");
-//            for(ElementHandle<TypeElement> name : controller.getJavaSource().getClasspathInfo().getClassIndex().getDeclaredTypes(prefix != null ? prefix : EMPTY, kind, EnumSet.allOf(ClassIndex.SearchScope.class))) {
-//                LazyTypeCompletionItem item = LazyTypeCompletionItem.create(name, kinds, anchorOffset, controller.getJavaSource(), insideNew);
-//                if (item.isAnnonInner())
-//                    continue;
-//                results.add(item);
-//            }
+    protected void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
+        if (LOGGABLE) log(" addAllTypes ");
+            for (ElementHandle<TypeElement> name :
+                    controller.getJavaFXSource().getCpInfo().getClassIndex().getDeclaredTypes(
+                        prefix != null ? prefix : EMPTY,
+                        NameKind.PREFIX,
+                        EnumSet.allOf(SearchScope.class))) {
+
+                LazyTypeCompletionItem item = LazyTypeCompletionItem.create(
+                        name, kinds,
+                        query.anchorOffset,
+                        controller.getJavaFXSource(), insideNew);
+                addResult(item);
+            }
     }
 
     protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(Tree tree, int position) {

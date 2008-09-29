@@ -447,9 +447,12 @@ public final class TreeUtilities {
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
             Object env = ((JavafxcScope) scope).getEnv();
             JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-	    return resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);  
-        } else 
+            boolean resolved = resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);
+            // temporary:
+            return true;
+        } else {
             return false;
+        }
     }
 
         public boolean isAccessible(Scope
