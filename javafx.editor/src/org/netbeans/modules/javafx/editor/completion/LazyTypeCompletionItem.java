@@ -115,7 +115,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                                     e, (DeclaredType)e.asType(),
                                     substitutionOffset,
                                     controller.getElements().isDeprecated(e),
-                                    insideNew, false);
+                                    insideNew, false, true);
                             }
                         }
                         handle = null;

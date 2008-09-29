@@ -130,18 +130,17 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
     }
     
-    public static final JavaFXCompletionItem createTypeItem(TypeElement elem, DeclaredType type, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
+    public static final JavaFXCompletionItem createTypeItem(TypeElement elem, DeclaredType type, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType, boolean insertImport) {
         switch (elem.getKind()) {
             case CLASS:
-                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
             case INTERFACE:
-                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
             case ENUM:
-                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType);
+                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType, insertImport);
             default:
                 throw new IllegalArgumentException("kind=" + elem.getKind());
         }
     }
+
     public static final JavaFXCompletionItem createTypeItem(String name,  int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
         return new ClassItem(name, 0, substitutionOffset, isDeprecated, insideNew, smartType);
     }
@@ -1001,6 +1000,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private String leftText;
         private DeclaredType type;
         private TypeElement elem;
+        private boolean insertImport;
 
         private ClassItem(String name, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
             super(substitutionOffset);
@@ -1013,7 +1013,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.sortText = this.simpleName;
         }
         
-        private ClassItem(TypeElement elem, DeclaredType type, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
+        private ClassItem(TypeElement elem, DeclaredType type, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType, boolean insertImport) {
             super(substitutionOffset);
             this.dim = dim;
             this.elem = elem;
@@ -1027,6 +1027,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             this.type = type;
             this.sortText = this.simpleName;
+            this.insertImport = insertImport;
         }
 
         @Override
@@ -1214,11 +1215,20 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                         if (!insideNew)
                                             cs = text.insert(0, cs);
                                         String textToReplace = doc.getText(offset, finalLen3);
-                                        if (textToReplace.contentEquals(cs)) return;
+                                        if (textToReplace.contentEquals(cs)) {
+                                            if (insertImport && eleme != null) {
+                                                Imports.addImport(c, eleme.getQualifiedName().toString());
+                                            }
+                                            return;
+                                        }
                                         doc.remove(offset, finalLen3);
                                         doc.insertString(offset, cs.toString(), null);
-                                        if (semiPosition != null)
+                                        if (semiPosition != null) {
                                             doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
+                                        }
+                                        if (insertImport && eleme != null) {
+                                            Imports.addImport(c, eleme.getQualifiedName().toString());
+                                        }
                                     } catch (BadLocationException e) {
                                         // Can't update
                                     }
