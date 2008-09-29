@@ -8,7 +8,7 @@
 package ${package};
 </#if>
 
-import javafx.application.*;
+import javafx.stage.*;
 import javafx.scene.*;
 import javafx.scene.text.*;
 
@@ -16,12 +16,16 @@ import javafx.scene.text.*;
  * @author ${user}
  */
 
-Application{
-    stage: Stage{
+Stage{
+    visible: true
+    decoration: Decoration{ title: "Application title" }
+    width: 250
+    height: 80
+    scene: Scene{
         content: Text {
             x: 10, y: 30
             content: "Application content"
-            font: Font { size: 24  style: FontStyle.PLAIN }
+            font: Font { size: 24 }
         }
     }
-} 
+}

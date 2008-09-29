@@ -92,7 +92,7 @@ public class AppletSupport {
 
     private final static String POLICY_FILE_NAME = "applet";
     private final static String POLICY_FILE_EXT = "policy";
-    private final static String APPLET_MAIN_CLASS = "javafx.application.Applet";
+    private final static String APPLET_MAIN_CLASS = "com.sun.javafx.runtime.adapter.Applet";
     private final static int defaultWidth=200;
     private final static int defaultHeight=150;
 
@@ -460,7 +460,7 @@ public class AppletSupport {
 
                 writer.println(" width="+width+" height="+height+">"); // NOI18N
 
-                writer.println("    <param name=\"ApplicationClass\" value=\"" + name + "\">"); // NOI18N
+                writer.println("    <param name=\"StageClass\" value=\"" + name + "\">"); // NOI18N
 
             } else {
                 writer.print("\"" + name + "\""); // NOI18N
