@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.applications;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -59,9 +59,9 @@ public class CustomNode implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         //
-        Util.addImport( targetComponent, "javafx.scene.CustomNode" );
-        Util.addImport( targetComponent, "javafx.scene.Group" );
-        Util.addImport( targetComponent, "javafx.scene.Node" );
+        Imports.addImport( targetComponent, "javafx.scene.CustomNode" );
+        Imports.addImport( targetComponent, "javafx.scene.Group" );
+        Imports.addImport( targetComponent, "javafx.scene.Node" );
         
         return true;
     }

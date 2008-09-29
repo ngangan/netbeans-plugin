@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.components;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -59,8 +59,8 @@ public class ComboBox implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.ext.swing.SwingComboBox" ); // NOI18N
-        Util.addImport( targetComponent, "javafx.ext.swing.ComboBoxItem" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.ext.swing.SwingComboBox" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.ext.swing.ComboBoxItem" ); // NOI18N
         
         return true;
     }    

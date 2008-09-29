@@ -45,7 +45,7 @@ import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 
 /**
  *
@@ -59,8 +59,8 @@ public class Frame implements ActiveEditorDrop {
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Util.addImport( targetComponent, "javafx.stage.Frame" );
-        Util.addImport( targetComponent, "javafx.scene.Scene" );
+        Imports.addImport( targetComponent, "javafx.stage.Frame" );
+        Imports.addImport( targetComponent, "javafx.scene.Scene" );
                 
         return true;
     }

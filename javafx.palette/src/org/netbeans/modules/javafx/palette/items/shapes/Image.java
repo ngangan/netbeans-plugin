@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.shapes;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -59,8 +59,8 @@ public class Image implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.scene.image.ImageView" );
-        Util.addImport( targetComponent, "javafx.scene.image.Image" );
+        Imports.addImport( targetComponent, "javafx.scene.image.ImageView" );
+        Imports.addImport( targetComponent, "javafx.scene.image.Image" );
         
         return true;
     }

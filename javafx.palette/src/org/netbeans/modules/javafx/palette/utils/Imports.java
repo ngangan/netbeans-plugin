@@ -53,7 +53,7 @@ import org.openide.util.Exceptions;
  *
  * @author Michal Skvor
  */
-public class Util {
+public class Imports {
 
     public static void addImport( final JTextComponent targetComponent, final String im ) {
         String doc = null;

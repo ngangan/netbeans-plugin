@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.colors;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -58,7 +58,7 @@ public class Yellow implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Import
-        Util.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
         
         return true;
     }

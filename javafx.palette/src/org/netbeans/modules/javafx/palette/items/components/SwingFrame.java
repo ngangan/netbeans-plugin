@@ -45,7 +45,7 @@ import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 
 /**
  *
@@ -59,8 +59,8 @@ public class SwingFrame implements ActiveEditorDrop {
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Util.addImport( targetComponent, "javafx.ext.swing.SwingFrame" );
-        Util.addImport( targetComponent, "javafx.ext.swing.Canvas" );
+        Imports.addImport( targetComponent, "javafx.ext.swing.SwingFrame" );
+        Imports.addImport( targetComponent, "javafx.ext.swing.Canvas" );
                 
         return true;
     }

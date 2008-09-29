@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.timeline;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.modules.javafx.palette.utils.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -59,8 +59,8 @@ public class Timeline implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Util.addImport( targetComponent, "javafx.animation.Timeline" );
-        Util.addImport( targetComponent, "javafx.animation.KeyFrame" );
+        Imports.addImport( targetComponent, "javafx.animation.Timeline" );
+        Imports.addImport( targetComponent, "javafx.animation.KeyFrame" );
         
         return true;
     }
