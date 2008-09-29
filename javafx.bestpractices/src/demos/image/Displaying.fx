@@ -31,7 +31,7 @@ package image;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
@@ -45,7 +45,7 @@ var height : Number = 200;
 
 var img = Image { url : "{__DIR__}../resources/background.png" };
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             ImageView {
@@ -60,9 +60,6 @@ Frame {
         ]
     }
 
-    visible : true
-    title : "Displaying"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }

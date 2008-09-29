@@ -32,7 +32,8 @@ package math;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
+import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -77,7 +78,7 @@ var timer : Timeline = Timeline {
         }
 };
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.BLACK
         content : [
@@ -94,13 +95,14 @@ Frame {
     }
 
     visible : true
-    title : "Distance 1D"
+    decoration : Decoration {
+        title : "Distance 1D"
+    }
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timer.start();
+timer.play();
 
 class Box extends CustomNode {
 
