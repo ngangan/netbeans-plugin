@@ -1,5 +1,6 @@
 endX
 endY
+initializedLine
 startX
 startY
 blocksMouse
@@ -39,6 +40,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+style
 styleClass
 transforms
 translateX

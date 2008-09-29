@@ -1,3 +1,5 @@
+gPath
+initializingXXX
 points
 blocksMouse
 cache
@@ -36,6 +38,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+style
 styleClass
 transforms
 translateX

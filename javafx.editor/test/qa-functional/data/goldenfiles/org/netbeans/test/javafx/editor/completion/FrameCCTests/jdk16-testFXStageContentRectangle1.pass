@@ -1,6 +1,7 @@
 arcHeight
 arcWidth
 height
+initializedRec
 width
 x
 y
@@ -41,6 +42,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+style
 styleClass
 transforms
 translateX

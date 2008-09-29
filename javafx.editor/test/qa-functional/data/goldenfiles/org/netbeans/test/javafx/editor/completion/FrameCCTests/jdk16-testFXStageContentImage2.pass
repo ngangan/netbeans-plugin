@@ -1,8 +1,11 @@
 backgroundLoading
 bufferedImage
+frames
 height
+loadImageTask
 placeholder
 preserveRatio
 progress
+timeline
 url
 width

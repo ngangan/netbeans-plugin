@@ -1,5 +1,6 @@
 centerX
 centerY
+initializedCir
 radius
 blocksMouse
 cache
@@ -38,6 +39,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+style
 styleClass
 transforms
 translateX
