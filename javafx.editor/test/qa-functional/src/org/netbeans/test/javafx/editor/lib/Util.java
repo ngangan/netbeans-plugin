@@ -62,6 +62,7 @@ public class Util {
         locationWizard.txtProjectName().setText(name);
         locationWizard.txtProjectLocation().setText(location);
         projectWizard.finish();
+        waitScanFinished();
         new QueueTool().waitEmpty();
 
         //Verifies that project exists
@@ -142,6 +143,33 @@ public class Util {
 
 //        screenCapture(PROJECT_NAME + "screen.png");
 //        return textComponent.getText();
+        return textComponent;
+    }
+
+    /** Inserts string typed char by char in the editor 'Place Code Here' comment and types tab to expand it. */
+    public static JEditorPaneOperator typeTemplateAtPlaceCodeHere(String PROJECT_NAME, String SAMPLE, String text) {
+        Node projectNode = new Node(ProjectsTabOperator.invoke().tree(), PROJECT_NAME);
+        String mainPath = _source + Util.PATH_SEPARATOR +
+                PROJECT_NAME.toLowerCase() +
+                Util.PATH_SEPARATOR + _main;
+        Node mainFileNode = new Node(projectNode, mainPath);
+
+        new OpenAction().performPopup(mainFileNode);
+        TopComponentOperator main = new TopComponentOperator(_main);
+        JEditorPaneOperator textComponent = new JEditorPaneOperator(main);
+        textComponent.changeCaretPosition(textComponent.getPositionByText(_placeCodeHere));
+
+        if (text == null) { //fails to find source
+            return null;
+        }
+        textComponent.selectText(_placeCodeHere);
+//        textComponent.replaceSelection(text);
+        for (int i = 0; i < text.length(); i++) {
+            textComponent.typeKey(text.charAt(i));
+        }
+        textComponent.typeKey('\t'); //Tab
+
+        new QueueTool().waitEmpty();
         return textComponent;
     }
 
