@@ -202,8 +202,20 @@ public final class TreeUtilities {
                             JavaFXTreePath parentPath = tp.getParentPath();
                             if (parentPath != null) {
                                 JavaFXTreePath grandParentPath = parentPath.getParentPath();
-                                Tree grandParent = grandParentPath.getLeaf();
-                                if (grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(grandParentPath)) {
+                                if (grandParentPath != null) {
+                                    Tree grandParent = grandParentPath.getLeaf();
+                                    if (grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(grandParentPath)) {
+                                        isSynteticMainBlock = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_VALUE) {
+                            JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
+                            JavaFXTreePath parentPath = tp.getParentPath();
+                            if (parentPath != null) {
+                                Tree parent = parentPath.getLeaf();
+                                if (parent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(parentPath)) {
                                     isSynteticMainBlock = true;
                                 }
                             }
