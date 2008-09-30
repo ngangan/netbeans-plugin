@@ -392,6 +392,8 @@ made subject to such option by the copyright holder.
         <property name="jnlp.resources.jars.value" value="${jnlp.signed.jars}${jnlp.components}"/>
     </target>
     <target name="-sign-jars" depends="-repack-pack200-jars, -jnlp-init-keystore,-check-signing-possible" if="jnlp.signed.true+signjarstask.available">
+        <taskdef name="jnlpsignjars" classname="org.netbeans.modules.javawebstart.anttasks.SignJarsTask"
+            classpath="${libs.JWSAntTasks.classpath}"/>
         <jnlpsignjars keystore="${jnlp.signjar.keystore}" storepass="${jnlp.signjar.storepass}" 
                 keypass="${jnlp.signjar.keypass}" alias="${jnlp.signjar.alias}" mainjar="${dist.jar}" destdir="dist"
                 codebase="${jnlp.codebase.value}" signedjarsprop="jnlp.signed.jars"
