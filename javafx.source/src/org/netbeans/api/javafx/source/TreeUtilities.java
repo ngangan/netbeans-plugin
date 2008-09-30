@@ -195,10 +195,10 @@ public final class TreeUtilities {
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
                     if (start != -1 && start < pos && end >= pos) {
-                        boolean isSynteticMainBlock = false;
+                        JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
+                        boolean isSynteticMainBlock = isSynthetic(tp);
                         // we don't want to return the syntetic main block as the result
                         if (tree.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
-                            JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
                             JavaFXTreePath parentPath = tp.getParentPath();
                             if (parentPath != null) {
                                 JavaFXTreePath grandParentPath = parentPath.getParentPath();
@@ -211,7 +211,6 @@ public final class TreeUtilities {
                             }
                         }
                         if (tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_VALUE) {
-                            JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
                             JavaFXTreePath parentPath = tp.getParentPath();
                             if (parentPath != null) {
                                 Tree parent = parentPath.getLeaf();
