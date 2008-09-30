@@ -54,22 +54,47 @@ public class TestSuite {
         addTest(TemplateBi.class).
         addTest(TemplateBo.class).
         addTest(TemplateBr.class).
+        addTest(TemplateCa.class).
+        addTest(TemplateCl.class).
         addTest(TemplateCn.class).
+        addTest(TemplateDe.class).
+        addTest(TemplateEl.class).
+        addTest(TemplateEli.class).
+        addTest(TemplateEx.class).
         addTest(TemplateFa.class).
         addTest(TemplateFi.class).
+        addTest(TemplateFor.class).
+        addTest(TemplateFu.class).
+        addTest(TemplateIf.class).
+        addTest(TemplateIfe.class).
         addTest(TemplateIm.class).
         addTest(TemplateIn.class).
         addTest(TemplateInd.class).
+        addTest(TemplateIns.class).
+        addTest(TemplateInsa.class).
+        addTest(TemplateInsb.class).
+        addTest(TemplateInv.class).
         addTest(TemplateIof.class).
         addTest(TemplateNu.class).
         addTest(TemplatePa.class).
         addTest(TemplatePe.class).
         addTest(TemplatePu.class).
+        addTest(TemplateRe.class).
+        addTest(TemplateSerr.class).
         addTest(TemplateSo.class).
+        addTest(TemplateSout.class).
         addTest(TemplateSt.class).
         addTest(TemplateTh.class).
         addTest(TemplateTof.class).
-        addTest(TemplateWe.class);
+        addTest(TemplateTr.class).
+        addTest(TemplateTrid.class).
+        addTest(TemplateTrii.class).
+        addTest(TemplateTrin.class).
+        addTest(TemplateTrir.class).
+        addTest(TemplateTw.class).
+        addTest(TemplateVar.class).
+        addTest(TemplateWe.class).
+        addTest(TemplateWh.class);
       return NbModuleSuite.create(config);
   }
 

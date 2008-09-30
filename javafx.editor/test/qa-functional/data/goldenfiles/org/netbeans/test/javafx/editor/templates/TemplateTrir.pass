@@ -1,0 +1,7 @@
+
+
+package templatetrir;
+
+
+
+trigger on ClassName.AttributeName oldValue = newValue {  }
