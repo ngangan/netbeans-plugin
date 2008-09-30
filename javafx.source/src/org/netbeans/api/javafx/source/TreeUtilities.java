@@ -195,11 +195,22 @@ public final class TreeUtilities {
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
                     if (start != -1 && start < pos && end >= pos) {
-                        if (tree.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) {
-                            tree.accept(this, p);
-                            throw new Result(getCurrentPath());
+                        boolean isSynteticMainBlock = false;
+                        // we don't want to return the syntetic main block as the result
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
+                            JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
+                            JavaFXTreePath parentPath = tp.getParentPath();
+                            if (parentPath != null) {
+                                JavaFXTreePath grandParentPath = parentPath.getParentPath();
+                                Tree grandParent = grandParentPath.getLeaf();
+                                if (grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(grandParentPath)) {
+                                    isSynteticMainBlock = true;
+                                }
+                            }
                         }
-                        throw new Result(new JavaFXTreePath(getCurrentPath(), tree));
+                        if (!isSynteticMainBlock) {
+                            throw new Result(new JavaFXTreePath(getCurrentPath(), tree));
+                        }
                     } else {
                         if ((start == -1) || (end == -1)) {
                             if (!isSynthetic(getCurrentPath())) {
