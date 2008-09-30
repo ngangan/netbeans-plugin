@@ -30,7 +30,6 @@
 package math;
 
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
@@ -82,9 +81,7 @@ Stage {
     }
 
     visible : true
-    decoration : Decoration {
-        title : "Sine Wave"
-    }
+    title : "Sine Wave"
     width : 200
     height : 232
 }

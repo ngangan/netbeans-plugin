@@ -88,6 +88,7 @@ Stage {
 
     width : 200
     height : 232
+    title : "Background Image"
 }
 
 timeline.play();

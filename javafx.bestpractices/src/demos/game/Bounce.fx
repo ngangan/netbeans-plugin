@@ -141,6 +141,7 @@ Stage {
 
     width : 207
     height : 232
+    title: "Bounce"
 }
 
 class Paddle extends CustomNode {

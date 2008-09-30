@@ -35,7 +35,6 @@ import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
@@ -59,9 +58,7 @@ Stage {
 
     width : 200
     height : 232
-    decoration : Decoration {
-        title: "Clock"
-    }
+    title: "Clock"
 }
 
 clockWork.timer.play();

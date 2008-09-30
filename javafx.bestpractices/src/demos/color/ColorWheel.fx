@@ -37,7 +37,6 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.stage.Decoration;
 
 import javafx.lang.FX;
 
@@ -132,7 +131,5 @@ Stage {
 
     width : 206                     // Width and heiight of the frame
     height : 232
-    decoration : Decoration {
-        title : "Color Wheel"
-    }
+    title : "Color Wheel"
 }

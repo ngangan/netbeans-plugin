@@ -32,7 +32,6 @@ package transform;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -82,9 +81,7 @@ Stage {
     }
 
     visible : true
-    decoration : Decoration {
-        title : "Scale"
-    }
+    title : "Scale"
     width : 200
     height : 232
 }

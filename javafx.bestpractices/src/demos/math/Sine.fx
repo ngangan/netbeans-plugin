@@ -30,7 +30,6 @@
 package math;
 
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
@@ -92,9 +91,7 @@ Stage {
 
 
     visible : true
-    decoration : Decoration {
-        title : "Sine"
-    }
+    title : "Sine"
     width : 200
     height : 232
 }

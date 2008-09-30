@@ -32,7 +32,6 @@ package motion;
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
@@ -66,9 +65,7 @@ Stage {
         }
     }
 
-    decoration : Decoration {
-        title : "Linear"
-    }
+    title : "Linear"
     width : 200
     height : 232
 }

@@ -33,7 +33,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.stage.Decoration;
 
 /**
  * @author Michal Skvor
@@ -126,7 +125,5 @@ Stage {
     visible : true
     width : 206
     height : 232
-    decoration : Decoration {
-        title : "Point and Lines"
-    }
+    title : "Point and Lines"
 }

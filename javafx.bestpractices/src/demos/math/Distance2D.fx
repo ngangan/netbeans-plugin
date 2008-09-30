@@ -34,7 +34,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 
 import java.lang.Math;
@@ -89,9 +88,7 @@ Stage {
     };
 
     visible : true
-    decoration : Decoration {
-        title : "Distance 2D"
-    }
+    title : "Distance 2D"
     width : 200
     height : 232
 }

@@ -39,7 +39,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
@@ -59,9 +58,7 @@ Stage {
     }
 
     visible : true
-    decoration : Decoration {
-        title : "Smoke Particle System"
-    }
+    title : "Smoke Particle System"
     width : 200
     height : 232
 }

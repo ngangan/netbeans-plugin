@@ -38,7 +38,6 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.stage.Decoration;
 
 import javafx.lang.FX;
 
@@ -74,9 +73,7 @@ Stage {
 
     width : 206                       // Width and height of the frame
     height : 230
-    decoration : Decoration {
-        title : "Gradient Sample"
-    }
+    title : "Gradient Sample"
 }
 
 class GradientBox extends CustomNode {

@@ -32,7 +32,6 @@ package input;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -77,9 +76,7 @@ Stage {
     };
 
     visible : true
-    decoration : Decoration {
-        title : "Milliseconds"
-    }
+    title : "Milliseconds"
     width : 208
     height : 232
 }

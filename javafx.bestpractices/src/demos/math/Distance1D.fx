@@ -33,7 +33,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -95,9 +94,7 @@ Stage {
     }
 
     visible : true
-    decoration : Decoration {
-        title : "Distance 1D"
-    }
+    title : "Distance 1D"
     width : 200
     height : 232
 }

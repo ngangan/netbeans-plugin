@@ -32,7 +32,6 @@ package transform;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -79,9 +78,7 @@ Stage {
         ]
     }
 
-    decoration : Decoration {
-        title : "Translate"
-    }
+    title : "Translate"
     width : 200
     height : 232
 }

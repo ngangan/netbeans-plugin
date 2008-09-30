@@ -35,7 +35,6 @@ import javafx.scene.Group;
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -57,9 +56,7 @@ Stage {
     };
 
     visible : true
-    decoration : Decoration {
-        title : "Flocks"
-    }
+    title : "Flocks"
     width : 200
     height : 232
 }

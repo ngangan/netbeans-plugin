@@ -35,7 +35,6 @@ import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -86,9 +85,7 @@ Stage {
         content : bind parts
     }
 
-    decoration : Decoration {
-        title : "Simple Particle System"
-    }
+    title : "Simple Particle System"
     width : 200
     height : 232
 }

@@ -35,7 +35,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.stage.Decoration;
 
 /**
  * @author Michal Skvor
@@ -75,7 +74,5 @@ Stage {
 
     width : 206
     height : 232
-    decoration : Decoration {
-        title : "Shape Primitives"
-    }
+    title : "Shape Primitives"
 }

@@ -37,7 +37,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.stage.Decoration;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
@@ -74,9 +73,7 @@ Stage {
     }
 
     visible : true
-    decoration : Decoration {
-        title : "Arctangent"
-    }
+    title : "Arctangent"
     width : 200
     height : 232
 }
