@@ -146,7 +146,10 @@ public final class FXSourceUtils {
             }
         }
         s.append("):"); // NOI18N
-        s.append(mtype == null ? "???" : typeToString(types, mtype.restype)); // NOI18N
+        final Type restype = mtype.restype;
+        if (mtype != null && TypeKind.VOID != mtype.getKind()) {
+            s.append(mtype == null ? "???" : typeToString(types,restype)); // NOI18N
+        }
         return s.toString();
     }
 
@@ -219,42 +222,50 @@ public final class FXSourceUtils {
             sb.append("</s>"); // NOI18N
         }
 
-        if (element.getKind() != ElementKind.ENUM_CONSTANT) {
-            sb.append(": "); // NOI18N
-            sb.append("<font color="); // NOI18N
-            sb.append(TYPE_COLOR);
-            sb.append('>'); // NOI18N
-            final Type type = (Type) element.asType();
-            if (type instanceof FunctionType) {
-                MethodType mtype = ((FunctionType) type).asMethodType();
-                sb.append("function "); // NOI18N
+        sb.append(": "); // NOI18N
+        sb.append("<font color="); // NOI18N
+        sb.append(TYPE_COLOR);
+        sb.append('>'); // NOI18N
 
-                sb.append('('); // NOI18N
-                com.sun.tools.javac.util.List<Type> args = mtype.argtypes;
-                for (com.sun.tools.javac.util.List<Type> l = args; l.nonEmpty(); l = l.tail) {
-                    if (l != args) {
-                        sb.append(", "); // NOI18N
-                    }
-                    sb.append(':'); // NOI18N
-                    sb.append("<font color="); // NOI18N
-                    sb.append(TYPE_COLOR);
-                    sb.append('>'); // NOI18N
-                    sb.append(typeToString(types, l.head));
-                    sb.append("</font>"); // NOI18N
-                }
-                sb.append(')'); // NOI18N
+        final Type type = (Type) element.asType();
+        if (element instanceof ExecutableElement) {
+//        if (type instanceof FunctionType) {
 
-                sb.append(": "); // NOI18N     
+            Symbol.TypeSymbol sym = type.asElement();
+            String name = sym.name.toString();
+
+            sb.append("function "); // NOI18N
+            sb.append(element.getSimpleName());
+            sb.append('('); // NOI18N
+            java.util.List<? extends VariableElement> params = ((ExecutableElement) element).getParameters();
+            for (Iterator<? extends VariableElement> it = params.iterator(); it.hasNext();) {
+                VariableElement param = it.next();
+                sb.append(param.getSimpleName());
+                sb.append(": "); // NOI18N
                 sb.append("<font color="); // NOI18N
                 sb.append(TYPE_COLOR);
                 sb.append('>'); // NOI18N
-                sb.append(typeToString(types, mtype.restype));
-                sb.append("</font>"); // NOI18N                    
-            } else {
-                sb.append(typeToString(types, type));
+                sb.append(typeToString(types, (Type) param.asType()));
+                sb.append("</font>"); // NOI18N
+                if (it.hasNext()) {
+                    sb.append(", "); // NOI18N
+                }
             }
-            sb.append("</font>"); // NOI18N
+            sb.append(')'); // NOI18N
+
+            TypeMirror rt = ((ExecutableElement) element).getReturnType();
+            if (rt.getKind() != TypeKind.VOID) {
+                sb.append(": "); // NOI18N
+                sb.append("<font color="); // NOI18N
+                sb.append(TYPE_COLOR);
+                sb.append('>'); // NOI18N
+                sb.append(typeToString(types, (Type) ((ExecutableElement) element).getReturnType()));
+                sb.append("</font>"); // NOI18N
+            }
+        } else {
+            sb.append(typeToString(types, type));
         }
+        sb.append("</font>"); // NOI18N
 
         return sb.toString();
     }
