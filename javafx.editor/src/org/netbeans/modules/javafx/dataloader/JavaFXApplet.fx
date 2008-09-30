@@ -18,7 +18,7 @@ import javafx.scene.text.*;
 
 Stage{
     visible: true
-    decoration: Decoration{ title: "Application title" }
+    title: "Application title"
     width: 250
     height: 80
     scene: Scene{
