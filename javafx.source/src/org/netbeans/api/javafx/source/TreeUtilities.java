@@ -40,18 +40,13 @@
  */
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.tree.BlockExpressionTree;
 import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.SyntheticTree.SynthType;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
@@ -397,33 +392,69 @@ public final class TreeUtilities {
         return null;
     }
 
-    
+    /**
+     * @param scope
+     * @param member
+     * @param type
+     * @return true if the given member of the given type is accessible in the
+     *   given scope
+     */
     public boolean isAccessible(Scope 
             scope, Element member, TypeMirror type) {
+        if (LOGGABLE) {
+            log("isAccessible scope == " + scope);
+            log("   member == " + member);
+            log("   type == " + type);
+        }
         if (scope instanceof JavafxcScope && member instanceof Symbol && type instanceof Type) {
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
+            if (LOGGABLE) log("     resolve == " + resolve);
             Object env = ((JavafxcScope) scope).getEnv();
             JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-            boolean resolved = resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);
+            if (LOGGABLE) log("     fxEnv == " + fxEnv);
+            boolean res = resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);
+            if (LOGGABLE) log("     returning " + res);
             // temporary:
             return true;
         } else {
+            if (LOGGABLE) log("     returning FALSE from the else branch");
             return false;
         }
     }
 
-        public boolean isAccessible(Scope
+    /**
+     *
+     * @param scope
+     * @param type
+     * @return true if the class denoted by the type element is accessible
+     *   in the given scope
+     */
+    public boolean isAccessible(Scope
             scope, Element type) {
+        if (LOGGABLE) {
+            log("isAccessible scope == " + scope);
+            log("   type == " + type);
+        }
         if (scope instanceof JavafxcScope &&  type instanceof Symbol.TypeSymbol) {
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
+            if (LOGGABLE) log("     resolve == " + resolve);
             Object env = ((JavafxcScope) scope).getEnv();
             JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-	    return resolve.isAccessible(fxEnv, (Symbol.TypeSymbol) type);
-        } else
+            if (LOGGABLE) log("     fxEnv == " + fxEnv);
+            boolean res = resolve.isAccessible(fxEnv, (Symbol.TypeSymbol) type);
+            if (LOGGABLE) log("     returning " + res);
+            return res;
+        } else {
+            if (LOGGABLE) log("     returning FALSE from the else branch");
             return false;
+        }
     }
 
-
+    /**
+     *
+     * @param scope
+     * @return
+     */
     public boolean isStaticContext(Scope scope) {
         Object env = ((JavafxcScope) scope).getEnv();
         JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
