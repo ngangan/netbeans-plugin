@@ -60,8 +60,8 @@ public class Stage implements ActiveEditorDrop {
         
         // Imports
         Imports.addImport( targetComponent, "javafx.stage.Stage" );
-        Imports.addImport( targetComponent, "javafx.stage.Decoration" );
         Imports.addImport( targetComponent, "javafx.scene.Scene" );
+        
         return true;
     }
 }
