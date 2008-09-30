@@ -119,7 +119,6 @@ Stage {
                 fill : Color.LIGHTGREY
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    java.lang.System.out.println( "! {e.x},{e.y}" );
                     if( e.sceneX < paddle.width / 2 ) { paddle.x = paddle.width / 2; }
                     else if( e.sceneX > 200 - paddle.width / 2 ) { paddle.x = 200 - paddle.width / 2; }
                     else { paddle.x = e.sceneX; }
