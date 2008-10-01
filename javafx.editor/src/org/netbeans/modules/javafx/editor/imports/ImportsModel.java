@@ -5,7 +5,6 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.tree.JFXSelect;
@@ -109,6 +108,7 @@ public final class ImportsModel {
     }
 
     private Rectangle countLocation(Element e) {
+/*
         JavaFXTreePath elpath = ci.getPath(e);
         Tree tree = elpath.getLeaf();
 
@@ -126,6 +126,7 @@ public final class ImportsModel {
             }
 
         }
+*/
         return DEFAULT_POS;
     }
 
