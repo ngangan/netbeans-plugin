@@ -133,7 +133,7 @@ public final class ImportsModel {
         // this code is intended to run in EDT.
         final FixImportsLayout<FixItem> fil = FixImportsLayout.create();
         fil.setEditorComponent(tc.get());
-        fil.setLocation(rectangle.getLocation());
+//        fil.setLocation(rectangle.getLocation());
         List<FixItem> items = createItems(options, fil);
         fil.show(items, "FixImports", 0, new MyListSelectionListener(), "", "", 0);
     }
