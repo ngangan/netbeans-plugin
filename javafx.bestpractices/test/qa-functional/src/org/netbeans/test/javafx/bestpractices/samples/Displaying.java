@@ -54,28 +54,28 @@ public class Displaying extends JavaFXTestCase {
     public String _type = "Image"; //Type of Sample
     public String _project = "Displaying";
     public String _projectPath = "Displaying|Source Packages|image|Displaying.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testDisplayingCreate", "testDisplayingCompile", "testDisplayingCloseProject"};
     
     public Displaying(String name) {
         super(name);
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testDisplayingCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testDisplayingCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testDisplayingCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }

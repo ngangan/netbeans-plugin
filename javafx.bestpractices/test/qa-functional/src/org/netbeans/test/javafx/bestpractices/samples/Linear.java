@@ -54,28 +54,28 @@ public class Linear extends JavaFXTestCase {
     public String _type = "Motion"; //Type of Sample
     public String _project = "Linear";
     public String _projectPath = "Linear|Source Packages|motion|Linear.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testLinearCreate", "testLinearCompile", "testLinearCloseProject"};
     
     public Linear (String name) {
         super(name);
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testLinearCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testLinearCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testLinearCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }

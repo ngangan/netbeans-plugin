@@ -54,28 +54,28 @@ public class BouncyBubbles extends JavaFXTestCase {
     public String _type = "Motion"; //Type of Sample
     public String _project = "Bouncy Bubbles";
     public String _projectPath = "Bouncy Bubbles|Source Packages|motion|BouncyBubbles.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testBouncyBubblesCreate", "testBouncyBubblesCompile", "testBouncyBubblesCloseProject"};
     
     public BouncyBubbles (String name) {
         super(name);
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testBouncyBubblesCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testBouncyBubblesCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testBouncyBubblesCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }

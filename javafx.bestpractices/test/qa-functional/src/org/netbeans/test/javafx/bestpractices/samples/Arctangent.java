@@ -54,28 +54,28 @@ public class Arctangent extends JavaFXTestCase {
     public String _type = "Math"; //Type of Sample
     public String _project = "Arctangent";
     public String _projectPath = "Arctangent|Source Packages|math|Arctangent.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testArctangentCreate", "testArctangentCompile", "testArctangentCloseProject"};
     
     public Arctangent (String name) {
         super(name);
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testArctangentCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testArctangentCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testArctangentCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }
