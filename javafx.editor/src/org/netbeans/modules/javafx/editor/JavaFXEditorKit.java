@@ -40,12 +40,14 @@
  */
 package org.netbeans.modules.javafx.editor;
 
-import java.awt.Graphics;
-import java.rmi.RemoteException;
 import org.netbeans.api.java.queries.SourceLevelQuery;
+import org.netbeans.api.print.PrintManager;
 import org.netbeans.editor.*;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.editor.indent.api.Indent;
+import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
+import org.netbeans.modules.javafx.preview.Bridge;
+import org.netbeans.modules.javafx.preview.SerializableImage;
 import org.netbeans.modules.lexer.editorbridge.LexerEditorKit;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
@@ -56,12 +58,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.rmi.RemoteException;
 import java.util.Map;
-import org.netbeans.api.print.PrintManager;
-import org.netbeans.modules.javafx.preview.Bridge;
-import org.netbeans.modules.javafx.preview.SerializableImage;
 
 /**
  *
@@ -121,6 +122,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             new JavaDeleteCharAction(deletePrevCharAction, false),
             new JavaFXGoToDeclarationAction(),
             new JavaFXGoToSourceAction(),
+                JavaFXImports.getInstance(),
             new JavaInsertBreakAction()
         };
         return TextAction.augmentList(superActions, javafxActions);

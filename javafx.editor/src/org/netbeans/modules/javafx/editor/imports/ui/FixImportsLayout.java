@@ -17,8 +17,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -44,11 +45,11 @@ public final class FixImportsLayout<T extends CompletionItem> {
      */
     static final int POPUP_VERTICAL_GAP = 1;
 
-//    private Reference<JTextComponent> editorComponentRef;
+    private Reference<JTextComponent> editorComponentRef;
 
     private final FixPopup<T> fixPopup;
 
-    private Stack<PopupWindow<T>> visiblePopups;    
+//    private Stack<PopupWindow<T>> visiblePopups;
 
     public static <T extends CompletionItem> FixImportsLayout<T> create() {
         return new FixImportsLayout<T>();
@@ -58,39 +59,37 @@ public final class FixImportsLayout<T extends CompletionItem> {
         fixPopup = new FixPopup<T>();
         fixPopup.setLayout(this);
         fixPopup.setPreferDisplayAboveCaret(false);
-        visiblePopups = new Stack<PopupWindow<T>>();
+//        visiblePopups = new Stack<PopupWindow<T>>();
     }
 
     /*public*/ JTextComponent getEditorComponent() {
-//        return (editorComponentRef != null)
-//                ? editorComponentRef.get()
-//                : null;
-        return EditorRegistry.lastFocusedComponent();
+        return (editorComponentRef != null)
+                ? editorComponentRef.get()
+                : EditorRegistry.lastFocusedComponent();         
     }
 
-//    public void setEditorComponent(JTextComponent editorComponent) {
-//        hideAll();
-//        this.editorComponentRef = new WeakReference<JTextComponent>(editorComponent);
-//    }
+    public void setEditorComponent(JTextComponent editorComponent) {
+        hideAll();
+        this.editorComponentRef = new WeakReference<JTextComponent>(editorComponent);
+    }
 
     private void hideAll() {
         fixPopup.hide();
-        visiblePopups.clear();
+//        visiblePopups.clear();
     }
 
     @SuppressWarnings({"MethodWithTooManyParameters"})
-    public void show(List<T> data, String title, int anchorOffset, ListSelectionListener lsl, 
+    public void show(List<T> data, String title, int anchorOffset, ListSelectionListener lsl,
                      String additionalItemsText, String shortcutHint, int selectedIndex) {
         fixPopup.show(data, title, anchorOffset, lsl, additionalItemsText, shortcutHint, selectedIndex);
-        if (!visiblePopups.contains(fixPopup))
-            visiblePopups.push(fixPopup);
+        fixPopup.completionScrollPane.requestFocus();
     }
 
     public boolean hide() {
         if (fixPopup.isVisible()) {
             fixPopup.hide();
             fixPopup.completionScrollPane = null;
-            visiblePopups.remove(fixPopup);
+//            visiblePopups.remove(fixPopup);
             return true;
         } else { // not visible
             return false;
@@ -105,16 +104,14 @@ public final class FixImportsLayout<T extends CompletionItem> {
         return fixPopup.getSelectedCompletionItem();
     }
 
+
     public int getSelectedIndex() {
         return fixPopup.getSelectedIndex();
     }
 
     public void processKeyEvent(KeyEvent evt) {
-        for (int i = visiblePopups.size() - 1; i >= 0; i--) {
-            PopupWindow<T> popup = visiblePopups.get(i);
-            popup.processKeyEvent(evt);
-            if (evt.isConsumed())
-                return;
+        if (fixPopup.isVisible()) {
+            fixPopup.processKeyEvent(evt);
         }
     }
 
@@ -130,6 +127,7 @@ public final class FixImportsLayout<T extends CompletionItem> {
     PopupWindow<T> testGetCompletionPopup() {
         return fixPopup;
     }
+
 
     private static final class FixPopup<T extends CompletionItem> extends PopupWindow<T> {
 

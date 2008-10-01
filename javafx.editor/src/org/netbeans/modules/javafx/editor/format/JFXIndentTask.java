@@ -181,7 +181,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 ///*
             //verify if we need to adjust level in case of previous line.
             ts().move(ls);
-            Token t = ts.moveNext() ? ts.token() : null;
+            Token<?> t = ts.moveNext() ? ts.token() : null;
             while (t != null && ts.offset() < lso) {
                 if (t.id() == JFXTokenId.LBRACE || t.id() == JFXTokenId.LPAREN || t.id() == JFXTokenId.LBRACKET) {
                     level += getIndentStepLevel();

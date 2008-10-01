@@ -201,6 +201,20 @@ class InnerScrollPane extends JScrollPane {
         BaseKit.endLineAction, component);
     }
 
+    /**
+     * Overrides <code>processKeyEvent</code> to process events. *
+     */
+    @Override
+    protected void processKeyEvent(KeyEvent e) {
+        CompletionItem si = getSelectedCompletionItem();
+        if (si != null) {
+            si.processKeyEvent(e);
+        }
+        if (!e.isConsumed()) {
+            super.processKeyEvent(e);
+        }
+    }
+
     List testGetData() {
         return dataObj;
     }
