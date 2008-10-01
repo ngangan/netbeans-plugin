@@ -7,7 +7,6 @@ package org.netbeans.modules.javafx.editor.imports;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javafx.tree.JFXSelect;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -15,6 +14,7 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.editor.indent.api.Reformat;
 import org.netbeans.modules.javafx.editor.JFXImportManager;
 import org.netbeans.modules.javafx.editor.imports.ui.FixImportsLayout;
 import org.netbeans.modules.javafx.editor.imports.ui.FixItem;
@@ -30,6 +30,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
 import java.awt.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -166,25 +167,24 @@ public final class ImportsModel {
         TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
         final int startPos = quessImportsStart(ts);
         final int endPos = quessImportsEnd(ts, startPos);
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    logger.info("Publishing following entries:");
-                    doc.remove(startPos, endPos - startPos);
-                    int offset = startPos;
-                    for (ModelEntry entry : entries) {
-                        logger.info("\t" + entry.toImportStatement());
-                        String text = "\n" + entry.toImportStatement();
-                        doc.insertString(offset, text, null);
-                        offset += text.length();
-                    }
-                } catch (BadLocationException e) {
-                    logger.severe(e.getLocalizedMessage());
-                }
+        try {
+            Position end = doc.createPosition(endPos);
+            logger.info("Publishing following entries:");
+            doc.remove(startPos, endPos - startPos);
+            int offset = startPos;
+            boolean first = true;
+            for (ModelEntry entry : entries) {
+                logger.info("\t" + entry.toImportStatement());
+                String text = (first ? "" : "\n") + entry.toImportStatement();
+                first = false;
+                doc.insertString(offset, text, null);
+                offset += text.length();
             }
-        };
-//        doc.render(runnable);
-        runnable.run();
+            Reformat.get(doc).reformat(0, end.getOffset());
+        } catch (BadLocationException e) {
+            logger.severe(e.getLocalizedMessage());
+        }
+
     }
 
     private int quessImportsEnd(TokenSequence<JFXTokenId> ts, int startPos) {
@@ -276,13 +276,8 @@ public final class ImportsModel {
         private ModelEntry(ImportTree tree) {
             this.tree = tree;
             Tree qi = tree.getQualifiedIdentifier();
-            if (qi.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
-                JFXSelect select = (JFXSelect) qi;
-                type = select.getIdentifier().toString().trim();
-                verifyType();
-            } else {
-                throw new IllegalArgumentException("Cannot resolve argument");
-            }
+            type = qi.toString();
+            verifyType();
         }
 
         private void verifyType() {
