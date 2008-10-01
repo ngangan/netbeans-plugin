@@ -31,7 +31,7 @@ package motion;
 
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.animation.Timeline;
@@ -55,7 +55,7 @@ var timeline : Timeline = Timeline {
         }
 };
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.DARKGRAY
         content : Line {
@@ -65,11 +65,9 @@ Frame {
         }
     }
 
-    visible : true
     title : "Linear"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timeline.start();
+timeline.play();

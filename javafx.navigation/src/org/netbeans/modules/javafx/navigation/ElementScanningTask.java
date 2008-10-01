@@ -49,13 +49,11 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,14 +61,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.WildcardType;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -83,9 +74,6 @@ import org.netbeans.modules.javafx.navigation.ElementNode.Description;
  * @author Anton Chechel (space magic fixes only)
  */
 public class ElementScanningTask implements CancellableTask<CompilationInfo> {
-
-    private static final String TYPE_COLOR = "#707070";
-    private static final String INHERITED_COLOR = "#7D694A";
 
     private ClassMemberPanelUI ui;
     private final AtomicBoolean canceled = new AtomicBoolean();
@@ -188,7 +176,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             if (e != null) {
                 long pos = this.sourcePositions.getStartPosition(cu, node);
                 p.put(e, pos);
-                
+
                 // guesss what? space magic! weeeee! >:-((
                 if (SpaceMagicUtils.isSpiritualMethod(e)) {
                     List<Element> spiritualMembers = SpaceMagicUtils.getSpiritualMembers(info);
@@ -278,16 +266,17 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
         ElementHandle<Element> eh = null;
         try {
-            eh  = ElementHandle.create(e);
+            eh = ElementHandle.create(e);
         } catch (IllegalArgumentException iae) {
             // can't convert to element handler (incomplete element)
         }
         if (eh == null) {
             return null;
         }
-        
-        Description d = new Description(ui, name, eh, spaceMagicKind,inherited);
+
+        Description d = new Description(ui, name, eh, spaceMagicKind, inherited);
         final JavafxTypes javafxTypes = info.getJavafxTypes();
+        final boolean isDeprecated = info.getElements().isDeprecated(e);
 
         if (e instanceof TypeElement) {
             if (null != parent) {
@@ -297,20 +286,18 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                     return null;
                 }
             }
-
             d.subs = new HashSet<Description>();
-            d.htmlHeader = createHtmlHeader((TypeElement) e, info.getElements().isDeprecated(e), d.isInherited, javafxTypes);
+            d.htmlHeader = FXSourceUtils.typeElementToString(javafxTypes, (TypeElement) e, isDeprecated, d.isInherited);
         } else if (e instanceof ExecutableElement) {
             if (!spaceMagic && name.contains("$")) {
                 return null;
             }
-
-            d.htmlHeader = createHtmlHeader((ExecutableElement) e, info.getElements().isDeprecated(e), d.isInherited, javafxTypes);
+            d.htmlHeader = FXSourceUtils.executableElementToString(javafxTypes, (ExecutableElement) e, isDeprecated, d.isInherited);
         } else if (e instanceof VariableElement) {
             if (!spaceMagic && kind != ElementKind.FIELD && kind != ElementKind.ENUM_CONSTANT) {
                 return null;
             }
-            d.htmlHeader = createHtmlHeader((VariableElement) e, info.getElements().isDeprecated(e), d.isInherited, javafxTypes);
+            d.htmlHeader = FXSourceUtils.variableElementToString(javafxTypes, (VariableElement) e, isDeprecated, d.isInherited);
         }
 
         d.modifiers = e.getModifiers();
@@ -319,7 +306,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return d;
     }
 
-    private long getPosition(final Element e, final Map<Element, Long> pos) {
+    private static long getPosition(final Element e, final Map<Element, Long> pos) {
         Long res = pos.get(e);
         if (res == null) {
             return -1;
@@ -327,233 +314,4 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         return res.longValue();
     }
 
-    /** Creates HTML display name of the Executable element */
-    private String createHtmlHeader(ExecutableElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
-
-        StringBuilder sb = new StringBuilder();
-        if (isDeprecated) {
-            sb.append("<s>"); // NOI18N
-        }
-        if (isInherited) {
-            sb.append("<font color=" + INHERITED_COLOR + ">"); // NOI18N
-        }
-        if (e.getKind() == ElementKind.CONSTRUCTOR) {
-            sb.append(e.getEnclosingElement().getSimpleName());
-        } else {
-            sb.append(e.getSimpleName());
-        }
-        if (isDeprecated) {
-            sb.append("</s>"); // NOI18N
-        }
-
-        sb.append("("); // NOI18N
-
-        List<? extends VariableElement> params = e.getParameters();
-        for (Iterator<? extends VariableElement> it = params.iterator(); it.hasNext();) {
-            VariableElement param = it.next();
-            sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-            sb.append(print(types, param.asType()));
-            sb.append("</font>"); // NOI18N
-            sb.append(" "); // NOI18N
-            sb.append(param.getSimpleName());
-            if (it.hasNext()) {
-                sb.append(", "); // NOI18N
-            }
-        }
-
-
-        sb.append(")"); // NOI18N
-
-        if (e.getKind() != ElementKind.CONSTRUCTOR) {
-            TypeMirror rt = e.getReturnType();
-            if (rt.getKind() != TypeKind.VOID) {
-                sb.append(" : "); // NOI18N     
-                sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-                sb.append(print(types, e.getReturnType()));
-                sb.append("</font>"); // NOI18N                    
-            }
-        }
-
-        return sb.toString();
-    }
-
-    private String createHtmlHeader(VariableElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
-
-        StringBuilder sb = new StringBuilder();
-
-        if (isDeprecated) {
-            sb.append("<s>"); // NOI18N
-        }
-        if (isInherited) {
-            sb.append("<font color=" + INHERITED_COLOR + ">"); // NOI18N
-        }
-        sb.append(e.getSimpleName());
-        if (isDeprecated) {
-            sb.append("</s>"); // NOI18N
-        }
-
-        if (e.getKind() != ElementKind.ENUM_CONSTANT) {
-            sb.append(" : "); // NOI18N
-            sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N
-            sb.append(print(types, e.asType()));
-            sb.append("</font>"); // NOI18N
-        }
-
-        return sb.toString();
-    }
-
-    private String createHtmlHeader(TypeElement e, boolean isDeprecated, boolean isInherited, JavafxTypes types) {
-
-        StringBuilder sb = new StringBuilder();
-        if (isDeprecated) {
-            sb.append("<s>"); // NOI18N
-        }
-        if (isInherited) {
-            sb.append("<font color=" + INHERITED_COLOR + ">"); // NOI18N
-        }
-        sb.append(e.getSimpleName());
-        if (isDeprecated) {
-            sb.append("</s>"); // NOI18N
-        }
-        // sb.append(print(e.asType()));            
-        List<? extends TypeParameterElement> typeParams = e.getTypeParameters();
-
-        if (typeParams != null && !typeParams.isEmpty()) {
-            sb.append("&lt;"); // NOI18N
-
-            for (Iterator<? extends TypeParameterElement> it = typeParams.iterator(); it.hasNext();) {
-                TypeParameterElement tp = it.next();
-                sb.append(tp.getSimpleName());
-                try { // XXX Verry ugly -> file a bug against Javac?
-                    List<? extends TypeMirror> bounds = tp.getBounds();
-                    if (!bounds.isEmpty()) {
-                        sb.append(printBounds(bounds, types));
-                    }
-                } catch (NullPointerException npe) {
-                    System.err.println("El " + e);
-                    npe.printStackTrace();
-                }
-                if (it.hasNext()) {
-                    sb.append(", "); // NOI18N
-                }
-            }
-
-            sb.append("&gt;"); // NOI18N
-        }
-
-        // Add superclass and implemented interfaces
-
-        TypeMirror sc = e.getSuperclass();
-        String scName = print(types, sc);
-
-        if (sc == null ||
-                e.getKind() == ElementKind.ENUM ||
-                e.getKind() == ElementKind.ANNOTATION_TYPE ||
-                "Object".equals(scName) || // NOI18N
-                "<none>".equals(scName)) { // NOI18N
-            scName = null;
-        }
-
-        List<? extends TypeMirror> ifaces = e.getInterfaces();
-
-        if ((scName != null || !ifaces.isEmpty()) &&
-                e.getKind() != ElementKind.ANNOTATION_TYPE) {
-            sb.append(" :: "); // NOI18N
-            if (scName != null) {
-                sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N                
-                sb.append(scName);
-                sb.append("</font>"); // NOI18N
-            }
-            if (!ifaces.isEmpty()) {
-                if (scName != null) {
-                    sb.append(" : "); // NOI18N
-                }
-                for (Iterator<? extends TypeMirror> it = ifaces.iterator(); it.hasNext();) {
-                    TypeMirror typeMirror = it.next();
-                    sb.append("<font color=" + TYPE_COLOR + ">"); // NOI18N                
-                    sb.append(print(types, typeMirror));
-                    sb.append("</font>"); // NOI18N
-                    if (it.hasNext()) {
-                        sb.append(", "); // NOI18N
-                    }
-                }
-
-            }
-        }
-
-        return sb.toString();
-    }
-
-    private String printBounds(List<? extends TypeMirror> bounds, JavafxTypes types) {
-        if (bounds.size() == 1 && "java.lang.Object".equals(bounds.get(0).toString())) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(" extends "); // NOI18N
-
-        for (Iterator<? extends TypeMirror> it = bounds.iterator(); it.hasNext();) {
-            TypeMirror bound = it.next();
-            sb.append(print(types, bound));
-            if (it.hasNext()) {
-                sb.append(" & "); // NOI18N
-            }
-
-        }
-
-        return sb.toString();
-    }
-
-    private String print(JavafxTypes types, TypeMirror tm) {
-        StringBuilder sb;
-
-        switch (tm.getKind()) {
-            case DECLARED:
-                DeclaredType dt = (DeclaredType) tm;
-                sb = new StringBuilder(dt.asElement().getSimpleName().toString());
-                List<? extends TypeMirror> typeArgs = dt.getTypeArguments();
-                if (!typeArgs.isEmpty()) {
-                    sb.append("&lt;");
-
-                    for (Iterator<? extends TypeMirror> it = typeArgs.iterator(); it.hasNext();) {
-                        TypeMirror ta = it.next();
-                        sb.append(print(types, ta));
-                        if (it.hasNext()) {
-                            sb.append(", ");
-                        }
-                    }
-                    sb.append("&gt;");
-                }
-
-                return sb.toString();
-            case TYPEVAR:
-                TypeVariable tv = (TypeVariable) tm;
-                sb = new StringBuilder(tv.asElement().getSimpleName().toString());
-                return sb.toString();
-            case ARRAY:
-                ArrayType at = (ArrayType) tm;
-                sb = new StringBuilder(print(types, at.getComponentType()));
-                sb.append("[]");
-                return sb.toString();
-            case WILDCARD:
-                WildcardType wt = (WildcardType) tm;
-                sb = new StringBuilder("?");
-                if (wt.getExtendsBound() != null) {
-                    sb.append(" extends "); // NOI18N
-                    sb.append(print(types, wt.getExtendsBound()));
-                }
-                if (wt.getSuperBound() != null) {
-                    sb.append(" super "); // NOI18N
-                    sb.append(print(types, wt.getSuperBound()));
-                }
-                return sb.toString();
-            default:
-                if (tm instanceof Type) {
-                    // another space magic
-                    return FXSourceUtils.typeToString(types, (Type) tm);
-                }
-                return tm.toString();
-        }
-    }
 }

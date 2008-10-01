@@ -13,7 +13,11 @@ throw
 try
 var
 while
+Duration
+Object
 String
+TopLvlVar1
+TopLvlVar2
 applications
 classes
 com

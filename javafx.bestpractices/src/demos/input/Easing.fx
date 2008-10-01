@@ -35,7 +35,7 @@ import javafx.scene.CustomNode;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -48,7 +48,7 @@ import java.lang.Math;
 
 var easing : Ball = Ball {};
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -56,8 +56,8 @@ Frame {
                 fill : Color{ red: 0.2, green : 0.2, blue : 0.2 }
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    easing.targetX = e.x;
-                    easing.targetY = e.y;
+                    easing.targetX = e.sceneX;
+                    easing.targetY = e.sceneY;
                 }
             },
             easing
@@ -69,7 +69,6 @@ Frame {
     title : "Easing"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 class Ball extends CustomNode {
@@ -81,7 +80,7 @@ class Ball extends CustomNode {
     var easing : Number = 0.05;
 
     init {
-        timer.start();
+        timer.play();
     }
 
     var timer : Timeline = Timeline {

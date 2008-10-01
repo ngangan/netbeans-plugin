@@ -1,0 +1,7 @@
+
+
+package templatetrid;
+
+
+
+trigger on delete e from ClassName.AttributeName {  }

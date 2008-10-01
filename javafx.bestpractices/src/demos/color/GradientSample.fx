@@ -36,9 +36,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
-import java.lang.System;
+
+import javafx.lang.FX;
 
 /**
  * @author Michal Skvor
@@ -57,7 +58,9 @@ var C6 = Color.rgb(  25, 255, 200 );
 var Y_AXIS = false;
 var X_AXIS = true;
 
-Frame {
+// Frame representing view to our application
+Stage {
+    // Visual scene definition
     scene : Scene {
         content: [
             GradientBox { x :   0, y :   0, size : 200, c1 : B1, c2 : B2, axis : Y_AXIS },
@@ -68,11 +71,9 @@ Frame {
        ]
     }
 
-    visible : true
+    width : 206                       // Width and height of the frame
+    height : 230
     title : "Gradient Sample"
-    width : 208
-    height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 class GradientBox extends CustomNode {
@@ -104,6 +105,8 @@ class GradientBox extends CustomNode {
         };
     }
 
+    /** create() function which returns our visual representation of the
+     *  color wheel */
     override function create() : Node {
         return Group {
             content : Rectangle {

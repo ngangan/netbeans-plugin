@@ -1,6 +1,8 @@
+bufferedImage
 fitHeight
 fitWidth
 image
+initializedIV
 preserveRatio
 x
 y
@@ -32,6 +34,7 @@ pressed
 rotate
 scaleX
 scaleY
+style
 styleClass
 transforms
 translateX

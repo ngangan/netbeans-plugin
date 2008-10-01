@@ -174,6 +174,7 @@ public class ImportCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
+/* package no longer exists
     public void testFXImportJavaFXInput() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
@@ -185,6 +186,7 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
+*/
 
     public void testFXImportJavaFXLang() throws Exception {
         new CompletionTestCase(this).test(

@@ -31,7 +31,7 @@
 
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 /**
@@ -44,7 +44,7 @@ var p2 = p1 + d;
 var p3 = p2 + d;
 var p4 = p3 + d;
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.BLACK
         content : [
@@ -123,8 +123,7 @@ Frame {
     };
 
     visible : true
-    title : "Points And Lines"
-    width : 200
+    width : 206
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
+    title : "Point and Lines"
 }

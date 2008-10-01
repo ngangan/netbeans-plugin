@@ -32,7 +32,7 @@ package input;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 /**
@@ -46,7 +46,7 @@ var width : Number = 200;
 var leftColor:Color = Color { red : 0.0, green : 0.4, blue : 0.6 };
 var rightColor:Color = Color { red : 0.0, green : 0.2, blue : 0.4 };
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -54,14 +54,14 @@ Frame {
                 fill : Color.BLACK
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    var l = -0.002 * ( e.x - 100 ) / 2 + 0.06;
-                    var r = 0.002 * ( e.x - 100 ) / 2 + 0.06;
+                    var l = -0.002 * ( e.sceneX - 100 ) / 2 + 0.06;
+                    var r = 0.002 * ( e.sceneX - 100 ) / 2 + 0.06;
 
                     leftColor = Color { red : 0.0, green : l + 0.4, blue : l + 0.6 };
                     rightColor = Color { red : 0.0, green : r + 0.4, blue : r + 0.6 };
 
-                    gx = e.x / 2;
-                    gy = 100 - e.x / 2;
+                    gx = e.sceneX / 2;
+                    gy = 100 - e.sceneX / 2;
 
                     if( gx < 10 ) {
                     gx = 10;
@@ -97,5 +97,4 @@ Frame {
     title : "Mouse 1D"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }

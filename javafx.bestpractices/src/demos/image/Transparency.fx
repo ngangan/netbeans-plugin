@@ -32,7 +32,7 @@ package image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Scale;
@@ -45,13 +45,13 @@ var x : Number = 40;
 
 var img : Image = Image { url : "{__DIR__}../resources/overlay.png" };
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             ImageView {
                 image : Image { url : "{__DIR__}../resources/background.png" }
                 onMouseMoved : function( e : MouseEvent ):Void {
-                    x = e.x - 100 * 0.5;
+                    x = e.sceneX - 100 * 0.5;
                 }
             },
             ImageView {
@@ -62,9 +62,7 @@ Frame {
         ]
     }
 
-    visible : true
-    title : "Transparency"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
+    title : "Transparency"
 }

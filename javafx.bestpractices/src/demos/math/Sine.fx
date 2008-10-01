@@ -29,7 +29,7 @@
 
 package math;
 
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
@@ -77,7 +77,7 @@ for( i in [0..4] ) {
     angle += 360 / 5;
 }
 
-Frame {
+Stage {
     scene : Scene {
         fill : Color.LIGHTGREY
         content : [
@@ -94,7 +94,6 @@ Frame {
     title : "Sine"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timeline.start();
+timeline.play();

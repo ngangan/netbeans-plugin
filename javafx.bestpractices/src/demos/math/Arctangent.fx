@@ -36,7 +36,7 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
@@ -55,7 +55,7 @@ var eyes : Eye[] = [
     Eye { x : 175, y : 120,  size : 40 }
 ];
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -76,7 +76,6 @@ Frame {
     title : "Arctangent"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
 class Eye extends CustomNode {
@@ -87,7 +86,7 @@ class Eye extends CustomNode {
     public var size : Number;
 
     public var mouse : MouseEvent;
-    var angle : Number = bind Math.toDegrees( Math.atan2( y - mouse.x, x - mouse.x )) + 180;
+    var angle : Number = bind Math.toDegrees( Math.atan2( y - mouse.sceneY, x - mouse.sceneX )) + 180;
 
     public override function create(): Node {
         return Group {

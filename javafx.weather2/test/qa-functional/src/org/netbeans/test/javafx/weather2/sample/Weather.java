@@ -62,7 +62,7 @@ public class Weather extends JavaFXTestCase {
 
     /** Create Sample Project and Verify that Project exists */
     public void testCreate() {
-        if ((Util.createSampleProject(SAMPLE_PATH, _projectName)).equals(false)) {
+        if ((Util.createSampleProject(SAMPLE_PATH, _projectName, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }

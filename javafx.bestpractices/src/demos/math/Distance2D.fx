@@ -33,7 +33,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 import java.lang.Math;
@@ -71,7 +71,7 @@ for( x in [0..10] ) {
     }
 }
 
-Frame {
+Stage {
     scene : Scene {
         content : [
             Rectangle {
@@ -79,8 +79,8 @@ Frame {
                 fill : Color.GRAY
 
                 onMouseMoved : function( e : MouseEvent ): Void {
-                    mouseX = e.x;
-                    mouseY = e.y;
+                    mouseX = e.sceneX;
+                    mouseY = e.sceneY;
                 }
             },
             circles
@@ -91,5 +91,4 @@ Frame {
     title : "Distance 2D"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }

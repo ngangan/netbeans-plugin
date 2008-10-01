@@ -34,7 +34,7 @@ import javafx.scene.CustomNode;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Translate;
@@ -51,25 +51,30 @@ import java.lang.System;
 
 var clockWork : ClockWork = ClockWork {};
 
-Frame {
+Stage {
     scene : Scene {
         content : clockWork
         }
 
-    visible : true
-    title : "Clock"
     width : 200
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
-    }
+    title: "Clock"
+}
 
-clockWork.timer.start();
+clockWork.timer.play();
 
 class ClockWork extends CustomNode {
 
     var seconds : Number;
     var minutes : Number;
     var hours : Number;
+
+    init {
+        var calendar : Calendar = Calendar.getInstance();
+        seconds = calendar.get( Calendar.SECOND );
+        minutes = calendar.get( Calendar.MINUTE );
+        hours = calendar.get( Calendar.HOUR_OF_DAY );
+    }
 
     public var timer : Timeline = Timeline {
         repeatCount : Timeline.INDEFINITE
@@ -82,7 +87,7 @@ class ClockWork extends CustomNode {
                     minutes = calendar.get( Calendar.MINUTE );
                     hours = calendar.get( Calendar.HOUR_OF_DAY );
                 }
-            }
+            },
     };
 
     public override function create(): Node {

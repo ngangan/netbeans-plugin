@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.palette.items.applications;
 import javax.swing.text.JTextComponent;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.utils.Util;
+import org.netbeans.api.javafx.source.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -53,12 +53,12 @@ import org.openide.util.NbBundle;
 public class Scene implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Frame.class, "TEMPLATE_Scene" ); // NOI18N
+        String code = NbBundle.getMessage( Scene.class, "TEMPLATE_Scene" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Util.addImport( targetComponent, "javafx.scene.Scene" );
+        Imports.addImport( targetComponent, "javafx.scene.Scene" );
                 
         return true;
     }

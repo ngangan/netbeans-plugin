@@ -1,11 +1,12 @@
 animation
-application
 async
+data
 ext
 fxunit
-input
+geometry
+io
 lang
 reflect
 scene
-ui
+stage
 util

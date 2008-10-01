@@ -31,7 +31,7 @@ package input;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -70,7 +70,7 @@ for( i in [0..9] ) {
     } into barrs;
 }
 
-Frame {
+Stage {
     scene : Scene {
         content : bind barrs;
     };
@@ -79,7 +79,6 @@ Frame {
     title : "Milliseconds"
     width : 208
     height : 232
-    closeAction : function() { java.lang.System.exit( 0 ); }
 }
 
-timeline.start();
+timeline.play();

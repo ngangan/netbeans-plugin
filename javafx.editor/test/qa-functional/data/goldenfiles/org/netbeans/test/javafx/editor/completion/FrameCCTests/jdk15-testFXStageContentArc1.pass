@@ -1,5 +1,6 @@
 centerX
 centerY
+initializedArc
 length
 radiusX
 radiusY
@@ -42,6 +43,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+style
 styleClass
 transforms
 translateX
