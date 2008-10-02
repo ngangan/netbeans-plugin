@@ -16,11 +16,13 @@ cd $WORKSPACE/main/contrib/javafx.kit
 ant do-qa-functional-test-build
 cd ./build/test/qa-functional/data/
 zip -r ../data.zip ./ 
+cp ./data.zip ../../../../../../nbbuild/build/testdist/qa-functional/javafx2/org-netbeans-modules-javafx-kit/
 
 cd $WORKSPACE/main/contrib/javafx.editor
 ant do-qa-functional-test-build
 cd ./build/test/qa-functional/data/
 zip -r ../data.zip ./ 
+cp ./data.zip ../../../../../../nbbuild/build/testdist/qa-functional/javafx2/org-netbeans-modules-javafx-editor/
 
 cd $WORKSPACE/main/contrib/javafx.bestpractices
 ant do-qa-functional-test-build
