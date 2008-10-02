@@ -24,13 +24,9 @@ zip -r ../data.zip ./
 
 cd $WORKSPACE/main/contrib/javafx.bestpractices
 ant do-qa-functional-test-build
-cd ./build/test/qa-functional/data/
-zip -r ../data.zip ./ 
 
 cd $WORKSPACE/main/contrib/javafx.weather2
 ant do-qa-functional-test-build
-cd ./build/test/qa-functional/data/
-zip -r ../data.zip ./ 
 
 cd $WORKSPACE/main
 
