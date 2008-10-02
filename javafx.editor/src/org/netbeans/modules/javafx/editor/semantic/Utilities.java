@@ -208,7 +208,7 @@ public class Utilities {
             JFXFunctionDefinition function = (JFXFunctionDefinition) leaf;
             List<Tree> rightTrees = new ArrayList<Tree>();
 
-            rightTrees.addAll(function.getParameters());
+            rightTrees.addAll(function.getParams());
 //            rightTrees.addAll(function.getThrows());
             rightTrees.add(function.getBodyExpression());
 

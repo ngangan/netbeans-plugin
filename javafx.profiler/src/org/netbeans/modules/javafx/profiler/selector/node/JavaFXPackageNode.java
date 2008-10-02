@@ -59,6 +59,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
@@ -144,7 +145,8 @@ public class JavaFXPackageNode extends ContainerNode {
         super(stripName(defaultizeName(fo.getName())), IconResource.PACKAGE_ICON, parent);        
         this.project = project;
         this.fo = fo;
-        name = fo.getName();        
+        ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+        name = cp.getResourceName(fo, '.', false);
         this.cpInfo = cpInfo;
         // this.name = name;
         this.signature = new ClientUtils.SourceCodeSelection(name + ".*", null, null); // NOI18N

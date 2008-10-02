@@ -48,7 +48,6 @@ import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,8 +55,8 @@ import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
-import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.InnerClassesNode;
 import org.openide.util.NbBundle;
 
@@ -81,11 +80,9 @@ public class JavaFXInnerClassesNode extends ContainerNode {
                         public void run(CompilationController controller)
                                  throws Exception {
                             if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
-
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);
-String mName = tek.getSimpleName().toString();
                                     if (classElement.equals(tek.getEnclosingElement()) && tek.getKind().isClass()) {
                                         JavaFXClassNode classNode = new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, (TypeElement)tek, parent);
                                         if (classNode.getSignature() != null) {

@@ -101,9 +101,8 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
 
         return pkgs;
     }
-    
+
    private List<SelectorNode> collectPackages(ContainerNode parent, ClasspathInfo cpInfo, FileObject[] roots, List<SelectorNode> pkgs) {
-       
         for (int i = 0; i < roots.length; i++) {
             if (roots[i].isFolder()) {
                 pkgs = collectPackages(parent, cpInfo, roots[i], pkgs);
@@ -121,8 +120,9 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
                     if (JavaFXProjectUtilities.SOURCES_TYPE_JAVA.equalsIgnoreCase(files[i].getExt()) ||
                         JavaFXProjectUtilities.SOURCES_TYPE_JAVAFX.equalsIgnoreCase(files[i].getExt())) {
                         JavaFXPackageNode node = new JavaFXPackageNode(cpInfo, root, parent, scope, project);
-                        if (!pkgs.contains(node))
+                        if (!pkgs.contains(node)) {
                             pkgs.add(node);
+                        }
                     }
                 } else {
                     // this is a folder. Make recursive call.

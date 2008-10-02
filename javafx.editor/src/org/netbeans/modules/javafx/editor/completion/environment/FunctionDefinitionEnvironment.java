@@ -79,7 +79,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             if (parEnd > parStart) {
                 headerText = headerText.substring(parEnd + 1).trim();
             } else {
-                for (JFXVar param : def.getParameters()) {
+                for (JFXVar param : def.getParams()) {
                     int parPos = (int) sourcePositions.getEndPosition(root, param);
                     if (parPos == Diagnostic.NOPOS || offset <= parPos) {
                         break;

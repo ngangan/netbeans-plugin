@@ -45,7 +45,7 @@ import java.util.Comparator;
 import javax.lang.model.element.Element;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.java.source.ElementHandle;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
@@ -93,8 +93,6 @@ public class JavaFXClassNode extends ContainerNode {
 
     @Override
     public ClientUtils.SourceCodeSelection getSignature() {
-// TBD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
-// only javafx$run$ selected so far
         return signature;
 //        return new ClientUtils.SourceCodeSelection(((TypeElement)classElement).getQualifiedName().toString(),
 //                                                         JavaFXProjectUtilities.MAGIC_METHOD_NAME, JavaFXProjectUtilities.MAGIC_METHOD_SIGNATURE);
