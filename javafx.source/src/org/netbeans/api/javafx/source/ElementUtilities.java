@@ -56,6 +56,7 @@ import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
+import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafxdoc.DocEnv;
@@ -273,7 +274,7 @@ public final class ElementUtilities {
 
     /**Return members declared in the given scope.
      */
-    public Iterable<? extends Element> getLocalMembersAndVars(Scope scope, ElementAcceptor acceptor) {
+    public Iterable<? extends Element> getLocalMembersAndVars(JavafxcScope scope, ElementAcceptor acceptor) {
         ArrayList<Element> members = new ArrayList<Element>();
         HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
 //        Elements elements = JavacElements.instance(ctx);

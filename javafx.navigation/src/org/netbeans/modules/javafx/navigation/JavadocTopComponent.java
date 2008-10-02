@@ -73,6 +73,7 @@ public class JavadocTopComponent extends TopComponent {
         setIcon(Utilities.loadImage(ICON_PATH, true));
         
         documentationPane = new DocumentationScrollPane( false );
+        setLayout(new BorderLayout());
         add( documentationPane, BorderLayout.CENTER );
     }
     
