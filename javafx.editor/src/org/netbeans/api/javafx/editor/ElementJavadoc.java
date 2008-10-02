@@ -579,7 +579,8 @@ public class ElementJavadoc {
         sb.append("<p><tt>"); //NOI18N
         sb.append(getAnnotations(eu, mdoc.annotations()));
         int len = sb.length();
-        sb.append(Modifier.toString(mdoc.modifierSpecifier() & ~Modifier.NATIVE));
+        // TODO modifierSpecifier() does not exist for javafx
+//        sb.append(Modifier.toString(mdoc.modifierSpecifier() & ~Modifier.NATIVE));
         len = sb.length() - len;
         TypeVariable[] tvars = mdoc.typeParameters();
         if (tvars.length > 0) {
