@@ -765,10 +765,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 lText.append('(');
                 for (Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                     ParamDesc paramDesc = it.next();
-                    lText.append(escape(paramDesc.typeName));
-                    lText.append(' ');
-                    lText.append(PARAMETER_NAME_COLOR);
                     lText.append(paramDesc.name);
+                    lText.append(" : ");
+                    lText.append(PARAMETER_NAME_COLOR);
+                    lText.append(escape(paramDesc.typeName));
                     lText.append(COLOR_END);
                     if (it.hasNext()) {
                         lText.append(", "); //NOI18N
@@ -976,9 +976,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             sb.append('(');
             for (Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                 ParamDesc paramDesc = it.next();
-                sb.append(paramDesc.typeName);
-                sb.append(' ');
                 sb.append(paramDesc.name);
+                sb.append(" : ");
+                sb.append(paramDesc.typeName);
                 if (it.hasNext()) {
                     sb.append(", "); //NOI18N
                 }
@@ -1362,9 +1362,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     ParamDesc paramDesc = params.get(i);
                     if (i == activeParamsIndex)
                         lText.append(COLOR_END).append(ACTIVE_PARAMETER_COLOR).append(BOLD);
-                    lText.append(escape(paramDesc.typeName));
-                    lText.append(' ');
                     lText.append(paramDesc.name);
+                    lText.append(" : ");
+                    lText.append(escape(paramDesc.typeName));
                     if (i < params.size() - 1)
                         lText.append(", "); //NOI18N
                     else
@@ -1479,9 +1479,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             sb.append('(');
             for (Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                 ParamDesc paramDesc = it.next();
-                sb.append(paramDesc.typeName);
-                sb.append(' ');
                 sb.append(paramDesc.name);
+                sb.append(" : ");
+                sb.append(paramDesc.typeName);
                 if (it.hasNext()) {
                     sb.append(", "); //NOI18N
                 }
