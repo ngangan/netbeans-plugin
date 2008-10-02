@@ -82,9 +82,15 @@ public class Util {
             new QueueTool().waitEmpty();
             String output = oo.getText();
             CharSequence build = new String("BUILD");
-            if (!output.contains(build)) { //Compilation hasn't finished yet or window isn't open.
-                sleep();
-                output = oo.getText();
+            int done = 0;
+            while (done < 3) {
+                if (!output.contains(build)) { //Compilation hasn't finished yet or window isn't open.
+                    sleep();
+                    output = oo.getText();
+                    done++;
+                } else {
+                    done = 3;
+                }
             }
             CharSequence sucess = new String("BUILD SUCCESS");
             CharSequence warning = new String("warnings");
