@@ -54,7 +54,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
-import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
@@ -70,7 +69,6 @@ public class JavaFXFunctionNode extends SelectorNode {
             return o1.toString().compareTo(o2.toString());
         }
     };
-
 
     private ClientUtils.SourceCodeSelection rootMethod;
     private String signature = "signature";
@@ -160,7 +158,6 @@ public class JavaFXFunctionNode extends SelectorNode {
                 icon = IconResource.METHOD_PACKAGE_ICON;
             }
         }
-
         return icon;
     }
 }
