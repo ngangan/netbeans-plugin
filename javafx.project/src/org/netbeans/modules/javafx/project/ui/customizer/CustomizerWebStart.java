@@ -74,9 +74,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         
         initComponents();
         
-        jwsProps.enabledModel.setMnemonic(enableCheckBox.getMnemonic());
-        enableCheckBox.setModel(jwsProps.enabledModel);
-        
         jwsProps.allowOfflineModel.setMnemonic(offlineCheckBox.getMnemonic());
         offlineCheckBox.setModel(jwsProps.allowOfflineModel);
         
@@ -94,9 +91,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         codebaseTextField.setDocument(jwsProps.codebaseURLDocument);
         
         setCodebaseComponents();
-        boolean enableSelected = enableCheckBox.getModel().isSelected();
-        setEnabledAllComponents(enableSelected);
-        setEnabledRunComponent(enableSelected);
         
     }
     
@@ -115,7 +109,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        enableCheckBox = new javax.swing.JCheckBox();
         iconLabel = new javax.swing.JLabel();
         codebaseLabel = new javax.swing.JLabel();
         iconTextField = new javax.swing.JTextField();
@@ -132,21 +125,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         setMinimumSize(new java.awt.Dimension(499, 339));
         setPreferredSize(new java.awt.Dimension(499, 339));
         setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(enableCheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.enableCheckBox.text")); // NOI18N
-        enableCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.enableCheckBox.toolTipText")); // NOI18N
-        enableCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                enableCheckBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 2, 6, 2);
-        add(enableCheckBox, gridBagConstraints);
 
         iconLabel.setLabelFor(iconTextField);
         org.openide.awt.Mnemonics.setLocalizedText(iconLabel, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconLabel.text")); // NOI18N
@@ -220,6 +198,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         codebaseTextField.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseTextField.AccessibleContext.accessibleDescription")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(offlineCheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.offlineCheckBox.text")); // NOI18N
+        offlineCheckBox.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -241,6 +220,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         add(panelDescLabel, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(signedCheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.signedCheckBox.text")); // NOI18N
+        signedCheckBox.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -253,6 +233,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
 
         org.openide.awt.Mnemonics.setLocalizedText(pack200CheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.pack200CheckBox.text")); // NOI18N
         pack200CheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.pack200CheckBox.toolTipText")); // NOI18N
+        pack200CheckBox.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -265,6 +246,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
 
         org.openide.awt.Mnemonics.setLocalizedText(enablePack200CheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.enablePack200CheckBox.text")); // NOI18N
         enablePack200CheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.enablePack200CheckBox.toolTipText")); // NOI18N
+        enablePack200CheckBox.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -290,12 +272,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     private void codebaseComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_codebaseComboBoxActionPerformed
         setCodebaseComponents();
     }//GEN-LAST:event_codebaseComboBoxActionPerformed
-
-    private void enableCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableCheckBoxActionPerformed
-        boolean isSelected = enableCheckBox.getModel().isSelected();
-        setEnabledAllComponents(isSelected);
-        setEnabledRunComponent(isSelected);
-    }//GEN-LAST:event_enableCheckBoxActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         JFileChooser chooser = new JFileChooser();
@@ -360,26 +336,12 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         }
     }
     
-    private void setEnabledAllComponents(boolean b) {
-        iconLabel.setEnabled(b);
-        iconTextField.setEnabled(b);
-        browseButton.setEnabled(b);
-        codebaseLabel.setEnabled(b);
-        codebaseLabel1.setEnabled(b);
-        codebaseComboBox.setEnabled(b);
-        codebaseTextField.setEnabled(b);
-        offlineCheckBox.setEnabled(b);
-        signedCheckBox.setEnabled(b);
-        pack200CheckBox.setEnabled(b);
-        enablePack200CheckBox.setEnabled(b);
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JComboBox codebaseComboBox;
     private javax.swing.JLabel codebaseLabel;
     private javax.swing.JLabel codebaseLabel1;
     private javax.swing.JTextField codebaseTextField;
-    private javax.swing.JCheckBox enableCheckBox;
     private javax.swing.JCheckBox enablePack200CheckBox;
     private javax.swing.JLabel iconLabel;
     private javax.swing.JTextField iconTextField;

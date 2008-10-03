@@ -164,94 +164,91 @@ public class AppletSupport {
     /**
      * @return html file with the same name as applet
      */
-    private static FileObject generateHtml(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform, EditableProperties ep) throws IOException {
-        FileObject htmlFile = distDir.getFileObject(appletFile.getName(), HTML_EXT);
-
-        if (htmlFile == null) {
-//            htmlFile = buildDir.createData(appletFile.getName(), HTML_EXT);
-            htmlFile = distDir.createData(appletFile.getName(), HTML_EXT);
-        }
-
-        FileLock lock = htmlFile.lock();
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(htmlFile.getOutputStream(lock));
-//            ClassPath cp = ClassPath.getClassPath(appletFile, ClassPath.EXECUTE);
-            ClassPath sp = ClassPath.getClassPath(appletFile, ClassPath.SOURCE);
-            String path = FileUtil.getRelativePath(sp.findOwnerRoot(appletFile), appletFile);
-            String codebase = FileUtil.getRelativePath(buildDir, classesDir);
-
-            if (codebase == null) {
-                codebase = classesDir.getURL().toString();
-            }
-            String appletJavaScript = ep.getProperty(JavaFXProjectProperties.APPLET_JAVASCRIPT);
-            boolean isJavaScript = "true".equals(appletJavaScript);
-            boolean isInBrowser = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_RUN_IN_BROWSER));
-            String jnlpFileName = "true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP)) ? htmlFile.getName() + "." + JNLP_EXT : null;
-            String draggable = ep.getProperty(JavaFXProjectProperties.APPLET_DRAGGABLE);
-            String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
-            int width = defaultWidth;
-            int height = defaultHeight;
-            try {
-                width = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_WIDTH));
-                height = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_HEIGHT));
-            }catch(NumberFormatException nfe) {
-            }
-            if (appletFile.getExt().equals("fx")) {
-                JavaFXProject project = (JavaFXProject) getProject(appletFile);
-		if (project == null) {
-		    project = (JavaFXProject)getProject(buildDir);
-		}
-
-                String distJAR = project.evaluator().getProperty("dist.jar");
-                distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
-                String libs = distJAR;
-                try {
-                    File fxFolder = new File(((JavaFXPlatform) JavaFXProjectUtil.getActivePlatform(activePlatform)).getJavaFXFolder().toURI());
-                    String[] list = fxFolder.list(new FilenameFilter() {
-
-                        public boolean accept(File dir, String name) {
-                            if (name.endsWith(".jar")) {
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        }
-                    });
-                    for (int i = 0; i < list.length; i++) {
-                        libs += ",lib/" + list[i];
-                    }
-                } catch (URISyntaxException e) {
-                }
-
-
-//                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
-                path = path.substring(0, path.length() - 3);
-                if (isJavaScript && isInBrowser) {
-                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
-
-                } else {
-                    fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
-
-                }
-            } else {
-                path = path.substring(0, path.length() - 5);
-                if (isJavaScript && isInBrowser) {
-                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName, width,height); // NOI18N
-
-                } else {
-                    fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName,width,height); // NOI18N
-
-                }
-            }
-        } finally {
-            lock.releaseLock();
-            if (writer != null) {
-                writer.close();
-            }
-        }
-        return htmlFile;
-    }
+//    private static FileObject generateHtml(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform, EditableProperties ep) throws IOException {
+//        FileObject htmlFile = distDir.getFileObject(appletFile.getName(), HTML_EXT);
+//
+//        if (htmlFile == null) {
+////            htmlFile = buildDir.createData(appletFile.getName(), HTML_EXT);
+//            htmlFile = distDir.createData(appletFile.getName(), HTML_EXT);
+//        }
+//
+//        FileLock lock = htmlFile.lock();
+//        PrintWriter writer = null;
+//        try {
+//            writer = new PrintWriter(htmlFile.getOutputStream(lock));
+////            ClassPath cp = ClassPath.getClassPath(appletFile, ClassPath.EXECUTE);
+//            ClassPath sp = ClassPath.getClassPath(appletFile, ClassPath.SOURCE);
+//            String path = FileUtil.getRelativePath(sp.findOwnerRoot(appletFile), appletFile);
+//            String codebase = FileUtil.getRelativePath(buildDir, classesDir);
+//
+//            if (codebase == null) {
+//                codebase = classesDir.getURL().toString();
+//            }
+//            String jnlpFileName = htmlFile.getName() + "." + JNLP_EXT;
+//            String draggable = ep.getProperty(JavaFXProjectProperties.APPLET_DRAGGABLE);
+//            String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
+//            int width = defaultWidth;
+//            int height = defaultHeight;
+//            try {
+//                width = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_WIDTH));
+//                height = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_HEIGHT));
+//            }catch(NumberFormatException nfe) {
+//            }
+//            if (appletFile.getExt().equals("fx")) {
+//                JavaFXProject project = (JavaFXProject) getProject(appletFile);
+//		if (project == null) {
+//		    project = (JavaFXProject)getProject(buildDir);
+//		}
+//
+//                String distJAR = project.evaluator().getProperty("dist.jar");
+//                distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
+//                String libs = distJAR;
+//                try {
+//                    File fxFolder = new File(((JavaFXPlatform) JavaFXProjectUtil.getActivePlatform(activePlatform)).getJavaFXFolder().toURI());
+//                    String[] list = fxFolder.list(new FilenameFilter() {
+//
+//                        public boolean accept(File dir, String name) {
+//                            if (name.endsWith(".jar")) {
+//                                return true;
+//                            } else {
+//                                return false;
+//                            }
+//                        }
+//                    });
+//                    for (int i = 0; i < list.length; i++) {
+//                        libs += ",lib/" + list[i];
+//                    }
+//                } catch (URISyntaxException e) {
+//                }
+//
+//
+////                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
+//                path = path.substring(0, path.length() - 3);
+//                if (isJavaScript && isInBrowser) {
+//                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
+//
+//                } else {
+//                    fillInFile(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
+//
+//                }
+//            } else {
+//                path = path.substring(0, path.length() - 5);
+//                if (isJavaScript && isInBrowser) {
+//                    fillInFileJavaScript(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName, width,height); // NOI18N
+//
+//                } else {
+//                    fillInFile(writer, path + "." + CLASS_EXT, "codebase=\"" + codebase + "\"", false, draggable, java_args, jnlpFileName,width,height); // NOI18N
+//
+//                }
+//            }
+//        } finally {
+//            lock.releaseLock();
+//            if (writer != null) {
+//                writer.close();
+//            }
+//        }
+//        return htmlFile;
+//    }
 
     /**
      * @return JNLP file with the same name as applet
@@ -274,7 +271,6 @@ public class AppletSupport {
             if (codebase == null) {
                 codebase = distDir.getURL().toString();
             }
-            String appletJavaScript = ep.getProperty(JavaFXProjectProperties.APPLET_JAVASCRIPT);
             int width = defaultWidth;
             int height = defaultHeight;
             try {
@@ -352,27 +348,27 @@ public class AppletSupport {
     /**
      * @return URL of the html file with the same name as sibling
      */
-    public static URL generateHtmlFileURL(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform, EditableProperties ep) throws FileStateInvalidException {
-        FileObject html = null;
-        FileObject jnlp = null;
-        IOException ex = null;
-        if ((appletFile == null) || (buildDir == null) || (classesDir == null)) {
-            return null;
-        }
-        try {
-            if ("true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP))) {
-                jnlp = generateJNLP(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
-            }
-            html = generateHtml(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
-            if (html != null) {
-                return getHTMLPageURL(html, activePlatform);
-            } else {
-                return null;
-            }
-        } catch (IOException iex) {
-            return null;
-        }
-    }
+//    public static URL generateHtmlFileURL(FileObject appletFile, FileObject buildDir, FileObject classesDir, FileObject distDir, String activePlatform, EditableProperties ep) throws FileStateInvalidException {
+//        FileObject html = null;
+//        FileObject jnlp = null;
+//        IOException ex = null;
+//        if ((appletFile == null) || (buildDir == null) || (classesDir == null)) {
+//            return null;
+//        }
+//        try {
+//            if ("true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP))) {
+//                jnlp = generateJNLP(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
+//            }
+//            html = generateHtml(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
+//            if (html != null) {
+//                return getHTMLPageURL(html, activePlatform);
+//            } else {
+//                return null;
+//            }
+//        } catch (IOException iex) {
+//            return null;
+//        }
+//    }
 
     /**
      * Creates an URL of html page passed to the appletviewer. It workarounds a JDK 1.5 appletviewer

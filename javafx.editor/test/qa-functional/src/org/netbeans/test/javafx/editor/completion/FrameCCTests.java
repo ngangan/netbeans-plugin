@@ -86,7 +86,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/Stage001.fx",
-                19, // line number where the cursor should be
+                16, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -98,7 +98,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/Stage001.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -110,7 +110,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentArc1.fx",
-                24, // line number where the cursor should be
+                21, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -122,7 +122,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentCircle1.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -134,7 +134,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentEllipse1.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -146,7 +146,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentImage1.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -158,7 +158,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentImage1.fx",
-                23, // line number where the cursor should be
+                20, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -170,7 +170,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentLine1.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -182,7 +182,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentPolygon1.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -194,7 +194,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentRectangle1.fx",
-                21, // line number where the cursor should be
+                18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -206,7 +206,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentText1.fx",
-                22, // line number where the cursor should be
+                19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -218,7 +218,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentText1.fx",
-                24, // line number where the cursor should be
+                21, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
@@ -230,7 +230,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/ContentColor.fx",
-                26, // line number where the cursor should be
+                23, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
@@ -242,7 +242,7 @@ public class FrameCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "frame/stage/content/LinearGradient1.fx",
-                23, // line number where the cursor should be
+                20, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     public static Test suite() {

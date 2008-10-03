@@ -61,7 +61,6 @@ made subject to such option by the copyright holder.
                     <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/project/ui/resources/fx.png"/>
                     <attr name="instantiatingWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/project/ui/resources/emptyProject.html"/>
                 </file>
-                <file name="jnlp-impl.xml" url="/org/netbeans/modules/javafx/project/resources/jnlp-impl.xml"/>
             </folder>
         </folder>
     </folder>
