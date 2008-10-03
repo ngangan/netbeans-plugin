@@ -5,6 +5,7 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -19,6 +20,7 @@ import org.netbeans.modules.editor.indent.api.Reformat;
 import org.netbeans.modules.javafx.editor.JFXImportManager;
 import org.netbeans.modules.javafx.editor.imports.ui.FixImportsLayout;
 import org.netbeans.modules.javafx.editor.imports.ui.FixItem;
+import org.openide.util.NbBundle;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
@@ -96,7 +98,8 @@ public final class ImportsModel {
         } else if (!result.isEmpty()) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    display(result, countLocation(e));
+                    moveCaret(e);
+                    display(result, getHeaderText(e));
                 }
             });
             try {
@@ -109,36 +112,29 @@ public final class ImportsModel {
         }
     }
 
-    private Rectangle countLocation(Element e) {
-/*
+    private String getHeaderText(Element e) {
+        return NbBundle.getMessage(ImportsModel.class, "FI_IMPORT_UI_HEADER", e.getSimpleName().toString());
+    }
+
+    private void moveCaret(Element e) {
         JavaFXTreePath elpath = ci.getPath(e);
+        if (elpath == null) return;
         Tree tree = elpath.getLeaf();
 
         if (tree != null) {
             long startPos = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), tree);
-            try {
-                JTextComponent jtc = tc.get();
-                Rectangle rectangle = jtc.modelToView((int) startPos);
-                jtc.scrollRectToVisible(rectangle);
-                Container parent = jtc.getParent();
-                SwingUtilities.convertRectangle(jtc, rectangle, parent);                
-                return rectangle;
-            } catch (BadLocationException e1) {
-                logger.severe(e1.toString());
-            }
+            JTextComponent jtc = tc.get();
+            jtc.getCaret().setDot((int) startPos);
 
         }
-*/
-        return DEFAULT_POS;
     }
 
-    private void display(final Set<ElementHandle<TypeElement>> options, Rectangle rectangle) {
+    private void display(final Set<ElementHandle<TypeElement>> options, String text) {
         // this code is intended to run in EDT.
         final FixImportsLayout<FixItem> fil = FixImportsLayout.create();
         fil.setEditorComponent(tc.get());
-//        fil.setLocation(rectangle.getLocation());
         List<FixItem> items = createItems(options, fil);
-        fil.show(items, "FixImports", 0, new MyListSelectionListener(), "", "", 0);
+        fil.show(items, text, 0, new MyListSelectionListener(), null, null, 0);
     }
 
     private List<FixItem> createItems(Set<ElementHandle<TypeElement>> options, FixImportsLayout<FixItem> fil) {

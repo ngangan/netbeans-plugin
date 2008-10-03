@@ -93,6 +93,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
             public void run() {
                 logger.info(" ===> Fixing imports started");
                 final JavaFXSource s = JavaFXSource.forDocument(document);
+                int caret = target.getCaret().getDot();
                 try {
                     s.runUserActionTask(new Task<CompilationController>() {
                         public void run(CompilationController cc) throws Exception {
@@ -118,6 +119,8 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
                     }, false);
                 } catch (IOException e) {
                     throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e);
+                } finally {
+                    target.getCaret().setDot(caret);
                 }
                 logger.info(" ===> Fixing imports finished");
             }
