@@ -287,6 +287,7 @@ public class JavaFXProjectGenerator {
         ep.setProperty("applet.width", "200"); // NOI18N
         ep.setProperty("pack200.jar.compress", "true"); // NOI18N
         ep.setProperty("javafx.profile", "desktop"); // NOI18N
+        ep.setProperty("application.title", name); // NOI18N
 
         Charset enc = FileEncodingQuery.getDefaultEncoding();
         ep.setProperty(JavaFXProjectProperties.SOURCE_ENCODING, enc.name());
