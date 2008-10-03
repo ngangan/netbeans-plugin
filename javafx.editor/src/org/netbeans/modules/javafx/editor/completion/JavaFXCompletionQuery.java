@@ -448,6 +448,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
+        while (t != null && t.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+            path = path.getParentPath();
+            if (path != null) {
+                t = path.getLeaf();
+            } else {
+                t = null;
+            }
+        }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
         result = createEnvironment(k);
