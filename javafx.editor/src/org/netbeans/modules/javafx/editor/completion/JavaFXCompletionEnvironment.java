@@ -251,8 +251,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) {
         if (LOGGABLE) log("addMembers: " + type);
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
             return;
@@ -1100,8 +1099,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         Elements elements = controller.getElements();
         JavafxTypes types = controller.getJavafxTypes();
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         for (Element e : getEnclosedElements(pe)) {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
@@ -1147,8 +1145,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     private void addBasicType(String name1, String name2) {
         if (LOGGABLE) log("  addBasicType " + name1 + " : " + name2);
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         if (LOGGABLE) log("  scope == " + scope);
         for (Element local : scope.getLocalElements()) {
             if (LOGGABLE) log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
@@ -1178,15 +1175,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) {
         if (LOGGABLE) log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         JavafxcScope originalScope = scope;
         while (scope != null) {
             if (LOGGABLE) log("  scope == " + scope);
             addLocalAndImportedTypes(scope.getLocalElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,false);
             scope = scope.getEnclosingScope();
         }
-        Element e = trees.getElement(p);
+        Element e = trees.getElement(path);
         while (e != null && e.getKind() != ElementKind.PACKAGE) {
             e = e.getEnclosingElement();
         }
@@ -1250,7 +1246,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("findTypeElement: " + simpleName);
         JavafxcTrees trees = controller.getTrees();
         JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         while (scope != null) {
             if (LOGGABLE) log("  scope == " + scope);
             TypeElement res = findTypeElement(scope.getLocalElements(), simpleName,null);
