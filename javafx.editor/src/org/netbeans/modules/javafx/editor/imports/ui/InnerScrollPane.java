@@ -125,8 +125,9 @@ class InnerScrollPane extends JScrollPane {
                 topLabel.setText(title);
             } else {
                 topLabel = new JLabel(title);
-                topLabel.setForeground(Color.blue);
-                topLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+//                topLabel.setForeground(Color.blue);
+                topLabel.setFont(topLabel.getFont().deriveFont(Font.BOLD));
+                topLabel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 2));
                 setColumnHeaderView(topLabel);
             }
         }
