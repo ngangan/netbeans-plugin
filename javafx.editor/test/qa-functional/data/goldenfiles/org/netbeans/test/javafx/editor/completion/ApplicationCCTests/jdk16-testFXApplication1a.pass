@@ -1,8 +1,10 @@
-debug
+closing
 focused
+fullScreen
 height
 iconified
 icons
+impl_sceneCursor
 impl_stageDelegate
 onClose
 opacity
@@ -10,7 +12,6 @@ resizable
 scene
 style
 title
-transparent
 visible
 width
 x

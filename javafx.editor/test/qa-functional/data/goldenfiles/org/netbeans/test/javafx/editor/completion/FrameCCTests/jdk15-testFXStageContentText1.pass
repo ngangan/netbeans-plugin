@@ -1,5 +1,13 @@
+boundsInLocalListener
 content
 font
+impl_caretPosition
+impl_caretShape
+impl_selectionEnd
+impl_selectionFill
+impl_selectionShape
+impl_selectionStart
+impl_selectionStroke
 overline
 strikethrough
 textAlignment
@@ -12,6 +20,7 @@ blocksMouse
 cache
 clip
 cursor
+disable
 effect
 fill
 focusable
@@ -45,6 +54,7 @@ strokeLineCap
 strokeLineJoin
 strokeMiterLimit
 strokeWidth
+style
 styleClass
 transforms
 translateX
