@@ -179,11 +179,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     
     public Set<JavaFXCompletionItem> results;
     private boolean hasAdditionalItems;
-    private JToolTip toolTip;
+    JToolTip toolTip;
     private CompletionDocumentation documentation;
     int anchorOffset;
-    private int toolTipOffset;
-    private JTextComponent component;
+    int toolTipOffset;
+    JTextComponent component;
     public int queryType;
     private int caretOffset;
     private String filterPrefix;
@@ -336,6 +336,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 if (component != null && isTaskCancelled()) {
                     component.putClientProperty("completion-active", Boolean.FALSE);
                 }
+            } else if (queryType == JavaFXCompletionProvider.TOOLTIP_QUERY_TYPE) {
+                JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset);
+                env.resolveToolTip(controller);
+            } else if (queryType == JavaFXCompletionProvider.DOCUMENTATION_QUERY_TYPE) {
+                //resolveDocumentation(controller);
             }
         }
     }
