@@ -80,7 +80,6 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         this.uiProperties = uiProperties;
         initComponents();
         
-        testRootsPanel.setVisible(false);
         jScrollPane1.getViewport().setBackground( sourceRoots.getBackground() );
 //        jScrollPane2.getViewport().setBackground( testRoots.getBackground() );
         
@@ -114,23 +113,6 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
 */        
 //        emSR.setRelatedEditMediator( emTSR );
 //        emTSR.setRelatedEditMediator( emSR );
-        this.sourceLevel.setEditable(false);
-        this.sourceLevel.setModel(uiProperties.JAVAC_SOURCE_MODEL);
-        this.sourceLevel.setRenderer(uiProperties.JAVAC_SOURCE_RENDERER);        
-        uiProperties.JAVAC_SOURCE_MODEL.addListDataListener(new ListDataListener () {
-            public void intervalAdded(ListDataEvent e) {
-                enableSourceLevel ();
-            }
-
-            public void intervalRemoved(ListDataEvent e) {
-                enableSourceLevel ();
-            }
-
-            public void contentsChanged(ListDataEvent e) {
-                enableSourceLevel ();
-            }                                    
-        });
-        enableSourceLevel ();
         this.originalEncoding = this.uiProperties.getProject().evaluator().getProperty(JavaFXProjectProperties.SOURCE_ENCODING);
         if (this.originalEncoding == null) {
             this.originalEncoding = FileEncodingQuery.getDefaultEncoding().name();
@@ -162,10 +144,6 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
 
     public HelpCtx getHelpCtx() {
         return new HelpCtx (CustomizerSources.class);
-    }
-    
-    private void enableSourceLevel () {
-        this.sourceLevel.setEnabled(sourceLevel.getItemCount()>0);
     }
     
     
@@ -244,21 +222,10 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         removeSourceRoot = new javax.swing.JButton();
         upSourceRoot = new javax.swing.JButton();
         downSourceRoot = new javax.swing.JButton();
-        testRootsPanel = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        testRoots = new javax.swing.JTable();
-        addTestRoot = new javax.swing.JButton();
-        removeTestRoot = new javax.swing.JButton();
-        upTestRoot = new javax.swing.JButton();
-        downTestRoot = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        sourceLevel = new javax.swing.JComboBox();
-        includeExcludeButton = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         encoding = new javax.swing.JComboBox();
-        jPanel2 = new javax.swing.JPanel();
+        includeExcludeButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -389,153 +356,14 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         add(sourceRootsPanel, gridBagConstraints);
 
-        testRootsPanel.setLayout(new java.awt.GridBagLayout());
-
-        jLabel3.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_TestRoots").charAt(0));
-        jLabel3.setLabelFor(testRoots);
-        jLabel3.setText(bundle.getString("CTL_TestRoots")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
-        testRootsPanel.add(jLabel3, gridBagConstraints);
-
-        testRoots.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
-            },
-            new String [] {
-                "Package Folder", "Label"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane2.setViewportView(testRoots);
-        testRoots.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_testRoots")); // NOI18N
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        testRootsPanel.add(jScrollPane2, gridBagConstraints);
-
-        addTestRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_AddTestRoot").charAt(0));
-        addTestRoot.setText(bundle.getString("CTL_AddTestRoot")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 6, 0);
-        testRootsPanel.add(addTestRoot, gridBagConstraints);
-        addTestRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_addTestRoot")); // NOI18N
-
-        removeTestRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_RemoveTestRoot").charAt(0));
-        removeTestRoot.setText(bundle.getString("CTL_RemoveTestRoot")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 12, 0);
-        testRootsPanel.add(removeTestRoot, gridBagConstraints);
-        removeTestRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_removeTestRoot")); // NOI18N
-
-        upTestRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_UpTestRoot").charAt(0));
-        upTestRoot.setText(bundle.getString("CTL_UpTestRoot")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 6, 0);
-        testRootsPanel.add(upTestRoot, gridBagConstraints);
-        upTestRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_upTestRoot")); // NOI18N
-
-        downTestRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_DownTestRoot").charAt(0));
-        downTestRoot.setText(bundle.getString("CTL_DownTestRoot")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-        testRootsPanel.add(downTestRoot, gridBagConstraints);
-        downTestRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_downTestRoot")); // NOI18N
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.45;
-        gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
-        add(testRootsPanel, gridBagConstraints);
-
         jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        jLabel4.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_SourceLevel").charAt(0));
-        jLabel4.setLabelFor(sourceLevel);
-        jLabel4.setText(bundle.getString("TXT_SourceLevel")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 12);
-        jPanel1.add(jLabel4, gridBagConstraints);
-
-        sourceLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1.4", "1.5" }));
-        sourceLevel.setMinimumSize(this.sourceLevel.getPreferredSize());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(sourceLevel, gridBagConstraints);
-        sourceLevel.getAccessibleContext().setAccessibleName(bundle.getString("AN_SourceLevel")); // NOI18N
-        sourceLevel.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_SourceLevel")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(includeExcludeButton, org.openide.util.NbBundle.getMessage(CustomizerSources.class, "CustomizerSources.includeExcludeButton")); // NOI18N
-        includeExcludeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                includeExcludeButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        jPanel1.add(includeExcludeButton, gridBagConstraints);
-        includeExcludeButton.getAccessibleContext().setAccessibleDescription("Iinvokes the Configure Includes & Excludes dialog which allows you to specify the packages you want to include in your project.");
 
         jLabel5.setLabelFor(encoding);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(CustomizerSources.class, "TXT_Encoding")); // NOI18N
+        jLabel5.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -544,18 +372,26 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         jLabel5.getAccessibleContext().setAccessibleDescription("Encoding determines how the IDE interprets characters beyond the ASCII character set.");
 
         encoding.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        encoding.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         jPanel1.add(encoding, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(includeExcludeButton, org.openide.util.NbBundle.getMessage(CustomizerSources.class, "CustomizerSources.includeExcludeButton")); // NOI18N
+        includeExcludeButton.setEnabled(false);
+        includeExcludeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                includeExcludeButtonActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(jPanel2, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
+        jPanel1.add(includeExcludeButton, gridBagConstraints);
+        includeExcludeButton.getAccessibleContext().setAccessibleDescription("Iinvokes the Configure Includes & Excludes dialog which allows you to specify the packages you want to include in your project.");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -582,30 +418,19 @@ private void includeExcludeButtonActionPerformed(java.awt.event.ActionEvent evt)
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addSourceRoot;
-    private javax.swing.JButton addTestRoot;
     private javax.swing.JButton downSourceRoot;
-    private javax.swing.JButton downTestRoot;
     private javax.swing.JComboBox encoding;
     private javax.swing.JButton includeExcludeButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField projectLocation;
     private javax.swing.JButton removeSourceRoot;
-    private javax.swing.JButton removeTestRoot;
-    private javax.swing.JComboBox sourceLevel;
     private javax.swing.JTable sourceRoots;
     private javax.swing.JPanel sourceRootsPanel;
-    private javax.swing.JTable testRoots;
-    private javax.swing.JPanel testRootsPanel;
     private javax.swing.JButton upSourceRoot;
-    private javax.swing.JButton upTestRoot;
     // End of variables declaration//GEN-END:variables
     
 }

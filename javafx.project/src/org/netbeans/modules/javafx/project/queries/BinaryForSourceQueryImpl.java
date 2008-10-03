@@ -95,13 +95,6 @@ public class BinaryForSourceQueryImpl implements BinaryForSourceQueryImplementat
                     break;
                 }
             }
-            for (URL root : this.test.getRootURLs()) {
-                if (root.equals(sourceRoot)) {
-                    result = new R (JavaFXProjectProperties.BUILD_TEST_CLASSES_DIR);
-                    cache.put (sourceRoot,result);
-                    break;
-                }
-            }
         }
         return result;
     }

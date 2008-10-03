@@ -47,17 +47,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ButtonModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
-import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.api.project.ant.AntBuildExtender;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.javafx.project.api.JavaFXProjectConfigurations;
 import org.netbeans.spi.project.ProjectConfiguration;
@@ -65,20 +61,12 @@ import org.netbeans.spi.project.ProjectConfigurationProvider;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.ui.StoreGroup;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
-import org.openide.filesystems.Repository;
 import org.openide.util.Mutex;
 import org.openide.util.MutexException;
 import org.openide.util.NbBundle;
-import org.openide.xml.XMLUtil;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -86,7 +74,6 @@ import org.xml.sax.SAXException;
  */
 public class WebStartProjectProperties {
 
-    public static final String JNLP_ENABLED = "jnlp.enabled";
     public static final String JNLP_ICON = "jnlp.icon";
     public static final String JNLP_OFFLINE = "jnlp.offline-allowed";
     public static final String JNLP_CBASE_TYPE = "jnlp.codebase.type";
@@ -103,12 +90,10 @@ public class WebStartProjectProperties {
     // special value to persist Ant script handling
     public static final String CB_URL_WEB_PROP_VALUE = "$$$$codebase";
     public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value";
-    private String JNLP_FX_MAIN_JAR_VALUE = "lib/javafxrt.jar";
     private StoreGroup jnlpPropGroup = new StoreGroup();
     private PropertyEvaluator evaluator;
     private JavaFXProject javafxProject;
     // Models
-    ButtonModel enabledModel;
     ButtonModel allowOfflineModel;
     ButtonModel signedModel;
     ButtonModel pack200Model;
@@ -131,7 +116,6 @@ public class WebStartProjectProperties {
         }
         evaluator = javafxPropEval.evaluator();
          */
-        enabledModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_ENABLED);
         allowOfflineModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_OFFLINE);
         signedModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_SIGNED);
         if (evaluator.getProperty(JNLP_SIGNED) == null) {
@@ -166,7 +150,6 @@ public class WebStartProjectProperties {
         } else {
             editableProps.setProperty(JNLP_CBASE_TYPE, selItem);
             editableProps.setProperty(propName, propValue);
-            editableProps.setProperty(JNLP_FX_MAIN_JAR, JNLP_FX_MAIN_JAR_VALUE);
         }
     }
 
@@ -263,8 +246,8 @@ public class WebStartProjectProperties {
             // test if the file already exists, if so do not z tigenerate, just set as active
             JavaFXProjectConfigurations.createConfigurationFiles(javafxProject, "JWS_generated", prepareSharedProps(), null); // NOI18N
             setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
-            copyTemplate(javafxProject);
-            modifyBuildXml(javafxProject);
+//            copyTemplate(javafxProject);
+//            modifyBuildXml(javafxProject);
         } else {
             setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_Default"));
         }
@@ -291,109 +274,109 @@ public class WebStartProjectProperties {
         }
     }
 
-    private void copyTemplate(Project proj) throws IOException {
-        FileObject projDir = proj.getProjectDirectory();
-        FileObject jnlpBuildFile = projDir.getFileObject("nbproject/jnlp-impl.xml"); // NOI18N
-        if (jnlpBuildFile == null) {
-            FileSystem sfs = Repository.getDefault().getDefaultFileSystem();
-            FileObject templateFO = sfs.findResource("Templates/Project/JavaFX/jnlp-impl.xml"); // NOI18N
-            if (templateFO != null) {
-                FileUtil.copyFile(templateFO, projDir.getFileObject("nbproject"), "jnlp-impl"); // NOI18N
-            }
-        }
-    }
-
-    private void modifyBuildXml(Project proj) throws IOException {
-        FileObject projDir = proj.getProjectDirectory();
-        final FileObject buildXmlFO = projDir.getFileObject("build.xml"); // NOI18N
-        File buildXmlFile = FileUtil.toFile(buildXmlFO);
-        org.w3c.dom.Document xmlDoc = null;
-        try {
-            xmlDoc = XMLUtil.parse(new InputSource(buildXmlFile.toURI().toString()), false, true, null, null);
-        } catch (SAXException ex) {
-            ErrorManager.getDefault().notify(ex);
-        }
-        FileObject jnlpBuildFile = projDir.getFileObject("nbproject/jnlp-impl.xml"); // NOI18N
-        AntBuildExtender extender = proj.getLookup().lookup(AntBuildExtender.class);
-        if (extender != null) {
-            assert jnlpBuildFile != null;
-            if (extender.getExtension("jws") == null) {
-                // NOI18N
-                AntBuildExtender.Extension ext = extender.addExtension("jws", jnlpBuildFile); // NOI18N
-                ext.addDependency("jar", "jnlp"); // NOI18N
-            }
-            ProjectManager.getDefault().saveProject(proj);
-        } else {
-            Logger.getLogger(JavaFXCompositePanelProvider.class.getName()).log(Level.INFO, "Trying to include JWS build snippet in project type that doesn't support AntBuildExtender API contract."); // NOI18N
-        }
-
-        //TODO this piece shall not proceed when the upgrade to j2se-project/4 was cancelled.
-        //how to figure..
-        Element docElem = xmlDoc.getDocumentElement();
-        NodeList nl = docElem.getElementsByTagName("target"); // NOI18N
-        Element target = null;
-        for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element) nl.item(i);
-            if (e.getAttribute("name") != null && "-post-jar".equals(e.getAttribute("name"))) {
-                // NOI18N
-                target = e;
-                break;
-            }
-        }
-        boolean changed = false;
-        if (target != null) {
-            if (target.getAttribute("depends") != null && target.getAttribute("depends").contains("jnlp")) {
-                // NOI18N
-                String old = target.getAttribute("depends"); // NOI18N
-                old = old.replaceAll("jnlp", ""); // NOI18N
-                old = old.replaceAll(",[\\s]*$", ""); // NOI18N
-                old = old.replaceAll("^[\\s]*,", ""); // NOI18N
-                old = old.replaceAll(",[\\s]*,", ","); // NOI18N
-                old = old.trim();
-                if (old.length() == 0) {
-                    target.removeAttribute("depends"); // NOI18N
-                } else {
-                    target.setAttribute("depends", old); // NOI18N
-                }
-                changed = true;
-            }
-        }
-        nl = docElem.getElementsByTagName("import"); // NOI18N
-        for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element) nl.item(i);
-            if (e.getAttribute("file") != null && "nbproject/jnlp-impl.xml".equals(e.getAttribute("file"))) {
-                // NOI18N
-                e.getParentNode().removeChild(e);
-                changed = true;
-                break;
-            }
-        }
-
-        if (changed) {
-            final org.w3c.dom.Document fdoc = xmlDoc;
-            try {
-                ProjectManager.mutex().writeAccess(new Mutex.ExceptionAction<Void>() {
-
-                    public Void run() throws Exception {
-                        FileLock lock = buildXmlFO.lock();
-                        try {
-                            OutputStream os = buildXmlFO.getOutputStream(lock);
-                            try {
-                                XMLUtil.write(fdoc, os, "UTF-8"); // NOI18N
-                            } finally {
-                                os.close();
-                            }
-                        } finally {
-                            lock.releaseLock();
-                        }
-                        return null;
-                    }
-                });
-            } catch (MutexException mex) {
-                throw (IOException) mex.getException();
-            }
-        }
-    }
+//    private void copyTemplate(Project proj) throws IOException {
+//        FileObject projDir = proj.getProjectDirectory();
+//        FileObject jnlpBuildFile = projDir.getFileObject("nbproject/jnlp-impl.xml"); // NOI18N
+//        if (jnlpBuildFile == null) {
+//            FileSystem sfs = Repository.getDefault().getDefaultFileSystem();
+//            FileObject templateFO = sfs.findResource("Templates/Project/JavaFX/jnlp-impl.xml"); // NOI18N
+//            if (templateFO != null) {
+//                FileUtil.copyFile(templateFO, projDir.getFileObject("nbproject"), "jnlp-impl"); // NOI18N
+//            }
+//        }
+//    }
+//
+//    private void modifyBuildXml(Project proj) throws IOException {
+//        FileObject projDir = proj.getProjectDirectory();
+//        final FileObject buildXmlFO = projDir.getFileObject("build.xml"); // NOI18N
+//        File buildXmlFile = FileUtil.toFile(buildXmlFO);
+//        org.w3c.dom.Document xmlDoc = null;
+//        try {
+//            xmlDoc = XMLUtil.parse(new InputSource(buildXmlFile.toURI().toString()), false, true, null, null);
+//        } catch (SAXException ex) {
+//            ErrorManager.getDefault().notify(ex);
+//        }
+//        FileObject jnlpBuildFile = projDir.getFileObject("nbproject/jnlp-impl.xml"); // NOI18N
+//        AntBuildExtender extender = proj.getLookup().lookup(AntBuildExtender.class);
+//        if (extender != null) {
+//            assert jnlpBuildFile != null;
+//            if (extender.getExtension("jws") == null) {
+//                // NOI18N
+//                AntBuildExtender.Extension ext = extender.addExtension("jws", jnlpBuildFile); // NOI18N
+//                ext.addDependency("jar", "jnlp"); // NOI18N
+//            }
+//            ProjectManager.getDefault().saveProject(proj);
+//        } else {
+//            Logger.getLogger(JavaFXCompositePanelProvider.class.getName()).log(Level.INFO, "Trying to include JWS build snippet in project type that doesn't support AntBuildExtender API contract."); // NOI18N
+//        }
+//
+//        //TODO this piece shall not proceed when the upgrade to j2se-project/4 was cancelled.
+//        //how to figure..
+//        Element docElem = xmlDoc.getDocumentElement();
+//        NodeList nl = docElem.getElementsByTagName("target"); // NOI18N
+//        Element target = null;
+//        for (int i = 0; i < nl.getLength(); i++) {
+//            Element e = (Element) nl.item(i);
+//            if (e.getAttribute("name") != null && "-post-jar".equals(e.getAttribute("name"))) {
+//                // NOI18N
+//                target = e;
+//                break;
+//            }
+//        }
+//        boolean changed = false;
+//        if (target != null) {
+//            if (target.getAttribute("depends") != null && target.getAttribute("depends").contains("jnlp")) {
+//                // NOI18N
+//                String old = target.getAttribute("depends"); // NOI18N
+//                old = old.replaceAll("jnlp", ""); // NOI18N
+//                old = old.replaceAll(",[\\s]*$", ""); // NOI18N
+//                old = old.replaceAll("^[\\s]*,", ""); // NOI18N
+//                old = old.replaceAll(",[\\s]*,", ","); // NOI18N
+//                old = old.trim();
+//                if (old.length() == 0) {
+//                    target.removeAttribute("depends"); // NOI18N
+//                } else {
+//                    target.setAttribute("depends", old); // NOI18N
+//                }
+//                changed = true;
+//            }
+//        }
+//        nl = docElem.getElementsByTagName("import"); // NOI18N
+//        for (int i = 0; i < nl.getLength(); i++) {
+//            Element e = (Element) nl.item(i);
+//            if (e.getAttribute("file") != null && "nbproject/jnlp-impl.xml".equals(e.getAttribute("file"))) {
+//                // NOI18N
+//                e.getParentNode().removeChild(e);
+//                changed = true;
+//                break;
+//            }
+//        }
+//
+//        if (changed) {
+//            final org.w3c.dom.Document fdoc = xmlDoc;
+//            try {
+//                ProjectManager.mutex().writeAccess(new Mutex.ExceptionAction<Void>() {
+//
+//                    public Void run() throws Exception {
+//                        FileLock lock = buildXmlFO.lock();
+//                        try {
+//                            OutputStream os = buildXmlFO.getOutputStream(lock);
+//                            try {
+//                                XMLUtil.write(fdoc, os, "UTF-8"); // NOI18N
+//                            } finally {
+//                                os.close();
+//                            }
+//                        } finally {
+//                            lock.releaseLock();
+//                        }
+//                        return null;
+//                    }
+//                });
+//            } catch (MutexException mex) {
+//                throw (IOException) mex.getException();
+//            }
+//        }
+//    }
 
     private Properties prepareSharedProps() {
         Properties props = new Properties();

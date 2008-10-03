@@ -16,43 +16,13 @@ public class CustomizerApplet extends javax.swing.JPanel {
     public CustomizerApplet(JavaFXProjectProperties uiProperties) {
         initComponents();
         
-        uiProperties.javaScriptModel.setMnemonic(javaScriptCheckBox.getMnemonic());
-        javaScriptCheckBox.setModel(uiProperties.javaScriptModel);
-        
-        uiProperties.jnlpFileModel.setMnemonic(jnlpFileCheckBox.getMnemonic());
-        jnlpFileCheckBox.setModel(uiProperties.jnlpFileModel);
-        
         uiProperties.draggableModel.setMnemonic(draggableCheckBox.getMnemonic());
         draggableCheckBox.setModel(uiProperties.draggableModel);
-        
-        uiProperties.runAppletInBrowser.setMnemonic(runInBrowserCheckBox.getMnemonic());
-        runInBrowserCheckBox.setModel(uiProperties.runAppletInBrowser);
         
         javaArgumentsTextField.setDocument(uiProperties.javaArgumentsDocument);
         widthSpinner.setModel(uiProperties.widthModel);
         heightSpinner.setModel(uiProperties.heightModel);
-        boolean isSelected = javaScriptCheckBox.getModel().isSelected();
         noteLabel.setVisible(false);
-        boolean enabled = runInBrowserCheckBox.getModel().isSelected();
-        setEnabledAllComponents(enabled);
-        if (!enabled) {
-            setSelectedAllComponents(enabled);
-        }
-        
-    }
-    private void setEnabledAllComponents(boolean enabled) {
-        javaScriptCheckBox.setEnabled(enabled);
-        jnlpFileCheckBox.setEnabled(enabled);
-        draggableCheckBox.setEnabled(enabled);
-        widthLabel.setEnabled(enabled);
-        heightLabel.setEnabled(enabled);
-        widthSpinner.setEnabled(enabled);
-        heightSpinner.setEnabled(enabled);
-    }
-    private void setSelectedAllComponents(boolean selected) {
-        javaScriptCheckBox.getModel().setSelected(selected);
-        jnlpFileCheckBox.getModel().setSelected(selected);
-        draggableCheckBox.getModel().setSelected(selected);
     }
     /** This method is called from within the constructor to
      * initialize the form.
@@ -64,14 +34,11 @@ public class CustomizerApplet extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        javaScriptCheckBox = new javax.swing.JCheckBox();
-        jnlpFileCheckBox = new javax.swing.JCheckBox();
         descriptionLabel = new javax.swing.JLabel();
         draggableCheckBox = new javax.swing.JCheckBox();
         javaArgumentsTextField = new javax.swing.JTextField();
         javaArgumentsLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        runInBrowserCheckBox = new javax.swing.JCheckBox();
         noteLabel = new javax.swing.JLabel();
         widthLabel = new javax.swing.JLabel();
         widthSpinner = new javax.swing.JSpinner();
@@ -81,28 +48,6 @@ public class CustomizerApplet extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(499, 239));
         setPreferredSize(new java.awt.Dimension(499, 239));
         setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(javaScriptCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.text")); // NOI18N
-        javaScriptCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaScriptCheckBox.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 2);
-        add(javaScriptCheckBox, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jnlpFileCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.text")); // NOI18N
-        jnlpFileCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jnlpFileCheckBox.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 2);
-        add(jnlpFileCheckBox, gridBagConstraints);
 
         descriptionLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.descriptionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -155,21 +100,6 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 2);
         add(jLabel1, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(runInBrowserCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.runInBrowserCheckBox.text")); // NOI18N
-        runInBrowserCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                runInBrowserCheckBoxActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
-        add(runInBrowserCheckBox, gridBagConstraints);
-        runInBrowserCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.runInBrowserCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
-
         noteLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.noteLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -213,15 +143,6 @@ public class CustomizerApplet extends javax.swing.JPanel {
         add(heightSpinner, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-private void runInBrowserCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runInBrowserCheckBoxActionPerformed
-// TODO add your handling code here:
-    boolean enabled = runInBrowserCheckBox.getModel().isSelected();
-    if (!enabled) {
-        setSelectedAllComponents(enabled);
-    }
-    setEnabledAllComponents(enabled);
-}//GEN-LAST:event_runInBrowserCheckBoxActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JCheckBox draggableCheckBox;
@@ -230,10 +151,7 @@ private void runInBrowserCheckBoxActionPerformed(java.awt.event.ActionEvent evt)
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel javaArgumentsLabel;
     private javax.swing.JTextField javaArgumentsTextField;
-    private javax.swing.JCheckBox javaScriptCheckBox;
-    private javax.swing.JCheckBox jnlpFileCheckBox;
     private javax.swing.JLabel noteLabel;
-    private javax.swing.JCheckBox runInBrowserCheckBox;
     private javax.swing.JLabel widthLabel;
     private javax.swing.JSpinner widthSpinner;
     // End of variables declaration//GEN-END:variables

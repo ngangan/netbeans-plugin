@@ -1078,33 +1078,33 @@ class JavaFXActionProvider implements ActionProvider {
 
     private URL generateAppletHTML(FileObject file, EditableProperties ep) {
         URL url = null;
-        try {
-            String buildDirProp = project.evaluator().getProperty("build.dir"); //NOI18N
-            String classesDirProp = project.evaluator().getProperty("build.classes.dir"); //NOI18N
-            String distDirProp = project.evaluator().getProperty("dist.dir"); //NOI18N
-            FileObject buildDir = this.updateHelper.getAntProjectHelper().resolveFileObject(buildDirProp);
-            FileObject classesDir = this.updateHelper.getAntProjectHelper().resolveFileObject(classesDirProp);
-            FileObject distDir = this.updateHelper.getAntProjectHelper().resolveFileObject(distDirProp);
-
-            if (buildDir == null) {
-                buildDir = FileUtil.createFolder(project.getProjectDirectory(), buildDirProp);
-            }
-
-            if (distDir == null) {
-                distDir = FileUtil.createFolder(project.getProjectDirectory(), distDirProp);
-            }
-            
-            if (classesDir == null) {
-                classesDir = FileUtil.createFolder(project.getProjectDirectory(), classesDirProp);
-            }
-            String activePlatformName = project.evaluator().getProperty("platform.active"); //NOI18N
-            url = AppletSupport.generateHtmlFileURL(file, buildDir, classesDir, distDir, activePlatformName, ep);
-        } catch (FileStateInvalidException fe) {
-            //ingore
-        } catch (IOException ioe) {
-            ErrorManager.getDefault().notify(ioe);
-            return null;
-        }
+//        try {
+//            String buildDirProp = project.evaluator().getProperty("build.dir"); //NOI18N
+//            String classesDirProp = project.evaluator().getProperty("build.classes.dir"); //NOI18N
+//            String distDirProp = project.evaluator().getProperty("dist.dir"); //NOI18N
+//            FileObject buildDir = this.updateHelper.getAntProjectHelper().resolveFileObject(buildDirProp);
+//            FileObject classesDir = this.updateHelper.getAntProjectHelper().resolveFileObject(classesDirProp);
+//            FileObject distDir = this.updateHelper.getAntProjectHelper().resolveFileObject(distDirProp);
+//
+//            if (buildDir == null) {
+//                buildDir = FileUtil.createFolder(project.getProjectDirectory(), buildDirProp);
+//            }
+//
+//            if (distDir == null) {
+//                distDir = FileUtil.createFolder(project.getProjectDirectory(), distDirProp);
+//            }
+//            
+//            if (classesDir == null) {
+//                classesDir = FileUtil.createFolder(project.getProjectDirectory(), classesDirProp);
+//            }
+//            String activePlatformName = project.evaluator().getProperty("platform.active"); //NOI18N
+//            url = AppletSupport.generateHtmlFileURL(file, buildDir, classesDir, distDir, activePlatformName, ep);
+//        } catch (FileStateInvalidException fe) {
+//            //ingore
+//        } catch (IOException ioe) {
+//            ErrorManager.getDefault().notify(ioe);
+//            return null;
+//        }
         return url;
     }
 

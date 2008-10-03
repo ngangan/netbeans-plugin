@@ -93,7 +93,7 @@ public class JavaFXProjectGenerator {
         final AntProjectHelper[] h = new AntProjectHelper[1];
         dirFO.getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
             public void run() throws IOException {
-                h[0] = createProject(dirFO, name, "src", "test", mainClass, manifestFile, manifestFile == null); //NOI18N
+                h[0] = createProject(dirFO, name, "src", null, mainClass, manifestFile, manifestFile == null); //NOI18N
                 Project p = ProjectManager.getDefault().findProject(dirFO);
                 ProjectManager.getDefault().saveProject(p);
                 FileObject srcFolder = dirFO.createFolder("src"); // NOI18N
@@ -245,7 +245,7 @@ public class JavaFXProjectGenerator {
         ep.setProperty("debug.classpath", new String[] { // NOI18N
             "${run.classpath}", // NOI18N
         });        
-        ep.setProperty("jar.compress", "false"); // NOI18N
+        ep.setProperty("jar.compress", "true"); // NOI18N
         if (!isLibrary) {
             ep.setProperty("main.class", mainClass == null ? "" : mainClass); // NOI18N
         }
@@ -258,26 +258,10 @@ public class JavaFXProjectGenerator {
         ep.setProperty("javac.source", sourceLevel.toString()); // NOI18N
         ep.setProperty("javac.target", sourceLevel.toString()); // NOI18N
         ep.setProperty("javac.deprecation", "false"); // NOI18N
-        ep.setProperty("javac.test.classpath", new String[] { // NOI18N
-            "${javac.classpath}:", // NOI18N
-            "${build.classes.dir}:", // NOI18N
-            "${libs.junit.classpath}", // NOI18N
-        });
-        ep.setProperty("run.test.classpath", new String[] { // NOI18N
-            "${javac.test.classpath}:", // NOI18N
-            "${build.test.classes.dir}", // NOI18N
-        });
-        ep.setProperty("debug.test.classpath", new String[] { // NOI18N
-            "${run.test.classpath}", // NOI18N
-        });
         ep.setProperty("build.generated.dir", "${build.dir}/generated"); // NOI18N
-        ep.setProperty("meta.inf.dir", "${src.dir}/META-INF"); // NOI18N
         
         ep.setProperty("build.dir", "build"); // NOI18N
         ep.setComment("build.dir", new String[] {"# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_build.dir")}, false); // NOI18N
-        ep.setProperty("build.classes.dir", "${build.dir}/classes"); // NOI18N
-        ep.setProperty("build.test.classes.dir", "${build.dir}/test/classes"); // NOI18N
-        ep.setProperty("build.test.results.dir", "${build.dir}/test/results"); // NOI18N
         ep.setProperty("build.classes.excludes", "**/*.java,**/*.form,**/*.fx"); // NOI18N
         ep.setProperty("dist.javadoc.dir", "${dist.dir}/javadoc"); // NOI18N
         ep.setProperty("platform.active", "default_fx_platform"); // NOI18N
@@ -289,22 +273,24 @@ public class JavaFXProjectGenerator {
             "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs_3"), // NOI18N
         }, false);
 
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_PRIVATE, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_NO_TREE, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_USE, "true"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_NO_NAVBAR, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_NO_INDEX, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_SPLIT_INDEX, "true"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_AUTHOR, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_VERSION, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_WINDOW_TITLE, ""); // NOI18N
+        ep.setProperty(JavaFXProjectProperties.JAVADOC_PRIVATE, "true"); // NOI18N
+        ep.setProperty(JavaFXProjectProperties.JAVADOC_AUTHOR, "true"); // NOI18N
+        ep.setProperty(JavaFXProjectProperties.JAVADOC_VERSION, "true"); // NOI18N
         ep.setProperty(JavaFXProjectProperties.JAVADOC_ENCODING, ""); // NOI18N
         ep.setProperty(JavaFXProjectProperties.JAVADOC_ADDITIONALPARAM, ""); // NOI18N
+        ep.setProperty("jnlp.codebase.type", "local"); // NOI18N
+        ep.setProperty("jnlp.offline-allowed", "true"); // NOI18N
+        ep.setProperty("jnlp.packEnabled", "true"); // NOI18N
+        ep.setProperty("jnlp.signed", "true"); // NOI18N
+        ep.setProperty("applet.draggable", "true"); // NOI18N
+        ep.setProperty("applet.height", "200"); // NOI18N
+        ep.setProperty("applet.width", "200"); // NOI18N
+        ep.setProperty("pack200.jar.compress", "true"); // NOI18N
+        ep.setProperty("javafx.profile", "desktop"); // NOI18N
+        ep.setProperty("application.title", name); // NOI18N
+
         Charset enc = FileEncodingQuery.getDefaultEncoding();
         ep.setProperty(JavaFXProjectProperties.SOURCE_ENCODING, enc.name());
-        if (manifestFile != null) {
-            ep.setProperty("manifest.file", manifestFile); // NOI18N
-        }
         h.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);        
         return h;
     }
