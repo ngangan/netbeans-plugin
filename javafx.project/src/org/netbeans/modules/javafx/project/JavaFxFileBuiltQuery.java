@@ -91,10 +91,6 @@ public class JavaFxFileBuiltQuery implements FileBuiltQueryImplementation, Prope
             from[i] = "${" + srcRoots[i] + "}/*.java"; // NOI18N
             to[i] = "${" + JavaFXProjectProperties.BUILD_CLASSES_DIR + "}/*.class"; // NOI18N
         }
-        for (int i=0; i<tstRoots.length; i++) {
-            from[srcRoots.length+i] = "${" + tstRoots[i] + "}/*.java"; // NOI18N
-            to[srcRoots.length+i] = "${" + JavaFXProjectProperties.BUILD_TEST_CLASSES_DIR + "}/*.class"; // NOI18N
-        }
         return helper.createGlobFileBuiltQuery(evaluator, from, to);    //Safe to pass APH
     }
 

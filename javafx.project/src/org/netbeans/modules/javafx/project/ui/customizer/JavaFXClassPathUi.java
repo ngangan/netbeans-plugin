@@ -126,11 +126,8 @@ public class JavaFXClassPathUi {
         private static final Map WELL_KNOWN_PATHS_NAMES = new HashMap();
         static {
             WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.JAVAC_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_JavacClasspath_DisplayName" ) );
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.JAVAC_TEST_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class,"LBL_JavacTestClasspath_DisplayName") );
             WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.RUN_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_RunClasspath_DisplayName" ) );
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.RUN_TEST_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_RunTestClasspath_DisplayName" ) );
             WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.BUILD_CLASSES_DIR, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_BuildClassesDir_DisplayName" ) );            
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.BUILD_TEST_CLASSES_DIR, NbBundle.getMessage (JavaFXProjectProperties.class,"LBL_BuildTestClassesDir_DisplayName") );
         };
                 
         public ClassPathListCellRenderer( PropertyEvaluator evaluator ) {

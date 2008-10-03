@@ -346,14 +346,6 @@ public final class JavaFXProject implements Project, AntProjectListener {
         return this.testRoots;
     }
     
-    File getTestClassesDirectory() {
-        String testClassesDir = evaluator().getProperty(JavaFXProjectProperties.BUILD_TEST_CLASSES_DIR);
-        if (testClassesDir == null) {
-            return null;
-        }
-        return helper.resolveFile(testClassesDir);
-    }
-    
     // Currently unused (but see #47230):
     /** Store configured project name. */
     public void setName(final String name) {

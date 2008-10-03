@@ -47,17 +47,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ButtonModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
-import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.api.project.ant.AntBuildExtender;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.javafx.project.api.JavaFXProjectConfigurations;
 import org.netbeans.spi.project.ProjectConfiguration;
@@ -65,20 +61,12 @@ import org.netbeans.spi.project.ProjectConfigurationProvider;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.ui.StoreGroup;
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
-import org.openide.filesystems.Repository;
 import org.openide.util.Mutex;
 import org.openide.util.MutexException;
 import org.openide.util.NbBundle;
-import org.openide.xml.XMLUtil;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -86,7 +74,6 @@ import org.xml.sax.SAXException;
  */
 public class WebStartProjectProperties {
 
-    public static final String JNLP_ENABLED = "jnlp.enabled";
     public static final String JNLP_ICON = "jnlp.icon";
     public static final String JNLP_OFFLINE = "jnlp.offline-allowed";
     public static final String JNLP_CBASE_TYPE = "jnlp.codebase.type";
@@ -103,12 +90,10 @@ public class WebStartProjectProperties {
     // special value to persist Ant script handling
     public static final String CB_URL_WEB_PROP_VALUE = "$$$$codebase";
     public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value";
-    private String JNLP_FX_MAIN_JAR_VALUE = "lib/javafxrt.jar";
     private StoreGroup jnlpPropGroup = new StoreGroup();
     private PropertyEvaluator evaluator;
     private JavaFXProject javafxProject;
     // Models
-    ButtonModel enabledModel;
     ButtonModel allowOfflineModel;
     ButtonModel signedModel;
     ButtonModel pack200Model;
@@ -131,7 +116,6 @@ public class WebStartProjectProperties {
         }
         evaluator = javafxPropEval.evaluator();
          */
-        enabledModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_ENABLED);
         allowOfflineModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_OFFLINE);
         signedModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_SIGNED);
         if (evaluator.getProperty(JNLP_SIGNED) == null) {
@@ -166,7 +150,6 @@ public class WebStartProjectProperties {
         } else {
             editableProps.setProperty(JNLP_CBASE_TYPE, selItem);
             editableProps.setProperty(propName, propValue);
-            editableProps.setProperty(JNLP_FX_MAIN_JAR, JNLP_FX_MAIN_JAR_VALUE);
         }
     }
 

@@ -145,26 +145,7 @@ public final class LibrariesNodeFactory implements NodeFactory {
                             new SourceNodeFactory.PreselectPropertiesAction(project, "Libraries", CustomizerLibraries.COMPILE), // NOI18N
                         }
                     );
-            } else if (key == TEST_LIBRARIES) {
-                return  
-                    new LibrariesNode(NbBundle.getMessage(JavaFXLogicalViewProvider.class,"CTL_TestLibrariesNode"),
-                        project, evaluator, helper, resolver, JavaFXProjectProperties.RUN_TEST_CLASSPATH,
-                        new String[] {
-                            JavaFXProjectProperties.BUILD_TEST_CLASSES_DIR,
-                            JavaFXProjectProperties.JAVAC_CLASSPATH,
-                            JavaFXProjectProperties.BUILD_CLASSES_DIR,
-                        },
-                        null,
-                        new Action[] {
-                            LibrariesNode.createAddProjectAction(project, JavaFXProjectProperties.JAVAC_TEST_CLASSPATH),
-                            LibrariesNode.createAddLibraryAction(project, JavaFXProjectProperties.JAVAC_TEST_CLASSPATH),
-                            LibrariesNode.createAddFolderAction(project, JavaFXProjectProperties.JAVAC_TEST_CLASSPATH),
-                            null,
-                            new SourceNodeFactory.PreselectPropertiesAction(project, "Libraries", CustomizerLibraries.COMPILE_TESTS), // NOI18N
-                        }
-                    );
             }
-            assert false: "No node for key: " + key;
             return null;
             
         }

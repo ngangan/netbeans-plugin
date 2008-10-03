@@ -64,7 +64,6 @@ import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -142,20 +141,15 @@ public class JavaFXProjectProperties {
     public static final String MAIN_FX_BUILD_CLASS = "FXBuild.class"; // NOI18M
     public static final String JAVAC_SOURCE = "javac.source"; // NOI18N
     public static final String JAVAC_TARGET = "javac.target"; // NOI18N
-    public static final String JAVAC_TEST_CLASSPATH = "javac.test.classpath"; // NOI18N
     public static final String JAVAC_DEBUG = "javac.debug"; // NOI18N
     public static final String JAVAC_DEPRECATION = "javac.deprecation"; // NOI18N
     public static final String JAVAC_COMPILER_ARG = "javac.compilerargs";    //NOI18N
-    public static final String RUN_TEST_CLASSPATH = "run.test.classpath"; // NOI18N
     public static final String BUILD_CLASSPATH = "build.classpath"; // NOI18N
     public static final String BUILD_DIR = "build.dir"; // NOI18N
     public static final String BUILD_CLASSES_DIR = "build.classes.dir"; // NOI18N
-    public static final String BUILD_TEST_CLASSES_DIR = "build.test.classes.dir"; // NOI18N
-    public static final String BUILD_TEST_RESULTS_DIR = "build.test.results.dir"; // NOI18N
     public static final String BUILD_CLASSES_EXCLUDES = "build.classes.excludes"; // NOI18N
     public static final String DIST_JAVADOC_DIR = "dist.javadoc.dir"; // NOI18N
     public static final String NO_DEPENDENCIES="no.dependencies"; // NOI18N
-    public static final String DEBUG_TEST_CLASSPATH = "debug.test.classpath"; // NOI18N
     public static final String SOURCE_ENCODING="source.encoding"; // NOI18N
     
     public static final String INCLUDES = "includes"; // NOI18N
@@ -164,14 +158,8 @@ public class JavaFXProjectProperties {
     public static final String DO_JAR = "do.jar"; // NOI18N
     
     public static final String JAVADOC_PRIVATE="javadoc.private"; // NOI18N
-    public static final String JAVADOC_NO_TREE="javadoc.notree"; // NOI18N
-    public static final String JAVADOC_USE="javadoc.use"; // NOI18N
-    public static final String JAVADOC_NO_NAVBAR="javadoc.nonavbar"; // NOI18N
-    public static final String JAVADOC_NO_INDEX="javadoc.noindex"; // NOI18N
-    public static final String JAVADOC_SPLIT_INDEX="javadoc.splitindex"; // NOI18N
     public static final String JAVADOC_AUTHOR="javadoc.author"; // NOI18N
     public static final String JAVADOC_VERSION="javadoc.version"; // NOI18N
-    public static final String JAVADOC_WINDOW_TITLE="javadoc.windowtitle"; // NOI18N
     public static final String JAVADOC_ENCODING="javadoc.encoding"; // NOI18N
     public static final String JAVADOC_ADDITIONALPARAM="javadoc.additionalparam"; // NOI18N
     
@@ -190,11 +178,8 @@ public class JavaFXProjectProperties {
 */    
     //Applet properties
     
-    public static final String APPLET_JAVASCRIPT="applet.javascript.enable";
-    public static final String APPLET_JNLP = "applet.from.jnlp";
     public static final String APPLET_DRAGGABLE = "applet.draggable";
     public static final String APPLET_ARGUMENTS = "applet.java.arguments";
-    public static final String APPLET_RUN_IN_BROWSER="applet.run.in.browser";
     public static final String APPLET_WIDTH = "applet.width";
     public static final String APPLET_HEIGHT = "applet.height";
 
@@ -208,11 +193,8 @@ public class JavaFXProjectProperties {
     // Well known paths
     public static final String[] WELL_KNOWN_PATHS = new String[] {            
             "${" + JAVAC_CLASSPATH + "}", 
-            "${" + JAVAC_TEST_CLASSPATH  + "}", 
             "${" + RUN_CLASSPATH  + "}", 
-            "${" + RUN_TEST_CLASSPATH  + "}", 
             "${" + BUILD_CLASSES_DIR  + "}", 
-            "${" + BUILD_TEST_CLASSES_DIR  + "}", 
     };
     
     // Prefixes and suffixes of classpath
@@ -232,14 +214,11 @@ public class JavaFXProjectProperties {
     
     // CustomizerSources
     DefaultTableModel SOURCE_ROOTS_MODEL;
-    DefaultTableModel TEST_ROOTS_MODEL;
     ComboBoxModel JAVAC_SOURCE_MODEL;
      
     // CustomizerLibraries
     DefaultListModel JAVAC_CLASSPATH_MODEL;
-    DefaultListModel JAVAC_TEST_CLASSPATH_MODEL;
     DefaultListModel RUN_CLASSPATH_MODEL;
-    DefaultListModel RUN_TEST_CLASSPATH_MODEL;
     ComboBoxModel PLATFORM_MODEL;
     ListCellRenderer CLASS_PATH_LIST_RENDERER;
     ListCellRenderer PLATFORM_LIST_RENDERER;
@@ -351,7 +330,6 @@ public class JavaFXProjectProperties {
         
         // CustomizerSources
         SOURCE_ROOTS_MODEL = JavaFXSourceRootsUi.createModel( project.getSourceRoots() );
-        TEST_ROOTS_MODEL = JavaFXSourceRootsUi.createModel( project.getTestSourceRoots() );        
         includes = evaluator.getProperty(INCLUDES);
         if (includes == null) {
             includes = "**"; // NOI18N
@@ -365,9 +343,7 @@ public class JavaFXProjectProperties {
         EditableProperties projectProperties = updateHelper.getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );                
         
         JAVAC_CLASSPATH_MODEL = ClassPathUiSupport.createListModel( cs.itemsIterator( (String)projectProperties.get( JAVAC_CLASSPATH )  ) );
-        JAVAC_TEST_CLASSPATH_MODEL = ClassPathUiSupport.createListModel( cs.itemsIterator( (String)projectProperties.get( JAVAC_TEST_CLASSPATH ) ) );
         RUN_CLASSPATH_MODEL = ClassPathUiSupport.createListModel( cs.itemsIterator( (String)projectProperties.get( RUN_CLASSPATH ) ) );
-        RUN_TEST_CLASSPATH_MODEL = ClassPathUiSupport.createListModel( cs.itemsIterator( (String)projectProperties.get( RUN_TEST_CLASSPATH ) ) );
         PLATFORM_MODEL = PlatformUiSupport.createPlatformComboBoxModel (evaluator.getProperty(JAVA_PLATFORM), "JavaFX"); //NOI18N
         PLATFORM_LIST_RENDERER = PlatformUiSupport.createPlatformListCellRenderer();
         JAVAC_SOURCE_MODEL = PlatformUiSupport.createSourceLevelComboBoxModel (PLATFORM_MODEL, evaluator.getProperty(JAVAC_SOURCE), evaluator.getProperty(JAVAC_TARGET));
@@ -392,14 +368,8 @@ public class JavaFXProjectProperties {
         
         // CustomizerJavadoc
         JAVADOC_PRIVATE_MODEL = projectGroup.createToggleButtonModel( evaluator, JAVADOC_PRIVATE );
-        JAVADOC_NO_TREE_MODEL = projectGroup.createInverseToggleButtonModel( evaluator, JAVADOC_NO_TREE );
-        JAVADOC_USE_MODEL = projectGroup.createToggleButtonModel( evaluator, JAVADOC_USE );
-        JAVADOC_NO_NAVBAR_MODEL = projectGroup.createInverseToggleButtonModel( evaluator, JAVADOC_NO_NAVBAR );
-        JAVADOC_NO_INDEX_MODEL = projectGroup.createInverseToggleButtonModel( evaluator, JAVADOC_NO_INDEX ); 
-        JAVADOC_SPLIT_INDEX_MODEL = projectGroup.createToggleButtonModel( evaluator, JAVADOC_SPLIT_INDEX );
         JAVADOC_AUTHOR_MODEL = projectGroup.createToggleButtonModel( evaluator, JAVADOC_AUTHOR );
         JAVADOC_VERSION_MODEL = projectGroup.createToggleButtonModel( evaluator, JAVADOC_VERSION );
-        JAVADOC_WINDOW_TITLE_MODEL = projectGroup.createStringDocument( evaluator, JAVADOC_WINDOW_TITLE );
         //Hotfix of the issue #70058
         //Should use the StoreGroup when the StoreGroup SPI will be extended to allow false default value in ToggleButtonModel        
         JAVADOC_PREVIEW_MODEL = createToggleButtonModel ( evaluator, JAVADOC_PREVIEW, kind);
@@ -439,11 +409,8 @@ public class JavaFXProjectProperties {
         WEBSTART_SELFSIGNED_MODEL = projectGroup.createToggleButtonModel(evaluator, WEBSTART_SELFSIGNED);
         */
         //CustomizerApplet
-        javaScriptModel = projectGroup.createToggleButtonModel(evaluator, APPLET_JAVASCRIPT);
-        jnlpFileModel = projectGroup.createToggleButtonModel(evaluator, APPLET_JNLP);
         draggableModel = projectGroup.createToggleButtonModel(evaluator, APPLET_DRAGGABLE);
         javaArgumentsDocument = projectGroup.createStringDocument(evaluator, APPLET_ARGUMENTS);
-        runAppletInBrowser = projectGroup.createToggleButtonModel(evaluator, APPLET_RUN_IN_BROWSER);
         widthModel = AppletSupport.createSpinnerModel(evaluator, APPLET_WIDTH);
         heightModel = AppletSupport.createSpinnerModel(evaluator, APPLET_HEIGHT);
         // CustomizerRun
@@ -499,23 +466,15 @@ public class JavaFXProjectProperties {
         
         // Encode all paths (this may change the project properties)
         String[] javac_cp = cs.encodeToStrings( ClassPathUiSupport.getIterator( JAVAC_CLASSPATH_MODEL ) );
-        String[] javac_test_cp = cs.encodeToStrings( ClassPathUiSupport.getIterator( JAVAC_TEST_CLASSPATH_MODEL ) );
         String[] run_cp = cs.encodeToStrings( ClassPathUiSupport.getIterator( RUN_CLASSPATH_MODEL ) );
-        String[] run_test_cp = cs.encodeToStrings( ClassPathUiSupport.getIterator( RUN_TEST_CLASSPATH_MODEL ) );
                 
         // Store source roots
         storeRoots( project.getSourceRoots(), SOURCE_ROOTS_MODEL );
-        storeRoots( project.getTestSourceRoots(), TEST_ROOTS_MODEL );
                 
         // Store standard properties
         EditableProperties projectProperties = updateHelper.getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );        
         EditableProperties privateProperties = updateHelper.getProperties( AntProjectHelper.PRIVATE_PROPERTIES_PATH );
         
-        // Assure inegrity which can't shound not be assured in UI
-        if ( !JAVADOC_NO_INDEX_MODEL.isSelected() ) {
-            JAVADOC_SPLIT_INDEX_MODEL.setSelected( false ); // Can't split non existing index
-        }
-                                
         // Standard store of the properties
         projectGroup.store( projectProperties );        
         privateGroup.store( privateProperties );
@@ -541,9 +500,7 @@ public class JavaFXProjectProperties {
                 
         // Save all paths
         projectProperties.setProperty( JAVAC_CLASSPATH, javac_cp );
-        projectProperties.setProperty( JAVAC_TEST_CLASSPATH, javac_test_cp );
         projectProperties.setProperty( RUN_CLASSPATH, run_cp );
-        projectProperties.setProperty( RUN_TEST_CLASSPATH, run_test_cp );
         
         //Handle platform selection and javac.source javac.target properties
         storePlatform (projectProperties, updateHelper, JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, PLATFORM_MODEL.getSelectedItem(), JAVAC_SOURCE_MODEL.getSelectedItem());
@@ -722,15 +679,11 @@ public class JavaFXProjectProperties {
         Set oldArtifacts = new HashSet();
         EditableProperties projectProperties = updateHelper.getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );        
         oldArtifacts.addAll( cs.itemsList( projectProperties.get( JAVAC_CLASSPATH ) ) );
-        oldArtifacts.addAll( cs.itemsList( projectProperties.get( JAVAC_TEST_CLASSPATH ) ) );
         oldArtifacts.addAll( cs.itemsList( projectProperties.get( RUN_CLASSPATH ) ) );
-        oldArtifacts.addAll( cs.itemsList( projectProperties.get( RUN_TEST_CLASSPATH ) ) );
                    
         Set newArtifacts = new HashSet();
         newArtifacts.addAll( ClassPathUiSupport.getList( JAVAC_CLASSPATH_MODEL ) );
-        newArtifacts.addAll( ClassPathUiSupport.getList( JAVAC_TEST_CLASSPATH_MODEL ) );
         newArtifacts.addAll( ClassPathUiSupport.getList( RUN_CLASSPATH_MODEL ) );
-        newArtifacts.addAll( ClassPathUiSupport.getList( RUN_TEST_CLASSPATH_MODEL ) );
                 
         // Create set of removed artifacts and remove them
         Set removed = new HashSet( oldArtifacts );
@@ -949,10 +902,8 @@ public class JavaFXProjectProperties {
     
     void loadIncludesExcludes(IncludeExcludeVisualizer v) {
         Set<File> roots = new HashSet<File>();
-        for (DefaultTableModel model : new DefaultTableModel[] {SOURCE_ROOTS_MODEL, TEST_ROOTS_MODEL}) {
-            for (Object row : model.getDataVector()) {
-                roots.add((File) ((Vector) row).elementAt(0));
-            }
+        for (Object row : SOURCE_ROOTS_MODEL.getDataVector()) {
+            roots.add((File) ((Vector) row).elementAt(0));
         }
         v.setRoots(roots.toArray(new File[roots.size()]));
         v.setIncludePattern(includes);
