@@ -43,16 +43,16 @@ package org.netbeans.modules.javafx.profiler.selector.node;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.java.source.ElementHandle;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
-import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
@@ -64,8 +64,7 @@ import org.openide.util.NbBundle;
  *
  * @author cms
  */
-public class JavaFXFunctionsNode extends ContainerNode {
-    
+public class JavaFXFunctionsNode extends ContainerNode {    
     
     private static class Children extends GreedySelectorChildren<JavaFXFunctionsNode> {
 
@@ -73,8 +72,7 @@ public class JavaFXFunctionsNode extends ContainerNode {
             final List<JavaFXFunctionNode> functionNodes = new ArrayList<JavaFXFunctionNode>();
 
             try {
-//            JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, (JavaFXProject)parent.getProject()));
-            JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+                JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
                 
                 js.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
@@ -86,12 +84,14 @@ public class JavaFXFunctionsNode extends ContainerNode {
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);
-                                    if (classElement.equals(tek.getEnclosingElement()) && !tek.getKind().isClass()) {
+                                    if (classElement.equals(tek.getEnclosingElement()) && 
+                                            ((tek.getKind() == ElementKind.METHOD) ||
+                                            (tek.getKind() == ElementKind.CONSTRUCTOR) ||
+                                            (tek.getKind() == ElementKind.STATIC_INIT))) {
                                         JavaFXFunctionNode functionNode = new JavaFXFunctionNode(parent.cpInfo, tek, parent);
-                                            if (functionNode.getSignature() != null) {
-                                                functionNodes.add(functionNode);
-                                            }
-
+                                        if (functionNode.getSignature() != null) {
+                                            functionNodes.add(functionNode);
+                                        }
                                     }
                                 }
                             }

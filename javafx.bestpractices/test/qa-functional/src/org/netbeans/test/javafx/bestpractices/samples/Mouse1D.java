@@ -54,28 +54,28 @@ public class Mouse1D extends JavaFXTestCase {
     public String _type = "Input"; //Type of Sample
     public String _project = "Mouse 1D";
     public String _projectPath = "Mouse 1D|Source Packages|input|Mouse1D.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testMouse1DCreate", "testMouse1DCompile", "testMouse1DCloseProject"};
     
     public Mouse1D (String name) {
         super(name);
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testMouse1DCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testMouse1DCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testMouse1DCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }

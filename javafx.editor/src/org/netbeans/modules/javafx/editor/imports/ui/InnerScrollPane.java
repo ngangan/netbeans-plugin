@@ -125,8 +125,9 @@ class InnerScrollPane extends JScrollPane {
                 topLabel.setText(title);
             } else {
                 topLabel = new JLabel(title);
-                topLabel.setForeground(Color.blue);
-                topLabel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+//                topLabel.setForeground(Color.blue);
+                topLabel.setFont(topLabel.getFont().deriveFont(Font.BOLD));
+                topLabel.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 2));
                 setColumnHeaderView(topLabel);
             }
         }
@@ -199,6 +200,20 @@ class InnerScrollPane extends JScrollPane {
         registerKeybinding(ACTION_COMPLETION_END, COMPLETION_END,
         KeyStroke.getKeyStroke(KeyEvent.VK_END, 0),
         BaseKit.endLineAction, component);
+    }
+
+    /**
+     * Overrides <code>processKeyEvent</code> to process events. *
+     */
+    @Override
+    protected void processKeyEvent(KeyEvent e) {
+        CompletionItem si = getSelectedCompletionItem();
+        if (si != null) {
+            si.processKeyEvent(e);
+        }
+        if (!e.isConsumed()) {
+            super.processKeyEvent(e);
+        }
     }
 
     List testGetData() {

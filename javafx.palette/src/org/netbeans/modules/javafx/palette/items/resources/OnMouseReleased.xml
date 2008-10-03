@@ -46,7 +46,7 @@ made subject to such option by the copyright holder.
     <class name="org.netbeans.modules.javafx.palette.items.actions.OnMouseReleased" />
 
     <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/on_mouse_released_16.png" />
-    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/on_mouse_released_32.png" />
+    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/on_mouse_released_32.png" />
     <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
                display-name-key="NAME_javafx-OnMouseReleased"
                tooltip-key="HINT_javafx-OnMouseReleased" />

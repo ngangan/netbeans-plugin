@@ -5,6 +5,7 @@
 package org.netbeans.modules.javafx.editor;
 
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
 /**
  * Manager of imports in JavaFX source code.
@@ -17,6 +18,7 @@ public interface JFXImportManager {
     /**
      * Fix imports within source code.
      * @param document document containing source code.
+     * @param target
      */
-    void fixImports(Document document);
+    void fixImports(Document document, JTextComponent target);
 }

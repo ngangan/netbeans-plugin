@@ -76,8 +76,22 @@ public class Util {
         //Verify compilation
         try {
             OutputOperator oo = new OutputOperator();
+            if (!oo.isShowing()) {
+                new ActionNoBlock("Window|Output|Output", null).perform();
+            }
             new QueueTool().waitEmpty();
             String output = oo.getText();
+            CharSequence build = new String("BUILD");
+            int done = 0;
+            while (done < 3) {
+                if (!output.contains(build)) { //Compilation hasn't finished yet or window isn't open.
+                    sleep();
+                    output = oo.getText();
+                    done++;
+                } else {
+                    done = 3;
+                }
+            }
             CharSequence sucess = new String("BUILD SUCCESS");
             CharSequence warning = new String("warnings");
             if ((!output.contains(sucess)) || (output.contains(warning))) {
@@ -92,8 +106,9 @@ public class Util {
                 OutputOperator oo = new OutputOperator();
                 new QueueTool().waitEmpty();
                 String output = oo.getText();
-                CharSequence cs = new String("BUILD SUCCESS");
-                if (!output.contains(cs)) {
+                CharSequence sucess = new String("BUILD SUCCESS");
+                CharSequence warning = new String("warnings");
+                if ((!output.contains(sucess)) || (output.contains(warning))) {
                     return false;
                 }
                 return true;
@@ -165,6 +180,7 @@ public class Util {
         throw new TimeoutExpiredException("Scaning isn't finished in " + MAX_WAIT_TIME + " ms");
     }
 // =================== Utility Operations  ===================
+
     public static void sleep() {
         sleep(WAIT_TIME);
     }

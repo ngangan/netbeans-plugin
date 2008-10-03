@@ -4,6 +4,7 @@
 
 package org.netbeans.modules.javafx.editor.imports.ui;
 
+import org.netbeans.modules.javafx.editor.imports.ImportsModel;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
@@ -18,7 +19,7 @@ import java.awt.event.KeyEvent;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
-public class FixItem implements CompletionItem{
+public class FixItem implements CompletionItem {
     private static final String EMPTY_STRING = "";
     private static final String ITEM_ICON = "org/netbeans/modules/editor/resources/completion/class_16.png";
     private static final String ITEM_COLOR = "<font color=#560000>";
@@ -28,12 +29,16 @@ public class FixItem implements CompletionItem{
     static {
         icon = new ImageIcon(ImageUtilities.loadImage(ITEM_ICON));
     }
-    
+
     private String element;
+    private final ImportsModel model;
+    private final FixImportsLayout<FixItem> fil;
     private String elementHTMLForm;
 
-    public FixItem(String element) {
+    public FixItem(String element, ImportsModel importsModel, FixImportsLayout<FixItem> fil) {
         this.element = element;
+        model = importsModel;
+        this.fil = fil;
         elementHTMLForm = ITEM_COLOR + element + ITEM_END;
     }
 
@@ -46,6 +51,11 @@ public class FixItem implements CompletionItem{
      * @param component non-null text component for which the completion was invoked.
      */
     public void defaultAction(JTextComponent component) {
+        fil.hide();
+        synchronized (this.model) {
+            this.model.notifyAll();
+        }
+        this.model.addImport(getElement());
     }
 
     /**
@@ -60,6 +70,21 @@ public class FixItem implements CompletionItem{
      *            be performed.
      */
     public void processKeyEvent(KeyEvent evt) {
+        int keyCode = evt.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.VK_ENTER: {
+                defaultAction(null);
+                evt.consume();
+                break;
+            }
+            case KeyEvent.VK_ESCAPE: {
+                fil.hide();
+                synchronized (this.model) {
+                    this.model.notifyAll();
+                }
+                evt.consume();
+            }
+        }
     }
 
 

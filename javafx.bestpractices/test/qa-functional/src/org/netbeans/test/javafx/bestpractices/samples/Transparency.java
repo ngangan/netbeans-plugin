@@ -55,7 +55,7 @@ public class Transparency extends JavaFXTestCase {
     public String _type = "Image"; //Type of Sample
     public String _project = "Transparency";
     public String _projectPath = "Transparency|Source Packages|image|Transparency.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testTransparencyCreate", "testTransparencyCompile", "testTransparencyCloseProject"};
 
     
     public Transparency(String name) {
@@ -63,21 +63,21 @@ public class Transparency extends JavaFXTestCase {
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testTransparencyCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testTransparencyCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testTransparencyCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }

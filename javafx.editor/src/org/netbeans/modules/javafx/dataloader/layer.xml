@@ -92,18 +92,9 @@ made subject to such option by the copyright holder.
                     <file name="org-netbeans-modules-javafx-editor-semantic-OccurrencesMarkProviderCreator.instance">
                     </file>
                 </folder>
-<!--
-                <file name="ReformatTask">
-                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.editor.ReformatTaskFactory"/>
-                </file>
--->
 
                 <file name="org-netbeans-modules-javafx-editor-ReformatTaskFactory.instance"/>
                 <file name="org-netbeans-modules-javafx-editor-IndentTaskFactory.instance"/>
-
-                <!--<file name="IndentTask.instance">-->
-                    <!--<attr name="instanceClass" stringvalue="org-netbeans-modules-javafx-editor-IndentTaskFactory"/>-->
-                <!--</file>-->
 
 
                 <folder name="HyperlinkProviders">
@@ -216,6 +207,9 @@ made subject to such option by the copyright holder.
                 <folder name="Popup">
                     <file name="format">
                         <attr name="position" intvalue="1490"/>
+                    </file>
+                    <file name="fix-imports">
+                        <attr name="position" intvalue="1500"/>
                     </file>
                     <file name="SeparatorBeforeRun.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>

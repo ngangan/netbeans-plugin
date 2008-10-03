@@ -54,28 +54,28 @@ public class BackgroundImage extends JavaFXTestCase {
     public String _type = "Image"; //Type of Sample
     public String _project = "Background Image";
     public String _projectPath = "Background Image|Source Packages|image|BackgroundImage.fx";
-    static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};
+    static String[] TESTS = {"testBackgroundImageCreate", "testBackgroundImageCompile", "testBackgroundImageCloseProject"};
     
     public BackgroundImage(String name) {
         super(name);
     }
 
     /** Create Sample Project and Verify that Project exists */
-    public void testCreate() {
+    public void testBackgroundImageCreate() {
         if ((Util.createSampleProject(SAMPLE_PATH, _type, _project, this.getWorkDirAsString())).equals(false)) {
             fail("Project " + _project + " was not found.");
         }
     }
 
     /** Compile Single File and Verify Success */
-    public void testCompile() {
+    public void testBackgroundImageCompile() {
         if (Util.compileProjectFile(_projectPath).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
 
     /** Close Sample Project and Output window*/
-    public void testCloseProject() {
+    public void testBackgroundImageCloseProject() {
         if (Util.closeProject(_project).equals(false)) {
             fail("Project " + _project + " did not close properly.");
         }

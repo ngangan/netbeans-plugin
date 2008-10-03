@@ -5,12 +5,19 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import org.netbeans.api.javafx.source.*;
+import org.netbeans.editor.BaseAction;
+import org.netbeans.modules.editor.MainMenuAction;
 import org.netbeans.modules.javafx.editor.JFXImportManager;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
+import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 
 import javax.lang.model.element.Element;
+import javax.swing.*;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.logging.Logger;
@@ -26,7 +33,9 @@ import java.util.logging.Logger;
  *
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.org">RKo</a>)
  */
-public final class JavaFXImports implements JFXImportManager {
+public final class JavaFXImports extends BaseAction implements JFXImportManager {
+
+
 
     private static JavaFXImports instance;
     public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
@@ -36,6 +45,24 @@ public final class JavaFXImports implements JFXImportManager {
             instance = new JavaFXImports();
         }
         return instance;
+    }
+
+    private JavaFXImports() {
+        super(fixImportsAction);
+    }
+
+    /**
+     * Get the default value for {@link javax.swing.Action#SHORT_DESCRIPTION} property.
+     * <br>
+     * If this method returns non-empty value it will only be called once
+     * (its result will be remembered).
+     *
+     * @return value that will be use as result for
+     *         <code>Action.getValue(Action.SHORT_DESCRIPTION)</code>.
+     */
+    @Override
+    protected Object getDefaultShortDescription() {
+        return NbBundle.getBundle(JavaFXImports.class).getString(fixImportsAction);
     }
 
     private static FileObject getFileObject(Document doc) {
@@ -48,35 +75,90 @@ public final class JavaFXImports implements JFXImportManager {
      * Fix imports within source code.
      *
      * @param document containing source code.
+     * @param target
      */
-    public void fixImports(final Document document) {
-        final JavaFXSource s = JavaFXSource.forDocument(document);
-        try {
-            s.runUserActionTask(new Task<CompilationController>() {
-                public void run(CompilationController cc) throws Exception {
-                    final JavaFXSource.Phase phase = cc.toPhase(JavaFXSource.Phase.ANALYZED);
-                    if (phase.lessThan(JavaFXSource.Phase.ANALYZED)) {
-                        logger.warning("We did not reach required phase. Leaving without fix");
-                        return;
-                    }
-                    final FileObject source = getFileObject(document);
-                    if (source == null) {
-                        throw new IllegalArgumentException("There is no associated fileobject for document.");
-                    }
-                    ClassIndex index = ClasspathInfo.create(source).getClassIndex();
-                    HashSet<Element> elements = new HashSet<Element>(100, .9F);
-                    cc.getCompilationUnit().accept(new IdentifierVisitor(cc), elements);
-                    ImportsModel model = new ImportsModel(cc.getCompilationUnit().getImports(), index, cc);
-                    for (Element element : elements) {
-                        model.addImport(element);
-                    }
-                    model.optimize();
-                    model.publish(document);
-                }
-            }, false);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot fix imports due to underlying error.", e);
+    public void fixImports(final Document document, JTextComponent target) {
+        Runnable runnable = prepareTask(document, target);
+        if (SwingUtilities.isEventDispatchThread()) {
+            RequestProcessor processor = RequestProcessor.getDefault();
+            processor.execute(runnable);
+        } else {
+            runnable.run();
         }
 
     }
+
+    private Runnable prepareTask(final Document document, final JTextComponent target) {
+        return new Runnable() {
+            public void run() {
+                logger.info(" ===> Fixing imports started");
+                final JavaFXSource s = JavaFXSource.forDocument(document);
+                int caret = target.getCaret().getDot();
+                try {
+                    s.runUserActionTask(new Task<CompilationController>() {
+                        public void run(CompilationController cc) throws Exception {
+                            final JavaFXSource.Phase phase = cc.toPhase(JavaFXSource.Phase.ANALYZED);
+                            if (phase.lessThan(JavaFXSource.Phase.ANALYZED)) {
+                                logger.warning("We did not reach required phase. Leaving without fix");
+                                return;
+                            }
+                            final FileObject source = getFileObject(document);
+                            if (source == null) {
+                                throw new IllegalArgumentException("There is no associated fileobject for document.");
+                            }
+                            ClassIndex index = ClasspathInfo.create(source).getClassIndex();
+                            HashSet<Element> elements = new HashSet<Element>(100, .9F);
+                            cc.getCompilationUnit().accept(new IdentifierVisitor(cc), elements);
+                            ImportsModel model = new ImportsModel(cc.getCompilationUnit().getImports(), index, cc, target);
+                            for (Element element : elements) {
+                                model.addImport(element);
+                            }
+                            model.optimize();
+                            model.publish(document);
+                        }
+                    }, false);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e);
+                } finally {
+                    target.getCaret().setDot(caret);
+                }
+                logger.info(" ===> Fixing imports finished");
+            }
+        };
+    }
+
+    public static final String fixImportsAction = "fix-imports";
+
+    /**
+     * The target method that performs the real action functionality.
+     *
+     * @param evt    action event describing the action that occured
+     * @param target target component where the action occured. It's retrieved
+     *               by the TextAction.getTextComponent(evt).
+     */
+    public void actionPerformed(ActionEvent evt, JTextComponent target) {
+        fixImports(target.getDocument(), target);
+    }
+
+    public static final class GlobalAction extends MainMenuAction {
+            private final JMenuItem menuPresenter;
+
+            public GlobalAction() {
+                super();
+                this.menuPresenter = new JMenuItem(getMenuItemText());
+                setMenu();
+            }
+
+            protected String getMenuItemText() {
+                return NbBundle.getBundle(GlobalAction.class).getString("fix-imports-main-menu-source-item"); //NOI18N
+            }
+
+            protected String getActionName() {
+                return fixImportsAction;
+            }
+
+            public JMenuItem getMenuPresenter() {
+                return menuPresenter;
+            }
+        }
 }

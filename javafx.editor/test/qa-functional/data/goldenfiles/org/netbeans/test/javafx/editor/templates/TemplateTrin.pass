@@ -1,0 +1,7 @@
+
+
+package templatetrin;
+
+
+
+trigger on new ClassName {  }

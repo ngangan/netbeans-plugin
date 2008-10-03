@@ -1,0 +1,7 @@
+
+
+package templatetrii;
+
+
+
+trigger on insert e into ClassName.AttributeName {  }

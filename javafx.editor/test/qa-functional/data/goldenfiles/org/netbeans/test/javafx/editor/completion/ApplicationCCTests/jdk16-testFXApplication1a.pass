@@ -1,12 +1,15 @@
 debug
-decoration
-focus
+focused
 height
 iconified
+icons
 impl_stageDelegate
+onClose
 opacity
 resizable
 scene
+style
+title
 transparent
 visible
 width

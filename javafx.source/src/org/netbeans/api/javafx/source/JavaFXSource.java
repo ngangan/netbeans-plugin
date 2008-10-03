@@ -209,11 +209,11 @@ public final class JavaFXSource {
         
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));
         Context context = task.getContext();
+//        JavafxdocClassReader.preRegister(context);
         Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
         JavafxdocEnter.preRegister(context);
         JavadocEnv.preRegister(context, cpInfo);
         DocCommentScanner.Factory.preRegister(context);
-//        JavafxdocClassReader.preRegister(context);
         
         return task;
   }

@@ -5,7 +5,7 @@
  */
 class JavaFXExample {
 
-    attribute a: String;
+    var a: String;
     function sample(): String {
         return "sample"
     }
