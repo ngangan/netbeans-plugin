@@ -56,6 +56,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.lang.model.element.Element;
 import javax.swing.JToolTip;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -68,6 +69,7 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.javafx.editor.JavaCompletionDoc;
 import org.netbeans.modules.javafx.editor.completion.environment.*;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
@@ -336,7 +338,18 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 if (component != null && isTaskCancelled()) {
                     component.putClientProperty("completion-active", Boolean.FALSE);
                 }
+            } else if (queryType == JavaFXCompletionProvider.DOCUMENTATION_QUERY_TYPE) {
+                resolveDocumentation(controller);
             }
+        }
+    }
+
+    private void resolveDocumentation(CompilationController controller) throws IOException {
+        controller.toPhase(Phase.ANALYZED);
+        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset);
+        Element el = controller.getTrees().getElement(env.getPath());
+        if (el != null) {
+            documentation = JavaCompletionDoc.create(controller, el);
         }
     }
 

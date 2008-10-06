@@ -52,6 +52,7 @@ import javax.swing.text.JTextComponent;
 
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -162,6 +163,12 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         return null;
     }
     
+    static CompletionTask createDocTask() {
+        JavaFXCompletionQuery query = new JavaFXCompletionQuery(DOCUMENTATION_QUERY_TYPE, -1, true);
+//        query.element = element;
+        return new AsyncCompletionTask(query, EditorRegistry.lastFocusedComponent());
+    }
+
     public static Set<? extends CompletionItem> query(JavaFXSource source, int queryType, int offset, int substitutionOffset) throws IOException {
         assert source != null;
         assert (queryType & COMPLETION_QUERY_TYPE) != 0;

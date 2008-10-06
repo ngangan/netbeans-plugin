@@ -787,9 +787,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return rightText;
         }
         
-//        public CompletionTask createDocumentationTask() {
-//            return JavaFXCompletionProvider.createDocTask(elementHandle);
-//        }
+        @Override
+        public CompletionTask createDocumentationTask() {
+            return JavaFXCompletionProvider.createDocTask();
+        }
 
         @Override
         protected ImageIcon getIcon() {
@@ -1072,9 +1073,11 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return false;
         }
     
-//        public CompletionTask createDocumentationTask() {
+        @Override
+        public CompletionTask createDocumentationTask() {
 //            return typeHandle.getKind() == TypeKind.DECLARED ? JavaCompletionProvider.createDocTask(ElementHandle.from(typeHandle)) : null;
-//        }
+            return JavaFXCompletionProvider.createDocTask();
+        }
 
         @Override
         protected ImageIcon getIcon(){
@@ -1348,6 +1351,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return ""; //NOI18N
         }
 
+        @Override
         protected String getLeftHtmlText() {
             if (leftText == null) {
                 StringBuilder lText = new StringBuilder();
@@ -1377,21 +1381,25 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return leftText;
         }
 
+        @Override
         protected String getRightHtmlText() {
             if (rightText == null)
                 rightText = PARAMETERS_COLOR + escape(typeName) + COLOR_END;
             return rightText;
         }
 
+        @Override
         public CompletionTask createDocumentationTask() {
-            //return JavaFXCompletionProvider.createDocTask(elementHandle);
-            return null;
+            return JavaFXCompletionProvider.createDocTask();
+//            return null;
         }
 
+        @Override
         public boolean instantSubstitution(JTextComponent component) {
             return false;
         }
 
+        @Override
         protected void substituteText(final JTextComponent c, final int offset, int len, String toAdd) {
             String add = ")"; //NOI18N
             if (toAdd != null && !add.startsWith(toAdd))
@@ -1471,6 +1479,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
         }
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append(typeName);
