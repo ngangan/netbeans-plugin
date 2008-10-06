@@ -71,7 +71,6 @@ import javax.swing.plaf.UIResource;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.api.JavaFXRunConfigProvider;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -92,25 +91,22 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
     private String[] keys;
     private Map<String, Map<String, String>> configs;
     JavaFXProjectProperties uiProperties;
-    private JavaFXRunConfigProvider compProvider;
 
     public CustomizerRun(JavaFXProjectProperties uiProperties) {
         this.uiProperties = uiProperties;
         initComponents();
 
         this.project = uiProperties.getProject();
-        //XXX TODO
-        compProvider = Lookup.getDefault().lookup(JavaFXRunConfigProvider.class);
-        initExtPanel(project, project.evaluator());
 
         configs = uiProperties.RUN_CONFIGS;
 
-        data = new JTextField[]{jTextFieldMainClass, jTextFieldArgs, jTextVMOptions};
-        dataLabels = new JLabel[]{jLabelMainClass, jLabelArgs, jLabelVMOptions};
-        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS};
+        data = new JTextField[]{jTextFieldMainClass};
+        dataLabels = new JLabel[]{jLabelMainClass};
+        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS};
         assert data.length == keys.length;
 
         configChanged(uiProperties.activeConfig);
+        configUpdated();
 
         configCombo.setRenderer(new ConfigListCellRenderer());
 
@@ -178,6 +174,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         configSep = new javax.swing.JSeparator();
         configPanel = new javax.swing.JPanel();
         configLabel = new javax.swing.JLabel();
@@ -188,12 +185,12 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         jLabelMainClass = new javax.swing.JLabel();
         jTextFieldMainClass = new javax.swing.JTextField();
         jButtonMainClass = new javax.swing.JButton();
-        jLabelArgs = new javax.swing.JLabel();
-        jTextFieldArgs = new javax.swing.JTextField();
-        jLabelVMOptions = new javax.swing.JLabel();
-        jTextVMOptions = new javax.swing.JTextField();
-        jLabelVMOptionsExample = new javax.swing.JLabel();
         extPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jRadioButton4 = new javax.swing.JRadioButton();
 
         setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -280,49 +277,6 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         mainPanel.add(jButtonMainClass, gridBagConstraints);
         jButtonMainClass.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jButtonMainClass")); // NOI18N
 
-        jLabelArgs.setLabelFor(jTextFieldArgs);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelArgs, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_Args_JLabel")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 12, 0);
-        mainPanel.add(jLabelArgs, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 12, 0);
-        mainPanel.add(jTextFieldArgs, gridBagConstraints);
-        jTextFieldArgs.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jTextFieldArgs")); // NOI18N
-
-        jLabelVMOptions.setLabelFor(jTextVMOptions);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelVMOptions, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_VM_Options")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        mainPanel.add(jLabelVMOptions, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
-        mainPanel.add(jTextVMOptions, gridBagConstraints);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle"); // NOI18N
-        jTextVMOptions.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizeRun_Run_VM_Options")); // NOI18N
-
-        jLabelVMOptionsExample.setText(org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_VM_Options_Example")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 12, 0);
-        mainPanel.add(jLabelVMOptionsExample, gridBagConstraints);
-        jLabelVMOptionsExample.getAccessibleContext().setAccessibleName(null);
-        jLabelVMOptionsExample.getAccessibleContext().setAccessibleDescription(bundle.getString("LBL_CustomizeRun_Run_VM_Options_Example")); // NOI18N
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -333,6 +287,67 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         add(mainPanel, gridBagConstraints);
 
         extPanel.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRunComponent.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 0, 5, 0);
+        extPanel.add(jLabel1, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton1);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("CustomizerRunComponent.jRadioButton1.text")); // NOI18N
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        extPanel.add(jRadioButton1, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton2);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("CustomizerRunComponent.jRadioButton2.text")); // NOI18N
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        extPanel.add(jRadioButton2, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton3);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRunComponent.jRadioButton3.text")); // NOI18N
+        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton3ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        extPanel.add(jRadioButton3, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton4);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton4, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRunComponent.jRadioButton4.text")); // NOI18N
+        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton4ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        extPanel.add(jRadioButton4, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -343,32 +358,6 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.weighty = 1.0;
         add(extPanel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void initExtPanel(Project p, PropertyEvaluator pe) {
-        if (compProvider != null) {
-
-            JavaFXRunConfigProvider.ConfigChangeListener ccl = new JavaFXRunConfigProvider.ConfigChangeListener() {
-
-                public void propertiesChanged(Map<String, String> updates) {
-                    // update active configuration
-                    Map<String, String> m = configs.get(uiProperties.activeConfig);
-                    m.putAll(updates);
-                    compProvider.configUpdated(updates);
-                }
-            };
-            JComponent comp = compProvider.createComponent(p, pe,ccl);
-            if (comp != null) {
-                compProvider.configUpdated(uiProperties.readRunConfigs().get(uiProperties.activeConfig));
-                java.awt.GridBagConstraints constraints = new java.awt.GridBagConstraints();
-                constraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                constraints.gridx = 0;
-                constraints.gridy = 0;
-                constraints.weightx = 1.0;
-                constraints.weighty = 1.0;
-                extPanel.add(comp, constraints);
-            }
-        }
-    }
 
     private void configDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configDelActionPerformed
         String config = (String) configCombo.getSelectedItem();
@@ -405,8 +394,51 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         }
         configChanged(config);
         uiProperties.activeConfig = config;
+        configUpdated();
     }//GEN-LAST:event_configComboActionPerformed
 
+    
+    
+    
+    
+    
+private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+    Map<String, String> m = configs.get(uiProperties.activeConfig);
+    m.put("javafx.profile", "desktop");
+    m.put("execution.target", "standard");
+}//GEN-LAST:event_jRadioButton1ActionPerformed
+
+private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    Map<String, String> m = configs.get(uiProperties.activeConfig);
+    m.put("javafx.profile", "desktop");
+    m.put("execution.target", "jnlp");
+}//GEN-LAST:event_jRadioButton2ActionPerformed
+
+private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+    Map<String, String> m = configs.get(uiProperties.activeConfig);
+    m.put("javafx.profile", "desktop");
+    m.put("execution.target", "applet");
+}//GEN-LAST:event_jRadioButton3ActionPerformed
+
+private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+    Map<String, String> m = configs.get(uiProperties.activeConfig);
+    m.put("javafx.profile", "mobile");
+    m.put("execution.target", "midp");
+}//GEN-LAST:event_jRadioButton4ActionPerformed
+    
+    public void configUpdated() {
+        Map<String, String> m = configs.get(uiProperties.activeConfig);
+        String run = m.get("execution.target");
+        if (run == null || run.equals("standard")) jRadioButton1.setSelected(true);
+        else if (run.equals("jnlp")) jRadioButton2.setSelected(true);
+        else if (run.equals("applet")) jRadioButton3.setSelected(true);
+        else if (run.equals("midp")) jRadioButton4.setSelected(true);
+    }
+
+    
+    
+    
+    
     private void configChanged(String activeConfig) {
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         model.addElement("");
@@ -451,6 +483,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox configCombo;
     private javax.swing.JButton configDel;
     private javax.swing.JLabel configLabel;
@@ -459,13 +492,13 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
     private javax.swing.JSeparator configSep;
     private javax.swing.JPanel extPanel;
     private javax.swing.JButton jButtonMainClass;
-    private javax.swing.JLabel jLabelArgs;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelMainClass;
-    private javax.swing.JLabel jLabelVMOptions;
-    private javax.swing.JLabel jLabelVMOptionsExample;
-    private javax.swing.JTextField jTextFieldArgs;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JTextField jTextFieldMainClass;
-    private javax.swing.JTextField jTextVMOptions;
     private javax.swing.JPanel mainPanel;
     // End of variables declaration//GEN-END:variables
 

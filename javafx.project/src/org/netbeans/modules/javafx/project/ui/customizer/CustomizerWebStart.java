@@ -61,11 +61,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     
     private WebStartProjectProperties jwsProps;
     private File lastImageFolder = null;
-            
-    public static CustomizerRunComponent runComponent;
-    static {
-        runComponent = new CustomizerRunComponent();
-    }
     
     /** Creates new form JWSCustomizerPanel */
     public CustomizerWebStart(WebStartProjectProperties props) {
@@ -73,20 +68,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         this.jwsProps = props;
         
         initComponents();
-        
-        jwsProps.allowOfflineModel.setMnemonic(offlineCheckBox.getMnemonic());
-        offlineCheckBox.setModel(jwsProps.allowOfflineModel);
-        
-        jwsProps.signedModel.setMnemonic(signedCheckBox.getMnemonic());
-        signedCheckBox.setModel(jwsProps.signedModel);
-        
-        jwsProps.pack200Model.setMnemonic(pack200CheckBox.getMnemonic());
-        pack200CheckBox.setModel(jwsProps.pack200Model);
-        
-        jwsProps.enablePack200Model.setMnemonic(enablePack200CheckBox.getMnemonic());
-        enablePack200CheckBox.setModel(jwsProps.enablePack200Model);
-        
-        iconTextField.setDocument(jwsProps.iconDocument);
+                
         codebaseComboBox.setModel(jwsProps.codebaseModel);
         codebaseTextField.setDocument(jwsProps.codebaseURLDocument);
         
@@ -104,33 +86,13 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        iconLabel = new javax.swing.JLabel();
         codebaseLabel = new javax.swing.JLabel();
-        iconTextField = new javax.swing.JTextField();
-        browseButton = new javax.swing.JButton();
         codebaseComboBox = new javax.swing.JComboBox();
         codebaseTextField = new javax.swing.JTextField();
-        offlineCheckBox = new javax.swing.JCheckBox();
         panelDescLabel = new javax.swing.JLabel();
-        signedCheckBox = new javax.swing.JCheckBox();
-        pack200CheckBox = new javax.swing.JCheckBox();
-        enablePack200CheckBox = new javax.swing.JCheckBox();
         codebaseLabel1 = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(499, 339));
-        setPreferredSize(new java.awt.Dimension(499, 339));
         setLayout(new java.awt.GridBagLayout());
-
-        iconLabel.setLabelFor(iconTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(iconLabel, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(11, 2, 0, 2);
-        add(iconLabel, gridBagConstraints);
-        iconLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
         codebaseLabel.setLabelFor(codebaseComboBox);
         org.openide.awt.Mnemonics.setLocalizedText(codebaseLabel, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel.text")); // NOI18N
@@ -142,30 +104,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.insets = new java.awt.Insets(8, 2, 0, 2);
         add(codebaseLabel, gridBagConstraints);
         codebaseLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel.AccessibleContext.accessibleDescription")); // NOI18N
-
-        iconTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconTextField.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
-        add(iconTextField, gridBagConstraints);
-        iconTextField.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.iconTextField.AccessibleContext.accessibleDescription")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.browseButton.text")); // NOI18N
-        browseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
-        add(browseButton, gridBagConstraints);
-        browseButton.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.browseButton.AccessibleContext.accessibleDescription")); // NOI18N
 
         codebaseComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -186,23 +124,11 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 6, 0, 0);
         add(codebaseTextField, gridBagConstraints);
         codebaseTextField.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseTextField.AccessibleContext.accessibleName")); // NOI18N
         codebaseTextField.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseTextField.AccessibleContext.accessibleDescription")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(offlineCheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.offlineCheckBox.text")); // NOI18N
-        offlineCheckBox.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
-        add(offlineCheckBox, gridBagConstraints);
-        offlineCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.offlineCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
 
         panelDescLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.panelDescLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -213,44 +139,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 10, 2);
         add(panelDescLabel, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(signedCheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.signedCheckBox.text")); // NOI18N
-        signedCheckBox.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
-        add(signedCheckBox, gridBagConstraints);
-        signedCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.signedCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(pack200CheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.pack200CheckBox.text")); // NOI18N
-        pack200CheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.pack200CheckBox.toolTipText")); // NOI18N
-        pack200CheckBox.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.RELATIVE;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
-        add(pack200CheckBox, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(enablePack200CheckBox, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.enablePack200CheckBox.text")); // NOI18N
-        enablePack200CheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.enablePack200CheckBox.toolTipText")); // NOI18N
-        enablePack200CheckBox.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
-        add(enablePack200CheckBox, gridBagConstraints);
 
         codebaseLabel1.setLabelFor(codebaseTextField);
         org.openide.awt.Mnemonics.setLocalizedText(codebaseLabel1, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel1.text")); // NOI18N
@@ -267,26 +155,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     private void codebaseComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_codebaseComboBoxActionPerformed
         setCodebaseComponents();
     }//GEN-LAST:event_codebaseComboBoxActionPerformed
-
-    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        JFileChooser chooser = new JFileChooser();
-        FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-        chooser.setFileSelectionMode (JFileChooser.FILES_AND_DIRECTORIES);
-        chooser.setMultiSelectionEnabled(false);
-        chooser.setFileFilter(new IconFileFilter());
-        if (lastImageFolder != null) {
-            chooser.setSelectedFile(lastImageFolder);
-        } else { // ???
-            // workDir = FileUtil.toFile(project.getProjectDirectory()).getAbsolutePath();
-            // chooser.setSelectedFile(new File(workDir));
-        }
-        chooser.setDialogTitle(NbBundle.getMessage(WebStartProjectProperties.class, "LBL_Select_Icon_Image"));
-        if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
-            File file = FileUtil.normalizeFile(chooser.getSelectedFile());
-            iconTextField.setText(file.getAbsolutePath());
-            lastImageFolder = file.getParentFile();
-        }
-    }//GEN-LAST:event_browseButtonActionPerformed
 
     public HelpCtx getHelpCtx() {
         return new HelpCtx(CustomizerWebStart.class);
@@ -332,18 +200,11 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton browseButton;
     private javax.swing.JComboBox codebaseComboBox;
     private javax.swing.JLabel codebaseLabel;
     private javax.swing.JLabel codebaseLabel1;
     private javax.swing.JTextField codebaseTextField;
-    private javax.swing.JCheckBox enablePack200CheckBox;
-    private javax.swing.JLabel iconLabel;
-    private javax.swing.JTextField iconTextField;
-    private javax.swing.JCheckBox offlineCheckBox;
-    private javax.swing.JCheckBox pack200CheckBox;
     private javax.swing.JLabel panelDescLabel;
-    private javax.swing.JCheckBox signedCheckBox;
     // End of variables declaration//GEN-END:variables
     
 }

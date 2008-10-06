@@ -74,7 +74,8 @@ made subject to such option by the copyright holder.
                 <file name="Libraries.instance">
                     <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createLibraries"/>
                 </file>
-                <attr name="Libraries.instance/BuildCategory" boolvalue="true"/>
+                <attr name="Libraries.instance/Javadoc.instance" boolvalue="true"/>
+<!--
                 <folder name="BuildCategory">
                     <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.project.ui.customizer.Bundle"/>
                     <file name="Build.instance">
@@ -85,16 +86,21 @@ made subject to such option by the copyright holder.
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createJar"/>
                     </file>
                     <attr name="Jar.instance/Javadoc.instance" boolvalue="true"/>
+-->                    
                     <file name="Javadoc.instance">
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createJavadoc"/>
                     </file>
+<!--
                 </folder>
-                <attr name="BuildCategory/Run.instance" boolvalue="true"/>
+-->                
+                <attr name="Javadoc.instance/Run.instance" boolvalue="true"/>
                 <file name="Run.instance">
                     <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createRun"/>
                 </file>
-                <attr name="Run.instance/Application" boolvalue="true"/>
-                <folder name="Application">
+                <attr name="Run.instance/Application.instance" boolvalue="true"/>
+                <file name="Application.instance">
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createApplication"/>
+<!--
                     <file name="Self.instance">
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createApplication"/>
                     </file>
@@ -102,7 +108,9 @@ made subject to such option by the copyright holder.
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createWebStart"/>
                     </file>  
                 </folder>
-                <attr name="Application/Client.instance" boolvalue="true"/>
+-->
+                </file>
+                <attr name="Application.instance/Client.instance" boolvalue="true"/>
                 <file name="Client.instance">
                     <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider.createWebServiceClients"/>
                 </file>
