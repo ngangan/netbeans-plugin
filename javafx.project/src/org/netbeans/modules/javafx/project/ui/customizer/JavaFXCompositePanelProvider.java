@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.project.ui.customizer;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -179,7 +180,13 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
                 return new NoWebServiceClientsPanel();
             }
         }*/ else if (APPLICATION.equals(nm)) {
-            return new CustomizerApplication(uiProps);
+            CustomizerApplication ca = new CustomizerApplication(uiProps);
+            ca.jPanel1.add(new CustomizerApplet(uiProps), BorderLayout.CENTER);
+            WebStartProjectProperties jwsProps = uiProps.getWebStartProjectProperties();
+            category.setOkButtonListener(new SavePropsListener(jwsProps, context.lookup(Project.class)));
+            ca.jPanel2.add(new CustomizerWebStart(jwsProps), BorderLayout.CENTER);
+            return ca;
+
         } else if (WEBSTART.equals(nm)) {
             //return new CustomizerWebStart(uiProps);
             WebStartProjectProperties jwsProps = uiProps.getWebStartProjectProperties();

@@ -118,29 +118,20 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
             this.originalEncoding = FileEncodingQuery.getDefaultEncoding().name();
         }
         
-        this.encoding.setModel(new EncodingModel(this.originalEncoding));
-        this.encoding.setRenderer(new EncodingRenderer());
-        
-
-        this.encoding.addActionListener(new ActionListener () {
-            public void actionPerformed(ActionEvent arg0) {
-                handleEncodingChange();
-            }            
-        });
     }
     
     
-    private void handleEncodingChange () {
-            Charset enc = (Charset) encoding.getSelectedItem();
-            String encName;
-            if (enc != null) {
-                encName = enc.name();
-            }
-            else {
-                encName = originalEncoding;
-            }
-            this.uiProperties.putAdditionalProperty(JavaFXProjectProperties.SOURCE_ENCODING, encName);
-    }
+//    private void handleEncodingChange () {
+//            Charset enc = (Charset) encoding.getSelectedItem();
+//            String encName;
+//            if (enc != null) {
+//                encName = enc.name();
+//            }
+//            else {
+//                encName = originalEncoding;
+//            }
+//            this.uiProperties.putAdditionalProperty(JavaFXProjectProperties.SOURCE_ENCODING, encName);
+//    }
 
     public HelpCtx getHelpCtx() {
         return new HelpCtx (CustomizerSources.class);
@@ -223,9 +214,6 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         upSourceRoot = new javax.swing.JButton();
         downSourceRoot = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        encoding = new javax.swing.JComboBox();
-        includeExcludeButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -357,42 +345,6 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         add(sourceRootsPanel, gridBagConstraints);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        jLabel5.setLabelFor(encoding);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(CustomizerSources.class, "TXT_Encoding")); // NOI18N
-        jLabel5.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 12);
-        jPanel1.add(jLabel5, gridBagConstraints);
-        jLabel5.getAccessibleContext().setAccessibleDescription("Encoding determines how the IDE interprets characters beyond the ASCII character set.");
-
-        encoding.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        encoding.setEnabled(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
-        jPanel1.add(encoding, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(includeExcludeButton, org.openide.util.NbBundle.getMessage(CustomizerSources.class, "CustomizerSources.includeExcludeButton")); // NOI18N
-        includeExcludeButton.setEnabled(false);
-        includeExcludeButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                includeExcludeButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
-        jPanel1.add(includeExcludeButton, gridBagConstraints);
-        includeExcludeButton.getAccessibleContext().setAccessibleDescription("Iinvokes the Configure Includes & Excludes dialog which allows you to specify the packages you want to include in your project.");
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -403,27 +355,13 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-
-private void includeExcludeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_includeExcludeButtonActionPerformed
-    IncludeExcludeVisualizer v = new IncludeExcludeVisualizer();
-    uiProperties.loadIncludesExcludes(v);
-    DialogDescriptor dd = new DialogDescriptor(v.getVisualizerPanel(),
-            NbBundle.getMessage(CustomizerSources.class, "CustomizerSources.title.includeExclude"));
-    dd.setOptionType(NotifyDescriptor.OK_CANCEL_OPTION);
-    if (NotifyDescriptor.OK_OPTION.equals(DialogDisplayer.getDefault().notify(dd))) {
-        uiProperties.storeIncludesExcludes(v);
-    }
-}//GEN-LAST:event_includeExcludeButtonActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addSourceRoot;
     private javax.swing.JButton downSourceRoot;
-    private javax.swing.JComboBox encoding;
-    private javax.swing.JButton includeExcludeButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField projectLocation;

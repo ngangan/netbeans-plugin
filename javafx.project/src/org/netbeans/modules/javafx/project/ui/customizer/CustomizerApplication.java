@@ -41,12 +41,10 @@
 
 package org.netbeans.modules.javafx.project.ui.customizer;
 
+import java.awt.BorderLayout;
 import java.io.File;
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
 
 /**
  * Customizer panel for general application information (title, vendor, description,
@@ -63,9 +61,6 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         initComponents();
         titleTextField.setDocument(props.APPLICATION_TITLE_DOC);
         vendorTextField.setDocument(props.APPLICATION_VENDOR_DOC);
-        descTextArea.setDocument(props.APPLICATION_DESC_DOC);
-        homepageTextField.setDocument(props.APPLICATION_HOMEPAGE_DOC);
-        splashTextField.setDocument(props.APPLICATION_SPLASH_DOC);
     }
     
     /** This method is called from within the constructor to
@@ -80,16 +75,11 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         panelDescLabel = new javax.swing.JLabel();
         titleLabel = new javax.swing.JLabel();
         vendorLabel = new javax.swing.JLabel();
-        descLabel = new javax.swing.JLabel();
-        homepageLabel = new javax.swing.JLabel();
-        splashLabel = new javax.swing.JLabel();
         titleTextField = new javax.swing.JTextField();
         vendorTextField = new javax.swing.JTextField();
-        homepageTextField = new javax.swing.JTextField();
-        splashTextField = new javax.swing.JTextField();
-        browseButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        descTextArea = new javax.swing.JTextArea();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -123,38 +113,6 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         add(vendorLabel, gridBagConstraints);
         vendorLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.vendorLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
-        descLabel.setLabelFor(descTextArea);
-        org.openide.awt.Mnemonics.setLocalizedText(descLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.descLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 0, 0);
-        add(descLabel, gridBagConstraints);
-        descLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.descLabel.AccessibleContext.accessibleDescription")); // NOI18N
-
-        homepageLabel.setLabelFor(homepageTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(homepageLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.homepageLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
-        add(homepageLabel, gridBagConstraints);
-        homepageLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.homepageLabel.AccessibleContext.accessibleDescription")); // NOI18N
-
-        splashLabel.setLabelFor(splashTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(splashLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.splashLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
-        add(splashLabel, gridBagConstraints);
-        splashLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.splashLabel.AccessibleContext.accessibleDescription")); // NOI18N
-
         titleTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.titleTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -175,76 +133,29 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.insets = new java.awt.Insets(5, 6, 0, 0);
         add(vendorTextField, gridBagConstraints);
 
-        homepageTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.homepageTextField.text")); // NOI18N
+        jPanel1.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 6, 0, 0);
-        add(homepageTextField, gridBagConstraints);
-
-        splashTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.splashTextField.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 6, 0, 0);
-        add(splashTextField, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.browseButton.text")); // NOI18N
-        browseButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(3, 6, 0, 0);
-        add(browseButton, gridBagConstraints);
-        browseButton.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.browseButton.AccessibleContext.accessibleDescription")); // NOI18N
-
-        descTextArea.setColumns(20);
-        descTextArea.setRows(4);
-        jScrollPane1.setViewportView(descTextArea);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
-        add(jScrollPane1, gridBagConstraints);
-    }// </editor-fold>//GEN-END:initComponents
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
+        add(jPanel1, gridBagConstraints);
 
-    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        JFileChooser chooser = new JFileChooser();
-        FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-        chooser.setFileSelectionMode (JFileChooser.FILES_AND_DIRECTORIES);
-        chooser.setMultiSelectionEnabled(false);
-        chooser.setFileFilter(new SplashFileFilter());
-        if (lastImageFolder != null) {
-            chooser.setSelectedFile(lastImageFolder);
-        } else {
-            // ???
-        }
-        chooser.setDialogTitle(NbBundle.getMessage(CustomizerApplication.class, "LBL_Select_Splash_Image"));
-        if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
-            File file = FileUtil.normalizeFile(chooser.getSelectedFile());
-            splashTextField.setText(file.getAbsolutePath());
-            lastImageFolder = file.getParentFile();
-        }
-    }//GEN-LAST:event_browseButtonActionPerformed
+        jPanel2.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
+        add(jPanel2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.weighty = 1.0;
+        add(jPanel3, gridBagConstraints);
+    }// </editor-fold>//GEN-END:initComponents
     
     private static class SplashFileFilter extends FileFilter {
         
@@ -271,15 +182,10 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton browseButton;
-    private javax.swing.JLabel descLabel;
-    private javax.swing.JTextArea descTextArea;
-    private javax.swing.JLabel homepageLabel;
-    private javax.swing.JTextField homepageTextField;
-    private javax.swing.JScrollPane jScrollPane1;
+    javax.swing.JPanel jPanel1;
+    javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel panelDescLabel;
-    private javax.swing.JLabel splashLabel;
-    private javax.swing.JTextField splashTextField;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
     private javax.swing.JLabel vendorLabel;

@@ -16,10 +16,6 @@ public class CustomizerApplet extends javax.swing.JPanel {
     public CustomizerApplet(JavaFXProjectProperties uiProperties) {
         initComponents();
         
-        uiProperties.draggableModel.setMnemonic(draggableCheckBox.getMnemonic());
-        draggableCheckBox.setModel(uiProperties.draggableModel);
-        
-        javaArgumentsTextField.setDocument(uiProperties.javaArgumentsDocument);
         widthSpinner.setModel(uiProperties.widthModel);
         heightSpinner.setModel(uiProperties.heightModel);
         noteLabel.setVisible(false);
@@ -35,18 +31,12 @@ public class CustomizerApplet extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         descriptionLabel = new javax.swing.JLabel();
-        draggableCheckBox = new javax.swing.JCheckBox();
-        javaArgumentsTextField = new javax.swing.JTextField();
-        javaArgumentsLabel = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
         noteLabel = new javax.swing.JLabel();
         widthLabel = new javax.swing.JLabel();
         widthSpinner = new javax.swing.JSpinner();
         heightLabel = new javax.swing.JLabel();
         heightSpinner = new javax.swing.JSpinner();
 
-        setMinimumSize(new java.awt.Dimension(499, 239));
-        setPreferredSize(new java.awt.Dimension(499, 239));
         setLayout(new java.awt.GridBagLayout());
 
         descriptionLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.descriptionLabel.text")); // NOI18N
@@ -55,50 +45,9 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 9, 0);
         add(descriptionLabel, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(draggableCheckBox, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.draggableCheckBox.text")); // NOI18N
-        draggableCheckBox.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.draggableCheckBox.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 6, 2);
-        add(draggableCheckBox, gridBagConstraints);
-
-        javaArgumentsTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaArgumentsTextField.text")); // NOI18N
-        javaArgumentsTextField.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaArgumentsTextField.toolTipText")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 12);
-        add(javaArgumentsTextField, gridBagConstraints);
-
-        javaArgumentsLabel.setLabelFor(javaArgumentsTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(javaArgumentsLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.javaArgumentsLabel.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 2, 0, 2);
-        add(javaArgumentsLabel, gridBagConstraints);
-
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 2);
-        add(jLabel1, gridBagConstraints);
 
         noteLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.noteLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -113,44 +62,42 @@ public class CustomizerApplet extends javax.swing.JPanel {
         widthLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.widthLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
         add(widthLabel, gridBagConstraints);
 
         widthSpinner.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.widthSpinner.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 60, 0, 10);
         add(widthSpinner, gridBagConstraints);
 
         heightLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.heightLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         add(heightLabel, gridBagConstraints);
 
         heightSpinner.setToolTipText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.heightSpinner.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 60, 0, 10);
         add(heightSpinner, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel descriptionLabel;
-    private javax.swing.JCheckBox draggableCheckBox;
     private javax.swing.JLabel heightLabel;
     private javax.swing.JSpinner heightSpinner;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel javaArgumentsLabel;
-    private javax.swing.JTextField javaArgumentsTextField;
     private javax.swing.JLabel noteLabel;
     private javax.swing.JLabel widthLabel;
     private javax.swing.JSpinner widthSpinner;
