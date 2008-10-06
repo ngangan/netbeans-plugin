@@ -680,17 +680,17 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             boolean v = ((BooleanValue) var).value();
             boolean e = ((BooleanValue) exp).value();
             switch (kind) {
-                case AND_ASSIGNMENT:
-                    v &= e; break;
-                case OR_ASSIGNMENT:
-                    v |= e; break;
-                case XOR_ASSIGNMENT:
-                    v ^= e; break;
+//                case AND_ASSIGNMENT:
+//                    v &= e; break;
+//                case OR_ASSIGNMENT:
+//                    v |= e; break;
+//                case XOR_ASSIGNMENT:
+//                    v ^= e; break;
                 default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
             }
-            Value value = vm.mirrorOf(v);
-            setToMirror(arg0.getVariable(), value, evaluationContext);
-            return value;
+//            Value value = vm.mirrorOf(v);
+//            setToMirror(arg0.getVariable(), value, evaluationContext);
+//            return value;
         }
         if (var instanceof DoubleValue) {
             double v = ((DoubleValue) var).value();
@@ -732,8 +732,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             long v = ((LongValue) var).value();
             long e = ((PrimitiveValue) exp).longValue();
             switch (kind) {
-                case AND_ASSIGNMENT:
-                    v &= e; break;
+//                case AND_ASSIGNMENT:
+//                    v &= e; break;
                 case DIVIDE_ASSIGNMENT:
                     v /= e; break;
 //                case LEFT_SHIFT_ASSIGNMENT:
@@ -742,18 +742,18 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     v -= e; break;
                 case MULTIPLY_ASSIGNMENT:
                     v *= e; break;
-                case OR_ASSIGNMENT:
-                    v |= e; break;
+//                case OR_ASSIGNMENT:
+//                    v |= e; break;
                 case PLUS_ASSIGNMENT:
                     v += e; break;
-                case REMAINDER_ASSIGNMENT:
-                    v %= e; break;
+//                case REMAINDER_ASSIGNMENT:
+//                    v %= e; break;
 //                case RIGHT_SHIFT_ASSIGNMENT:
 //                    v >>= e; break;
 //                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
 //                    v >>>= e; break;
-                case XOR_ASSIGNMENT:
-                    v ^= e; break;
+//                case XOR_ASSIGNMENT:
+//                    v ^= e; break;
                 default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
             }
             Value value = vm.mirrorOf(v);
@@ -764,8 +764,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             int v = ((IntegerValue) var).value();
             int e = ((PrimitiveValue) exp).intValue();
             switch (kind) {
-                case AND_ASSIGNMENT:
-                    v &= e; break;
+//                case AND_ASSIGNMENT:
+//                    v &= e; break;
                 case DIVIDE_ASSIGNMENT:
                     v /= e; break;
 //                case LEFT_SHIFT_ASSIGNMENT:
@@ -774,18 +774,18 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     v -= e; break;
                 case MULTIPLY_ASSIGNMENT:
                     v *= e; break;
-                case OR_ASSIGNMENT:
-                    v |= e; break;
+//                case OR_ASSIGNMENT:
+//                    v |= e; break;
                 case PLUS_ASSIGNMENT:
                     v += e; break;
-                case REMAINDER_ASSIGNMENT:
-                    v %= e; break;
+//                case REMAINDER_ASSIGNMENT:
+//                    v %= e; break;
 //                case RIGHT_SHIFT_ASSIGNMENT:
 //                    v >>= e; break;
 //                case UNSIGNED_RIGHT_SHIFT_ASSIGNMENT:
 //                    v >>>= e; break;
-                case XOR_ASSIGNMENT:
-                    v ^= e; break;
+//                case XOR_ASSIGNMENT:
+//                    v ^= e; break;
                 default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
             }
             Value value = vm.mirrorOf(v);
@@ -824,13 +824,13 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             boolean op2 = ((BooleanValue) right).booleanValue();
             boolean res;
             switch (kind) {
-                case AND: res = op1 & op2; break;
+//                case AND: res = op1 & op2; break;
                 case CONDITIONAL_AND: res = op1 && op2; break;
                 case CONDITIONAL_OR: res = op1 || op2; break;
                 case EQUAL_TO: res = op1 == op2; break;
                 case NOT_EQUAL_TO: res = op1 != op2; break;
-                case OR: res = op1 | op2; break;
-                case XOR: res = op1 ^ op2; break;
+//                case OR: res = op1 | op2; break;
+//                case XOR: res = op1 ^ op2; break;
                 default:
                     throw new IllegalArgumentException("Unhandled binary tree: "+arg0);
             }
@@ -932,12 +932,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                        v = l >> r; break;
 //                    case UNSIGNED_RIGHT_SHIFT:
 //                        v = l >>> r; break;
-                    case AND:
-                        v = l & r; break;
-                    case OR:
-                        v = l | r; break;
-                    case XOR:
-                        v = l ^ r; break;
+//                    case AND:
+//                        v = l & r; break;
+//                    case OR:
+//                        v = l | r; break;
+//                    case XOR:
+//                        v = l ^ r; break;
                     case EQUAL_TO:
                         b = l == r; isBoolean = true; break;
                     case GREATER_THAN:
@@ -982,12 +982,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                        v = l >> r; break;
 //                    case UNSIGNED_RIGHT_SHIFT:
 //                        v = l >>> r; break;
-                    case AND:
-                        v = l & r; break;
-                    case OR:
-                        v = l | r; break;
-                    case XOR:
-                        v = l ^ r; break;
+//                    case AND:
+//                        v = l & r; break;
+//                    case OR:
+//                        v = l | r; break;
+//                    case XOR:
+//                        v = l ^ r; break;
                     case EQUAL_TO:
                         b = l == r; isBoolean = true; break;
                     case GREATER_THAN:
@@ -2086,9 +2086,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (expression instanceof ByteValue) {
             byte v = ((ByteValue) expression).value();
             switch (kind) {
-                case BITWISE_COMPLEMENT:
-                    int i = ~v;
-                    return vm.mirrorOf(i);
+//                case BITWISE_COMPLEMENT:
+//                    int i = ~v;
+//                    return vm.mirrorOf(i);
                 case POSTFIX_DECREMENT:
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v - 1), evaluationContext);
                     break;
@@ -2104,10 +2104,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v), evaluationContext);
                     break;
                 case UNARY_MINUS:
-                    i = -v;
+                    int i = -v;
                     return vm.mirrorOf(i);
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);
@@ -2115,9 +2115,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (expression instanceof CharValue) {
             char v = ((CharValue) expression).value();
             switch (kind) {
-                case BITWISE_COMPLEMENT:
-                    int i = ~v;
-                    return vm.mirrorOf(i);
+//                case BITWISE_COMPLEMENT:
+//                    int i = ~v;
+//                    return vm.mirrorOf(i);
                 case POSTFIX_DECREMENT:
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v - 1), evaluationContext);
                     break;
@@ -2133,10 +2133,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v), evaluationContext);
                     break;
                 case UNARY_MINUS:
-                    i = -v;
+                    int i = -v;
                     return vm.mirrorOf(i);
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);
@@ -2144,9 +2144,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (expression instanceof ShortValue) {
             short v = ((ShortValue) expression).value();
             switch (kind) {
-                case BITWISE_COMPLEMENT:
-                    int i = ~v;
-                    return vm.mirrorOf(i);
+//                case BITWISE_COMPLEMENT:
+//                    int i = ~v;
+//                    return vm.mirrorOf(i);
                 case POSTFIX_DECREMENT:
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v - 1), evaluationContext);
                     break;
@@ -2162,10 +2162,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v), evaluationContext);
                     break;
                 case UNARY_MINUS:
-                    i = -v;
+                    int i = -v;
                     return vm.mirrorOf(i);
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);
@@ -2173,9 +2173,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (expression instanceof IntegerValue) {
             int v = ((IntegerValue) expression).value();
             switch (kind) {
-                case BITWISE_COMPLEMENT:
-                    v = ~v;
-                    break;
+//                case BITWISE_COMPLEMENT:
+//                    v = ~v;
+//                    break;
                 case POSTFIX_DECREMENT:
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v - 1), evaluationContext);
                     break;
@@ -2193,8 +2193,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 case UNARY_MINUS:
                     v = -v;
                     break;
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);
@@ -2202,9 +2202,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (expression instanceof LongValue) {
             long v = ((LongValue) expression).value();
             switch (kind) {
-                case BITWISE_COMPLEMENT:
-                    v = ~v;
-                    break;
+//                case BITWISE_COMPLEMENT:
+//                    v = ~v;
+//                    break;
                 case POSTFIX_DECREMENT:
                     setToMirror(arg0.getExpression(), vm.mirrorOf(v - 1), evaluationContext);
                     break;
@@ -2222,8 +2222,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 case UNARY_MINUS:
                     v = -v;
                     break;
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);
@@ -2248,8 +2248,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 case UNARY_MINUS:
                     v = -v;
                     break;
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);
@@ -2274,8 +2274,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 case UNARY_MINUS:
                     v = -v;
                     break;
-                case UNARY_PLUS:
-                    break;
+//                case UNARY_PLUS:
+//                    break;
                 default: throw new IllegalStateException("Tree = "+arg0);
             }
             return vm.mirrorOf(v);

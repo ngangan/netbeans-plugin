@@ -10,6 +10,7 @@ blocksMouse
 cache
 clip
 cursor
+disable
 effect
 fill
 focusable
@@ -19,6 +20,8 @@ id
 impl_layoutX
 impl_layoutY
 impl_needsLayout
+initializing
+morphEvaluator
 onKeyPressed
 onKeyReleased
 onKeyTyped

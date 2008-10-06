@@ -1,18 +1,15 @@
 
 package frame.stage;
 
-import javafx.stage.Frame;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
 
-Frame {
+Stage {
     title: "MyApplication"
     width: 200
     height: 200
-    closeAction: function() { 
-        java.lang.System.exit( 0 ); 
-    }
     visible: true
 
     scene: Scene {
