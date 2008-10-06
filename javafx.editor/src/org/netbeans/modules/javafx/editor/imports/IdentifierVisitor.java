@@ -8,6 +8,7 @@ import com.sun.javafx.api.tree.*;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeKind;
 import java.util.Collection;
 
 /**
@@ -26,7 +27,15 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
     @Override
     public Collection<Element> visitIdentifier(IdentifierTree node, Collection<Element> elements) {
         Element element = toElement(node);
-        elements.add(element);
+        if (element != null && (element.asType().getKind() == TypeKind.PACKAGE)) {
+            JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+            Tree parent = path.getParentPath().getLeaf();
+            if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                elements.add(element);
+            }
+        } else {
+            elements.add(element);
+        }
         return elements;
     }
 

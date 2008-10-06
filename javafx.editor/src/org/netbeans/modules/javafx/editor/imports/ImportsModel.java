@@ -25,8 +25,6 @@ import org.openide.util.NbBundle;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -65,20 +63,21 @@ public final class ImportsModel {
         this.ci = ci;
     }
 
-    public void addImport(Element e) {
+    public void addImport(Element e) {        
         if (e == null) return;
         if (!isImported(e)) {
-            TypeMirror mirror = e.asType();
+            resolveEntryByClassIndex(e);
+            /*TypeMirror mirror = e.asType();
             TypeKind mk = mirror.getKind();
             switch (mk) {
-                case DECLARED:
-                    entries.add(new ModelEntry(mirror.toString()));
-                    break;
                 case ERROR:
                 case NONE:
                     resolveEntryByClassIndex(e);
                     break;
-            }
+                default:
+                    entries.add(new ModelEntry(mirror.toString()));
+                    break;
+            }*/
         }
     }
 

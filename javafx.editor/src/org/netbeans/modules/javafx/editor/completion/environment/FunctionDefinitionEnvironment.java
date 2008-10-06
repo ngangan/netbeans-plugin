@@ -45,14 +45,15 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXType;
-import com.sun.tools.javafx.tree.JFXVar;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.CATCH_KEYWORD;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.FINALLY_KEYWORD;
+
+import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
  *
@@ -79,13 +80,13 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             if (parEnd > parStart) {
                 headerText = headerText.substring(parEnd + 1).trim();
             } else {
-                for (JFXVar param : def.getParams()) {
-                    int parPos = (int) sourcePositions.getEndPosition(root, param);
-                    if (parPos == Diagnostic.NOPOS || offset <= parPos) {
-                        break;
-                    }
-                    parStart = parPos - startPos;
-                }
+//                for (JFXVar param : def.getParams()) {
+//                    int parPos = (int) sourcePositions.getEndPosition(root, param);
+//                    if (parPos == Diagnostic.NOPOS || offset <= parPos) {
+//                        break;
+//                    }
+//                    parStart = parPos - startPos;
+//                }
                 headerText = headerText.substring(parStart).trim();
             }
             if (LOGGABLE) log("  headerText(2) ==" + headerText);

@@ -51,7 +51,6 @@ import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.project.Project;
 import org.netbeans.modules.editor.indent.spi.Context;
 
 import javax.swing.text.BadLocationException;
@@ -288,6 +287,23 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
 
         if (log.isLoggable(Level.INFO)) log.info("leaving: visitObjectLiteralPart " + node);
+        return adjustments;
+    }
+
+    @Override
+    public Queue<Adjustment> visitOnReplace(OnReplaceTree node, Queue<Adjustment> adjustments) {
+        try {
+            boolean firstOnLine = isFirstOnLine(getStartPos(node));
+            if (firstOnLine) {
+                indentOffset += getCi(); 
+            }
+            super.visitOnReplace(node, adjustments);
+            if (firstOnLine) {
+                indentOffset -= getCi();
+            }
+        } catch (BadLocationException e) {
+            if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
+        }
         return adjustments;
     }
 
@@ -1159,8 +1175,11 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             incIndent();
             super.visitBlockExpression(node, adjustments);
             decIndent();
-            final int end = ctx.lineStartOffset(getEndPos(node));
-            indentLine(end, adjustments);
+            int endPos = getEndPos(node);
+            if (isFirstOnLine(endPos)) {
+                final int end = ctx.lineStartOffset(endPos);
+                indentLine(end, adjustments);
+            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
