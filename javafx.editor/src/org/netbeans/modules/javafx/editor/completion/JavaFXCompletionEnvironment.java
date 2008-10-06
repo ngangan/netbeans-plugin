@@ -87,6 +87,7 @@ import javax.lang.model.element.PackageElement;
 import static javax.lang.model.element.Modifier.*;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeKind;
@@ -112,6 +113,7 @@ import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.NbBundle;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
@@ -249,8 +251,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) {
         if (LOGGABLE) log("addMembers: " + type);
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
             return;
@@ -526,6 +527,124 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return Collections.emptyList();
     }
 
+    void resolveToolTip(final CompilationController controller) throws IOException {
+        Phase resPhase = controller.toPhase(Phase.ANALYZED);
+
+        if  ((resPhase.lessThan(Phase.ANALYZED)) || (isTreeBroken())) {
+            if (LOGGABLE) log("resolveToolTip: phase: " + resPhase);
+            return;
+        }
+        if (LOGGABLE) {
+            log("  resolveToolTip start");
+        }
+        Tree lastTree = null;
+        while (path != null) {
+            Tree tree = path.getLeaf();
+            if (LOGGABLE) log("  resolveToolTip on " + tree.getJavaFXKind());
+            if (tree.getJavaFXKind() == Tree.JavaFXKind.METHOD_INVOCATION) {
+                FunctionInvocationTree mi = (FunctionInvocationTree) tree;
+                int startPos = lastTree != null ? (int) sourcePositions.getStartPosition(root, lastTree) : offset;
+                if (LOGGABLE) log("  startPos == " + startPos);
+                List<Tree> argTypes = getArgumentsUpToPos(mi.getArguments(), (int) sourcePositions.getEndPosition(root, mi.getMethodSelect()), startPos);
+                if (LOGGABLE) log("  argTypes = " + argTypes);
+                if (argTypes != null) {
+                    TypeMirror[] types = new TypeMirror[argTypes.size()];
+                    int j = 0;
+                    for (Tree t : argTypes) {
+                        types[j++] = controller.getTrees().getTypeMirror(JavaFXTreePath.getPath(root, t));
+                        if (LOGGABLE) {
+                            log("  types[j-1] == " + types[j-1]);
+                        }
+                    }
+                    List<List<String>> params = null;
+                    Tree mid = mi.getMethodSelect();
+                    if (LOGGABLE) log("   mid == " + mid.getJavaFXKind() + mid);
+                    if (LOGGABLE) {
+                        log("    path " + path);
+                        if (path != null) {
+                            log("    path.getLeaf() == " + path.getLeaf());
+                        }
+                    }
+                    path = new JavaFXTreePath(path, mid);
+                    switch (mid.getJavaFXKind()) {
+                        case MEMBER_SELECT: {
+                            ExpressionTree exp = ((MemberSelectTree) mid).getExpression();
+                            path = new JavaFXTreePath(path, exp);
+                            if (LOGGABLE) log("   path == " + path.getLeaf());
+                            JavafxcTrees trees = controller.getTrees();
+                            final TypeMirror type = trees.getTypeMirror(path);
+                            if (LOGGABLE) log("    type == " + type);
+                            final Element element = trees.getElement(path);
+                            if (LOGGABLE) log("    element == " + element);
+                            final boolean isStatic = element != null && (element.getKind().isClass() || element.getKind().isInterface());
+                            if (LOGGABLE) log("     isStatic == " + isStatic);
+                            final boolean isSuperCall = element != null && element.getKind().isField() && element.getSimpleName().contentEquals(SUPER_KEYWORD);
+                            final JavafxcScope scope = trees.getScope(path);
+                            if (LOGGABLE) log("   scope == " + scope);
+                            final TreeUtilities tu = controller.getTreeUtilities();
+                            TypeElement enclClass = scope.getEnclosingClass();
+                            final TypeMirror enclType = enclClass != null ? enclClass.asType() : null;
+                            ElementUtilities.ElementAcceptor acceptor = new ElementUtilities.ElementAcceptor() {
+
+                                public boolean accept(Element e, TypeMirror t) {
+                                    boolean res = (!isStatic || e.getModifiers().contains(STATIC)) && tu.isAccessible(scope, e, isSuperCall && enclType != null ? enclType : t);
+                                    if (LOGGABLE) {
+                                        log("   accept for " + e + " on " + t);
+                                        log("   returning " + res);
+                                    }
+                                    return res;
+                                }
+                            };
+                            params = getMatchingParams(type, controller.getElementUtilities().getMembers(type, acceptor), ((MemberSelectTree) mid).getIdentifier().toString(), types, controller.getTypes());
+                            if (LOGGABLE) log("  params == " + params);
+                            break;
+                        }
+                        case IDENTIFIER: {
+                            JavafxcTrees trees = controller.getTrees();
+                            final JavafxcScope scope = trees.getScope(path);
+                            if (LOGGABLE) log("   scope (2) == " + scope);
+                            final TreeUtilities tu = controller.getTreeUtilities();
+                            final TypeElement enclClass = scope.getEnclosingClass();
+                            final boolean isStatic = enclClass != null ? (tu.isStaticContext(scope) || (path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION && ((BlockExpressionTree) path.getLeaf()).isStatic())) : false;
+                            final ExecutableElement method = scope.getEnclosingMethod();
+                            ElementUtilities.ElementAcceptor acceptor = new ElementUtilities.ElementAcceptor() {
+
+                                public boolean accept(Element e, TypeMirror t) {
+                                    switch (e.getKind()) {
+                                        case CONSTRUCTOR:
+                                            return !e.getModifiers().contains(PRIVATE);
+                                        case METHOD:
+                                            return (!isStatic || e.getModifiers().contains(STATIC)) && tu.isAccessible(scope, e, t);
+                                        default:
+                                            return false;
+                                    }
+                                }
+                            };
+                            String name = ((IdentifierTree) mid).getName().toString();
+                            params = getMatchingParams(enclClass != null ? enclClass.asType() : null, controller.getElementUtilities().getLocalMembersAndVars(scope, acceptor), name, types, controller.getTypes());
+                            if (LOGGABLE) log("  params (2) == " + params);
+                            break;
+                        }
+                    }
+                    if (LOGGABLE) log("  params (3) == " + params);
+                    if (params != null) {
+                        query.toolTip = new MethodParamsTipPaintComponent(params, types.length, query.component);
+                    }
+                    startPos = (int) sourcePositions.getEndPosition(root, mi.getMethodSelect());
+                    String text = controller.getText().substring(startPos, offset);
+                    query.anchorOffset = startPos + text.indexOf('('); //NOI18N
+                    query.toolTipOffset = startPos + text.lastIndexOf(','); //NOI18N
+                    if (query.toolTipOffset < query.anchorOffset) {
+                        query.toolTipOffset = query.anchorOffset;
+                    }
+                    return;
+                }
+            }
+            lastTree = tree;
+            path = path.getParentPath();
+        }
+    }
+
     protected void addMethodArguments(FunctionInvocationTree mit) throws IOException {
         if (LOGGABLE) log("addMethodArguments " + mit);
         List<Tree> argTypes = getArgumentsUpToPos(mit.getArguments(), (int)sourcePositions.getEndPosition(root, mit.getMethodSelect()), offset);
@@ -533,11 +652,21 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (argTypes != null) {
             TypeMirror[] types = new TypeMirror[argTypes.size()];
             int j = 0;
-            for (Tree t : argTypes)
-                types[j++] = controller.getTrees().getTypeMirror(new JavaFXTreePath(path, t));
+            for (Tree t : argTypes) {
+                JavaFXTreePath jfxtp = new JavaFXTreePath(path, t);
+                if (LOGGABLE) log("    jfxtp == " + jfxtp.getLeaf());
+                types[j++] = controller.getTrees().getTypeMirror(jfxtp);
+                if (LOGGABLE) log("      types[j-1] == " + types[j-1]);
+            }
             List<Pair<ExecutableElement, ExecutableType>> methods = null;
             String name = null;
             Tree mid = mit.getMethodSelect();
+            if (LOGGABLE) {
+                log("    path " + path);
+                if (path != null) {
+                    log("    path.getLeaf() == " + path.getLeaf());
+                }
+            }
             path = new JavaFXTreePath(path, mid);
             switch (mid.getJavaFXKind()) {
                 case MEMBER_SELECT: {
@@ -659,57 +788,68 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
 
         private List<List<String>> getMatchingParams(TypeMirror type, Iterable<? extends Element> elements, String name, TypeMirror[] argTypes, Types types) {
+            if (LOGGABLE) log("getMatchingParams type == " + type + " name == " + name);
             List<List<String>> ret = new ArrayList<List<String>>();
-//            for (Element e : elements) {
-//                if ((e.getKind() == CONSTRUCTOR || e.getKind() == METHOD) && name.contentEquals(e.getSimpleName())) {
-//                    List<? extends VariableElement> params = ((ExecutableElement)e).getParameters();
-//                    int parSize = params.size();
-//                    boolean varArgs = ((ExecutableElement)e).isVarArgs();
-//                    if (!varArgs && (parSize < argTypes.length)) {
-//                        continue;
-//                    }
-//                    if (parSize == 0) {
-//                        ret.add(Collections.<String>singletonList(NbBundle.getMessage(JavaCompletionProvider.class, "JCP-no-parameters")));
-//                    } else {
-//                        ExecutableType eType = (ExecutableType)asMemberOf(e, type, types);
-//                        Iterator<? extends TypeMirror> parIt = eType.getParameterTypes().iterator();
-//                        TypeMirror param = null;
-//                        for (int i = 0; i <= argTypes.length; i++) {
-//                            if (parIt.hasNext()) {
-//                                param = parIt.next();
-//                                if (!parIt.hasNext() && param.getKind() == TypeKind.ARRAY)
-//                                    param = ((ArrayType)param).getComponentType();
-//                            } else if (!varArgs) {
-//                                break;
-//                            }
-//                            if (i == argTypes.length) {
-//                                List<String> paramStrings = new ArrayList<String>(parSize);
-//                                Iterator<? extends TypeMirror> tIt = eType.getParameterTypes().iterator();
-//                                for (Iterator<? extends VariableElement> it = params.iterator(); it.hasNext();) {
-//                                    VariableElement ve = it.next();
-//                                    StringBuffer sb = new StringBuffer();
-//                                    sb.append(Utilities.getTypeName(tIt.next(), false));
-//                                    if (varArgs && !tIt.hasNext())
-//                                        sb.delete(sb.length() - 2, sb.length()).append("..."); //NOI18N
-//                                    CharSequence veName = ve.getSimpleName();
-//                                    if (veName != null && veName.length() > 0) {
-//                                        sb.append(" "); // NOI18N
-//                                        sb.append(veName);
-//                                    }
-//                                    if (it.hasNext()) {
-//                                        sb.append(", "); // NOI18N
-//                                    }
-//                                    paramStrings.add(sb.toString());
-//                                }
-//                                ret.add(paramStrings);
-//                                break;
-//                            }
-//                            if (!types.isAssignable(argTypes[i], param))
-//                                break;
-//                        }
-//                    }
-//                }
-//            }
+            for (Element e : elements) {
+                if (LOGGABLE) log("   e == " + e);
+                if ((e.getKind() == ElementKind.CONSTRUCTOR || e.getKind() == ElementKind.METHOD) && name.contentEquals(e.getSimpleName())) {
+                    List<? extends VariableElement> params = ((ExecutableElement)e).getParameters();
+                    int parSize = params.size();
+                    if (LOGGABLE) log("   parSize == " + parSize);
+                    boolean varArgs = ((ExecutableElement)e).isVarArgs();
+                    if (!varArgs && (parSize < argTypes.length)) {
+                        continue;
+                    }
+                    if (parSize == 0) {
+                        ret.add(Collections.<String>singletonList(NbBundle.getMessage(JavaFXCompletionProvider.class, "JCP-no-parameters")));
+                    } else {
+                        ExecutableType eType = (ExecutableType)asMemberOf(e, type, types);
+                        if (LOGGABLE) log("  eType == " + eType);
+                        Iterator<? extends TypeMirror> parIt = eType.getParameterTypes().iterator();
+                        TypeMirror param = null;
+                        for (int i = 0; i <= argTypes.length; i++) {
+                            log("    i == " + i);
+                            if (parIt.hasNext()) {
+                                param = parIt.next();
+                                if (LOGGABLE) log("      param == " + param);
+                                if (!parIt.hasNext() && param.getKind() == TypeKind.ARRAY)
+                                    param = ((ArrayType)param).getComponentType();
+                            } else if (!varArgs) {
+                                break;
+                            }
+                            if (i == argTypes.length) {
+                                if (LOGGABLE) log("   i == argTypes.length");
+                                List<String> paramStrings = new ArrayList<String>(parSize);
+                                Iterator<? extends TypeMirror> tIt = eType.getParameterTypes().iterator();
+                                for (Iterator<? extends VariableElement> it = params.iterator(); it.hasNext();) {
+                                    VariableElement ve = it.next();
+                                    StringBuffer sb = new StringBuffer();
+                                    sb.append(tIt.next());
+                                    if (varArgs && !tIt.hasNext())
+                                        sb.delete(sb.length() - 2, sb.length()).append("..."); //NOI18N
+                                    CharSequence veName = ve.getSimpleName();
+                                    if (veName != null && veName.length() > 0) {
+                                        sb.append(" "); // NOI18N
+                                        sb.append(veName);
+                                    }
+                                    if (it.hasNext()) {
+                                        sb.append(", "); // NOI18N
+                                    }
+                                    paramStrings.add(sb.toString());
+                                }
+                                ret.add(paramStrings);
+                                break;
+                            }
+                            if (LOGGABLE) log("    will check " + argTypes[i] + " " + param);
+                            if (argTypes[i] != null && !types.isAssignable(argTypes[i], param)) {
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if (LOGGABLE) log("   e.getKind() == " + e.getKind());
+                }
+            }
             return ret.isEmpty() ? null : ret;
         }
 
@@ -959,8 +1099,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         Elements elements = controller.getElements();
         JavafxTypes types = controller.getJavafxTypes();
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         for (Element e : getEnclosedElements(pe)) {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
@@ -1006,8 +1145,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     private void addBasicType(String name1, String name2) {
         if (LOGGABLE) log("  addBasicType " + name1 + " : " + name2);
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         if (LOGGABLE) log("  scope == " + scope);
         for (Element local : scope.getLocalElements()) {
             if (LOGGABLE) log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
@@ -1037,15 +1175,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) {
         if (LOGGABLE) log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
-        JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         JavafxcScope originalScope = scope;
         while (scope != null) {
             if (LOGGABLE) log("  scope == " + scope);
             addLocalAndImportedTypes(scope.getLocalElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,false);
             scope = scope.getEnclosingScope();
         }
-        Element e = trees.getElement(p);
+        Element e = trees.getElement(path);
         while (e != null && e.getKind() != ElementKind.PACKAGE) {
             e = e.getEnclosingElement();
         }
@@ -1109,7 +1246,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("findTypeElement: " + simpleName);
         JavafxcTrees trees = controller.getTrees();
         JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(p);
+        JavafxcScope scope = trees.getScope(path);
         while (scope != null) {
             if (LOGGABLE) log("  scope == " + scope);
             TypeElement res = findTypeElement(scope.getLocalElements(), simpleName,null);
