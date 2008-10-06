@@ -292,7 +292,7 @@ is divided into following sections:
             </nbjavafxstart>
         </target>
         <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
-            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" jar="${{dist.dir}}/${{application.title}}.jar">
+            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}">
                 <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
                 <syspropertyset>
                     <propertyref prefix="run-sys-prop."/>
