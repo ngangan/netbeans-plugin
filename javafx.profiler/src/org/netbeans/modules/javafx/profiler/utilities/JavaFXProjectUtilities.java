@@ -85,9 +85,7 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.source.tree.ClassTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 
 /* 
