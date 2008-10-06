@@ -44,20 +44,17 @@ package org.netbeans.modules.javafx.project;
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import javax.lang.model.element.TypeElement;
@@ -120,17 +117,17 @@ class JavaFXActionProvider implements ActionProvider {
         COMMAND_BUILD,
         COMMAND_CLEAN,
         COMMAND_REBUILD,
-        COMMAND_COMPILE_SINGLE,
+//        COMMAND_COMPILE_SINGLE,
         COMMAND_RUN,
-        COMMAND_RUN_SINGLE,
-        COMMAND_RUN_APPLET,
+//        COMMAND_RUN_SINGLE,
+//        COMMAND_RUN_APPLET,
         COMMAND_DEBUG,
-        COMMAND_DEBUG_SINGLE,
+//        COMMAND_DEBUG_SINGLE,
         JavaProjectConstants.COMMAND_JAVADOC,
-        COMMAND_TEST,
-        COMMAND_TEST_SINGLE,
-        COMMAND_DEBUG_TEST_SINGLE,
-        JavaProjectConstants.COMMAND_DEBUG_FIX,
+//        COMMAND_TEST,
+//        COMMAND_TEST_SINGLE,
+//        COMMAND_DEBUG_TEST_SINGLE,
+//        JavaProjectConstants.COMMAND_DEBUG_FIX,
         COMMAND_DEBUG_STEP_INTO,
         COMMAND_DELETE,
         COMMAND_COPY,
@@ -142,17 +139,17 @@ class JavaFXActionProvider implements ActionProvider {
     private static final String[] platformSensitiveActions = {
         COMMAND_BUILD,
         COMMAND_REBUILD,
-        COMMAND_COMPILE_SINGLE,
+//        COMMAND_COMPILE_SINGLE,
         COMMAND_RUN,
-        COMMAND_RUN_SINGLE,
-        COMMAND_RUN_APPLET,
+//        COMMAND_RUN_SINGLE,
+//        COMMAND_RUN_APPLET,
         COMMAND_DEBUG,
-        COMMAND_DEBUG_SINGLE,
+//        COMMAND_DEBUG_SINGLE,
         JavaProjectConstants.COMMAND_JAVADOC,
-        COMMAND_TEST,
-        COMMAND_TEST_SINGLE,
-        COMMAND_DEBUG_TEST_SINGLE,
-        JavaProjectConstants.COMMAND_DEBUG_FIX,
+//        COMMAND_TEST,
+//        COMMAND_TEST_SINGLE,
+//        COMMAND_DEBUG_TEST_SINGLE,
+//        JavaProjectConstants.COMMAND_DEBUG_FIX,
         COMMAND_DEBUG_STEP_INTO,
     };
 
@@ -184,25 +181,25 @@ class JavaFXActionProvider implements ActionProvider {
         commands = new HashMap<String,String[]>();
         // treated specially: COMMAND_{,RE}BUILD
         commands.put(COMMAND_CLEAN, new String[] {"clean"}); // NOI18N
-        commands.put(COMMAND_COMPILE_SINGLE, new String[] {"compile-single"}); // NOI18N
+//        commands.put(COMMAND_COMPILE_SINGLE, new String[] {"compile-single"}); // NOI18N
         commands.put(COMMAND_RUN, new String[] {"run"}); // NOI18N
-        commands.put(COMMAND_RUN_SINGLE, new String[] {"run-single"}); // NOI18N
-        commands.put(COMMAND_RUN_APPLET, new String[] {"run-applet"}); // NOI18N
+//        commands.put(COMMAND_RUN_SINGLE, new String[] {"run-single"}); // NOI18N
+//        commands.put(COMMAND_RUN_APPLET, new String[] {"run-applet"}); // NOI18N
         commands.put(COMMAND_DEBUG, new String[] {"debug"}); // NOI18N
-        commands.put(COMMAND_DEBUG_SINGLE, new String[] {"debug-single"}); // NOI18N
+//        commands.put(COMMAND_DEBUG_SINGLE, new String[] {"debug-single"}); // NOI18N
         commands.put(JavaProjectConstants.COMMAND_JAVADOC, new String[] {"javadoc"}); // NOI18N
-        commands.put(COMMAND_TEST, new String[] {"test"}); // NOI18N
-        commands.put(COMMAND_TEST_SINGLE, new String[] {"test-single"}); // NOI18N
-        commands.put(COMMAND_DEBUG_TEST_SINGLE, new String[] {"debug-test"}); // NOI18N
-        commands.put(JavaProjectConstants.COMMAND_DEBUG_FIX, new String[] {"debug-fix"}); // NOI18N
+//        commands.put(COMMAND_TEST, new String[] {"test"}); // NOI18N
+//        commands.put(COMMAND_TEST_SINGLE, new String[] {"test-single"}); // NOI18N
+//        commands.put(COMMAND_DEBUG_TEST_SINGLE, new String[] {"debug-test"}); // NOI18N
+//        commands.put(JavaProjectConstants.COMMAND_DEBUG_FIX, new String[] {"debug-fix"}); // NOI18N
         commands.put(COMMAND_DEBUG_STEP_INTO, new String[] {"debug-stepinto"}); // NOI18N
 
         this.bkgScanSensitiveActions = new HashSet<String>(Arrays.asList(
             COMMAND_RUN,
-            COMMAND_RUN_SINGLE,
-            COMMAND_RUN_APPLET,
+//            COMMAND_RUN_SINGLE,
+//            COMMAND_RUN_APPLET,
             COMMAND_DEBUG,
-            COMMAND_DEBUG_SINGLE,
+//            COMMAND_DEBUG_SINGLE,
             COMMAND_DEBUG_STEP_INTO
         ));
 
@@ -376,15 +373,16 @@ class JavaFXActionProvider implements ActionProvider {
             }
         }
         String[] targetNames = new String[0];
-        Map<String,String[]> targetsFromConfig = loadTargetsFromConfig();
+//        Map<String,String[]> targetsFromConfig = loadTargetsFromConfig();
         if ( command.equals( COMMAND_COMPILE_SINGLE ) ) {
             FileObject[] sourceRoots = project.getSourceRoots().getRoots();
             FileObject[] files = findSourcesAndPackages( context, sourceRoots);
             boolean recursive = (context.lookup(NonRecursiveFolder.class) == null);
             if (files != null) {
                 p.setProperty("javac.includes", ActionUtils.antIncludesList(files, getRoot(sourceRoots,files[0]), recursive)); // NOI18N
-                String[] targets = targetsFromConfig.get(command);
-                targetNames = (targets != null) ? targets : commands.get(command);
+//                String[] targets = targetsFromConfig.get(command);
+//                targetNames = (targets != null) ? targets : commands.get(command);
+                targetNames = commands.get(command);
             }
             else {
                 FileObject[] testRoots = project.getTestSourceRoots().getRoots();
@@ -473,8 +471,9 @@ class JavaFXActionProvider implements ActionProvider {
             if (!command.equals(COMMAND_RUN) && /* XXX should ideally look up proper mainClass in evaluator x config */ mainClass != null) {
                 p.setProperty("debug.class", mainClass); // NOI18N
             }
-            String[] targets = targetsFromConfig.get(command);
-            targetNames = (targets != null) ? targets : commands.get(command);
+//            String[] targets = targetsFromConfig.get(command);
+//            targetNames = (targets != null) ? targets : commands.get(command);
+            targetNames = commands.get(command);
             if (targetNames == null) {
                 throw new IllegalArgumentException(command);
             }
@@ -549,8 +548,9 @@ class JavaFXActionProvider implements ActionProvider {
                         if ("true".equals(runInBrowser)) {
                             targetNames = new String[]{"run-applet-in-browser"}; // NOI18N
                         } else {
-                            String[] targets = targetsFromConfig.get(command);
-                            targetNames = (targets != null) ? targets : commands.get(COMMAND_RUN_APPLET);
+//                            String[] targets = targetsFromConfig.get(command);
+//                            targetNames = (targets != null) ? targets : commands.get(COMMAND_RUN_APPLET);
+                            targetNames = commands.get(COMMAND_RUN_APPLET);
                         }
                     } else{
                         p.setProperty("debug.class", clazz); // NOI18N
@@ -573,12 +573,14 @@ class JavaFXActionProvider implements ActionProvider {
                     }
                     if (command.equals (COMMAND_RUN_SINGLE)) {
                         p.setProperty("run.class", clazz); // NOI18N
-                        String[] targets = targetsFromConfig.get(command);
-                        targetNames = (targets != null) ? targets : commands.get(COMMAND_RUN_SINGLE);
+//                        String[] targets = targetsFromConfig.get(command);
+//                        targetNames = (targets != null) ? targets : commands.get(COMMAND_RUN_SINGLE);
+                        targetNames = commands.get(COMMAND_RUN_SINGLE);
                     } else {
                         p.setProperty("debug.class", clazz); // NOI18N
-                        String[] targets = targetsFromConfig.get(command);
-                        targetNames = (targets != null) ? targets : commands.get(COMMAND_DEBUG_SINGLE);
+//                        String[] targets = targetsFromConfig.get(command);
+//                        targetNames = (targets != null) ? targets : commands.get(COMMAND_DEBUG_SINGLE);
+                        targetNames = commands.get(COMMAND_DEBUG_SINGLE);
                     }
                 }else{
                     NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(JavaFXActionProvider.class, "LBL_No_Main_Classs_Found", clazz), NotifyDescriptor.INFORMATION_MESSAGE);
@@ -587,8 +589,9 @@ class JavaFXActionProvider implements ActionProvider {
                 }
             }
         } else {
-            String[] targets = targetsFromConfig.get(command);
-            targetNames = (targets != null) ? targets : commands.get(command);
+//            String[] targets = targetsFromConfig.get(command);
+//            targetNames = (targets != null) ? targets : commands.get(command);
+            targetNames = commands.get(command);
             if (targetNames == null) {
                 String buildTarget = "false".equalsIgnoreCase(project.evaluator().getProperty(JavaFXProjectProperties.DO_JAR)) ? "compile" : "jar"; // NOI18N
                 if (command.equals(COMMAND_BUILD)) {
@@ -658,45 +661,45 @@ class JavaFXActionProvider implements ActionProvider {
 
     // loads targets for specific commands from shared config property file
     // returns map; key=command name; value=array of targets for given command
-    private HashMap<String,String[]> loadTargetsFromConfig() {
-        HashMap<String,String[]> targets = new HashMap<String,String[]>(6);
-        String config = project.evaluator().getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
-        // load targets from shared config
-        FileObject propFO = project.getProjectDirectory().getFileObject("nbproject/configs/" + config + ".properties");
-        if (propFO == null) {
-            return targets;
-        }
-        Properties props = new Properties();
-        try {
-            InputStream is = propFO.getInputStream();
-            try {
-                props.load(is);
-            } finally {
-                is.close();
-            }
-        } catch (IOException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-            return targets;
-        }
-        Enumeration propNames = props.propertyNames();
-        while (propNames.hasMoreElements()) {
-            String propName = (String) propNames.nextElement();
-            if (propName.startsWith("$target.")) {
-                String tNameVal = props.getProperty(propName);
-                String cmdNameKey = null;
-                if (tNameVal != null && !tNameVal.equals("")) {
-                    cmdNameKey = propName.substring("$target.".length());
-                    StringTokenizer stok = new StringTokenizer(tNameVal.trim(), " ");
-                    List<String> targetNames = new ArrayList<String>(3);
-                    while (stok.hasMoreTokens()) {
-                        targetNames.add(stok.nextToken());
-                    }
-                    targets.put(cmdNameKey, targetNames.toArray(new String[targetNames.size()]));
-                }
-            }
-        }
-        return targets;
-    }
+//    private HashMap<String,String[]> loadTargetsFromConfig() {
+//        HashMap<String,String[]> targets = new HashMap<String,String[]>(6);
+//        String config = project.evaluator().getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
+//        // load targets from shared config
+//        FileObject propFO = project.getProjectDirectory().getFileObject("nbproject/configs/" + config + ".properties");
+//        if (propFO == null) {
+//            return targets;
+//        }
+//        Properties props = new Properties();
+//        try {
+//            InputStream is = propFO.getInputStream();
+//            try {
+//                props.load(is);
+//            } finally {
+//                is.close();
+//            }
+//        } catch (IOException ex) {
+//            ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
+//            return targets;
+//        }
+//        Enumeration propNames = props.propertyNames();
+//        while (propNames.hasMoreElements()) {
+//            String propName = (String) propNames.nextElement();
+//            if (propName.startsWith("$target.")) {
+//                String tNameVal = props.getProperty(propName);
+//                String cmdNameKey = null;
+//                if (tNameVal != null && !tNameVal.equals("")) {
+//                    cmdNameKey = propName.substring("$target.".length());
+//                    StringTokenizer stok = new StringTokenizer(tNameVal.trim(), " ");
+//                    List<String> targetNames = new ArrayList<String>(3);
+//                    while (stok.hasMoreTokens()) {
+//                        targetNames.add(stok.nextToken());
+//                    }
+//                    targets.put(cmdNameKey, targetNames.toArray(new String[targetNames.size()]));
+//                }
+//            }
+//        }
+//        return targets;
+//    }
 
     private String[] setupTestSingle(Properties p, FileObject[] files) {
         FileObject[] testSrcPath = project.getTestSourceRoots().getRoots();

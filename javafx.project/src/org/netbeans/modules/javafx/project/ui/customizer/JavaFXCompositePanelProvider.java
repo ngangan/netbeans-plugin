@@ -253,8 +253,8 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
             }
             final ProjectConfigurationProvider configProvider = 
                     javafxProject.getLookup().lookup(ProjectConfigurationProvider.class);
-            try {
-                jwsProps.createConfigurationFiles(configProvider, true);
+//            try {
+//                jwsProps.createConfigurationFiles(configProvider, true);
                 /*
                 if (enabled) {
                     // XXX logging
@@ -268,9 +268,9 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
                     setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_Default"));
                 }
                  */
-            } catch (IOException ioe) {
-                ErrorManager.getDefault().notify(ioe);
-            }
+//            } catch (IOException ioe) {
+//                ErrorManager.getDefault().notify(ioe);
+//            }
         }
     }
 }

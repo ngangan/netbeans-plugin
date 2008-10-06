@@ -58,18 +58,10 @@ public class JavaFXRunConfigProviderImpl implements JavaFXRunConfigProvider {
 
     public JComponent createComponent(Project p, PropertyEvaluator evaluator, JavaFXRunConfigProvider.ConfigChangeListener listener) {
         CustomizerWebStart.runComponent.addListener(listener);
-        if (CustomizerWebStart.runComponent.isHintLabelVisible() == CustomizerWebStart.runComponent.isRunCheckBoxEnabled()) {
-            CustomizerWebStart.runComponent.setCheckboxEnabled(true);
-            CustomizerWebStart.runComponent.setHintVisible(false);
-        }
         return CustomizerWebStart.runComponent;
     }
 
     public void configUpdated(Map<String, String> m) {
-        if ((m.get("$target.run") != null) && (m.get("$target.debug") != null)) {
-            CustomizerWebStart.runComponent.setCheckboxSelected(true);
-        } else {
-            CustomizerWebStart.runComponent.setCheckboxSelected(false);
-        }
+        CustomizerWebStart.runComponent.configUpdated(m);
     }
 }

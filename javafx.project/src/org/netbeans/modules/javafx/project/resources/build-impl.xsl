@@ -140,6 +140,30 @@ is divided into following sections:
                 <os family="windows"/>
             </condition>
             <property name="javafx.profile" value="desktop"/>
+            <condition property="midp.execution.trigger">
+                <equals arg1="${{javafx.profile}}" arg2="mobile"/>
+            </condition>
+            <condition property="jnlp.execution.trigger">
+                <and>
+                    <equals arg1="${{javafx.profile}}" arg2="desktop"/>
+                    <equals arg1="${{execution.target}}" arg2="jnlp"/>
+                </and>    
+            </condition>
+            <condition property="applet.execution.trigger">
+                <and>
+                    <equals arg1="${{javafx.profile}}" arg2="desktop"/>
+                    <equals arg1="${{execution.target}}" arg2="applet"/>
+                </and>    
+            </condition>
+            <condition property="standard.execution.trigger">
+                <not>
+                    <or>
+                         <isset property="jnlp.execution.trigger"/>
+                         <isset property="applet.execution.trigger"/>
+                         <isset property="midp.execution.trigger"/>
+                    </or>
+                </not>
+            </condition>
         </target>
         <target name="-post-init">
         <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
@@ -214,9 +238,40 @@ is divided into following sections:
                     EXECUTION SECTION
                     =================
     </xsl:comment>
-        <target depends="init,compile,jar" description="Run a main class." name="run">
+        <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
             <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}"/>
         </target>
+        <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
+            <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
+            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
+                <arg value="-Xdescriptor:${{jad.file}}"/>
+            </exec>
+        </target>
+        <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
+            <property name="applet.url" location="${{dist.dir}}/${{application.title}}.html"/>
+            <condition property="browser" value="open">
+                <os family="mac"/>
+            </condition>
+            <condition property="browser" value="firefox">
+                <os family="unix"/>
+            </condition>
+            <condition property="browser" value="cmd.exe">
+                <os family="windows"/>
+            </condition>
+            <condition property="browser.args" value="/C start">
+                <os family="windows"/>
+            </condition>
+            <property name="browser.args" value=""/>
+            <exec executable="${{browser}}" spawn="true">
+                <arg line="${{browser.args}} ${{applet.url}}"/>
+            </exec>
+        </target>
+        <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
+            <exec executable="${{java.home}}/bin/javaws">
+                <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
+            </exec>
+        </target>
+        <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run" description="Run an application." name="run"/>
     <xsl:comment>
                     =================
                     DEBUGGING SECTION
@@ -236,7 +291,7 @@ is divided into following sections:
                 </classpath>
             </nbjavafxstart>
         </target>
-        <target depends="init,compile" name="-debug-start-debuggee">
+        <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
             <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" jar="${{dist.dir}}/${{application.title}}.jar">
                 <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
                 <syspropertyset>
@@ -245,8 +300,22 @@ is divided into following sections:
                 </syspropertyset>
             </java>
         </target>
-        <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
-        <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee" if="netbeans.home" name="debug-stepinto"/>
+        <target name="-debug-midp-debuggee" if="midp.execution.trigger">
+            <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
+            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
+                <arg value="-Xdescriptor:${{jad.file}}"/>
+                <arg value="-Xdebug"/>
+                <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
+            </exec>
+        </target>
+        <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
+            <exec executable="${{java.home}}/bin/javaws">
+                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
+                <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
+            </exec>
+        </target>
+        <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
+        <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee" if="netbeans.home" name="debug-stepinto"/>
     <xsl:comment>
                     ===============
                     JAVADOC SECTION
@@ -268,75 +337,6 @@ is divided into following sections:
             <nbbrowse file="${{dist.javadoc.dir}}/index.html"/>
         </target>
         <target depends="init,-javadoc-build,-javadoc-browse" description="Build Javadoc." name="javadoc"/>
-    <xsl:comment>
-                    =========================
-                    APPLET EXECUTION SECTION
-                    =========================
-    </xsl:comment>
-        <target depends="init,jar" name="run-applet">
-            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}">
-                <arg value="-cp"/>
-                <arg value="${{dist.dir}}/${{application.title}}.jar"/>
-                <arg value="sun.applet.AppletViewer"/>
-                <arg value="${{applet.url}}"/>
-            </exec>
-        </target>
-        <target depends="init,jar" name="run-applet-in-browser">
-            <fail unless="applet.url">Must select one file in the IDE or set applet.url</fail>
-            <condition property="browser" value="open">
-                <os family="mac"/>
-            </condition>
-            <condition property="browser" value="firefox">
-                <os family="unix"/>
-            </condition>
-            <condition property="browser" value="cmd.exe">
-                <os family="windows"/>
-            </condition>
-            <condition property="browser.args" value="/C start">
-                <os family="windows"/>
-            </condition>
-            <property name="browser.args" value=""/>
-            <exec executable="${{browser}}" spawn="true">
-                <arg line="${{browser.args}} ${{applet.url}}"/>
-            </exec>
-        </target>
-    <xsl:comment>
-                    =========================
-                    JNLP EXECUTION    SECTION
-                    =========================
-    </xsl:comment>
-        <target depends="jar" description="Start javaws execution" name="jws-run">
-            <exec executable="${{java.home}}/bin/javaws">
-                <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
-            </exec>
-        </target>
-        <target depends="jar,-debug-start-debugger,-debug-javaws-debuggee" description="Debug javaws project in IDE" if="netbeans.home" name="jws-debug"/>
-        <target name="-debug-javaws-debuggee">
-            <exec executable="${{java.home}}/bin/javaws">
-                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
-                <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
-            </exec>
-        </target>
-    <xsl:comment>
-                    =========================
-                    MIDP EXECUTION    SECTION
-                    =========================
-    </xsl:comment>
-        <target depends="jar" description="Start javaws execution" name="midp-run">
-            <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
-            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
-                <arg value="-Xdescriptor:${{jad.file}}"/>
-            </exec>
-        </target>
-        <target depends="jar,-debug-start-debugger,-debug-midp-debuggee" description="Debug javaws project in IDE" if="netbeans.home" name="midp-debug"/>
-        <target name="-debug-midp-debuggee">
-            <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
-            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
-                <arg value="-Xdescriptor:${{jad.file}}"/>
-                <arg value="-Xdebug"/>
-                <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
-            </exec>
-        </target>
     <xsl:comment>
                     ===============
                     CLEANUP SECTION

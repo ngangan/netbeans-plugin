@@ -94,11 +94,6 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         
     }
     
-    private static void setEnabledRunComponent(boolean enable) {
-        runComponent.setCheckboxEnabled(enable);
-        runComponent.setHintVisible(!enable);
-        
-    }
     
     /** This method is called from within the constructor to
      * initialize the form.

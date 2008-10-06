@@ -240,20 +240,20 @@ public class WebStartProjectProperties {
         return evaluator.getProperty(propName);
     }
 
-    public void createConfigurationFiles(ProjectConfigurationProvider configProvider, Boolean enabled) throws IOException {
-        if (enabled) {
-            // XXX logging
-            // test if the file already exists, if so do not z tigenerate, just set as active
-            JavaFXProjectConfigurations.createConfigurationFiles(javafxProject, "JWS_generated", prepareSharedProps(), null); // NOI18N
-            setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
-//            copyTemplate(javafxProject);
-//            modifyBuildXml(javafxProject);
-        } else {
-            setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_Default"));
-        }
-        CustomizerWebStart.runComponent.setCheckboxEnabled(true);
-        CustomizerWebStart.runComponent.setHintVisible(true);
-    }
+//    public void createConfigurationFiles(ProjectConfigurationProvider configProvider, Boolean enabled) throws IOException {
+//        if (enabled) {
+//            // XXX logging
+//            // test if the file already exists, if so do not z tigenerate, just set as active
+//            JavaFXProjectConfigurations.createConfigurationFiles(javafxProject, "JWS_generated", prepareSharedProps(), null); // NOI18N
+//            setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
+////            copyTemplate(javafxProject);
+////            modifyBuildXml(javafxProject);
+//        } else {
+//            setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_Default"));
+//        }
+//        CustomizerWebStart.runComponent.setCheckboxEnabled(true);
+//        CustomizerWebStart.runComponent.setHintVisible(true);
+//    }
 
     private void setActiveConfig(final ProjectConfigurationProvider provider, String displayName) throws IOException {
         Collection<ProjectConfiguration> configs = provider.getConfigurations();
@@ -378,15 +378,15 @@ public class WebStartProjectProperties {
 //        }
 //    }
 
-    private Properties prepareSharedProps() {
-        Properties props = new Properties();
-        props.setProperty("$label", NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
-        if (CustomizerWebStart.runComponent.isRunCheckBoxSelected()) {
-            props.setProperty("$target.run", "jws-run"); // NOI18N
-            props.setProperty("$target.debug", "jws-debug"); // NOI18N
-        }
-        return props;
-    }
+//    private Properties prepareSharedProps() {
+//        Properties props = new Properties();
+//        props.setProperty("$label", NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
+//        if (CustomizerWebStart.runComponent.isRunCheckBoxSelected()) {
+//            props.setProperty("$target.run", "jws-run"); // NOI18N
+//            props.setProperty("$target.debug", "jws-debug"); // NOI18N
+//        }
+//        return props;
+//    }
     // ----------
 
     public class CodebaseComboBoxModel extends DefaultComboBoxModel {

@@ -54,19 +54,12 @@ import org.netbeans.modules.javafx.project.api.JavaFXRunConfigProvider;
  * 
  * @author  Milan Kubec
  */
-public class CustomizerRunComponent extends javax.swing.JPanel implements ActionListener {
-    
-    private Map<String,String> runSelectedMap = new HashMap<String,String>();
-    private Map<String,String> runUnselectedMap = new HashMap<String,String>();
+public class CustomizerRunComponent extends javax.swing.JPanel {
     
     private JavaFXRunConfigProvider.ConfigChangeListener listener;
-    private boolean runCheckBoxSelected;
-    private boolean runCheckBoxEnabled;
-    private boolean hintLabelVisible;
     
     public CustomizerRunComponent() {
         initComponents();
-        runCheckBox.addActionListener(this);
     }
     
     /** This method is called from within the constructor to
@@ -78,80 +71,114 @@ public class CustomizerRunComponent extends javax.swing.JPanel implements Action
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        runCheckBox = new javax.swing.JCheckBox();
-        hintLabel = new javax.swing.JLabel();
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jRadioButton4 = new javax.swing.JRadioButton();
 
         setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(runCheckBox, org.openide.util.NbBundle.getMessage(CustomizerRunComponent.class, "LBL_Run_with_JWS")); // NOI18N
-        runCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        buttonGroup1.add(jRadioButton1);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getBundle(CustomizerRunComponent.class).getString("CustomizerRunComponent.jRadioButton1.text")); // NOI18N
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(runCheckBox, gridBagConstraints);
-        runCheckBox.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerRunComponent.class, "CustomizerRunComponent.runCheckBox.AccessibleContext.accessibleDescription")); // NOI18N
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        add(jRadioButton1, gridBagConstraints);
 
-        hintLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerRunComponent.class, "HINT_Run_with_JWS")); // NOI18N
+        buttonGroup1.add(jRadioButton2);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getBundle(CustomizerRunComponent.class).getString("CustomizerRunComponent.jRadioButton2.text")); // NOI18N
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(4, 22, 0, 0);
-        add(hintLabel, gridBagConstraints);
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(jRadioButton2, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton3);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(CustomizerRunComponent.class, "CustomizerRunComponent.jRadioButton3.text")); // NOI18N
+        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton3ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(jRadioButton3, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton4);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton4, org.openide.util.NbBundle.getMessage(CustomizerRunComponent.class, "CustomizerRunComponent.jRadioButton4.text")); // NOI18N
+        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton4ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(jRadioButton4, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+    Map<String, String> m = new HashMap(2);
+    m.put("javafx.profile", "desktop");
+    m.put("execution.target", "standard");
+    if (listener != null) listener.propertiesChanged(m);
+
+}//GEN-LAST:event_jRadioButton1ActionPerformed
+
+private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    Map<String, String> m = new HashMap(2);
+    m.put("javafx.profile", "desktop");
+    m.put("execution.target", "jnlp");
+    if (listener != null) listener.propertiesChanged(m);
+}//GEN-LAST:event_jRadioButton2ActionPerformed
+
+private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+    Map<String, String> m = new HashMap(2);
+    m.put("javafx.profile", "desktop");
+    m.put("execution.target", "applet");
+    if (listener != null) listener.propertiesChanged(m);
+}//GEN-LAST:event_jRadioButton3ActionPerformed
+
+private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+    Map<String, String> m = new HashMap(2);
+    m.put("javafx.profile", "mobile");
+    m.put("execution.target", "midp");
+    if (listener != null) listener.propertiesChanged(m);
+}//GEN-LAST:event_jRadioButton4ActionPerformed
     
     public void addListener(JavaFXRunConfigProvider.ConfigChangeListener l) {
         listener = l;
     }
     
-    public void setCheckboxEnabled(boolean b) {
-        runCheckBox.setEnabled(b);
-        runCheckBoxEnabled = b;
+    public void configUpdated(Map<String, String> m) {
+        String run = m.get("execution.target");
+        if (run == null) jRadioButton1.setSelected(true);
+        else if (run.equals("jnlp")) jRadioButton2.setSelected(true);
+        else if (run.equals("applet")) jRadioButton3.setSelected(true);
+        else if (run.equals("midp")) jRadioButton4.setSelected(true);
     }
     
-    public void setCheckboxSelected(boolean b) {
-        runCheckBox.setSelected(b);
-        runCheckBoxSelected = b;
-    }
-    
-    public void setHintVisible(boolean b) {
-        hintLabel.setVisible(b);
-        hintLabelVisible = b;
-    }
-    
-    public void actionPerformed(ActionEvent e) {
-        initMaps();
-        if (runCheckBox.isSelected()) {
-            runCheckBoxSelected = true;
-            listener.propertiesChanged(runSelectedMap);
-        } else {
-            runCheckBoxSelected = false;
-            listener.propertiesChanged(runUnselectedMap);
-        }
-    }
-    
-    private void initMaps() {
-        runUnselectedMap.put("$target.run", null);
-        runUnselectedMap.put("$target.debug", null);
-        runSelectedMap.put("$target.run", "jws-run");
-        runSelectedMap.put("$target.debug", "jws-debug");
-    }
-    
-    public boolean isRunCheckBoxSelected(){
-        return runCheckBoxSelected;
-    }
-    public boolean isRunCheckBoxEnabled(){
-        return runCheckBoxEnabled;
-    }
-    public boolean isHintLabelVisible(){
-        return hintLabelVisible;
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel hintLabel;
-    private javax.swing.JCheckBox runCheckBox;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JRadioButton jRadioButton4;
     // End of variables declaration//GEN-END:variables
     
 }

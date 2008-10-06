@@ -105,9 +105,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
         configs = uiProperties.RUN_CONFIGS;
 
-        data = new JTextField[]{jTextFieldMainClass, jTextFieldArgs, jTextVMOptions, jTextWorkingDirectory};
-        dataLabels = new JLabel[]{jLabelMainClass, jLabelArgs, jLabelVMOptions, jLabelWorkingDirectory};
-        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS, JavaFXProjectProperties.RUN_WORK_DIR};
+        data = new JTextField[]{jTextFieldMainClass, jTextFieldArgs, jTextVMOptions};
+        dataLabels = new JLabel[]{jLabelMainClass, jLabelArgs, jLabelVMOptions};
+        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS};
         assert data.length == keys.length;
 
         configChanged(uiProperties.activeConfig);
@@ -190,9 +190,6 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         jButtonMainClass = new javax.swing.JButton();
         jLabelArgs = new javax.swing.JLabel();
         jTextFieldArgs = new javax.swing.JTextField();
-        jLabelWorkingDirectory = new javax.swing.JLabel();
-        jTextWorkingDirectory = new javax.swing.JTextField();
-        jButtonWorkingDirectoryBrowse = new javax.swing.JButton();
         jLabelVMOptions = new javax.swing.JLabel();
         jTextVMOptions = new javax.swing.JTextField();
         jLabelVMOptionsExample = new javax.swing.JLabel();
@@ -297,59 +294,33 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         mainPanel.add(jTextFieldArgs, gridBagConstraints);
         jTextFieldArgs.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jTextFieldArgs")); // NOI18N
 
-        jLabelWorkingDirectory.setLabelFor(jTextWorkingDirectory);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelWorkingDirectory, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_Working_Directory")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-        mainPanel.add(jLabelWorkingDirectory, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 5, 0);
-        mainPanel.add(jTextWorkingDirectory, gridBagConstraints);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle"); // NOI18N
-        jTextWorkingDirectory.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizeRun_Run_Working_Directory")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonWorkingDirectoryBrowse, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_Working_Directory_Browse")); // NOI18N
-        jButtonWorkingDirectoryBrowse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonWorkingDirectoryBrowseActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 5, 0);
-        mainPanel.add(jButtonWorkingDirectoryBrowse, gridBagConstraints);
-        jButtonWorkingDirectoryBrowse.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizeRun_Run_Working_Directory_Browse")); // NOI18N
-
         jLabelVMOptions.setLabelFor(jTextVMOptions);
         org.openide.awt.Mnemonics.setLocalizedText(jLabelVMOptions, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_VM_Options")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         mainPanel.add(jLabelVMOptions, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
         mainPanel.add(jTextVMOptions, gridBagConstraints);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle"); // NOI18N
         jTextVMOptions.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizeRun_Run_VM_Options")); // NOI18N
 
         jLabelVMOptionsExample.setText(org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_VM_Options_Example")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 12, 0);
         mainPanel.add(jLabelVMOptionsExample, gridBagConstraints);
-        jLabelVMOptionsExample.getAccessibleContext().setAccessibleName("null");
+        jLabelVMOptionsExample.getAccessibleContext().setAccessibleName(null);
         jLabelVMOptionsExample.getAccessibleContext().setAccessibleDescription(bundle.getString("LBL_CustomizeRun_Run_VM_Options_Example")); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -436,28 +407,6 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         uiProperties.activeConfig = config;
     }//GEN-LAST:event_configComboActionPerformed
 
-    private void jButtonWorkingDirectoryBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonWorkingDirectoryBrowseActionPerformed
-        JFileChooser chooser = new JFileChooser();
-        FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setMultiSelectionEnabled(false);
-
-        String workDir = jTextWorkingDirectory.getText();
-        if (workDir.equals("")) {
-            workDir = FileUtil.toFile(project.getProjectDirectory()).getAbsolutePath();
-        }
-        chooser.setSelectedFile(new File(workDir));
-        chooser.setDialogTitle(NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizeRun_Run_Working_Directory_Browse_Title"));
-        if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
-            //NOI18N
-            //NOI18N
-            //NOI18N
-            //NOI18N
-            File file = FileUtil.normalizeFile(chooser.getSelectedFile());
-            jTextWorkingDirectory.setText(file.getAbsolutePath());
-        }
-    }//GEN-LAST:event_jButtonWorkingDirectoryBrowseActionPerformed
-
     private void configChanged(String activeConfig) {
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         model.addElement("");
@@ -510,16 +459,13 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
     private javax.swing.JSeparator configSep;
     private javax.swing.JPanel extPanel;
     private javax.swing.JButton jButtonMainClass;
-    private javax.swing.JButton jButtonWorkingDirectoryBrowse;
     private javax.swing.JLabel jLabelArgs;
     private javax.swing.JLabel jLabelMainClass;
     private javax.swing.JLabel jLabelVMOptions;
     private javax.swing.JLabel jLabelVMOptionsExample;
-    private javax.swing.JLabel jLabelWorkingDirectory;
     private javax.swing.JTextField jTextFieldArgs;
     private javax.swing.JTextField jTextFieldMainClass;
     private javax.swing.JTextField jTextVMOptions;
-    private javax.swing.JTextField jTextWorkingDirectory;
     private javax.swing.JPanel mainPanel;
     // End of variables declaration//GEN-END:variables
 
