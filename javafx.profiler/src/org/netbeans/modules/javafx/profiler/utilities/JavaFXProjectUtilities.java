@@ -85,7 +85,9 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.source.tree.ClassTree;
+import com.sun.tools.javafx.api.JavafxcTrees;
 import javax.lang.model.element.ElementKind;
+import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 
 /* 
@@ -671,13 +673,11 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                         if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                            return;
                         }
-
                         JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
 
                         if (path == null) {
                             return;
                         }
-
                         Element element = ci.getTrees().getElement(path);
 
                         if (element == null) {
@@ -700,6 +700,31 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                             TypeElement jclass = getDeclaredType(element.asType());
                             String vmClassName = getBinaryName(jclass, jclass.getEnclosingElement());
                             resolvedClass.setValue(new ResolvedClass(jclass, vmClassName));
+
+                            return;
+                        }
+
+                        // function
+                        if (element.getKind() == ElementKind.METHOD) {
+                            TypeElement jclass = (TypeElement) element.getEnclosingElement();
+                            String vmClassName = getBinaryName(jclass, jclass.getEnclosingElement());
+                            resolvedClass.setValue(new ResolvedClass(jclass, vmClassName));
+
+                            return;
+                        }
+
+
+                        // package
+                        if (element.getKind() == ElementKind.PACKAGE) {
+                            Iterator<? extends Element> elements = element.getEnclosedElements().iterator();
+                            Element elmt;
+                            while (elements.hasNext()) {
+                                if ((elmt = elements.next()).getKind() == ElementKind.CLASS) {
+                                    TypeElement jclass = (TypeElement) elmt;
+                                    String vmClassName = getBinaryName(jclass, jclass.getEnclosingElement());
+                                    resolvedClass.setValue(new ResolvedClass(jclass, vmClassName));
+                                }
+                            }
 
                             return;
                         }
