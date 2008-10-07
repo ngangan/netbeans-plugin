@@ -67,7 +67,7 @@ import org.openide.util.Exceptions;
  *
  * @author answer
  */
-public class JavaFXDocument extends NbEditorDocument implements FXDocument {
+public class JavaFXDocument extends NbEditorDocument {
     
     private JEditorPane pane = null;
     private Component editor = null;
