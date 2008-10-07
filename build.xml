@@ -53,6 +53,8 @@ made subject to such option by the copyright holder.
         <property name="javafx.sdk.pattern" value="javafx-sdk*/**"/>
 
 	<mkdir dir="zips"/>
+	
+<!-- Clusters with SDK -->
 
         <zip destfile="zips/javafx-cluster-win.zip" update="false" duplicate="preserve">
           <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${netbeans.dest.dir}/${nb.cluster.javafx.dir}">
@@ -61,7 +63,7 @@ made subject to such option by the copyright holder.
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-mac.*"/>
           </zipfileset>
-          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.win/${javafx-sdk.win.zip}"/>
+          <!-- zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.win/${javafx-sdk.win.zip}"/ -->
         </zip>
 
         <zip destfile="zips/javafx-cluster-mac.zip" update="false" duplicate="preserve">
@@ -71,7 +73,7 @@ made subject to such option by the copyright holder.
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-win.*"/>
           </zipfileset>
-          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.mac/${javafx-sdk.mac.zip}"/>
+          <!-- zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.mac/${javafx-sdk.mac.zip}"/ -->
         </zip>
 
         <zip destfile="zips/javafx-cluster-lin.zip" update="false" duplicate="preserve">
@@ -81,7 +83,7 @@ made subject to such option by the copyright holder.
 		<exclude name="**/*-sol.*"/>
 		<exclude name="**/*-win.*"/>
           </zipfileset>
-          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.lin/${javafx-sdk.lin.zip}"/>
+          <!-- zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.lin/${javafx-sdk.lin.zip}"/ -->
         </zip>
 
         <zip destfile="zips/javafx-cluster-sol.zip" update="false" duplicate="preserve">
@@ -91,8 +93,12 @@ made subject to such option by the copyright holder.
 		<exclude name="**/*-mac.*"/>
 		<exclude name="**/*-win.*"/>
           </zipfileset>
-          <zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.sol/${javafx-sdk.sol.zip}"/>
+          <!-- zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.sol/${javafx-sdk.sol.zip}"/ -->
         </zip>
 	
+	<copy file="javafx.sdk.win/${javafx-sdk.win.zip}" tofile="zips/javafx-sdk-win.zip"/>
+	<copy file="javafx.sdk.mac/${javafx-sdk.mac.zip}" tofile="zips/javafx-sdk-mac.zip"/>
+	<copy file="javafx.sdk.lin/${javafx-sdk.lin.zip}" tofile="zips/javafx-sdk-lin.zip"/>
+	<copy file="javafx.sdk.sol/${javafx-sdk.sol.zip}" tofile="zips/javafx-sdk-sol.zip"/>
     </target>
 </project>
