@@ -84,7 +84,7 @@ is divided into following sections:
     ======================
     </xsl:comment>
 
-            <target name="profile-init" depends="-profile-pre-init, init, -profile-post-init, -profile-init-macrodef-profile, -profile-init-check"/>
+            <target name="profile-init" depends="-profile-pre-init,init,-profile-post-init,-profile-init-check"/>
 
             <target name="-profile-pre-init">
                 <xsl:comment> Empty placeholder for easier customization. </xsl:comment>
@@ -95,7 +95,7 @@ is divided into following sections:
                 <xsl:comment> Empty placeholder for easier customization. </xsl:comment>
                 <xsl:comment> You can override this target in the ../build.xml file. </xsl:comment>
             </target>
-
+<!--
             <target name="-profile-init-macrodef-profile">
                 <macrodef>
                   <xsl:attribute name="name">resolve</xsl:attribute>
@@ -141,10 +141,12 @@ is divided into following sections:
                     </sequential>
                   </macrodef>
             </target>
-
+-->
             <target name="-profile-init-check">
-                <xsl:attribute name="depends">-profile-pre-init, init, -profile-post-init, -profile-init-macrodef-profile</xsl:attribute>
+                <xsl:attribute name="depends">-profile-pre-init,init,-profile-post-init</xsl:attribute>
+<!--
                 <fail unless="profiler.info.jvm">Must set JVM to use for profiling in profiler.info.jvm</fail>
+-->                
                 <fail unless="profiler.info.jvmargs.agent">Must set profiler agent JVM arguments in profiler.info.jvmargs.agent</fail>
             </target>
 
@@ -161,12 +163,17 @@ is divided into following sections:
                 <nbprofiledirect>
                     <classpath>
                         <path path="${{platform.bootcp}}"/>
-                        <path path="${{run.classpath}}"/>
+                        <path path="${{javac.classpath}}"/>
                     </classpath>
                 </nbprofiledirect>
-                <profile/>
+                <javafxproject:property name="profiler.current.path" value="${{profiler.info.pathvar}}"/>
+                <java classname="${{main.class}}" classpath="${{dist.dir}}/${{application.title}}.jar" fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}">
+                    <jvmarg value="${{profiler.info.jvmargs.agent}}"/>
+                    <jvmarg line="${{profiler.info.jvmargs}}"/>
+                    <env key="${{profiler.info.pathvar}}" path="${{profiler.info.agentpath}}:${{profiler.current.path}}"/>
+                </java>
             </target>
-
+<!--
             <target name="profile-single">
                 <xsl:attribute name="if">netbeans.home</xsl:attribute>
                 <xsl:attribute name="depends">profile-init,compile-single</xsl:attribute>
@@ -235,7 +242,7 @@ is divided into following sections:
                   <formatter type="xml"/>
               </junit>
           </target>
-
+-->
   </project>
   </xsl:template>
 </xsl:stylesheet>

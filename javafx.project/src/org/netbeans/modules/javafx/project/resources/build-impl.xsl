@@ -258,12 +258,13 @@ is divided into following sections:
             <condition property="browser" value="cmd.exe">
                 <os family="windows"/>
             </condition>
-            <condition property="browser.args" value="/C start">
+            <condition property="browser.args" value="/C">
                 <os family="windows"/>
             </condition>
             <property name="browser.args" value=""/>
             <exec executable="${{browser}}" spawn="true">
-                <arg line="${{browser.args}} ${{applet.url}}"/>
+                <arg value="${{browser.args}}"/>
+                <arg value="${{applet.url}}"/>
             </exec>
         </target>
         <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
