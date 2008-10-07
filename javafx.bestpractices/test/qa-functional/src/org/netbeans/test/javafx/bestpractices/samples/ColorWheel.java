@@ -64,7 +64,7 @@ public class ColorWheel extends JavaFXTestCase {
 
     /** Compile Single File and Verify Success */
     public void testColorWheelCompile() {
-        if (Util.compileProjectFile(_projectPath).equals(false)) {
+        if (Util.compileProject(_project).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }

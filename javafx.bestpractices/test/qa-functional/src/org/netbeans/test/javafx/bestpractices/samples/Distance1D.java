@@ -69,7 +69,7 @@ public class Distance1D extends JavaFXTestCase {
 
     /** Compile Single File and Verify Success */
     public void testDistance1DCompile() {
-        if (Util.compileProjectFile(_projectPath).equals(false)) {
+        if (Util.compileProject(_project).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
