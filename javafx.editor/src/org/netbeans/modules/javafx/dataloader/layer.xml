@@ -49,7 +49,7 @@ made subject to such option by the copyright holder.
             </file>
         </folder>
     </folder>
-
+<!--
     <folder name="Actions">
         <folder name="FXProject">
             <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance">
@@ -81,7 +81,7 @@ made subject to such option by the copyright holder.
             <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
         </file>
     </folder>
-    
+-->    
 
     <folder name="Editors">
         <folder name="text">
@@ -217,6 +217,7 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1940"/>
                     </file>
+<!--                    
                     <file name="RunFile.instance">
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.project.JavaProjectModule.run"/>
                         <attr name="position" intvalue="1950"/>
@@ -226,6 +227,7 @@ made subject to such option by the copyright holder.
                         <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
                         <attr name="position" intvalue="1955"/>
                     </file>
+-->                    
                     <file name="SeparatorBeforeCut.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1960"/>
@@ -279,6 +281,8 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="600"/>
                     </file>
+                    <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance_hidden"/>
+<!--
                     <file name="CompileFile.instance">
                         <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.project.JavaProjectModule.compile"/>
                         <attr name="position" intvalue="620"/>
@@ -296,6 +300,7 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="700"/>
                     </file>
+-->                    
                     <file name="DeleteAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.DeleteAction"/>
                         <attr name="position" intvalue="800"/>
@@ -362,6 +367,7 @@ made subject to such option by the copyright holder.
                 <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
+<!--            
             <file name="JavaFXApplet.fx" url="JavaFXApplet.fx">
                 <attr name="position" intvalue="300"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
@@ -372,6 +378,7 @@ made subject to such option by the copyright holder.
                 <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
+-->            
         </folder>
     </folder>
 

@@ -96,7 +96,7 @@ made subject to such option by the copyright holder.
             <file name="MethodBreakpoint.xml" url="MethodBreakpoint.xml"/>
         </folder>
     </folder>
-
+<!--
     <folder name="Loaders">
         <folder name="text">
             <folder name="x-fx">
@@ -109,7 +109,7 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-
+-->
     <folder name="Actions">
         <folder name="Debug">
             <file name="org-netbeans-modules-debugger-javafx-ui-actions-BreakpointEnableAction.instance"/>
