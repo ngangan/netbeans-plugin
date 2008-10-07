@@ -81,6 +81,7 @@ import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.xml.XMLUtil;
 
@@ -379,7 +380,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         protected ImageIcon getIcon(){
-            if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(JAVA_KEYWORD));
+            if (icon == null) icon = new ImageIcon(ImageUtilities.loadImage(JAVA_KEYWORD));
             return icon;            
         }
         
@@ -536,7 +537,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         protected ImageIcon getIcon(){
-            if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(PACKAGE));
+            if (icon == null) icon = new ImageIcon(ImageUtilities.loadImage(PACKAGE));
             return icon;            
         }
         
@@ -642,7 +643,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         protected ImageIcon getIcon(){
-            if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(LOCAL_VARIABLE));
+            if (icon == null) icon = new ImageIcon(ImageUtilities.loadImage(LOCAL_VARIABLE));
             return icon;            
         }
 
@@ -838,7 +839,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         break;
                 }
             }
-            ImageIcon newIcon = new ImageIcon(org.openide.util.Utilities.loadImage(iconPath));
+            ImageIcon newIcon = new ImageIcon(ImageUtilities.loadImage(iconPath));
             icon[isStatic?1:0][level] = newIcon;
             return newIcon;            
         }
@@ -1081,7 +1082,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
         @Override
         protected ImageIcon getIcon(){
-            if (icon == null) icon = new ImageIcon(org.openide.util.Utilities.loadImage(CLASS));
+            if (icon == null) icon = new ImageIcon(ImageUtilities.loadImage(CLASS));
             return icon;            
         }
 

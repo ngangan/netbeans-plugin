@@ -704,9 +704,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                                 case FIELD:
                                     if (e.getSimpleName().contentEquals(THIS_KEYWORD) || e.getSimpleName().contentEquals(SUPER_KEYWORD))
                                         return !isStatic;
-                                default:
-                                    return (!isStatic || e.getModifiers().contains(STATIC)) && tu.isAccessible(scope, e, t);
                             }
+                            return (!isStatic || e.getModifiers().contains(STATIC)) && tu.isAccessible(scope, e, t);
                         }
                     };
                     name = ((IdentifierTree)mid).getName().toString();
@@ -762,7 +761,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                     ExecutableType eType = (ExecutableType)asMemberOf(e, type, types);
                     if (parSize == 0) {
-                        ret.add(new Pair(e, eType));
+                        ret.add(new Pair<ExecutableElement,ExecutableType>((ExecutableElement)e, eType));
                     } else {
                         Iterator<? extends TypeMirror> parIt = eType.getParameterTypes().iterator();
                         TypeMirror param = null;
@@ -775,7 +774,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                                 break;
                             }
                             if (i == argTypes.length) {
-                                ret.add(new Pair(e, eType));
+                                ret.add(new Pair<ExecutableElement, ExecutableType>((ExecutableElement)e, eType));
                                 break;
                             }
                             if (argTypes[i] == null || !types.isAssignable(argTypes[i], param))
