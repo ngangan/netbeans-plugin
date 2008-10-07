@@ -201,7 +201,9 @@ made subject to such option by the copyright holder.
                 </file>
                
                 <folder name="BracesMatchers">
-                    <file name="org-netbeans-modules-javafx-editor-JavaFXBracesMatcher.instance"/>
+                    <file name="org-netbeans-modules-javafx-editor-JavaFXBracesMatcher.instance">
+                        <attr name="position" intvalue="130"/>
+                    </file>
                 </folder>
                 
                 <folder name="Popup">
@@ -288,7 +290,7 @@ made subject to such option by the copyright holder.
 
                     <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
                         <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
-                        <attr name="position" intvalue="660"/>
+                        <attr name="position" intvalue="680"/>
                     </file>
                     <file name="Separator3.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
@@ -308,7 +310,7 @@ made subject to such option by the copyright holder.
                     </file>
                     <file name="SaveAsTemplateAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.SaveAsTemplateAction"/>
-                        <attr name="position" intvalue="1100"/>
+                        <attr name="position" intvalue="1120"/>
                     </file>
                     <file name="Separator5.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
@@ -338,9 +340,8 @@ made subject to such option by the copyright holder.
     </folder>
   
     <folder name="Templates">
-        <attr name="Java/JavaFX" boolvalue="true"/>
         <folder name="JavaFX">
-            <attr name="position" intvalue="900"/>
+            <attr name="position" intvalue="910"/>
             <file name="JavaFXEmpty.fx" url="JavaFXEmpty.fx">
                 <attr name="position" intvalue="100"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
