@@ -1399,7 +1399,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             s.runWhenScanFinished(new Task<CompilationController>() {
                 public void run(CompilationController fakeController) throws Exception {
                     if (LOGGABLE) log("    scan finished");
-                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos);
+                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos,true);
                     if (LOGGABLE) log("    env == " + env);
                     if (fakeController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         if (LOGGABLE) log("    fake failed to analyze -- returning");
