@@ -69,7 +69,7 @@ public class Weather extends JavaFXTestCase {
 
     /** Compile Single File and Verify Success */
     public void testCompile() {
-        if (Util.compileProjectFile(_projectPath).equals(false)) {
+        if (Util.compileProject(_projectName).equals(false)) {
             fail("Build Failed to compile: " + new OutputOperator().getText());
         }
     }
