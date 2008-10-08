@@ -51,8 +51,12 @@ import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.errorstripe.UpToDateStatus;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -115,6 +119,10 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             long end = d.getEndPosition();
             if (start != Diagnostic.NOPOS && end != Diagnostic.NOPOS) {
                 if (LOGGABLE) log("    start == " + start + "  end == " + end);
+                if (start == end) {
+                    end = skipWhiteSpace(info, (int)start);
+                    if (LOGGABLE) log("  after skip  start == " + start + "  end == " + end);
+                }
                 try {
                     c.add(ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
@@ -125,11 +133,13 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                     ));
                     continue;
                 } catch (BadLocationException ex) {
-                    // let's just try the line number then
+                    if (LOGGABLE) {
+                        LOGGER.log(Level.INFO, "Problem with error underlining", ex);
+                    }
                 }
             } 
             // let's use the line number
-            int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
+        int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
             if (LOGGABLE) log("    lastLine == " + lastLine);
             if (d.getLineNumber()-1 <= lastLine) {
                 c.add(ErrorDescriptionFactory.createErrorDescription(
@@ -145,10 +155,27 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         p.refresh(diag, UpToDateStatus.UP_TO_DATE_OK);
     }
 
+    private int skipWhiteSpace(CompilationInfo info, int start) {
+        TokenSequence<JFXTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        ts.move(start);
+        while (ts.moveNext()) {
+            if (ts.token().id() != JFXTokenId.WS) {
+                break;
+            }
+        }
+        int res = ts.offset();
+        if (res > start && res < info.getJavaFXSource().getDocument().getLength()) {
+            if (LOGGABLE) log("skipping the whitespace start == " + start + "  res == " + res);
+            return res;
+        } else {
+            if (LOGGABLE) log("NOT skipping the whitespace start == " + start + "  res == " + res);
+            return start;
+        }
+    }
+
     private static void log(String s) {
         if (LOGGABLE) {
             LOGGER.fine(s);
         }
     }
-
 }

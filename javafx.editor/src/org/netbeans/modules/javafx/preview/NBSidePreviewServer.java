@@ -49,9 +49,9 @@ import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import java.beans.PropertyChangeListener;
+import javax.swing.text.Document;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.javafx.editor.FXDocument;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
@@ -91,7 +91,7 @@ class NBSidePreviewServer extends UnicastRemoteObject implements NBSideServerFac
         }
     }
     
-    public static Project getProject(FXDocument doc){
+    public static Project getProject(Document doc){
         return getProject(NbEditorUtilities.getFileObject(doc));
     }
 

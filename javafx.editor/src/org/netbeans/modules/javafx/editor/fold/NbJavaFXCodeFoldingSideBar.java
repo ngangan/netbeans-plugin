@@ -58,9 +58,6 @@ public class NbJavaFXCodeFoldingSideBar extends CodeFoldingSideBar{
     private int endPos;
     private List elems = new ArrayList();
     
-    public NbJavaFXCodeFoldingSideBar(){
-    }
-    
     /** Creates a new instance of NbCodeFoldingSideBar */
     public NbJavaFXCodeFoldingSideBar(JTextComponent target) {
         super(target);

@@ -490,13 +490,6 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
         }
     }
 
-/*
-    @Override
-    public Syntax createSyntax(Document doc) {
-        return new JavaFXSyntax(getSourceLevel((BaseDocument)doc));
-    }
-*/
-
     public String getSourceLevel(BaseDocument doc) {
         DataObject dob = NbEditorUtilities.getDataObject(doc);
         return dob != null ? SourceLevelQuery.getSourceLevel(dob.getPrimaryFile()) : null;
@@ -505,10 +498,4 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     public HelpCtx getHelpCtx() {
         return new org.openide.util.HelpCtx(JavaFXEditorKit.class);
     }
-
-/*    @Override
-    public Formatter createFormatter() {
-//        return new JavaFXFormatter(this.getClass());
-
-    }*/
 }
