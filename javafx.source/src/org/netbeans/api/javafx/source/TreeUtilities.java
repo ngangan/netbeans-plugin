@@ -436,8 +436,7 @@ public final class TreeUtilities {
             if (LOGGABLE) log("     fxEnv == " + fxEnv);
             boolean res = resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);
             if (LOGGABLE) log("     returning " + res);
-            // temporary:
-            return true;
+            return res;
         } else {
             if (LOGGABLE) log("     returning FALSE from the else branch");
             return false;

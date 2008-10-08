@@ -34,6 +34,7 @@ public class Util {
     public static String FILE_SEPARATOR = System.getProperty("file.separator");
     protected static final String _close = "Close";
     protected static final String _compile = "Compile";
+    protected static final String _buildProject = "Build Project";
     private static final int WAIT_TIME = 2000;
     public static final long MAX_WAIT_TIME = 300000;
 
@@ -60,6 +61,62 @@ public class Util {
             return false;
         }
         return true;
+    }
+
+    /** Compile project */
+    public static Boolean compileProject(String projectName) {
+        ProjectsTabOperator pto = new ProjectsTabOperator();
+        Node projectNode = new Node(pto.invoke().tree(), projectName);
+        new QueueTool().waitEmpty();
+        sleep();
+        JPopupMenuOperator item = projectNode.callPopup();
+        item.pushMenuNoBlock(_buildProject);
+        new QueueTool().waitEmpty();
+        sleep();
+
+        //Verify compilation
+        try {
+            OutputOperator oo = new OutputOperator();
+            if (!oo.isShowing()) {
+                new ActionNoBlock("Window|Output|Output", null).perform();
+            }
+            new QueueTool().waitEmpty();
+            String output = oo.getText();
+            CharSequence build = new String("BUILD");
+            int done = 0;
+            while (done < 3) {
+                if (!output.contains(build)) { //Compilation hasn't finished yet or window isn't open.
+                    sleep();
+                    output = oo.getText();
+                    done++;
+                } else {
+                    done = 3;
+                }
+            }
+            CharSequence sucess = new String("BUILD SUCCESS");
+            CharSequence warning = new String("warnings");
+            if ((!output.contains(sucess)) || (output.contains(warning))) {
+                return false;
+            }
+            return true;
+        } catch (org.netbeans.jemmy.TimeoutExpiredException e) {
+            //open it and try again
+            new ActionNoBlock("Window|Output|Output", null).perform();
+            new QueueTool().waitEmpty();
+            try {
+                OutputOperator oo = new OutputOperator();
+                new QueueTool().waitEmpty();
+                String output = oo.getText();
+                CharSequence sucess = new String("BUILD SUCCESS");
+                CharSequence warning = new String("warnings");
+                if ((!output.contains(sucess)) || (output.contains(warning))) {
+                    return false;
+                }
+                return true;
+            } catch (org.netbeans.jemmy.TimeoutExpiredException e2) {
+                return false; //output window not found
+            }
+        }
     }
 
     /** Compile single file using treePath */

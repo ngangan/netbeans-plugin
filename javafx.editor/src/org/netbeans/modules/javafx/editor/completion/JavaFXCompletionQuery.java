@@ -181,11 +181,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     
     public Set<JavaFXCompletionItem> results;
     private boolean hasAdditionalItems;
-    private JToolTip toolTip;
+    JToolTip toolTip;
     private CompletionDocumentation documentation;
     int anchorOffset;
-    private int toolTipOffset;
-    private JTextComponent component;
+    int toolTipOffset;
+    JTextComponent component;
     public int queryType;
     private int caretOffset;
     private String filterPrefix;
@@ -338,6 +338,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 if (component != null && isTaskCancelled()) {
                     component.putClientProperty("completion-active", Boolean.FALSE);
                 }
+            } else if (queryType == JavaFXCompletionProvider.TOOLTIP_QUERY_TYPE) {
+                JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset,true);
+                env.resolveToolTip(controller);
             } else if (queryType == JavaFXCompletionProvider.DOCUMENTATION_QUERY_TYPE) {
                 resolveDocumentation(controller);
             }
@@ -346,7 +349,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     private void resolveDocumentation(CompilationController controller) throws IOException {
         controller.toPhase(Phase.ANALYZED);
-        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset);
+        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset,true);
         Element el = controller.getTrees().getElement(env.getPath());
         if (el != null) {
             documentation = JavaCompletionDoc.create(controller, el);
@@ -355,7 +358,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     @SuppressWarnings("unchecked")
     private void resolveCompletion(CompilationController controller) throws IOException {
-        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset);
+        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset,true);
         results = new HashSet<JavaFXCompletionItem>();
         if (anchorOffset == -1) {
             anchorOffset = env.getOffset();
@@ -371,6 +374,17 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if  ((!resPhase.lessThan(Phase.ANALYZED)) && (! env.isTreeBroken())) {
             Tree leaf = env.getPath().getLeaf();
             env.inside(leaf);
+            if (results.isEmpty()) {
+                if (anchorOffset != env.getOffset()) {
+                    if (LOGGABLE) log("  let's try without moving back");
+                    env = getCompletionEnvironment(controller, caretOffset,false);
+                    if (anchorOffset == -1) {
+                        anchorOffset = env.getOffset();
+                    }
+                    leaf = env.getPath().getLeaf();
+                    env.inside(leaf);
+                }
+            }
         } else {
             if (LOGGABLE) log("Completion not resolved: phase: " + resPhase);
         }
@@ -414,7 +428,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
     }
 
-    JavaFXCompletionEnvironment getCompletionEnvironment(CompilationController controller, int offset) throws IOException {
+    JavaFXCompletionEnvironment getCompletionEnvironment(CompilationController controller, int offset,boolean allowMovingBack) throws IOException {
         controller.toPhase(Phase.PARSED);
         String prefix = null;
         if (offset > 0) {
@@ -433,7 +447,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 //TODO: Use isKeyword(...) when available
                 prefix = ts.token().toString().substring(0, len);
                 offset = ts.offset();
-            } else {
+            } else if (allowMovingBack) {
                 boolean moved = false;
                 while (ts.token().id() == JFXTokenId.WS) {
                     if (LOGGABLE) log("     moving back " + ts.token().id());
@@ -456,6 +470,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
+        while (t != null && t.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+            path = path.getParentPath();
+            if (path != null) {
+                t = path.getLeaf();
+            } else {
+                t = null;
+            }
+        }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
         result = createEnvironment(k);

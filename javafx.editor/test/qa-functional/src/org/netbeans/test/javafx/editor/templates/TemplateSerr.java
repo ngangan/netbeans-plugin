@@ -88,13 +88,18 @@ public class TemplateSerr extends JavaFXTestCase {
         if (Util.diff(currentState, goldenState)) {
             assertTrue("Pass: Editor Source Matches Golden Source.", true);
         } else {
-            log("WHAT WE WANT TO SEE: Golden State: length = " + goldenState.length());
-            log(goldenState);
+            String output, temp;
+            output = "";
+            temp = "WHAT WE WANT TO SEE: Golden State: length = " + goldenState.length();
+            log(temp); output+= ("\n" + temp);
+            log(goldenState); output+=("\n" + goldenState);
+            temp = "------";
+            log(temp); output+=("\n" + temp);
+            temp = "WHAT WE GOT: Current State: length = " + currentState.length();
+            log(temp); output+=("\n" + temp);
+            log(currentState); output+=("\n" + currentState);
             log("------");
-            log("WHAT WE GOT: Current State: length = " + currentState.length());
-            log(currentState);
-            fail("Source does not match Golden.");
-            log("------");
+            fail("Source does not match Golden." + output);
         }
 
     }
