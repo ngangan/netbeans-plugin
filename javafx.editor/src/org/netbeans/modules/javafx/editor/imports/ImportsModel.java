@@ -1,5 +1,29 @@
 /*
- * Copyright (c) 2008, Your Corporation. All Rights Reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.editor.imports;
@@ -50,7 +74,6 @@ public final class ImportsModel {
     private final ClassIndex index;
     private final CompilationInfo ci;
     private final Reference<JTextComponent> tc;
-    private static final Rectangle DEFAULT_POS = new Rectangle(0, 0, 10, 10);
 
 
     ImportsModel(List<? extends ImportTree> imports, ClassIndex index, CompilationInfo ci, JTextComponent tc) {
@@ -136,6 +159,10 @@ public final class ImportsModel {
         fil.show(items, text, 0, new MyListSelectionListener(), null, null, 0);
     }
 
+    private boolean isLocal(Element e) {
+        return false;
+    }
+
     private List<FixItem> createItems(Set<ElementHandle<TypeElement>> options, FixImportsLayout<FixItem> fil) {
         List<FixItem> result = new ArrayList<FixItem>(options.size());
         for (ElementHandle<TypeElement> option : options) {
@@ -147,8 +174,7 @@ public final class ImportsModel {
     }
 
     boolean isImported(Element e) {
-        Symbol s = (Symbol) e;
-        if (s.isLocal()) return true;
+        if (isLocal(e)) return true;
         for (ModelEntry entry : entries) {
             if (entry != null && entry.includes(e.asType().toString())) {
                 return true;
@@ -166,7 +192,6 @@ public final class ImportsModel {
                 final int startPos = quessImportsStart(ts);
                 final int endPos = quessImportsEnd(ts, startPos);
                 Reformat reformat = null;
-                boolean relock = !(doc instanceof GuardedDocument);
                 try {
                     Position end = doc.createPosition(endPos);
                     logger.info("Publishing following entries:");
