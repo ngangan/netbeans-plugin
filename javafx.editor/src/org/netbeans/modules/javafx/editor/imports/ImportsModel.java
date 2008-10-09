@@ -31,7 +31,6 @@ package org.netbeans.modules.javafx.editor.imports;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -56,12 +55,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
-import java.awt.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.text.Collator;
 import java.util.*;
-import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -70,7 +68,7 @@ import java.util.logging.Logger;
  */
 public final class ImportsModel {
     public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
-    private final List<ModelEntry> entries = new ArrayList<ModelEntry>(20);
+    private final Collection<ModelEntry> entries = new TreeSet<ModelEntry>();
     private final ClassIndex index;
     private final CompilationInfo ci;
     private final Reference<JTextComponent> tc;
@@ -187,15 +185,19 @@ public final class ImportsModel {
     void publish(final Document doc) {
         Runnable runnable = new Runnable() {
             public void run() {
-                Collections.sort(entries);
+//                Collections.sort(entries);
                 TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
                 final int startPos = quessImportsStart(ts);
                 final int endPos = quessImportsEnd(ts, startPos);
                 Reformat reformat = null;
                 try {
                     Position end = doc.createPosition(endPos);
-                    logger.info("Publishing following entries:");
-                    doc.remove(startPos, endPos - startPos);
+                    int length = endPos - startPos;
+                    if (logger.isLoggable(Level.INFO)) {
+                        logger.info(doc.getText(startPos, length) + "\n");
+                        logger.info("Publishing following entries:");
+                    }
+                    doc.remove(startPos, length);
                     int offset = startPos;
                     boolean first = true;
                     for (ModelEntry entry : entries) {
@@ -282,6 +284,7 @@ public final class ImportsModel {
     }
 
 
+    @SuppressWarnings({"unchecked"})
     private static <T extends TokenId> TokenSequence<T> getTokenSequence(Document doc, int dotPos) {
         TokenHierarchy<Document> th = TokenHierarchy.get(doc);
         TokenSequence<T> seq = (TokenSequence<T>) th.tokenSequence();
@@ -339,9 +342,9 @@ public final class ImportsModel {
                 return type.startsWith(this.type);
             } else if (stared) {
                 int dotIndex = type.lastIndexOf('.');
-                return this.type.equals(type.substring(0, dotIndex));
+                return dotIndex > -1 && this.type.equals(type.substring(0, dotIndex));
             }
-            return this.type.equals(type);
+            return this.type.equals(type) || this.type.endsWith(type);
         }
 
         String toImportStatement() {
@@ -354,9 +357,9 @@ public final class ImportsModel {
 
             ModelEntry that = (ModelEntry) o;
 
-            if (dStared != that.dStared) return false;
-            if (stared != that.stared) return false;
-            if (tree != null ? !tree.equals(that.tree) : that.tree != null) return false;
+//            if (dStared != that.dStared) return false;
+//            if (stared != that.stared) return false;
+//            if (tree != null ? !tree.equals(that.tree) : that.tree != null) return false;
             if (type != null ? !type.equals(that.type) : that.type != null) return false;
 
             return true;
@@ -365,9 +368,9 @@ public final class ImportsModel {
         public int hashCode() {
             int result;
             result = (type != null ? type.hashCode() : 0);
-            result = 31 * result + (tree != null ? tree.hashCode() : 0);
-            result = 31 * result + (stared ? 1 : 0);
-            result = 31 * result + (dStared ? 1 : 0);
+//            result = 31 * result + (tree != null ? tree.hashCode() : 0);
+//            result = 31 * result + (stared ? 1 : 0);
+//            result = 31 * result + (dStared ? 1 : 0);
             return result;
         }
 
