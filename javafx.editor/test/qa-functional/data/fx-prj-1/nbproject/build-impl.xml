@@ -121,11 +121,14 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file.-->
     </target>
     <target depends="init,deps-jar,-pre-compile" name="-do-compile">
+        <condition else="" property="cp.arg" value="-cp">
+            <length length="0" string="${javac.classpath}" trim="true" when="greater"/>
+        </condition>
         <exec executable="${platform.fxhome}/bin/javafxpackager${binary.extension}" failonerror="true">
             <arg value="-src"/>
             <arg value="${src.dir}"/>
-            <arg value="-cp"/>
-            <arg value="${javac.classpath};"/>
+            <arg value="${cp.arg}"/>
+            <arg path="${javac.classpath}"/>
             <arg value="-workdir"/>
             <arg file="${build.dir}"/>
             <arg value="-d"/>

@@ -1,6 +1,5 @@
 centerX
 centerY
-initializedArc
 length
 radiusX
 radiusY
@@ -20,8 +19,6 @@ id
 impl_layoutX
 impl_layoutY
 impl_needsLayout
-initializing
-morphEvaluator
 onKeyPressed
 onKeyReleased
 onKeyTyped

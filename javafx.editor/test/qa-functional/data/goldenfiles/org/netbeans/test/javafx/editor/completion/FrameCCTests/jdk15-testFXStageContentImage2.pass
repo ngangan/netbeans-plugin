@@ -1,11 +1,9 @@
 backgroundLoading
 bufferedImage
-frames
+error
 height
-loadImageTask
 placeholder
 preserveRatio
 progress
-timeline
 url
 width

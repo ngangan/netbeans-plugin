@@ -1,6 +1,5 @@
 centerX
 centerY
-initializedCir
 radius
 blocksMouse
 cache
@@ -16,8 +15,6 @@ id
 impl_layoutX
 impl_layoutY
 impl_needsLayout
-initializing
-morphEvaluator
 onKeyPressed
 onKeyReleased
 onKeyTyped

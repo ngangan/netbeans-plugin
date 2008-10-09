@@ -1,11 +1,14 @@
-iconified
-closeAction
+focused
+fullScreen
 height
+iconified
 icons
-name
+impl_sceneCursor
+onClose
 opacity
 resizable
 scene
+style
 title
 visible
 width

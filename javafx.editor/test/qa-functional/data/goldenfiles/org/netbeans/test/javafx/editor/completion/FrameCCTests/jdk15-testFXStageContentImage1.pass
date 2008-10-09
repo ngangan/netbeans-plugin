@@ -1,9 +1,8 @@
-bufferedImage
 fitHeight
 fitWidth
 image
-initializedIV
 preserveRatio
+viewport
 x
 y
 blocksMouse

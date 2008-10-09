@@ -1,6 +1,5 @@
 centerX
 centerY
-initializedE
 radiusX
 radiusY
 blocksMouse
@@ -17,8 +16,6 @@ id
 impl_layoutX
 impl_layoutY
 impl_needsLayout
-initializing
-morphEvaluator
 onKeyPressed
 onKeyReleased
 onKeyTyped
