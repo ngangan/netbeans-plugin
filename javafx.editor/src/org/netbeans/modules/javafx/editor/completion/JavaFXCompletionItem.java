@@ -132,14 +132,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     }
     
     public static final JavaFXCompletionItem createTypeItem(TypeElement elem, DeclaredType type, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType, boolean insertImport) {
-        switch (elem.getKind()) {
-            case CLASS:
-            case INTERFACE:
-            case ENUM:
-                return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType, insertImport);
-            default:
-                throw new IllegalArgumentException("kind=" + elem.getKind());
-        }
+        return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType, insertImport);
     }
 
     public static final JavaFXCompletionItem createTypeItem(String name,  int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
