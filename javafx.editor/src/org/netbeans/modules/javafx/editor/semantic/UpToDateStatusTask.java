@@ -158,10 +158,16 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     private int skipWhiteSpace(CompilationInfo info, int start) {
         TokenSequence<JFXTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
+        boolean nonWSFound = false;
         while (ts.moveNext()) {
             if (ts.token().id() != JFXTokenId.WS) {
+                nonWSFound = true;
                 break;
             }
+        }
+        if (!nonWSFound) {
+            if (LOGGABLE) log("NOT skipping the WS because we are at the very end");
+            return start;
         }
         int res = ts.offset();
         if (res > start && res < info.getJavaFXSource().getDocument().getLength()) {
