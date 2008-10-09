@@ -68,9 +68,7 @@ import javax.swing.text.StyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -95,10 +93,10 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     }
 
     public void run(CompilationInfo info) throws IOException {
-        // dirty hack by nenik
-        if (((CompilationController) info).toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-            return; // convert the element to local element
-        }
+//        // dirty hack by nenik
+//        if (((CompilationController) info).toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+//            return; // convert the element to local element
+//        }
 
         resume();
 

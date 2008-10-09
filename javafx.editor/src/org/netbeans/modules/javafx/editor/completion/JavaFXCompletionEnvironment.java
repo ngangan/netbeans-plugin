@@ -1158,10 +1158,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
                         if (LOGGABLE) log("    found " + name1);
                         if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
-                            addResult(JavaFXCompletionItem.createTypeItem(name1, query.anchorOffset, false, false, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(name1, query.anchorOffset, false, false, true));
                         } else {
                             DeclaredType dt = (DeclaredType) local.asType();
-                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, query.anchorOffset, false, false, false, false));
+                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, query.anchorOffset, false, false, true, false));
                         }
                         return;
                     }

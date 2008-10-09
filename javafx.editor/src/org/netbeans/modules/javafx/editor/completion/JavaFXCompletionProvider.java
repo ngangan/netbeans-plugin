@@ -49,9 +49,7 @@ import java.util.logging.Level;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
@@ -59,7 +57,6 @@ import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.completion.*;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
-
 
 /**
  *
@@ -163,9 +160,9 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         return null;
     }
     
-    static CompletionTask createDocTask() {
+    static CompletionTask createDocTask(ElementHandle element) {
         JavaFXCompletionQuery query = new JavaFXCompletionQuery(DOCUMENTATION_QUERY_TYPE, -1, true);
-//        query.element = element;
+        query.setElement(element);
         return new AsyncCompletionTask(query, EditorRegistry.lastFocusedComponent());
     }
 

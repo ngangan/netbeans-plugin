@@ -34,6 +34,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -42,6 +43,7 @@ import java.util.Collection;
 class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collection<Element>> {
     private final CompilationInfo info;
     protected UnitTree cu;
+    private static Logger log = Logger.getLogger(IdentifierVisitor.class.getName());
 
     IdentifierVisitor(CompilationInfo info) {
         this.info = info;
@@ -62,6 +64,18 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         }
         return elements;
     }
+
+/*
+    @Override
+    public Collection<Element> visitInterpolateValue(InterpolateValueTree node, Collection<Element> elements) {
+        if (log.isLoggable(Level.INFO)) {
+            log.info("Approching visitInterpolateValue");
+        }
+        scan(node.getInterpolation(), elements);
+        return elements;
+//        return super.visitInterpolateValue(node, elements);
+    }
+*/
 
     private Element toElement(Tree node) {
         return info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));

@@ -671,9 +671,11 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private String sortText;
         private String leftText;
         private String rightText;
+        protected ElementHandle<ExecutableElement> elementHandle;
         
         private MethodItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {
             super(substitutionOffset);
+            this.elementHandle = ElementHandle.create(elem);
             this.isInherited = isInherited;
             this.isDeprecated = isDeprecated;
             this.inImport = inImport;
@@ -783,7 +785,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         public CompletionTask createDocumentationTask() {
-            return JavaFXCompletionProvider.createDocTask();
+            return JavaFXCompletionProvider.createDocTask(elementHandle);
         }
 
         @Override
@@ -1070,7 +1072,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         @Override
         public CompletionTask createDocumentationTask() {
 //            return typeHandle.getKind() == TypeKind.DECLARED ? JavaCompletionProvider.createDocTask(ElementHandle.from(typeHandle)) : null;
-            return JavaFXCompletionProvider.createDocTask();
+            return JavaFXCompletionProvider.createDocTask(ElementHandle.create(type.asElement()));
         }
 
         @Override
@@ -1384,8 +1386,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
         @Override
         public CompletionTask createDocumentationTask() {
-            return JavaFXCompletionProvider.createDocTask();
-//            return null;
+            return JavaFXCompletionProvider.createDocTask(elementHandle);
         }
 
         @Override

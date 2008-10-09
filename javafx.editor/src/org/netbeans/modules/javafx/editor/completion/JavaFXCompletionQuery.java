@@ -66,8 +66,10 @@ import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -76,6 +78,7 @@ import org.netbeans.modules.javafx.editor.completion.environment.*;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -84,77 +87,77 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     private static final Logger logger = Logger.getLogger(JavaFXCompletionProvider.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
-    public static final String ERROR = "<error>";
-    public static final String INIT = "<init>";
-    public static final String SPACE = " ";
-    public static final String COLON = ":";
-    public static final String SEMI = ";";
-    public static final String EMPTY = "";
-    public static final String ABSTRACT_KEYWORD = "abstract";
-    public static final String AFTER_KEYWORD = "after";
-    public static final String AND_KEYWORD = "and";
-    public static final String AS_KEYWORD = "as";
-    public static final String ASSERT_KEYWORD = "assert";
-    public static final String BEFORE_KEYWORD = "before";
-    public static final String BIND_KEYWORD = "bind";
-    public static final String BOUND_KEYWORD = "bound";
-    public static final String BREAK_KEYWORD = "break";
-    public static final String CATCH_KEYWORD = "catch";
-    public static final String CLASS_KEYWORD = "class";
-    public static final String CONTINUE_KEYWORD = "continue";
-    public static final String DELETE_KEYWORD = "delete";
-    public static final String DEF_KEYWORD = "def";
-    public static final String ELSE_KEYWORD = "else";
-    public static final String EXCLUSIVE_KEYWORD = "exclusive";
-    public static final String EXTENDS_KEYWORD = "extends";
-    public static final String FALSE_KEYWORD = "false";
-    public static final String FINALLY_KEYWORD = "finally";
-    public static final String FIRST_KEYWORD = "first";
-    public static final String FOR_KEYWORD = "for";
-    public static final String FROM_KEYWORD = "from";
-    public static final String FUNCTION_KEYWORD = "function";
-    public static final String IF_KEYWORD = "if";
-    public static final String IMPORT_KEYWORD = "import";
-    public static final String INDEXOF_KEYWORD = "indexof";
-    public static final String INIT_KEYWORD = "init";
-    public static final String IN_KEYWORD = "in";
-    public static final String INSERT_KEYWORD = "insert";
-    public static final String INSTANCEOF_KEYWORD = "instanceof";
-    public static final String INTO_KEYWORD = "into";
-    public static final String INVERSE_KEYWORD = "inverse";
-    public static final String LAST_KEYWORD = "last";
-    public static final String LAZY_KEYWORD = "lazy";
-    public static final String LET_KEYWORD = "let";
-    public static final String NEW_KEYWORD = "new";
-    public static final String NOT_KEYWORD = "not";
-    public static final String NULL_KEYWORD = "null";
-    public static final String ON_KEYWORD = "on";
-    public static final String OR_KEYWORD = "or";
-    public static final String OVERRIDE_KEYWORD = "override";
-    public static final String PACKAGE_KEYWORD = "package";
-    public static final String POSTINIT_KEYWORD = "postinit";
-    public static final String PROTECTED_KEYWORD = "protected";
-    public static final String PUBLIC_KEYWORD = "public";
-    public static final String PUBLIC_INIT_KEYWORD = "public-init";
-    public static final String PUBLIC_READ_KEYWORD = "public-read";
-    public static final String REPLACE_KEYWORD = "replace";
-    public static final String RETURN_KEYWORD = "return";
-    public static final String REVERSE_KEYWORD = "reverse";
-    public static final String SIZEOF_KEYWORD = "sizeof";
-    public static final String STEP_KEYWORD = "step";
-    public static final String SUPER_KEYWORD = "super";
-    public static final String THEN_KEYWORD = "then";
-    public static final String THIS_KEYWORD = "this";
-    public static final String THROW_KEYWORD = "throw";
-    public static final String TRANSIENT_KEYWORD = "transient";
-    public static final String TRUE_KEYWORD = "true";
-    public static final String TRY_KEYWORD = "try";
-    public static final String TWEEN_KEYWORD = "tween";
-    public static final String TYPEOF_KEYWORD = "typeof";
-    public static final String VAR_KEYWORD = "var";
-    public static final String WHERE_KEYWORD = "where";
-    public static final String WHILE_KEYWORD = "while";
-    public static final String WITH_KEYWORD = "with";
+    public static final String ERROR = "<error>"; // NOI18N
+    public static final String INIT = "<init>"; // NOI18N
+    public static final String SPACE = " "; // NOI18N
+    public static final String COLON = ":"; // NOI18N
+    public static final String SEMI = ";"; // NOI18N
+    public static final String EMPTY = ""; // NOI18N
+    public static final String ABSTRACT_KEYWORD = "abstract"; // NOI18N
+    public static final String AFTER_KEYWORD = "after"; // NOI18N
+    public static final String AND_KEYWORD = "and"; // NOI18N
+    public static final String AS_KEYWORD = "as"; // NOI18N
+    public static final String ASSERT_KEYWORD = "assert"; // NOI18N
+    public static final String BEFORE_KEYWORD = "before"; // NOI18N
+    public static final String BIND_KEYWORD = "bind"; // NOI18N
+    public static final String BOUND_KEYWORD = "bound"; // NOI18N
+    public static final String BREAK_KEYWORD = "break"; // NOI18N
+    public static final String CATCH_KEYWORD = "catch"; // NOI18N
+    public static final String CLASS_KEYWORD = "class"; // NOI18N
+    public static final String CONTINUE_KEYWORD = "continue"; // NOI18N
+    public static final String DELETE_KEYWORD = "delete"; // NOI18N
+    public static final String DEF_KEYWORD = "def"; // NOI18N
+    public static final String ELSE_KEYWORD = "else"; // NOI18N
+    public static final String EXCLUSIVE_KEYWORD = "exclusive"; // NOI18N
+    public static final String EXTENDS_KEYWORD = "extends"; // NOI18N
+    public static final String FALSE_KEYWORD = "false"; // NOI18N
+    public static final String FINALLY_KEYWORD = "finally"; // NOI18N
+    public static final String FIRST_KEYWORD = "first"; // NOI18N
+    public static final String FOR_KEYWORD = "for"; // NOI18N
+    public static final String FROM_KEYWORD = "from"; // NOI18N
+    public static final String FUNCTION_KEYWORD = "function"; // NOI18N
+    public static final String IF_KEYWORD = "if"; // NOI18N
+    public static final String IMPORT_KEYWORD = "import"; // NOI18N
+    public static final String INDEXOF_KEYWORD = "indexof"; // NOI18N
+    public static final String INIT_KEYWORD = "init"; // NOI18N
+    public static final String IN_KEYWORD = "in"; // NOI18N
+    public static final String INSERT_KEYWORD = "insert"; // NOI18N
+    public static final String INSTANCEOF_KEYWORD = "instanceof"; // NOI18N
+    public static final String INTO_KEYWORD = "into"; // NOI18N
+    public static final String INVERSE_KEYWORD = "inverse"; // NOI18N
+    public static final String LAST_KEYWORD = "last"; // NOI18N
+    public static final String LAZY_KEYWORD = "lazy"; // NOI18N
+    public static final String LET_KEYWORD = "let"; // NOI18N
+    public static final String NEW_KEYWORD = "new"; // NOI18N
+    public static final String NOT_KEYWORD = "not"; // NOI18N
+    public static final String NULL_KEYWORD = "null"; // NOI18N
+    public static final String ON_KEYWORD = "on"; // NOI18N
+    public static final String OR_KEYWORD = "or"; // NOI18N
+    public static final String OVERRIDE_KEYWORD = "override"; // NOI18N
+    public static final String PACKAGE_KEYWORD = "package"; // NOI18N
+    public static final String POSTINIT_KEYWORD = "postinit"; // NOI18N
+    public static final String PROTECTED_KEYWORD = "protected"; // NOI18N
+    public static final String PUBLIC_KEYWORD = "public"; // NOI18N
+    public static final String PUBLIC_INIT_KEYWORD = "public-init"; // NOI18N
+    public static final String PUBLIC_READ_KEYWORD = "public-read"; // NOI18N
+    public static final String REPLACE_KEYWORD = "replace"; // NOI18N
+    public static final String RETURN_KEYWORD = "return"; // NOI18N
+    public static final String REVERSE_KEYWORD = "reverse"; // NOI18N
+    public static final String SIZEOF_KEYWORD = "sizeof"; // NOI18N
+    public static final String STEP_KEYWORD = "step"; // NOI18N
+    public static final String SUPER_KEYWORD = "super"; // NOI18N
+    public static final String THEN_KEYWORD = "then"; // NOI18N
+    public static final String THIS_KEYWORD = "this"; // NOI18N
+    public static final String THROW_KEYWORD = "throw"; // NOI18N
+    public static final String TRANSIENT_KEYWORD = "transient"; // NOI18N
+    public static final String TRUE_KEYWORD = "true"; // NOI18N
+    public static final String TRY_KEYWORD = "try"; // NOI18N
+    public static final String TWEEN_KEYWORD = "tween"; // NOI18N
+    public static final String TYPEOF_KEYWORD = "typeof"; // NOI18N
+    public static final String VAR_KEYWORD = "var"; // NOI18N
+    public static final String WHERE_KEYWORD = "where"; // NOI18N
+    public static final String WHILE_KEYWORD = "while"; // NOI18N
+    public static final String WITH_KEYWORD = "with"; // NOI18N
     
     public static final String[] STATEMENT_KEYWORDS = new String[]{
         FOR_KEYWORD,
@@ -179,7 +182,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         VAR_KEYWORD
     };
 
-    static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}");
+    static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}"); // NOI18N
     
     public Set<JavaFXCompletionItem> results;
     private boolean hasAdditionalItems;
@@ -191,6 +194,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public int queryType;
     private int caretOffset;
     private String filterPrefix;
+    private ElementHandle element;
     private boolean hasTask;
 
     public JavaFXCompletionQuery(int queryType, int caretOffset, boolean hasTask) {
@@ -198,6 +202,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         this.queryType = queryType;
         this.caretOffset = caretOffset;
         this.hasTask = hasTask;
+    }
+    
+    void setElement(ElementHandle element) {
+        this.element = element;
     }
 
     @Override
@@ -230,12 +238,16 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 anchorOffset = -1;
                 JavaFXSource js = JavaFXSource.forDocument(doc);
                 if (js != null) {
+                    if (queryType == JavaFXCompletionProvider.DOCUMENTATION_QUERY_TYPE && element != null) {
+                        FileObject fo = JavaFXSourceUtils.getFile(element, js.getCpInfo());
+                        if (fo != null) {
+                            js = JavaFXSource.forFileObject(fo);
+                        }
+                    }
                     Future<Void> f = js.runWhenScanFinished(this, true);
                     if (!f.isDone()) {
-                        component.putClientProperty("completion-active", Boolean.FALSE);
-                        //NOI18N
-                        resultSet.setWaitText(NbBundle.getMessage(JavaFXCompletionProvider.class, "scanning-in-progress"));
-                        //NOI18N
+                        component.putClientProperty("completion-active", Boolean.FALSE); // NOI18N
+                        resultSet.setWaitText(NbBundle.getMessage(JavaFXCompletionProvider.class, "scanning-in-progress")); // NOI18N
                         f.get();
                     }
                     if ((queryType & JavaFXCompletionProvider.COMPLETION_QUERY_TYPE) != 0) {
@@ -244,7 +256,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                         }
                         resultSet.setHasAdditionalItems(hasAdditionalItems);
                         if (hasAdditionalItems) {
-                            resultSet.setHasAdditionalItemsText(NbBundle.getMessage(JavaFXCompletionProvider.class, "JCP-imported-items"));
+                            resultSet.setHasAdditionalItemsText(NbBundle.getMessage(JavaFXCompletionProvider.class, "JCP-imported-items")); // NOI18N
                         }
                     } else if (queryType == JavaFXCompletionProvider.TOOLTIP_QUERY_TYPE) {
                         if (toolTip != null) {
@@ -301,7 +313,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             } catch (BadLocationException ex) {
             }
-            return filterPrefix != null && filterPrefix.indexOf(',') == -1 && filterPrefix.indexOf('(') == -1 && filterPrefix.indexOf(')') == -1;
+            return filterPrefix != null && filterPrefix.indexOf(',') == -1 && filterPrefix.indexOf('(') == -1 && filterPrefix.indexOf(')') == -1; // NOI18N
         }
         return false;
     }
@@ -333,12 +345,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (!hasTask || !isTaskCancelled()) {
             if ((queryType & JavaFXCompletionProvider.COMPLETION_QUERY_TYPE) != 0) {
                 if (component != null) {
-                    component.putClientProperty("completion-active", Boolean.TRUE);
+                    component.putClientProperty("completion-active", Boolean.TRUE); // NOI18N
                 }
-                //NOI18N
                 resolveCompletion(controller);
                 if (component != null && isTaskCancelled()) {
-                    component.putClientProperty("completion-active", Boolean.FALSE);
+                    component.putClientProperty("completion-active", Boolean.FALSE); // NOI18N
                 }
             } else if (queryType == JavaFXCompletionProvider.TOOLTIP_QUERY_TYPE) {
                 JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset,true);
@@ -351,8 +362,15 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
     private void resolveDocumentation(CompilationController controller) throws IOException {
         controller.toPhase(Phase.ANALYZED);
-        JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset,true);
-        Element el = controller.getTrees().getElement(env.getPath());
+        Element el = null;
+        if (element != null) {
+            el = element.resolve(controller);
+        } else {
+            JavaFXCompletionEnvironment env = getCompletionEnvironment(controller, caretOffset, true);
+            if (env != null) {
+                el = controller.getTrees().getElement(env.getPath());
+            }
+        }
         if (el != null) {
             documentation = JavaCompletionDoc.create(controller, el);
         }
@@ -368,7 +386,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         
         // make sure the init method was called
         if (env.query != this) {
-            throw new IllegalStateException("init method not called before resolveCompletion");
+            throw new IllegalStateException("init method not called before resolveCompletion"); // NOI18N
         }
         
         Phase resPhase = controller.toPhase(Phase.ANALYZED);
@@ -378,7 +396,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             env.inside(leaf);
             if (results.isEmpty()) {
                 if (anchorOffset != env.getOffset()) {
-                    if (LOGGABLE) log("  let's try without moving back");
+                    if (LOGGABLE) log("  let's try without moving back"); // NOI18N
                     env = getCompletionEnvironment(controller, caretOffset,false);
                     if (anchorOffset == -1) {
                         anchorOffset = env.getOffset();
@@ -388,10 +406,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             }
         } else {
-            if (LOGGABLE) log("Completion not resolved: phase: " + resPhase);
+            if (LOGGABLE) log("Completion not resolved: phase: " + resPhase); // NOI18N
         }
         
-        if (LOGGABLE) log("Results: " + results);
+        if (LOGGABLE) log("Results: " + results); // NOI18N
     }
 
     static boolean isJavaIdentifierPart(String text) {
@@ -440,11 +458,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 ts.movePrevious();
             }
             int len = offset - ts.offset();
-            if (LOGGABLE) log("getCompletionEnvironment len = " + len);
+            if (LOGGABLE) log("getCompletionEnvironment len = " + len); // NOI18N
             if (len > 0 &&
                         (ts.token().id() == JFXTokenId.IDENTIFIER ||
-                        (ts.token().id().primaryCategory().startsWith("keyword")) ||
-                        ts.token().id().primaryCategory().equals("literal")) &&
+                        (ts.token().id().primaryCategory().startsWith("keyword")) || // NOI18N
+                        ts.token().id().primaryCategory().equals("literal")) && // NOI18N
                     ts.token().length() >= len) {
                 //TODO: Use isKeyword(...) when available
                 prefix = ts.token().toString().substring(0, len);
@@ -452,7 +470,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             } else if (allowMovingBack) {
                 boolean moved = false;
                 while (ts.token().id() == JFXTokenId.WS) {
-                    if (LOGGABLE) log("     moving back " + ts.token().id());
+                    if (LOGGABLE) log("     moving back " + ts.token().id()); // NOI18N
                     if (ts.movePrevious()) {
                         moved = true;
                     } else {
@@ -469,7 +487,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             }
         }
-        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
+        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset); // NOI18N
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
         SourcePositions pos = controller.getTrees().getSourcePositions();
@@ -491,6 +509,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             s = pos.getStartPosition(unit, t);
             e = pos.getEndPosition(unit, t);
         }
+        if (t == null) {
+            t = unit;
+        }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
         result = createEnvironment(k);
@@ -500,7 +521,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     
     static JavaFXCompletionEnvironment createEnvironment(JavaFXKind k) {
         JavaFXCompletionEnvironment result = null;
-        if (LOGGABLE) log("JavaFXKind: " + k);
+        if (LOGGABLE) log("JavaFXKind: " + k); // NOI18N
         switch (k) {
             case COMPILATION_UNIT:
                 result = new CompilationUnitEnvironment();
