@@ -43,8 +43,10 @@ package org.netbeans.modules.javafx.editor.completion;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.javafx.api.tree.UnitTree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -470,13 +472,24 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset);
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
-        while (t != null && t.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+        SourcePositions pos = controller.getTrees().getSourcePositions();
+        UnitTree unit = controller.getCompilationUnit();
+        long s = pos.getStartPosition(unit, t);
+        long e = pos.getEndPosition(unit, t);
+        while (t != null &&
+                (t.getJavaFXKind() == JavaFXKind.ERRONEOUS ||
+                    (offset <= s) ||
+                    (offset > e)
+                )
+        ) {
             path = path.getParentPath();
             if (path != null) {
                 t = path.getLeaf();
             } else {
                 t = null;
             }
+            s = pos.getStartPosition(unit, t);
+            e = pos.getEndPosition(unit, t);
         }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
