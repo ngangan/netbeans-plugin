@@ -364,13 +364,16 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
                 
                 //this is workaround to include mobile classpath into platform
                 //the workaround should be replace by multiple platform profiles implementation with alterantive classpath
-                in = new FileInputStream(new File(fxFolder, "profiles/mobile.properties"));
-                p.clear();
-                p.load(in);
-                String val = p.getProperty("compile_classpath");
-                if (val != null) {
-                    if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
-                    properties.put("mobile_compile_classpath", val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
+                File mf = new File(fxFolder, "profiles/mobile.properties");
+                if (mf.isFile()) {
+                    in = new FileInputStream(mf);
+                    p.clear();
+                    p.load(in);
+                    String val = p.getProperty("compile_classpath");
+                    if (val != null) {
+                        if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
+                        properties.put("mobile_compile_classpath", val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
+                    }
                 }
                 
                 
