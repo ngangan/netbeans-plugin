@@ -175,20 +175,6 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             return;
         }
         
-        // Compute and set javadoc
-        if (javadocShouldUpdate) {
-            computeAndSetJavadoc(compilationInfo, element);
-        }
-
-        if (isCancelled()) {
-            return;
-        }
-
-    // Compute and set declaration
-//        if ( declarationShouldUpdate ) {
-//            computeAndSetDeclaration(compilationInfo, element);
-//        }
-
         ElementHandle<Element> eh = null;
         try {
             eh  = ElementHandle.create(element);
@@ -248,6 +234,21 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                     return;
             }
         }
+        
+        // Compute and set javadoc
+        if (javadocShouldUpdate) {
+            computeAndSetJavadoc(compilationInfo, element);
+        }
+
+        if (isCancelled()) {
+            return;
+        }
+
+    // Compute and set declaration
+//        if ( declarationShouldUpdate ) {
+//            computeAndSetDeclaration(compilationInfo, element);
+//        }
+
     }
 
 //    private void setDeclaration(final String declaration) {
