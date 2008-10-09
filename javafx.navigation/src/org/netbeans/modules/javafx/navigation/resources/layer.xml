@@ -33,9 +33,10 @@
     </folder>
 
     <folder name="Windows2">
+        <!--
         <folder name="Components">
             <file name="JavadocTopComponent.settings" url="JavadocTopComponentSettings.xml"/>
-        </folder>
+        </folder> -->
         <folder name="Modes">
             <folder name="output">
                 <file name="JavadocTopComponent.wstcref" url="JavadocTopComponentWstcref.xml">
