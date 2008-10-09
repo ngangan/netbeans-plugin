@@ -41,7 +41,6 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -49,16 +48,13 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
 
 /**
  * This task is called every time the caret position changes in a Java editor.
@@ -135,16 +131,16 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             ++lastPosition;
         }
 
-        try {
-             // TODO dirty hack
-            CompilationController cc = (CompilationController) compilationInfo;
-            if (cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                return;
-            }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-            return;
-        }
+//        try {
+//             // TODO dirty hack
+//            CompilationController cc = (CompilationController) compilationInfo;
+//            if (cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+//                return;
+//            }
+//        } catch (IOException ex) {
+//            Exceptions.printStackTrace(ex);
+//            return;
+//        }
 
         // Find the TreePath for the caret position
         JavaFXTreePath tp = compilationInfo.getTreeUtilities().pathFor(lastPosition);
