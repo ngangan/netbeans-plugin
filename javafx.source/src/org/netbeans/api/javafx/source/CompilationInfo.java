@@ -99,7 +99,7 @@ public class CompilationInfo {
         impl = new CompilationInfoImpl(source);
     }
 
-    CompilationInfo(CompilationInfoImpl impl) {
+    public CompilationInfo(CompilationInfoImpl impl) {
         this.impl = impl;
     }
 

@@ -141,7 +141,7 @@ public class CompilationJob implements Runnable {
                             } else {
                                 assert js.files.size() <= 1;
                                 boolean jsInvalid;
-                                CompilationController ci;
+                                CompilationInfoImpl ci;
                                 synchronized (INTERNAL_LOCK) {
                                     //jl:what does this comment mean?
                                     //Not only the finishedRequests for the current request.JavaFXSource should be cleaned,
@@ -194,8 +194,7 @@ public class CompilationJob implements Runnable {
                                                 try {
                                                     final long startTime = System.currentTimeMillis();
                                                     // XXX: bad package, needs to hard downcast
-                                                    //final CompilationInfo clientCi = new CompilationInfo(ci.impl);
-                                                    final CompilationInfo clientCi = ci;
+                                                    final CompilationInfo clientCi = new CompilationInfo(ci);
                                                     r.task.run(clientCi);
                                                     final long endTime = System.currentTimeMillis();
                                                     if (LOGGER.isLoggable(Level.FINEST)) {

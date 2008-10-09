@@ -146,8 +146,9 @@ public final class JavaFXSource {
     // all the following should be private:
     public int flags = 0;
     public volatile boolean k24;
-    public CompilationController currentInfo;
-    
+//    public CompilationController currentInfo;
+    public CompilationInfoImpl currentInfo;
+
     public final Collection<? extends FileObject> files;
     public final int reparseDelay;
     
@@ -409,25 +410,62 @@ public final class JavaFXSource {
         if (this.files.size()<=1) {                        
             // XXX: cancel pending tasks
 
-            // XXX: validity check
-            final CompilationController clientController = createCurrentInfo (this, null);
-            try {
-                task.run(clientController);
-            } catch (Exception ex) {
-                // XXX better handling
-                Exceptions.printStackTrace(ex);
-            } finally {
-                if (shared) {
-                    clientController.invalidate();
+
+            // XXX: validity check, reuse
+            CompilationInfoImpl currentInfo = null;
+            boolean jsInvalid;
+            synchronized (this) {                        
+                jsInvalid = this.currentInfo == null || (this.flags & INVALID)!=0;
+                currentInfo = this.currentInfo;
+                if (!shared) {
+                    this.flags|=INVALID;
+                }                        
+            }                    
+            if (jsInvalid) {
+                currentInfo = createCurrentInfo(this, null);
+            }
+            if (shared) {
+                synchronized (this) {                        
+                    if (this.currentInfo == null || (this.flags & INVALID) != 0) {
+                        this.currentInfo = currentInfo;
+                        this.flags&=~INVALID;
+                    } else {
+                        currentInfo = this.currentInfo;
+                    }
                 }
+            }
+            assert currentInfo != null;
+//                    if (shared) {
+//                        if (!infoStack.isEmpty()) {
+//                            currentInfo = infoStack.peek();
+//                        }
+//                    } else {
+//                        infoStack.push (currentInfo);
+//                    }
+            try {
+                final CompilationController clientController = new CompilationController (currentInfo);
+                try {
+                    task.run (clientController);
+                } catch (Exception ex) {
+                  // XXX better handling
+                  Exceptions.printStackTrace(ex);
+                } finally {
+                    if (shared) {
+                        clientController.invalidate();
+                    }
+                }
+            } finally {
+//                if (!shared) {
+//                    infoStack.pop ();
+//                }
             }
         }
     }
 
-    public static CompilationController createCurrentInfo (final JavaFXSource js, final String javafxc) throws IOException {
+    public static CompilationInfoImpl createCurrentInfo (final JavaFXSource js, final String javafxc) throws IOException {
         CompilationInfoImpl impl = new CompilationInfoImpl(js);
-        CompilationController info = new CompilationController(impl);//js, binding, javac);
-        return info;
+//        CompilationController info = new CompilationController(impl);//js, binding, javac);
+        return impl;
     }
 
     /** Adds a task to given compilation phase. The tasks will run sequentially by
