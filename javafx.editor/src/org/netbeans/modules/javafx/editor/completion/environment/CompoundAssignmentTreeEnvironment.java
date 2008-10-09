@@ -61,7 +61,7 @@ public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironme
         if (LOGGABLE) log("inside CompoundAssignmentTree " + cat);
         int catTextStart = (int) sourcePositions.getEndPosition(root, cat.getVariable());
         if (catTextStart != Diagnostic.NOPOS) {
-            Tree expr = unwrapErrTree(cat.getExpression());
+            Tree expr = cat.getExpression();
             if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
                 String catText = getController().getText().substring(catTextStart, offset);
                 int eqPos = catText.indexOf('=');

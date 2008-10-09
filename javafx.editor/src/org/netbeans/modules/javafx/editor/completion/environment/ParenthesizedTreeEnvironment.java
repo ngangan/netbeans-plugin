@@ -59,7 +59,7 @@ public class ParenthesizedTreeEnvironment extends JavaFXCompletionEnvironment<Pa
     @Override
     protected void inside(ParenthesizedTree pa) throws IOException {
         if (LOGGABLE) log("inside ParenthesizedTree " + pa);
-        Tree exp = unwrapErrTree(pa.getExpression());
+        Tree exp = pa.getExpression();
         if (exp == null || getOffset() <= sourcePositions.getStartPosition(root, exp)) {
             addLocalMembersAndVars(null);
             addValueKeywords();

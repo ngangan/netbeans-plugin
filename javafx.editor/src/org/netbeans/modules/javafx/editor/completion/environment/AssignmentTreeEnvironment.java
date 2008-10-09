@@ -63,7 +63,7 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
         if (LOGGABLE) log("inside AssignmentTree " + as);
         int asTextStart = (int) sourcePositions.getEndPosition(root, as.getVariable());
         if (asTextStart != Diagnostic.NOPOS) {
-            Tree expr = unwrapErrTree(as.getExpression());
+            Tree expr = as.getExpression();
             if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
                 String asText = getController().getText().substring(asTextStart, offset);
                 int eqPos = asText.indexOf('=');

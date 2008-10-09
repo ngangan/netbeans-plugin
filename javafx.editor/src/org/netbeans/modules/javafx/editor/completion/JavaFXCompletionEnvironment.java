@@ -63,7 +63,6 @@ import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXErroneousType;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -1461,14 +1460,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
         return null;
-    }
-
-    protected static Tree unwrapErrTree(Tree tree) {
-        if (tree != null && tree.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) {
-            Iterator<? extends Tree> it = ((JFXErroneousType) tree).getErrorTrees().iterator();
-            tree = it.hasNext() ? it.next() : null;
-        }
-        return tree;
     }
 
     protected static TypeMirror asMemberOf(Element element, TypeMirror type, Types types) {
