@@ -491,6 +491,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             s = pos.getStartPosition(unit, t);
             e = pos.getEndPosition(unit, t);
         }
+        if (t == null) {
+            t = unit;
+        }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
         result = createEnvironment(k);
