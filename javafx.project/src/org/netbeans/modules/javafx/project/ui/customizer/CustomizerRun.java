@@ -48,6 +48,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -56,8 +57,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -68,17 +67,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.UIResource;
-import org.netbeans.api.project.Project;
+import org.netbeans.api.java.platform.JavaPlatform;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.modules.java.api.common.SourceRoots;
+import org.netbeans.modules.javafx.platform.PlatformUiSupport;
 import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.MouseUtils;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.HelpCtx;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
@@ -98,6 +96,14 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
         this.project = uiProperties.getProject();
 
+        PlatformUiSupport.PlatformKey pk = (PlatformUiSupport.PlatformKey)uiProperties.PLATFORM_MODEL.getSelectedItem();
+        if (pk != null) {
+            JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
+            if (jp instanceof JavaFXPlatform) try {
+                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator").isDirectory());
+            } catch (URISyntaxException e) {}
+        }
+        
         configs = uiProperties.RUN_CONFIGS;
 
         data = new JTextField[]{jTextFieldMainClass};
