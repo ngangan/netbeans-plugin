@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.api.JavafxcScope;
 import java.awt.Color;
 import java.awt.Font;
@@ -111,11 +112,12 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                         if (!isAnnonInner()) {
                             TypeElement e = handle.resolve(controller);
                             if (e != null) {
+                                boolean isFx = controller.getJavafxTypes().isJFXClass((Symbol) e);
                                 delegate = JavaFXCompletionItem.createTypeItem(
                                     e, (DeclaredType)e.asType(),
                                     substitutionOffset,
                                     controller.getElements().isDeprecated(e),
-                                    insideNew, false, true);
+                                    insideNew, isFx, true);
                             }
                         }
                         handle = null;
