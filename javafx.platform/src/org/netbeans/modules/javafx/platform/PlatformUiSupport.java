@@ -624,7 +624,7 @@ public final class PlatformUiSupport {
         }
     }
 
-    private static JavaPlatform getPlatform(PlatformKey platformKey) {
+    public static JavaPlatform getPlatform(PlatformKey platformKey) {
         return platformKey.platform;
     }
 
