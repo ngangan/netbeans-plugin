@@ -263,8 +263,9 @@ public class FXErrorAnnotator extends AnnotationProvider {
                 return false;
             if (fxSource.currentInfo == null)
                 return false;
-            List<Diagnostic> diag = fxSource.currentInfo.getDiagnostics();
-            return !diag.isEmpty();
+//            List<Diagnostic> diag = fxSource.currentInfo.getDiagnostics();
+//            return !diag.isEmpty();
+            return fxSource.currentInfo.isErrors();
         } else {
 /* need to be implemented with java file checking for errors, temporary always without errors
             FileObject[] childs = file.getChildren();

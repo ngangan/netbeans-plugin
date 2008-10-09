@@ -57,10 +57,10 @@ import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
 
 /**
- *
+ * Don't use! Should be private, needs some repackaging....
  * @author nenik
  */
-class CompilationInfoImpl {
+public class CompilationInfoImpl {
     static final Logger LOGGER = Logger.getLogger(CompilationInfoImpl.class.getName());
     
     JavaFXSource.Phase phase = JavaFXSource.Phase.MODIFIED;
@@ -175,7 +175,7 @@ class CompilationInfoImpl {
         return new ArrayList<Diagnostic>(errors);
     }
     
-    boolean isErrors() {
+    public boolean isErrors() {
         for (Diagnostic diag: getDiagnostics()) {
             if (diag.getKind() == Kind.ERROR) return true;
         }
