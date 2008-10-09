@@ -220,6 +220,11 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             String ccp = getProperties().get("compile_classpath");
             ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
             pathSpec = pathSpec + ccp;
+
+            //merging mobile compile classpath to the platform bootstrap as a workaround
+            ccp = getProperties().get("mobile_compile_classpath");
+            ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
+            pathSpec = pathSpec + ccp;
             
             //adding path to the DLLs here
             if (installFolders.size() == 2) try {
@@ -356,6 +361,19 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
                     if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
                     properties.put(e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
                 }
+                
+                //this is workaround to include mobile classpath into platform
+                //the workaround should be replace by multiple platform profiles implementation with alterantive classpath
+                in = new FileInputStream(new File(fxFolder, "profiles/mobile.properties"));
+                p.clear();
+                p.load(in);
+                String val = p.getProperty("compile_classpath");
+                if (val != null) {
+                    if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
+                    properties.put("mobile_compile_classpath", val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
+                }
+                
+                
             } finally {
                 in.close();
             }

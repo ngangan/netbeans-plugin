@@ -99,8 +99,6 @@ public class DetectPanel extends javax.swing.JPanel {
     }    
 
     private void postInitComponents () {
-        platformCombo.setModel(PlatformUiSupport.createPlatformComboBoxModel(null, "j2se")); //NOI18N
-        platformCombo.setRenderer(PlatformUiSupport.createPlatformListCellRenderer());
         DocumentListener lsn = new DocumentListener () {
             public void insertUpdate(DocumentEvent e) {
                 cs.fireChange();
@@ -114,9 +112,7 @@ public class DetectPanel extends javax.swing.JPanel {
                 cs.fireChange();
             }
         };                
-        radioBtChng(null);
         jdkName.getDocument().addDocumentListener(lsn);
-        javaFolder.getDocument().addDocumentListener(lsn);
         fxFolder.getDocument().addDocumentListener(lsn);
     }
 
@@ -132,12 +128,6 @@ public class DetectPanel extends javax.swing.JPanel {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel3 = new javax.swing.JLabel();
         jdkName = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        platformCombo = new javax.swing.JComboBox();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        javaFolder = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         fxFolder = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
@@ -163,80 +153,6 @@ public class DetectPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(11, 5, 0, 0);
         add(jdkName, gridBagConstraints);
         jdkName.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(DetectPanel.class).getString("AD_PlatformName")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DetectPanel.class, "TXT_JavaPlatform")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(11, 0, 0, 0);
-        add(jLabel2, gridBagConstraints);
-
-        buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getMessage(DetectPanel.class, "TXT_InstalledJDK")); // NOI18N
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioBtChng(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jRadioButton1, gridBagConstraints);
-
-        platformCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                platformComboActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(platformCombo, gridBagConstraints);
-
-        buttonGroup1.add(jRadioButton2);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getMessage(DetectPanel.class, "TXT_CustomJava")); // NOI18N
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioBtChng(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        add(jRadioButton2, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(javaFolder, gridBagConstraints);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButton3, org.openide.util.NbBundle.getMessage(DetectPanel.class, "LBL_BrowsePlatform")); // NOI18N
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        add(jButton3, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(DetectPanel.class, "TXT_FX")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -276,52 +192,6 @@ public class DetectPanel extends javax.swing.JPanel {
 
         getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(DetectPanel.class).getString("AD_DetectPanel")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
-
-private void radioBtChng(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioBtChng
-    boolean sel = jRadioButton1.isSelected();
-    platformCombo.setEnabled(sel);
-    javaFolder.setEnabled(!sel);
-    jButton3.setEnabled(!sel);
-}//GEN-LAST:event_radioBtChng
-
-private void platformComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_platformComboActionPerformed
-    cs.fireChange();
-}//GEN-LAST:event_platformComboActionPerformed
-
-private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        JFileChooser chooser = new JFileChooser ();
-        final FileSystemView fsv = chooser.getFileSystemView();
-        chooser.setFileView(new FileView() {
-            private Icon lastOriginal;
-            private Icon lastMerged;
-            public Icon getIcon(File _f) {
-                File f = FileUtil.normalizeFile(_f);
-                Icon original = fsv.getSystemIcon(f);
-                if (original == null) {
-                    // L&F (e.g. GTK) did not specify any icon.
-                    original = EMPTY;
-                }
-                if (new File(f, "bin/java").isFile() || new File(f, "bin/java.exe").isFile()) {
-                    if ( original.equals( lastOriginal ) ) {
-                        return lastMerged;
-                    }
-                    lastOriginal = original;
-                    lastMerged = new MergedIcon(original, BADGE, -1, -1);                
-                    return lastMerged;
-                } else {
-                    return original;
-                }
-            }
-        });
-        FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        File f = new File (javaFolder.getText());
-        chooser.setSelectedFile(f);
-        chooser.setDialogTitle (NbBundle.getMessage(DetectPanel.class, "TITLE_SelectJava"));
-        if (chooser.showOpenDialog (this) == JFileChooser.APPROVE_OPTION) {
-            javaFolder.setText(chooser.getSelectedFile().getAbsolutePath());
-        }
-}//GEN-LAST:event_jButton3ActionPerformed
 
 private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         JFileChooser chooser = new JFileChooser ();
@@ -371,8 +241,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     }
     
     public File getPlatformFolder() {
-        return jRadioButton1.isSelected() ? FileUtil.toFile(PlatformUiSupport.getPlatform(platformCombo.getSelectedItem()).getInstallFolders().iterator().next()) 
-                                          : FileUtil.normalizeFile(new File(javaFolder.getText()));
+        return FileUtil.toFile(JavaPlatformManager.getDefault().getDefaultPlatform().getInstallFolders().iterator().next());
     }
     
     public File getFxFolder() {
@@ -382,17 +251,11 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JTextField fxFolder;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JTextField javaFolder;
     private javax.swing.JTextField jdkName;
-    private javax.swing.JComboBox platformCombo;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -447,7 +310,6 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
             if (fxPath != null && fxPath.isFile()) component.fxFolder.setText(fxPath.getParentFile().getParentFile().getParent());
             File f = component.getPlatformFolder();
-            if (f != null && f.isDirectory()) component.javaFolder.setText(f.getAbsolutePath());
             checkValid();
         }
 
@@ -497,12 +359,12 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 setErrorMessage("ERROR_UsedDisplayName");    //NOI18N
                 return;
             }
-            File f = component.getPlatformFolder();
-            if (!new File(f, "bin/java").isFile() && !new File(f, "bin/java.exe").isFile()) {
-                setErrorMessage("ERROR_WrongJavaPlatformLocation"); //NOI18N
-                 return;
-            }
-            f = component.getFxFolder();
+//            File f = component.getPlatformFolder();
+//            if (!new File(f, "bin/java").isFile() && !new File(f, "bin/java.exe").isFile()) {
+//                setErrorMessage("ERROR_WrongJavaPlatformLocation"); //NOI18N
+//                 return;
+//            }
+            File f = component.getFxFolder();
             if (!new File(f, "lib/shared/javafxc.jar").isFile() || !new File(f, "lib/shared/javafxrt.jar").isFile()) {
                 setErrorMessage("ERROR_WrongFxLocation"); //NOI18N
                  return;

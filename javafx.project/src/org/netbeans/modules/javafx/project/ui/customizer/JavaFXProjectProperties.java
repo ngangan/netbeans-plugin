@@ -382,7 +382,7 @@ public class JavaFXProjectProperties {
         String title = evaluator.getProperty("application.title");
         if (title == null) {
             try {
-                APPLICATION_TITLE_DOC.insertString(0, ProjectUtils.getInformation(project).getDisplayName(), null);
+                APPLICATION_TITLE_DOC.insertString(0, ProjectUtils.getInformation(project).getName(), null);
             } catch (BadLocationException ex) {
                 // just do not set anything
             }
