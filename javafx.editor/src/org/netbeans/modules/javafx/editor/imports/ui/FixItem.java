@@ -38,6 +38,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -49,6 +50,7 @@ public class FixItem implements CompletionItem {
     private static final String ITEM_COLOR = "<font color=#560000>";
     private static final String ITEM_END = "</font>";
     public static final ImageIcon icon;
+    private static Logger log = Logger.getLogger(FixItem.class.getName());
 
     static {
         icon = new ImageIcon(ImageUtilities.loadImage(ITEM_ICON));
@@ -58,12 +60,16 @@ public class FixItem implements CompletionItem {
     private final ImportsModel model;
     private final FixImportsLayout<FixItem> fil;
     private String elementHTMLForm;
+    private static final int NORMAL = 0;
+    private static final int JAVAFX = -100;
+    private int sortPriority;
 
     public FixItem(String element, ImportsModel importsModel, FixImportsLayout<FixItem> fil) {
         this.element = element;
         model = importsModel;
         this.fil = fil;
         elementHTMLForm = ITEM_COLOR + element + ITEM_END;
+        sortPriority = element.startsWith("javafx.") ? JAVAFX : NORMAL;
     }
 
     /**
@@ -95,6 +101,7 @@ public class FixItem implements CompletionItem {
      */
     public void processKeyEvent(KeyEvent evt) {
         int keyCode = evt.getKeyCode();
+        log.info("KeyEvent: " + evt.getKeyCode() + " consumed: " + evt.isConsumed());
         switch (keyCode) {
             case KeyEvent.VK_ENTER: {
                 defaultAction(null);
@@ -201,7 +208,7 @@ public class FixItem implements CompletionItem {
      * in the completion result list.
      */
     public int getSortPriority() {
-        return 0;
+        return sortPriority;
     }
 
     /**

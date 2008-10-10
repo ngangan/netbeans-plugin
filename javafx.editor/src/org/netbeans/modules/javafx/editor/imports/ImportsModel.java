@@ -216,6 +216,7 @@ public final class ImportsModel {
                     if (reformat != null) {
                         reformat.unlock();
                     }
+                    tc.get().requestFocusInWindow();
                 }
             }
         };
@@ -306,7 +307,10 @@ public final class ImportsModel {
         }
 
         public int compare(FixItem o1, FixItem o2) {
-            return collator.compare(o1.getElement(), o2.getElement());
+            if (o1.getSortPriority() == o2.getSortPriority()) {
+                return collator.compare(o1.getElement(), o2.getElement());
+            }
+            return o1.getSortPriority() - o2.getSortPriority();
         }
     }
 
