@@ -113,10 +113,8 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
                 return bottomHelp;
             }
         }
-        
-        //XXX
-        return null;
-        
+
+        return new HelpCtx("javafx_proj_quickref");
     }
 
     public boolean isValid() {              
