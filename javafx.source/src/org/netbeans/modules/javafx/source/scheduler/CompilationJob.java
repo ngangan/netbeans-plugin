@@ -183,7 +183,8 @@ public class CompilationJob implements Runnable {
                                         boolean shouldCall;
                                         try {
 //                                            final Phase phase = js.moveToPhase(r.phase, ci, true);
-                                            final Phase phase = ci.toPhase(r.phase);                                            shouldCall = phase.compareTo(r.phase) >= 0;
+                                            final Phase phase = ci.toPhase(r.phase);
+                                            shouldCall = phase.compareTo(r.phase) >= 0;
                                         } finally {
                                         }
                                         if (shouldCall) {

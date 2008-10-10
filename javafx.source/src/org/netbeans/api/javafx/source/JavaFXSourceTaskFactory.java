@@ -221,12 +221,8 @@ public abstract class JavaFXSourceTaskFactory {
 //                    throw new IllegalArgumentException("This factory did not created any task for " + FileUtil.getFileDisplayName(file)); // NOI18N
             return ;
         }
-        try {
-            source.runUserActionTask(task, false);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-//        ACCESSOR2.rescheduleTask(source, task);
+
+        source.rescheduleTask(task);
     }
 
     private final Map<FileObject, CancellableTask<CompilationInfo>> file2Task;
