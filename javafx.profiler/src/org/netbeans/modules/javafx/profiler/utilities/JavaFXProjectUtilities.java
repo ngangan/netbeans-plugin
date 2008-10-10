@@ -711,7 +711,6 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                             return;
                         }
 
-
                         // package
                         if (element.getKind() == ElementKind.PACKAGE) {
                             Iterator<? extends Element> elements = element.getEnclosedElements().iterator();

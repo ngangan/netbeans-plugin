@@ -40,13 +40,15 @@
 
 package org.netbeans.modules.javafx.profiler.selector.node;
 
-import org.netbeans.api.java.source.ClassIndex.SearchScope;
+import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
@@ -61,8 +63,9 @@ import org.openide.filesystems.FileObject;
 public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
     
     JavaFXProject project;
-    public static enum PackageType {//~ Enumeration constant initializers ------------------------------------------------------------------------------------
+    JavaFXSource source;
 
+    public static enum PackageType {
         Libraries, Source;
     }
 
@@ -92,37 +95,42 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
         List<SelectorNode> pkgs = new ArrayList<SelectorNode>();
 
         ClasspathInfo cpInfo = JavaFXProjectUtilities.createClassPathInfo((JavaFXProject)project);
-        
-        FileObject[] roots = project.getFOSourceRoots();
 
-        pkgs = collectPackages(parent, cpInfo, roots, pkgs);
+        ClassIndex index = cpInfo.getClassIndex();
+        source = JavaFXSource.forFileObject(JavaFXProjectUtilities.getSourceFiles(project).get(0));
+
+        for (String pkgName : index.getPackageNames("", true, scope)) { // NOI18N
+            pkgs.add(new JavaFXPackageNode(cpInfo, pkgName, parent, scope, source));
+        }
 
         Collections.sort(pkgs, JavaFXPackageNode.COMPARATOR);
+        if (pkgs.isEmpty())
+            pkgs = collectPackages(parent, cpInfo, project.getFOSourceRoots(), pkgs);
 
         return pkgs;
     }
 
    private List<SelectorNode> collectPackages(ContainerNode parent, ClasspathInfo cpInfo, FileObject[] roots, List<SelectorNode> pkgs) {
+
         for (int i = 0; i < roots.length; i++) {
             if (roots[i].isFolder()) {
                 pkgs = collectPackages(parent, cpInfo, roots[i], pkgs);
             }
         }
-        return pkgs;        
+        return pkgs;
    }
 
    private List<SelectorNode> collectPackages(ContainerNode parent, ClasspathInfo cpInfo, FileObject root, List<SelectorNode> pkgs) {
         FileObject[] files = root.getChildren();
-    
+
         if (files != null) {
             for (int i = 0; i < files.length; i++) {
                 if (!files[i].isFolder()) {
                     if (JavaFXProjectUtilities.SOURCES_TYPE_JAVA.equalsIgnoreCase(files[i].getExt()) ||
                         JavaFXProjectUtilities.SOURCES_TYPE_JAVAFX.equalsIgnoreCase(files[i].getExt())) {
-                        JavaFXPackageNode node = new JavaFXPackageNode(cpInfo, root, parent, scope, project);
-                        if (!pkgs.contains(node)) {
+                        JavaFXPackageNode node = new JavaFXPackageNode(cpInfo, root.getName(), parent, scope, source);
+                        if (!pkgs.contains(node))
                             pkgs.add(node);
-                        }
                     }
                 } else {
                     // this is a folder. Make recursive call.
