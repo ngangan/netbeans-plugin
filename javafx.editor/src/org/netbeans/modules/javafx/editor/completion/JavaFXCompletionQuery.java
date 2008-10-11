@@ -633,8 +633,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case INSTANTIATE_OBJECT_LITERAL:
                 result = new InstantiateEnvironment();
                 break;
-            case INTERPOLATE:
-                break;
             case INTERPOLATE_VALUE:
                 break;
             case KEYFRAME_LITERAL:
