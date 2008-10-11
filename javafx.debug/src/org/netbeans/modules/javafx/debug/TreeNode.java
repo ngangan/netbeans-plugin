@@ -255,18 +255,6 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         @Override
-        public Void visitInterpolate(InterpolateTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            super.visitInterpolate(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
-            return null;
-        }
-
-        @Override
         public Void visitInterpolateValue(InterpolateValueTree tree, List<Node> d) {
             List<Node> below = new ArrayList<Node>();
             
