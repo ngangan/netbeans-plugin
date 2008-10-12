@@ -8,7 +8,6 @@ package org.netbeans.modules.javafx.fxd.dataloader;
 import javafx.fxd.FXDContainer;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
@@ -19,7 +18,6 @@ import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
 import org.openide.cookies.SaveCookie;
-import org.openide.filesystems.FileAlreadyLockedException;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.text.CloneableEditorSupport;
@@ -59,7 +57,7 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
         } catch( IOException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOException( "Archive save failed", e);
+            throw new IOException( "Archive save failed - [" + e.getClass() + "-" + e.getMessage() + "]");
         }
     }
     

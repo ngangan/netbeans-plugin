@@ -87,7 +87,6 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
             return false;
         }
 
-        @Override
         public void paint(Graphics g) {
             if (!m_highlighted.isDeleted()) {
                 if ( !m_isCompleted && getDataModel().getIsHighlightOn()) {

@@ -131,7 +131,6 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
             return false;
         }
 
-        @Override
         public void paint(Graphics g) {
             if ( !isCompleted()) {
                 for ( FXDElement elem : m_selected) {
