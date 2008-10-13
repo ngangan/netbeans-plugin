@@ -258,6 +258,9 @@ public class CompilationInfo {
         List<? extends Tree> typeDecls = cu.getTypeDecls();
         JavaFXTreePath cuPath = new JavaFXTreePath(cu);
         for (Tree t : typeDecls) {
+            if (t == null) {
+                continue;
+            }
             JavaFXTreePath p = new JavaFXTreePath(cuPath, t);
             Element e = trees.getElement(p);
             if (e != null && (e.getKind().isClass() || e.getKind().isInterface())) {
