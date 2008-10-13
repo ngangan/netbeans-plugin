@@ -66,7 +66,8 @@ nb.cluster.javafx=\\
        contrib/debugger.javafx.projects,\\
        contrib/debugger.javafx.ui,\\
        contrib/javafx.palette,\\
-       contrib/javafx.navigation
+       contrib/javafx.navigation,\\
+
 
 javafx-sdk.win.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-dev-windows-i586.zip
 javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
@@ -75,7 +76,7 @@ javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/artifact/jfx/build/solaris-spa
 jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxc.jar
 jfxdoc.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
-
+javafx-fxd-netbeans-support.zip.url=http://getjfx.sfbay.sun.com/hudson/view/Project%20Nile/job/Project_Nile_Trunk/label=macosx-universal2/lastSuccessfulBuild/artifact/installer/macosx/build/javafx-fxd-netbeans-support-1.0-macosx-universal.zip
 EOF
 
 # Get Netbeans binary
