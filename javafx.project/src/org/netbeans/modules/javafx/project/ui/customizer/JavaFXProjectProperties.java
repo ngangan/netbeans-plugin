@@ -296,7 +296,7 @@ public class JavaFXProjectProperties {
 
     private String includes, excludes;
     
-    private WebStartProjectProperties webStartProjectProperties;
+    WebStartProjectProperties webStartProjectProperties;
     
     JavaFXProject getProject() {
         return project;

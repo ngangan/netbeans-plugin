@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.project.ui.customizer;
 
-import java.awt.BorderLayout;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
 import org.openide.util.HelpCtx;
@@ -113,7 +112,6 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         add(vendorLabel, gridBagConstraints);
         vendorLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.vendorLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
-        titleTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.titleTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -122,8 +120,6 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(titleTextField, gridBagConstraints);
-
-        vendorTextField.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.vendorTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
