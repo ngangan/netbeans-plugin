@@ -192,9 +192,6 @@ is divided into following sections:
         <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
         </target>
         <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-            <condition property="cp.arg" value="-cp" else="">
-                <length string="${{javac.classpath}}" trim="true" when="greater" length="0"/>
-            </condition>
             <exec executable="${{platform.fxhome}}/bin/javafxpackager${{binary.extension}}" failonerror="true">
                 <arg value="-src"/>
                 <arg>
@@ -204,8 +201,6 @@ is divided into following sections:
                         </xsl:call-template>
                     </xsl:attribute>
                 </arg>
-                <arg value="${{cp.arg}}"/>
-                <arg path="${{javac.classpath}}"/>
                 <arg value="-workdir"/>
                 <arg file="${{build.dir}}"/>
                 <arg value="-d"/>
@@ -223,6 +218,8 @@ is divided into following sections:
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
                 <arg value="-v"/>
+                <arg value="-cp"/>
+                <arg path="${{javac.classpath}}"/>
             </exec>
         </target>
         <target name="-post-compile">
