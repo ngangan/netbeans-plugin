@@ -286,7 +286,6 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     }
 
     private void computeAndSetJavadoc(CompilationInfo compilationInfo, Element element) {
-
         if (isCancelled()) {
             return;
         }

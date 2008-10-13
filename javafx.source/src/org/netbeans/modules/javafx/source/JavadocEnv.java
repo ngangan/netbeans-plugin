@@ -101,120 +101,120 @@ public class JavadocEnv extends DocEnv {
         this.legacyDoclet = false;
     }
 
-    @Override
-    public ClassDocImpl getClassDoc(ClassSymbol clazz) {
-        ClassDocImpl result = classMap.get(clazz);
-        if (result != null) {
-            return result;
-        }
-        result = new JavadocClass(this, clazz);
-        classMap.put(clazz, result);
-        return result;
-    }
+//    @Override
+//    public ClassDocImpl getClassDoc(ClassSymbol clazz) {
+//        ClassDocImpl result = classMap.get(clazz);
+//        if (result != null) {
+//            return result;
+//        }
+//        result = new JavadocClass(this, clazz);
+//        classMap.put(clazz, result);
+//        return result;
+//    }
+//
+//    @Override
+//    protected void makeClassDoc(ClassSymbol clazz, String docComment, JFXClassDeclaration tree, Position.LineMap lineMap) {
+//        ClassDocImpl result = classMap.get(clazz);
+//        if (result != null) {
+//            if (docComment != null) {
+//                result.setRawCommentText(docComment);
+//            }
+//            return;
+//        }
+//        result = new JavadocClass(this, clazz, docComment);
+//        classMap.put(clazz, result);
+//    }
 
-    @Override
-    protected void makeClassDoc(ClassSymbol clazz, String docComment, JFXClassDeclaration tree, Position.LineMap lineMap) {
-        ClassDocImpl result = classMap.get(clazz);
-        if (result != null) {
-            if (docComment != null) {
-                result.setRawCommentText(docComment);
-            }
-            return;
-        }
-        result = new JavadocClass(this, clazz, docComment);
-        classMap.put(clazz, result);
-    }
+//    @Override
+//    public FieldDocImpl getFieldDoc(VarSymbol var) {
+//        FieldDocImpl result = fieldMap.get(var);
+//        if (result != null) {
+//            return result;
+//        }
+//        result = new JavadocField(this, var);
+//        fieldMap.put(var, result);
+//        return result;
+//    }
+//
+//    @Override
+//    protected void makeFieldDoc(VarSymbol var, String docComment, JFXVar tree, Position.LineMap lineMap) {
+//        FieldDocImpl result = fieldMap.get(var);
+//        if (result != null) {
+//            if (docComment != null) {
+//                result.setRawCommentText(docComment);
+//            }
+//        } else {
+//            result = new JavadocField(this, var, docComment);
+//            fieldMap.put(var, result);
+//        }
+//    }
 
-    @Override
-    public FieldDocImpl getFieldDoc(VarSymbol var) {
-        FieldDocImpl result = fieldMap.get(var);
-        if (result != null) {
-            return result;
-        }
-        result = new JavadocField(this, var);
-        fieldMap.put(var, result);
-        return result;
-    }
-
-    @Override
-    protected void makeFieldDoc(VarSymbol var, String docComment, JFXVar tree, Position.LineMap lineMap) {
-        FieldDocImpl result = fieldMap.get(var);
-        if (result != null) {
-            if (docComment != null) {
-                result.setRawCommentText(docComment);
-            }
-        } else {
-            result = new JavadocField(this, var, docComment);
-            fieldMap.put(var, result);
-        }
-    }
-
-    @Override
-    public FunctionDocImpl getFunctionDoc(MethodSymbol meth) {
-        ExecutableMemberDocImpl docImpl = methodMap.get(meth);
-        if (docImpl != null && !docImpl.isMethod()) {
-            return null;
-        }
-        FunctionDocImpl result = (FunctionDocImpl) docImpl;
-        if (result != null) {
-            return result;
-        }
-        result = new JavadocMethod(this, meth);
-        methodMap.put(meth, result);
-        return result;
-    }
-
-    @Override
-    protected void makeFunctionDoc(MethodSymbol meth, String docComment, JFXFunctionDefinition tree, Position.LineMap lineMap) {
-        FunctionDocImpl result = (FunctionDocImpl) methodMap.get(meth);
-        if (result != null) {
-            if (docComment != null) {
-                result.setRawCommentText(docComment);
-            }
-        } else {
-            result = new JavadocMethod(this, meth, docComment);
-            methodMap.put(meth, result);
-        }
-    }
-
-    @Override
-    public ConstructorDocImpl getConstructorDoc(MethodSymbol meth) {
-        ConstructorDocImpl result = (ConstructorDocImpl) methodMap.get(meth);
-        if (result != null) {
-            return result;
-        }
-        result = new JavadocConstructor(this, meth);
-        methodMap.put(meth, result);
-        return result;
-    }
-
-    @Override
-    protected void makeConstructorDoc(MethodSymbol meth, String docComment, JFXFunctionDefinition tree, Position.LineMap lineMap) {
-        ConstructorDocImpl result = (ConstructorDocImpl) methodMap.get(meth);
-        if (result != null) {
-            if (docComment != null) {
-                result.setRawCommentText(docComment);
-            }
-        } else {
-            result = new JavadocConstructor(this, meth, docComment);
-            methodMap.put(meth, result);
-        }
-    }
-
-    /**
-     * Return the AnnotationTypeElementDoc for a MethodSymbol.
-     * Should be called only on symbols representing annotation type elements.
-     */
-    @Override
-    public PackageDocImpl getPackageDoc(PackageSymbol pack) {
-        PackageDocImpl result = packageMap.get(pack);
-        if (result != null) {
-            return result;
-        }
-        result = new JavaDocPackage(this, pack, ctx);
-        packageMap.put(pack, result);
-        return result;
-    }
+//    @Override
+//    public FunctionDocImpl getFunctionDoc(MethodSymbol meth) {
+//        ExecutableMemberDocImpl docImpl = methodMap.get(meth);
+//        if (docImpl != null && !docImpl.isMethod()) {
+//            return null;
+//        }
+//        FunctionDocImpl result = (FunctionDocImpl) docImpl;
+//        if (result != null) {
+//            return result;
+//        }
+//        result = new JavadocMethod(this, meth);
+//        methodMap.put(meth, result);
+//        return result;
+//    }
+//
+//    @Override
+//    protected void makeFunctionDoc(MethodSymbol meth, String docComment, JFXFunctionDefinition tree, Position.LineMap lineMap) {
+//        FunctionDocImpl result = (FunctionDocImpl) methodMap.get(meth);
+//        if (result != null) {
+//            if (docComment != null) {
+//                result.setRawCommentText(docComment);
+//            }
+//        } else {
+//            result = new JavadocMethod(this, meth, docComment);
+//            methodMap.put(meth, result);
+//        }
+//    }
+//
+//    @Override
+//    public ConstructorDocImpl getConstructorDoc(MethodSymbol meth) {
+//        ConstructorDocImpl result = (ConstructorDocImpl) methodMap.get(meth);
+//        if (result != null) {
+//            return result;
+//        }
+//        result = new JavadocConstructor(this, meth);
+//        methodMap.put(meth, result);
+//        return result;
+//    }
+//
+//    @Override
+//    protected void makeConstructorDoc(MethodSymbol meth, String docComment, JFXFunctionDefinition tree, Position.LineMap lineMap) {
+//        ConstructorDocImpl result = (ConstructorDocImpl) methodMap.get(meth);
+//        if (result != null) {
+//            if (docComment != null) {
+//                result.setRawCommentText(docComment);
+//            }
+//        } else {
+//            result = new JavadocConstructor(this, meth, docComment);
+//            methodMap.put(meth, result);
+//        }
+//    }
+//
+//    /**
+//     * Return the AnnotationTypeElementDoc for a MethodSymbol.
+//     * Should be called only on symbols representing annotation type elements.
+//     */
+//    @Override
+//    public PackageDocImpl getPackageDoc(PackageSymbol pack) {
+//        PackageDocImpl result = packageMap.get(pack);
+//        if (result != null) {
+//            return result;
+//        }
+//        result = new JavaDocPackage(this, pack, ctx);
+//        packageMap.put(pack, result);
+//        return result;
+//    }
 
     @Override
     public ClassDocImpl lookupClass(String name) {
