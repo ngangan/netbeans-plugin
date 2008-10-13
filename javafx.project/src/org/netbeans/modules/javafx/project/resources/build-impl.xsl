@@ -130,9 +130,13 @@ is divided into following sections:
             </condition>
             <property name="work.dir" value="${{basedir}}"/>
             <condition property="no.deps">
-                <and>
-                    <istrue value="${{no.dependencies}}"/>
-                </and>
+                <istrue value="${{no.dependencies}}"/>
+            </condition>
+            <condition property="pack200.arg" value="-pack200" else="">
+                <istrue value="${{jnlp.packEnabled}}"/>
+            </condition>
+            <condition property="sign.arg" value="-sign" else="">
+                <istrue value="${{jnlp.signed}}"/>
             </condition>
             <property name="javadoc.preview" value="true"/>
             <property name="source.encoding" value="${{file.encoding}}"/>
@@ -218,6 +222,8 @@ is divided into following sections:
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
                 <arg value="-v"/>
+                <arg value="${{pack200.arg}}"/>
+                <arg value="${{sign.arg}}"/>
                 <arg value="-cp"/>
                 <arg path="${{javac.classpath}}"/>
             </exec>

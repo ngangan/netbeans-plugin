@@ -280,8 +280,8 @@ public class JavaFXProjectGenerator {
         ep.setProperty(JavaFXProjectProperties.JAVADOC_ADDITIONALPARAM, ""); // NOI18N
         ep.setProperty("jnlp.codebase.type", "local"); // NOI18N
         ep.setProperty("jnlp.offline-allowed", "true"); // NOI18N
-        ep.setProperty("jnlp.packEnabled", "true"); // NOI18N
-        ep.setProperty("jnlp.signed", "true"); // NOI18N
+        ep.setProperty("jnlp.packEnabled", "false"); // NOI18N
+        ep.setProperty("jnlp.signed", "false"); // NOI18N
         ep.setProperty("applet.draggable", "true"); // NOI18N
         ep.setProperty("applet.height", "200"); // NOI18N
         ep.setProperty("applet.width", "200"); // NOI18N
