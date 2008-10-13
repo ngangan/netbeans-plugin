@@ -50,8 +50,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
@@ -489,5 +489,19 @@ public enum JFXTokenId implements TokenId {
         return language;
     }
 
-
+    /**
+     * Check if provided token is comment token.
+     * @param id to check.
+     * @return true if <code>id</code> is comment
+     */
+    public static boolean isComment(JFXTokenId id) {
+        switch (id) {
+            case COMMENT:
+            case LINE_COMMENT:
+            case DOC_COMMENT:
+                return true;
+            default:
+                return false;
+        }
+    }
 }

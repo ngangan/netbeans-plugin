@@ -77,6 +77,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 
     private final Context context;
     private TokenSequence<JFXTokenId> ts = null;
+    private static final int ONE = 1;
+    private static final int ZERO = 0;
 
 
     public JFXIndentTask(Context context) {
@@ -122,10 +124,22 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 
     private void indentLine(int offset) throws BadLocationException {
         int lso = context.lineStartOffset(offset);
-        int si = getScopeIndent(context.document(), lso);
+        int si = getScopeIndent(context.document(), lso) + indentComment(offset, lso);
         if (context.lineIndent(lso) != si) {
             context.modifyIndent(lso, si);
         }
+    }
+
+    private int indentComment(int offset, int lso) {
+        ts().move(offset);
+        Token<JFXTokenId> t = ts().moveNext() ? ts().token() : null;
+        if (t != null && JFXTokenId.isComment(t.id())
+                && ts().offset() < lso
+                && (ts().offset() + t.length()) > lso) {
+            return ONE;
+
+        }
+        return ZERO;
     }
 
     private void indentRegion(Context.Region region) throws BadLocationException {
@@ -170,18 +184,18 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
     private int getScopeIndent(Document document, int startOffset) throws BadLocationException {
         final Position position = document.getStartPosition();
         if (position.getOffset() == startOffset) {
-            return 0;
+            return ZERO;
         } else {
             // we simply adapt indent of previous line and adjust if necessary.
             int lso = context.lineStartOffset(startOffset);
             int ls = getPreviousLine(lso);
-            if (ls == lso) return 0;
+            if (ls == lso) return ZERO;
             int level = context.lineIndent(ls); //previous line indent
 
 ///*
             //verify if we need to adjust level in case of previous line.
             ts().move(ls);
-            Token<?> t = ts.moveNext() ? ts.token() : null;
+            Token<JFXTokenId> t = ts.moveNext() ? ts.token() : null;
             while (t != null && ts.offset() < lso) {
                 if (t.id() == JFXTokenId.LBRACE || t.id() == JFXTokenId.LPAREN || t.id() == JFXTokenId.LBRACKET) {
                     level += getIndentStepLevel();
@@ -193,7 +207,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                 }
                 t = ts.moveNext() ? ts.token() : null;
             }
-                                                                
+
             // Handle special cases. This cases are handled with small guessing.
             int nlo = adjustOffsetToNewLine(lso, lso); //start offset of next line
             if (KEEP_LEVEL_PTRN.matcher(document.getText(lso, nlo - lso)).matches()) {
@@ -204,13 +218,13 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                 level += getIndentStepLevel();
             } else {
                 final String previousLineText = document.getText(ls, lso - ls);
-                if ( previousLineText.trim().endsWith(":")
-                || previousLineText.trim().endsWith("=")) {
+                if (previousLineText.trim().endsWith(":")
+                        || previousLineText.trim().endsWith("=")) {
                     level += getIndentStepLevel();
                 }
             }
             //if we got buggy source code we descent only to zero indent.
-            return Math.max(0, level);
+            return Math.max(ZERO, level);
         }
     }
 
@@ -222,15 +236,15 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      * @throws BadLocationException if something goes wrong.
      */
     private int getPreviousLine(int lso) throws BadLocationException {
-        while (lso > 0) {
-            int ls = context.lineStartOffset(Math.max(0, lso - 1));
-            if (lso - ls > 1) {
+        while (lso > ZERO) {
+            int ls = context.lineStartOffset(Math.max(ZERO, lso - ONE));
+            if (lso - ls > ONE) {
                 return ls;
             } else {
                 lso = ls;
             }
         }
-        return 0;
+        return ZERO;
     }
 
     @SuppressWarnings("unchecked")
@@ -269,7 +283,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                     final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
                     if (log.isLoggable(Level.INFO))
                         log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
-                    if (phase.compareTo(JavaFXSource.Phase.PARSED) >= 0) {
+                    if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
                         if (log.isLoggable(Level.INFO))
                             log.info("The " + phase + " phase has been reached ... OK!");
                         final int offset = context.startOffset();
@@ -277,8 +291,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                         final JavaFXTreePath path = tu.pathFor(context.startOffset());
                         final int position = (int) controller.getTrees().getSourcePositions()
                                 .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
-                        int dot = offset == 0 ? 0 : position < 0 ? 0 : context.lineIndent(context.lineStartOffset(position));
-                        Visitor visitor = new Visitor(controller, context, dot); 
+                        int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
+                        Visitor visitor = new Visitor(controller, context, dot);
                         final LinkedList<Adjustment> adjustments = new LinkedList<Adjustment>();
                         visitor.scan(path, adjustments);
                         applyAdjustments(adjustments);

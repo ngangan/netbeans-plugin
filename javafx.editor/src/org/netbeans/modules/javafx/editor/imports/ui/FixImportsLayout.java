@@ -72,11 +72,13 @@ public final class FixImportsLayout<T extends CompletionItem> {
     private Reference<JTextComponent> editorComponentRef;
 
     private final FixPopup<T> fixPopup;
+    protected static FixImportsLayout<CompletionItem> instance = new FixImportsLayout<CompletionItem>();
 
 //    private Stack<PopupWindow<T>> visiblePopups;
 
+    @SuppressWarnings({"unchecked"})
     public static <T extends CompletionItem> FixImportsLayout<T> create() {
-        return new FixImportsLayout<T>();
+        return (FixImportsLayout<T>) instance;
     }
 
     FixImportsLayout() {

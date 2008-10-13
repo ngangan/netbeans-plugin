@@ -44,20 +44,13 @@ import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.jvm.Target;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
+
+import javax.lang.model.element.*;
+import javax.lang.model.type.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ErrorType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 
 /**
  * Represents a handle for {@link Element} which can be kept and later resolved
@@ -548,5 +541,25 @@ public class ElementHandle<T extends Element> {
         } catch (Exception e) {
         }
         return null;
+    }
+
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ElementHandle that = (ElementHandle) o;
+
+        if (kind != that.kind) return false;
+        if (!Arrays.equals(signatures, that.signatures)) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = (kind != null ? kind.hashCode() : 0);
+        result = 31 * result + (signatures != null ? Arrays.hashCode(signatures) : 0);
+        return result;
     }
 }

@@ -125,7 +125,7 @@ class BracketCompletion {
         }
     }
 
-    private static <T extends TokenId> T tokenAt(BaseDocument doc, int dotPos) {
+    static <T extends TokenId> T tokenAt(BaseDocument doc, int dotPos) {
         TokenSequence<T> seq = getTokenSequence(doc, dotPos);
         return seq.moveNext() ? seq.token().id() : null;
     }

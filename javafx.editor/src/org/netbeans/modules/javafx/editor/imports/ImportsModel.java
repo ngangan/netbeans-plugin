@@ -46,6 +46,7 @@ import org.netbeans.modules.javafx.editor.imports.ui.FixItem;
 import org.openide.util.NbBundle;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.swing.*;
@@ -88,17 +89,6 @@ public final class ImportsModel {
         if (e == null) return;
         if (!isImported(e)) {
             resolveEntryByClassIndex(e);
-            /*TypeMirror mirror = e.asType();
-            TypeKind mk = mirror.getKind();
-            switch (mk) {
-                case ERROR:
-                case NONE:
-                    resolveEntryByClassIndex(e);
-                    break;
-                default:
-                    entries.add(new ModelEntry(mirror.toString()));
-                    break;
-            }*/
         }
     }
 
@@ -109,8 +99,8 @@ public final class ImportsModel {
     private synchronized void resolveEntryByClassIndex(final Element e) {
         Set<ClassIndex.SearchScope> set = new TreeSet<ClassIndex.SearchScope>();
         set.add(ClassIndex.SearchScope.DEPENDENCIES);
-        set.add(ClassIndex.SearchScope.SOURCE);
-        final Set<ElementHandle<TypeElement>> result = index.getDeclaredTypes(e.getSimpleName().toString(), ClassIndex.NameKind.SIMPLE_NAME, set);
+        set.add(ClassIndex.SearchScope.SOURCE);        
+        final Set<ElementHandle<TypeElement>> result = prefilterResult(index.getDeclaredTypes(e.getSimpleName().toString(), ClassIndex.NameKind.SIMPLE_NAME, set));         
         if (result.size() == 1) {
             ElementHandle<TypeElement> handle = result.iterator().next();
             Name qname = handle.resolve(ci).getQualifiedName();
@@ -130,6 +120,17 @@ public final class ImportsModel {
                 logger.severe(e1.getLocalizedMessage());
             }
         }
+    }
+
+    private Set<ElementHandle<TypeElement>> prefilterResult(Set<ElementHandle<TypeElement>> result) {
+        Iterator<ElementHandle<TypeElement>> handleIterator = result.iterator();
+        while (handleIterator.hasNext()) {
+            ElementHandle<TypeElement> handle = handleIterator.next();
+            if (handle.getKind() != ElementKind.CLASS) {
+                handleIterator.remove();
+            }
+        }
+        return result;
     }
 
     private String getHeaderText(Element e) {
@@ -163,7 +164,7 @@ public final class ImportsModel {
 
     private List<FixItem> createItems(Set<ElementHandle<TypeElement>> options, FixImportsLayout<FixItem> fil) {
         List<FixItem> result = new ArrayList<FixItem>(options.size());
-        for (ElementHandle<TypeElement> option : options) {
+        for (ElementHandle<TypeElement> option : options) {            
             String qn = option.getQualifiedName();
             result.add(new FixItem(qn, this, fil));
         }
@@ -185,7 +186,6 @@ public final class ImportsModel {
     void publish(final Document doc) {
         Runnable runnable = new Runnable() {
             public void run() {
-//                Collections.sort(entries);
                 TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
                 final int startPos = quessImportsStart(ts);
                 final int endPos = quessImportsEnd(ts, startPos);
