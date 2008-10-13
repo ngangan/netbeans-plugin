@@ -338,7 +338,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 sbootcp.append(normalizePath(root, jdkHome, homePropName));
             }
             props.setProperty(bootClassPathPropName,sbootcp.toString());   //NOI18N
-            props.setProperty(compilerType,getCompilerType(platform));
+            props.setProperty(compilerType, MODERN);
             for (int i = 0; i < IMPORTANT_TOOLS.length; i++) {
                 String name = IMPORTANT_TOOLS[i];
                 FileObject tool = platform.findTool(name);
@@ -362,24 +362,6 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
 
     public static String createName (String platName, String propType) {
         return "platforms." + platName + "." + propType;        //NOI18N
-    }
-
-    private static String getCompilerType (JavaPlatform platform) {
-        assert platform != null;
-        String prop = platform.getSystemProperties().get("java.specification.version"); //NOI18N
-        assert prop != null;
-        SpecificationVersion specificationVersion = new SpecificationVersion (prop);
-        SpecificationVersion jdk13 = new SpecificationVersion("1.3");   //NOI18N
-        int c = specificationVersion.compareTo (jdk13);
-        if (c<0) {
-            return CLASSIC;
-        }
-        else if (c == 0) {
-            return JAVAC13;
-        }
-        else {
-            return MODERN;
-        }
     }
 
     private static boolean isDefaultLocation (FileObject tool, Collection<FileObject> installFolders) {
