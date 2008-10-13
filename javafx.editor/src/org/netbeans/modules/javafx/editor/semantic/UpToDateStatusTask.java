@@ -139,14 +139,15 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                 }
             } 
             // let's use the line number
-        int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
-            if (LOGGABLE) log("    lastLine == " + lastLine);
-            if (d.getLineNumber()-1 <= lastLine) {
+            int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
+            long linu = d.getLineNumber();
+            if (LOGGABLE) log("    lastLine == " + lastLine + " linu == " + linu);
+            if ( (linu>=0) && (linu-1 <= lastLine)) {
                 c.add(ErrorDescriptionFactory.createErrorDescription(
                     Severity.ERROR, d.getMessage(Locale.getDefault()),
                     doc, (int)d.getLineNumber()));
             } else {
-                if (LOGGABLE) log("   after last line: " + d);
+                if (LOGGABLE) log("   NOT USED (wrong bounds): " + d);
             }
         }
         HintsController.setErrors(doc, "semantic-highlighter", c);
