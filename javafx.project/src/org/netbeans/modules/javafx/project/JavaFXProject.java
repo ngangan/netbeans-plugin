@@ -473,6 +473,12 @@ public final class JavaFXProject implements Project, AntProjectListener {
         protected void projectOpened() {
             // Check up on build scripts.
             try {
+                AntBuildExtender extender = lookup.lookup(AntBuildExtender.class);
+                if (extender.getExtension("jws") != null) { //NOI18N
+                    extender.removeExtension("jws"); //NOI18N
+                    ProjectManager.getDefault().saveProject(JavaFXProject.this);
+                }
+
                 if (updateHelper.isCurrent()) {
                     //Refresh build-impl.xml only for j2seproject/2
                     genFilesHelper.refreshBuildScript(
