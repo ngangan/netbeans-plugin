@@ -1072,6 +1072,9 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         @Override
         public CompletionTask createDocumentationTask() {
 //            return typeHandle.getKind() == TypeKind.DECLARED ? JavaCompletionProvider.createDocTask(ElementHandle.from(typeHandle)) : null;
+            if (type == null) {
+                return null;
+            }
             return JavaFXCompletionProvider.createDocTask(ElementHandle.create(type.asElement()));
         }
 
