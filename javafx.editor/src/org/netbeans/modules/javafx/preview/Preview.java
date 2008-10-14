@@ -374,6 +374,8 @@ public class Preview {
             }
             noWindows = true;
             desktopPane.removeAll();
+            comp.removeAll();
+            comp.add(desktopPane);
             desktopPane.repaint();
             Object obj = CodeUtils.run(_context, cl);
             if (obj != null) thiss.processObject(obj);

@@ -26,23 +26,28 @@ import javax.swing.JDialog;
 import javax.swing.event.MouseInputAdapter;
 
 public class CodeUtils {
-    private static final String[] getComponentNames = {"getComponent", "getJComponent"};                     // NOI18N
-    private static final String[] frameNames = {"frame", "window"};                                          // NOI18N
-    private static final String[] dialogNames = {"jdialog", "jDialog"};                                      // NOI18N
-    private static final String[] getVisualNodeNames = {"getVisualNode", "getSGNode", "impl_getSGNode"};     // NOI18N
-    
-    private static final String secuencesClassName = "com.sun.javafx.runtime.sequence.Sequences";            // NOI18N
-    private static final String secuenceClassName = "com.sun.javafx.runtime.sequence.Sequence";              // NOI18N
-    private static final String runMethodName = "javafx$run$";                                               // NOI18N
-    private static final String makeMethodName = "make";                                                     // NOI18N
-    private static final String getMethodName = "get";                                                       // NOI18N
-    private static final String jsgPanelClassName = "com.sun.scenario.scenegraph.JSGPanel";                  // NOI18N
-    private static final String sgNodeClassName = "com.sun.scenario.scenegraph.SGNode";                      // NOI18N
-    private static final String setSceneMethodName = "setScene";                                             // NOI18N
-    private static final String NOCOLOR = "NOCOLOR";                                                         // NOI18N
-    private static final String typeInfoClassName = "com.sun.javafx.runtime.TypeInfo";                       // NOI18N
-    private static final String stringFieldNameName = "String";                                                         // NOI18N
-    
+    private static final String[] getComponentNames = {"getComponent", "getJComponent"};                        // NOI18N
+    private static final String[] frameNames = {"frame", "window"};                                             // NOI18N
+    private static final String[] dialogNames = {"jdialog", "jDialog"};                                         // NOI18N
+    private static final String secuencesClassName = "com.sun.javafx.runtime.sequence.Sequences";               // NOI18N
+    private static final String secuenceClassName = "com.sun.javafx.runtime.sequence.Sequence";                 // NOI18N
+    private static final String runMethodName = "javafx$run$";                                                  // NOI18N
+    private static final String makeMethodName = "make";                                                        // NOI18N
+    private static final String getMethodName = "get";                                                          // NOI18N
+    private static final String setMethodName = "set";                                                          // NOI18N
+    private static final String insertMethodName = "insert";                                                    // NOI18N
+    private static final String jsgPanelClassName = "com.sun.javafx.scene.JSGPanelSceneImpl";                   // NOI18N
+    private static final String sceneClassName = "javafx.scene.Scene";                                          // NOI18N
+    private static final String shapeClassName = "javafx.scene.shape.Shape";                                    // NOI18N
+    private static final String NOCOLOR = "NOCOLOR";                                                            // NOI18N
+    private static final String typeInfoClassName = "com.sun.javafx.runtime.TypeInfo";                          // NOI18N
+    private static final String stringFieldName = "String";                                                     // NOI18N
+    private static final String sceneFieldName = "$scene";                                                      // NOI18N
+    private static final String jsgPanelFieldName = "$com$sun$javafx$scene$JSGPanelSceneImpl$jsgPanel";         // NOI18N
+    private static final String objectVariableClassName = "com.sun.javafx.runtime.location.ObjectVariable";     // NOI18N
+    private static final String sequenceVariableClassName = "com.sun.javafx.runtime.location.SequenceVariable"; // NOI18N
+    private static final String contentFieldName = "$content";                                                  // NOI18N
+
     public static class Context implements Serializable {
         Context(
             Map<String, byte[]> classBytes,
@@ -161,7 +166,7 @@ public class CodeUtils {
         Class<?> typeinfoClass = classLoader.loadClass(typeInfoClassName); 
         Object commandLineArgs = new String[]{};
         Method makeMethod = sequencesClass.getDeclaredMethod(makeMethodName, typeinfoClass, Object[].class);
-        Field stringField = typeinfoClass.getDeclaredField(stringFieldNameName);
+        Field stringField = typeinfoClass.getDeclaredField(stringFieldName);
         Object args = makeMethod.invoke(null, stringField.get(null), commandLineArgs);
         Object obj = runMethod.invoke(null, args);
         return obj;
@@ -173,7 +178,7 @@ public class CodeUtils {
             Method getComponent = null;
             for (String getComponentStr : getComponentNames) {
                 try {
-                    getComponent = obj.getClass().getDeclaredMethod(getComponentStr);
+                    getComponent = obj.getClass().getMethod(getComponentStr);
                 } catch (Exception ex) {
                 }
                 if (getComponent != null) break;
@@ -318,28 +323,44 @@ public class CodeUtils {
         }
     }
 
-    private static JComponent parseSGNodeObj(Object obj) {
+    private static JComponent parseSceneAndShapeObj(Object obj) {
         JComponent comp = null;
         try {
-            Method getVisualNode = null;
-            for (String getVisualNodeStr : getVisualNodeNames) {
-                try {
-                    getVisualNode = obj.getClass().getDeclaredMethod(getVisualNodeStr);
-                } catch (Exception ex) {
-                }
-                if (getVisualNode != null) break;
+            boolean skip = true;
+            boolean shape = false;
+            if (obj.getClass().getName().contentEquals(sceneClassName)) skip = false;
+            if (obj.getClass().getSuperclass().getName().contentEquals(shapeClassName)) {
+                skip = false;
+                shape = true;
             }
-            if (getVisualNode != null) {
-                Object sgNode = getVisualNode.invoke(obj);
-                if (sgNode != null) {
-                    Class<?> jsgPanelClass = obj.getClass().getClassLoader().loadClass(jsgPanelClassName);
-                    Class<?> sgNodeClass = obj.getClass().getClassLoader().loadClass(sgNodeClassName);
-                    Object panel = jsgPanelClass.newInstance();
-                    Method setSceneMethod = jsgPanelClass.getDeclaredMethod(setSceneMethodName, sgNodeClass);
-                    setSceneMethod.invoke(panel, sgNode);
-                    comp = (JComponent)panel;
+            
+            if (!skip ) {
+                Class<?> jsgPanelClass = obj.getClass().getClassLoader().loadClass(jsgPanelClassName);
+                Class<?> objectVariableClass = obj.getClass().getClassLoader().loadClass(objectVariableClassName);
+                Method setMethod = objectVariableClass.getDeclaredMethod(setMethodName, java.lang.Object.class);
+                Method getMethod = objectVariableClass.getDeclaredMethod(getMethodName);
+                Field sceneField = jsgPanelClass.getDeclaredField(sceneFieldName);
+                Object jsgPanel = jsgPanelClass.newInstance();
+                Object scene = sceneField.get(jsgPanel);
+                
+                if (!shape) {
+                    setMethod.invoke(scene, obj);
+                } else {
+                    Class<?> sceneClass = obj.getClass().getClassLoader().loadClass(sceneClassName);
+                    Object newScene = sceneClass.newInstance();
+                    Field contentField = sceneClass.getDeclaredField(contentFieldName);
+                    Object sceneContent = contentField.get(newScene);
+                    Class<?> sequenceVariableClass = obj.getClass().getClassLoader().loadClass(sequenceVariableClassName);
+                    Method insertMethod = sequenceVariableClass.getDeclaredMethod(insertMethodName, java.lang.Object.class);
+                    insertMethod.invoke(sceneContent, obj);
+                    setMethod.invoke(scene, newScene);
                 }
-            }  
+                
+                Field jsgPanelField = jsgPanelClass.getDeclaredField(jsgPanelFieldName);
+                Object jsgPanelVar = jsgPanelField.get(jsgPanel);
+                Object swingPanel = getMethod.invoke(jsgPanelVar);
+                comp = (JComponent)swingPanel;
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -356,7 +377,7 @@ public class CodeUtils {
     public static JComponent parseComponent(Object obj) {
         JComponent comp = null;
         if ((comp = parseJComponentObj(obj)) == null)
-            comp = parseSGNodeObj(obj);
+            comp = parseSceneAndShapeObj(obj);
         return comp;
     }
     
