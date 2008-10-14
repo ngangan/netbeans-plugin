@@ -48,6 +48,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -67,6 +69,8 @@ import org.netbeans.spi.editor.completion.support.CompletionUtilities;
  * @author Dusan Balek & David Strupl
  */
 public class LazyTypeCompletionItem extends JavaFXCompletionItem implements LazyCompletionItem {
+    private static final Logger logger = Logger.getLogger(LazyTypeCompletionItem.class.getName());
+    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
     
     public static final LazyTypeCompletionItem create(ElementHandle<TypeElement> handle, EnumSet<ElementKind> kinds, int substitutionOffset, JavaFXSource javafxSource, boolean insideNew) {
         return new LazyTypeCompletionItem(handle, kinds, substitutionOffset, javafxSource, insideNew);
@@ -110,7 +114,14 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                         controller.toPhase(JavaFXSource.Phase.ANALYZED);
                         JavafxcScope scope = controller.getTrees().getScope(controller.getTreeUtilities().pathFor(substitutionOffset));
                         if (!isAnnonInner()) {
-                            TypeElement e = handle.resolve(controller);
+                            TypeElement e = null;
+                            try {
+                                e = handle.resolve(controller);
+                            } catch (Exception ex) {
+                                if (LOGGABLE) {
+                                    logger.log(Level.FINE, "Cannot resolve " + handle, ex);
+                                }
+                            }
                             if (e != null) {
                                 boolean isFx = controller.getJavafxTypes().isJFXClass((Symbol) e);
                                 delegate = JavaFXCompletionItem.createTypeItem(
