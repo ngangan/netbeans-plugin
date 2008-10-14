@@ -374,13 +374,16 @@ public final class FXSourceUtils {
         if (text == null) {
             return length;
         }
-
-        int index = offset + text.length();
+        int tlength = text.length();
+        int index = offset + tlength;
         for (int i = 0; i < CODE_COMPL_SUBST_BREAKERS.length; i++) {
             int k = text.indexOf(CODE_COMPL_SUBST_BREAKERS[i], offset);
             if (k != -1 && k < index) {
                 index = k;
             }
+        }
+        if (tlength < index) {
+            index = tlength;
         }
         int ret = index - offset;
         if (length > ret) {
