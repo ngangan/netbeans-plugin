@@ -67,7 +67,7 @@ nb.cluster.javafx=\\
        contrib/debugger.javafx.ui,\\
        contrib/javafx.palette,\\
        contrib/javafx.navigation,\\
-       contrib/javafx.fxd, \\
+       contrib/javafx.fxd,\\
        contrib/javafx.fxd.lib  
 
 
