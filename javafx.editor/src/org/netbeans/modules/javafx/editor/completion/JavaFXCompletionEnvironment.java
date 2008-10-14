@@ -1190,7 +1190,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
         addPackages("");
-        addAllTypes(kinds, insideNew);
+        if (query.queryType == JavaFXCompletionProvider.COMPLETION_ALL_QUERY_TYPE) {
+            addAllTypes(kinds, insideNew);
+        } else {
+            query.hasAdditionalItems = true;
+        }
     }
     
     private void addLocalAndImportedTypes(Iterable<? extends Element> from,
