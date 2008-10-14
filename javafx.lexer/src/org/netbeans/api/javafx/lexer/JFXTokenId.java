@@ -495,6 +495,7 @@ public enum JFXTokenId implements TokenId {
      * @return true if <code>id</code> is comment
      */
     public static boolean isComment(JFXTokenId id) {
+        if (id == null) return false;
         switch (id) {
             case COMMENT:
             case LINE_COMMENT:
