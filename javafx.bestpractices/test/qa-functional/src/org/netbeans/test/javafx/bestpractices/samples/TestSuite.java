@@ -78,7 +78,8 @@ public class TestSuite {
         addTest(SmokeParticleSystem.class, SmokeParticleSystem.TESTS).
         addTest(Rotate.class, Rotate.TESTS).
         addTest(Scale.class, Scale.TESTS).
-        addTest(Translate.class, Translate.TESTS);
+        addTest(Translate.class, Translate.TESTS).clusters(".*").enableModules(".*");
+
       return NbModuleSuite.create(config);
   }
 
