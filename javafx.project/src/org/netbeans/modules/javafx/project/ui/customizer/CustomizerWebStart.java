@@ -102,7 +102,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 2, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(8, 10, 0, 2);
         add(codebaseLabel, gridBagConstraints);
         codebaseLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
@@ -148,7 +148,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 2, 0, 2);
+        gridBagConstraints.insets = new java.awt.Insets(8, 10, 0, 2);
         add(codebaseLabel1, gridBagConstraints);
         codebaseLabel1.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.codebaseLabel1.AccessibleContext.accessibleDescription")); // NOI18N
 
@@ -157,7 +157,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
         add(jCheckBox2, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.jCheckBox1.text")); // NOI18N
@@ -165,7 +165,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
         add(jCheckBox1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 

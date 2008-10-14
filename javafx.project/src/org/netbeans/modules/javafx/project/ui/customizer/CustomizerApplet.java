@@ -18,6 +18,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         
         widthSpinner.setModel(uiProperties.widthModel);
         heightSpinner.setModel(uiProperties.heightModel);
+        jCheckBox1.setModel(uiProperties.draggableModel);
         noteLabel.setVisible(false);
     }
     /** This method is called from within the constructor to
@@ -36,10 +37,11 @@ public class CustomizerApplet extends javax.swing.JPanel {
         widthSpinner = new javax.swing.JSpinner();
         heightLabel = new javax.swing.JLabel();
         heightSpinner = new javax.swing.JSpinner();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setLayout(new java.awt.GridBagLayout());
 
-        descriptionLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.descriptionLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(descriptionLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.descriptionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -49,7 +51,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 9, 0);
         add(descriptionLabel, gridBagConstraints);
 
-        noteLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.noteLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(noteLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.noteLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 11;
@@ -59,7 +61,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(28, 2, 2, 2);
         add(noteLabel, gridBagConstraints);
 
-        widthLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.widthLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(widthLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.widthLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -76,7 +78,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 60, 0, 10);
         add(widthSpinner, gridBagConstraints);
 
-        heightLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.heightLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(heightLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.heightLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -92,12 +94,21 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 60, 0, 10);
         add(heightSpinner, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.jCheckBox1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
+        add(jCheckBox1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JLabel heightLabel;
     private javax.swing.JSpinner heightSpinner;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel noteLabel;
     private javax.swing.JLabel widthLabel;
     private javax.swing.JSpinner widthSpinner;

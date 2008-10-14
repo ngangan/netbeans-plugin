@@ -132,6 +132,9 @@ is divided into following sections:
             <condition property="no.deps">
                 <istrue value="${{no.dependencies}}"/>
             </condition>
+            <condition property="draggable.arg" value="-draggable" else="">
+                <istrue value="${{applet.draggable}}"/>
+            </condition>
             <condition property="pack200.arg" value="-pack200" else="">
                 <istrue value="${{jnlp.packEnabled}}"/>
             </condition>
@@ -222,6 +225,7 @@ is divided into following sections:
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
                 <arg value="-v"/>
+                <arg value="${{draggable.arg}}"/>
                 <arg value="${{pack200.arg}}"/>
                 <arg value="${{sign.arg}}"/>
                 <arg value="-cp"/>

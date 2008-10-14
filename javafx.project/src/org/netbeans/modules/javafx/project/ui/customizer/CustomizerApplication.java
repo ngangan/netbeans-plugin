@@ -98,7 +98,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(9, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(9, 10, 0, 0);
         add(titleLabel, gridBagConstraints);
         titleLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.titleLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
@@ -108,7 +108,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(7, 0, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(7, 10, 0, 0);
         add(vendorLabel, gridBagConstraints);
         vendorLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.vendorLabel.AccessibleContext.accessibleDescription")); // NOI18N
 
