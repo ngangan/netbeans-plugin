@@ -367,18 +367,18 @@ made subject to such option by the copyright holder.
                 <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
-<!--            
-            <file name="JavaFXApplet.fx" url="JavaFXApplet.fx">
+            
+            <file name="JavaFXStage.fx" url="JavaFXStage.fx">
                 <attr name="position" intvalue="300"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXApplet.html"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXStage.html"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateCategory" stringvalue="javafx, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
                 <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
--->            
+            
         </folder>
     </folder>
 

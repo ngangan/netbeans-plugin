@@ -8,16 +8,15 @@
 package ${package};
 </#if>
 
-import javafx.stage.*;
-import javafx.scene.*;
-import javafx.scene.text.*;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.text.Text;
 
 /**
  * @author ${user}
  */
 
 Stage{
-    visible: true
     title: "Application title"
     width: 250
     height: 80
@@ -25,7 +24,6 @@ Stage{
         content: Text {
             x: 10, y: 30
             content: "Application content"
-            font: Font { size: 24 }
         }
     }
 }
