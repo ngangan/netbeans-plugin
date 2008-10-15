@@ -23,7 +23,7 @@ if [ -d $WORKSPACE/main/ ]; then
     		 hg pull
 	else
                 rm -rf $WORKSPACE/main
-		hg clone http://hg.netbeans.org/main $WORKSPACE/main
+		hg clone http://hg.netbeans.org/$REPO $WORKSPACE/main
 	fi
 else
     hg clone http://hg.netbeans.org/main $WORKSPACE/main
