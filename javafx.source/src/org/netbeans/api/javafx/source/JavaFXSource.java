@@ -203,7 +203,18 @@ public final class JavaFXSource {
         JavafxcTool tool = JavafxcTool.create();
         JavaFileManager fileManager = cpInfo.getFileManager(tool);
         JavaFileObject jfo = (JavaFileObject) SourceFileObject.create(files.iterator().next(), null); // XXX
-        
+
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            try {
+                String sourceTxt = jfo.getCharContent(true).toString();
+                LOGGER.finest("\n======================================================\n");
+                LOGGER.finest(sourceTxt);
+                LOGGER.finest("\n------------------------------------------------------\n");
+            } catch (IOException ex) {
+                LOGGER.log(Level.FINEST, "Cannot get file content.", ex);
+            }
+        }
+
         List<String> options = new ArrayList<String>();
         //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
         options.add("-XDdisableStringFolding"); //NOI18N
@@ -228,7 +239,7 @@ public final class JavaFXSource {
                 //runnig after the phace completion task may still use it.
                 return cc.phase;
             }
-
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to parse " + file.getNameExt());
             long start = System.currentTimeMillis();
             Iterable<? extends UnitTree> trees = null;
             try {
@@ -257,13 +268,14 @@ public final class JavaFXSource {
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Compilation Unit", new Object[] {file, unit}); // log the instance
             Logger.getLogger("TIMER").log(Level.FINE, "Parsed", new Object[] {file, end-start});
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished parsing " + file.getNameExt());
         }
 
         if (cc.phase == Phase.PARSED && !phase.lessThan(Phase.ANALYZED)) {
             if (cancellable && CompilationJob.currentRequest.isCanceled()) {
                 return Phase.MODIFIED;
             }
-
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to analyze " + file.getNameExt());
             long start = System.currentTimeMillis();
             try {
                 cc.getJavafxcTask().analyze();
@@ -274,6 +286,7 @@ public final class JavaFXSource {
             cc.setPhase(Phase.ANALYZED);
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished to analyze " + file.getNameExt());
         }
         
         if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.UP_TO_DATE)) {
