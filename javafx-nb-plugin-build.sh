@@ -83,7 +83,7 @@ EOF
 
 # Get Netbeans binary
 ########################## 
-rm -rf nbms/* netbeans
+rm -rf nbms/* netbeans nbproject/private
 unzip -o /net/smetiste.czech/space/builds/netbeans/trunk/daily/latest/zip/netbeans-*-*[0-9].zip
 
 ant init  build-one-cluster -Done.cluster.name=nb.cluster.javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
