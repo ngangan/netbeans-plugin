@@ -62,6 +62,7 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
+import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -77,7 +78,7 @@ import static org.openide.util.NbBundle.getMessage;
  */
 
 public class JavaFXDataNode extends DataNode implements ChangeListener{
-    
+
     private static final String FX_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
     private static final String CLASS_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
 
@@ -132,6 +133,13 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         }
   
     }
+
+    @Override
+    public HelpCtx getHelpCtx() {
+        return new HelpCtx("javafx_editing_source");
+    }
+
+
 /*    
     public void setName(String name) {
         RenameHandler handler = getRenameHandler();
