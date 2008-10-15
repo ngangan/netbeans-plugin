@@ -48,14 +48,8 @@ import java.beans.PropertyChangeListener;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JSeparator;
@@ -67,8 +61,6 @@ import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
 import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
 import org.netbeans.modules.javafx.project.JavaFXProject;
@@ -89,11 +81,6 @@ import org.openide.ErrorManager;
 import org.openide.actions.FindAction;
 import org.openide.actions.ToolsAction;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
-import org.openide.filesystems.FileStatusEvent;
-import org.openide.filesystems.FileStatusListener;
-import org.openide.filesystems.FileSystem;
-import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.Repository;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.FolderLookup;
@@ -314,7 +301,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         }
         
         public HelpCtx getHelpCtx() {
-            return new HelpCtx(JavaFXLogicalViewRootNode.class);
+            return new HelpCtx("javafx_proj_about");
         }
         
         // Private methods -------------------------------------------------
