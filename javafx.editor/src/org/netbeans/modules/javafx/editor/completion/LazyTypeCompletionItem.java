@@ -119,7 +119,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                                 e = handle.resolve(controller);
                             } catch (Exception ex) {
                                 if (LOGGABLE) {
-                                    logger.log(Level.FINE, "Cannot resolve " + handle, ex);
+                                    logger.log(Level.FINE, "Cannot resolve " + handle + " name: " + handle.getQualifiedName(), ex);
                                 }
                             }
                             if (e != null) {

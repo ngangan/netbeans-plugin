@@ -1235,7 +1235,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
                 if (parent == myPackage) {
                    if (LOGGABLE) log("   will check inner classes of: " + local);
-                    addLocalAndImportedTypes(local.getEnclosedElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,true);
+                   if (local.getEnclosedElements() != null) {
+                        addLocalAndImportedTypes(local.getEnclosedElements(), kinds, baseType, toExclude, insideNew, smart, originalScope, null,true);
+                   }
                 }
             }
         }
@@ -1309,18 +1311,34 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     
     protected void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew) {
         if (LOGGABLE) log(" addAllTypes ");
-            for (ElementHandle<TypeElement> name :
-                    controller.getJavaFXSource().getCpInfo().getClassIndex().getDeclaredTypes(
-                        prefix != null ? prefix : EMPTY,
-                        NameKind.PREFIX,
-                        EnumSet.allOf(SearchScope.class))) {
-
+        for (ElementHandle<TypeElement> name :
+            controller.getJavaFXSource().getCpInfo().getClassIndex().getDeclaredTypes(
+                prefix != null ? prefix : EMPTY,
+                NameKind.PREFIX,
+                EnumSet.allOf(SearchScope.class))) {
+            String[] sigs = name.getSignatures();
+            if ((sigs == null) || (sigs.length == 0)) {
+                continue;
+            }
+            String sig = sigs[0];
+            int firstDollar = sig.indexOf('$');
+            if (firstDollar >= 0) {
+                int secondDollar = sig.indexOf('$', firstDollar);
+                if (secondDollar >= 0) {
+                    // we don't want to show second level inner classes
+                    continue;
+                }
+            }
+            if (!name.getQualifiedName().startsWith("com.sun.") &&
+               (!name.getQualifiedName().startsWith("sun."))
+                ) {
                 LazyTypeCompletionItem item = LazyTypeCompletionItem.create(
                         name, kinds,
                         query.anchorOffset,
                         controller.getJavaFXSource(), insideNew);
                 addResult(item);
             }
+        }
     }
 
     protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(Tree tree, int position) {
