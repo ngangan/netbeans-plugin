@@ -315,7 +315,7 @@ public class JavaFXProjectGenerator {
         }
         
         FileObject mainTemplate = Repository.getDefault().getDefaultFileSystem().
-            findResource( "Templates/JavaFX/JavaFXEmpty.fx" ); // NOI18N
+            findResource( "Templates/JavaFX/JavaFXStage.fx" ); // NOI18N
 
         if ( mainTemplate == null ) {
             return; // Don't know the template
