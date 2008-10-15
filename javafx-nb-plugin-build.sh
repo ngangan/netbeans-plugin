@@ -68,7 +68,7 @@ nb.cluster.javafx=\\
        contrib/javafx.palette,\\
        contrib/javafx.navigation,\\
        contrib/javafx.fxd,\\
-       contrib/javafx.fxd.lib 
+       contrib/javafx.fxd.lib
 
 javafx-sdk.win.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-dev-windows-i586.zip
 javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
