@@ -104,6 +104,4 @@ cd $WORKSPACE/main/nbbuild
 mkdir -p nbms/compress
 zip nbms/compress/${BUILD_ID}.zip nbms/javafx2/*.nbm
 tar cvf - nbms/javafx2/*.nbm |  gzip  > nbms/compress/${BUILD_ID}.tar.gz
-ln -s $WORKSPACE/main/nbbuild/nbms/compress/${BUILD_ID}.zip nbms/compress/netbeans-6.5-javafx-nbms.zip
-ln -s $WORKSPACE/main/nbbuild/nbms/compress/${BUILD_ID}.tar.gz nbms/compress/netbeans-6.5-javafx-nbms.tar.gz
 
