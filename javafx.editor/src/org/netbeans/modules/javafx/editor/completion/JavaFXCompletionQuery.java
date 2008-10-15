@@ -511,6 +511,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         if (t == null) {
             t = unit;
+            path = new JavaFXTreePath(unit);
         }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
