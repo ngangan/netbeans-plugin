@@ -1,44 +1,40 @@
 package smokeprofiler;
 
+import javafx.stage.*;
 
-import javafx.application.Frame;
+import javafx.scene.*;
 
-import javafx.scene.Scene;
-
-import javafx.scene.paint.Color;
-import javafx.scene.geometry.Circle;
-import javafx.scene.transform.Translate;
+import javafx.scene.paint.*;
+import javafx.scene.shape.*;
+import javafx.scene.transform.*;
 
 
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import javafx.animation.*;
 
 import java.lang.Math;
 
 var radius = 50;
 
 var angle = 0.0;
-var frequency = 0.5;
+var frequency = 0.05;
 
 var timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames : [
         KeyFrame {
-            time : 0.05s
-            action: function() {
-                angle+= 0.5;
-            }
+            time : 1s
+            values: angle => 360.0 tween Interpolator.LINEAR
         }
     ]
 }
 
-timeline.start();
+timeline.play();
 
-Frame {
-    title: "Cicrcle"
+Stage {
+    title: "Circle"
     width: 300
     height: 300
-    closeAction: function() {  java.lang.System.exit( 0 ); }
+    onClose: function() {  java.lang.System.exit( 0 ); }
     visible: true
 
     scene: Scene{
@@ -49,6 +45,7 @@ Frame {
               centerY: bind radius * Math.sin(frequency * angle)
               radius: 10
               fill: Color.ORANGE
-            }]
+            }
+        ]
     }
 }
