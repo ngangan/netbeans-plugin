@@ -1,20 +1,16 @@
 package helloworld;
 
-
-import javafx.application.Frame;
-
+import javafx.stage.Stage;
 import javafx.scene.Scene;
-
 import javafx.scene.text.Text;
 
-Frame {
+
+
+Stage {
     title: "Hello World JavaFX!"
     width: 300
     height: 200
-    closeAction: function() {
-        java.lang.System.exit( 0 );
-    }
-    visible: true
+    onClose: function() { java.lang.System.exit( 0 ); }
 
     scene: Scene{
         content: [
@@ -24,4 +20,5 @@ Frame {
             }
         ]
     }
+    visible: true
 }
