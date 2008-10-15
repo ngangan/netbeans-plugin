@@ -62,7 +62,9 @@ public class JavaFXTestCase extends JellyTestCase {
         //System.setOut(getLog());
         System.out.println("[fx test case] setup");
         Util.XTEST_DATA_PATH = getDataDir().getAbsolutePath();
-        System.out.println("XTEST_DATA_PATH = " + Util.XTEST_DATA_PATH);
+        Util.WORK_DIR  = getWorkDir().getAbsolutePath();
+        System.out.println("XTEST_DATA_DIR = " + Util.XTEST_DATA_PATH);
+        System.out.println("XTEST_WORK_DIR = " + Util.WORK_DIR);
     }
 
     public class ClassNameComponentChooser implements ComponentChooser {

@@ -68,8 +68,7 @@ nb.cluster.javafx=\\
        contrib/javafx.palette,\\
        contrib/javafx.navigation,\\
        contrib/javafx.fxd,\\
-       contrib/javafx.fxd.lib  
-
+       contrib/javafx.fxd.lib
 
 javafx-sdk.win.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-dev-windows-i586.zip
 javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
@@ -84,7 +83,7 @@ EOF
 
 # Get Netbeans binary
 ########################## 
-rm -rf nbms/* netbeans
+rm -rf nbms/* netbeans nbproject/private
 unzip -o /net/smetiste.czech/space/builds/netbeans/trunk/daily/latest/zip/netbeans-*-*[0-9].zip
 
 ant init  build-one-cluster -Done.cluster.name=nb.cluster.javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
@@ -105,6 +104,4 @@ cd $WORKSPACE/main/nbbuild
 mkdir -p nbms/compress
 zip nbms/compress/${BUILD_ID}.zip nbms/javafx2/*.nbm
 tar cvf - nbms/javafx2/*.nbm |  gzip  > nbms/compress/${BUILD_ID}.tar.gz
-ln -s $WORKSPACE/main/nbbuild/nbms/compress/${BUILD_ID}.zip nbms/compress/netbeans-6.5-javafx-nbms.zip
-ln -s $WORKSPACE/main/nbbuild/nbms/compress/${BUILD_ID}.tar.gz nbms/compress/netbeans-6.5-javafx-nbms.tar.gz
 
