@@ -449,7 +449,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     }
 
     JavaFXCompletionEnvironment getCompletionEnvironment(CompilationController controller, int offset,boolean allowMovingBack) throws IOException {
-        controller.toPhase(Phase.PARSED);
+        controller.toPhase(Phase.ANALYZED);
         String prefix = null;
         if (offset > 0) {
             TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
