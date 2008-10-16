@@ -60,7 +60,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.tree.TreePath;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
@@ -174,7 +173,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         }
     }
 
-    public void refresh(final Description description, final CompilationInfo info) {
+    public void refresh(final Description description, final JavaFXSource source) {
         final ElementNode rootNode = getRootNode();
 
         if (rootNode != null && rootNode.getDescritption().fileObject.equals(description.fileObject)) {
@@ -193,7 +192,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
 
                 public void run() {
                     elementView.setRootVisible(false);
-                    manager.setRootContext(new ElementNode(description, info));
+                    manager.setRootContext(new ElementNode(description, source));
                     boolean scrollOnExpand = getScrollOnExpand();
                     setScrollOnExpand(false);
                     elementView.expandAll();
