@@ -133,7 +133,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         if (!canceled.get()) {
-            ui.refresh(rootDescription, info);
+            ui.refresh(rootDescription, info.getJavaFXSource());
         }
     }
 

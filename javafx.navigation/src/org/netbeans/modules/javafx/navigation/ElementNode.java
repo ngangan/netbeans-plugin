@@ -52,8 +52,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.Action;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.modules.javafx.navigation.actions.OpenAction;
 import org.netbeans.modules.javafx.source.ui.Icons;
 import org.openide.filesystems.FileObject;
@@ -64,7 +64,8 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.datatransfer.PasteType;
 
-/** Node representing an Element
+/**
+ * Node representing an Element
  *
  * @author Petr Hrebejk
  * @author Anton Chechel - javafx modifications
@@ -73,13 +74,13 @@ public class ElementNode extends AbstractNode {
 
     private static Node WAIT_NODE;
     
-    private CompilationInfo info; // TODO weak reference
+    private final JavaFXSource source;
     private OpenAction openAction;
     private Description description;
 
-    public ElementNode(Description description, CompilationInfo info) {
-        super(description.subs == null ? Children.LEAF : new ElementChilren(info, description.subs, description.ui.getFilters()), null);
-        this.info = info;
+    public ElementNode(Description description, final JavaFXSource source) {
+        super(description.subs == null ? Children.LEAF : new ElementChilren(source, description.subs, description.ui.getFilters()), null);
+        this.source = source;
         this.description = description;
         setDisplayName(description.name);
     }
@@ -170,7 +171,7 @@ public class ElementNode extends AbstractNode {
 
     private synchronized Action getOpenAction() {
         if (openAction == null) {
-            openAction = new OpenAction(info, description.elementHandle, description.ui.getFileObject(), description.name, description.pos);
+            openAction = new OpenAction(source, description.elementHandle, description.ui.getFileObject(), description.name, description.pos);
         }
         return openAction;
     }
@@ -266,14 +267,15 @@ public class ElementNode extends AbstractNode {
 
     private static final class ElementChilren extends Children.Keys<Description> {
         
-        private CompilationInfo info; // TODO weak reference
+        private final JavaFXSource source;
 
-        public ElementChilren(CompilationInfo info, Set<Description> descriptions, ClassMemberFilters filters) {
+        public ElementChilren(JavaFXSource source, Set<Description> descriptions, ClassMemberFilters filters) {
+            this.source = source;
             resetKeys(descriptions, filters);
         }
 
         protected Node[] createNodes(Description key) {
-            return new Node[]{new ElementNode(key, info)};
+            return new Node[]{new ElementNode(key, source)};
         }
 
         void resetKeys(Set<Description> descriptions, ClassMemberFilters filters) {

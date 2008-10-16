@@ -45,8 +45,8 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.editor.ElementOpen;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.modules.javafx.navigation.SpaceMagicUtils;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
@@ -61,7 +61,7 @@ import org.openide.util.*;
  */
 public final class OpenAction extends AbstractAction {
 
-    private CompilationInfo compilationInfo; // TODO weak reference
+    private JavaFXSource source;
     private ElementHandle<? extends Element> elementHandle;
     private FileObject fileObject;
     private String displayName;
@@ -71,8 +71,8 @@ public final class OpenAction extends AbstractAction {
 //        this(element, fileObject, null, -1);
 //    }
 
-    public OpenAction(CompilationInfo compilationInfo, ElementHandle<? extends Element> elementHandle, FileObject fileObject, String displayName, long offset) {
-        this.compilationInfo = compilationInfo;
+    public OpenAction(JavaFXSource source, ElementHandle<? extends Element> elementHandle, FileObject fileObject, String displayName, long offset) {
+        this.source = source;
         this.elementHandle = elementHandle;
         this.fileObject = fileObject;
         this.displayName = displayName;
@@ -88,7 +88,7 @@ public final class OpenAction extends AbstractAction {
             }
         } else {
             try {
-                if (SpaceMagicUtils.hasSpiritualInvocation(elementHandle, compilationInfo)) {
+                if (SpaceMagicUtils.hasSpiritualInvocation(elementHandle, source)) {
                     // space magic here, can't be opened via element
                     ElementOpen.open(fileObject, (int) offset);
                 } else {

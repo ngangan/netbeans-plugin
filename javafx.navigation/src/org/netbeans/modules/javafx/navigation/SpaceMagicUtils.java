@@ -47,12 +47,17 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.Task;
+import org.openide.util.Exceptions;
 
 /**
  * Only quintessentially pure space magic is here.
@@ -62,18 +67,27 @@ import org.netbeans.api.javafx.source.ElementHandle;
 public final class SpaceMagicUtils {
 
     public static final String MAGIC_FUNCTION = "javafx$run$";
-    
+
     private SpaceMagicUtils() {
     }
 
-    public static boolean hasSpiritualInvocation(ElementHandle<? extends Element> elementHandle, CompilationInfo compilationInfo) {
-        Element element = null;
+    public static boolean hasSpiritualInvocation(final ElementHandle<? extends Element> elementHandle, final JavaFXSource source) {
+        final Element[] element = new Element[1];
         try {
-            element = elementHandle.resolve(compilationInfo);
-        } catch (Exception e) {
-            // can't convert to element (incomplete element)
+            source.runUserActionTask(new Task<CompilationController>() {
+                public void run(CompilationController cc) throws Exception {
+                    try {
+                        element[0] = elementHandle.resolve(cc);
+                    } catch (Exception e) {
+                        Exceptions.printStackTrace(e);
+                        // can't convert to element (incomplete element)
+                    }
+                }
+            }, true);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        return element != null ? hasSpiritualInvocation(element) : false;
+        return element[0] != null ? hasSpiritualInvocation(element[0]) : false;
     }
 
     /**
@@ -119,7 +133,7 @@ public final class SpaceMagicUtils {
         final List<Element> elements = new ArrayList<Element>();
         final JavafxcTrees trees = info.getTrees();
         final UnitTree cut = info.getCompilationUnit();
-        
+
         for (Tree tt : cut.getTypeDecls()) {
             JavaFXKind kk = tt.getJavaFXKind();
             if (kk == JavaFXKind.CLASS_DECLARATION) {
@@ -144,11 +158,11 @@ public final class SpaceMagicUtils {
                 }
             }
         }
-        
+
         return Collections.unmodifiableList(elements);
-        
-        // This is too advanced magic at the moment, maybe will work later on
-        
+
+    // This is too advanced magic at the moment, maybe will work later on
+
 //        JavafxcTrees trees = info.getTrees();
 //        TreePath path = trees.getPath(e);
 //        JFXFunctionDefinition tree = (JFXFunctionDefinition) trees.getTree(e);
