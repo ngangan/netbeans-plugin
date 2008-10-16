@@ -94,7 +94,7 @@ public class TestSuite {
         addTest(TemplateTw.class).
         addTest(TemplateVar.class).
         addTest(TemplateWe.class).
-        addTest(TemplateWh.class);
+        addTest(TemplateWh.class).clusters(".*").enableModules(".*");
       return NbModuleSuite.create(config);
   }
 
