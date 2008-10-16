@@ -23,8 +23,8 @@ import javax.swing.JPanel;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-import javafx.fxd.Loader;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import com.sun.javafx.tools.fxd.LoaderExtended;
 
 /**
  *
@@ -33,14 +33,14 @@ import javafx.fxd.Loader;
 final class PreviewImagePanel extends JPanel implements ActionLookup {
     private static final float       ZOOM_STEP = (float) 1.1;
     
-    private final FXDDataObject      m_dObj;
+    private final FXZDataObject      m_dObj;
     private final Action []          m_actions;
     private       JSGPanel           m_sgPanel = null;
     //TODO Implement the ZoomToFit action
     //private final ZoomToFitAction m_zoomToFitAction;
     private       int                m_changeTickerCopy = -1;
         
-    PreviewImagePanel(final FXDDataObject dObj) {
+    PreviewImagePanel(final FXZDataObject dObj) {
         m_dObj = dObj;
     
         m_actions = new Action[] {
@@ -82,7 +82,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 FXNode fxNode = (FXNode) method_impl_getFXNode.invoke(node); 
                  */
                 
-                javafx.scene.Node$Intf node = Loader.get().load(m_dObj.getDataModel().getFXDContainer());
+                javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(m_dObj.getDataModel().getFXDContainer());
                 //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
                 //Object   group  = m.invoke(fxNode);
                 FXNode fxNode = node.impl_getFXNode();  

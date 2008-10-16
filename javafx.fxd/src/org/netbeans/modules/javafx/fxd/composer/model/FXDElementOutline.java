@@ -69,7 +69,7 @@ public final class FXDElementOutline {
     private       short      m_tickerCopy;
         
     FXDElementOutline(FXDElement fxdElement) {
-        assert fxdElement != null : "The FXDElement reference cannot be null";
+        assert fxdElement != null : "The FXDElement reference cannot be null"; //NOI18N
         m_fxdElement  = fxdElement;
         m_coords = rect2poly( fxdElement.getBounds(), null);
         setDirty();

@@ -7,7 +7,6 @@ package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,14 +14,13 @@ import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.text.JTextComponent;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDToolbar;
+import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
@@ -31,10 +29,10 @@ import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
 final class PreviewToolbar extends FXDToolbar {
     private static final String[] ZOOM_VALUES = new String[]{"400%", "300%", "200%", "100%", "75%", "50%", "25%"}; //NOI18N
     
-    private final FXDDataObject       m_dObj;
+    private final FXZDataObject       m_dObj;
     private final JComboBox           m_zoomComboBox;
     
-    public PreviewToolbar( FXDDataObject dObj, ActionLookup lookup) {
+    public PreviewToolbar( FXZDataObject dObj, ActionLookup lookup) {
         m_dObj = dObj;
         
         GridBagConstraints constrains = new GridBagConstraints();
@@ -57,6 +55,8 @@ final class PreviewToolbar extends FXDToolbar {
 
         addButton( lookup.get(HighlightActionFactory.ToggleTooltipAction.class));
         addButton( lookup.get(HighlightActionFactory.ToggleHighlightAction.class));
+        add(createToolBarSeparator(), constrains);
+        addButton( lookup.get(ActionController.GenerateUIStubAction.class));
         
         constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;

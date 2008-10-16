@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
 import org.netbeans.modules.javafx.fxd.composer.model.*;
@@ -14,33 +15,32 @@ import java.util.List;
 import java.util.Stack;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.composer.uistub.UIStubGenerator;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
  * @author Pavel Benes
  */
 public class ActionController implements ActionLookup {
-    private final FXDDataObject               m_dObj;
+    private final FXZDataObject               m_dObj;
     private final List<ComposerActionFactory> m_actionFactories;    
     private final Stack<ComposerAction>       m_activeActions;
     private final SelectActionFactory         m_selectActionFactory;
 
-    public Stack<ComposerAction> getActiveActions() {
-        return m_activeActions;
-    }
-
-    public ActionController(FXDDataObject dObj) {
+    public ActionController(FXZDataObject dObj) {
         m_dObj = dObj;
-        FXDComposerModel model = dObj.getDataModel();
         m_activeActions   = new Stack<ComposerAction>();
         m_actionFactories = new ArrayList<ComposerActionFactory>();
         
         m_actionFactories.add( m_selectActionFactory=new SelectActionFactory(dObj));
-        m_actionFactories.add( new HighlightActionFactory(dObj));
-        
+        m_actionFactories.add( new HighlightActionFactory(dObj));        
     } 
     
+    public Stack<ComposerAction> getActiveActions() {
+        return m_activeActions;
+    }
+
     public SelectActionFactory getSelectionModel() {
         return m_selectActionFactory;
     }
@@ -123,6 +123,10 @@ public class ActionController implements ActionLookup {
     }
 
     public Action get(Class clazz) {
+        if ( GenerateUIStubAction.class.equals( clazz)) {
+            return m_generateStubAction;
+        }
+        
         for ( ComposerActionFactory factory : m_actionFactories) {
             Action a =ActionLookupUtils.get( factory.getMenuActions(), clazz);
             if ( a != null) {
@@ -130,5 +134,17 @@ public class ActionController implements ActionLookup {
             }
         }
         return null;
+    }
+    
+    private final GenerateUIStubAction m_generateStubAction = new GenerateUIStubAction();
+    
+    public final class GenerateUIStubAction extends AbstractFXDAction {
+        GenerateUIStubAction() {
+            super("generate_stub", true);
+        }
+        public void actionPerformed(ActionEvent e) {
+            UIStubGenerator generator = new UIStubGenerator(m_dObj);
+            generator.generate();
+        }        
     }
 }

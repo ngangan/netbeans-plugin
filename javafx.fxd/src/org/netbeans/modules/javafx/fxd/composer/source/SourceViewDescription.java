@@ -9,8 +9,7 @@ import java.awt.EventQueue;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -22,10 +21,10 @@ import org.openide.windows.TopComponent;
 public final class SourceViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
         
-    private FXDSourceEditor m_editor = null;
-    private final FXDEditorSupport m_support;
+    private FXDSourceEditor        m_editor = null;
+    private final FXZEditorSupport m_support;
 
-    public SourceViewDescription(FXDEditorSupport ed) {
+    public SourceViewDescription(FXZEditorSupport ed) {
         m_support = ed;
     }
 
@@ -50,7 +49,7 @@ public final class SourceViewDescription implements MultiViewDescription, Serial
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(FXDDataObject.class, "LBL_MULVIEW_SOURCE_TITLE");
+        return NbBundle.getMessage(SourceViewDescription.class, "LBL_MULVIEW_SOURCE_TITLE");
     }
 
     public HelpCtx getHelpCtx() {

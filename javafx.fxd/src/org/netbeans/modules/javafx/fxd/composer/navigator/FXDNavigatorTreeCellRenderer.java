@@ -50,6 +50,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.openide.awt.HtmlRenderer;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Utilities;
 
 
@@ -66,7 +67,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
 //    private static final String CDATA_16    = "org/netbeans/modules/xml/text/navigator/resources/cdata.png";    
     private static final String ERROR_16    = "org/netbeans/modules/xml/text/navigator/resources/badge_error.png"; //NOI18N
     
-    private final Image  ERROR_IMAGE   = Utilities.loadImage(ERROR_16, true);   
+    private final Image  ERROR_IMAGE   = ImageUtilities.loadImage(ERROR_16, true);   
     private final Icon[] TAG_GRAY_ICON = new Icon[]{getImageIcon(TAG_16, false), getImageIcon(TAG_16, true)};
     private final Icon[] TAG_ICON      = new Icon[]{getImageIcon(TAG_16, false), getImageIcon(TAG_16, true)};
     //private final Icon[] PI_ICON       = new Icon[]{getImageIcon(PI_16, false), getImageIcon(PI_16, true)};
@@ -118,9 +119,9 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
     }
     
     private ImageIcon getImageIcon(String name, boolean error){
-        ImageIcon icon = new ImageIcon(Utilities.loadImage(name));
+        ImageIcon icon = new ImageIcon(ImageUtilities.loadImage(name));
         if(error)
-            return new ImageIcon(Utilities.mergeImages( icon.getImage(), ERROR_IMAGE, 15, 7 ));
+            return new ImageIcon(ImageUtilities.mergeImages( icon.getImage(), ERROR_IMAGE, 15, 7 ));
         else
             return icon;
     }    

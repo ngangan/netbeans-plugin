@@ -22,24 +22,24 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ComposerAction;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.preview.PreviewElement;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
  * @author Pavel Benes
  */
 public final class FXDComposerController {
-    private final FXDDataObject     m_dObj;
+    private final FXZDataObject     m_dObj;
     private final ActionController  m_actionController;
     private final List<String>      m_busyStates   = new ArrayList<String>(4);
     private       boolean           m_busyCursorOn = false;
-    private       PreviewElement m_previewTopComponent = null; 
+    private       PreviewElement    m_previewTopComponent = null; 
     private volatile short          m_screenChangeTicker = 0;
     
     //private       JSGPanel         m_sgPanel      = null;
     //private       StatusBar        m_statusBar = null;   
                 
-    public FXDComposerController( FXDDataObject dObj) {
+    public FXDComposerController( FXZDataObject dObj) {
         m_dObj = dObj;
         m_actionController = new ActionController(dObj);
     }

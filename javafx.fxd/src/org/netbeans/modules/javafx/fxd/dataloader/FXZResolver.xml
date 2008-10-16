@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
 Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
 
 The contents of this file are subject to the terms of either the GNU
 General Public License Version 2 only ("GPL") or the Common
@@ -40,33 +40,12 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<project name="org.netbeans.modules.javafx.fxd.lib" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project javafx.fxd.lib</description>
-    <import file="../../nbbuild/templates/projectized.xml"/>
-    <target name="netbeans-extra" depends="init">
 
-        <mkdir dir="external"/>
-        <get src="${javafx-fxd-netbeans-support.zip.url}" dest="external/javafx-fxd-netbeans-support.zip" usetimestamp="true" verbose="true"/> 
-        <unzip src="external/javafx-fxd-netbeans-support.zip" dest="external" />
-        <mkdir dir="external/javafx-fxd-netbeans-support"/>
-        <move todir="external/javafx-fxd-netbeans-support" flatten="true">
-            <fileset dir="external">
-              <include name="**/*.jar"/>
-            </fileset>
-        </move>   
-        
-        <delete includeemptydirs="true">
-            <fileset dir="external">
-                <exclude name="javafx-fxd-netbeans-support/*.jar"/>
-                <exclude name="javafx-fxd-netbeans-support.zip"/>
-            </fileset>
-        </delete>
-  <!--        
-	<mkdir dir="external/compiler"/>
-        <get src="${jfxcompiler.jar.url}" dest="${jfxcompiler.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${jfxdoc.jar.url}" dest="${jfxdoc.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${jfxrt.jar.url}" dest="${jfxrt.jar}" usetimestamp="true" verbose="true"/>
-        <get src="${Scenario.jar.url}" dest="${Scenario.jar}" usetimestamp="true" verbose="true"/>
--->        
-    </target>
-</project>
+<!DOCTYPE MIME-resolver PUBLIC "-//NetBeans//DTD MIME Resolver 1.0//EN" "http://www.netbeans.org/dtds/mime-resolver-1_0.dtd">
+<MIME-resolver>
+    <file>
+        <ext name="fxz"/>
+        <ext name="FXZ"/>
+        <resolver mime="multipart/x-fxz"/>
+    </file>
+</MIME-resolver>
