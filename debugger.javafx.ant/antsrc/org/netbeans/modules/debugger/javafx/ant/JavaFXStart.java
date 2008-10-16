@@ -86,7 +86,8 @@ import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.api.debugger.DebuggerEngine;
 import org.netbeans.api.debugger.DebuggerManagerAdapter;
 import org.netbeans.api.debugger.javafx.MethodBreakpoint;
-import org.netbeans.api.java.platform.JavaPlatform;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
+//import org.netbeans.api.java.platform.JavaPlatform;
 
 
 /**
@@ -397,7 +398,8 @@ public class JavaFXStart extends Task implements Runnable {
     ) {
         if (bootclasspath == null) {
             // if current platform is default one, bootclasspath is set to null
-            JavaPlatform jp = JavaPlatform.getDefault();
+//            JavaPlatform jp = JavaPlatform.getDefault();
+            JavaFXPlatform jp = JavaFXPlatform.getDefaultFXPlatform();
             if (jp != null) {
                 return jp.getSourceFolders ();
             } else {

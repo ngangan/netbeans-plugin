@@ -196,19 +196,19 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
             setValidity(Breakpoint.VALIDITY.INVALID, reason[0]);
             return;
         }
-        Location prevLocation = null;
+//        Location prevLocation = null;
         for (Iterator it = locations.iterator(); it.hasNext();) {
             Location location = (Location) it.next();
             try {
-                if ((prevLocation==null) ? true : (location.lineNumber()!=prevLocation.lineNumber()) ) {
+//                if ((prevLocation==null) ? true : (location.lineNumber()!=prevLocation.lineNumber()) ) {
                     BreakpointRequest br = getEventRequestManager().
                             createBreakpointRequest(location);
                     setFilters(br);
                     addEventRequest(br);
                     setValidity(Breakpoint.VALIDITY.VALID, null);
                     //System.out.println("Breakpoint " + br + location + "created");
-                    prevLocation = location;
-                }
+//                    prevLocation = location;
+//                }
             } catch (VMDisconnectedException e) {
             }
         }

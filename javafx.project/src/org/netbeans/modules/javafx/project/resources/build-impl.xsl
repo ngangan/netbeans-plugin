@@ -293,6 +293,9 @@ is divided into following sections:
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
+                <sourcepath>
+                    <path path="${{src.dir}}"/>
+                </sourcepath>
             </nbjavafxstart>
         </target>
         <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
@@ -300,6 +303,9 @@ is divided into following sections:
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
+                <sourcepath>
+                    <path path="${{src.dir}}"/>
+                </sourcepath>
             </nbjavafxstart>
         </target>
         <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">

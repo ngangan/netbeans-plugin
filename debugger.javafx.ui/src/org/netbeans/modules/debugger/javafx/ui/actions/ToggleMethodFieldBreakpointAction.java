@@ -269,8 +269,8 @@ public class ToggleMethodFieldBreakpointAction extends AbstractAction {//impleme
         if (fieldName != null) {
 //            TODO XXX If both types will be used then TYPE_MODIFICATION will stop at main Thread
 //            and TYPE_ACCESS will stop at AWT_Event_0 Thread
-//            b = FieldBreakpoint.create(className, fieldName, FieldBreakpoint.TYPE_MODIFICATION | FieldBreakpoint.TYPE_ACCESS);
-            b = FieldBreakpoint.create(className, fieldName, FieldBreakpoint.TYPE_ACCESS);
+            b = FieldBreakpoint.create(className, fieldName, FieldBreakpoint.TYPE_MODIFICATION | FieldBreakpoint.TYPE_ACCESS);
+//            b = FieldBreakpoint.create(className, fieldName, FieldBreakpoint.TYPE_ACCESS);
             b.setPrintText(NbBundle.getMessage(FieldBreakpointPanel.class, "CTL_Field_Breakpoint_Print_Text"));
         } else {
             b = MethodBreakpoint.create(className, methodName);
