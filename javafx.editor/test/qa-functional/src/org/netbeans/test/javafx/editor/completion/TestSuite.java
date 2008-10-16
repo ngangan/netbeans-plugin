@@ -63,7 +63,7 @@ public class TestSuite {
         addTest(DeclarationCCTests.class).
         addTest(FrameCCTests.class).
         addTest(ImportCCTests.class).
-        addTest(PackageCCTests.class);
+        addTest(PackageCCTests.class).clusters(".*").enableModules(".*");
       return NbModuleSuite.create(config);
   }
 
