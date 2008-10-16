@@ -80,7 +80,7 @@ public class FixItem implements CompletionItem {
      *
      * @param component non-null text component for which the completion was invoked.
      */
-    public void defaultAction(JTextComponent component) {
+    public void defaultAction(JTextComponent component) {        
         if (!fil.isVisible()) return;
         fil.hide();
         this.model.addImport(getElement());

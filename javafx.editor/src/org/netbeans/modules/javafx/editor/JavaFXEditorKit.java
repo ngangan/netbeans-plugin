@@ -402,12 +402,12 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     caret.setDot(dotPos);
                     return dotPos;
                 } catch (BadLocationException ex) {
-                    log.severe("Excetion throw during InsertBreakAction. " + ex);
+                    log.severe("Excetion thrown during InsertBreakAction. " + ex);
                 }
             } else {
                 try {
                     JFXTokenId id = BracketCompletion.tokenAt(doc, dotPos);
-                    if (JFXTokenId.isComment(id)) {
+                    if (id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) {
                         doc.insertString(dotPos, "* ", null);
                         caret.setDot(dotPos);
                         return dotPos+3;
@@ -415,7 +415,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                         return processRawString(doc, caret);
                     }
                 } catch (BadLocationException ex) {
-                    log.severe("Excetion throw during InsertBreakAction. " + ex);
+                    log.severe("Excetion thrown during InsertBreakAction. " + ex);
                 }
             }
             return null;

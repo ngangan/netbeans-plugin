@@ -805,6 +805,11 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
+    public Queue<Adjustment> visitCompilationUnit(UnitTree node, Queue<Adjustment> adjustments) {
+        return super.visitCompilationUnit(node, adjustments);
+    }
+
+    @Override
     public Queue<Adjustment> visitClassDeclaration(ClassDeclarationTree node, Queue<Adjustment> adjustments) {
         if (tu.isSynthetic(getCurrentPath())) {
             super.visitClassDeclaration(node, adjustments);
