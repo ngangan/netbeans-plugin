@@ -200,6 +200,8 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
         for (Iterator it = locations.iterator(); it.hasNext();) {
             Location location = (Location) it.next();
             try {
+//TODO XXX 2 Locations returned fore som breakpoints (Bug in Runtime). Need to filter it
+                if (!location.method().isStaticInitializer()){
 //                if ((prevLocation==null) ? true : (location.lineNumber()!=prevLocation.lineNumber()) ) {
                     BreakpointRequest br = getEventRequestManager().
                             createBreakpointRequest(location);
@@ -208,7 +210,7 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
                     setValidity(Breakpoint.VALIDITY.VALID, null);
                     //System.out.println("Breakpoint " + br + location + "created");
 //                    prevLocation = location;
-//                }
+                }
             } catch (VMDisconnectedException e) {
             }
         }
