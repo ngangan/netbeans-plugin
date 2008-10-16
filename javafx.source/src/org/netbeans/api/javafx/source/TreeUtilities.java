@@ -271,12 +271,27 @@ public final class TreeUtilities {
     
     /**Computes {@link Scope} for the given position.
      */
-    public Scope scopeFor(int pos) {
+    public JavafxcScope scopeFor(int pos) {
         JavaFXTreePath path = pathFor(pos);
-        Scope scope = info.getTrees().getScope(path);
+        JavafxcScope scope = getScope(path);
         return scope;
     }
-    
+
+    public JavafxcScope getScope(JavaFXTreePath p) {
+        JavafxcScope scope = null;
+        while ((p != null) && (scope == null)) {
+            try {
+                scope = info.getTrees().getScope(p);
+            } catch (Exception ex) {
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.log(Level.FINEST, "  getScope failed on " + p, ex);
+                }
+                p = p.getParentPath();
+            }
+        }
+        return scope;
+    }
+
     /**Returns tokens for a given tree.
      */
     public TokenSequence<JFXTokenId> tokensFor(Tree tree) {

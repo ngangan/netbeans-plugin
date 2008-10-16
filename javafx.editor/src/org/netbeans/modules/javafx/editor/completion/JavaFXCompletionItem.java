@@ -48,6 +48,7 @@ import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.ThrowTree;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.awt.Font;
@@ -1243,7 +1244,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                             if (insideNew && type != null && type.getKind() == TypeKind.DECLARED) {
                                 ExecutableElement ctor = null;
                                 JavafxcTrees trees = controller.getTrees();
-                                Scope scope = controller.getTreeUtilities().scopeFor(offset);
+                                JavafxcScope scope = controller.getTreeUtilities().scopeFor(offset);
                                 int val = 0; // no constructors seen yet
                                 if (eleme != null) {
                                     for (ExecutableElement ee : ElementFilter.constructorsIn(eleme.getEnclosedElements())) {

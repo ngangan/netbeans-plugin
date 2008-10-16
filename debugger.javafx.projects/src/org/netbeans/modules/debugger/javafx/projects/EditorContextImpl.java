@@ -53,6 +53,7 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 
 import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
@@ -1116,8 +1117,7 @@ public class EditorContextImpl extends EditorContext {
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
                     }
-                    Scope scope = ci.getTreeUtilities().scopeFor(offset);
-//                    JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(offset);
+                    JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
                     TypeElement te = scope.getEnclosingClass();
                     if (te != null) {
                         result[0] = getBinaryName(te);
@@ -1203,8 +1203,7 @@ public class EditorContextImpl extends EditorContext {
                         ops[0] = new Operation[] {};
                         return;
                     }
-                    Scope scope = ci.getTreeUtilities().scopeFor(offset);
-//                    JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(offset);
+                    JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
                     Element method = scope.getEnclosingMethod();
                     if (method == null) {
                         ops[0] = new Operation[] {};
@@ -1375,8 +1374,7 @@ public class EditorContextImpl extends EditorContext {
                         return;
                     }
                     int offset = operation.getMethodEndPosition().getOffset();
-                    Scope scope = ci.getTreeUtilities().scopeFor(offset);
-//                    JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(offset);
+                    JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
                     Element method = scope.getEnclosingMethod();
                     if (method == null) {
                         return ;
@@ -1426,8 +1424,7 @@ public class EditorContextImpl extends EditorContext {
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
                     }
-                    Scope scope = ci.getTreeUtilities().scopeFor(offset);
-//                    JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(offset);
+                    JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
                     Element clazz = scope.getEnclosingClass();
                     if (clazz == null) {
                         return ;
@@ -1753,8 +1750,7 @@ public class EditorContextImpl extends EditorContext {
                                 currentElementPtr[0] = packageName+"."+className;
                                 te = null;
                             } else {
-                                Scope scope = ci.getTreeUtilities().scopeFor(currentOffset);
-//                                JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(currentOffset);
+                                JavafxcScope scope = ci.getTreeUtilities().scopeFor(currentOffset);
                                 te = scope.getEnclosingClass();
                             }
                             if (te != null) {
@@ -1763,8 +1759,7 @@ public class EditorContextImpl extends EditorContext {
                             el = te;
                         }
                     } else if (kind == ElementKind.METHOD) {
-                        Scope scope = ci.getTreeUtilities().scopeFor(currentOffset);
-//                        JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(currentOffset);
+                        JavafxcScope scope = ci.getTreeUtilities().scopeFor(currentOffset);
                         el = scope.getEnclosingMethod();
                         if (el != null) {
                             currentElementPtr[0] = el.getSimpleName().toString();
@@ -1806,8 +1801,7 @@ public class EditorContextImpl extends EditorContext {
                         } else if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER && selectedIdentifier != null) {
                             IdentifierTree it = (IdentifierTree) tree;
                             String fieldName = it.getName().toString();
-                            Scope scope = ci.getTreeUtilities().scopeFor(offset);
-//                            JavafxcScope scope = ci.getTreeUtilities().javafxcScopeFor(offset);
+                            JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
                             TypeElement te = scope.getEnclosingClass();
                             List<? extends Element> enclosedElms = te.getEnclosedElements();
                             for (Element elm : enclosedElms) {

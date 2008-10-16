@@ -249,8 +249,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) {
         if (LOGGABLE) log("addMembers: " + type);
-        JavafxcTrees trees = controller.getTrees();
-        JavafxcScope scope = trees.getScope(path);
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
             return;
@@ -578,7 +577,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             final boolean isStatic = element != null && (element.getKind().isClass() || element.getKind().isInterface());
                             if (LOGGABLE) log("     isStatic == " + isStatic);
                             final boolean isSuperCall = element != null && element.getKind().isField() && element.getSimpleName().contentEquals(SUPER_KEYWORD);
-                            final JavafxcScope scope = trees.getScope(path);
+                            final JavafxcScope scope = controller.getTreeUtilities().getScope(path);
                             if (LOGGABLE) log("   scope == " + scope);
                             final TreeUtilities tu = controller.getTreeUtilities();
                             TypeElement enclClass = scope.getEnclosingClass();
@@ -599,8 +598,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             break;
                         }
                         case IDENTIFIER: {
-                            JavafxcTrees trees = controller.getTrees();
-                            final JavafxcScope scope = trees.getScope(path);
+                            final JavafxcScope scope = controller.getTreeUtilities().getScope(path);
                             if (LOGGABLE) log("   scope (2) == " + scope);
                             final TreeUtilities tu = controller.getTreeUtilities();
                             final TypeElement enclClass = scope.getEnclosingClass();
@@ -675,8 +673,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     final Element element = trees.getElement(path);
                     final boolean isStatic = element != null && (element.getKind().isClass() || element.getKind().isInterface());
                     final boolean isSuperCall = element != null && element.getKind().isField() && element.getSimpleName().contentEquals(SUPER_KEYWORD);
-                    final JavafxcScope scope = trees.getScope(path);
                     final TreeUtilities tu = controller.getTreeUtilities();
+                    final JavafxcScope scope = tu.getScope(path);
                     TypeElement enclClass = scope.getEnclosingClass();
                     final TypeMirror enclType = enclClass != null ? enclClass.asType() : null;
                     ElementUtilities.ElementAcceptor acceptor = new ElementUtilities.ElementAcceptor() {
@@ -688,8 +686,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     break;
                 }
                 case IDENTIFIER: {
-                    final JavafxcScope scope = trees.getScope(path);
                     final TreeUtilities tu = controller.getTreeUtilities();
+                    final JavafxcScope scope = tu.getScope(path);
                     final TypeElement enclClass = scope.getEnclosingClass();
                     final boolean isStatic = enclClass != null ? (tu.isStaticContext(scope) || (path.getLeaf().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION && ((BlockExpressionTree)path.getLeaf()).isStatic())) : false;
                     final ExecutableElement method = scope.getEnclosingMethod();
@@ -1079,12 +1077,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     private List<? extends Element> getEnclosedElements(PackageElement pe) {
         Symbol s = (Symbol)pe;
         for (Scope.Entry e = s.members().elems; e != null; e = e.sibling) {
-            if ((e.sym != null) && (!e.sym.toString().contains("$"))){
+            if (e.sym != null) {
                 try {
                     e.sym.complete();
                 } catch (RuntimeException x) {
-                    if (LOGGABLE) {
-                        logger.log(Level.FINE,"Let's see whether we survive this: ",x);
+                    if (logger.isLoggable(Level.FINEST)) {
+                        logger.log(Level.FINEST,"Let's see whether we survive this: ",x);
                     }
                 }
             }
@@ -1096,8 +1094,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("addPackageContent " + pe);
         Elements elements = controller.getElements();
         JavafxTypes types = controller.getJavafxTypes();
-        JavafxcTrees trees = controller.getTrees();
-        JavafxcScope scope = trees.getScope(path);
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
         for (Element e : getEnclosedElements(pe)) {
             if (e.getKind().isClass() || e.getKind() == ElementKind.INTERFACE) {
                 String name = e.getSimpleName().toString();
@@ -1142,38 +1139,40 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     private void addBasicType(String name1, String name2) {
         if (LOGGABLE) log("  addBasicType " + name1 + " : " + name2);
-        JavafxcTrees trees = controller.getTrees();
-        JavafxcScope scope = trees.getScope(path);
-        if (LOGGABLE) log("  scope == " + scope);
-        for (Element local : scope.getLocalElements()) {
-            if (LOGGABLE) log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
-            if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
-                if (! (local instanceof TypeElement)) {
-                    if (LOGGABLE) log("    " + local.getSimpleName() + " not TypeElement");
-                    continue;
-                }
-                TypeElement te = (TypeElement) local;
-                String name = local.getSimpleName().toString();
-                if (name.equals(name2)) {
-                    if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
-                        if (LOGGABLE) log("    found " + name1);
-                        if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
-                            addResult(JavaFXCompletionItem.createTypeItem(name1, query.anchorOffset, false, false, true));
-                        } else {
-                            DeclaredType dt = (DeclaredType) local.asType();
-                            addResult(JavaFXCompletionItem.createTypeItem(te, dt, query.anchorOffset, false, false, true, false));
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
+        while (scope != null) {
+            if (LOGGABLE) log("  scope == " + scope);
+            for (Element local : scope.getLocalElements()) {
+                if (LOGGABLE) log("    local == " + local.getSimpleName() + "  kind: " + local.getKind() + "  class: " + local.getClass().getName() + "  asType: " + local.asType());
+                if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
+                    if (! (local instanceof TypeElement)) {
+                        if (LOGGABLE) log("    " + local.getSimpleName() + " not TypeElement");
+                        continue;
+                    }
+                    TypeElement te = (TypeElement) local;
+                    String name = local.getSimpleName().toString();
+                    if (name.equals(name2)) {
+                        if (JavaFXCompletionProvider.startsWith(name1, prefix)) {
+                            if (LOGGABLE) log("    found " + name1);
+                            if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
+                                addResult(JavaFXCompletionItem.createTypeItem(name1, query.anchorOffset, false, false, true));
+                            } else {
+                                DeclaredType dt = (DeclaredType) local.asType();
+                                addResult(JavaFXCompletionItem.createTypeItem(te, dt, query.anchorOffset, false, false, true, false));
+                            }
+                            return;
                         }
-                        return;
                     }
                 }
             }
+            scope = scope.getEnclosingScope();
         }
     }
     
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) {
         if (LOGGABLE) log("addLocalAndImportedTypes");
         JavafxcTrees trees = controller.getTrees();
-        JavafxcScope scope = trees.getScope(path);
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
         JavafxcScope originalScope = scope;
         while (scope != null) {
             if (LOGGABLE) log("  scope == " + scope);
@@ -1250,7 +1249,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("findTypeElement: " + simpleName);
         JavafxcTrees trees = controller.getTrees();
         JavaFXTreePath p = new JavaFXTreePath(root);
-        JavafxcScope scope = trees.getScope(path);
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
         while (scope != null) {
             if (LOGGABLE) log("  scope == " + scope);
             TypeElement res = findTypeElement(scope.getLocalElements(), simpleName,null);
