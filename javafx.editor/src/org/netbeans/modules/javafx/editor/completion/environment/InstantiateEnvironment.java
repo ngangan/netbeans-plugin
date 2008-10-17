@@ -82,7 +82,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
             return;
         }
         if (LOGGABLE) log(" TODO: missing check whether we are not after the closing bracket!"); 
-        addMembers(tm, false, true, ":");
+        addMembers(tm, false, true, ":",controller.getTreeUtilities().getScope(path),true, true);
     }
 
     public TypeMirror getSmartType(JFXInstanciate it) throws IOException {
