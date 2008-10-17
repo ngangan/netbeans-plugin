@@ -1,7 +1,11 @@
 a
+b
+c
+bleep
 equals
 getClass
 hashCode
+mud
 notify
 notifyAll
 toString
@@ -19,12 +23,8 @@ try
 var
 while
 Duration
-FXTestClass
-FXTestClass001
-FXTestClass002
+FX
 FXTestClass003
-FXTestClassVar1
-Foo
 Object
 String
 System
@@ -36,6 +36,7 @@ frame
 fxprj1
 imports
 java
+javacard
 javafx
 javax
 org
