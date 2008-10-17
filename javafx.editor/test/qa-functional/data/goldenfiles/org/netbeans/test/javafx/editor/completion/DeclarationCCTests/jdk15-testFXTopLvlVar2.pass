@@ -17,7 +17,13 @@ throw
 try
 var
 while
+Duration
+FX
+Object
 String
+TopLvlVar1
+TopLvlVar2
+applications
 classes
 com
 declarations
@@ -25,6 +31,7 @@ frame
 fxprj1
 imports
 java
+javacard
 javafx
 javax
 org
