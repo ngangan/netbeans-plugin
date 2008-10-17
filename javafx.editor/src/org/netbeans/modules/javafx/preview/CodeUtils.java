@@ -17,6 +17,7 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.util.Exceptions;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
@@ -270,7 +271,7 @@ public class CodeUtils {
         }
     } 
     
-    public static void moveToInner(AutoResizableDesktopPane jdp, Object frame) {
+    public static Dimension moveToInner(AutoResizableDesktopPane jdp, Object frame) {
         try {
             JInternalFrame intFrame = new JInternalFrame();
             if (intFrame.getUI().getClass() == WindowsInternalFrameUI.class) {
@@ -318,9 +319,11 @@ public class CodeUtils {
             jdp.setBackground(Color.WHITE);
             jdp.add(intFrame);
             jdp.setMinimumSize(intFrame.getSize());
+            return intFrame.getSize();
         } catch (Throwable th) {
             th.printStackTrace();
         }
+        return null;
     }
 
     private static JComponent parseSceneAndShapeObj(Object obj) {
