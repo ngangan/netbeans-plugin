@@ -388,9 +388,16 @@ public class Preview {
             int borderHeight = previewFrame.getHeight() - content.getHeight();
             int width = content.getWidth();
             int height = content.getHeight();
-            if (d.width > width) width = d.width;
-            if (d.height > height) height = d.height;
-            previewFrame.setSize(width + borderWidth + 2, height + borderHeight + 2);
+            boolean set = false;
+            if (d.width > width) {
+                width = d.width + 2;
+                set = true;
+            }
+            if (d.height > height) {
+                height = d.height + 2;
+                set = true;
+            }
+            if (set) previewFrame.setSize(width + borderWidth, height + borderHeight);
         }
 
         private class ExceptionAwareThreadGroup extends ThreadGroup {
