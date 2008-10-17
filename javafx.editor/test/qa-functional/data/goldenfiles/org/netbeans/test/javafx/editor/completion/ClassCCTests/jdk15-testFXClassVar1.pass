@@ -1,15 +1,10 @@
-Boolean
-Duration
 FXTestClass
 FXTestClass001
 FXTestClass002
 FXTestClass003
 FXTestClassVar1
+FXTestClassVar2
 Foo
-Integer
-Number
-Object
-String
 applications
 classes
 com
@@ -18,6 +13,7 @@ frame
 fxprj1
 imports
 java
+javacard
 javafx
 javax
 org

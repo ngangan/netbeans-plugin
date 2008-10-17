@@ -14,11 +14,13 @@ try
 var
 while
 Duration
+FX
 FXTestClass
 FXTestClass001
 FXTestClass002
 FXTestClass003
 FXTestClassVar1
+FXTestClassVar2
 Foo
 Object
 String
@@ -31,6 +33,7 @@ frame
 fxprj1
 imports
 java
+javacard
 javafx
 javax
 org

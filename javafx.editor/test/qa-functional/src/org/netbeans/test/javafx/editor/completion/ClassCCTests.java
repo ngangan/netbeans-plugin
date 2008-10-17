@@ -158,6 +158,18 @@ public class ClassCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
+    public void testFXClassVar2() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "var a = ", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClassVar2.fx",
+                6, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     public void testFXClass004() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter,
