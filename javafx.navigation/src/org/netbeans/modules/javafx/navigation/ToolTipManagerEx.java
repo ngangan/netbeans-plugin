@@ -732,7 +732,7 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
             JScrollPane scroll = new JScrollPane( content );
             scroll.setHorizontalScrollBarPolicy( JScrollPane.HORIZONTAL_SCROLLBAR_NEVER );
             add( scroll, new GridBagConstraints(0,0,1,1,1.0,1.0,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0) );
-            shortcut = new JLabel( NbBundle.getMessage( ToolTipManagerEx.class, "HINT_EnlargeJavaDocToolip", //NOI18N
+            shortcut = new JLabel( NbBundle.getMessage( ToolTipManagerEx.class, "HINT_EnlargeJavafxDocToolip", //NOI18N
                     Utilities.isMac() ? KeyEvent.getKeyText(KeyEvent.VK_META)+"+F1" : "Ctrl+F1" )  ); //NOI18N //NOI18N
             shortcut.setHorizontalAlignment( JLabel.CENTER );
             shortcut.setBorder( BorderFactory.createLineBorder(Color.black) );

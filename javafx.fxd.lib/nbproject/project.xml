@@ -45,6 +45,20 @@ made subject to such option by the copyright holder.
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/2">
             <code-name-base>org.netbeans.modules.javafx.fxd.lib</code-name-base>
             <module-dependencies/>
+            <public-packages>
+                <package>com.sun.javafx.runtime</package>
+                <package>com.sun.javafx.runtime.annotation</package>
+                <package>com.sun.javafx.tools.fxd</package>
+                <package>com.sun.javafx.tools.fxd.ai</package>
+                <package>com.sun.javafx.tools.fxd.ai.shape</package>
+                <package>com.sun.javafx.tools.fxd.container</package>
+                <package>com.sun.javafx.tools.fxd.container.builder</package>
+                <package>com.sun.javafx.tools.fxd.container.scene.fxd</package>
+                <package>com.sun.scenario.scenegraph</package>
+                <package>com.sun.scenario.scenegraph.fx</package>
+                <package>javafx.fxd</package>
+                <package>javafx.scene</package>
+            </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/fxd/lib/AI2JavaFX.jar</runtime-relative-path>
                 <binary-origin>external/javafx-fxd-netbeans-support/AI2JavaFX.jar</binary-origin>
@@ -65,20 +79,6 @@ made subject to such option by the copyright holder.
                 <runtime-relative-path>ext/fxd/lib/javafxgui.jar</runtime-relative-path>
                 <binary-origin>external/javafx-fxd-netbeans-support/javafxgui.jar</binary-origin>
             </class-path-extension>
-            <public-packages>
-                <package>com.sun.javafx.runtime</package>
-                <package>com.sun.javafx.runtime.annotation</package>
-                <package>com.sun.javafx.tools.fxd</package>
-                <package>com.sun.javafx.tools.fxd.ai</package>
-                <package>com.sun.javafx.tools.fxd.ai.shape</package>
-                <package>com.sun.javafx.tools.fxd.container</package>
-                <package>com.sun.javafx.tools.fxd.container.builder</package>
-                <package>com.sun.javafx.tools.fxd.container.scene.fxd</package>
-                <package>com.sun.scenario.scenegraph</package>
-                <package>com.sun.scenario.scenegraph.fx</package>
-                <package>javafx.fxd</package>
-                <package>javafx.scene</package>
-            </public-packages>
         </data>
     </configuration>
 </project>
