@@ -91,7 +91,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         resume();
 
         boolean navigatorShouldUpdate = ClassMemberPanel.getInstance() != null; // XXX set by navigator visible
-        boolean javadocShouldUpdate = JavadocTopComponent.shouldUpdate();
+        boolean javadocShouldUpdate = JavafxdocTopComponent.shouldUpdate();
 //        boolean declarationShouldUpdate = DeclarationTopComponent.shouldUpdate();
 
         if (isCancelled() || (!navigatorShouldUpdate && !javadocShouldUpdate)) {
@@ -261,9 +261,9 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private void setJavadoc(final ElementJavadoc javadoc) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JavadocTopComponent javadocTopComponent = JavadocTopComponent.findInstance();
-                if (javadocTopComponent != null && javadocTopComponent.isOpened()) {
-                    javadocTopComponent.setJavadoc(javadoc);
+                JavafxdocTopComponent javafxdocTopComponent = JavafxdocTopComponent.findInstance();
+                if (javafxdocTopComponent != null && javafxdocTopComponent.isOpened()) {
+                    javafxdocTopComponent.setJavadoc(javadoc);
                 }
             }
         });
@@ -405,7 +405,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             final ElementHandle[] eh = new ElementHandle[1];
             try {
                 eh[0]  = ElementHandle.create(e);
-            } catch (IllegalArgumentException iae) {
+            } catch (Exception ex) {
                 // can't convert to element handler (incomplete element)
             }
             if (eh[0] == null) {

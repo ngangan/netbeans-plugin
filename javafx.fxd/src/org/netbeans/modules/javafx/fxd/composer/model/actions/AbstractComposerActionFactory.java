@@ -45,17 +45,17 @@ import java.awt.event.MouseEvent;
 import javax.swing.Action;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
  * @author Pavel Benes
  */
 public abstract class AbstractComposerActionFactory implements ComposerActionFactory {
-    protected final FXDDataObject m_dObj;
+    protected final FXZDataObject m_dObj;
     protected       boolean       m_isBlocked;
 
-    protected AbstractComposerActionFactory(FXDDataObject dObj) {
+    protected AbstractComposerActionFactory(FXZDataObject dObj) {
         m_dObj = dObj;
     }
 
@@ -82,7 +82,7 @@ public abstract class AbstractComposerActionFactory implements ComposerActionFac
     public void updateActionState() {        
     }
 
-    protected FXDDataObject getDataObject() {
+    protected FXZDataObject getDataObject() {
         return m_dObj;
     }
     

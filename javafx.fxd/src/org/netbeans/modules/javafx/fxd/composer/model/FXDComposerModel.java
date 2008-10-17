@@ -7,7 +7,7 @@ package org.netbeans.modules.javafx.fxd.composer.model;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
@@ -22,7 +22,7 @@ public class FXDComposerModel {
     private boolean  m_showTooltip   = true;   
     private float    m_zoomRatio     = 1.0f;
             
-    public FXDComposerModel( FXDDataObject dObj) throws FileNotFoundException, IOException {
+    public FXDComposerModel( FXZDataObject dObj) throws FileNotFoundException, IOException {
         assert dObj != null;
         //m_dObj = dObj;
         m_fxzArchive = new FXZArchive(dObj);

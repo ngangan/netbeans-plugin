@@ -48,10 +48,12 @@ made subject to such option by the copyright holder.
             <public-packages>
                 <package>com.sun.javafx.runtime</package>
                 <package>com.sun.javafx.runtime.annotation</package>
+                <package>com.sun.javafx.tools.fxd</package>
+                <package>com.sun.javafx.tools.fxd.ai</package>
+                <package>com.sun.javafx.tools.fxd.ai.shape</package>
                 <package>com.sun.javafx.tools.fxd.container</package>
                 <package>com.sun.javafx.tools.fxd.container.builder</package>
                 <package>com.sun.javafx.tools.fxd.container.scene.fxd</package>
-                <package>com.sun.javafx.tools.fxd.container.scene.fxd1</package>
                 <package>com.sun.scenario.scenegraph</package>
                 <package>com.sun.scenario.scenegraph.fx</package>
                 <package>javafx.fxd</package>

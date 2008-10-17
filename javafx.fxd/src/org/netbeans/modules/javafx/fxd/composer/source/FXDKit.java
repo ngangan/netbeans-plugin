@@ -7,11 +7,7 @@ package org.netbeans.modules.javafx.fxd.composer.source;
 
 import java.util.Map;
 import javax.swing.Action;
-import javax.swing.text.Document;
 import javax.swing.text.TextAction;
-import org.netbeans.editor.DrawLayer;
-import org.netbeans.editor.DrawLayerFactory;
-import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorKit;
 
 /**

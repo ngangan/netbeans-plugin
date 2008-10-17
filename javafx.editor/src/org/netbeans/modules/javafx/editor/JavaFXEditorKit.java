@@ -146,7 +146,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             this.previewAction = previewAction;
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
                     "org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {

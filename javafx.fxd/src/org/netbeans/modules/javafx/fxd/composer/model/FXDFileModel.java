@@ -5,7 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import javafx.fxd.FXDNode;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -18,26 +17,28 @@ import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelStateListener;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import com.sun.javafx.tools.fxd.FXDNode;
 /**
  *
  * @author Pavel Benes
  */
 public class FXDFileModel implements DocumentListener, DocumentModelStateListener {   
-    public static final String DOCUMENT_ROOT_ELEMENT_TYPE = "ROOT_ELEMENT";
+    public static final String DOCUMENT_ROOT_ELEMENT_TYPE = "ROOT_ELEMENT";  //NOI18N
     
-//    private static final String PROP_FILE_MODEL = "prop-fxd-file-model";
-    
-    public static final String FXD_DOC       = "doc";
-    public static final String FXD_HEADER    = "header";
-    public static final String FXD_NODE      = "node";
-    public static final String FXD_ATTRIBUTE = "attr";
+    public static final String FXD_DOC       = "doc";      //NOI18N
+    public static final String FXD_HEADER    = "header";   //NOI18N
+    public static final String FXD_NODE      = "node";     //NOI18N
+    public static final String FXD_ATTRIBUTE = "attr";     //NOI18N
     
     private final    FXZArchive     m_archive;
     private final    DocumentModel  m_docModel;
     private volatile boolean        m_changed = false;
-        
+
+    public interface ElementVisitor {
+        public boolean visitElement( String elemType, String elemName, AttributeSet attrs) throws Exception;
+    }
+    
     public interface ElementAttrVisitor {
         public boolean visitAttribute( String attrName, String attrValue);
     }
@@ -48,7 +49,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         m_archive  = archive;
         m_docModel = docModel;
         m_docModel.getDocument().addDocumentListener(this);
-        System.err.println("File model created.");
+        System.err.println("File model created."); //NOI18N
     }
           
     BaseDocument getDocument() {
@@ -60,9 +61,9 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     }
 
     public synchronized void updateModel() {
-        assert SwingUtilities.isEventDispatchThread() == false : "Model update cannot be called in AWT thread.";
+        assert SwingUtilities.isEventDispatchThread() == false : "Model update cannot be called in AWT thread.";  //NOI18N
         if ( m_changed) {
-            System.err.println("Forcing model update");
+            System.err.println("Forcing model update"); //NOI18N
             m_docModel.forceUpdate();
         }
     }
@@ -77,8 +78,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         //TODO Use better construction
         return (FXDNode) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0));
     }    
-    
-    
+        
     protected DocumentElement findElement( final DocumentElement de, final String id) {
         //TODO Do not use the String id, use number instead and use fact that the sequence is monotonuous
         DocumentElement result = null;
@@ -109,7 +109,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     }
     
     protected void documentChanged( DocumentEvent e) {
-        System.err.println("Document changed.");
+        System.err.println("Document changed.");   //NOI18N
         m_archive.incrementChangeTicker();
         m_changed = true;
     }
@@ -121,7 +121,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         return String.valueOf(de.getStartOffset());
     }    
         
-    public static DocumentModel getDocumentModel( final FXDDataObject dObj) {
+    public static DocumentModel getDocumentModel( final FXZDataObject dObj) {
         FXDFileModel fm = dObj.getDataModel().getFXDContainer().getFileModel();
         return fm != null ? fm.getDocumentModel() : null;
     }
@@ -146,7 +146,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     
     private static final int MAX_ATTR_VALUE_LENGTH = 50;
     
-    public static void visitAttributes( final DocumentElement de, final ElementAttrVisitor visitor) {
+    public static void visitAttributes( final DocumentElement de, final ElementAttrVisitor visitor, boolean shortValues) {
         assert de != null;
     
         AttributeSet attrs = de.getAttributes();
@@ -164,8 +164,8 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
 //                    continue;
 //                }
                 
-                if ( value.length() > MAX_ATTR_VALUE_LENGTH) {
-                    value = value.substring(0, MAX_ATTR_VALUE_LENGTH-3) + "...";
+                if ( shortValues && value.length() > MAX_ATTR_VALUE_LENGTH) {
+                    value = value.substring(0, MAX_ATTR_VALUE_LENGTH-3) + "...";   //NOI18N
                 }
                 if (!visitor.visitAttribute(name, value)) {
                     return;
@@ -174,6 +174,21 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         }
     }    
     
+    public void visitElements( ElementVisitor visitor) throws Exception {
+        visitElements( m_docModel.getRootElement(), visitor);
+    }
+    
+    private boolean visitElements( DocumentElement de, ElementVisitor visitor) throws Exception {
+        visitor.visitElement( de.getType(), de.getName(), de.getAttributes());
+        int num = de.getElementCount();
+        for ( int i = 0; i < num; i++) {
+            if (!visitElements( de.getElement(i), visitor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+        
     public static boolean isEqual( final AttributeSet attrs, final Map<String,String> map) {
         int attrNum = attrs.getAttributeCount();
         
@@ -187,7 +202,8 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
                     String attrValue2 = map.get(attrName);
 
                     if ( !isEqual( attrValue1, attrValue2)) {
-                        System.err.println( String.format( "ATTR_CHANGED: %s, '%s' != '%s'", attrName, attrValue1, attrValue2));
+                        System.err.println( String.format( "ATTR_CHANGED: %s, '%s' != '%s'", //NOI18N
+                                attrName, attrValue1, attrValue2));  
                         return false;
                     }
        //         }
@@ -220,7 +236,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     }
 
     public void updateFinished() {
-        System.err.println("Model update finished.");
+        System.err.println("Model update finished."); //NOI18N
         m_changed = false;
     }
 }

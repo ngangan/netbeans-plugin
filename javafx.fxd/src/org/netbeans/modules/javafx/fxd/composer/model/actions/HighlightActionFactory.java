@@ -49,7 +49,7 @@ import javax.swing.Action;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElementOutline;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
@@ -111,7 +111,7 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
                 final StringBuilder sb = new StringBuilder();
                     sb.append("<html>&nbsp;");  //NOI18N
                     sb.append( m_highlighted.getName());
-                    sb.append( "&nbsp;{<br/>"); //NOI18N
+                    sb.append( "&nbsp;{<br>"); //NOI18N
                 
                 m_highlighted.visitAttributes( new FXDFileModel.ElementAttrVisitor() {
                     public boolean visitAttribute(String attrName, String attrValue) {
@@ -119,11 +119,12 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
                         sb.append( attrName);
                         sb.append( ": "); //NOI18N
                         sb.append( attrValue);
-                        sb.append( "<br/>"); //NOI18N
+                        sb.append( "<br>"); //NOI18N
                         return true;
                     }
                 });
                 sb.append("}"); //NOI18N
+                sb.append("</html>"); //NOI18N
                 text = sb.toString();
             }
 
@@ -183,7 +184,7 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
     private final ToggleHighlightAction  m_highlightAction = new ToggleHighlightAction();
     private final ToggleTooltipAction    m_tooltipAction   = new ToggleTooltipAction();
         
-    public HighlightActionFactory(FXDDataObject dObj) {
+    public HighlightActionFactory(FXZDataObject dObj) {
         super(dObj);
     }
         

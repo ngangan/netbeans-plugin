@@ -48,7 +48,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElementOutline;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
@@ -58,8 +58,8 @@ import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
  * @author Pavel Benes
  */
 public final class SelectActionFactory extends AbstractComposerActionFactory {
-    private static final Color SELECTION_BODY_COLOR = new Color( 64, 64, 255, 64);
-    private static final Color SELECTION_OUTLINE_COLOR = new Color( 64, 64, 255, 128);
+   // private static final Color SELECTION_BODY_COLOR = new Color( 64, 64, 255, 64);
+   // private static final Color SELECTION_OUTLINE_COLOR = new Color( 64, 64, 255, 128);
     
     public static interface SelectionListener {
         public void selectionChanged( FXDElement [] newSelection, FXDElement [] oldSelection);
@@ -162,7 +162,7 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
     private int                           m_selectionHistoryIndex = -1;
     private       SelectAction            m_activeAction;
             
-    SelectActionFactory(FXDDataObject dObj) {
+    SelectActionFactory(FXZDataObject dObj) {
         super(dObj);
         m_selectionListeners = new ArrayList<SelectionListener>();
     }
@@ -285,7 +285,8 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
     }
     
     private void updateSelectionHistoryButtons() {
-        System.err.println(String.format("Updating buttons: <%d, %d>", m_selectionHistoryIndex, m_selectionHistory.size()));
+        System.err.println(String.format("Updating buttons: <%d, %d>",  //NOI18N
+                m_selectionHistoryIndex, m_selectionHistory.size()));
         m_navigateBackAction.setEnabled( m_selectionHistoryIndex > 0);
         m_navigateForwardAction.setEnabled( m_selectionHistoryIndex < m_selectionHistory.size() - 1);
     }    

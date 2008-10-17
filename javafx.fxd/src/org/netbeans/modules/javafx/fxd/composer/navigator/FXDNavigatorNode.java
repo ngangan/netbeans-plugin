@@ -220,7 +220,7 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                     text.append("<font color=888888>");  //NOI18N
                 }
             }
-            String id = (String) getDocumentElement().getAttributes().getAttribute("id");
+            String id = (String) getDocumentElement().getAttributes().getAttribute("id"); //NOI18N
             if (id != null /*&& !id.startsWith(JSONObject.INJECTED_ID_PREFIX)*/) {
                 text.append(id);
                 text.append(':');
@@ -240,11 +240,11 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
             if ( FXDNavigatorTree.showAttributes) {
                 attribsVisibleText = getAttribsText(ATTRIBS_MAX_LEN);
             } else {
-                attribsVisibleText = "";
+                attribsVisibleText = ""; //NOI18N
             }
             
             if(attribsVisibleText.trim().length() > 0) {
-                text.append(" ");
+                text.append(" ");  //NOI18N
                 text.append(attribsVisibleText);
             }
             text.append(html ? "</font>" : ""); //NOI18N
@@ -276,7 +276,7 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
             return visibleText;
         }*/
         
-        return m_de.getName() + " [unknown content]";
+        return m_de.getName() + " [unknown content]"; //NOI18N
     }
     
     public String getToolTipText() {
@@ -349,12 +349,12 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                 sb.append(", ");  //NOI18N
                 return sb.length() < maxSize;
             }
-        });
+        }, true);
 
         int len = sb.length();
         if ( len > maxSize) {
             sb.setLength(maxSize);
-            sb.append( "...");
+            sb.append( "...");  //NOI18N
         } else {
             sb.setLength(Math.max(len-2, 0));
         }
@@ -488,9 +488,9 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                 m_children.remove(tn);
                 //notify treemodel - do that in event dispath thread
                 m_nodeTree.getTreeModel().nodesWereRemoved(FXDNavigatorNode.this, new int[]{tnIndex}, new Object[]{tn});
-            } else if(debug) System.out.println("Warning: TreeNode for removed element doesn't exist!!!");
+            } else if(debug) System.out.println("Warning: TreeNode for removed element doesn't exist!!!");  //NOI18N
         } 
-        if(debug) System.out.println("<<<EVENT finished (node removed)");
+        if(debug) System.out.println("<<<EVENT finished (node removed)");  //NOI18N
     }
         
     private void unmarkNodeAsError(final FXDNavigatorNode tna) {
@@ -506,12 +506,12 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
     }
     
     public void attributesChanged(DocumentElementEvent e) {
-        if(debug)System.out.println("Attributes of treenode " + this + " has changed.");
+        if(debug)System.out.println("Attributes of treenode " + this + " has changed."); //NOI18N
         m_nodeTree.getTreeModel().nodeChanged(FXDNavigatorNode.this);
     }
     
     public void contentChanged(DocumentElementEvent e) {
-        if(debug) System.out.println("treenode " + this + " changed.");
+        if(debug) System.out.println("treenode " + this + " changed.");   //NOI18N
         m_nodeTree.getTreeModel().nodeChanged(FXDNavigatorNode.this);
     }
 

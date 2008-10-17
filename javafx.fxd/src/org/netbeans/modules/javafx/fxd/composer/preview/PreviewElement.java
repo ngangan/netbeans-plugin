@@ -20,8 +20,8 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.openide.util.Lookup;
 
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.FilterNode;
 import org.openide.util.Mutex;
@@ -34,16 +34,16 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public final class PreviewElement extends TopComponent implements MultiViewElement, Runnable {
-    protected final FXDEditorSupport m_edSup;
+    protected final FXZEditorSupport m_edSup;
     private   final PreviewImagePanel    m_imgPanel;
     private   final PreviewToolbar       m_toolBar;
     private   final PreviewStatusBar     m_statusBar;
     //protected       SGParent        m_root = null;
     private Lookup m_lookup = null;
     
-    public PreviewElement( final FXDEditorSupport edSup) {
+    public PreviewElement( final FXZEditorSupport edSup) {
         m_edSup = edSup;   
-        FXDDataObject dObj = (FXDDataObject) edSup.getDataObject();
+        FXZDataObject dObj = (FXZDataObject) edSup.getDataObject();
 
         setLayout( new BorderLayout());
         m_statusBar = new PreviewStatusBar();
@@ -180,7 +180,7 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
     }
         
     private final class FXDPreviewCookie implements SelectionCookie {
-        public void updateSelection(final FXDDataObject doj, FXDElement elem, boolean doubleClick) {
+        public void updateSelection(final FXZDataObject doj, FXDElement elem, boolean doubleClick) {
             if ( elem.isVisible()) {
                 System.err.println( String.format("Selecting the element '%s' in the visual view #1", elem));
                 doj.getController().getSelectionModel().setSelection(elem, true);

@@ -43,7 +43,7 @@ package org.netbeans.modules.javafx.navigation.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
-import org.netbeans.modules.javafx.navigation.JavadocTopComponent;
+import org.netbeans.modules.javafx.navigation.JavafxdocTopComponent;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
@@ -53,15 +53,15 @@ import org.openide.windows.TopComponent;
  * 
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  */
-public class JavadocAction extends AbstractAction {
+public class JavafxdocAction extends AbstractAction {
 
-    public JavadocAction() {
-        super(NbBundle.getMessage(JavadocAction.class, "CTL_JavadocAction"));
-        putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(JavadocTopComponent.ICON_PATH, true)));
+    public JavafxdocAction() {
+        super(NbBundle.getMessage(JavafxdocAction.class, "CTL_JavafxdocAction"));
+        putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(JavafxdocTopComponent.ICON_PATH, true)));
     }
 
     public void actionPerformed(ActionEvent evt) {
-        TopComponent win = JavadocTopComponent.findInstance();
+        TopComponent win = JavafxdocTopComponent.findInstance();
         win.open();
         win.requestActive();
     }

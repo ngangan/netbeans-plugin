@@ -45,12 +45,9 @@ made subject to such option by the copyright holder.
     
     <folder name="Services">
         <folder name="MIMEResolver">
-            <!--
-            <file name="SVGPaletteItemResolver.xml" url="SVGPaletteItemResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.mobility.svgcore.Bundle"/>
-                <attr name="position" intvalue="250"/>
+            <file name="FXZResolver.xml" url="FXZResolver.xml">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
             </file>
-            -->
             <file name="FXDResolver.xml" url="FXDResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
             </file>
@@ -58,10 +55,25 @@ made subject to such option by the copyright holder.
     </folder>
     
     <folder name="Loaders">
+<!--   
         <folder name="text">
             <folder name="x-fxd">                
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFileType.png"/>
-                <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFileType.png"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
+                <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
+                
+                <folder name="Actions">
+                    <file name="OpenAction.instance">
+                        <attr name="instanceClass" stringvalue="org.openide.actions.OpenAction"/>
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                </folder>
+            </folder>
+        </folder>
+-->
+        <folder name="multipart">
+            <folder name="x-fxz">                
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
+                <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
                 
                 <folder name="Actions">
                     <file name="OpenAction.instance">
@@ -88,12 +100,34 @@ made subject to such option by the copyright holder.
                 </folder>                
             </folder>
         </folder>
+        <folder name="multipart">
+            <folder name="x-fxz">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <file name="EditorKit.instance">
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
+                    <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
+                    <attr name="beaninfo" boolvalue="false"/>
+                </file>
+                
+                <folder name="DocumentModel">
+                    <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
+                </folder>                
+            </folder>
+        </folder>
+
     </folder>
     
     <folder name="Navigator">
         <folder name="Panels">
+            <!--
             <folder name="text">
                 <folder name="x-fxd">
+                    <file name="org-netbeans-modules-javafx-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
+                </folder>
+            </folder>
+-->
+            <folder name="multipart">
+                <folder name="x-fxz">
                     <file name="org-netbeans-modules-javafx-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
                 </folder>
             </folder>

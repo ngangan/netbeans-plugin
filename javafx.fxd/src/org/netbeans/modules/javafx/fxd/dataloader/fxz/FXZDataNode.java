@@ -37,7 +37,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -51,28 +51,28 @@ import org.openide.util.RequestProcessor;
 
 /**
  *
- * @author answer
+ * @author Pavel Benes
  */
 
-public class FXDDataNode extends DataNode {
-    private static final String IMAGE_ICON_BASE = "org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFileType.png"; //NOI18N
+public final class FXZDataNode extends DataNode {
+    private static final String IMAGE_ICON_BASE = "org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"; //NOI18N
     
-    public FXDDataNode(DataObject obj) {
+    public FXZDataNode(DataObject obj) {
         this(obj, new DummyChildren());
     }
     
-    private FXDDataNode(DataObject obj, DummyChildren c) {
+    private FXZDataNode(DataObject obj, DummyChildren c) {
         super(obj, c);
         c.attachFXDNode(this);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
         
-    private static Children childrenFor(FileObject jar) {
-        if (!FileUtil.isArchiveFile(jar)) {
+    private static Children childrenFor(FileObject fxzArchive) {
+        if (!FileUtil.isArchiveFile(fxzArchive)) {
             // Maybe corrupt, etc.
             return Children.LEAF;
         }
-        FileObject root = FileUtil.getArchiveRoot(jar);
+        FileObject root = FileUtil.getArchiveRoot(fxzArchive);
         if (root != null) {
             return DataFolder.findFolder(root).createNodeChildren(DataFilter.ALL);
         } else {
@@ -87,7 +87,7 @@ public class FXDDataNode extends DataNode {
      */
     final static class DummyChildren extends Children implements Runnable {
 
-        private FXDDataNode node;
+        private FXZDataNode node;
 
         @Override
         protected void addNotify() {
@@ -96,7 +96,7 @@ public class FXDDataNode extends DataNode {
             RequestProcessor.getDefault().post(this);
         }
 
-        private void attachFXDNode(FXDDataNode fxdDataNode) {
+        private void attachFXDNode(FXZDataNode fxdDataNode) {
             this.node = fxdDataNode;
         }
 
