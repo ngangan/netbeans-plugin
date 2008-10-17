@@ -349,7 +349,7 @@ public class ImportCCTests extends CompletionTestPerformer {
     }
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(ImportCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(ImportCCTests.class).enableModules(".*").clusters(".*"));
     }
     
 }

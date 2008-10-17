@@ -112,7 +112,7 @@ public class ApplicationCCTests extends CompletionTestPerformer {
     /** For individual running of this class */
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(ApplicationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(ApplicationCCTests.class).enableModules(".*").clusters(".*"));
     }
     
 }

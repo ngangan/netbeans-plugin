@@ -247,7 +247,7 @@ public class FrameCCTests extends CompletionTestPerformer {
     }
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(FrameCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(FrameCCTests.class).enableModules(".*").clusters(".*"));
     }
 
 }

@@ -122,7 +122,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
     }
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(DeclarationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(DeclarationCCTests.class).enableModules(".*").clusters(".*"));
     }
 
 }
