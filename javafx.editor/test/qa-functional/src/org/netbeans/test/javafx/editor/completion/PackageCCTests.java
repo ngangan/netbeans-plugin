@@ -86,7 +86,7 @@ public class PackageCCTests extends CompletionTestPerformer {
     }
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(PackageCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(PackageCCTests.class).enableModules(".*").clusters(".*"));
     }
     
 }

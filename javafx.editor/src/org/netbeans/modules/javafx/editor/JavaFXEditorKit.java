@@ -146,7 +146,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
             this.previewAction = previewAction;
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
                     "org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("enable-fx-preview-execution"));
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -402,12 +402,12 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     caret.setDot(dotPos);
                     return dotPos;
                 } catch (BadLocationException ex) {
-                    log.severe("Excetion throw during InsertBreakAction. " + ex);
+                    log.severe("Excetion thrown during InsertBreakAction. " + ex);
                 }
             } else {
                 try {
                     JFXTokenId id = BracketCompletion.tokenAt(doc, dotPos);
-                    if (JFXTokenId.isComment(id)) {
+                    if (id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) {
                         doc.insertString(dotPos, "* ", null);
                         caret.setDot(dotPos);
                         return dotPos+3;
@@ -415,7 +415,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                         return processRawString(doc, caret);
                     }
                 } catch (BadLocationException ex) {
-                    log.severe("Excetion throw during InsertBreakAction. " + ex);
+                    log.severe("Excetion thrown during InsertBreakAction. " + ex);
                 }
             }
             return null;

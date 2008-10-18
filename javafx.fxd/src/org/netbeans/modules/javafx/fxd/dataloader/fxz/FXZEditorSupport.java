@@ -3,9 +3,8 @@
  *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
-import javafx.fxd.FXDContainer;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.swing.text.StyledDocument;
@@ -23,18 +22,19 @@ import org.openide.filesystems.FileObject;
 import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
 import org.openide.windows.CloneableTopComponent;
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 
 /**
  *
  * @author Pavel Benes
  */
-public final class FXDEditorSupport extends DataEditorSupport implements OpenCookie, EditorCookie, EditCookie {
+public final class FXZEditorSupport extends DataEditorSupport implements OpenCookie, EditorCookie, EditCookie {
     private static final long  serialVersionUID = 1L;
         
     protected CloneableTopComponent    m_mvtc  = null;
     protected  MultiViewDescription [] m_views = null;
     
-    public FXDEditorSupport( FXDDataObject dObj) {
+    public FXZEditorSupport( FXZDataObject dObj) {
         super(dObj, new FXDEnv(dObj));
     }
         
@@ -42,7 +42,7 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
     public StyledDocument openDocument() throws IOException {
         StyledDocument doc = super.openDocument();
         synchronized(this) {
-            ((FXDDataObject) getDataObject()).getDataModel().getFXDContainer().documentOpened(doc);
+            ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().documentOpened(doc);
         }
         return doc;
     }
@@ -53,7 +53,7 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
             super.saveDocument();
         }
         try {
-            ((FXDDataObject) getDataObject()).getDataModel().getFXDContainer().save();
+            ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().save();
         } catch( IOException e) {
             throw e;
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
     protected boolean notifyModified() {
         boolean retValue = super.notifyModified();
         if ( retValue) {
-            FXDDataObject dObj = (FXDDataObject) getDataObject();
+            FXZDataObject dObj = (FXZDataObject) getDataObject();
             dObj.m_ic.add(env);
         }
         return retValue;
@@ -74,7 +74,7 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
     @Override
     protected void notifyUnmodified() {
         super.notifyUnmodified();
-            FXDDataObject dObj = (FXDDataObject) getDataObject();
+            FXZDataObject dObj = (FXZDataObject) getDataObject();
             dObj.m_ic.remove(env);
     }
     
@@ -112,18 +112,18 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
         
     private static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
         
-        public FXDEnv( FXDDataObject obj) {
+        public FXDEnv( FXZDataObject obj) {
             super(obj);
         }
 
         public void save() throws IOException {
-            FXDEditorSupport ed = (FXDEditorSupport)this.findCloneableOpenSupport();
+            FXZEditorSupport ed = (FXZEditorSupport)this.findCloneableOpenSupport();
             ed.saveDocument();
         }
         
         @Override
         public InputStream inputStream() throws IOException {
-            FXDContainer container = ((FXDDataObject)getDataObject()).getDataModel().getFXDContainer();
+            FXDContainer container = ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer();
             return container.open();
         }        
         
@@ -134,7 +134,7 @@ public final class FXDEditorSupport extends DataEditorSupport implements OpenCoo
 
         @Override
         protected FileLock takeLock() throws IOException {
-            return ((FXDDataObject)getDataObject()).getPrimaryEntry().takeLock();
+            return ((FXZDataObject)getDataObject()).getPrimaryEntry().takeLock();
         }
     }
 }

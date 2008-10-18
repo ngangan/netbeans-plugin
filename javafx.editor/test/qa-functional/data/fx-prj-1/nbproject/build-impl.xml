@@ -64,9 +64,16 @@ is divided into following sections:
         </condition>
         <property name="work.dir" value="${basedir}"/>
         <condition property="no.deps">
-            <and>
-                <istrue value="${no.dependencies}"/>
-            </and>
+            <istrue value="${no.dependencies}"/>
+        </condition>
+        <condition else="" property="draggable.arg" value="-draggable">
+            <istrue value="${applet.draggable}"/>
+        </condition>
+        <condition else="" property="pack200.arg" value="-pack200">
+            <istrue value="${jnlp.packEnabled}"/>
+        </condition>
+        <condition else="" property="sign.arg" value="-sign">
+            <istrue value="${jnlp.signed}"/>
         </condition>
         <property name="javadoc.preview" value="true"/>
         <property name="source.encoding" value="${file.encoding}"/>
@@ -121,14 +128,9 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file.-->
     </target>
     <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-        <condition else="" property="cp.arg" value="-cp">
-            <length length="0" string="${javac.classpath}" trim="true" when="greater"/>
-        </condition>
         <exec executable="${platform.fxhome}/bin/javafxpackager${binary.extension}" failonerror="true">
             <arg value="-src"/>
             <arg value="${src.dir}"/>
-            <arg value="${cp.arg}"/>
-            <arg path="${javac.classpath}"/>
             <arg value="-workdir"/>
             <arg file="${build.dir}"/>
             <arg value="-d"/>
@@ -146,6 +148,11 @@ is divided into following sections:
             <arg value="-p"/>
             <arg value="${javafx.profile}"/>
             <arg value="-v"/>
+            <arg value="${draggable.arg}"/>
+            <arg value="${pack200.arg}"/>
+            <arg value="${sign.arg}"/>
+            <arg value="-cp"/>
+            <arg path="${javac.classpath}"/>
         </exec>
     </target>
     <target name="-post-compile">
@@ -209,6 +216,9 @@ is divided into following sections:
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
+            <sourcepath>
+                <path path="${src.dir}"/>
+            </sourcepath>
         </nbjavafxstart>
     </target>
     <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
@@ -216,6 +226,9 @@ is divided into following sections:
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
+            <sourcepath>
+                <path path="${src.dir}"/>
+            </sourcepath>
         </nbjavafxstart>
     </target>
     <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">

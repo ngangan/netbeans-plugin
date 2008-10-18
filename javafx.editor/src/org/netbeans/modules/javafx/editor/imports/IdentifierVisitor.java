@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.*;
+import com.sun.tools.javafx.tree.JFXTree;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
 import javax.lang.model.element.Element;
@@ -62,6 +63,7 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         } else {
             elements.add(element);
         }
+//        super.visitIdentifier(node, elements);
         return elements;
     }
 
@@ -79,5 +81,17 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
 
     private Element toElement(Tree node) {
         return info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
+    }
+
+    @Override
+    public Collection<Element> visitFunctionValue(FunctionValueTree node, Collection<Element> elements) {
+        JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+        JFXTree tree = (JFXTree) path.getParentPath().getLeaf();
+        if (tree.getGenType() == SyntheticTree.SynthType.COMPILED) {
+            elements.add(toElement(node.getType()));
+        }
+        super.visitFunctionValue(node, elements);
+        return elements;
+
     }
 }

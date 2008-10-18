@@ -11,8 +11,8 @@ import javax.swing.JComponent;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Mutex;
 import org.openide.windows.TopComponent;
@@ -22,16 +22,16 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 final class ArchiveElement extends TopComponent implements MultiViewElement, Runnable {
-    protected final FXDEditorSupport         m_edSup;
+    protected final FXZEditorSupport         m_edSup;
     private         MultiViewElementCallback m_callback;
     private         ArchivePanel             m_panel;
     private         ArchiveToolbar           m_toolbar;
     
-    public ArchiveElement( final FXDEditorSupport edSup) {
+    public ArchiveElement( final FXZEditorSupport edSup) {
         m_edSup = edSup;   
         //FXDDataObject dObj = ;
 
-        m_panel = new ArchivePanel(((FXDDataObject) edSup.getDataObject()).getDataModel().getFXDContainer());
+        m_panel = new ArchivePanel(((FXZDataObject) edSup.getDataObject()).getDataModel().getFXDContainer());
         setLayout( new BorderLayout());
         add( m_panel, BorderLayout.CENTER);
     }

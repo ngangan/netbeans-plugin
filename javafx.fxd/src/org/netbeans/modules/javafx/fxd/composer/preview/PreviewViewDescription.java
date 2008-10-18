@@ -10,8 +10,8 @@ import java.awt.Image;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -23,11 +23,11 @@ import org.openide.windows.TopComponent;
 public class PreviewViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private transient final FXDEditorSupport m_edSup;
+    private transient final FXZEditorSupport m_edSup;
     //private transient PreviewElement      m_preview = null;
 
 
-    public PreviewViewDescription(final FXDEditorSupport edSup) {
+    public PreviewViewDescription(final FXZEditorSupport edSup) {
         m_edSup = edSup;
     }
     
@@ -56,6 +56,6 @@ public class PreviewViewDescription implements MultiViewDescription, Serializabl
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(FXDDataObject.class, "LBL_MULTIVIEW_PREVIEW_TITLE"); //NOI18N
+        return NbBundle.getMessage(PreviewViewDescription.class, "LBL_MULTIVIEW_PREVIEW_TITLE"); //NOI18N
     }
 }

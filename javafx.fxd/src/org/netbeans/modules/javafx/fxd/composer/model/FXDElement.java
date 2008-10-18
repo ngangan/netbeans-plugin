@@ -43,14 +43,14 @@ package org.netbeans.modules.javafx.fxd.composer.model;
 import com.sun.scenario.scenegraph.SGNode;
 import java.awt.geom.Rectangle2D;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
  * @author Pavel Benes
  */
 public final class FXDElement {
-    private final FXDDataObject       m_dObj;
+    private final FXZDataObject       m_dObj;
     private final String              m_id;
     private       FXDElementOutline   m_outline   = null;
     private       boolean             m_isDeleted = false;
@@ -71,7 +71,7 @@ public final class FXDElement {
     private       float               m_tempScaleY      = 1;
     private       float               m_tempRotate      = 0;
 */
-    public FXDElement(final FXDDataObject dObj, final String id) {
+    public FXDElement(final FXZDataObject dObj, final String id) {
         assert dObj != null;
         assert id != null;
         
@@ -91,7 +91,7 @@ public final class FXDElement {
     }
     
     public void visitAttributes( FXDFileModel.ElementAttrVisitor visitor) {
-        FXDFileModel.visitAttributes( getDocumentElement(), visitor);
+        FXDFileModel.visitAttributes( getDocumentElement(), visitor, true);
     }
     
     //TODO should be private
@@ -107,7 +107,7 @@ public final class FXDElement {
         DocumentElement de = getDocumentElement();
         if ( de != null) {
             de = de.getParentElement();
-            System.err.println("Parent: " + de);
+            System.err.println("Parent: " + de); //NOI18N
             if ( de != null) {
                 String id = FXDFileModel.getIdAttribute(de);
                 return new FXDElement(m_dObj, id);

@@ -51,8 +51,8 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
 
@@ -183,7 +183,7 @@ public abstract class AbstractFXDAction extends AbstractAction implements Presen
         try {
             String iconFileName = getCleanMessage( bundleKey).trim();
             String iconPath = ICON_PATH_PREFIX + iconFileName;
-            Image img = Utilities.loadImage(iconPath);
+            Image img = ImageUtilities.loadImage(iconPath);
             assert img != null : "Icon not found: " + iconPath; //NOI18N
             return new ImageIcon(img);
         } catch( MissingResourceException e) {

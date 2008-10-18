@@ -128,7 +128,7 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                 final File file = chooser.getSelectedFile();
                 if (!file.isFile()) {
                     DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
-                            NbBundle.getMessage(ArchivePanel.class, "ERROR_NOT_A_FILE", file),
+                            NbBundle.getMessage(ArchivePanel.class, "ERROR_NOT_A_FILE", file), //NOI18N
                             NotifyDescriptor.Message.WARNING_MESSAGE));
                 } else {
                     try {
@@ -137,8 +137,8 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
-                                NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_READ_FILE", ex.getLocalizedMessage()),
-                                NotifyDescriptor.Message.ERROR_MESSAGE));
+                                NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_READ_FILE",  //NOI18N
+                                ex.getLocalizedMessage()), NotifyDescriptor.Message.ERROR_MESSAGE));
                     }
                 }
             }
@@ -187,5 +187,4 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     private javax.swing.JLabel labelTotalSize;
     private javax.swing.JTable tableContent;
     // End of variables declaration//GEN-END:variables
-
 }

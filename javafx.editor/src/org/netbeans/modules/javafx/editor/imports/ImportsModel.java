@@ -176,6 +176,7 @@ public final class ImportsModel {
         if (isLocal(e)) return true;
         for (ModelEntry entry : entries) {
             if (entry != null && entry.includes(e.asType().toString())) {
+                entry.setUsage();
                 return true;
             }
         }
@@ -201,11 +202,13 @@ public final class ImportsModel {
                     int offset = startPos;
                     boolean first = true;
                     for (ModelEntry entry : entries) {
-                        logger.info("\t" + entry.toImportStatement());
-                        String text = (first ? "" : "\n") + entry.toImportStatement();
-                        first = false;
-                        doc.insertString(offset, text, null);
-                        offset += text.length();
+                        if (entry.isUsed()) {
+                            logger.info("\t" + entry.toImportStatement());
+                            String text = (first ? "" : "\n") + entry.toImportStatement();
+                            first = false;
+                            doc.insertString(offset, text, null);
+                            offset += text.length();
+                        }
                     }
                     reformat = Reformat.get(doc);
                     reformat.lock();
@@ -298,6 +301,10 @@ public final class ImportsModel {
 
     }
 
+    void append(ModelEntry modelEntry) {
+        entries.add(modelEntry);
+    }
+
     private static class FixItemComparator implements Comparator<FixItem> {
         public static final Collator collator = Collator.getInstance();
         public static final Comparator<FixItem> instance = new FixItemComparator();
@@ -314,11 +321,12 @@ public final class ImportsModel {
         }
     }
 
-    private static class ModelEntry implements Comparable<ModelEntry> {
+    static class ModelEntry implements Comparable<ModelEntry> {
         String type;
         ImportTree tree;
         boolean stared;
         boolean dStared;
+        boolean isUsed = false;
 
         private ModelEntry(ImportTree tree) {
             this.tree = tree;
@@ -336,23 +344,38 @@ public final class ImportsModel {
             }
         }
 
-        private ModelEntry(String type) {
+        ModelEntry(String type) {
             this.type = type;
             verifyType();
+            isUsed = true;
         }
 
         boolean includes(String type) {
+            if (type == null) return false;
             if (dStared) {
                 return type.startsWith(this.type);
             } else if (stared) {
                 int dotIndex = type.lastIndexOf('.');
                 return dotIndex > -1 && this.type.equals(type.substring(0, dotIndex));
             }
-            return this.type.equals(type) || this.type.endsWith(type);
+            return this.type.equals(type) || canBeThisType(type);
+        }
+
+        private boolean canBeThisType(String type) {
+            int index = this.type.lastIndexOf('.');
+            return index > 0 && this.type.substring(index).equals(type);
         }
 
         String toImportStatement() {
             return "import " + type + (stared ? ".*" : "") + (dStared ? ".**" : "") + ";";
+        }
+
+        void setUsage() {
+            isUsed = true;
+        }
+
+        boolean isUsed() {
+            return isUsed;
         }
 
         public boolean equals(Object o) {

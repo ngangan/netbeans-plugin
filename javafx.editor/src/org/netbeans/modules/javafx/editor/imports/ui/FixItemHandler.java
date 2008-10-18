@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -39,56 +39,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.javafx.editor.imports.ui;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
-import org.openide.nodes.AbstractNode;
-import org.openide.nodes.Children;
-import org.openide.nodes.Node;
+import javax.swing.text.JTextComponent;
 
 /**
- * This class contains helper methods necessary to write extensions
- * of the java data support.
- *
- * @author Jan Pokorsky
+ * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
+ * @todo documentation
  */
-public final class FXDDataSupport {
-
-    /** singleton */
-    private FXDDataSupport() {
-    }
-    
-    /**
-     * In case you write own data loader you should use this entry for the
-     * <code>.java</code> file object. The entry provides functionality like
-     * create from template.
-     * @param mdo the data object this entry will belong to
-     * @param javafile the file object for the entry
-     * @return the java entry
-     */
-    /*
-    public static MultiDataObject.Entry createJavaFileEntry(MultiDataObject mdo, FileObject fxfile) {
-        return new FXDDataLoader.FXDFileEntry(mdo, fxfile);
-    }
-     * */
-
-    /**
-     * Creates a default node for a particular java file object.
-     * @param javafile the java file object to represent
-     * @return the node
-     */
-    public static Node createFXDNode(FileObject javafile) {
-        try {
-            DataObject jdo = DataObject.find(javafile);
-            return new FXDDataNode(jdo);
-        } catch (DataObjectNotFoundException ex) {
-            Logger.getLogger(FXDDataSupport.class.getName()).log(Level.INFO, null, ex);
-            return new AbstractNode(Children.LEAF);
-        }
-    }
-
+public interface FixItemHandler {
+    public void defaultAction(JTextComponent component, FixItem item);
 }

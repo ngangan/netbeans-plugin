@@ -9,8 +9,7 @@ import java.awt.EventQueue;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -22,10 +21,10 @@ import org.openide.windows.TopComponent;
 public class ArchiveViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
         
-    private final FXDEditorSupport m_support;
+    private final FXZEditorSupport m_support;
     private       ArchiveElement   m_elem;
 
-    public ArchiveViewDescription(FXDEditorSupport ed) {
+    public ArchiveViewDescription(FXZEditorSupport ed) {
         m_support = ed;
     }
 
@@ -51,7 +50,7 @@ public class ArchiveViewDescription implements MultiViewDescription, Serializabl
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(FXDDataObject.class, "LBL_MULTIVIEW_ARCHIVE_TITLE");
+        return NbBundle.getMessage(ArchiveViewDescription.class, "LBL_MULTIVIEW_ARCHIVE_TITLE"); //NOI18N
     }
 
     public HelpCtx getHelpCtx() {

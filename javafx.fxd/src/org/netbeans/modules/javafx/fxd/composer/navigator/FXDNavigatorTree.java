@@ -53,7 +53,7 @@ import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
@@ -67,12 +67,12 @@ final class FXDNavigatorTree extends JTree {
     static boolean showAttributes     = true;
     static boolean showIdOnly         = false;
     
-    private final FXDDataObject     m_dObj;
+    private final FXZDataObject     m_dObj;
     private final DefaultTreeModel  m_treeModel;    
     private       boolean           m_firstPaint;
     private       FXDElement        m_selected = null;
 
-    public FXDNavigatorTree(FXDDataObject dObj, final DocumentModel docModel) throws Exception {
+    public FXDNavigatorTree(FXZDataObject dObj, final DocumentModel docModel) throws Exception {
         super();
         m_dObj = dObj;
         
@@ -144,9 +144,9 @@ final class FXDNavigatorTree extends JTree {
                 if ( node == null) {
                     List<DocumentElement> parents = FXDFileModel.getParentChain(de);
                     int parentIndex = parents.size() - 1;
-                    assert parentIndex >= 0 : "The element must have at least one parent";
+                    assert parentIndex >= 0 : "The element must have at least one parent"; //NOI18N
                     node = rootNode.findNode( parents.get(parentIndex));
-                    assert node != null : "Tree node not found";
+                    assert node != null : "Tree node not found"; //NOI18N
 
                     while( parentIndex > 0) {
                         FXDNavigatorNode childNode = node.getChildByElemenent(parents.get(--parentIndex));

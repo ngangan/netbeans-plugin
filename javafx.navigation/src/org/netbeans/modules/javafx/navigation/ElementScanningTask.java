@@ -218,16 +218,27 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         if (e == null) {
             return;
         }
-        List<? extends Element> members = info.getElements().getAllMembers(e);
-        for (Element m : members) {
-            if (canceled.get()) {
-                return;
-            }
-            Description d = element2description(m, e, parentDescription.isInherited, info, pos);
-            if (null != d) {
-                parentDescription.subs.add(d);
-                if (m instanceof TypeElement && !d.isInherited) {
-                    addMembers((TypeElement) m, d, info, pos);
+        List<? extends Element> members = null;
+        try {
+            members = info.getElements().getAllMembers(e);
+        // TODO this is temporary for debug
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            System.err.println("* e = " + e);
+            System.err.println("* e.getKind() = " + e.getKind());
+            System.err.println("* e.asType() = " + e.asType());
+        }
+        if (members != null) {
+            for (Element m : members) {
+                if (canceled.get()) {
+                    return;
+                }
+                Description d = element2description(m, e, parentDescription.isInherited, info, pos);
+                if (null != d) {
+                    parentDescription.subs.add(d);
+                    if (m instanceof TypeElement && !d.isInherited) {
+                        addMembers((TypeElement) m, d, info, pos);
+                    }
                 }
             }
         }
@@ -313,5 +324,4 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
         return res.longValue();
     }
-
 }

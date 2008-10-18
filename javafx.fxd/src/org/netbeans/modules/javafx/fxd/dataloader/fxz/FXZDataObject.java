@@ -37,7 +37,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
 import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
@@ -54,11 +54,13 @@ import org.openide.windows.TopComponent;
 
 /**
  *
- * @author answer
+ * @author Pavel Benes
  */
 
-public class FXDDataObject extends MultiDataObject implements Lookup.Provider {    
+public final class FXZDataObject extends MultiDataObject implements Lookup.Provider {     
     private static final long  serialVersionUID = 1L;
+    
+    public static final String FXZ_EXT = "fxz";  //NOI18N
 
     public static final int    TEXT_VIEW_INDEX    = 0;
     public static final int    VISUAL_VIEW_INDEX  = 1;
@@ -66,16 +68,16 @@ public class FXDDataObject extends MultiDataObject implements Lookup.Provider {
     
     final InstanceContent m_ic;
     private final     AbstractLookup        m_lookup;
-    private final     FXDEditorSupport      m_edSup;
+    private final     FXZEditorSupport      m_edSup;
     private transient FXDComposerModel      m_model = null;
     private transient FXDComposerController m_controller = null;
         
     
-    public FXDDataObject(FileObject pf, FXDDataLoader loader) throws DataObjectExistsException, IOException {
+    public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
         m_ic = new InstanceContent();
         m_lookup = new AbstractLookup(m_ic);
-        m_ic.add( m_edSup = new FXDEditorSupport(this));
+        m_ic.add( m_edSup = new FXZEditorSupport(this));
         m_ic.add(this);           
 //        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
     }
@@ -111,7 +113,7 @@ public class FXDDataObject extends MultiDataObject implements Lookup.Provider {
 
     @Override
     protected Node createNodeDelegate() {
-        return new FXDDataNode(this);
+        return new FXZDataNode(this);
     }
     
     @Override

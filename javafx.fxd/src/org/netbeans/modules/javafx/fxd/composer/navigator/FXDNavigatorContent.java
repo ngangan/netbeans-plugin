@@ -73,7 +73,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.nodes.Node.Cookie;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -101,7 +101,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
     
     private final JPanel                 emptyPanel;    
     private final JLabel                 msgLabel;    
-    private       FXDDataObject          peerDO = null;
+    private       FXZDataObject          peerDO = null;
     private       NavigatorContentPanel  navigatorPanel = null; 
     private       boolean                blockNotification = false;
         
@@ -127,8 +127,8 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
 
     private final WeakHashMap uiCache = new WeakHashMap();
     
-    public synchronized void navigate(final FXDDataObject dObj) throws Exception { 
-        System.err.println("Navigate: " + dObj);
+    public synchronized void navigate(final FXZDataObject dObj) throws Exception { 
+        System.err.println("Navigate: " + dObj);  //NOI18N
         if (dObj != peerDO) {
             if (peerDO != null) {
                 //peerDO.getSceneManager().removeSelectionListener(this);
@@ -141,7 +141,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
             if(panelWR != null) {
                 NavigatorContentPanel cp = (NavigatorContentPanel)panelWR.get();
                 if(cp != null) {
-                    System.out.println("panel is cached");
+                    System.out.println("panel is cached");  //NOI18N
                     //test if the document associated with the panel is the same we got now
                     if (cp.m_docModel == FXDFileModel.getDocumentModel(dObj)) {
                         cachedPanel = cp;
@@ -167,7 +167,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                         showWaitPanel();
                         while( FXDFileModel.getDocumentModel(dObj) == null) {
                             try {
-                                System.err.println("Waiting for document to come up ...");
+                                System.err.println("Waiting for document to come up ...");  //NOI18N
                                 Thread.sleep(5);
                             } catch (InterruptedException ex) {
                                 Exceptions.printStackTrace(ex);
@@ -180,7 +180,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                                 panel = new NavigatorContentPanel(dObj);
                                 uiCache.put(dObj, new WeakReference(panel));
                             } catch (Exception ex) {
-                                System.err.println(ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                                System.err.println(ex.getClass().getName() + " " + ex.getLocalizedMessage());  //NOI18N
                                 ex.printStackTrace();
                                 //SceneManager.log(Level.SEVERE, "Navigator panel creation failed", ex); //NOI18N
                                 showCannotNavigate();
@@ -202,7 +202,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
         }
     }
 
-    synchronized void setContent( final FXDDataObject obj, final NavigatorContentPanel panel) {
+    synchronized void setContent( final FXZDataObject obj, final NavigatorContentPanel panel) {
         navigatorPanel = panel;
                 
         removeAll();
@@ -251,7 +251,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
     }
 
      private class NavigatorContentPanel extends JPanel implements FiltersManager.FilterChangeListener {
-        private final FXDDataObject    m_doj;
+        private final FXZDataObject    m_doj;
         private final DocumentModel    m_docModel;
         private final FXDNavigatorTree tree;
         private final FiltersManager   m_filters;
@@ -279,13 +279,13 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                 return FXDFileModel.getIdAttribute(de);
             } else {
                 //TODO
-                System.err.println("Deleted element found: " + de);
+                System.err.println("Deleted element found: " + de);  //NOI18N
                 //SceneManager.log(Level.SEVERE, "Deleted element found: " + de); //NOI18N
                 return null;
             }
         }
         
-        public NavigatorContentPanel(FXDDataObject doj) throws Exception {
+        public NavigatorContentPanel(FXZDataObject doj) throws Exception {
             m_doj = doj;
             setLayout(new BorderLayout());
             
@@ -465,14 +465,14 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowAttributes"),     //NOI18N
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowAttributesTip"),     //NOI18N
                     FXDNavigatorTree.showAttributes,
-                    new ImageIcon(org.openide.util.Utilities.loadImage("org/netbeans/modules/javafx/fxd/composer/resources/showAttribs.png")), //NOI18N
+                    new ImageIcon(org.openide.util.ImageUtilities.loadImage("org/netbeans/modules/javafx/fxd/composer/resources/showAttribs.png")), //NOI18N
                     null
             );
             desc.addFilter(ID_FILTER,
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowId"),     //NOI18N
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowIdTip"),     //NOI18N
                     FXDNavigatorTree.showIdOnly,
-                    new ImageIcon(org.openide.util.Utilities.loadImage("org/netbeans/modules/javafx/fxd/composer/resources/filterSignificant.png")), //NOI18N
+                    new ImageIcon(org.openide.util.ImageUtilities.loadImage("org/netbeans/modules/javafx/fxd/composer/resources/filterSignificant.png")), //NOI18N
                     null
             );
             

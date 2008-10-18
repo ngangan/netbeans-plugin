@@ -86,6 +86,18 @@ public class ImportCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
+    public void testFXImportJava2() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "jav", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJava2.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
 // /*   Fails
     public void testFXImportJavaFX() throws Exception {
         new CompletionTestCase(this).test(
@@ -347,9 +359,22 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
+
+    public void testFXImportJavaFXS() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "import javafx.s", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXS.fx",
+                5, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(ImportCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(ImportCCTests.class).enableModules(".*").clusters(".*"));
     }
     
 }

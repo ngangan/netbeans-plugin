@@ -4,18 +4,12 @@
 package org.netbeans.lib.javafx.lexer;
 
 import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javafx.util.MsgSym;
-
-
-
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+
 import java.util.HashMap;
+import java.util.Map;
 public class v4Lexer extends AbstractGeneratedLexerV4 {
     public static final int LAZY=39;
     public static final int COMMA=85;
@@ -6937,9 +6931,18 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
 
     static {
         int numStates = DFA53_transitionS.length;
+        Map<String, short[]> map = new HashMap<String, short[]>(numStates);
         DFA53_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA53_transition[i] = DFA.unpackEncodedString(DFA53_transitionS[i]);
+            String transition = DFA53_transitionS[i];
+            short[] shorts;
+            if (map.containsKey(transition)) {
+                shorts = map.get(transition);
+            } else {
+                shorts = DFA.unpackEncodedString(transition);
+                map.put(transition, shorts);
+            }
+            DFA53_transition[i] = shorts;
         }
     }
 

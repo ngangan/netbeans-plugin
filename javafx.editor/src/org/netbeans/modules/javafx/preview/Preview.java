@@ -41,6 +41,7 @@ package org.netbeans.modules.javafx.preview;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -272,7 +273,7 @@ public class Preview {
             } else {
                 acTread.executeOnEDT(new Runnable() {
                     public void run() {
-                        CodeUtils.moveToInner(desktopPane, window);
+                        checkSize(CodeUtils.moveToInner(desktopPane, window));
                     }
                 });
             }
@@ -380,6 +381,24 @@ public class Preview {
             Object obj = CodeUtils.run(_context, cl);
             if (obj != null) thiss.processObject(obj);
         }
+        
+        void checkSize(Dimension d) {
+            Container content = previewFrame.getContentPane();
+            int borderWidth = previewFrame.getWidth() - content.getWidth();
+            int borderHeight = previewFrame.getHeight() - content.getHeight();
+            int width = content.getWidth();
+            int height = content.getHeight();
+            boolean set = false;
+            if (d.width > width) {
+                width = d.width + 2;
+                set = true;
+            }
+            if (d.height > height) {
+                height = d.height + 2;
+                set = true;
+            }
+            if (set) previewFrame.setSize(width + borderWidth, height + borderHeight);
+        }
 
         private class ExceptionAwareThreadGroup extends ThreadGroup {
             private boolean skip = false;
@@ -406,7 +425,7 @@ public class Preview {
                         }
                     });
                     try {
-                        Thread.sleep(12000);
+                        Thread.sleep(20000);
                     } catch (InterruptedException ex) {
                         interrupt();
                     }
@@ -466,7 +485,7 @@ public class Preview {
             window.removeWindowListener(this);
             acTread.executeOnEDT(new Runnable() {
                 public void run() {
-                    CodeUtils.moveToInner(desktopPane, window);
+                    checkSize(CodeUtils.moveToInner(desktopPane, window));
                 }
             });
         }
@@ -585,6 +604,5 @@ public class Preview {
     private static String CNAC = "createNewAppContext";                     // NOI18N
     private static String SAST = "sun.awt.SunToolkit";                      // NOI18N
     private static String DESIGN_PREVIEW = "Design Preview";                // NOI18N
-    private static String GET_WINDOWS = "getWindows";                       // NOI18N
     private static String EDT_HANGS = "Preview cancelled due to problems in previewed code.";                      // NOI18N
 }

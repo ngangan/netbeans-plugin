@@ -120,9 +120,22 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 12, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
+
+    public void testFXTopLvlVar3() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "var C6 = Color.rgb( ", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "declarations/TopLvlVar3.fx",
+                5, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(DeclarationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(DeclarationCCTests.class).enableModules(".*").clusters(".*"));
     }
 
 }

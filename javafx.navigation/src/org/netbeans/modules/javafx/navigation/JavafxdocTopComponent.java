@@ -55,21 +55,21 @@ import org.openide.windows.WindowManager;
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  * @author Anton Chechel - javafx modifications
  */
-public class JavadocTopComponent extends TopComponent {
+public class JavafxdocTopComponent extends TopComponent {
 
-    private static final Logger LOGGER = Logger.getLogger(JavadocTopComponent.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JavafxdocTopComponent.class.getName());
     
-    private static JavadocTopComponent instance;
+    private static JavafxdocTopComponent instance;
     /** path to the icon used by the component and its open action */
     public static final String ICON_PATH = "org/netbeans/modules/javafx/navigation/resources/javadoc_action.png";
     
-    private static final String PREFERRED_ID = "JavadocTopComponent";
+    private static final String PREFERRED_ID = "JavafxdocTopComponent";
     
     private DocumentationScrollPane documentationPane;
     
-    private JavadocTopComponent() {
-        setName(NbBundle.getMessage(JavadocTopComponent.class, "CTL_JavadocTopComponent"));
-        setToolTipText(NbBundle.getMessage(JavadocTopComponent.class, "HINT_JavadocTopComponent"));
+    private JavafxdocTopComponent() {
+        setName(NbBundle.getMessage(JavafxdocTopComponent.class, "CTL_JavafxdocTopComponent"));
+        setToolTipText(NbBundle.getMessage(JavafxdocTopComponent.class, "HINT_JavafxdocTopComponent"));
         setIcon(Utilities.loadImage(ICON_PATH, true));
         
         documentationPane = new DocumentationScrollPane( false );
@@ -95,25 +95,25 @@ public class JavadocTopComponent extends TopComponent {
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link findInstance}.
      */
-    public static synchronized JavadocTopComponent getDefault() {
+    public static synchronized JavafxdocTopComponent getDefault() {
         if (instance == null) {
-            instance = new JavadocTopComponent();
+            instance = new JavafxdocTopComponent();
         }
         return instance;
     }
     
     /**
-     * Obtain the JavadocTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the JavafxdocTopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized JavadocTopComponent findInstance() {
+    public static synchronized JavafxdocTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
             LOGGER.log(Level.WARNING, 
                        "Cannot find MyWindow component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof JavadocTopComponent) {
-            return (JavadocTopComponent)win;
+        if (win instanceof JavafxdocTopComponent) {
+            return (JavafxdocTopComponent)win;
         }
         LOGGER.log(Level./* Shut up! Logged dozens of times in every session. */FINE,
                 "There seem to be multiple components with the '" + PREFERRED_ID +
@@ -161,7 +161,7 @@ public class JavadocTopComponent extends TopComponent {
     final static class ResolvableHelper implements Serializable {
         private static final long serialVersionUID = 1L;
         public Object readResolve() {
-            return JavadocTopComponent.getDefault();
+            return JavafxdocTopComponent.getDefault();
         }
     }
     

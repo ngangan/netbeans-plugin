@@ -109,10 +109,70 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
 
+    public void testFXApplication02() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "for (num in ", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication2.fx",
+                5, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
+    public void testFXApplication03() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "Timeline{}.", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication3.fx",
+                5, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
+    public void testFXApplication04() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication4.fx",
+                5, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
+    public void testFXApplication05() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication5.fx",
+                7, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
+    public void testFXApplication06() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication6.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     /** For individual running of this class */
     public static Test suite() {
         return NbModuleSuite.create(
-                NbModuleSuite.createConfiguration(ApplicationCCTests.class).enableModules(".*").clusters("ide.*|java.*|javafx.*"));
+                NbModuleSuite.createConfiguration(ApplicationCCTests.class).enableModules(".*").clusters(".*"));
     }
     
 }

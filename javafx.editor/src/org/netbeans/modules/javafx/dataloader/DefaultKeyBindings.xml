@@ -63,4 +63,7 @@ made subject to such option by the copyright holder.
     
     <bind actionName="java-next-marked-occurrence" key="O-DOWN"/>
     <bind actionName="java-prev-marked-occurrence" key="O-UP"/>
+    <bind actionName="toggle-fx-preview-execution" key="OS-P"/>
+    <bind actionName="toggle-reset-fx-preview-execution" key="OS-R"/>
+    <bind actionName="print-fx-preview" key="DOS-P"/>
 </bindings>

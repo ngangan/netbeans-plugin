@@ -7,11 +7,11 @@ package org.netbeans.modules.javafx.fxd.composer.model;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.util.Enumeration;
-import javafx.fxd.FXDElement;
-import javafx.fxd.FXDNode;
-import javafx.fxd.FXDNodeArray;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
+import com.sun.javafx.tools.fxd.FXDElement;
+import com.sun.javafx.tools.fxd.FXDNode;
+import com.sun.javafx.tools.fxd.FXDNodeArray;
 
 /**
  *
@@ -68,7 +68,7 @@ final class DocumentElementWrapper {
                                 }
                             }
                         }
-                        System.err.println("Attribute " + name + " not found on the element " + m_de.getName() + "!");
+                        System.err.println("Attribute " + name + " not found on the element " + m_de.getName() + "!"); //NOI18N
                     }
                     return null;
                 }
@@ -89,7 +89,7 @@ final class DocumentElementWrapper {
 
         public Enumeration<FXDElement> children() {
             //TODO Implement
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException("Not supported yet."); //NOI18N
         }
     }
     
@@ -116,7 +116,7 @@ final class DocumentElementWrapper {
         }
 
         public Enumeration<FXDElement> children() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            throw new UnsupportedOperationException("Not supported yet."); //NOI18N
         }        
     }
 
@@ -126,7 +126,7 @@ final class DocumentElementWrapper {
         } else if ( FXDDocumentModelProvider.FXD_ATTRIBUTE_ARRAY.equals(de.getType())) {
             return new FXDNodeArrayWrapper(de);
         } else {
-            throw new RuntimeException( "Unknown DocumentElement type: " + de.getType());
+            throw new RuntimeException( "Unknown DocumentElement type: " + de.getType()); //NOI18N
         }
     }
 }

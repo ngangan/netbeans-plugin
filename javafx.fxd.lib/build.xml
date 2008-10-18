@@ -47,7 +47,6 @@ made subject to such option by the copyright holder.
 
         <mkdir dir="external"/>
         <get src="${javafx-fxd-netbeans-support.zip.url}" dest="external/javafx-fxd-netbeans-support.zip" usetimestamp="true" verbose="true"/> 
-
         <unzip src="external/javafx-fxd-netbeans-support.zip" dest="external" />
         <mkdir dir="external/javafx-fxd-netbeans-support"/>
         <move todir="external/javafx-fxd-netbeans-support" flatten="true">

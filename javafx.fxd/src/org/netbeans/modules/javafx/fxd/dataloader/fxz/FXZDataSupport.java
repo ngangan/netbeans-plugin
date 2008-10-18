@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,13 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
+ * Contributor(s):
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,52 +37,58 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
- * Contributor(s):
- * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
-import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObjectExistsException;
-import org.openide.loaders.MultiDataObject;
-import org.openide.loaders.UniFileLoader;
-import org.openide.util.NbBundle;
+import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.nodes.AbstractNode;
+import org.openide.nodes.Children;
+import org.openide.nodes.Node;
 
 /**
+ * This class contains helper methods necessary to write extensions
+ * of the java data support.
  *
- * @author answer
+ * @author Pavel Benes
  */
-public class FXDDataLoader extends UniFileLoader {
-    
-    public static final String REQUIRED_MIME = "text/x-fxd"; //NOI18N
-    
-    private static final long serialVersionUID = 1L;
-    
-    public FXDDataLoader() {
-        super("org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject"); //NOI18N
+public final class FXZDataSupport {
+
+    /** singleton */
+    private FXZDataSupport() {
     }
     
-    @Override
-    protected String defaultDisplayName() {
-        return NbBundle.getMessage(FXDDataLoader.class, "LBL_FXD_loader_name"); //NOI18N
+    /**
+     * In case you write own data loader you should use this entry for the
+     * <code>.java</code> file object. The entry provides functionality like
+     * create from template.
+     * @param mdo the data object this entry will belong to
+     * @param javafile the file object for the entry
+     * @return the java entry
+     */
+    /*
+    public static MultiDataObject.Entry createJavaFileEntry(MultiDataObject mdo, FileObject fxfile) {
+        return new FXDDataLoader.FXDFileEntry(mdo, fxfile);
     }
-    
-    @Override
-    protected void initialize() {
-        super.initialize();
-        getExtensions().addMimeType(REQUIRED_MIME);
+     * */
+
+    /**
+     * Creates a default node for a particular java file object.
+     * @param javafile the java file object to represent
+     * @return the node
+     */
+    public static Node createFXDNode(FileObject javafile) {
+        try {
+            DataObject jdo = DataObject.find(javafile);
+            return new FXZDataNode(jdo);
+        } catch (DataObjectNotFoundException ex) {
+            Logger.getLogger(FXZDataSupport.class.getName()).log(Level.INFO, null, ex);
+            return new AbstractNode(Children.LEAF);
+        }
     }
-    
-    protected MultiDataObject createMultiObject(FileObject primaryFile) throws DataObjectExistsException, IOException {
-        return new FXDDataObject(primaryFile, this);
-    }
-    
-    @Override
-    protected String actionsContext() {
-        return "Loaders/" + REQUIRED_MIME + "/Actions"; //NOI18N
-    }    
+
 }

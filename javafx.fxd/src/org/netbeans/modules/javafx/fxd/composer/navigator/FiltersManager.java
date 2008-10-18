@@ -159,7 +159,7 @@ final class FiltersManager implements Serializable {
             }
             
             if (result == null) {
-                throw new IllegalArgumentException("Filter " + filterName + " not found.");
+                throw new IllegalArgumentException("Filter " + filterName + " not found."); //NOI18N
             }
             return result.booleanValue();
         }
@@ -170,7 +170,7 @@ final class FiltersManager implements Serializable {
             
             int index = filterIndexForName(filterName);
             if (index < 0) {
-                throw new IllegalArgumentException("Filter " + filterName + " not found.");
+                throw new IllegalArgumentException("Filter " + filterName + " not found."); //NOI18N
             }
             // update both swing control and states map
             toggles.get(index).setSelected(value);

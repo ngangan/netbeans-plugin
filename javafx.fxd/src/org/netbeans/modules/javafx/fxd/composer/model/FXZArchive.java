@@ -5,12 +5,9 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
-import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import javafx.fxd.FXDNode;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -29,25 +27,28 @@ import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.javafx.fxd.composer.misc.ByteArrayBuffer;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileAlreadyLockedException;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
+import com.sun.javafx.tools.fxd.FXDNode;
+import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
+import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
 
 /**
  *
  * @author Pavel Benes
  */
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
-    private final    FXDDataObject            m_dObj;
+    private final    FXZDataObject            m_dObj;
     private final    List<FXZArchiveEntry>    m_entries;
     private          FXDFileModel             m_fileModel = null;
     private final    List<TableModelListener> m_tableListeners;
     private volatile int                      m_changeTicker = 0;  
     
     private final EntryValue [] m_values = new EntryValue[] {
-        new EntryValue( "name", String.class, true) {
+        new EntryValue( "name", String.class, true) {  //NOI18N
             @Override
             public Object getValue(int row) {
                 return m_entries.get(row).getName();
@@ -57,13 +58,13 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                 m_entries.get(row).setName( (String) value);
             }
         },
-        new EntryValue("size", String.class, false) {
+        new EntryValue("size", String.class, false) {  //NOI18N
             @Override
             public Object getValue(int row) {
                 return m_entries.get(row).getSize();
             }
         },
-        new EntryValue("compressedSize", String.class, false) {
+        new EntryValue("compressedSize", String.class, false) {  //NOI18N
             @Override
             public Object getValue(int row) {
                 return m_entries.get(row).getCompressedSize();
@@ -77,7 +78,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         protected final boolean isEditable;
         
         protected EntryValue( String name, Class clazz, boolean isEditable) {
-            this.displayName = NbBundle.getMessage( FXZArchive.class, "Table.column." + name);
+            this.displayName = NbBundle.getMessage( FXZArchive.class, "Table.column." + name); //NOI18N
             this.clazz       = clazz;
             this.isEditable  = isEditable;
         }
@@ -86,11 +87,24 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         public          void   setValue(int row, Object value) {};
     }
     
+    protected static final class CountingOutputStream extends OutputStream {
+        private int m_size = 0;
+        
+        @Override
+        public void write(int b) throws IOException {
+            m_size++;
+        }
+        
+        public int getSize() {
+            return m_size;
+        }        
+    }
+    
     protected final class FXZArchiveEntry {
-        protected       String          m_name;
-        protected       long            m_size;
-        protected       long            m_compressedSize;
-        protected final ByteArrayBuffer m_buffer;
+        protected String          m_name;
+        protected long            m_size;
+        protected long            m_compressedSize;
+        protected ByteArrayBuffer m_buffer;
 
         public FXZArchiveEntry( String name) throws IOException {
             m_name   = name;
@@ -103,20 +117,57 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             m_buffer = read( m_zip.getInputStream( entry), m_size);
         }
 
-        public FXZArchiveEntry( File file) throws FileNotFoundException, IOException {
+        public FXZArchiveEntry( final File file) throws FileNotFoundException, IOException {
             m_name = file.getName();
             m_size = file.length();
-            //TODO Do not read file int the AWT thread
-            FileInputStream fin = new FileInputStream(file);
-            BufferedInputStream bin = new BufferedInputStream( fin);
-            try {
-                m_buffer = read( bin, m_size);
-                //TODO Compute the compressed size in the other thread
-                m_compressedSize = -1;
-            } finally {
-                bin.close();
-                fin.close();
-            }
+            m_buffer = null;
+            m_compressedSize = -1;
+            
+            Thread th = new Thread() {
+                @Override
+                public void run() {
+                    FileInputStream     fin = null;
+                    BufferedInputStream bin = null;
+                    ZipOutputStream     zout = null;
+                            
+                    try {
+                        fin = new FileInputStream(file);
+                        bin = new BufferedInputStream( fin);
+                        int b;
+
+                        ByteArrayBuffer buffer = new ByteArrayBuffer( (int) m_size);
+                        CountingOutputStream cout = new CountingOutputStream();
+                        zout = new ZipOutputStream(cout);
+                        zout.setMethod( ZipOutputStream.DEFLATED);
+                    
+                        synchronized(FXZArchiveEntry.this) {
+                            zout.putNextEntry( new ZipEntry(m_name));
+                            while( (b=bin.read()) != -1) {
+                                buffer.write(b);
+                                zout.write(b);
+                            }
+                            m_buffer = buffer;
+                            zout.closeEntry();
+                            zout.finish();                                   
+                            m_compressedSize = cout.getSize();
+                            fireTableChanged( new TableModelEvent( FXZArchive.this, 0, m_entries.size()-1));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            fin.close();
+                            bin.close();
+                            zout.close();
+                        } catch( Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            };
+            
+            th.setPriority( Thread.MIN_PRIORITY);
+            th.start();
         }
                 
         public String getName() {
@@ -138,11 +189,11 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             return getSizeText(m_compressedSize);
         }
                 
-        public InputStream open() throws IOException {
+        public synchronized InputStream open() throws IOException {
             return m_buffer.newInputStream();
         }
         
-        public void write(OutputStream out) throws IOException {
+        public synchronized void write(OutputStream out) throws IOException {
             m_buffer.writeTo(out);
         }
         
@@ -167,7 +218,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
         
-    public FXZArchive( FXDDataObject dObj) throws FileNotFoundException, IOException {
+    public FXZArchive( FXZDataObject dObj) throws FileNotFoundException, IOException {
         super(FileUtil.toFile(dObj.getPrimaryFile()));
         m_dObj    = dObj;
         m_entries = new ArrayList<FXZArchiveEntry>();
@@ -185,7 +236,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                 ex.printStackTrace();
             }
         } else {
-            System.err.println("Document reopened!");
+            System.err.println("Document reopened!");  //NOI18N
         }
     }
     
@@ -220,7 +271,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                     m_entries.remove(index);
                     changed = true;
                 } else {
-                    throw new IllegalArgumentException( "The entry " + name + " not found!");
+                    throw new IllegalArgumentException( "The entry " + name + " not found!");  //NOI18N
                 }
             }
         } finally {
@@ -250,10 +301,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         doc.write(writer, 0, doc.getLength());
         writer.close();
         
-        System.err.println("Entry num: " + m_entries.size());
+        //System.err.println("Entry num: " + m_entries.size());
         for (FXZArchiveEntry entry : m_entries) {
             if ( !MAIN_CONTENT.equals( entry.m_name)) {
-                System.err.println("Adding entry: " + entry.getName());
+                //System.err.println("Adding entry: " + entry.getName());  //NOI18N
                 out = builder.add( entry.getName());
                 entry.write(out);
                 out.close();
@@ -286,7 +337,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             if (index != -1) {
                 return m_entries.get(index).open();
             } else {
-                throw new FileNotFoundException("The entry '" + entryName + "' not found!");
+                throw new FileNotFoundException("The entry '" + entryName + "' not found!"); //NOI18N
             }
         }
     }
@@ -340,7 +391,9 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     }   
     
     public static String getSizeText( long size) {
-        if ( size < 1024) {
+        if ( size < 0) {
+            return "Calculating...";  //NOI18N
+        } else if ( size < 1024) {
             return size + " Bytes"; //NOI18N
         } else if ( size < 1024 * 1024) {
             return (Math.round(size / 102.4) / 10.0) + " KBytes"; //NOI18N
