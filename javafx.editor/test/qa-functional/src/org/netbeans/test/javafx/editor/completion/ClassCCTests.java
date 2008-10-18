@@ -194,6 +194,42 @@ public class ClassCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
 
+    public void testFXClass006() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "class testit extends javafx.", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass006.fx",
+                7, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
+    public void testFXClass007() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "var b : ", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass007.fx",
+                19, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
+    public void testFXClass008() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "function Foo (a : ", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass008.fx",
+                19, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     public static Test suite() {
         return NbModuleSuite.create(
                 NbModuleSuite.createConfiguration(ClassCCTests.class).enableModules(".*").clusters(".*"));

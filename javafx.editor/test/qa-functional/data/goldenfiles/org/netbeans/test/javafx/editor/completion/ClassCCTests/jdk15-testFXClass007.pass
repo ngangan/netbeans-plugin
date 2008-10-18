@@ -1,18 +1,3 @@
-a
-equals
-getClass
-hashCode
-notify
-notifyAll
-toString
-wait
-wait
-wait
-bind
-false
-new
-null
-true
 FXTestClass
 FXTestClass001
 FXTestClass002
@@ -21,6 +6,7 @@ FXTestClass005
 FXTestClass006
 FXTestClass007
 FXTestClass008
+FXTestClass07
 FXTestClassVar1
 FXTestClassVar2
 Foo

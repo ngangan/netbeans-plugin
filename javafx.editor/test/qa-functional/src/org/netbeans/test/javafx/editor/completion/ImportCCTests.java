@@ -359,6 +359,19 @@ public class ImportCCTests extends CompletionTestPerformer {
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
+
+    public void testFXImportJavaFXS() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "import javafx.s", // what should be typed in the editor
+                false, 
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJavaFXS.fx",
+                5, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     public static Test suite() {
         return NbModuleSuite.create(
                 NbModuleSuite.createConfiguration(ImportCCTests.class).enableModules(".*").clusters(".*"));

@@ -1,9 +1,11 @@
-a
-attribute1
-attribute2
+
+
+C6
+<ARGS>
+color
+colorSEQ
+leftEyebrow
 equals
-function1
-function2
 getClass
 hashCode
 notify
@@ -12,3 +14,8 @@ toString
 wait
 wait
 wait
+bind
+false
+new
+null
+true

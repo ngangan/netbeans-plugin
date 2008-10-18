@@ -157,6 +157,18 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
 
+    public void testFXApplication06() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "applications/FXTestApplication6.fx",
+                21, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     /** For individual running of this class */
     public static Test suite() {
         return NbModuleSuite.create(
