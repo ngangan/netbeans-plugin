@@ -86,6 +86,18 @@ public class ImportCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
     
+    public void testFXImportJava2() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "jav", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "imports/FXTestImportJava2.fx",
+                3, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
 // /*   Fails
     public void testFXImportJavaFX() throws Exception {
         new CompletionTestCase(this).test(

@@ -182,6 +182,18 @@ public class ClassCCTests extends CompletionTestPerformer {
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
 
+    public void testFXClass005() throws Exception {
+        new CompletionTestCase(this).test(
+                outputWriter, logWriter,
+                "", // what should be typed in the editor
+                false,
+                getDataDir(),
+                "fx-prj-1",
+                "classes/FXTestClass005.fx",
+                8, // line number where the cursor should be
+                CompletionProvider.COMPLETION_QUERY_TYPE);
+    }
+
     public static Test suite() {
         return NbModuleSuite.create(
                 NbModuleSuite.createConfiguration(ClassCCTests.class).enableModules(".*").clusters(".*"));
