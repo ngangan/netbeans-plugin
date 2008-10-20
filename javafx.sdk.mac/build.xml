@@ -66,7 +66,12 @@ made subject to such option by the copyright holder.
 		</BuildLibDesc>
     </target>
 
-    <target name="nbm" depends="init,netbeans,-nbm-prompt-for-storepass" description="Build NBM archive.">
+    <target name="main">
+        <javac srcdir="instsrc" destdir="main"/>
+    </target>
+
+
+    <target name="nbm" depends="init,netbeans,-nbm-prompt-for-storepass,main" description="Build NBM archive.">
         <mkdir dir="build"/>
         <property name="nbm.target.cluster" value=""/> <!-- fallback -->
         <makenbm file="build/${nbm}"
@@ -81,6 +86,7 @@ made subject to such option by the copyright holder.
                  moduleauthor="${nbm.module.author}">
             <license file="${custom.license.file}"/>
             <signature keystore="${keystore}" storepass="${storepass}" alias="${nbm_alias}"/>
+            <main dir="main"/>
         </makenbm>
     </target>
 </project>
