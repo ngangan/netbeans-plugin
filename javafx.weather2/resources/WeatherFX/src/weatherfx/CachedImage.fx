@@ -32,29 +32,26 @@ package weatherfx;
 import javafx.scene.image.*;
 import java.lang.*;
 import javafx.lang.*;
+import javafx.util.Sequences;
 
 /**
  * @author breh
  */
 
-public class CachedImage {
-    
-    private static attribute urls:String[];
-    private static attribute images:Image[];
-    
-    public static function getCachedImage(url:String):Image {
-        var img:Image = null;
-        if (url != null) {
-            var imgIndex =  Sequences.indexOf(urls, url); 
-            if (imgIndex >=0) {
-                img = images[imgIndex];
-            } else {
-                img = Image {url:url};
-                insert url into urls;
-                insert img into images;
-            }
-        } 
-        return img;
-    }
+var urls:String[];
+var images:Image[];
 
+public function getCachedImage(url:String):Image {
+    var img:Image = null;
+    if (url != null) {
+        var imgIndex = Sequences.indexOf(urls, url);
+        if (imgIndex >=0) {
+            img = images[imgIndex];
+        } else {
+            img = Image {url:url};
+            insert url into urls;
+            insert img into images;
+        }
+    }
+    return img;
 }
