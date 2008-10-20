@@ -65,8 +65,13 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
     @Override
     protected void inside(JFXInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
-        if (LOGGABLE) log("inside InstantiateEnvironment " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n");
+        int end = (int) sourcePositions.getEndPosition(root, it);
+        if (LOGGABLE) log("inside InstantiateEnvironment " + it + 
+                " pos == " + pos +
+                " end == " + end +
+                "  offset == " + offset + "  prefix == " + prefix + "\n");
         if (pos < 0) {
+            if (LOGGABLE) log("  returing nothing because pos < 0");
             return;
         }
         String s = it.getIdentifier().toString();
