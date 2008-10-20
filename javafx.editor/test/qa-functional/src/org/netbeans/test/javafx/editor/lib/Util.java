@@ -10,7 +10,10 @@ package org.netbeans.test.javafx.editor.lib;
 
 import java.awt.Container;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.NewProjectNameLocationStepOperator;
@@ -30,6 +33,8 @@ import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JProgressBarOperator;
 import org.netbeans.jemmy.util.Dumper;
 import org.netbeans.jemmy.util.PNGEncoder;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
@@ -51,6 +56,17 @@ public class Util {
     public static String _placeCodeHere = Bundle.getStringTrimmed(_bundle, "placeCodeHere");
     public static String _logFileLocation = Bundle.getStringTrimmed(_bundle, "logFile");
 //    public static String LOGFILE = WORKDIR + FILE_SEPARATOR + _logFileLocation;
+
+    public static FileObject getTestFile(File dataDir, String projectName, String testFile) throws IOException, InterruptedException {
+        File projectFile = new File(dataDir, projectName);
+        FileObject project = FileUtil.toFileObject(projectFile);
+        FileObject test = project.getFileObject("src/" + testFile);
+
+        if (test == null)
+            throw new IllegalStateException("File not found: src/" + testFile + " in project " + projectName);
+
+        return test;
+    }
 
     /** Creates a JavaFX project */
     public static Boolean createProject(String name, String location) {
@@ -116,6 +132,10 @@ public class Util {
                 return false; //output window not found
             }
         }
+    }
+
+    public static void clearEditor() {
+
     }
 
     /** Inserts loaded code in the editor 'Place Code Here' comment. */
