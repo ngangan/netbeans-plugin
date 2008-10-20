@@ -91,7 +91,7 @@ public final class FixImportsLayout<T extends CompletionItem> {
     /*public*/ JTextComponent getEditorComponent() {
         return (editorComponentRef != null)
                 ? editorComponentRef.get()
-                : EditorRegistry.lastFocusedComponent();         
+                : EditorRegistry.lastFocusedComponent();
     }
 
     public void setEditorComponent(JTextComponent editorComponent) {
@@ -106,9 +106,11 @@ public final class FixImportsLayout<T extends CompletionItem> {
 
     @SuppressWarnings({"MethodWithTooManyParameters"})
     public void show(List<T> data, String title, int anchorOffset, ListSelectionListener lsl,
-                     String additionalItemsText, String shortcutHint, int selectedIndex) {
+                     String additionalItemsText, String shortcutHint, int selectedIndex) {        
         fixPopup.show(data, title, anchorOffset, lsl, additionalItemsText, shortcutHint, selectedIndex);
         fixPopup.completionScrollPane.requestFocus();
+//        updateLayout(fixPopup);
+//        fixPopup.getPopup().show();
     }
 
     public boolean hide() {
@@ -137,6 +139,9 @@ public final class FixImportsLayout<T extends CompletionItem> {
 
     public void processKeyEvent(KeyEvent evt) {
         if (fixPopup.isVisible()) {
+            if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                fixPopup.completionScrollPane.clearSelection();
+            }
             fixPopup.processKeyEvent(evt);
         }
     }
@@ -144,10 +149,7 @@ public final class FixImportsLayout<T extends CompletionItem> {
     void updateLayout(PopupWindow<T> popup) {
         // Make sure the popup returns its natural preferred size
         popup.resetPreferredSize();
-
-        if (popup == fixPopup) { // completion popup
-            popup.showAlongAnchorBounds();
-        }
+        popup.showAlongAnchorBounds();
     }
 
     PopupWindow<T> testGetCompletionPopup() {

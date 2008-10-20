@@ -42,6 +42,7 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import javax.lang.model.element.Element;
+import java.util.Collection;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -49,4 +50,5 @@ import javax.lang.model.element.Element;
  */
 public interface ImportResolver {
     void resolve(ImportsModel model, Element e);
+    void resolve(ImportsModel model, Collection<Element> elements);
 }

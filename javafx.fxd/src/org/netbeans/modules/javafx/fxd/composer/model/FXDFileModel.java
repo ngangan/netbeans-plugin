@@ -26,10 +26,11 @@ import com.sun.javafx.tools.fxd.FXDNode;
 public class FXDFileModel implements DocumentListener, DocumentModelStateListener {   
     public static final String DOCUMENT_ROOT_ELEMENT_TYPE = "ROOT_ELEMENT";  //NOI18N
     
-    public static final String FXD_DOC       = "doc";      //NOI18N
-    public static final String FXD_HEADER    = "header";   //NOI18N
-    public static final String FXD_NODE      = "node";     //NOI18N
-    public static final String FXD_ATTRIBUTE = "attr";     //NOI18N
+    public static final String FXD_DOC       = "doc";                //NOI18N
+    public static final String FXD_HEADER    = "header";             //NOI18N
+    public static final String FXD_NODE      = "node";               //NOI18N
+    public static final String FXD_ATTRIBUTE = "attr";               //NOI18N
+    public static final String FXD_ATTRIBUTE_ARRAY = "attr-array";   //NOI18N
     
     private final    FXZArchive     m_archive;
     private final    DocumentModel  m_docModel;

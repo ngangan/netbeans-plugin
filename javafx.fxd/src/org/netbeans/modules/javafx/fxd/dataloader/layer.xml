@@ -54,13 +54,9 @@ made subject to such option by the copyright holder.
         </folder>
     </folder>
     
-    <folder name="Loaders">
-<!--   
+    <folder name="Loaders">  
         <folder name="text">
-            <folder name="x-fxd">                
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
-                <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
-                
+            <folder name="x-fxd">      
                 <folder name="Actions">
                     <file name="OpenAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.OpenAction"/>
@@ -69,16 +65,17 @@ made subject to such option by the copyright holder.
                 </folder>
             </folder>
         </folder>
--->
+        
         <folder name="multipart">
             <folder name="x-fxz">                
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
-                <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
-                
                 <folder name="Actions">
                     <file name="OpenAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.OpenAction"/>
                         <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="GenerateUIStubAction.instance">
+                        <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.uistub.GenerateUIStubAction"/>
+                        <attr name="position" intvalue="105"/>
                     </file>
                 </folder>
             </folder>
@@ -119,13 +116,11 @@ made subject to such option by the copyright holder.
     
     <folder name="Navigator">
         <folder name="Panels">
-            <!--
             <folder name="text">
                 <folder name="x-fxd">
                     <file name="org-netbeans-modules-javafx-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
                 </folder>
             </folder>
--->
             <folder name="multipart">
                 <folder name="x-fxz">
                     <file name="org-netbeans-modules-javafx-fxd-composer-navigator-FXDNavigatorPanel.instance"/>

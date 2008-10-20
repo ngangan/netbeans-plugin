@@ -9,6 +9,7 @@ import java.awt.EventQueue;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataNode;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -37,7 +38,7 @@ public final class SourceViewDescription implements MultiViewDescription, Serial
     }
 
     public java.awt.Image getIcon() {
-        return null;
+        return FXZDataNode.FILE_IMAGE;
     }
 
     public String preferredID() {
@@ -49,7 +50,7 @@ public final class SourceViewDescription implements MultiViewDescription, Serial
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(SourceViewDescription.class, "LBL_MULVIEW_SOURCE_TITLE");
+        return NbBundle.getMessage(SourceViewDescription.class, "LBL_MULVIEW_SOURCE_TITLE");  //NOI18N
     }
 
     public HelpCtx getHelpCtx() {

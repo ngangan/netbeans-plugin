@@ -81,7 +81,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     @Override
     protected CloneableEditorSupport.Pane createPane() {
         MultiViewDescription [] views = getViewDescriptions();
-        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[0]);
+        int                     defView = ((FXZDataObject) getDataObject()).getDefaultView();
+        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[ defView]);
         return (CloneableEditorSupport.Pane)m_mvtc;
     }
     
