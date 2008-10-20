@@ -44,6 +44,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.api.JavafxcScope;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.logging.Level;
@@ -117,22 +118,9 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             if (LOGGABLE) log("   exp == " + exp);
             JavaFXTreePath expPath = new JavaFXTreePath(path, exp);
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
+            Element el = controller.getTrees().getElement(expPath);
             if (LOGGABLE) log("   type == " + type);
             if (type != null) {
-                /* XXX[pn]: getDefaultValue -> annotation -> not in JavaFX
-                if (parent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((FunctionDefinitionTree)parent).getDefaultValue() == fa) {
-                    if (LOGGABLE) log("   inside method");
-                    Element el = controller.getTrees().getElement(expPath);
-                    if (type.getKind() == TypeKind.ERROR && el.getKind().isClass()) {
-                        el = controller.getElements().getPackageElement(((TypeElement)el).getQualifiedName());
-                    }
-                    if (LOGGABLE) log("   el(1) == " + el);
-                    if (el instanceof PackageElement)
-                        addPackageContent((PackageElement)el, EnumSet.of(CLASS, ENUM), null, false);
-                    else if (type.getKind() == TypeKind.DECLARED)
-                        addMemberConstantsAndTypes((DeclaredType)type, el);
-                    return;
-                }*/
                 if (LOGGABLE) log("   type.getKind() == " + type.getKind());
                 switch (type.getKind()) {
                     case TYPEVAR:
@@ -152,10 +140,11 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     case LONG:
                     case SHORT:
                     case VOID:
-                        addMembers(type, true, true);
+                        JavafxcScope sc = controller.getTreeUtilities().getScope(path);
+                        final boolean isStatic = el != null && (el.getKind().isClass() || el.getKind().isInterface());
+                        addMembers(type, true, true, null,sc, true, !isStatic);
                         break;
                     default:
-                        Element el = controller.getTrees().getElement(expPath);
                         if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():""));
                         if (type.getKind() == TypeKind.ERROR && el != null && el.getKind().isClass()) {
                             if (LOGGABLE) log("   will try to find package named " + (((TypeElement)el).getQualifiedName()));

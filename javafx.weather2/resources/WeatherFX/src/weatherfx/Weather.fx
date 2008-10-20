@@ -32,13 +32,11 @@ package weatherfx;
 import javafx.scene.*;
 import javafx.scene.paint.*;
 import javafx.scene.effect.*;
-import javafx.scene.geometry.*;
+import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.scene.transform.*;
 import javafx.scene.image.*;
 import javafx.animation.*;
-
-import javafx.ext.swing.Canvas;
 
 import java.lang.System;
 
@@ -48,27 +46,27 @@ import java.lang.System;
  */
 public class Weather extends CustomNode {
     
-    private function rgba(r:Number, g:Number, b:Number, a:Number):Color {
+    function rgba(r:Number, g:Number, b:Number, a:Number):Color {
         return Color {red: r/255, green: g/255, blue: b/255, opacity: a/255};
         }     
     
-    private function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
+    function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
         return Affine{m00:m00 m01:m01 m02:m02 m10:m10 m11:m11 m12:m12};
         }    
         
-    private attribute outlineShape:Shape;
+    var outlineShape:Shape;
     
-    private function showWeather() {
+    function showWeather() {
         initializeWeatherScreen();
-        showWeatherTimeline.start();
+        showWeatherTimeline.play();
     }
     
-    private function initializeWeatherScreen():Void {
+    function initializeWeatherScreen():Void {
         loadTodayConditionImages();
         loadTomorrowConditionImages();
     }
     
-    private function loadTodayConditionImages() {
+    function loadTodayConditionImages() {
         if (todayConditionImages == null) {
             todayConditionImages = [
                 ImageView{},
@@ -83,7 +81,7 @@ public class Weather extends CustomNode {
     }
     
     
-    private function loadTomorrowConditionImages() {
+    function loadTomorrowConditionImages() {
         if (tomorrowConditionImages == null) {
             tomorrowConditionImages = [
                 ImageView{},
@@ -98,35 +96,35 @@ public class Weather extends CustomNode {
     }
     
     
-    private attribute todayConditionImages:Node[];    
-    private attribute tomorrowConditionImages:Node[];
+    var todayConditionImages:Node[];
+    var tomorrowConditionImages:Node[];
     
     
-    private function getConditionImageForCode(conditionImages:Node[],code:Integer):Node {
+    function getConditionImageForCode(conditionImages:Node[],code:Integer):Node {
         return conditionImages[code];
         }
 
     // business logic
-    public attribute weatherModel: WeatherModel on replace {
+    public var weatherModel: WeatherModel = WeatherModel {} on replace {
         showWeather();
     }
 
     // animation support 
-    private attribute todayNodesOpacity: Number = 1.0;
-    private attribute tomorrowNodesOpacity: Number = bind 1.0 - todayNodesOpacity;
+    var todayNodesOpacity: Number = 1.0;
+    var tomorrowNodesOpacity: Number = bind 1.0 - todayNodesOpacity;
     
-    private attribute lowsTriangleTransform:TransformHelper = TransformHelper {};
-    private attribute highsTriangleTransform:TransformHelper = TransformHelper {
+    var lowsTriangleTransform:TransformHelper = TransformHelper {};
+    var highsTriangleTransform:TransformHelper = TransformHelper {
         scale: bind lowsTriangleTransform.scale
         };
     
-    private attribute todayHighsTY:Number = 0.0;
-    private attribute todayLowsTY:Number = 0.0;
-    private attribute tomorrowHighsTY:Number = 0.0;
-    private attribute tomorrowLowsTY:Number = 0.0;
+    var todayHighsTY:Number = 0.0;
+    var todayLowsTY:Number = 0.0;
+    var tomorrowHighsTY:Number = 0.0;
+    var tomorrowLowsTY:Number = 0.0;
    
     
-        private attribute toTomorrowTimeline = Timeline {
+    var toTomorrowTimeline = Timeline {
         keyFrames: [
         KeyFrame {
             time: 0s
@@ -173,7 +171,7 @@ public class Weather extends CustomNode {
         };
 
     
-    private attribute toTodayTimeline = Timeline {
+    var toTodayTimeline = Timeline {
         keyFrames: [
             KeyFrame {
                 time: 0s
@@ -216,11 +214,11 @@ public class Weather extends CustomNode {
             ]
         };    
     
-    private attribute weatherScreenOpacity:Number = 0.0;
-    private attribute loadingScreenOpacity:Number = bind 1.0 - weatherScreenOpacity;
+    var weatherScreenOpacity:Number = 0.0;
+    var loadingScreenOpacity:Number = bind 1.0 - weatherScreenOpacity;
     
     
-    private attribute showWeatherTimeline = Timeline {
+    var showWeatherTimeline = Timeline {
         keyFrames: [
         KeyFrame {
             time: 0s
@@ -234,61 +232,61 @@ public class Weather extends CustomNode {
     };
     
     // interactive elements
-    private function createTodayClickableArea() {        
+    function createTodayClickableArea() {
         var today = Rectangle {
             //var: self
             x:0 y:129 width: 90 height:12
             fill: Color.WHITE
             opacity: 0.0
             onMousePressed: function (e) { 
-                toTodayTimeline.start();
+                toTodayTimeline.play();
                 }            
             };
         return today;
         }
     
     
-    private function createTomorrowClickableArea() {
+    function createTomorrowClickableArea() {
         return Rectangle {
             //var: self
             x:90 y:129 width: 145 height:12 
             fill: Color.WHITE
             opacity: 0.0
             onMousePressed: function (e) {
-                toTomorrowTimeline.start();                
+                toTomorrowTimeline.play();
                 }        
             };
         }
     
 
-    private function createTextShadow():Effect {
+    function createTextShadow():Effect {
         return DropShadow {offsetX:3 offsetY:3 radius: 18 color: Color.WHITE};
     }
     
-    private function createSmallStuffBlackShadow():Effect {
+    function createSmallStuffBlackShadow():Effect {
         return DropShadow {offsetX:3 offsetY:3 radius: 12 color: Color.GRAY};
     }
         
-    private function createMainTempShadow():Effect {
+    function createMainTempShadow():Effect {
         return DropShadow {offsetX:3 offsetY:3 radius: 12};
     }        
     
     // graphics defintion
-    protected function create():Node { 
+    override function create():Node {
         Group {
             clip: Rectangle {x:0 y:0 width: 245 height: 84}
             //clip: Clip { shape: outlineShape}    
             content: [
             Group {
-                transform: Transform.translate(10,1)
+                transforms: Transform.translate(10,1)
                 opacity: bind loadingScreenOpacity
                 content: LoadingScreen {}
                 },
             Group { 
-                var weekdaysFont = Font.font("Arial",FontStyle.BOLD,8.6149)
+                var weekdaysFont = Font.font("Arial",FontWeight.BOLD, FontPosture.REGULAR,8.6149)
                 opacity: bind weatherScreenOpacity
                 //clip: Rectangle {x:0 y:58 width: 245 height: 83}
-                transform: Transform.translate(10,-57)
+                transforms: Transform.translate(10,-57)
                 content:[
                 Path {
                     elements: [
@@ -297,7 +295,7 @@ public class Weather extends CustomNode {
                         y: 133.471
                         absolute: true
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: 0.0
                         controlY1: 3.907
                         controlX2: -1.516
@@ -313,7 +311,7 @@ public class Weather extends CustomNode {
                         //y: 130 // 
                         absolute: false
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: -1.871
                         controlY1: 0.0
                         controlX2: -3.387
@@ -327,7 +325,7 @@ public class Weather extends CustomNode {
                         y: -67.76
                         absolute: false
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: 0.0
                         controlY1: -3.908
                         controlX2: 1.516
@@ -341,7 +339,7 @@ public class Weather extends CustomNode {
                         x: 226.57
                         absolute: false
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: 1.867
                         controlY1: 0.0
                         controlX2: 3.383
@@ -364,7 +362,7 @@ public class Weather extends CustomNode {
                     content: 'TODAY'
                     font: weekdaysFont
                     fill: rgba(0xF2, 0xF2, 0xF2, 0xff)
-                    transform: [
+                    transforms: [
                     matrix(1.0, 0.0, 0.0, 1.0, 6.6519, 137.2471),
                     ]
                     x: 0.0
@@ -377,7 +375,7 @@ public class Weather extends CustomNode {
                     content: 'TOMORROW'
                     font: weekdaysFont
                     fill: rgba(0xF2, 0xF2, 0xF2, 0xff)
-                    transform: [
+                    transforms: [
                     matrix(1.0, 0.0, 0.0, 1.0, 96.0806, 137.248),
                     ]
                     x: 0.0
@@ -387,13 +385,13 @@ public class Weather extends CustomNode {
 
                 // today condition
                 Group { 
-                    transform: Transform.translate(0,58)
+                    transforms: Transform.translate(0,58)
                     content: bind getConditionImageForCode(todayConditionImages, weatherModel.todayConditionCode)
                     opacity: bind todayNodesOpacity/2.0
                     },
                 // tomorrow condition
                 Group { 
-                    transform: Transform.translate(0,58)
+                    transforms: Transform.translate(0,58)
                     content: bind getConditionImageForCode(tomorrowConditionImages, weatherModel.tomorrowConditionCode)
                     opacity: bind tomorrowNodesOpacity/2.0
                     },
@@ -407,7 +405,7 @@ public class Weather extends CustomNode {
                         effect: createSmallStuffBlackShadow();
                         content: [
                         Group { // wind direction
-                            transform: Rotate {angle: bind weatherModel.windDirection x: 192.0 y: 98.0}
+                            transforms: Rotate {angle: bind weatherModel.windDirection + 90, pivotX: 192.0, pivotY: 98.0}
                             content: [
                             Path {
                                 elements: [
@@ -437,12 +435,14 @@ public class Weather extends CustomNode {
                                 },
                             Text {            
                                 textOrigin: TextOrigin.BASELINE
-                                horizontalAlignment: HorizontalAlignment.CENTER
+                                textAlignment: TextAlignment.CENTER
                                 content: bind weatherModel.windInformation()
-                                font: Font.font("Arial",FontStyle.PLAIN,13.5526)
-                                transform: [
+                                font: Font.font("Arial",FontWeight.REGULAR, FontPosture.REGULAR,13.5526)
+                                transforms: [
                                 //rotate (67,178,90)
+                                //matrix(0.3866, 0.9865, -0.9074, 0.4203, 178.8594, 90.377),
                                 matrix(0.3866, 0.9865, -0.9074, 0.4203, 178.8594, 90.377),
+                                Translate { x: -3, y : 10 }
                                 ]
                                 }]
                             }]
@@ -457,7 +457,7 @@ public class Weather extends CustomNode {
                         y: 133.471
                         absolute: true
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: 0.0
                         controlY1: 3.907
                         controlX2: -1.516
@@ -471,7 +471,7 @@ public class Weather extends CustomNode {
                         x: -226.57
                         absolute: false
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: -1.871
                         controlY1: 0.0
                         controlX2: -3.387
@@ -485,7 +485,7 @@ public class Weather extends CustomNode {
                         y: -67.76
                         absolute: false
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: 0.0
                         controlY1: -3.908
                         controlX2: 1.516
@@ -499,7 +499,7 @@ public class Weather extends CustomNode {
                         x: 226.57
                         absolute: false
                         },
-                    CurveTo {
+                    CubicCurveTo {
                         controlX1: 1.867
                         controlY1: 0.0
                         controlX2: 3.383
@@ -529,9 +529,9 @@ public class Weather extends CustomNode {
                     Text {
                         textOrigin: TextOrigin.BASELINE
                         content: bind "{%02.0f weatherModel.temperature}"
-                        font: Font.font("Arial",FontStyle.BOLD,48.6668)
+                        font: Font.font("Arial",FontWeight.BOLD, FontPosture.REGULAR,48.6668)
                         fill: rgba(0xED, 0x1E, 0x24, 0xff)
-                        transform: [
+                        transforms: [
                         matrix(1.0, 0.0, 0.0, 1.0, 88.8457, 116.3926),
                         ]
                         x: 0.0
@@ -544,7 +544,7 @@ public class Weather extends CustomNode {
                     effect: createSmallStuffBlackShadow();
                     content: 
                     Group {
-                        transform: [
+                        transforms: [
                         Translate{ x: bind highsTriangleTransform.tx y: bind highsTriangleTransform.ty},
                         Translate { x:37 y:93},
                         Scale { x: bind highsTriangleTransform.scale y: bind highsTriangleTransform.scale},
@@ -585,7 +585,7 @@ public class Weather extends CustomNode {
                     effect: createSmallStuffBlackShadow();
                     content:        
                     Group {
-                        transform: [
+                        transforms: [
                         Translate {x: bind lowsTriangleTransform.tx y: bind lowsTriangleTransform.ty},
                         Translate {x: 37 y: 109},
                         Scale {x: bind lowsTriangleTransform.scale y: bind lowsTriangleTransform.scale},
@@ -621,56 +621,56 @@ public class Weather extends CustomNode {
                         }},
                 // today highs
                 Group {
-                    transform: Translate { x:0 y: bind todayHighsTY}
+                    transforms: Translate { x:0 y: bind todayHighsTY}
                     content: 
                     Text {
                         effect: createSmallStuffBlackShadow();
                         opacity: bind todayNodesOpacity
                         textOrigin: TextOrigin.BASELINE
                         content: bind "{%02.0f weatherModel.todayHighs}"
-                        font: Font.font("Arial",FontStyle.PLAIN,18.3347)
+                        font: Font.font( "Arial",FontWeight.REGULAR, FontPosture.REGULAR, 18.3347 )
                         x: 46
                         y: 98.84
                         }
                     },
                 // today lows
                 Group {
-                    transform: Translate { x:0 y: bind todayLowsTY}
+                    transforms: Translate { x:0 y: bind todayLowsTY}
                     content:
                     Text {
                         effect: createSmallStuffBlackShadow();
                         opacity: bind todayNodesOpacity
                         textOrigin: TextOrigin.BASELINE
                         content: bind "{%02.0f weatherModel.todayLows}" 
-                        font: Font.font("Arial",FontStyle.PLAIN,18.3347)
+                        font: Font.font("Arial",FontWeight.REGULAR, FontPosture.REGULAR,18.3347)
                         x: 46.2
                         y: 114.88
                         }
                     },
                 // tomorrow highs
                 Group {
-                    transform: Translate { x:0 y:bind tomorrowHighsTY}
+                    transforms: Translate { x:0 y:bind tomorrowHighsTY}
                     content:
                     Text {
                         effect: createSmallStuffBlackShadow();
                         opacity: bind tomorrowNodesOpacity
                         textOrigin: TextOrigin.BASELINE
                         content:  bind "{%02.0f weatherModel.tomorrowHighs}" 
-                        font: Font.font("Arial",FontStyle.PLAIN,43)
+                        font: Font.font("Arial",FontWeight.REGULAR, FontPosture.REGULAR,43)
                         x: 65
                         y: 116
                         }
                     },
                 // tomorrow lows
                 Group {
-                    transform: Translate { x:0 y: bind tomorrowLowsTY}
+                    transforms: Translate { x:0 y: bind tomorrowLowsTY}
                     content:
                     Text {
                         effect: createSmallStuffBlackShadow();
                         opacity: bind tomorrowNodesOpacity
                         textOrigin: TextOrigin.BASELINE
                         content: bind "{%02.0f weatherModel.tomorrowLows}" 
-                        font: Font.font("Arial",FontStyle.PLAIN, 43)
+                        font: Font.font("Arial",FontWeight.REGULAR, FontPosture.REGULAR, 43)
                         x: 160
                         y: 116
                         }
@@ -711,9 +711,9 @@ public class Weather extends CustomNode {
                     Text {
                         textOrigin: TextOrigin.BASELINE
                         content: bind weatherModel.cityName
-                        font: Font.font("Arial",FontStyle.BOLD,15.0)
+                        font: Font.font("Arial",FontWeight.BOLD, FontPosture.REGULAR,15.0)
                         fill: rgba(0xF2, 0xF2, 0xF2, 0xff)
-                        transform: [
+                        transforms: [
                         matrix(1.0, 0.0, 0.0, 1.0, 6.145, 74.0625),
                         ]
                         x: 0.0
@@ -724,7 +724,7 @@ public class Weather extends CustomNode {
             ]};         
         }
     
-    private attribute weatherGradient: LinearGradient =  LinearGradient {
+    var weatherGradient: LinearGradient =  LinearGradient {
         startX: 0.50
         startY:0.94 
         endX: 0.50 
@@ -789,7 +789,7 @@ public class Weather extends CustomNode {
         
     
 }
-
+/*
 var weatherModel = WeatherModel {
     cityName: "San Francisco"
     temperature: 45
@@ -804,7 +804,4 @@ var weatherModel = WeatherModel {
 var weather = Weather{
     weatherModel: weatherModel
 };
-
-Canvas {
-   content: weather
-}
+*/

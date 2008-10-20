@@ -244,12 +244,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) {
-        addMembers(type, methods, fields, null);
+        JavafxcScope sc = controller.getTreeUtilities().getScope(path);
+        boolean isStatic = controller.getTreeUtilities().isStaticContext(sc);
+        addMembers(type, methods, fields, null,sc, true, !isStatic);
     }
     
-    protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields, final String textToAdd) {
+    protected void addMembers(final TypeMirror type,
+            final boolean methods, final boolean fields,
+            final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
         if (LOGGABLE) log("addMembers: " + type);
-        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
             return;
@@ -268,9 +271,18 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if ("<error>".equals(member.getSimpleName().toString())) {
                 continue;
             }
+            boolean isStatic = member.getModifiers().contains(STATIC);
             String s = member.getSimpleName().toString();
               if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
+                continue;
+            }
+            if (isStatic && !statics) {
+                if (LOGGABLE) log("    is static and we don't want them " + s);
+                continue;
+            }
+            if (!isStatic && !instance) {
+                if (LOGGABLE) log("     is instance and we don't want them " + s);
                 continue;
             }
             if (fields && member.getKind() == ElementKind.FIELD) {
@@ -288,6 +300,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s);
+                continue;
+            }
+            boolean isStatic = member.getModifiers().contains(STATIC);
+            if (isStatic && !statics) {
+                if (LOGGABLE) log("    is static and we don't want them " + s);
+                continue;
+            }
+            if (!isStatic && !instance) {
+                if (LOGGABLE) log("     is instance and we don't want them " + s);
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
@@ -354,6 +375,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                                 if (LOGGABLE) log("      fdt == " + fdt.name.toString());
                                 if ("javafx$run$".equals(fdt.name.toString())) {
                                     addBlockExpressionLocals(fdt.getBodyExpression(), tp, smart);
+                                    JavaFXTreePath mp = JavaFXTreePath.getPath(cut, tt);
+                                    TypeMirror tm = trees.getTypeMirror(mp);
+                                    if (LOGGABLE) log("  javafx$run$ tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind()));
+                                    JavaFXTreePath mp2 = JavaFXTreePath.getPath(cut, fdt);
+                                    addMembers(tm, true, true,
+                                            null, controller.getTreeUtilities().getScope(mp2),
+                                            true, false);
                                 }
                             }
                         }

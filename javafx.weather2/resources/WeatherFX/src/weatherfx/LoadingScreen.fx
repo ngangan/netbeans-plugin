@@ -32,13 +32,14 @@ package weatherfx;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.CustomNode;
-import javafx.scene.Font;
-import javafx.scene.FontStyle;
-import javafx.scene.geometry.CurveTo;
-import javafx.scene.geometry.MoveTo;
-import javafx.scene.geometry.LineTo;
-import javafx.scene.geometry.Path;
-import javafx.scene.geometry.ClosePath;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.FontPosture;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.ClosePath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextOrigin;
 import javafx.scene.paint.Color;
@@ -58,16 +59,16 @@ import javafx.scene.transform.Affine;
 public class LoadingScreen extends CustomNode  {    
 
     
-    private function rgba(r:Number, g:Number, b:Number, a:Number):Color {
+    function rgba(r:Number, g:Number, b:Number, a:Number):Color {
         return Color {red: r/255, green: g/255, blue: b/255, opacity: a/255};
     }     
     
-    private function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
+    function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
         return Affine{m00:m00 m01:m01 m02:m02 m10:m10 m11:m11 m12:m12};
     }
     
 
-    private function SVGID_1_(): LinearGradient {
+    function SVGID_1_(): LinearGradient {
          LinearGradient {
             startX: 117.1709
             endX: 117.1709
@@ -94,7 +95,7 @@ public class LoadingScreen extends CustomNode  {
         }
     }
     
-    protected function create():Node {
+    override function create():Node {
         return Group {
             content:[
                 Path {
@@ -104,7 +105,7 @@ public class LoadingScreen extends CustomNode  {
                             y: 75.336
                             absolute: true
                         },
-                        CurveTo {
+                        CubicCurveTo {
                             controlX1: 0.0
                             controlY1: 3.907
                             controlX2: -1.516
@@ -118,7 +119,7 @@ public class LoadingScreen extends CustomNode  {
                             x: -226.571
                             absolute: false
                         },
-                        CurveTo {
+                        CubicCurveTo {
                             controlX1: -1.871
                             controlY1: 0.0
                             controlX2: -3.387
@@ -132,7 +133,7 @@ public class LoadingScreen extends CustomNode  {
                             y: -67.76
                             absolute: false
                         },
-                        CurveTo {
+                        CubicCurveTo {
                             controlX1: 0.5
                             controlY1: 3.667
                             controlX2: 2.016
@@ -146,7 +147,7 @@ public class LoadingScreen extends CustomNode  {
                             x: 226.571
                             absolute: false
                         },
-                        CurveTo {
+                        CubicCurveTo {
                             controlX1: 1.867
                             controlY1: 0.0
                             controlX2: 3.383
@@ -168,9 +169,9 @@ public class LoadingScreen extends CustomNode  {
                 Text {
                     textOrigin: TextOrigin.BASELINE
                     content: "looking at the sky...."
-                    font: Font.font("Arial",FontStyle.BOLD,12.0)
+                    font: Font.font("Arial",FontWeight.BOLD, FontPosture.REGULAR,12.0)
                     fill: rgba(0xFF, 0xFF, 0xFF, 0xff)
-                    transform: [
+                    transforms: [
                         matrix(1.0, 0.0, 0.0, 1.0, 4.3374, 77.7271),
                     ]
                     x: 0.0

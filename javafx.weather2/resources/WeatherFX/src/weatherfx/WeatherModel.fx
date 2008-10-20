@@ -41,28 +41,28 @@ import java.lang.System;
 
 public class WeatherModel {
     
-    public static /*readonly*/ attribute UNKNOWN:Integer = 0;
-    public static /*readonly*/ attribute CLEAR:Integer = 1;
-    public static /*readonly*/ attribute CLOUDS:Integer = 2;
-    public static /*readonly*/ attribute RAIN:Integer = 3;
-    public static /*readonly*/ attribute SNOW:Integer = 4;
-    public static /*readonly*/ attribute THUNDER:Integer = 5;
-    public static /*readonly*/ attribute MOON:Integer = 6;
+    public var UNKNOWN:Integer = 0;
+    public var CLEAR:Integer = 1;
+    public var CLOUDS:Integer = 2;
+    public var RAIN:Integer = 3;
+    public var SNOW:Integer = 4;
+    public var THUNDER:Integer = 5;
+    public var MOON:Integer = 6;
 
-    public attribute cityName:String;
-    public attribute temperature:Number;    
-    public attribute windSpeed:Number;
-    public attribute windDirection:Number;    
+    public var cityName:String;
+    public var temperature:Number;
+    public var windSpeed:Number;
+    public var windDirection:Number;
 
-    public attribute todayLows:Number;
-    public attribute todayHighs:Number;   
-    public attribute todayConditionCode: Integer;
+    public var todayLows:Number;
+    public var todayHighs:Number;
+    public var todayConditionCode: Integer;
 
-    public attribute tomorrowLows:Number;
-    public attribute tomorrowHighs:Number;    
-    public attribute tomorrowConditionCode: Integer;
+    public var tomorrowLows:Number;
+    public var tomorrowHighs:Number;
+    public var tomorrowConditionCode: Integer;
 
-    private function translateConditionCode(code:Integer):Integer {
+    function translateConditionCode(code:Integer):Integer {
         return 
             if ((code >= 0) and ( code < 5))  then
                 THUNDER
@@ -126,8 +126,8 @@ public class WeatherModel {
     
     public function translateDirectionToString(dir:Number):String {
         var windDirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
-        dir = dir mod 360;    
-        var i = ((dir + 22.5 ) / 45).intValue();
+        var tmpdir = dir mod 360;
+        var i = ((tmpdir + 22.5 ) / 45).intValue();
         return windDirs[i];
     }
     

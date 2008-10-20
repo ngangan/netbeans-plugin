@@ -31,11 +31,11 @@
 package weatherfx;
 
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 
-import javafx.application.Frame;
-import javafx.application.Stage;
+import javafx.stage.Stage;
 
 import java.lang.*;
 import weatherfx.service.YahooWeatherService;
@@ -50,26 +50,25 @@ var weather1 = Weather{};
 var weather2 = Weather{};
 var weather3 = Weather{};
 
-var f = Frame {
-    stage: Stage {
+Stage {
+    scene: Scene {
         fill: Color.BLACK
         content:[
             Group {
-                transform: Transform.translate(0,5);
+                transforms: Transform.translate(0,5);
                 content: weather1
             },
             Group {
-                transform: Transform.translate(0,95);
+                transforms: Transform.translate(0,95);
                 content: weather2
             },
             Group {
-                transform: Transform.translate(0,185);
+                transforms: Transform.translate(0,185);
                 content: weather3
             }
         ]
     }
     title: "WeatherFX"
-    closeAction: function() { System.exit(0); }
     resizable: false
     width: 260
     height: 310
@@ -81,10 +80,10 @@ var f = Frame {
 function showWeather(weatherCode:String, weather:Weather):Void {
     // this has to use Threads as FX currently does not give us any reasonable options
      var ywsRunnable = Runnable {
-            public function run() {
+            public override function run() {
                 var yws = new YahooWeatherService(weatherCode, false);                
                 var modelRunnable = Runnable {
-                    public function run() {
+                    public override function run() {
                         System.out.println("Loaded weather {weatherCode} ");
                         var wm = WeatherModel{};
                         wm.loadFromYWS(yws);                        

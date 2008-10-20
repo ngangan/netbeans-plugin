@@ -47,13 +47,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -64,7 +62,6 @@ import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
 import org.openide.text.NbDocument;
-import org.openide.util.Exceptions;
 /**
  *
  * @author David Strupl
@@ -142,10 +139,10 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
             long linu = d.getLineNumber();
             if (LOGGABLE) log("    lastLine == " + lastLine + " linu == " + linu);
-            if ( (linu>=0) && (linu-1 <= lastLine)) {
+            if ( (linu>0) && (linu-1 <= lastLine)) {
                 c.add(ErrorDescriptionFactory.createErrorDescription(
                     Severity.ERROR, d.getMessage(Locale.getDefault()),
-                    doc, (int)d.getLineNumber()));
+                    doc,(int)linu));
             } else {
                 if (LOGGABLE) log("   NOT USED (wrong bounds): " + d);
             }

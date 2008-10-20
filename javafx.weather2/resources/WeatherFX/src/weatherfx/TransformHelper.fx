@@ -38,10 +38,10 @@ package weatherfx;
 
 public class TransformHelper {
     // translate x
-    public attribute tx:Number = 0.0;
+    public var tx:Number = 0.0;
     // translate y
-    public attribute ty:Number = 0.0;
+    public var ty:Number = 0.0;
     // scale
-    public attribute scale:Number = 1.0;
+    public var scale:Number = 1.0;
 }
 
