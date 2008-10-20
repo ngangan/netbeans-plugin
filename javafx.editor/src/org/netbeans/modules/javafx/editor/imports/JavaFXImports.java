@@ -35,7 +35,6 @@ import org.netbeans.modules.javafx.editor.JFXImportManager;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 
 import javax.lang.model.element.Element;
 import javax.swing.*;
@@ -43,22 +42,24 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.HashSet;
+import java.lang.ref.SoftReference;
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
- *
  * Algorithm:
- *  * Collect all important symbols
- *  * Collect all imports.
- *  * iterate over all symbols and verify if it is already imported or have to be.
- *  * collect resulting set of import
- *  * modify document 
+ * * Collect all important symbols
+ * * Collect all imports.
+ * * iterate over all symbols and verify if it is already imported or have to be.
+ * * collect resulting set of import
+ * * modify document
  *
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.org">RKo</a>)
  */
 public final class JavaFXImports extends BaseAction implements JFXImportManager {
-
 
 
     private static JavaFXImports instance;
@@ -99,23 +100,16 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
      * Fix imports within source code.
      *
      * @param document containing source code.
-     * @param target
+     * @param target   component to display over.
      */
     public void fixImports(final Document document, JTextComponent target) {
         Runnable runnable = prepareTask(document, target);
-        if (SwingUtilities.isEventDispatchThread()) {
-            RequestProcessor processor = RequestProcessor.getDefault();
-            processor.execute(runnable);
-        } else {
-            runnable.run();
-        }
-
+        SwingUtilities.invokeLater(runnable);
     }
 
     private Runnable prepareTask(final Document document, final JTextComponent target) {
         return new Runnable() {
             public void run() {
-                logger.info(" ===> Fixing imports started");
                 final JavaFXSource s = JavaFXSource.forDocument(document);
                 int caret = target.getCaret().getDot();
                 try {
@@ -131,14 +125,11 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
                                 throw new IllegalArgumentException("There is no associated fileobject for document.");
                             }
                             ClassIndex index = ClasspathInfo.create(source).getClassIndex();
-                            HashSet<Element> elements = new HashSet<Element>(100, .9F);
+                            Set<Element> elements = new TreeSet<Element>(InternalSetComparator.create());
                             cc.getCompilationUnit().accept(new IdentifierVisitor(cc), elements);
-                            ImportsModel model = new ImportsModel(cc.getCompilationUnit().getImports(), index, cc, target);
-                            for (Element element : elements) {
-                                model.addImport(element);
-                            }
-                            model.optimize();
-                            model.publish(document);
+                            ImportsModel model = new ImportsModel(cc.getCompilationUnit().getImports(), cc);
+                            ImportResolver ir = ImportResolverImpl.create(index, target);
+                            ir.resolve(model, elements);
                         }
                     }, false);
                 } catch (IOException e) {
@@ -146,7 +137,6 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
                 } finally {
                     target.getCaret().setDot(caret);
                 }
-                logger.info(" ===> Fixing imports finished");
             }
         };
     }
@@ -165,24 +155,43 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
     }
 
     public static final class GlobalAction extends MainMenuAction {
-            private final JMenuItem menuPresenter;
+        private final JMenuItem menuPresenter;
 
-            public GlobalAction() {
-                super();
-                this.menuPresenter = new JMenuItem(getMenuItemText());
-                setMenu();
-            }
-
-            protected String getMenuItemText() {
-                return NbBundle.getBundle(GlobalAction.class).getString("fix-imports-main-menu-source-item"); //NOI18N
-            }
-
-            protected String getActionName() {
-                return fixImportsAction;
-            }
-
-            public JMenuItem getMenuPresenter() {
-                return menuPresenter;
-            }
+        public GlobalAction() {
+            super();
+            this.menuPresenter = new JMenuItem(getMenuItemText());
+            setMenu();
         }
+
+        protected String getMenuItemText() {
+            return NbBundle.getBundle(GlobalAction.class).getString("fix-imports-main-menu-source-item"); //NOI18N
+        }
+
+        protected String getActionName() {
+            return fixImportsAction;
+        }
+
+        public JMenuItem getMenuPresenter() {
+            return menuPresenter;
+        }
+    }
+
+    private static class InternalSetComparator implements Comparator<Element> {
+        public static final Collator collator = Collator.getInstance();
+        static SoftReference<InternalSetComparator> instance;
+
+        private InternalSetComparator() {
+        }
+
+        public int compare(Element o1, Element o2) {
+            return collator.compare(o1.getSimpleName().toString(), o2.getSimpleName().toString());
+        }
+
+        private static InternalSetComparator create() {
+            if (instance == null || instance.get() == null) {
+                instance = new SoftReference<InternalSetComparator>(new InternalSetComparator());
+            }
+            return instance.get();
+        }
+    }
 }

@@ -28,7 +28,6 @@
 
 package org.netbeans.modules.javafx.editor.imports.ui;
 
-import org.netbeans.modules.javafx.editor.imports.ImportsModel;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
@@ -41,8 +40,10 @@ import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
 /**
+ * Implentation of <code>{@link org.netbeans.spi.editor.completion.CompletionItem} which stores info
+ * about one import item. This item has no logic. It just invoke notifyAll() on lock object passed on constructor.
+ *
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
- * @todo documentation
  */
 public class FixItem implements CompletionItem {
     private static final String EMPTY_STRING = "";
@@ -57,17 +58,21 @@ public class FixItem implements CompletionItem {
     }
 
     private String element;
-    private final ImportsModel model;
-    private final FixImportsLayout<FixItem> fil;
+    private final Object LOCK;
     private String elementHTMLForm;
     private static final int NORMAL = 0;
     private static final int JAVAFX = -100;
     private int sortPriority;
 
-    public FixItem(String element, ImportsModel importsModel, FixImportsLayout<FixItem> fil) {
+    /**
+     * Constructor
+     *
+     * @param element FQCN representation of imported item.
+     * @param lock the lock object hold by any depending thread.
+     */
+    public FixItem(String element, Object lock) {
         this.element = element;
-        model = importsModel;
-        this.fil = fil;
+        this.LOCK = lock;        
         elementHTMLForm = ITEM_COLOR + element + ITEM_END;
         sortPriority = element.startsWith("javafx.") ? JAVAFX : NORMAL;
     }
@@ -80,12 +85,9 @@ public class FixItem implements CompletionItem {
      *
      * @param component non-null text component for which the completion was invoked.
      */
-    public void defaultAction(JTextComponent component) {        
-        if (!fil.isVisible()) return;
-        fil.hide();
-        this.model.addImport(getElement());
-        synchronized (model) {
-            model.notify();
+    public void defaultAction(JTextComponent component) {
+        synchronized (LOCK) {
+            LOCK.notifyAll();
         }
     }
 
@@ -109,13 +111,11 @@ public class FixItem implements CompletionItem {
                 evt.consume();
                 break;
             }
-            case KeyEvent.VK_ESCAPE: {
-                fil.hide();
-                synchronized (this.model) {
-                    this.model.notifyAll();
-                }
+            case KeyEvent.VK_ESCAPE: {                
+                defaultAction(null);
                 evt.consume();
-            }
+                break;
+            }            
         }
     }
 
