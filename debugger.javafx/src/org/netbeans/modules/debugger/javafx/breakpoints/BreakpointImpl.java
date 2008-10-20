@@ -279,7 +279,10 @@ public abstract class BreakpointImpl implements Executor, PropertyChangeListener
     ) {
         //S ystem.out.println("BreakpointImpl.perform");
         boolean resume;
-        
+//This condition will ignore all events from main thread
+        if (thread.name().equals("main")) {         //NOI18N
+            return true;
+        }
         if (hitCountFilter > 0) {
             event.request().disable();
             //event.request().addCountFilter(hitCountFilter);
