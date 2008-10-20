@@ -59,11 +59,11 @@ final class DocumentElementWrapper {
                         for ( int i = 0; i < elemCount; i++) {
                             DocumentElement de = m_de.getElement(i);
                             if ( name.equals(de.getName())) {
-                                if ( FXDDocumentModelProvider.FXD_ATTRIBUTE.equals( de.getType())) {
+                                if ( FXDFileModel.FXD_ATTRIBUTE.equals( de.getType())) {
                                     assert de.getElementCount() == 1;
                                     return wrap(de.getElement(0));
                                 } else {
-                                    assert FXDDocumentModelProvider.FXD_ATTRIBUTE_ARRAY.equals( de.getType());
+                                    assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( de.getType());
                                     return wrap(de);
                                 }
                             }
@@ -121,9 +121,9 @@ final class DocumentElementWrapper {
     }
 
     public static FXDElement wrap( final DocumentElement de) {
-        if ( FXDDocumentModelProvider.FXD_NODE.equals( de.getType())) {
+        if ( FXDFileModel.FXD_NODE.equals( de.getType())) {
             return new FXDNodeWrapper(de);
-        } else if ( FXDDocumentModelProvider.FXD_ATTRIBUTE_ARRAY.equals(de.getType())) {
+        } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(de.getType())) {
             return new FXDNodeArrayWrapper(de);
         } else {
             throw new RuntimeException( "Unknown DocumentElement type: " + de.getType()); //NOI18N

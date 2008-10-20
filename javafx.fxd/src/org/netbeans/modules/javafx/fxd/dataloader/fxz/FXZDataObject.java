@@ -62,8 +62,8 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     
     public static final String FXZ_EXT = "fxz";  //NOI18N
 
-    public static final int    TEXT_VIEW_INDEX    = 0;
-    public static final int    VISUAL_VIEW_INDEX  = 1;
+    public static final int    VISUAL_VIEW_INDEX  = 0;
+    public static final int    TEXT_VIEW_INDEX    = 1;
     public static final int    ARCHIVE_VIEW_INDEX = 2;
     
     final InstanceContent m_ic;
@@ -71,8 +71,8 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     private final     FXZEditorSupport      m_edSup;
     private transient FXDComposerModel      m_model = null;
     private transient FXDComposerController m_controller = null;
-        
-    
+    private transient int                   m_defaultViewIndex = VISUAL_VIEW_INDEX;
+            
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
         m_ic = new InstanceContent();
@@ -80,6 +80,14 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         m_ic.add( m_edSup = new FXZEditorSupport(this));
         m_ic.add(this);           
 //        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
+    }
+    
+    public void setDefaultView( int viewIndex) {
+        m_defaultViewIndex = viewIndex;
+    }
+    
+    public int getDefaultView() {
+        return m_defaultViewIndex;
     }
     
     public synchronized FXDComposerModel getDataModel() {
@@ -126,4 +134,17 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         Object o = m_lookup.lookup(type);
         return o instanceof Node.Cookie ? (Node.Cookie) o : null;
     }
+    
+    /*
+    public static boolean isFXZArchive( final FileObject fo) {
+        System.err.println("FO: " + fo);
+        File file = FileUtil.toFile(fo);
+        System.err.println("File: " + file);
+        if ( file.exists() && file.isFile()) {
+            if ( FXZ_EXT.equalsIgnoreCase(fo.getExt())) {
+                return true;
+            }
+        }
+        return false;
+    }*/
 }

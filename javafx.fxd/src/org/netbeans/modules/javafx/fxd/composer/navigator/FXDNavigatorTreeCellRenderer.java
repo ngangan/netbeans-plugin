@@ -43,36 +43,54 @@ package org.netbeans.modules.javafx.fxd.composer.navigator;
 
 import java.awt.Component;
 import java.awt.Image;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.awt.HtmlRenderer;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Utilities;
 
 
 /** TreeCellRenderer implementatin for the XML Navigator.
  *
- * @author Marek Fukala
  * @author Pavel Benes
  * @version 1.0
  */
-final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {    
-    private static final String TAG_16      = "org/netbeans/modules/xml/text/navigator/resources/tag.png";  //NOI18N
-//    private static final String PI_16       = "org/netbeans/modules/xml/text/navigator/resources/xml_declaration.png"; //NOI18N
-//    private static final String DOCTYPE_16  = "org/netbeans/modules/xml/text/navigator/resources/doc_type.png"; //NOI18N
-//    private static final String CDATA_16    = "org/netbeans/modules/xml/text/navigator/resources/cdata.png";    
-    private static final String ERROR_16    = "org/netbeans/modules/xml/text/navigator/resources/badge_error.png"; //NOI18N
+final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer { 
+    private static final String IMAGE_BASE     = "org/netbeans/modules/javafx/fxd/composer/resources/";  //NOI18N
+    private static final String NODE           = IMAGE_BASE + "node_element.png";  //NOI18N
+    private static final String NODE_ATTR      = IMAGE_BASE + "node_attr.png";  //NOI18N
+    private static final String ERROR          = "org/netbeans/modules/xml/text/navigator/resources/badge_error.png"; //NOI18N    
+    private static final Image  ERROR_IMAGE    = ImageUtilities.loadImage(ERROR, true);   
     
-    private final Image  ERROR_IMAGE   = ImageUtilities.loadImage(ERROR_16, true);   
-    private final Icon[] TAG_GRAY_ICON = new Icon[]{getImageIcon(TAG_16, false), getImageIcon(TAG_16, true)};
-    private final Icon[] TAG_ICON      = new Icon[]{getImageIcon(TAG_16, false), getImageIcon(TAG_16, true)};
-    //private final Icon[] PI_ICON       = new Icon[]{getImageIcon(PI_16, false), getImageIcon(PI_16, true)};
-    //private final Icon[] DOCTYPE_ICON  = new Icon[]{getImageIcon(DOCTYPE_16, false), getImageIcon(DOCTYPE_16, true)};
-    //private final Icon[] CDATA_ICON    = new Icon[]{getImageIcon(CDATA_16, false), getImageIcon(CDATA_16, true)};
+    private static final Map<String, Icon[]> NODE_ICONS;
+    
+    static {
+        NODE_ICONS = new HashMap<String, Icon[]>();
+        NODE_ICONS.put("Group", createIcons(IMAGE_BASE + "node_group.png"));//NOI18N
+        NODE_ICONS.put("Path", createIcons(IMAGE_BASE + "node_path.png"));//NOI18N
+        NODE_ICONS.put("SVGPath", createIcons(IMAGE_BASE + "node_svgPath.png"));//NOI18N
+        NODE_ICONS.put("Rectangle", createIcons(IMAGE_BASE + "node_rectangle.png"));//NOI18N
+        NODE_ICONS.put("Text", createIcons(IMAGE_BASE + "node_text.png"));//NOI18N
+        NODE_ICONS.put("Image", createIcons(IMAGE_BASE + "node_image.png"));//NOI18N
+        NODE_ICONS.put("Line", createIcons(IMAGE_BASE + "node_line.png"));//NOI18N
+        NODE_ICONS.put("Polygon", createIcons(IMAGE_BASE + "node_polygon.png"));//NOI18N
+        NODE_ICONS.put("Polyline", createIcons(IMAGE_BASE + "node_polyline.png"));//NOI18N
+        NODE_ICONS.put("Circle", createIcons(IMAGE_BASE + "node_circle.png"));//NOI18N
+        NODE_ICONS.put("Ellipse", createIcons(IMAGE_BASE + "node_ellipse.png"));//NOI18N
+        NODE_ICONS.put("Arc", createIcons(IMAGE_BASE + "node_arc.png"));//NOI18N
+        NODE_ICONS.put("LinearGradient", createIcons(IMAGE_BASE + "node_linearGradient.png"));//NOI18N
+        NODE_ICONS.put("RadialGradient", createIcons(IMAGE_BASE + "node_radialGradient.png"));//NOI18N
+    }
+        
+    private final Icon[] NODE_GRAY_ICON = new Icon[]{getImageIcon(NODE, false), getImageIcon(NODE, true)};
+    private final Icon[] NODE_ICON      = createIcons(NODE);
+    private final Icon[] ATTR_ICON      = createIcons(NODE_ATTR);
 
     
     private final HtmlRenderer.Renderer renderer;
@@ -85,7 +103,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
     
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value,
-            boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         FXDNavigatorNode tna      = (FXDNavigatorNode)value;
         DocumentElement  de       = tna.getDocumentElement();        
         String           htmlText = tna.getText(true);
@@ -97,17 +115,26 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         boolean containsError = tna.getChildrenErrorCount() > 0;
         
         if ( tna.getNodeVisibility() == FXDNavigatorTree.VISIBILITY_UNDIRECT) {
-            setIcon( TAG_GRAY_ICON, containsError);
+            setIcon( NODE_GRAY_ICON, containsError);
         } else {
             //normal icons
             if( FXDNavigatorTree.isTreeElement(de)) {
-                /*
-                if (SVGFileModel.isAnimation(de)) {
-                    setIcon(ANIMATE_TAG_ICON, containsError);
+                Icon [] icons = null;
+                String type = de.getType();
+                
+                if ( FXDFileModel.FXD_NODE.equals(type)) {
+                    icons = NODE_ICONS.get( de.getName());
+                } else if ( FXDFileModel.FXD_ATTRIBUTE.equals(type)) {
+                    icons = ATTR_ICON;
+                } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
+                    icons = ATTR_ICON;
                 } else {
-                 */
-                    setIcon(TAG_ICON, containsError);
-                //}
+                    System.err.println("Unknown element type: " + type);  //NOI18N
+                }
+                if ( icons == null) {
+                    icons = NODE_ICON;
+                }
+                setIcon( icons, containsError);
             }          
         }
         
@@ -118,11 +145,22 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         renderer.setIcon(icons[containsError ? 1 : 0]);
     }
     
-    private ImageIcon getImageIcon(String name, boolean error){
-        ImageIcon icon = new ImageIcon(ImageUtilities.loadImage(name));
+    private static ImageIcon getImageIcon(String name, boolean error){
+        ImageIcon icon = null;
+        try {
+            icon = new ImageIcon(ImageUtilities.loadImage(name));
+        } catch( Exception e) {
+            System.err.println("Load of " + name + "  failed.");   //NOI18N
+            e.printStackTrace();
+        }
+        
         if(error)
             return new ImageIcon(ImageUtilities.mergeImages( icon.getImage(), ERROR_IMAGE, 15, 7 ));
         else
             return icon;
+    }   
+    
+    private static Icon [] createIcons( String name) {
+        return new Icon[] { getImageIcon(name, false), getImageIcon(name, true)};
     }    
 }

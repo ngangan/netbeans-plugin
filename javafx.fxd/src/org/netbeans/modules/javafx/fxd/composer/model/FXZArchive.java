@@ -35,6 +35,9 @@ import org.openide.util.NbBundle;
 import com.sun.javafx.tools.fxd.FXDNode;
 import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
+import javax.swing.JEditorPane;
+import javax.swing.text.EditorKit;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataLoader;
 
 /**
  *
@@ -240,7 +243,33 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
     
+    protected static BaseDocument loadDocument(InputStream in) throws IOException, DocumentModelException, BadLocationException {
+        EditorKit kit = JEditorPane.createEditorKitForContentType(FXZDataLoader.REQUIRED_MIME);
+        try {
+            BaseDocument doc = (BaseDocument) kit.createDefaultDocument();
+            kit.read(in, doc, 0);
+            return doc;
+        } finally {
+            in.close();
+        }
+    }
+    
     public synchronized FXDFileModel getFileModel() {
+        if ( m_fileModel == null) {
+            InputStream in = null;
+            try {
+                try {
+                    System.err.println("Loading the document ...");
+                    in = open();
+                    BaseDocument doc = loadDocument(in);
+                    m_fileModel = new FXDFileModel(this, DocumentModel.getDocumentModel(doc));
+                } finally {
+                    in.close();
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
         return m_fileModel;
     }
 

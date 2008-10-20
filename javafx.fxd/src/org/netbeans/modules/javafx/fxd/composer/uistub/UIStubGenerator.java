@@ -131,7 +131,8 @@ public final class UIStubGenerator {
             throw new IllegalArgumentException( );
         }        
     }
-        
+     
+    
     private void implGenerate( final String stubLocation, final String packagePath) {
         Thread th = new Thread() {
             @Override
@@ -139,7 +140,6 @@ public final class UIStubGenerator {
                 try {
                     // force the model update if changed lately
                     FXDFileModel model = m_dObj.getDataModel().getFXDContainer().getFileModel();
-
                     model.updateModel();
 
                     model.visitElements( new FXDFileModel.ElementVisitor() {
@@ -164,6 +164,7 @@ public final class UIStubGenerator {
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
                             String msgFormat = NbBundle.getMessage(UIStubGenerator.class, "MSG_STUB_CREATED");   //NOI18N 
+                            
                             NotifyDescriptor d = new NotifyDescriptor.Confirmation( 
                                     String.format(msgFormat, stubLocation),
                                     NbBundle.getMessage(UIStubGenerator.class, "TITLE_STUB_CREATED"),  //NOI18N 

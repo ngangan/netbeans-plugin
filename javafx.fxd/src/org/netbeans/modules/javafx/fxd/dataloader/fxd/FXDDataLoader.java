@@ -11,18 +11,17 @@ import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.UniFileLoader;
 import org.openide.util.NbBundle;
 
-public class FXDDataLoader extends UniFileLoader {
-
-    public static final String REQUIRED_MIME = "text/x-fxd";
+public final class FXDDataLoader extends UniFileLoader {
+    public static final String REQUIRED_MIME = "text/x-fxd";   //NOI18N
     private static final long serialVersionUID = 1L;
 
     public FXDDataLoader() {
-        super("org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataObject");
+        super("org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataObject");  //NOI18N
     }
 
     @Override
     protected String defaultDisplayName() {
-        return NbBundle.getMessage(FXDDataLoader.class, "LBL_FXD_loader_name");
+        return NbBundle.getMessage(FXDDataLoader.class, "LBL_FXD_loader_name");  //NOI18N
     }
 
     @Override
@@ -37,6 +36,6 @@ public class FXDDataLoader extends UniFileLoader {
 
     @Override
     protected String actionsContext() {
-        return "Loaders/" + REQUIRED_MIME + "/Actions";
+        return "Loaders/" + REQUIRED_MIME + "/Actions";   //NOI18N
     }
 }

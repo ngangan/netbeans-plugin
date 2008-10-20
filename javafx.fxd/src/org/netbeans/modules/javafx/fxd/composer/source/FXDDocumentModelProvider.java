@@ -21,6 +21,7 @@ import org.netbeans.modules.editor.structure.api.DocumentModel.DocumentModelTran
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.spi.DocumentModelProvider;
 
+import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Direction.BACKWARD;
 
 /**
@@ -28,10 +29,6 @@ import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Directi
  * @author Pavel Benes
  */
 public final class FXDDocumentModelProvider implements DocumentModelProvider {
-    public static final String FXD_HEADER          = "header";
-    public static final String FXD_NODE            = "node";
-    public static final String FXD_ATTRIBUTE       = "attr";
-    public static final String FXD_ATTRIBUTE_ARRAY = "attr-array";
         
     private static final Map<String,String> NO_ATTRS = new HashMap<String,String>(1);
     
@@ -54,7 +51,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         }
         
         protected void build(DocumentModelModificationTransaction trans, int endOffset) throws BadLocationException, DocumentModelTransactionCancelledException {
-            trans.addDocumentElement( m_typeName, FXD_NODE, m_attributes, m_startOffset, endOffset);
+            trans.addDocumentElement( m_typeName, FXDFileModel.FXD_NODE, m_attributes, m_startOffset, endOffset);
         }
 
         public boolean isEqual(final AttributeSet attrs) {
@@ -102,10 +99,10 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     if ( value == null) {
                         if ( m_isLastNode) {
                             //System.err.println(String.format("Adding attribute %s <%d, %d>", name, startOff, endOff));
-                            trans.addDocumentElement(name, FXD_ATTRIBUTE, NO_ATTRS, startOff, endOff);
+                            trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE, NO_ATTRS, startOff, endOff);
                         } else {
                             //System.err.println(String.format("Adding array attribute %s <%d, %d>", name, startOff, endOff));
-                            trans.addDocumentElement(name, FXD_ATTRIBUTE_ARRAY, NO_ATTRS, startOff, endOff);
+                            trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE_ARRAY, NO_ATTRS, startOff, endOff);
                         }
                     }
                     deb.addAttribute( name, value, startOff, endOff);

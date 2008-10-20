@@ -5,7 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
 
-import java.awt.Component;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
@@ -155,9 +154,11 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
                         if ( opened != null && opened.length > 0) {
                             final JEditorPane  pane = opened[0];
                             m_callback.requestVisible();
-                            pane.setSelectionStart(position);
-                            pane.setSelectionEnd(position);
-
+                            if (position >= 0) {
+                                pane.setSelectionStart(position);
+                                pane.setSelectionEnd(position);
+                            }
+                            
                             if ( requestFocus) {
                                 System.err.println("Requesting focus ...");
                                 m_callback.requestActive();
@@ -196,7 +197,6 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
             return true;
         }
         
-
         return false;
     }        
 }
