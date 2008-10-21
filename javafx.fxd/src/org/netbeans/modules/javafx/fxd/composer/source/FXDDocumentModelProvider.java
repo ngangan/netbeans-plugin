@@ -23,6 +23,7 @@ import org.netbeans.modules.editor.structure.spi.DocumentModelProvider;
 
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Direction.BACKWARD;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -128,10 +129,20 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     return null;
                 }
 
-                public void arrayElement(Object node, String value, int arg2, int arg3) {
+                public void arrayElement(Object node, String value, int startOff, int endOff) {
+                    if ( value != null) {
+                        //TODO throw exception when FXDContainer library gets updated
+                        try {
+                            trans.addDocumentElement(value, FXDFileModel.FXD_ARRAY_ELEM, NO_ATTRS, startOff, endOff);
+                        } catch (BadLocationException ex) {
+                            Exceptions.printStackTrace(ex);
+                        } catch (DocumentModelTransactionCancelledException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
                 }
 
-                public void endNodeArray(Object node, int endOff) throws BadLocationException, DocumentModelTransactionCancelledException {
+                public void endNodeArray(Object node, int endOff) {
                     //NodeArrayBuilder nab = (NodeArrayBuilder) node; 
                     m_isLastNode = false;
                 }

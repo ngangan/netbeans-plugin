@@ -8,7 +8,6 @@ package org.netbeans.modules.javafx.fxd.composer.model;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.util.Enumeration;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
 import com.sun.javafx.tools.fxd.FXDElement;
 import com.sun.javafx.tools.fxd.FXDNode;
 import com.sun.javafx.tools.fxd.FXDNodeArray;
@@ -104,7 +103,13 @@ final class DocumentElementWrapper {
         }
 
         public Object elementAt(int index) {
-            return wrap( m_de.getElement(index));
+            DocumentElement de = m_de.getElement(index);
+        
+            if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
+                return de.getName();
+            } else {
+                return wrap( de);
+            }
         }
 
         public int getKind() {
@@ -125,7 +130,7 @@ final class DocumentElementWrapper {
             return new FXDNodeWrapper(de);
         } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(de.getType())) {
             return new FXDNodeArrayWrapper(de);
-        } else {
+        } else {   
             throw new RuntimeException( "Unknown DocumentElement type: " + de.getType()); //NOI18N
         }
     }
