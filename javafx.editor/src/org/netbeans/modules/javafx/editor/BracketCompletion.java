@@ -130,7 +130,7 @@ class BracketCompletion {
         return seq.moveNext() ? seq.token().id() : null;
     }
 
-    private static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
+    public static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
         @SuppressWarnings("unchecked")
         TokenSequence<T> seq = (TokenSequence<T>)th.tokenSequence();

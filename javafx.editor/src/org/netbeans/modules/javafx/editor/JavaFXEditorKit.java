@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.editor;
 
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.print.PrintManager;
 import org.netbeans.editor.*;
 import org.netbeans.modules.editor.NbEditorUtilities;
@@ -406,11 +407,12 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                 }
             } else {
                 try {
-                    JFXTokenId id = BracketCompletion.tokenAt(doc, dotPos);
-                    if (id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) {
+                    TokenSequence<JFXTokenId> seq = BracketCompletion.getTokenSequence(doc, dotPos);
+                    JFXTokenId id = seq.moveNext() ? seq.token().id() : null;
+                    if ((id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) && seq.offset() < dotPos) {
                         doc.insertString(dotPos, "* ", null);
                         caret.setDot(dotPos);
-                        return dotPos+3;
+                        return dotPos + 3;
                     } else {
                         return processRawString(doc, caret);
                     }
@@ -472,7 +474,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
                     } catch (BadLocationException ex) {
                         log.severe("Excetion throw during InsertBreakAction. " + ex);
                     }
-                    if (newDot > nowDotPos+1) {
+                    if (newDot > nowDotPos + 1) {
                         caret.setDot(newDot);
                     } else {
                         caret.setDot(nowDotPos + 1);

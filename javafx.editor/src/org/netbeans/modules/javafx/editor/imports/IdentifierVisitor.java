@@ -76,7 +76,10 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
         JFXTree tree = (JFXTree) path.getParentPath().getLeaf();
         if (tree.getGenType() == SyntheticTree.SynthType.COMPILED) {
-            elements.add(toElement(node.getType()));
+            Element element = toElement(node.getType());
+            if (element != null) {
+                elements.add(element);
+            }
         }
         super.visitFunctionValue(node, elements);
         return elements;
