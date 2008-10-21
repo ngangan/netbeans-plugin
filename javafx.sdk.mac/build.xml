@@ -67,7 +67,10 @@ made subject to such option by the copyright holder.
     </target>
 
     <target name="main">
-        <javac srcdir="instsrc" destdir="main"/>
+        <mkdir dir="build/main"/>
+        <javac srcdir="instsrc" destdir="build/main"/>
+        <filter token="SDK_DIR" value="javafx-sdk1.0dev"/>
+        <copy file="main/main.properties" todir="build/main" overwrite="true" filtering="true"/>
     </target>
 
 
@@ -86,7 +89,7 @@ made subject to such option by the copyright holder.
                  moduleauthor="${nbm.module.author}">
             <license file="${custom.license.file}"/>
             <signature keystore="${keystore}" storepass="${storepass}" alias="${nbm_alias}"/>
-            <main dir="main"/>
+            <main dir="build/main"/>
         </makenbm>
     </target>
 </project>

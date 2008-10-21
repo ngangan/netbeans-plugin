@@ -115,7 +115,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             ZipEntry entry = m_zip.getEntry(m_name);
             m_size = entry.getSize();
             m_compressedSize = entry.getCompressedSize();
-            
+                        
             //TODO Do not read file int the AWT thread
             m_buffer = read( m_zip.getInputStream( entry), m_size);
         }
@@ -201,7 +201,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
         
         private ByteArrayBuffer read( InputStream in, long size) throws IOException {
-            if ( size < 0) {
+            if ( size <= 0) {
                 size = 8192;
             } 
             ByteArrayBuffer buffer = new ByteArrayBuffer( (int)size);
@@ -226,7 +226,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_dObj    = dObj;
         m_entries = new ArrayList<FXZArchiveEntry>();
         for ( String entryName : m_entryNames) {
-            m_entries.add( new FXZArchiveEntry(entryName));
+            FXZArchiveEntry entry = new FXZArchiveEntry(entryName);
+            if (entry.m_size > 0) {
+                m_entries.add( entry);
+            }
         }
         m_tableListeners = new ArrayList<TableModelListener>();
     }
@@ -239,7 +242,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                 ex.printStackTrace();
             }
         } else {
-            System.err.println("Document reopened!");  //NOI18N
+            if (m_fileModel.getDocument() != doc) {
+                System.err.println("Document switch!");  //NOI18N
+                Thread.dumpStack();
+            }
         }
     }
     
@@ -254,20 +260,22 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
     
-    public synchronized FXDFileModel getFileModel() {
+    public synchronized FXDFileModel getFileModel(boolean create) {
         if ( m_fileModel == null) {
-            InputStream in = null;
-            try {
+            if (create) {
+                InputStream in = null;
                 try {
-                    System.err.println("Loading the document ...");
-                    in = open();
-                    BaseDocument doc = loadDocument(in);
-                    m_fileModel = new FXDFileModel(this, DocumentModel.getDocumentModel(doc));
-                } finally {
-                    in.close();
+                    try {
+                        System.err.println("Loading the document ...");
+                        in = open();
+                        BaseDocument doc = loadDocument(in);
+                        m_fileModel = new FXDFileModel(this, DocumentModel.getDocumentModel(doc));
+                    } finally {
+                        in.close();
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
                 }
-            } catch(Exception e) {
-                e.printStackTrace();
             }
         }
         return m_fileModel;

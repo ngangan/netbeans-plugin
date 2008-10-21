@@ -132,6 +132,8 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
                     icons = ATTR_ICON;
                 } else if ( FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
                     icons = NODE_GENERAL_ICON;
+                } else if ( FXDFileModel.DOCUMENT_ROOT_ELEMENT_TYPE.equals(type)) {
+                    icons = NODE_ICON;
                 } else {
                     System.err.println("Unknown element type: " + type);  //NOI18N
                 }

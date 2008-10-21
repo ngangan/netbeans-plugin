@@ -96,7 +96,7 @@ public final class FXDElement {
     
     //TODO should be private
     public DocumentElement getDocumentElement() {
-        return m_dObj.getDataModel().getFXDContainer().getFileModel().getElementById(m_id);
+        return m_dObj.getDataModel().getFXDContainer().getFileModel(false).getElementById(m_id);
     }
     
     public int getStartOffset() {

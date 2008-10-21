@@ -139,7 +139,7 @@ public final class UIStubGenerator {
             public void run() {
                 try {
                     // force the model update if changed lately
-                    FXDFileModel model = m_dObj.getDataModel().getFXDContainer().getFileModel();
+                    FXDFileModel model = m_dObj.getDataModel().getFXDContainer().getFileModel(true);
                     model.updateModel();
 
                     model.visitElements( new FXDFileModel.ElementVisitor() {

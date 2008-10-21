@@ -206,7 +206,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                     // L&F (e.g. GTK) did not specify any icon.
                     original = EMPTY;
                 }
-                if (new File(f, "lib/shared/javafxc.jar").isFile() && new File(f, "lib/shared/javafxrt.jar").isFile()) {
+                if ((new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) && new File(f, "lib/shared/javafxc.jar").isFile() && new File(f, "lib/shared/javafxrt.jar").isFile()) {
                     if ( original.equals( lastOriginal ) ) {
                         return lastMerged;
                     }
@@ -365,7 +365,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 //                 return;
 //            }
             File f = component.getFxFolder();
-            if (!new File(f, "lib/shared/javafxc.jar").isFile() || !new File(f, "lib/shared/javafxrt.jar").isFile()) {
+            if (!(new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) || !new File(f, "lib/shared/javafxc.jar").isFile() || !new File(f, "lib/shared/javafxrt.jar").isFile()) {
                 setErrorMessage("ERROR_WrongFxLocation"); //NOI18N
                  return;
             }

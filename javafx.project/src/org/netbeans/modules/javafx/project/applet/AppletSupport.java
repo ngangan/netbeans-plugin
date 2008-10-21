@@ -631,7 +631,7 @@ public class AppletSupport {
         if (value != null) {
             intValue = Integer.valueOf(value).intValue();
         }
-        return new SpinnerNumberModel(intValue, 0, 1024, 1);
+        return new SpinnerNumberModel(intValue, 0, 16384, 1);
     }
 
     /** fills in policy file with all permissions granted
