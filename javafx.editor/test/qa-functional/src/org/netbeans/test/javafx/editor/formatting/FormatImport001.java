@@ -62,6 +62,7 @@ public class FormatImport001 extends JavaFXTestCase {
     static String[] TESTS = {
         "testOpenProject",
         "FormatImport001",
+        "BackgroundImage",
         "testCloseProject"}; //, "testIDELogForErrors"};
     public static String _bundle = "org.netbeans.test.javafx.editor.lib.Bundle";
 
@@ -143,6 +144,42 @@ public class FormatImport001 extends JavaFXTestCase {
         setSource("fxprj2/FormatImport001.fx");
         getFile(DIFF_FILE, "FormatImport001.diff");
         getFile(REF_FILE, "FormatImport001.ref"); //Not used yet.
+
+        //TODO
+        //getSource as String
+        //getPass as String
+        //output only when fails.
+
+        this.assertFile("Output does not match Golden.", new File(SOURCE.getPath()) , this.getGoldenFile(), DIFF_FILE,  new LineDiff(false));
+    }
+
+    public void BackgroundImage() {
+        ProjectsTabOperator pto = new ProjectsTabOperator();
+        String path = PROJECT_NAME + "|Source Packages|fxprj2|BackgroundImage.fx";
+        Node fxsource = new Node(pto.invoke().tree(), path);
+        fxsource.callPopup();
+        new JPopupMenuOperator().pushMenuNoBlock("Open");
+        new QueueTool().waitEmpty();
+        log("File path: " + path + " opened in editor.");
+
+        // get Editor
+        TopComponentOperator main = new TopComponentOperator("BackgroundImage.fx");
+        JEditorPaneOperator editor = new JEditorPaneOperator(main);
+
+        //Format, Save and Close
+        editor.clickForPopup();
+        Util.clickPopup("Format");
+        new QueueTool().waitEmpty();
+        log("Right click > Format done.");
+        new SaveAction().perform();
+        log("Ctrl-S.");
+        new QueueTool().waitEmpty();
+        main.closeWindow();
+
+        //Diff
+        setSource("fxprj2/BackgroundImage.fx");
+        getFile(DIFF_FILE, "BackgroundImage.diff");
+        getFile(REF_FILE, "BackgroundImage.ref"); //Not used yet.
 
         //TODO
         //getSource as String
