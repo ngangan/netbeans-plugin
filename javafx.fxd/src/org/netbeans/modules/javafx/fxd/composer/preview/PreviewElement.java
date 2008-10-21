@@ -118,7 +118,8 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
 
     @Override
     public void componentClosed() {
-        //throw new UnsupportedOperationException("Not supported yet.");
+        FXZDataObject dObj = (FXZDataObject) m_edSup.getDataObject();
+        dObj.reset();
     }
 
     @Override

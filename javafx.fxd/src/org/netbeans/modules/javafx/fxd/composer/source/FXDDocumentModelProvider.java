@@ -23,7 +23,6 @@ import org.netbeans.modules.editor.structure.spi.DocumentModelProvider;
 
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Direction.BACKWARD;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -117,7 +116,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                         deb.build(trans, endOff);
                     } else {                        
                         if ( !deb.isEqual(de.getAttributes())) {
-                            System.err.println("Attributes changes for " + deb.m_typeName);
+                            //System.err.println("Attributes changes for " + deb.m_typeName);
                             trans.updateDocumentElementAttribs(de, deb.getAttributeMap());
                         }
                     }
@@ -129,16 +128,9 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     return null;
                 }
 
-                public void arrayElement(Object node, String value, int startOff, int endOff) {
+                public void arrayElement(Object node, String value, int startOff, int endOff) throws BadLocationException, DocumentModelTransactionCancelledException {
                     if ( value != null) {
-                        //TODO throw exception when FXDContainer library gets updated
-                        try {
-                            trans.addDocumentElement(value, FXDFileModel.FXD_ARRAY_ELEM, NO_ATTRS, startOff, endOff);
-                        } catch (BadLocationException ex) {
-                            Exceptions.printStackTrace(ex);
-                        } catch (DocumentModelTransactionCancelledException ex) {
-                            Exceptions.printStackTrace(ex);
-                        }
+                        trans.addDocumentElement(value, FXDFileModel.FXD_ARRAY_ELEM, NO_ATTRS, startOff, endOff);
                     }
                 }
 

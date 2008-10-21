@@ -23,9 +23,10 @@ import com.sun.javafx.tools.fxd.FXDNode;
  *
  * @author Pavel Benes
  */
-public class FXDFileModel implements DocumentListener, DocumentModelStateListener {   
+public class FXDFileModel implements DocumentModelStateListener {   
     public static final String DOCUMENT_ROOT_ELEMENT_TYPE = "ROOT_ELEMENT";  //NOI18N
     
+    //TODO use intern and direct compare instead of equals
     public static final String FXD_DOC             = "doc";          //NOI18N
     public static final String FXD_HEADER          = "header";       //NOI18N
     public static final String FXD_NODE            = "node";         //NOI18N
@@ -35,8 +36,11 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     
     private final    FXZArchive     m_archive;
     private final    DocumentModel  m_docModel;
-    private volatile boolean        m_changed = false;
-
+    private final    Object         m_lock = new Object();
+    private volatile boolean        m_sourceChanged = false;
+    private volatile boolean        m_updateInProgress = false;
+    private volatile boolean        m_updateInProcess = false;
+    
     public interface ElementVisitor {
         public boolean visitElement( String elemType, String elemName, AttributeSet attrs) throws Exception;
     }
@@ -50,7 +54,8 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         assert docModel != null;
         m_archive  = archive;
         m_docModel = docModel;
-        m_docModel.getDocument().addDocumentListener(this);
+        m_docModel.addDocumentModelStateListener(this);
+        //m_docModel.getDocument().addDocumentListener(this);
         System.err.println("File model created."); //NOI18N
     }
           
@@ -64,9 +69,24 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
 
     public synchronized void updateModel() {
         assert SwingUtilities.isEventDispatchThread() == false : "Model update cannot be called in AWT thread.";  //NOI18N
-        if ( m_changed) {
-            System.err.println("Forcing model update"); //NOI18N
-            m_docModel.forceUpdate();
+
+        synchronized (m_lock) {
+            if (m_sourceChanged) {
+                System.err.println("Forcing model update"); //NOI18N
+                m_docModel.forceUpdate();
+            } else if (!m_updateInProgress) {
+                System.err.println("Model already up to date."); //NOI18N
+                return;
+            }
+
+            while (m_sourceChanged || m_updateInProgress) {
+                System.err.println("Waiting for model update..."); //NOI18N
+                try {
+                    m_lock.wait();
+                    System.err.println("Wait ended."); //NOI18N
+                } catch (InterruptedException ex) {
+                }
+            }
         }
     }
     
@@ -98,6 +118,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         return result;
     }
         
+/*    
     public void insertUpdate(DocumentEvent e) {
         documentChanged(e);
     }
@@ -115,7 +136,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
         m_archive.incrementChangeTicker();
         m_changed = true;
     }
-    
+/*    
     /**
      * Convenience helper method.
      */
@@ -124,7 +145,7 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     }    
         
     public static DocumentModel getDocumentModel( final FXZDataObject dObj) {
-        FXDFileModel fm = dObj.getDataModel().getFXDContainer().getFileModel();
+        FXDFileModel fm = dObj.getDataModel().getFXDContainer().getFileModel(false);
         return fm != null ? fm.getDocumentModel() : null;
     }
     
@@ -229,16 +250,33 @@ public class FXDFileModel implements DocumentListener, DocumentModelStateListene
     }
 
     public void sourceChanged() {
+        synchronized (m_lock) {
+            System.err.println("Document source changed."); //NOI18N
+            m_sourceChanged = true;
+            m_archive.incrementChangeTicker();            
+            m_lock.notifyAll();
+        }
     }
 
     public void scanningStarted() {
+        synchronized (m_lock) {
+            System.err.println("Document scanning started."); //NOI18N
+            //getSceneManager().setBusyState(MODEL_UPDATE_TOKEN, true);
+            m_updateInProgress = true;
+            m_sourceChanged = false;
+            m_lock.notifyAll();
+        }
     }
 
     public void updateStarted() {
     }
 
     public void updateFinished() {
-        System.err.println("Model update finished."); //NOI18N
-        m_changed = false;
+        synchronized (m_lock) {
+            System.err.println("Model update finished."); //NOI18N
+            m_updateInProgress = false;
+            m_lock.notifyAll();
+//            getSceneManager().setBusyState(MODEL_UPDATE_TOKEN, false);
+        }
     }
 }

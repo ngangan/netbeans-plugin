@@ -112,6 +112,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     }
         
     private static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
+        private static final long  serialVersionUID = 1L;
         
         public FXDEnv( FXZDataObject obj) {
             super(obj);
