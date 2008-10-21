@@ -63,8 +63,9 @@ import org.openide.util.ImageUtilities;
  */
 final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer { 
     private static final String IMAGE_BASE     = "org/netbeans/modules/javafx/fxd/composer/resources/";  //NOI18N
-    private static final String NODE           = IMAGE_BASE + "node_element.png";  //NOI18N
+    private static final String ELEMENT        = IMAGE_BASE + "node_element.png";  //NOI18N
     private static final String NODE_ATTR      = IMAGE_BASE + "node_attr.png";  //NOI18N
+    private static final String NODE_GENERAL   = IMAGE_BASE + "node_node.png";  //NOI18N
     private static final String ERROR          = "org/netbeans/modules/xml/text/navigator/resources/badge_error.png"; //NOI18N    
     private static final Image  ERROR_IMAGE    = ImageUtilities.loadImage(ERROR, true);   
     
@@ -88,9 +89,10 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         NODE_ICONS.put("RadialGradient", createIcons(IMAGE_BASE + "node_radialGradient.png"));//NOI18N
     }
         
-    private final Icon[] NODE_GRAY_ICON = new Icon[]{getImageIcon(NODE, false), getImageIcon(NODE, true)};
-    private final Icon[] NODE_ICON      = createIcons(NODE);
-    private final Icon[] ATTR_ICON      = createIcons(NODE_ATTR);
+    private final Icon[] NODE_GRAY_ICON    = new Icon[]{getImageIcon(ELEMENT, false), getImageIcon(ELEMENT, true)};
+    private final Icon[] NODE_ICON         = createIcons(ELEMENT);
+    private final Icon[] ATTR_ICON         = createIcons(NODE_ATTR);
+    private final Icon[] NODE_GENERAL_ICON = createIcons(NODE_GENERAL);
 
     
     private final HtmlRenderer.Renderer renderer;
@@ -128,6 +130,8 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
                     icons = ATTR_ICON;
                 } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
                     icons = ATTR_ICON;
+                } else if ( FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
+                    icons = NODE_GENERAL_ICON;
                 } else {
                     System.err.println("Unknown element type: " + type);  //NOI18N
                 }
