@@ -86,6 +86,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.source.tree.ClassTree;
 import javax.lang.model.element.ElementKind;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 
 /* 
@@ -96,6 +97,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static final String SOURCES_TYPE_JAVAFX = "fx";         // NOI18N
     public static final String SOURCES_TYPE_JAVA   = "java";       // NOI18N
     public static final String JAVAFX_MIME_TYPE    = "text/x-fx";  // NOI18N
+    public static final String CLASS_MIME_TYPE    = "application/x-class-file";   // NOI18N
     public static final String MAGIC_METHOD_NAME    = "javafx$run$";  // NOI18N
     public static final String MAGIC_METHOD_SIGNATURE    = "(Lcom/sun/javafx/runtime/sequence/Sequence;)Ljava/lang/Object;";  // NOI18N
     public static final String INTERFACE_NAME_SUFFIX = "$Intf";  // NOI18N
@@ -313,7 +315,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     }   
     
     public static boolean isJavaFXFile(FileObject f) {
-        return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
+        return JAVAFX_MIME_TYPE.equals(f.getMIMEType()) || CLASS_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
     }        
     
     public static FileObject getRoot(FileObject[] roots, FileObject file) {
@@ -451,6 +453,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static FileObject getFile(Element handle, ClasspathInfo cpInfo) {
         assert handle != null;
         assert handle instanceof TypeElement;
+
         TypeElement te = (TypeElement) handle;
         StringBuilder sb = new StringBuilder ();
         Name name = ((Symbol.ClassSymbol)te).flatname;

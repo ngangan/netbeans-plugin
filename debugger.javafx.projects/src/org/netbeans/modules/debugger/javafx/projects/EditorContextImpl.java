@@ -1333,7 +1333,7 @@ public class EditorContextImpl extends EditorContext {
                or -1 when the line does not exist
      */
     private static int findLineOffset(StyledDocument doc, int lineNumber) {
-        int offset;
+        int offset = -1;
         try {
             offset = NbDocument.findLineOffset (doc, lineNumber - 1);
             int offset2 = NbDocument.findLineOffset (doc, lineNumber);
@@ -1349,7 +1349,7 @@ public class EditorContextImpl extends EditorContext {
                 // ignore
             }
         } catch (IndexOutOfBoundsException ioobex) {
-            return -1;
+            //return -1;
         }
         return offset;
     }

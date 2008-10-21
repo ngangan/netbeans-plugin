@@ -47,12 +47,15 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Vector;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
+import org.openide.filesystems.FileObject;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
@@ -78,6 +81,13 @@ public class JavaFXFunctionNode extends SelectorNode {
         super(method.toString(), method.getSimpleName().toString(), getIcon(method), SelectorChildren.LEAF, parent);
 
         JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
+
+        // workaround for library class nodes
+        if (js == null) {
+            Vector<FileObject> v = new Vector<FileObject>();
+            v.add(JavaFXProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
+            js = JavaFXSource.create(cpInfo, v);
+        }
         
         try {
             js.runUserActionTask(new CancellableTask<CompilationController>() {

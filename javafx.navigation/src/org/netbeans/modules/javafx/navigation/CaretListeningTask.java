@@ -41,6 +41,8 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.tools.javac.code.Symbol;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -48,13 +50,18 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 
 /**
  * This task is called every time the caret position changes in a Java editor.
@@ -285,11 +292,28 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         canceled = false;
     }
 
-    private void computeAndSetJavadoc(CompilationInfo compilationInfo, Element element) {
+    private void computeAndSetJavadoc(CompilationInfo compilationInfo, final Element element) {
         if (isCancelled()) {
             return;
         }
-        setJavadoc(ElementJavadoc.create(compilationInfo, element));
+//        if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
+//            JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
+//            FileObject fo = JavaFXSourceUtils.getFile(element, javaFXSource.getCpInfo());
+//            if (fo != null) {
+//                javaFXSource = JavaFXSource.forFileObject(fo);
+//            }
+//            try {
+//                javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
+//                    public void run(CompilationController cc) throws Exception {
+//                        setJavadoc(ElementJavadoc.create(cc, element));
+//                    }
+//                }, true);
+//            } catch (IOException ex) {
+//                Exceptions.printStackTrace(ex);
+//            }
+//        } else {
+            setJavadoc(ElementJavadoc.create(compilationInfo, element));
+//        }
     }
 
 //    private void computeAndSetDeclaration(CompilationInfo compilationInfo, Element element ) {
@@ -406,6 +430,9 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             try {
                 eh[0]  = ElementHandle.create(e);
             } catch (Exception ex) {
+                System.out.println("* element = " + e);
+                System.out.println("* element kind = " + e.getKind());
+                ex.printStackTrace();
                 // can't convert to element handler (incomplete element)
             }
             if (eh[0] == null) {

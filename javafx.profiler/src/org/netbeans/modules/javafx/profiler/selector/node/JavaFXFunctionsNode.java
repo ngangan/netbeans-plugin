@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -58,6 +59,7 @@ import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.GreedySelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
+import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -73,6 +75,13 @@ public class JavaFXFunctionsNode extends ContainerNode {
 
             try {
                 JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+
+                // workaround for library class nodes
+                if (js == null) {
+                    Vector<FileObject> v = new Vector<FileObject>();
+                    v.add(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+                    js = JavaFXSource.create(parent.cpInfo, v);
+                }
                 
                 js.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
