@@ -494,12 +494,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         UnitTree unit = controller.getCompilationUnit();
         long s = pos.getStartPosition(unit, t);
         long e = pos.getEndPosition(unit, t);
-        while (t != null &&
-                (t.getJavaFXKind() == JavaFXKind.ERRONEOUS ||
-                    (offset <= s) ||
-                    (offset > e)
-                )
-        ) {
+        while (t != null && ((offset < s) || (offset >= e))) {
             path = path.getParentPath();
             if (path != null) {
                 t = path.getLeaf();
@@ -571,25 +566,18 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 break;
             case MULTIPLY_ASSIGNMENT:
             case DIVIDE_ASSIGNMENT:
-//            case REMAINDER_ASSIGNMENT:
             case PLUS_ASSIGNMENT:
             case MINUS_ASSIGNMENT:
-//            case AND_ASSIGNMENT:
-//            case XOR_ASSIGNMENT:
-//            case OR_ASSIGNMENT:
                 result = new CompoundAssignmentTreeEnvironment();
                 break;
             case PREFIX_INCREMENT:
             case POSTFIX_INCREMENT:
             case PREFIX_DECREMENT:
             case POSTFIX_DECREMENT:
-//            case UNARY_PLUS:
             case UNARY_MINUS:
-//            case BITWISE_COMPLEMENT:
             case LOGICAL_COMPLEMENT:
                 result = new UnaryTreeEnvironment();
                 break;
-//            case AND:
             case CONDITIONAL_AND:
             case CONDITIONAL_OR:
             case DIVIDE:
@@ -601,10 +589,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case MINUS:
             case MULTIPLY:
             case NOT_EQUAL_TO:
-//            case OR:
             case PLUS:
             case REMAINDER:
-//            case XOR:
                 result = new BinaryTreeEnvironment();
                 break;
             case CONDITIONAL_EXPRESSION:
@@ -687,15 +673,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case TRY:
                 break;
             case INT_LITERAL:
-//            case LONG_LITERAL:
             case FLOAT_LITERAL:
             case DOUBLE_LITERAL:
             case BOOLEAN_LITERAL:
-//            case CHAR_LITERAL:
             case STRING_LITERAL:
             case NULL_LITERAL:
                 break;
             case ERRONEOUS:
+                result = new ErroneousEnvironment();
                 break;
             case SIZEOF:
                 break;
