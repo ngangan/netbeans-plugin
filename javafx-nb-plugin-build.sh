@@ -55,7 +55,6 @@ nb.cluster.javafx=\\
        contrib/javafx.userlib,\\
        contrib/javafx.profiler,\\
        contrib/javafx.bestpractices,\\
-       contrib/javafx.sdksamples,\\
        contrib/javafx.weather2,\\
        contrib/javafx.sdk.win,\\
        contrib/javafx.sdk.mac,\\
