@@ -249,7 +249,7 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
-            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}"/>
+            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}"/>
         </target>
         <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
@@ -279,6 +279,7 @@ is divided into following sections:
         </target>
         <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
             <exec executable="${{java.home}}/bin/javaws">
+                <env key="JAVAWS_VM_ARGS" value="${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
         </target>
@@ -311,6 +312,7 @@ is divided into following sections:
         <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
             <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}">
                 <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
+                <jvmarg line="${{run.jvmargs}}"/>
                 <syspropertyset>
                     <propertyref prefix="run-sys-prop."/>
                     <mapper from="run-sys-prop.*" to="*" type="glob"/>
@@ -327,7 +329,7 @@ is divided into following sections:
         </target>
         <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
             <exec executable="${{java.home}}/bin/javaws">
-                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
+                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}} ${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
         </target>

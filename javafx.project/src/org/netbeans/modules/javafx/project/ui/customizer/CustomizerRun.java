@@ -106,9 +106,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         
         configs = uiProperties.RUN_CONFIGS;
 
-        data = new JTextField[]{jTextFieldMainClass};
-        dataLabels = new JLabel[]{jLabelMainClass};
-        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS};
+        data = new JTextField[]{jTextFieldMainClass, jvmText};
+        dataLabels = new JLabel[]{jLabelMainClass, jvmLabel};
+        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.RUN_JVM_ARGS};
         assert data.length == keys.length;
 
         configChanged(uiProperties.activeConfig);
@@ -197,6 +197,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         jRadioButton2 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
+        jvmLabel = new javax.swing.JLabel();
+        jvmText = new javax.swing.JTextField();
 
         setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -296,6 +298,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRunComponent.jLabel1.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 5, 0);
         extPanel.add(jLabel1, gridBagConstraints);
@@ -310,6 +313,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         extPanel.add(jRadioButton1, gridBagConstraints);
@@ -324,6 +328,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton2, gridBagConstraints);
 
@@ -337,6 +342,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton3, gridBagConstraints);
 
@@ -350,9 +356,26 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
         extPanel.add(jRadioButton4, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
+        extPanel.add(jvmLabel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 12, 0, 0);
+        extPanel.add(jvmText, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -505,6 +528,8 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JTextField jTextFieldMainClass;
+    private javax.swing.JLabel jvmLabel;
+    private javax.swing.JTextField jvmText;
     private javax.swing.JPanel mainPanel;
     // End of variables declaration//GEN-END:variables
 

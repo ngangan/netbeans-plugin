@@ -509,6 +509,13 @@ public class JavaFXProjectProperties {
         if ( NO_DEPENDENCIES_MODEL.isSelected() ) { // NOI18N
             projectProperties.remove( NO_DEPENDENCIES ); // Remove the property completely if not set
         }
+        
+        //Handle Application name fix
+        String name = projectProperties.get(APPLICATION_TITLE);
+        if (name != null) {
+            String newName = name.replaceAll("\\s+", "_").replaceAll("[^A-Za-z0-9-_]", ""); //NOI18N
+            if (!newName.equals(name)) projectProperties.put(APPLICATION_TITLE, newName);
+        }
 
         projectProperties.putAll(additionalProperties);
         //Applet
