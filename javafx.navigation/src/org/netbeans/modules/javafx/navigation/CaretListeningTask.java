@@ -430,6 +430,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             try {
                 eh[0]  = ElementHandle.create(e);
             } catch (Exception ex) {
+                ex.printStackTrace();
                 // can't convert to element handler (incomplete element)
             }
             if (eh[0] == null) {
