@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<filesystem>
+    <folder name="SDKSamples">
+        <folder name="PhotoEffects">
+            <file name="description.html" url="PhotoEffects/description.html"/>
+        </folder>
+    </folder>
+
+    <folder name="Templates">
+        <folder name="Project">
+            <folder name="Samples">
+                <folder name="JavaFX">
+                    <file name="PhotoEffects" url="PhotoEffects/PhotoEffects.zip">
+                        <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.weather2.Bundle"/>
+                        <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator.createIterator"/>
+                        <attr name="instantiatingWizardURL" urlvalue="nbfs:/SystemFileSystem/SDKSamples/PhotoEffects/description.html"/>
+                        <attr name="template" boolvalue="true"/>
+                    </file>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>
