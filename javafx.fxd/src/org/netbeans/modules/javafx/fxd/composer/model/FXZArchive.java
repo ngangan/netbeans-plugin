@@ -116,6 +116,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             m_size = entry.getSize();
             m_compressedSize = entry.getCompressedSize();
             
+            System.err.println("Name: " + m_name);
+            System.err.println("Size: " + m_size);
+            System.err.println("CSize: " + m_compressedSize);
+            
             //TODO Do not read file int the AWT thread
             m_buffer = read( m_zip.getInputStream( entry), m_size);
         }
@@ -201,7 +205,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
         
         private ByteArrayBuffer read( InputStream in, long size) throws IOException {
-            if ( size < 0) {
+            if ( size <= 0) {
                 size = 8192;
             } 
             ByteArrayBuffer buffer = new ByteArrayBuffer( (int)size);
@@ -226,7 +230,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_dObj    = dObj;
         m_entries = new ArrayList<FXZArchiveEntry>();
         for ( String entryName : m_entryNames) {
-            m_entries.add( new FXZArchiveEntry(entryName));
+            FXZArchiveEntry entry = new FXZArchiveEntry(entryName);
+            if (entry.m_size > 0) {
+                m_entries.add( entry);
+            }
         }
         m_tableListeners = new ArrayList<TableModelListener>();
     }
