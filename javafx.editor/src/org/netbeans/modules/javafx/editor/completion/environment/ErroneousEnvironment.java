@@ -39,7 +39,7 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXErroneous;
+import com.sun.tools.javafx.tree.JFXErroneousType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -49,13 +49,13 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  *
  * @author David Strupl
  */
-public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneous> {
+public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneousType> {
     
     private static final Logger logger = Logger.getLogger(ErroneousEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXErroneous t) {
+    protected void inside(JFXErroneousType t) {
         if (LOGGABLE) log("inside JFXErroneous " + t);
 
     }
