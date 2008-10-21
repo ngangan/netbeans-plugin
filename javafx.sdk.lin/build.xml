@@ -66,7 +66,14 @@ made subject to such option by the copyright holder.
 		</BuildLibDesc>
     </target>
 
-    <target name="nbm" depends="init,netbeans,-nbm-prompt-for-storepass" description="Build NBM archive.">
+    <target name="main">
+        <mkdir dir="build/main"/>
+        <javac srcdir="instsrc" destdir="build/main"/>
+        <filter token="SDK_DIR" value="javafx-sdk1.0dev"/>
+        <copy file="main/main.properties" todir="build/main" overwrite="true" filtering="true"/>
+    </target>
+
+    <target name="nbm" depends="init,netbeans,-nbm-prompt-for-storepass,main" description="Build NBM archive.">
         <mkdir dir="build"/>
         <property name="nbm.target.cluster" value=""/> <!-- fallback -->
         <makenbm file="build/${nbm}"
@@ -81,6 +88,7 @@ made subject to such option by the copyright holder.
                  moduleauthor="${nbm.module.author}">
             <license file="${custom.license.file}"/>
             <signature keystore="${keystore}" storepass="${storepass}" alias="${nbm_alias}"/>
+            <main dir="build/main"/>
         </makenbm>
     </target>
 </project>
