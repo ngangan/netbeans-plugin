@@ -487,24 +487,27 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             }
         }
-        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset); // NOI18N
+        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + 
+                " offset: " + offset + " prefix " + prefix); // NOI18N
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         Tree t = path.getLeaf();
         SourcePositions pos = controller.getTrees().getSourcePositions();
         UnitTree unit = controller.getCompilationUnit();
         long s = pos.getStartPosition(unit, t);
         long e = pos.getEndPosition(unit, t);
-        while (t != null && ((offset < s) || (offset >= e))) {
+        while (t != null && ((offset <= s) || (offset >= e))) {
             path = path.getParentPath();
             if (path != null) {
                 t = path.getLeaf();
             } else {
                 t = null;
             }
-            s = pos.getStartPosition(unit, t);
-            e = pos.getEndPosition(unit, t);
+            long s1 = pos.getStartPosition(unit, t);
+            s = s1 < s ? s1 : s;
+            long e1 = pos.getEndPosition(unit, t);
+            e = e1 > e ? e1 : e;
         }
-        if (t == null) {
+        if ((t == null) || (controller.getTreeUtilities().isSynthetic(path))){
             t = unit;
             path = new JavaFXTreePath(unit);
         }
