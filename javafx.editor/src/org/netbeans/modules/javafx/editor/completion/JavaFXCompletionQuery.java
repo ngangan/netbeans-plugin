@@ -643,6 +643,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new FunctionDefinitionEnvironment();
                 break;
             case FUNCTION_VALUE:
+                result = new FunctionValueEnvironment();
                 break;
             case INIT_DEFINITION:
                 break;
