@@ -39,14 +39,18 @@
 
 package org.netbeans.modules.javafx.sdksamples;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
+import javax.tools.FileObject;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.MultiFileSystem;
 import org.openide.filesystems.XMLFileSystem;
+import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
 import org.xml.sax.SAXException;
 
@@ -56,21 +60,26 @@ import org.xml.sax.SAXException;
  */
 public class SDKSamplesFileSystem extends MultiFileSystem {
 
-    public SDKSamplesFileSystem() throws MalformedURLException {
+    public SDKSamplesFileSystem() {
 
-        String samplesUrl = null;
-        for( JavaPlatform platform : JavaPlatformManager.getDefault().getInstalledPlatforms()) {
-            if( platform instanceof JavaFXPlatform ) {
-                JavaFXPlatform jfxp = (JavaFXPlatform) platform;
-                JavaFXPlatform p = jfxp.getDefaultFXPlatform();
-                samplesUrl = p.getJavaFXFolder().toExternalForm() + "samples/layer.xml";
-            }
-        }
+//        String samplesUrl = null;
+        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0dev/samples/layer.xml",
+                "org.netbeans.modules.javafx", false );
+//        for( JavaPlatform platform : JavaPlatformManager.getDefault().getInstalledPlatforms()) {
+//            if( platform instanceof JavaFXPlatform ) {
+//                JavaFXPlatform jfxp = (JavaFXPlatform) platform;
+//                JavaFXPlatform p = jfxp.getDefaultFXPlatform();
+//                samplesUrl = p.getJavaFXFolder().toExternalForm() + "samples/layer.xml";
+//            }
+//        }
         try {
-            if( samplesUrl != null ) {
-                setDelegates( new XMLFileSystem( new URL( samplesUrl )));
+            if( fxPath != null ) {
+                setDelegates( new XMLFileSystem( fxPath.toURI().toURL()));
             }
         } catch( SAXException e ) {
+            Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
+                    NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+        } catch( MalformedURLException e ) {
             Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
                     NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
         }
