@@ -730,7 +730,7 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getFileObject()/*.getCompilationUnit().getSourceFile()*/+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;
@@ -1333,7 +1333,7 @@ public class EditorContextImpl extends EditorContext {
                or -1 when the line does not exist
      */
     private static int findLineOffset(StyledDocument doc, int lineNumber) {
-        int offset;
+        int offset = -1;
         try {
             offset = NbDocument.findLineOffset (doc, lineNumber - 1);
             int offset2 = NbDocument.findLineOffset (doc, lineNumber);
@@ -1349,7 +1349,7 @@ public class EditorContextImpl extends EditorContext {
                 // ignore
             }
         } catch (IndexOutOfBoundsException ioobex) {
-            return -1;
+            //return -1;
         }
         return offset;
     }

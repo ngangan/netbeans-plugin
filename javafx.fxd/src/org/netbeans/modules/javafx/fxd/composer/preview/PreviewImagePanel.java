@@ -10,7 +10,6 @@ import com.sun.scenario.scenegraph.fx.FXNode;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -25,6 +24,10 @@ import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.LoaderExtended;
+import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
+import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 
 /**
  *
@@ -50,74 +53,97 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         };
         
         setLayout(new BorderLayout());
+        setBackground( Color.WHITE);
     }
     
     public JSGPanel getJSGPanel() {
         return m_sgPanel;
     }
     
+    protected JLabel createWaitPanel() {
+        URL url = PreviewImagePanel.class.getClassLoader().getResource("org/netbeans/modules/javafx/fxd/composer/resources/clock.gif"); //NOI18N
+        ImageIcon icon = new ImageIcon( url);
+        JLabel label = new JLabel( icon);
+        label.setHorizontalTextPosition(JLabel.CENTER);
+        label.setVerticalTextPosition( JLabel.BOTTOM);
+        return label;        
+    }
+    
     synchronized void refresh() {
         final int tickerCopy = m_dObj.getDataModel().getFXDContainer().getChangeTicker();
         if (  tickerCopy != m_changeTickerCopy) {
             removeAll();
+            final JLabel label = createWaitPanel();
+            label.setText("Parsing ...");
+            
+            add( label, BorderLayout.CENTER);
             m_sgPanel  = null;
 
-//            JavaFXPlatform jfxpf = JavaFXPlatform.getDefaultFXPlatform();
-//            System.err.println("JavaFX platform: " + jfxpf.getJavaFXFolder());
-                    
-            try {
-                //Object obj = Loader.get().load(m_dObj.getDataModel().getFXDContainer());
-                System.err.println("Recreating the FXD image ...");
-                /*
-                FXDContainer fxdContainer = m_dObj.getDataModel().getFXDContainer();
-                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-                Class class_Loader = classLoader.loadClass("javafx.fxd.Loader");
-                Method  method_get  = class_Loader.getDeclaredMethod("get");
-                Object  loader = method_get.invoke( null);
-                Method  method_load  = class_Loader.getDeclaredMethod("load", FXDContainer.class);
-                Object  node = method_load.invoke(loader, fxdContainer);
-                
-                Method  method_impl_getFXNode  = node.getClass().getDeclaredMethod("impl_getFXNode");
-                //Object   group  = m.invoke(fxNode);
-                FXNode fxNode = (FXNode) method_impl_getFXNode.invoke(node); 
-                 */
-                
-                javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(m_dObj.getDataModel().getFXDContainer());
-                //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
-                //Object   group  = m.invoke(fxNode);
-                FXNode fxNode = node.impl_getFXNode();  
-                
-                if (fxNode != null) {
-                    m_sgPanel = new JSGPanel() {
-                        @Override
-                        public void paintComponent(Graphics g) {
-                            super.paintComponent(g);
-                            m_dObj.getController().paintActions(g);
-                        }
-                    };
-                    m_sgPanel.setBackground(Color.WHITE);
-//                    FXNode fNode = new FXNode(sgNode);
-                    m_sgPanel.setScene( fxNode);
-                    
-                    add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
+            Thread th = new Thread() {
+                @Override
+                public void run() {
+                    final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
+                    fxz.getFileModel(false).updateModel();
 
-                    MouseEventCollector mec = new MouseEventCollector();
-                    m_sgPanel.addMouseListener(mec);
-                    m_sgPanel.addMouseMotionListener(mec);
-                    m_sgPanel.addMouseWheelListener(mec);
-                    
-                    m_changeTickerCopy = tickerCopy;
-                } else {
-                    add( new JLabel("Cannot show"));
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            label.setText("Rendering ...");
+                            SwingUtilities.invokeLater( new Runnable() {
+                                public void run() {
+                                    try {
+                                        javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(fxz);
+                                        //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
+                                        //Object   group  = m.invoke(fxNode);
+                                        FXNode fxNode = node.impl_getFXNode();  
+
+                                        if (fxNode != null) {
+                                            m_sgPanel = new JSGPanel() {
+                                                @Override
+                                                public void paintComponent(java.awt.Graphics g) {
+                                                    super.paintComponent(g);
+                                                    m_dObj.getController().paintActions(g);
+                                                }
+                                            };
+                                            m_sgPanel.setBackground(Color.WHITE);
+                        //                    FXNode fNode = new FXNode(sgNode);
+                                            m_sgPanel.setScene( fxNode);
+
+                                            removeAll();
+                                            add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
+
+                                            MouseEventCollector mec = new MouseEventCollector();
+                                            m_sgPanel.addMouseListener(mec);
+                                            m_sgPanel.addMouseMotionListener(mec);
+                                            m_sgPanel.addMouseWheelListener(mec);
+
+                                            m_changeTickerCopy = tickerCopy;
+                                            updateZoom();
+                                        } else {
+                                            removeAll();
+                                            add( new JLabel("Cannot show"));
+                                        }
+                                    } catch( Exception e) {
+                                        e.printStackTrace();
+                                        removeAll();
+                                        add( new JLabel( e.getLocalizedMessage()), BorderLayout.CENTER);
+                                    } finally {
+                                        System.gc();                                
+                                    }
+                                }                            
+                            });                            
+                        }
+                    });                    
                 }
-            } catch( Exception e) {
-                e.printStackTrace();
-                add( new JLabel( e.getLocalizedMessage()), BorderLayout.CENTER);
-            }
-            
-            System.gc();
+            };
+            th.setName("ModelUpdate-Thread");  //NOI18N
+            th.start();            
+        } else {
+            updateZoom();
         }
-        
+    }
+    
+    private void updateZoom() {
+        assert m_sgPanel != null;
         float zoom = m_dObj.getDataModel().getZoomRatio();
         FXNode fxNode = (FXNode) m_sgPanel.getScene();
         fxNode.setScaleX(zoom);
@@ -191,7 +217,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
         public void mouseExited(MouseEvent e) {
             processEvent(e);
-            getStatusBar().setText(PreviewStatusBar.CELL_POSITION, "[-,-]");
+            getStatusBar().setText(PreviewStatusBar.CELL_POSITION, "[-,-]");  //NOI18N
         }
 
         public void mouseDragged(MouseEvent e) {
@@ -202,7 +228,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             processEvent(e);
             float zoom = m_dObj.getDataModel().getZoomRatio();
             
-            getStatusBar().setText( PreviewStatusBar.CELL_POSITION, String.format("[%d,%d]", Math.round(e.getX()/zoom), Math.round(e.getY()/zoom)));
+            getStatusBar().setText( PreviewStatusBar.CELL_POSITION, String.format("[%d,%d]", Math.round(e.getX()/zoom), Math.round(e.getY()/zoom))); //NOI18N
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {

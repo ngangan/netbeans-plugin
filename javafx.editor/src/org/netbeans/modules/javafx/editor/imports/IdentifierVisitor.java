@@ -35,7 +35,6 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -44,7 +43,6 @@ import java.util.logging.Logger;
 class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collection<Element>> {
     private final CompilationInfo info;
     protected UnitTree cu;
-    private static Logger log = Logger.getLogger(IdentifierVisitor.class.getName());
 
     IdentifierVisitor(CompilationInfo info) {
         this.info = info;
@@ -54,30 +52,20 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
     @Override
     public Collection<Element> visitIdentifier(IdentifierTree node, Collection<Element> elements) {
         Element element = toElement(node);
-        if (element != null && (element.asType().getKind() == TypeKind.PACKAGE)) {
-            JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
-            Tree parent = path.getParentPath().getLeaf();
-            if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+        if (element != null) {
+            if ((element.asType().getKind() == TypeKind.PACKAGE)) {
+                JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+                Tree parent = path.getParentPath().getLeaf();
+                if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                    elements.add(element);
+                }
+            } else {
                 elements.add(element);
             }
-        } else {
-            elements.add(element);
         }
-//        super.visitIdentifier(node, elements);
         return elements;
     }
 
-/*
-    @Override
-    public Collection<Element> visitInterpolateValue(InterpolateValueTree node, Collection<Element> elements) {
-        if (log.isLoggable(Level.INFO)) {
-            log.info("Approching visitInterpolateValue");
-        }
-        scan(node.getInterpolation(), elements);
-        return elements;
-//        return super.visitInterpolateValue(node, elements);
-    }
-*/
 
     private Element toElement(Tree node) {
         return info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
@@ -88,7 +76,10 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
         JFXTree tree = (JFXTree) path.getParentPath().getLeaf();
         if (tree.getGenType() == SyntheticTree.SynthType.COMPILED) {
-            elements.add(toElement(node.getType()));
+            Element element = toElement(node.getType());
+            if (element != null) {
+                elements.add(element);
+            }
         }
         super.visitFunctionValue(node, elements);
         return elements;

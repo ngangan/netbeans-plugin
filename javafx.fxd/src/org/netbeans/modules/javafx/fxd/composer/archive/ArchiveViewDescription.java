@@ -9,6 +9,7 @@ import java.awt.EventQueue;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataNode;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -38,7 +39,7 @@ public class ArchiveViewDescription implements MultiViewDescription, Serializabl
     }
 
     public java.awt.Image getIcon() {
-        return null;
+        return FXZDataNode.FILE_IMAGE;
     }
 
     public String preferredID() {

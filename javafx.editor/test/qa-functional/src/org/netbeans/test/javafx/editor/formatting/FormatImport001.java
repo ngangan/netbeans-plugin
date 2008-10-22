@@ -43,25 +43,35 @@ package org.netbeans.test.javafx.editor.formatting;
  * @author Lark
  */
 import junit.framework.Test;
-import org.netbeans.jellytools.Bundle;
+import java.io.File;
+import org.netbeans.jellytools.ProjectsTabOperator;
+import org.netbeans.jellytools.TopComponentOperator;
+import org.netbeans.jellytools.actions.SaveAction;
 import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.JEditorPaneOperator;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.test.javafx.editor.lib.JavaFXTestCase;
 import org.netbeans.test.javafx.editor.lib.Util;
+import org.openide.filesystems.FileObject;
+import org.netbeans.jellytools.nodes.Node;
+import org.netbeans.jemmy.operators.JPopupMenuOperator;
+import org.netbeans.junit.diff.LineDiff;
 
 public class FormatImport001 extends JavaFXTestCase {
 
-    static String[] TESTS = {"testCreate", "testFormatting", "testCloseProject"}; //, "testIDELogForErrors"};
+    static String[] TESTS = {
+        "testOpenProject",
+        "FormatImport001",
+        "BackgroundImage",
+        "testCloseProject"}; //, "testIDELogForErrors"};
     public static String _bundle = "org.netbeans.test.javafx.editor.lib.Bundle";
-//    public static String _token = "qa.javafx.editor.tokenTest";
-    public static String _main = Bundle.getStringTrimmed(_bundle, "mainFX");
-    public static String _source = Bundle.getStringTrimmed(_bundle, "sourcePackages");
-    public static String _placeCodeHere = Bundle.getStringTrimmed(_bundle, "placeCodeHere");
-//    public static String _editor = Bundle.getStringTrimmed(_bundle, "editor");
-    public static String SOURCE = "formatting/FormatImport001.fx";
-    public static String GOLDEN = "goldenfiles/org/netbeans/test/javafx/editor/formatting/imports/FormatImport001.pass";
-    protected static final String PROJECT_NAME = "FormatImport001";
+
+    protected static final String PROJECT_NAME = "fx-prj-2";
+    protected final String DATA_DIR = this.getDataDirAsString();
+    protected final String WORK_DIR = this.getWorkDirAsString();
+    protected File DIFF_FILE;
+    protected File REF_FILE;
+    public FileObject SOURCE;
 
     public FormatImport001(String name) {
         super(name);
@@ -71,44 +81,112 @@ public class FormatImport001 extends JavaFXTestCase {
         return NbModuleSuite.create(FormatImport001.class, ".*", ".*", TESTS);
     }
 
-    public void testCreate() {
-        if ((Util.createProject(PROJECT_NAME, this.getWorkDirAsString())).equals(false)) {
-            fail("Project " + PROJECT_NAME + " was not found.");
+    /** Open Project opens he fx-prj-2 project which contains the
+     * Format related .fx files
+     */
+    public void testOpenProject() {
+        try {
+            this.openDataProjects(PROJECT_NAME);
+        } catch (java.io.IOException ioe) {
+            fail("Unable to open data project: " + PROJECT_NAME + " at " + DATA_DIR);
         }
+        log("Opened: " + PROJECT_NAME + " at " + DATA_DIR);
         Util.waitScanFinished();
     }
 
-    public void testFormatting() {
-        //put sample code in editor 'Place Code Here'
-        JEditorPaneOperator editor = Util.placeCodeHere(PROJECT_NAME, SOURCE, this.getDataDirAsString());
-        assertNotNull("Sample \"" + SOURCE + "\" was not found", editor.toString());
+    void setSource(String filePath) {
+        try {
+            SOURCE = Util.getTestFile(this.getDataDir(), PROJECT_NAME, filePath);
+        } catch (java.io.IOException ioe) {
+            log("Unable to open file: " + filePath);
+            fail(ioe.getCause());
+        } catch (java.lang.InterruptedException ie) {
+            log("Open interrupted for " + filePath);
+            fail(ie.getCause());
+        }
+        log("Opened " + filePath + "in project: " + PROJECT_NAME);
+    }
 
-        //Format
+    void getFile(File file, String fileName) {
+        try {
+            file = new File(getWorkDir(), fileName);
+        } catch (java.io.IOException ioe) {
+            log("Unable to open file: " + fileName);
+            fail(ioe.getCause());
+        }
+        log("Opened " + fileName);
+    }
+
+    public void FormatImport001() {
+        ProjectsTabOperator pto = new ProjectsTabOperator();
+        String path = PROJECT_NAME + "|Source Packages|fxprj2|FormatImport001.fx";
+        Node fxsource = new Node(pto.invoke().tree(), path);
+        fxsource.callPopup();
+        new JPopupMenuOperator().pushMenuNoBlock("Open");
+        new QueueTool().waitEmpty();
+        log("File path: " + path + " opened in editor.");
+
+        // get Editor
+        TopComponentOperator main = new TopComponentOperator("FormatImport001.fx");
+        JEditorPaneOperator editor = new JEditorPaneOperator(main);
+
+        //Format, Save and Close
         editor.clickForPopup();
         Util.clickPopup("Format");
         new QueueTool().waitEmpty();
+        log("Right click > Format done.");
+        new SaveAction().perform();
+        log("Ctrl-S.");
+        new QueueTool().waitEmpty();
+        main.closeWindow();
 
-        //Diff it
-        String goldenState = Util.getSourceCodeData(GOLDEN, this.getDataDirAsString()); //adds trailing \n
-        String currentState = Util.trimComments(editor.getText());
+        //Diff
+        setSource("fxprj2/FormatImport001.fx");
+        getFile(DIFF_FILE, "FormatImport001.diff");
+        getFile(REF_FILE, "FormatImport001.ref"); //Not used yet.
 
-        if (Util.diff(currentState, goldenState)) {
-            assertTrue("Pass: Editor Source Matches Golden Source.", true);
-        } else {
-            String output, temp;
-            output = "";
-            temp = "WHAT WE WANT TO SEE: Golden State: length = " + goldenState.length();
-            log(temp); output+= ("\n" + temp);
-            log(goldenState); output+=("\n" + goldenState);
-            temp = "------";
-            log(temp); output+=("\n" + temp);
-            temp = "WHAT WE GOT: Current State: length = " + currentState.length();
-            log(temp); output+=("\n" + temp);
-            log(currentState); output+=("\n" + currentState);
-            log("------");
-            fail("Source does not match Golden." + output);
-        }
+        //TODO
+        //getSource as String
+        //getPass as String
+        //output only when fails.
 
+        this.assertFile("Output does not match Golden.", new File(SOURCE.getPath()) , this.getGoldenFile(), DIFF_FILE,  new LineDiff(false));
+    }
+
+    public void BackgroundImage() {
+        ProjectsTabOperator pto = new ProjectsTabOperator();
+        String path = PROJECT_NAME + "|Source Packages|fxprj2|BackgroundImage.fx";
+        Node fxsource = new Node(pto.invoke().tree(), path);
+        fxsource.callPopup();
+        new JPopupMenuOperator().pushMenuNoBlock("Open");
+        new QueueTool().waitEmpty();
+        log("File path: " + path + " opened in editor.");
+
+        // get Editor
+        TopComponentOperator main = new TopComponentOperator("BackgroundImage.fx");
+        JEditorPaneOperator editor = new JEditorPaneOperator(main);
+
+        //Format, Save and Close
+        editor.clickForPopup();
+        Util.clickPopup("Format");
+        new QueueTool().waitEmpty();
+        log("Right click > Format done.");
+        new SaveAction().perform();
+        log("Ctrl-S.");
+        new QueueTool().waitEmpty();
+        main.closeWindow();
+
+        //Diff
+        setSource("fxprj2/BackgroundImage.fx");
+        getFile(DIFF_FILE, "BackgroundImage.diff");
+        getFile(REF_FILE, "BackgroundImage.ref"); //Not used yet.
+
+        //TODO
+        //getSource as String
+        //getPass as String
+        //output only when fails.
+
+        this.assertFile("Output does not match Golden.", new File(SOURCE.getPath()) , this.getGoldenFile(), DIFF_FILE,  new LineDiff(false));
     }
 
     public void testCloseProject() {

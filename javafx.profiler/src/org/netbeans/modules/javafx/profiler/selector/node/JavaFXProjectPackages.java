@@ -40,14 +40,19 @@
 
 package org.netbeans.modules.javafx.profiler.selector.node;
 
+import java.io.IOException;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.util.Elements;
+import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.javafx.project.JavaFXProject;
@@ -92,22 +97,42 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
     }
 
     protected List<SelectorNode> prepareChildren(ContainerNode parent) {
-        List<SelectorNode> pkgs = new ArrayList<SelectorNode>();
+        final List<SelectorNode> pkgs = new ArrayList<SelectorNode>();
 
-        ClasspathInfo cpInfo = JavaFXProjectUtilities.createClassPathInfo((JavaFXProject)project);
-
-        ClassIndex index = cpInfo.getClassIndex();
         source = JavaFXSource.forFileObject(JavaFXProjectUtilities.getSourceFiles(project).get(0));
 
-        for (String pkgName : index.getPackageNames("", true, scope)) { // NOI18N
-            pkgs.add(new JavaFXPackageNode(cpInfo, pkgName, parent, scope, source));
+        final ClasspathInfo cpInfo = source.getCpInfo();
+        ClassIndex index = cpInfo.getClassIndex();
+
+        if (scope.contains(SearchScope.DEPENDENCIES)) {
+            for (String pkgName : index.getPackageNames("", true, scope)) { // NOI18N
+                final String pkgNameFinal = pkgName;
+                final ContainerNode parentFinal = parent;
+                try {
+                    source.runUserActionTask(new CancellableTask<CompilationController>() {
+                        public void cancel() {
+                        }
+
+                        public void run(CompilationController controller)
+                                 throws Exception {
+                            if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
+                                PackageElement pelem = controller.getElements().getPackageElement(pkgNameFinal);
+
+                                if (pelem != null) {
+                                    pkgs.add(new JavaFXPackageNode(cpInfo, pkgNameFinal, parentFinal, scope, source));
+                                }
+                            }
+                        }
+                    }, true);
+                } catch (IOException ex) {
+                    // TBD
+                }
+            }
+            Collections.sort(pkgs, JavaFXPackageNode.COMPARATOR);
+            return pkgs;
+        } else {
+            return collectPackages(parent, cpInfo, project.getFOSourceRoots(), pkgs);
         }
-
-        Collections.sort(pkgs, JavaFXPackageNode.COMPARATOR);
-        if (pkgs.isEmpty())
-            pkgs = collectPackages(parent, cpInfo, project.getFOSourceRoots(), pkgs);
-
-        return pkgs;
     }
 
    private List<SelectorNode> collectPackages(ContainerNode parent, ClasspathInfo cpInfo, FileObject[] roots, List<SelectorNode> pkgs) {

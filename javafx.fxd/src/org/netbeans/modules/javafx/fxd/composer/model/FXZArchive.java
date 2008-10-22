@@ -35,6 +35,9 @@ import org.openide.util.NbBundle;
 import com.sun.javafx.tools.fxd.FXDNode;
 import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
+import javax.swing.JEditorPane;
+import javax.swing.text.EditorKit;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataLoader;
 
 /**
  *
@@ -112,7 +115,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             ZipEntry entry = m_zip.getEntry(m_name);
             m_size = entry.getSize();
             m_compressedSize = entry.getCompressedSize();
-            
+                        
             //TODO Do not read file int the AWT thread
             m_buffer = read( m_zip.getInputStream( entry), m_size);
         }
@@ -198,7 +201,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
         
         private ByteArrayBuffer read( InputStream in, long size) throws IOException {
-            if ( size < 0) {
+            if ( size <= 0) {
                 size = 8192;
             } 
             ByteArrayBuffer buffer = new ByteArrayBuffer( (int)size);
@@ -223,7 +226,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_dObj    = dObj;
         m_entries = new ArrayList<FXZArchiveEntry>();
         for ( String entryName : m_entryNames) {
-            m_entries.add( new FXZArchiveEntry(entryName));
+            FXZArchiveEntry entry = new FXZArchiveEntry(entryName);
+            if (entry.m_size > 0) {
+                m_entries.add( entry);
+            }
         }
         m_tableListeners = new ArrayList<TableModelListener>();
     }
@@ -236,11 +242,42 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                 ex.printStackTrace();
             }
         } else {
-            System.err.println("Document reopened!");  //NOI18N
+            if (m_fileModel.getDocument() != doc) {
+                System.err.println("Document switch!");  //NOI18N
+                Thread.dumpStack();
+            }
         }
     }
     
-    public synchronized FXDFileModel getFileModel() {
+    protected static BaseDocument loadDocument(InputStream in) throws IOException, DocumentModelException, BadLocationException {
+        EditorKit kit = JEditorPane.createEditorKitForContentType(FXZDataLoader.REQUIRED_MIME);
+        try {
+            BaseDocument doc = (BaseDocument) kit.createDefaultDocument();
+            kit.read(in, doc, 0);
+            return doc;
+        } finally {
+            in.close();
+        }
+    }
+    
+    public synchronized FXDFileModel getFileModel(boolean create) {
+        if ( m_fileModel == null) {
+            if (create) {
+                InputStream in = null;
+                try {
+                    try {
+                        System.err.println("Loading the document ...");
+                        in = open();
+                        BaseDocument doc = loadDocument(in);
+                        m_fileModel = new FXDFileModel(this, DocumentModel.getDocumentModel(doc));
+                    } finally {
+                        in.close();
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         return m_fileModel;
     }
 

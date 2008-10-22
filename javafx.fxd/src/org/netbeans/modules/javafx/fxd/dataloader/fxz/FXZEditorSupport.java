@@ -23,12 +23,13 @@ import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
 import org.openide.windows.CloneableTopComponent;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
+import java.io.Serializable;
 
 /**
  *
  * @author Pavel Benes
  */
-public final class FXZEditorSupport extends DataEditorSupport implements OpenCookie, EditorCookie, EditCookie {
+public final class FXZEditorSupport extends DataEditorSupport implements Serializable, OpenCookie, EditorCookie, EditCookie {
     private static final long  serialVersionUID = 1L;
         
     protected CloneableTopComponent    m_mvtc  = null;
@@ -81,7 +82,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     @Override
     protected CloneableEditorSupport.Pane createPane() {
         MultiViewDescription [] views = getViewDescriptions();
-        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[0]);
+        int                     defView = ((FXZDataObject) getDataObject()).getDefaultView();
+        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[ defView]);
         return (CloneableEditorSupport.Pane)m_mvtc;
     }
     
@@ -111,6 +113,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     }
         
     private static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
+        private static final long  serialVersionUID = 1L;
         
         public FXDEnv( FXZDataObject obj) {
             super(obj);

@@ -76,6 +76,13 @@ class InnerScrollPane extends JScrollPane {
 
     private JLabel topLabel;
 
+    void clearSelection() {
+        view.setValueIsAdjusting(true);
+        view.setSelectedIndex(-1);
+        view.setValueIsAdjusting(false);
+    }
+
+
     public InnerScrollPane(JTextComponent editorComponent,
     ListSelectionListener listSelectionListener, MouseListener mouseListener) {
 

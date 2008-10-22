@@ -75,6 +75,8 @@ import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.openide.cookies.EditorCookie;
@@ -257,9 +259,16 @@ public final class JavaFXSource {
             cc.setPhase(Phase.PARSED);
 
             //update error annotations in projects tree
+
             Set<URL> urls = new HashSet<URL>();
+
             try {
-                urls.add(file.getURL());
+                FileObject f = file;
+                urls.add(f.getURL());
+                do {
+                    f = f.getParent();
+                    urls.add(f.getURL());
+                } while (FileOwnerQuery.getOwner(file).getProjectDirectory() != f);
             } catch (FileStateInvalidException ex) {
                 Exceptions.printStackTrace(ex);
             }

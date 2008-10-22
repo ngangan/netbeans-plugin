@@ -40,20 +40,27 @@ import java.lang.*;
  * @author breh
  */
 
+public function create(baseURL:String, baseName:String, extension:String, imagesCount:Integer):AnimatedImage {
+    var animatedImage = AnimatedImage{baseURL:baseURL, baseName:baseName, extension:extension, imagesCount:imagesCount};
+    animatedImage.loadImages();
+    animatedImage.play();
+    return animatedImage;
+}
+
 public class AnimatedImage extends ImageView {
 
     
-    private attribute baseURL: String;    
-    private attribute baseName: String;
-    private attribute extension: String; 
+    var baseURL: String;
+    var baseName: String;
+    var extension: String;
 
-    private attribute imagesCount: Integer = 0;    
+    var imagesCount: Integer = 0;
     
-    private attribute images: Image[];
+    var images: Image[];
     
-    private attribute currentImageIndex:Integer ;    
+    var currentImageIndex:Integer ;
     
-    private attribute movieTimeline = Timeline {
+    var movieTimeline = Timeline {
         repeatCount: Double.POSITIVE_INFINITY
         keyFrames: KeyFrame {
             time: 1s/12
@@ -72,7 +79,7 @@ public class AnimatedImage extends ImageView {
         if (images == null) {
             loadImages();
         }
-        movieTimeline.start();
+        movieTimeline.play();
     }
     
     public function stop():Void {
@@ -87,13 +94,5 @@ public class AnimatedImage extends ImageView {
                 CachedImage.getCachedImage("{baseURL}/{baseName}{%03d i}.{extension}");
             };    
         }
-    }
-    
-   
-    public static function create(baseURL:String, baseName:String, extension:String, imagesCount:Integer):AnimatedImage {    
-        var animatedImage = AnimatedImage{baseURL:baseURL, baseName:baseName, extension:extension, imagesCount:imagesCount};
-        animatedImage.loadImages();
-        animatedImage.play();
-        return animatedImage;
-    }    
+    }   
 }

@@ -146,7 +146,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
         protected List<SelectorNode> prepareChildren(ProjectNode parent) {
             List<SelectorNode> nodes = new ArrayList<SelectorNode>(2);
             nodes.add(new SourcesNode(includeSubprojects, parent));
-//            nodes.add(new LibrariesNode(includeSubprojects, parent));
+            nodes.add(new LibrariesNode(includeSubprojects, parent));
 
             return nodes;
         }        

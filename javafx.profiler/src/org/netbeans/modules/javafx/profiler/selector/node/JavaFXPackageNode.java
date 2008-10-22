@@ -54,10 +54,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
@@ -74,7 +76,9 @@ public class JavaFXPackageNode extends ContainerNode {
         protected List<SelectorNode> prepareChildren(JavaFXPackageNode parent) {
             List<SelectorNode> nodes = new ArrayList<SelectorNode>();
             List<JavaFXClassNode> classes = getClasses(parent);
+            List<JavaFXPackageNode> packages = getSubpackages(parent);
             nodes.addAll(classes);
+            nodes.addAll(packages);
 
             return nodes;
         }
@@ -89,7 +93,7 @@ public class JavaFXPackageNode extends ContainerNode {
 
                     public void run(CompilationController controller)
                              throws Exception {
-                        if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
+                        if (JavaFXSource.Phase.CODE_GENERATED.compareTo(controller.toPhase(JavaFXSource.Phase.CODE_GENERATED))<=0) {
 
                             PackageElement pelem = controller.getElements().getPackageElement(parent.getName());
 
@@ -109,6 +113,20 @@ public class JavaFXPackageNode extends ContainerNode {
                 LOGGER.severe(ex.getLocalizedMessage());
             }
             Collections.sort(nodes, JavaFXClassNode.COMPARATOR);
+
+            return nodes;
+        }
+
+        private List<JavaFXPackageNode> getSubpackages(final JavaFXPackageNode parent) {
+            ClassIndex index = parent.cpInfo.getClassIndex();
+            List<JavaFXPackageNode> nodes = new ArrayList<JavaFXPackageNode>();
+
+            for (String pkgName : index.getPackageNames(parent.getName() + ".", true, parent.scope)) { // NOI18N
+                nodes.add(new JavaFXPackageNode(parent.cpInfo, pkgName, parent, parent.scope, parent.getJFXSource()));
+
+            }
+
+            Collections.sort(nodes, COMPARATOR);
 
             return nodes;
         }

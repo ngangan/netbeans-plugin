@@ -42,6 +42,7 @@
 package org.netbeans.modules.javafx.editor.imports.ui;
 
 import javax.swing.text.JTextComponent;
+import java.awt.event.KeyEvent;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -49,4 +50,6 @@ import javax.swing.text.JTextComponent;
  */
 public interface FixItemHandler {
     public void defaultAction(JTextComponent component, FixItem item);
+
+    public void process(KeyEvent evt);
 }

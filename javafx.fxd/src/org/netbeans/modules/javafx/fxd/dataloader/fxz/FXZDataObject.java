@@ -62,29 +62,45 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     
     public static final String FXZ_EXT = "fxz";  //NOI18N
 
-    public static final int    TEXT_VIEW_INDEX    = 0;
-    public static final int    VISUAL_VIEW_INDEX  = 1;
+    public static final int    VISUAL_VIEW_INDEX  = 0;
+    public static final int    TEXT_VIEW_INDEX    = 1;
     public static final int    ARCHIVE_VIEW_INDEX = 2;
     
-    final InstanceContent m_ic;
-    private final     AbstractLookup        m_lookup;
-    private final     FXZEditorSupport      m_edSup;
+    InstanceContent m_ic;
+    private           AbstractLookup        m_lookup;
+    private           FXZEditorSupport      m_edSup;
     private transient FXDComposerModel      m_model = null;
     private transient FXDComposerController m_controller = null;
-        
-    
+    private transient int                   m_defaultViewIndex;
+            
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
+        reset();
+//        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
+    }
+    
+    public synchronized void reset() {
         m_ic = new InstanceContent();
         m_lookup = new AbstractLookup(m_ic);
         m_ic.add( m_edSup = new FXZEditorSupport(this));
-        m_ic.add(this);           
-//        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
+        m_ic.add(this);     
+        m_defaultViewIndex = VISUAL_VIEW_INDEX;
+        m_model = null;
+        m_controller = null;
+    }
+
+    public void setDefaultView( int viewIndex) {
+        m_defaultViewIndex = viewIndex;
+    }
+    
+    public int getDefaultView() {
+        return m_defaultViewIndex;
     }
     
     public synchronized FXDComposerModel getDataModel() {
         if (m_model == null) {
             try {
+                System.err.println("Creating the DataModel");
                 m_model = new FXDComposerModel(this);
                 //SceneManager.log(Level.INFO, "SceneManager created for " + getPrimaryFile().getPath()); //NOI18N
             } catch (Exception ex) {
@@ -97,6 +113,7 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     
     public synchronized FXDComposerController getController() {
         if ( m_controller == null) {
+            System.err.println("Creating the Controller");
             m_controller = new FXDComposerController(this);
         }
         return m_controller;
@@ -126,4 +143,17 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         Object o = m_lookup.lookup(type);
         return o instanceof Node.Cookie ? (Node.Cookie) o : null;
     }
+    
+    /*
+    public static boolean isFXZArchive( final FileObject fo) {
+        System.err.println("FO: " + fo);
+        File file = FileUtil.toFile(fo);
+        System.err.println("File: " + file);
+        if ( file.exists() && file.isFile()) {
+            if ( FXZ_EXT.equalsIgnoreCase(fo.getExt())) {
+                return true;
+            }
+        }
+        return false;
+    }*/
 }

@@ -4,22 +4,24 @@
  */
 package org.netbeans.modules.javafx.fxd.dataloader.fxd;
 
+import java.awt.Image;
 import org.openide.loaders.DataNode;
 import org.openide.nodes.Children;
+import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 
 public class FXDDataNode extends DataNode {
-
-    private static final String IMAGE_ICON_BASE = "org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png";
-
+    public static final String FILE_IMAGE_ID = "org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png";  //NOI18N
+    public static final Image  FILE_IMAGE    = ImageUtilities.loadImage( FILE_IMAGE_ID);
+    
     public FXDDataNode(FXDDataObject obj) {
         super(obj, Children.LEAF);
-        setIconBaseWithExtension(IMAGE_ICON_BASE);
+        setIconBaseWithExtension(FILE_IMAGE_ID);
     }
 
     FXDDataNode(FXDDataObject obj, Lookup lookup) {
         super(obj, Children.LEAF, lookup);
-        setIconBaseWithExtension(IMAGE_ICON_BASE);
+        setIconBaseWithExtension(FILE_IMAGE_ID);
     }
         
 /** Creates a property sheet. */

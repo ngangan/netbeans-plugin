@@ -49,7 +49,7 @@ import org.openide.filesystems.FileUtil;
 
 /**
  *
- * @author Alexandr Scherbatiy sunflower@netbeans.org
+ * @author Lark Fitzgerald
  */
 public class JavaFXTestCase extends JellyTestCase {
 

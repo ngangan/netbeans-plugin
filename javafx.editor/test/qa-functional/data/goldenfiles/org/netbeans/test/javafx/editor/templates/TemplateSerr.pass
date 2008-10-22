@@ -1,7 +1,0 @@
-
-
-package templateserr;
-
-
-
-java.lang.System.err.println("");

@@ -10,7 +10,7 @@ import java.awt.Image;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataNode;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -40,7 +40,7 @@ public class PreviewViewDescription implements MultiViewDescription, Serializabl
     }
 
     public Image getIcon() {
-        return null;
+        return FXZDataNode.FILE_IMAGE;
     }
 
     public String preferredID() {

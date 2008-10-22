@@ -173,6 +173,16 @@ public class CodeUtils {
         return obj;
     }
     
+    private static JComponent parseTrueJComponentObj(Object obj) {
+        Class cl = obj.getClass(); 
+        while (cl != null) {
+            if (cl.getName().contentEquals("javax.swing.JComponent"))
+                return (JComponent) obj;
+            cl = cl.getSuperclass();
+        }
+        return null;
+    }
+    
     private static JComponent parseJComponentObj(Object obj) {
         JComponent comp = null;
         try {
@@ -380,7 +390,8 @@ public class CodeUtils {
     public static JComponent parseComponent(Object obj) {
         JComponent comp = null;
         if ((comp = parseJComponentObj(obj)) == null)
-            comp = parseSceneAndShapeObj(obj);
+            if ((comp = parseTrueJComponentObj(obj)) == null)
+                comp = parseSceneAndShapeObj(obj);
         return comp;
     }
     

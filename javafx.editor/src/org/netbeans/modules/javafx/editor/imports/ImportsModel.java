@@ -29,38 +29,14 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenId;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.editor.GuardedDocument;
-import org.netbeans.modules.editor.indent.api.Reformat;
 import org.netbeans.modules.javafx.editor.JFXImportManager;
-import org.netbeans.modules.javafx.editor.imports.ui.FixImportsLayout;
-import org.netbeans.modules.javafx.editor.imports.ui.FixItem;
-import org.openide.util.NbBundle;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.text.Collator;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
@@ -70,106 +46,23 @@ import java.util.logging.Logger;
 public final class ImportsModel {
     public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
     private final Collection<ModelEntry> entries = new TreeSet<ModelEntry>();
-    private final ClassIndex index;
     private final CompilationInfo ci;
-    private final Reference<JTextComponent> tc;
 
 
-    ImportsModel(List<? extends ImportTree> imports, ClassIndex index, CompilationInfo ci, JTextComponent tc) {
-        this.tc = new WeakReference<JTextComponent>(tc);
+    ImportsModel(List<? extends ImportTree> imports, CompilationInfo ci) {
         if (imports == null) throw new IllegalArgumentException("List of imports cannot be null.");
         for (ImportTree anImport : imports) {
             entries.add(new ModelEntry(anImport));
-        }
-        this.index = index;
+        }        
         this.ci = ci;
-    }
-
-    public void addImport(Element e) {        
-        if (e == null) return;
-        if (!isImported(e)) {
-            resolveEntryByClassIndex(e);
-        }
     }
 
     public void addImport(String qn) {
         entries.add(new ModelEntry(qn));
     }
 
-    private synchronized void resolveEntryByClassIndex(final Element e) {
-        Set<ClassIndex.SearchScope> set = new TreeSet<ClassIndex.SearchScope>();
-        set.add(ClassIndex.SearchScope.DEPENDENCIES);
-        set.add(ClassIndex.SearchScope.SOURCE);        
-        final Set<ElementHandle<TypeElement>> result = prefilterResult(index.getDeclaredTypes(e.getSimpleName().toString(), ClassIndex.NameKind.SIMPLE_NAME, set));         
-        if (result.size() == 1) {
-            ElementHandle<TypeElement> handle = result.iterator().next();
-            Name qname = handle.resolve(ci).getQualifiedName();
-            entries.add(new ModelEntry(qname.toString()));
-        } else if (!result.isEmpty()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    moveCaret(e);
-                    display(result, getHeaderText(e));
-                }
-            });
-            try {
-                logger.info("Waiting...");
-                wait();
-                logger.info("Continueing...");
-            } catch (InterruptedException e1) {
-                logger.severe(e1.getLocalizedMessage());
-            }
-        }
-    }
-
-    private Set<ElementHandle<TypeElement>> prefilterResult(Set<ElementHandle<TypeElement>> result) {
-        Iterator<ElementHandle<TypeElement>> handleIterator = result.iterator();
-        while (handleIterator.hasNext()) {
-            ElementHandle<TypeElement> handle = handleIterator.next();
-            if (handle.getKind() != ElementKind.CLASS) {
-                handleIterator.remove();
-            }
-        }
-        return result;
-    }
-
-    private String getHeaderText(Element e) {
-        return NbBundle.getMessage(ImportsModel.class, "FI_IMPORT_UI_HEADER", e.getSimpleName().toString());
-    }
-
-    private void moveCaret(Element e) {
-        JavaFXTreePath elpath = ci.getPath(e);
-        if (elpath == null) return;
-        Tree tree = elpath.getLeaf();
-
-        if (tree != null) {
-            long startPos = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), tree);
-            JTextComponent jtc = tc.get();
-            jtc.getCaret().setDot((int) startPos);
-
-        }
-    }
-
-    private void display(final Set<ElementHandle<TypeElement>> options, String text) {
-        // this code is intended to run in EDT.
-        final FixImportsLayout<FixItem> fil = FixImportsLayout.create();
-        fil.setEditorComponent(tc.get());
-        List<FixItem> items = createItems(options, fil);
-        fil.show(items, text, 0, new MyListSelectionListener(), null, null, 0);
-    }
-
     private boolean isLocal(Element e) {
         return false;
-    }
-
-    private List<FixItem> createItems(Set<ElementHandle<TypeElement>> options, FixImportsLayout<FixItem> fil) {
-        List<FixItem> result = new ArrayList<FixItem>(options.size());
-        for (ElementHandle<TypeElement> option : options) {            
-            String qn = option.getQualifiedName();
-            result.add(new FixItem(qn, this, fil));
-        }
-        Collections.sort(result, FixItemComparator.get());
-        return result;
     }
 
     boolean isImported(Element e) {
@@ -184,7 +77,12 @@ public final class ImportsModel {
     }
 
 
-    void publish(final Document doc) {
+/*
+    void publish(final JTextComponent editor) {
+        publish(editor.getDocument(), editor);
+    }
+    
+    void publish(final Document doc, final JTextComponent editor) {
         Runnable runnable = new Runnable() {
             public void run() {
                 TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
@@ -219,7 +117,7 @@ public final class ImportsModel {
                     if (reformat != null) {
                         reformat.unlock();
                     }
-                    tc.get().requestFocusInWindow();
+                    editor.requestFocusInWindow();
                 }
             }
         };
@@ -296,6 +194,7 @@ public final class ImportsModel {
         return seq;
     }
 
+*/
 
     void optimize() {
 
@@ -305,21 +204,25 @@ public final class ImportsModel {
         entries.add(modelEntry);
     }
 
-    private static class FixItemComparator implements Comparator<FixItem> {
-        public static final Collator collator = Collator.getInstance();
-        public static final Comparator<FixItem> instance = new FixItemComparator();
-
-        public static Comparator<FixItem> get() {
-            return instance;
-        }
-
-        public int compare(FixItem o1, FixItem o2) {
-            if (o1.getSortPriority() == o2.getSortPriority()) {
-                return collator.compare(o1.getElement(), o2.getElement());
-            }
-            return o1.getSortPriority() - o2.getSortPriority();
-        }
+    public Iterable<? extends ModelEntry> getEntries() {
+        return entries;
     }
+
+//    private static class FixItemComparator implements Comparator<FixItem> {
+//        public static final Collator collator = Collator.getInstance();
+//        public static final Comparator<FixItem> instance = new FixItemComparator();
+//
+//        public static Comparator<FixItem> get() {
+//            return instance;
+//        }
+//
+//        public int compare(FixItem o1, FixItem o2) {
+//            if (o1.getSortPriority() == o2.getSortPriority()) {
+//                return collator.compare(o1.getElement(), o2.getElement());
+//            }
+//            return o1.getSortPriority() - o2.getSortPriority();
+//        }
+//    }
 
     static class ModelEntry implements Comparable<ModelEntry> {
         String type;
@@ -414,8 +317,4 @@ public final class ImportsModel {
     }
 
 
-    private static class MyListSelectionListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent e) {
-        }
-    }
 }
