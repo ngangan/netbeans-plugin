@@ -23,12 +23,13 @@ import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
 import org.openide.windows.CloneableTopComponent;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
+import java.io.Serializable;
 
 /**
  *
  * @author Pavel Benes
  */
-public final class FXZEditorSupport extends DataEditorSupport implements OpenCookie, EditorCookie, EditCookie {
+public final class FXZEditorSupport extends DataEditorSupport implements Serializable, OpenCookie, EditorCookie, EditCookie {
     private static final long  serialVersionUID = 1L;
         
     protected CloneableTopComponent    m_mvtc  = null;

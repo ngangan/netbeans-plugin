@@ -48,12 +48,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.Action;
-import javax.tools.Diagnostic;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -267,14 +265,14 @@ public class FXErrorAnnotator extends AnnotationProvider {
 //            return !diag.isEmpty();
             return fxSource.currentInfo.isErrors();
         } else {
-/* need to be implemented with java file checking for errors, temporary always without errors
+/* need to be implemented with java file checking for errors, temporary always without errors */
             FileObject[] childs = file.getChildren();
             for(int i = 0;i < childs.length; i++){
                 if (haveError(childs[i], true)){
                     return true;
                 }
             }
- */
+ 
             return false;
         }
     }

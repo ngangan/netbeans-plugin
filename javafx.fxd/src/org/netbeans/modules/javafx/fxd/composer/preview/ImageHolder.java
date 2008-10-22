@@ -77,6 +77,7 @@ final class ImageHolder extends JPanel {
         canPaint = new AtomicBoolean( true );
         myErrorComponent = new JLabel( "ERR_UnableRender"); 
         myErrorComponent.validate();
+        setBackground( Color.WHITE);
     }
     
     public void setTryPaint(){
