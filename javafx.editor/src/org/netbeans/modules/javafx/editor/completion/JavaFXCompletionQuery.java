@@ -48,6 +48,9 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.JFXErroneousType;
+import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
+import com.sun.tools.javafx.tree.JFXSelect;
+import com.sun.tools.javafx.tree.JFXVar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -495,14 +498,25 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         Tree t = path.getLeaf();
         Tree brother = pathOfBrother.getLeaf();
         if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
-            path = pathOfBrother.getParentPath();
+            if ((brother.getJavaFXKind() == JavaFXKind.OBJECT_LITERAL_PART) ||
+                (brother.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) ||
+                (brother.getJavaFXKind() == JavaFXKind.VARIABLE))
+            {
+                path = pathOfBrother;
+            } else {
+                path = pathOfBrother.getParentPath();
+            }
             t = path.getLeaf();
         } else {
             SourcePositions pos = controller.getTrees().getSourcePositions();
             UnitTree unit = controller.getCompilationUnit();
             long s = pos.getStartPosition(unit, t);
             long e = pos.getEndPosition(unit, t);
-            while (t != null && ((offset <= s) || (offset >= e))) {
+            while (t != null && 
+                    ( (offset <= s) || (offset >= e) ||
+                      (t.getJavaFXKind() == JavaFXKind.ERRONEOUS)
+                    )
+                  ) {
                 path = path.getParentPath();
                 if (path != null) {
                     t = path.getLeaf();
@@ -513,6 +527,13 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 s = s1 < s ? s1 : s;
                 long e1 = pos.getEndPosition(unit, t);
                 e = e1 > e ? e1 : e;
+                if ((t != null) &&
+                        (t.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) &&
+                        s1 == e1) {
+                    // strange class declaration --> continue to the parent
+                    s = s1;
+                    e = e1;
+                }
             }
             if ((t == null) || (controller.getTreeUtilities().isSynthetic(path))){
                 t = unit;
@@ -538,8 +559,28 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             UnitTree unit = controller.getCompilationUnit();
             long s = pos.getStartPosition(unit, t);
             long e = pos.getEndPosition(unit, t);
-            if (LOGGABLE) log("    s == " + s + "  e == " + e + "  offset == " + offset);
+            if (LOGGABLE) log("   (1) s == " + s + "  e == " + e + "  offset == " + offset);
             return e == offset;
+        }
+        if ((t instanceof JFXObjectLiteralPart) || (t instanceof JFXVar)) {
+            if (t.toString().contains("/*missing*/")) { // ho ho hoooo
+                SourcePositions pos = controller.getTrees().getSourcePositions();
+                UnitTree unit = controller.getCompilationUnit();
+                long s = pos.getStartPosition(unit, t);
+                long e = pos.getEndPosition(unit, t);
+                if (LOGGABLE) log("   (2) s == " + s + "  e == " + e + "  offset == " + offset);
+                return e == offset;
+            }
+        }
+        if (t instanceof JFXSelect) {
+            if (t.toString().contains("<missing>")) { // ho ho hoooo
+                SourcePositions pos = controller.getTrees().getSourcePositions();
+                UnitTree unit = controller.getCompilationUnit();
+                long s = pos.getStartPosition(unit, t);
+                long e = pos.getEndPosition(unit, t);
+                if (LOGGABLE) log("   (3) s == " + s + "  e == " + e + "  offset == " + offset);
+                return e == offset;
+            }
         }
         return false;
     }
