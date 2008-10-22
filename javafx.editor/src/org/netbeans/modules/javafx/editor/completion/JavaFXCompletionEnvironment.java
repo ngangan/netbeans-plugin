@@ -59,6 +59,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
@@ -243,7 +244,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     
     protected void addMembers(final TypeMirror type,
             final boolean methods, final boolean fields,
-            final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
+            String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
         if (LOGGABLE) log("addMembers: " + type);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
@@ -279,6 +280,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             if (fields && member.getKind() == ElementKind.FIELD) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    if (":".equals(textToAdd)) {
+                        JavafxTypes types = controller.getJavafxTypes();
+                        TypeMirror tm = member.asType();
+                        if (types.isSequence((Type) tm)) {
+                            textToAdd += " []";
+                        }
+                    }
                     addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, textToAdd, true));
                 }
             }
@@ -317,6 +325,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    if (":".equals(textToAdd)) {
+                        JavafxTypes types = controller.getJavafxTypes();
+                        TypeMirror tm = member.asType();
+                        if (types.isSequence((Type) tm)) {
+                            textToAdd += " []";
+                        }
+                    }
                     addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, textToAdd, false));
                 }
             }
