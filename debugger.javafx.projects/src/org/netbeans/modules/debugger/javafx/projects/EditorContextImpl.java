@@ -730,7 +730,7 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
+                                "Unable to resolve "+ci.getFileObject()/*.getCompilationUnit().getSourceFile()*/+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                         return;

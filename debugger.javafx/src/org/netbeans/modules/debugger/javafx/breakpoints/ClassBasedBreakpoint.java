@@ -198,7 +198,7 @@ public abstract class ClassBasedBreakpoint extends BreakpointImpl {
                 ClassPrepareRequest cpr = getEventRequestManager().createClassPrepareRequest ();
                 int i, k = classFilters.length;
                 for (i = 0; i < k; i++) {
-                    cpr.addClassFilter (classFilters [i]);
+                    cpr.addClassFilter (classFilters [i]+"*");
                     logger.fine("Set class load request: " + classFilters [i]);
                 }
                 k = classExclusionFilters.length;
