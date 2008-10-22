@@ -31,11 +31,11 @@ final class DocumentElementWrapper {
         }
     }
     
-    private static final class FXDNodeWrapper extends FXDElementWrapper implements FXDNode {
+    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDNode {
         public FXDNodeWrapper(final DocumentElement de) {
             super(de);
         }        
-        
+
         public String getTypeName() {
             return m_de.getName();
         }
@@ -60,10 +60,10 @@ final class DocumentElementWrapper {
                             if ( name.equals(de.getName())) {
                                 if ( FXDFileModel.FXD_ATTRIBUTE.equals( de.getType())) {
                                     assert de.getElementCount() == 1;
-                                    return wrap(de.getElement(0));
+                                    return wrap(de.getElement(0), false);
                                 } else {
                                     assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( de.getType());
-                                    return wrap(de);
+                                    return wrap(de, false);
                                 }
                             }
                         }
@@ -91,6 +91,21 @@ final class DocumentElementWrapper {
             throw new UnsupportedOperationException("Not supported yet."); //NOI18N
         }
     }
+
+    private static final class FXDRootNodeWrapper extends FXDNodeWrapper {
+        public FXDRootNodeWrapper(final DocumentElement de) {
+            super(de);
+        }
+        
+        @Override
+        public Object getAttrValue(String name) {  //NOI18N
+            if ("cache".equals(name)) {
+                return Boolean.TRUE;
+            } else {
+                return super.getAttrValue(name);
+            }
+        }        
+    }
     
     private static final class FXDNodeArrayWrapper extends FXDElementWrapper implements FXDNodeArray {
 
@@ -108,7 +123,7 @@ final class DocumentElementWrapper {
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
                 return de.getName();
             } else {
-                return wrap( de);
+                return wrap( de, false);
             }
         }
 
@@ -125,9 +140,9 @@ final class DocumentElementWrapper {
         }        
     }
 
-    public static FXDElement wrap( final DocumentElement de) {
+    public static FXDElement wrap( final DocumentElement de, boolean isRoot) {
         if ( FXDFileModel.FXD_NODE.equals( de.getType())) {
-            return new FXDNodeWrapper(de);
+            return isRoot ? new FXDRootNodeWrapper(de) : new FXDNodeWrapper(de);
         } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(de.getType())) {
             return new FXDNodeArrayWrapper(de);
         } else {   

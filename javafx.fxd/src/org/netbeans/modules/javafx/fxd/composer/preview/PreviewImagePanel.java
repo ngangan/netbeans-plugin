@@ -10,7 +10,6 @@ import com.sun.scenario.scenegraph.fx.FXNode;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -25,7 +24,8 @@ import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.LoaderExtended;
-import javax.swing.SwingUtilities;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 
@@ -53,19 +53,31 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         };
         
         setLayout(new BorderLayout());
+        setBackground( Color.WHITE);
     }
     
     public JSGPanel getJSGPanel() {
         return m_sgPanel;
     }
     
+    protected JLabel createWaitPanel() {
+        URL url = PreviewImagePanel.class.getClassLoader().getResource("org/netbeans/modules/javafx/fxd/composer/resources/clock.gif"); //NOI18N
+        ImageIcon icon = new ImageIcon( url);
+        JLabel label = new JLabel( icon);
+        label.setHorizontalTextPosition(JLabel.CENTER);
+        label.setVerticalTextPosition( JLabel.BOTTOM);
+        return label;        
+    }
+    
     synchronized void refresh() {
         final int tickerCopy = m_dObj.getDataModel().getFXDContainer().getChangeTicker();
         if (  tickerCopy != m_changeTickerCopy) {
             removeAll();
+            final JLabel label = createWaitPanel();
+            label.setText("Parsing ...");
+            
+            add( label, BorderLayout.CENTER);
             m_sgPanel  = null;
-
-            System.err.println("Recreating the FXD image ...");
 
             Thread th = new Thread() {
                 @Override
@@ -75,44 +87,52 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            try {
-                                javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(fxz);
-                                //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
-                                //Object   group  = m.invoke(fxNode);
-                                FXNode fxNode = node.impl_getFXNode();  
+                            label.setText("Rendering ...");
+                            SwingUtilities.invokeLater( new Runnable() {
+                                public void run() {
+                                    try {
+                                        javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(fxz);
+                                        //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
+                                        //Object   group  = m.invoke(fxNode);
+                                        FXNode fxNode = node.impl_getFXNode();  
 
-                                if (fxNode != null) {
-                                    m_sgPanel = new JSGPanel() {
-                                        @Override
-                                        public void paintComponent(Graphics g) {
-                                            super.paintComponent(g);
-                                            m_dObj.getController().paintActions(g);
+                                        if (fxNode != null) {
+                                            m_sgPanel = new JSGPanel() {
+                                                @Override
+                                                public void paintComponent(java.awt.Graphics g) {
+                                                    super.paintComponent(g);
+                                                    m_dObj.getController().paintActions(g);
+                                                }
+                                            };
+                                            m_sgPanel.setBackground(Color.WHITE);
+                        //                    FXNode fNode = new FXNode(sgNode);
+                                            m_sgPanel.setScene( fxNode);
+
+                                            removeAll();
+                                            add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
+
+                                            MouseEventCollector mec = new MouseEventCollector();
+                                            m_sgPanel.addMouseListener(mec);
+                                            m_sgPanel.addMouseMotionListener(mec);
+                                            m_sgPanel.addMouseWheelListener(mec);
+
+                                            m_changeTickerCopy = tickerCopy;
+                                            updateZoom();
+                                        } else {
+                                            removeAll();
+                                            add( new JLabel("Cannot show"));
                                         }
-                                    };
-                                    m_sgPanel.setBackground(Color.WHITE);
-                //                    FXNode fNode = new FXNode(sgNode);
-                                    m_sgPanel.setScene( fxNode);
-
-                                    add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
-
-                                    MouseEventCollector mec = new MouseEventCollector();
-                                    m_sgPanel.addMouseListener(mec);
-                                    m_sgPanel.addMouseMotionListener(mec);
-                                    m_sgPanel.addMouseWheelListener(mec);
-
-                                    m_changeTickerCopy = tickerCopy;
-                                    updateZoom();
-                                } else {
-                                    add( new JLabel("Cannot show"));
-                                }
-                            } catch( Exception e) {
-                                e.printStackTrace();
-                                add( new JLabel( e.getLocalizedMessage()), BorderLayout.CENTER);
-                            } finally {
-                                System.gc();                                
-                            }
-                        }                            
-                    });
+                                    } catch( Exception e) {
+                                        e.printStackTrace();
+                                        removeAll();
+                                        add( new JLabel( e.getLocalizedMessage()), BorderLayout.CENTER);
+                                    } finally {
+                                        System.gc();                                
+                                    }
+                                }                            
+                            });                            
+                        }
+                    });                    
                 }
             };
             th.setName("ModelUpdate-Thread");  //NOI18N
@@ -197,7 +217,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
         public void mouseExited(MouseEvent e) {
             processEvent(e);
-            getStatusBar().setText(PreviewStatusBar.CELL_POSITION, "[-,-]");
+            getStatusBar().setText(PreviewStatusBar.CELL_POSITION, "[-,-]");  //NOI18N
         }
 
         public void mouseDragged(MouseEvent e) {
@@ -208,7 +228,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             processEvent(e);
             float zoom = m_dObj.getDataModel().getZoomRatio();
             
-            getStatusBar().setText( PreviewStatusBar.CELL_POSITION, String.format("[%d,%d]", Math.round(e.getX()/zoom), Math.round(e.getY()/zoom)));
+            getStatusBar().setText( PreviewStatusBar.CELL_POSITION, String.format("[%d,%d]", Math.round(e.getX()/zoom), Math.round(e.getY()/zoom))); //NOI18N
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {

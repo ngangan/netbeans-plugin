@@ -78,7 +78,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         NODE_ICONS.put("SVGPath", createIcons(IMAGE_BASE + "node_svgPath.png"));//NOI18N
         NODE_ICONS.put("Rectangle", createIcons(IMAGE_BASE + "node_rectangle.png"));//NOI18N
         NODE_ICONS.put("Text", createIcons(IMAGE_BASE + "node_text.png"));//NOI18N
-        NODE_ICONS.put("Image", createIcons(IMAGE_BASE + "node_image.png"));//NOI18N
+        NODE_ICONS.put("ImageView", createIcons(IMAGE_BASE + "node_image.png"));//NOI18N
         NODE_ICONS.put("Line", createIcons(IMAGE_BASE + "node_line.png"));//NOI18N
         NODE_ICONS.put("Polygon", createIcons(IMAGE_BASE + "node_polygon.png"));//NOI18N
         NODE_ICONS.put("Polyline", createIcons(IMAGE_BASE + "node_polyline.png"));//NOI18N

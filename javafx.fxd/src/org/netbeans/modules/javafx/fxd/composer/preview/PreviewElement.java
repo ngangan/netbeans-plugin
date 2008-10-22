@@ -34,7 +34,9 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public final class PreviewElement extends TopComponent implements MultiViewElement, Runnable {
-    protected final FXZEditorSupport m_edSup;
+    private static final long serialVersionUID = 1L;
+    
+    protected final FXZEditorSupport     m_edSup;
     private   final PreviewImagePanel    m_imgPanel;
     private   final PreviewToolbar       m_toolBar;
     private   final PreviewStatusBar     m_statusBar;
