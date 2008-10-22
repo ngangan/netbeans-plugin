@@ -44,7 +44,6 @@ package org.netbeans.modules.javafx.editor.completion;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.ReturnTree;
-import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.ThrowTree;
 import com.sun.javafx.api.tree.Tree;
@@ -997,6 +996,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private boolean insideNew;
         private boolean smartType;
         private String simpleName;
+        private String enclName;
         private String typeName;
         private CharSequence sortText;
         private String leftText;
@@ -1013,6 +1013,11 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.simpleName = name;
             this.typeName = name;
             this.sortText = this.simpleName;
+            if (name.contains(".")) {
+                int index = name.lastIndexOf('.');
+                this.simpleName = name.substring(index);
+                this.enclName = name.substring(0, index);
+            }
         }
         
         private ClassItem(TypeElement elem, DeclaredType type, int dim, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType, boolean insertImport) {
@@ -1030,6 +1035,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.type = type;
             this.sortText = this.simpleName;
             this.insertImport = insertImport;
+            this.enclName = elem.getEnclosingElement().toString();
         }
 
         @Override
@@ -1092,11 +1098,18 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 sb.append(getColor());
                 if (isDeprecated)
                     sb.append(STRIKE);
-                sb.append(escape(typeName));
+                sb.append(escape(simpleName));
                 for(int i = 0; i < dim; i++)
                     sb.append("[]"); //NOI18N
                 if (isDeprecated)
                     sb.append(STRIKE_END);
+                if (enclName != null && enclName.length() > 0) {
+                    sb.append(COLOR_END);
+                    sb.append(PKG_COLOR);
+                    sb.append(" ("); //NOI18N
+                    sb.append(enclName);
+                    sb.append(")"); //NOI18N
+                }
                 sb.append(COLOR_END);
                 leftText = sb.toString();
             }
