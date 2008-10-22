@@ -51,7 +51,7 @@ import javafx.lang.FX;
  * Definition of visual node which represents the color wheel. Custom
  * node is base for all custom visual elements.
  */
-class ColorWheel extends CustomNode {
+class ColorWheelNode extends CustomNode {
     var segments : Number = 12;
     var steps : Number = 6;
     var radius : Number = 95;
@@ -125,7 +125,7 @@ Stage {
     // Visual scene definition
     scene: Scene {
         fill : Color.GRAY           // Our scene will have gray background
-        content : ColorWheel {}     // There will be only color wheel
+        content : ColorWheelNode {}     // There will be only color wheel
                                     // content defined above
     }
 

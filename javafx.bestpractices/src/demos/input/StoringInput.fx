@@ -48,7 +48,7 @@ import java.lang.System;
  */
 
 Stage {
-    var input : StoringInput = StoringInput {};
+    var input : StoringInputNode = StoringInputNode {};
     scene : Scene {
         content : bind [
             Rectangle {
@@ -70,7 +70,7 @@ Stage {
     height : 232
 }
 
-class StoringInput extends CustomNode {
+class StoringInputNode extends CustomNode {
 
     var circles : Circle[];
     var mouseX : Number;
