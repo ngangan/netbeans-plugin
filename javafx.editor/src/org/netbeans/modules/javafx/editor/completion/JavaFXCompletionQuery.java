@@ -192,7 +192,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     boolean hasAdditionalItems;
     JToolTip toolTip;
     private CompletionDocumentation documentation;
-    int anchorOffset;
+    public int anchorOffset;
     int toolTipOffset;
     JTextComponent component;
     public int queryType;

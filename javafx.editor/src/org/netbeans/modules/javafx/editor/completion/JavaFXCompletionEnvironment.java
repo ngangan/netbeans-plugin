@@ -936,42 +936,6 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected void addKeywordsForCU() {
-        List<String> kws = new ArrayList<String>();
-        kws.add(ABSTRACT_KEYWORD);
-        kws.add(CLASS_KEYWORD);
-        kws.add(VAR_KEYWORD);
-        kws.add(FUNCTION_KEYWORD);
-        kws.add(PUBLIC_KEYWORD);
-        kws.add(IMPORT_KEYWORD);
-        boolean beforeAnyClass = true;
-        for (Tree t : root.getTypeDecls()) {
-            if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-                int pos = (int) sourcePositions.getEndPosition(root, t);
-                if (pos != Diagnostic.NOPOS && offset >= pos) {
-                    beforeAnyClass = false;
-                }
-            }
-        }
-        if (beforeAnyClass) {
-            Tree firstImport = null;
-            for (Tree t : root.getImports()) {
-                firstImport = t;
-                break;
-            }
-            Tree pd = root.getPackageName();
-            if ((pd != null && offset <= sourcePositions.getStartPosition(root, root)) || (pd == null && (firstImport == null || sourcePositions.getStartPosition(root, firstImport) >= offset))) {
-                kws.add(PACKAGE_KEYWORD);
-            }
-        }
-        for (String kw : kws) {
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
-            }
-        }
-        addKeywordsForStatement();
-    }
-
     protected void addKeywordsForClassBody() {
         for (String kw : CLASS_BODY_KEYWORDS) {
             if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
