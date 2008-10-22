@@ -102,9 +102,9 @@ public final class FXFileBuiltQueryImpl implements FileBuiltQueryImplementation,
         String[] to = new String [2*srcRoots.length + 2*tstRoots.length];
         for (int i = 0; i < srcRoots.length; i++) {
             from[i] = "${" + srcRoots[i] + "}/*.java"; // NOI18N
-            to[i] = "${build.classes.dir}/*.class"; // NOI18N
+            to[i] = "build/compiled/*.class"; // NOI18N
             from[srcRoots.length + tstRoots.length + i] = "${" + srcRoots[i] + "}/*.fx"; // NOI18N
-            to[srcRoots.length + tstRoots.length + i] = "${build.classes.dir}/*.class"; // NOI18N
+            to[srcRoots.length + tstRoots.length + i] = "build/compiled/*.class"; // NOI18N
         }
         for (int i = 0; i < tstRoots.length; i++) {
             from[srcRoots.length + i] = "${" + tstRoots[i] + "}/*.java"; // NOI18N
