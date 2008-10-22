@@ -74,6 +74,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
                 addPackages("");
                 addLocalAndImportedTypes(null, null, null, false, null);
                 addLocalMembersAndVars(null);
+                addLocalAndImportedFunctions();
             }
         }
     }

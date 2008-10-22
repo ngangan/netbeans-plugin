@@ -326,6 +326,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void localResult(TypeMirror smart) {
         addLocalMembersAndVars(smart);
         addLocalAndImportedTypes(null, null, null, false, smart);
+        addLocalAndImportedFunctions();
     }
 
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
@@ -1261,6 +1262,28 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
     }
+
+    protected void addLocalAndImportedFunctions() {
+        if (LOGGABLE) log("addLocalAndImportedFunctions");
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
+        while (scope != null) {
+            if (LOGGABLE) log("  scope == " + scope);
+            for (Element local : scope.getLocalElements()) {
+                if (LOGGABLE) log("    local == " + local);
+                if (local.getKind() == ElementKind.METHOD) {
+                    String name = local.getSimpleName().toString();
+                    if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) {
+                        addResult(JavaFXCompletionItem.createExecutableItem(
+                                (ExecutableElement) local,
+                                (ExecutableType) local.asType(),
+                                query.anchorOffset, false, false, false, false));
+                    }
+                }
+            }
+            scope = scope.getEnclosingScope();
+        }
+    }
+
     /**
      * @param simpleName name of a class or fully qualified name of a class
      * @return TypeElement or null if the passed in String does not denote a class
