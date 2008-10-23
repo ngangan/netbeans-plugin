@@ -24,10 +24,13 @@ import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.LoaderExtended;
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -74,7 +77,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         if (  tickerCopy != m_changeTickerCopy) {
             removeAll();
             final JLabel label = createWaitPanel();
-            label.setText("Parsing ...");
+            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_PARSING")); //NOI18N            
             
             add( label, BorderLayout.CENTER);
             m_sgPanel  = null;
@@ -87,7 +90,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            label.setText("Rendering ...");
+                            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N            
                             SwingUtilities.invokeLater( new Runnable() {
                                 public void run() {
                                     try {
@@ -117,6 +120,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             m_sgPanel.addMouseWheelListener(mec);
 
                                             m_changeTickerCopy = tickerCopy;
+                                            Rectangle2D bounds = fxNode.getTransformedBounds();
                                             updateZoom();
                                         } else {
                                             removeAll();
@@ -146,8 +150,15 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         assert m_sgPanel != null;
         float zoom = m_dObj.getDataModel().getZoomRatio();
         FXNode fxNode = (FXNode) m_sgPanel.getScene();
+        fxNode.setTranslateX( 0);
+        fxNode.setTranslateY( 0);
         fxNode.setScaleX(zoom);
         fxNode.setScaleY(zoom);
+        Rectangle2D bounds = fxNode.getTransformedBounds();
+        
+        fxNode.setTranslateX( -bounds.getX());
+        fxNode.setTranslateY( -bounds.getY());
+        
         m_sgPanel.invalidate();
     }
     
@@ -159,16 +170,15 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void actionPerformed(ActionEvent e) {
-            //TODO Implement
-            /*
-            ScreenManager smgr = getScreenManager();
-            Rectangle imgBounds = smgr.getImageBounds();
-            Rectangle panelBounds = smgr.getComponent().getBounds();
-
-            float zoomRatio = Math.min((float) (panelBounds.width - 2 * SVGImagePanel.CROSS_SIZE) / imgBounds.width, (float) (panelBounds.height - 2 * SVGImagePanel.CROSS_SIZE) / imgBounds.height);
-            smgr.setZoomRatio(zoomRatio * smgr.getZoomRatio());
-            updateZoomCombo();
-             */
+            FXNode fxNode = (FXNode) m_sgPanel.getScene();
+            Rectangle2D bounds = fxNode.getBoundsInLocal();
+            
+            Dimension panelSize = getParent().getSize();
+            
+                        double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / bounds.getWidth();
+            double yRatio = (panelSize.getHeight() - 2 * ImageHolder.CROSS_SIZE) / bounds.getHeight();
+            
+            m_dObj.getController().setZoomRatio((float) Math.min( xRatio, yRatio));
         }
     }
     

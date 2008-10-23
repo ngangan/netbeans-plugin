@@ -129,8 +129,7 @@ final class PreviewToolbar extends FXDToolbar {
                 String selection = (String) zoomComboBox.getSelectedItem();
                 if (selection != null) {
                     selection = selection.trim();
-                    if (selection.endsWith("%")) {
-                        //NOI18N
+                    if (selection.endsWith("%")) {   //NOI18N
                         selection = selection.substring(0, selection.length() - 1);
                     }
                     try {

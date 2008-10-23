@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import org.openide.util.NbBundle;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -151,8 +150,17 @@ final class ImageHolder extends JPanel {
             return imagePanel.getPreferredSize();
         }
 
+
         public void layoutContainer(Container parent) {
             Dimension d = imagePanel.getPreferredSize();
+//            System.err.println("Panel size: " + d);
+//            com.sun.scenario.scenegraph.JSGPanel sgPanel = (com.sun.scenario.scenegraph.JSGPanel) imagePanel;
+//            com.sun.scenario.scenegraph.fx.FXNode fxNode = (com.sun.scenario.scenegraph.fx.FXNode) sgPanel.getScene();
+//            Rectangle2D bounds = fxNode.getTransformedBounds();
+//            System.err.println("Bounds: " + bounds);
+//            
+//            d = new Dimension( (int) Math.round(bounds.getWidth()), (int) Math.round(bounds.getHeight()));
+            
             imagePanel.setSize(d);
             imagePanel.setLocation( (parent.getWidth() - imagePanel.getWidth()) / 2,
                     (parent.getHeight() - imagePanel.getHeight()) / 2);
