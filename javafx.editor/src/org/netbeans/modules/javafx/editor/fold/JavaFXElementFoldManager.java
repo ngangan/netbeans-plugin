@@ -45,6 +45,7 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.SequenceExplicitTree;
 import com.sun.javafx.api.tree.SourcePositions;
@@ -418,8 +419,10 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     Document doc = operation.getHierarchy().getComponent().getDocument();
                     int start = (int)sp.getStartPosition(cu, node);
                     int end   = (int)sp.getEndPosition(cu, node);
-                    
-                    if (start != (-1) && end != (-1)) {
+                    JavaFXTreePath p = info.getTreeUtilities().pathFor(start);
+                    if (start != (-1) && end != (-1) &&
+                            !info.getTreeUtilities().isSynthetic(p)) {
+                        
                         if (LOGGABLE) log("handleTree adding fold [" + start + ":" + end + "]");
                         if (LOGGABLE) log("  for tree: " + node);
                         folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldCodeBlocksPreset));

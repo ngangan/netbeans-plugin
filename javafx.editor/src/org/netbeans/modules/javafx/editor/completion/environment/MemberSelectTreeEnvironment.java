@@ -154,12 +154,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         if (el != null && el instanceof PackageElement) {                                
                             addPackageContent((PackageElement)el, null, null, false);
                         } else {
-                            String text = "import " + exp + ".*;";
-                            useFakeSource(text, text.length()-2);
-                            // fix the position
-                            for (JavaFXCompletionItem r : query.results) {
-                                r.substitutionOffset = offset;
-                            }
+                            addAllTypes(null, false, exp.toString());
                         }
                 }
             } else if (parent.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT && ((UnitTree)parent).getPackageName() == fa) {

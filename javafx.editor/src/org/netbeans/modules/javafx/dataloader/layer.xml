@@ -46,6 +46,7 @@ made subject to such option by the copyright holder.
         <folder name="MIMEResolver">
             <file name="JavaFXResolver.xml" url="JavaFXResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="position" intvalue="115"/>
             </file>
         </folder>
     </folder>

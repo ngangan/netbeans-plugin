@@ -47,6 +47,10 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXErroneousType;
+import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
+import com.sun.tools.javafx.tree.JFXSelect;
+import com.sun.tools.javafx.tree.JFXVar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -188,7 +192,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     boolean hasAdditionalItems;
     JToolTip toolTip;
     private CompletionDocumentation documentation;
-    int anchorOffset;
+    public int anchorOffset;
     int toolTipOffset;
     JTextComponent component;
     public int queryType;
@@ -487,31 +491,54 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             }
         }
-        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + " offset: " + offset); // NOI18N
+        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + 
+                " offset: " + offset + " prefix " + prefix); // NOI18N
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
+        JavaFXTreePath pathOfBrother = controller.getTreeUtilities().pathFor(offset > 0 ? offset - 1 : offset);
         Tree t = path.getLeaf();
-        SourcePositions pos = controller.getTrees().getSourcePositions();
-        UnitTree unit = controller.getCompilationUnit();
-        long s = pos.getStartPosition(unit, t);
-        long e = pos.getEndPosition(unit, t);
-        while (t != null &&
-                (t.getJavaFXKind() == JavaFXKind.ERRONEOUS ||
-                    (offset <= s) ||
-                    (offset > e)
-                )
-        ) {
-            path = path.getParentPath();
-            if (path != null) {
-                t = path.getLeaf();
+        Tree brother = pathOfBrother.getLeaf();
+        if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
+            if ((brother.getJavaFXKind() == JavaFXKind.OBJECT_LITERAL_PART) ||
+                (brother.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) ||
+                (brother.getJavaFXKind() == JavaFXKind.VARIABLE))
+            {
+                path = pathOfBrother;
             } else {
-                t = null;
+                path = pathOfBrother.getParentPath();
             }
-            s = pos.getStartPosition(unit, t);
-            e = pos.getEndPosition(unit, t);
-        }
-        if (t == null) {
-            t = unit;
-            path = new JavaFXTreePath(unit);
+            t = path.getLeaf();
+        } else {
+            SourcePositions pos = controller.getTrees().getSourcePositions();
+            UnitTree unit = controller.getCompilationUnit();
+            long s = pos.getStartPosition(unit, t);
+            long e = pos.getEndPosition(unit, t);
+            while (t != null && 
+                    ( (offset <= s) || (offset >= e) ||
+                      (t.getJavaFXKind() == JavaFXKind.ERRONEOUS)
+                    )
+                  ) {
+                path = path.getParentPath();
+                if (path != null) {
+                    t = path.getLeaf();
+                } else {
+                    t = null;
+                }
+                long s1 = pos.getStartPosition(unit, t);
+                s = s1 < s ? s1 : s;
+                long e1 = pos.getEndPosition(unit, t);
+                e = e1 > e ? e1 : e;
+                if ((t != null) &&
+                        (t.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) &&
+                        s1 == e1) {
+                    // strange class declaration --> continue to the parent
+                    s = s1;
+                    e = e1;
+                }
+            }
+            if ((t == null) || (controller.getTreeUtilities().isSynthetic(path))){
+                t = unit;
+                path = new JavaFXTreePath(unit);
+            }
         }
         JavaFXCompletionEnvironment result = null;
         JavaFXKind k = t.getJavaFXKind();
@@ -520,6 +547,44 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         return result;
     }
     
+    /**
+     * 
+     * @param t
+     * @return
+     */
+    private boolean isBrokenAtTheEnd(CompilationController controller, Tree t, int offset) {
+        if (LOGGABLE) log("isBrokenAtTheEnd " + t + " class == " + t.getClass());
+        if (t instanceof JFXErroneousType) {
+            SourcePositions pos = controller.getTrees().getSourcePositions();
+            UnitTree unit = controller.getCompilationUnit();
+            long s = pos.getStartPosition(unit, t);
+            long e = pos.getEndPosition(unit, t);
+            if (LOGGABLE) log("   (1) s == " + s + "  e == " + e + "  offset == " + offset);
+            return e == offset;
+        }
+        if ((t instanceof JFXObjectLiteralPart) || (t instanceof JFXVar)) {
+            if (t.toString().contains("/*missing*/")) { // ho ho hoooo
+                SourcePositions pos = controller.getTrees().getSourcePositions();
+                UnitTree unit = controller.getCompilationUnit();
+                long s = pos.getStartPosition(unit, t);
+                long e = pos.getEndPosition(unit, t);
+                if (LOGGABLE) log("   (2) s == " + s + "  e == " + e + "  offset == " + offset);
+                return e == offset;
+            }
+        }
+        if (t instanceof JFXSelect) {
+            if (t.toString().contains("<missing>")) { // ho ho hoooo
+                SourcePositions pos = controller.getTrees().getSourcePositions();
+                UnitTree unit = controller.getCompilationUnit();
+                long s = pos.getStartPosition(unit, t);
+                long e = pos.getEndPosition(unit, t);
+                if (LOGGABLE) log("   (3) s == " + s + "  e == " + e + "  offset == " + offset);
+                return e == offset;
+            }
+        }
+        return false;
+    }
+
     static JavaFXCompletionEnvironment createEnvironment(JavaFXKind k) {
         JavaFXCompletionEnvironment result = null;
         if (LOGGABLE) log("JavaFXKind: " + k); // NOI18N
@@ -571,25 +636,18 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 break;
             case MULTIPLY_ASSIGNMENT:
             case DIVIDE_ASSIGNMENT:
-//            case REMAINDER_ASSIGNMENT:
             case PLUS_ASSIGNMENT:
             case MINUS_ASSIGNMENT:
-//            case AND_ASSIGNMENT:
-//            case XOR_ASSIGNMENT:
-//            case OR_ASSIGNMENT:
                 result = new CompoundAssignmentTreeEnvironment();
                 break;
             case PREFIX_INCREMENT:
             case POSTFIX_INCREMENT:
             case PREFIX_DECREMENT:
             case POSTFIX_DECREMENT:
-//            case UNARY_PLUS:
             case UNARY_MINUS:
-//            case BITWISE_COMPLEMENT:
             case LOGICAL_COMPLEMENT:
                 result = new UnaryTreeEnvironment();
                 break;
-//            case AND:
             case CONDITIONAL_AND:
             case CONDITIONAL_OR:
             case DIVIDE:
@@ -601,10 +659,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case MINUS:
             case MULTIPLY:
             case NOT_EQUAL_TO:
-//            case OR:
             case PLUS:
             case REMAINDER:
-//            case XOR:
                 result = new BinaryTreeEnvironment();
                 break;
             case CONDITIONAL_EXPRESSION:
@@ -628,6 +684,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new FunctionDefinitionEnvironment();
                 break;
             case FUNCTION_VALUE:
+                result = new FunctionValueEnvironment();
                 break;
             case INIT_DEFINITION:
                 break;
@@ -687,15 +744,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case TRY:
                 break;
             case INT_LITERAL:
-//            case LONG_LITERAL:
             case FLOAT_LITERAL:
             case DOUBLE_LITERAL:
             case BOOLEAN_LITERAL:
-//            case CHAR_LITERAL:
             case STRING_LITERAL:
             case NULL_LITERAL:
                 break;
             case ERRONEOUS:
+                result = new ErroneousEnvironment();
                 break;
             case SIZEOF:
                 break;

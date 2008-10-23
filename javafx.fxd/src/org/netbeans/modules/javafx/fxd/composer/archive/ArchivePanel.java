@@ -21,6 +21,9 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import com.sun.javafx.tools.fxd.container.FXDContainer;
+import java.awt.Color;
+import java.awt.Dimension;
 
 /**
  *
@@ -34,24 +37,37 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     public ArchivePanel( FXZArchive archive) {
         m_archive = archive;
         initComponents();
+        jScrollPane1.getViewport().setBackground( Color.WHITE);
         
         tableContent.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if ( !e.getValueIsAdjusting()) {
+                    boolean allowReplace;
+                    boolean allowRemove;
+                    
                     switch( tableContent.getSelectedRowCount()) {
                         case 0:
-                            m_removeAction.setEnabled(false);
-                            m_replaceAction.setEnabled(false);
+                            allowRemove=false;
+                            allowReplace=false;
                             break;
                         case 1:
-                            m_removeAction.setEnabled(true);
-                            m_replaceAction.setEnabled(true);
+                            allowRemove=true;
+                            allowReplace=true;
                             break;
                         default:
-                            m_removeAction.setEnabled(true);
-                            m_replaceAction.setEnabled(false);
+                            allowRemove=true;
+                            allowReplace=false;
                             break;
                     }
+                    int [] rows = tableContent.getSelectedRows();
+                    for (int row : rows) {
+                        if ( FXDContainer.MAIN_CONTENT.equals(getNameAt(row))) {
+                            allowRemove = false;
+                            break;
+                        }
+                    }
+                    m_removeAction.setEnabled(allowRemove);
+                    m_replaceAction.setEnabled(allowReplace);                    
                 }
             }
         });
@@ -63,6 +79,13 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     }
     
     protected void update() {
+        int width = jScrollPane1.getViewport().getWidth();
+        
+        Dimension prefSize = tableContent.getPreferredSize();
+        if ( prefSize != null) {
+            jScrollPane1.getViewport().setSize( width, prefSize.height);
+        }
+        System.err.println( tableContent.getPreferredSize());
         labelTotalSize.setText ( FXZArchive.getSizeText(m_archive.getSize()));
     }
     
@@ -95,7 +118,7 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -110,8 +133,8 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                     .add(jLabel1)
                     .add(labelTotalSize))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 275, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -154,7 +177,7 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
             if ( selRows != null && selRows.length > 0) {
                 String [] selNames = new String[ selRows.length];
                 for (int i = 0; i < selNames.length; i++) {
-                    selNames[i] = (String) tableContent.getModel().getValueAt(selRows[0], 0);
+                    selNames[i] = getNameAt(selRows[0]);
                 }
                 m_archive.remove( selNames);
                 update();
@@ -166,10 +189,40 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
         public ReplaceArchiveEntryAction() {  
             super("replace_entry", false);  //NOI18N
         }        
+
         public void actionPerformed(ActionEvent e) {
-            update();
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int r = chooser.showDialog( SwingUtilities.getWindowAncestor(ArchivePanel.this),
+                    NbBundle.getMessage(ArchivePanel.class, "LBL_CHOOSE_FILE")); //NOI18N
+            if (r == JFileChooser.APPROVE_OPTION) {
+                final File file = chooser.getSelectedFile();
+                if (!file.isFile()) {
+                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                            NbBundle.getMessage(ArchivePanel.class, "ERROR_NOT_A_FILE", file), //NOI18N
+                            NotifyDescriptor.Message.WARNING_MESSAGE));
+                } else {
+                    try {
+                        int row = tableContent.getSelectedRow();
+                        if ( row >= 0) {
+                            String entryName = getNameAt(row);
+                            m_archive.replace( entryName, file);
+                            update();
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                                NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_READ_FILE",  //NOI18N
+                                ex.getLocalizedMessage()), NotifyDescriptor.Message.ERROR_MESSAGE));
+                    }
+                }
+            }
         }
     };      
+    
+    protected String getNameAt( int row) {
+        return (String) tableContent.getModel().getValueAt(row, 0);
+    }
     
     private final Action m_addAction     = new AddArchiveEntryAction();
     private final Action m_removeAction  = new RemoveArchiveEntryAction();

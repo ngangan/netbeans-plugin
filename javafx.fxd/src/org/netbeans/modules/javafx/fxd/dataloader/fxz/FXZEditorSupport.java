@@ -24,6 +24,8 @@ import org.openide.text.DataEditorSupport;
 import org.openide.windows.CloneableTopComponent;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.io.Serializable;
+import javax.swing.SwingUtilities;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -61,6 +63,26 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
             throw new IOException( "Archive save failed - [" + e.getClass() + "-" + e.getMessage() + "]");
         }
     }
+            
+    public void updateDisplayName() {
+        final TopComponent tc = m_mvtc;
+        if (tc == null) {
+            return;
+        }
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                //ProjectTypeInfo projectTypeInfo = ProjectTypeInfo.getProjectTypeInfoFor (IOSupport.getDataObjectContext (dataObject).getProjectType ());
+                //tc.setIcon (projectTypeInfo != null ? ImageUtilities.loadImage (projectTypeInfo.getIconResource ()) : null);
+
+                String displayName = messageName();
+                if (! displayName.equals(tc.getDisplayName()))
+                    tc.setDisplayName(displayName);
+                tc.setToolTipText(getDataObject().getPrimaryFile().getPath());
+            }
+        });
+    }
+
     
     @Override
     protected boolean notifyModified() {
@@ -69,15 +91,20 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
             FXZDataObject dObj = (FXZDataObject) getDataObject();
             dObj.m_ic.add(env);
         }
+        updateDisplayName();
         return retValue;
     }
     
     @Override
     protected void notifyUnmodified() {
-        super.notifyUnmodified();
-            FXZDataObject dObj = (FXZDataObject) getDataObject();
+        FXZDataObject dObj = (FXZDataObject) getDataObject();
+        if ( dObj.getDataModel().getFXDContainer().isSaved()) {
+            super.notifyUnmodified();
             dObj.m_ic.remove(env);
+            updateDisplayName();
+        }
     }
+    
     
     @Override
     protected CloneableEditorSupport.Pane createPane() {
@@ -101,6 +128,10 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         return super.messageName();        
     }
     
+    FXDEnv getEnv() {
+        return (FXDEnv) env;
+    }
+    
     protected synchronized MultiViewDescription [] getViewDescriptions() {
         if ( m_views == null) {
             m_views = new MultiViewDescription[] {
@@ -112,7 +143,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         return m_views;
     }
         
-    private static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
+    static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
         private static final long  serialVersionUID = 1L;
         
         public FXDEnv( FXZDataObject obj) {
@@ -122,6 +153,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         public void save() throws IOException {
             FXZEditorSupport ed = (FXZEditorSupport)this.findCloneableOpenSupport();
             ed.saveDocument();
+            ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().setIsSaved();
         }
         
         @Override

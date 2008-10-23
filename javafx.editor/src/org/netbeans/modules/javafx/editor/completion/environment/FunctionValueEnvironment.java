@@ -39,72 +39,54 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXInstanciate;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
+import com.sun.tools.javafx.tree.JFXBlock;
+import com.sun.tools.javafx.tree.JFXFunctionValue;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
+import javax.tools.Diagnostic;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
  *
  * @author David Strupl
  */
-public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInstanciate> {
-    
-    private static final Logger logger = Logger.getLogger(InstantiateEnvironment.class.getName());
+public class FunctionValueEnvironment extends JavaFXCompletionEnvironment<JFXFunctionValue> {
+
+    private static final Logger logger = Logger.getLogger(FunctionValueEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXInstanciate it) throws IOException {
-        int pos = (int) sourcePositions.getStartPosition(root, it);
-        int end = (int) sourcePositions.getEndPosition(root, it);
-        if (LOGGABLE) log("inside InstantiateEnvironment " + it + 
-                " pos == " + pos +
-                " end == " + end +
-                "  offset == " + offset + "  prefix == " + prefix + "\n");
-        if (pos < 0) {
-            if (LOGGABLE) log("  returing nothing because pos < 0");
-            return;
+    protected void inside(JFXFunctionValue val) throws IOException {
+        if (LOGGABLE) log("inside JFXFunctionValue " + val);
+        JFXBlock bl = val.getBodyExpression();
+        if (bl != null) {
+            ExpressionTree last = null;
+            for (ExpressionTree stat : bl.getStatements()) {
+                int pos = (int) sourcePositions.getStartPosition(root, stat);
+                if (pos == Diagnostic.NOPOS || offset <= pos) {
+                    break;
+                }
+                last = stat;
+            }
+            if (last != null && last.getJavaFXKind() == Tree.JavaFXKind.TRY) {
+                if (((TryTree) last).getFinallyBlock() == null) {
+                    addKeyword(CATCH_KEYWORD, null, false);
+                    addKeyword(FINALLY_KEYWORD, null, false);
+                    if (((TryTree) last).getCatches().size() == 0) {
+                        return;
+                    }
+                }
+            }
         }
-        String s = it.getIdentifier().toString();
-        if (LOGGABLE) log("  s == " + s);
-        TypeElement te = findTypeElement(s);
-        if (LOGGABLE) log("  te == " + te);
-        if (te == null) {
-            return;
-        }
-        TypeMirror tm = te.asType();
-        if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind()));
-        if (tm == null) {
-            return;
-        }
-        if (LOGGABLE) log(" TODO: missing check whether we are not after the closing bracket!"); 
-        addMembers(tm, false, true, ":",controller.getTreeUtilities().getScope(path),true, true);
-    }
-
-    public TypeMirror getSmartType(JFXInstanciate it) throws IOException {
-        String s = it.getIdentifier().toString();
-        TypeElement te = findTypeElement(s);
-        TypeMirror type = te != null ? te.asType() : null;
-        
-        if (type == null) {
-            return null;
-        }
-        
-        JavafxTypes types = controller.getJavafxTypes();
-        if (types.isSequence((Type) type)) {
-            type = types.elementType((Type) type);
-        } 
-        
-        return type;
+        path = JavaFXTreePath.getPath(root, bl);
+        localResult(null);
+        addKeywordsForStatement();
     }
 
     private static void log(String s) {

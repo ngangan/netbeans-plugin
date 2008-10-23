@@ -84,6 +84,7 @@ public class CompilationJob implements Runnable {
     }
 
     public void run() {
+        JavaFXSource js;
         try {
             while (true) {
                 try {
@@ -107,7 +108,7 @@ public class CompilationJob implements Runnable {
                     if (r != null) {
                         currentRequest.setCurrentTask(r);
                         try {
-                            JavaFXSource js = r.source;
+                            js = r.source;
                             if (js == null) {
                                 assert r.phase == null;
                                 assert r.reschedule == false;
@@ -230,6 +231,7 @@ public class CompilationJob implements Runnable {
                                 }
                             }
                         } finally {
+                            js = null; // help GC
                             currentRequest.setCurrentTask(null);
                         }
                     }

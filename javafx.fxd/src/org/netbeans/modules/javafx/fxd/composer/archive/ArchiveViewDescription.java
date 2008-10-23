@@ -31,7 +31,6 @@ public class ArchiveViewDescription implements MultiViewDescription, Serializabl
 
     public synchronized MultiViewElement createElement() {
         assert EventQueue.isDispatchThread();
-        assert m_elem == null;
         if (m_elem == null) {
             m_elem = new ArchiveElement(m_support);
         }

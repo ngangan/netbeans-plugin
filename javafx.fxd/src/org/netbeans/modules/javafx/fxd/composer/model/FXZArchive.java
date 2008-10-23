@@ -48,10 +48,11 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     private final    List<FXZArchiveEntry>    m_entries;
     private          FXDFileModel             m_fileModel = null;
     private final    List<TableModelListener> m_tableListeners;
-    private volatile int                      m_changeTicker = 0;  
+    private volatile int                      m_changeTicker = 0; 
+    private volatile int                      m_saveTickerCopy = 0;
     
     private final EntryValue [] m_values = new EntryValue[] {
-        new EntryValue( "name", String.class, true) {  //NOI18N
+        new EntryValue( "name", String.class, false) {  //NOI18N
             @Override
             public Object getValue(int row) {
                 return m_entries.get(row).getName();
@@ -121,7 +122,11 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
 
         public FXZArchiveEntry( final File file) throws FileNotFoundException, IOException {
-            m_name = file.getName();
+            this( file.getName(), file);
+        }
+        
+        public FXZArchiveEntry( String name, final File file) {
+            m_name = name;
             m_size = file.length();
             m_buffer = null;
             m_compressedSize = -1;
@@ -153,7 +158,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                             zout.closeEntry();
                             zout.finish();                                   
                             m_compressedSize = cout.getSize();
-                            fireTableChanged( new TableModelEvent( FXZArchive.this, 0, m_entries.size()-1));
+                            fireTableChanged( new TableModelEvent( FXZArchive.this));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -234,6 +239,14 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_tableListeners = new ArrayList<TableModelListener>();
     }
         
+    public void setIsSaved() {
+        m_saveTickerCopy = m_changeTicker;
+    }
+    
+    public boolean isSaved() {
+        return m_saveTickerCopy == m_changeTicker;
+    }
+    
     public synchronized void documentOpened( StyledDocument doc) {
         if ( m_fileModel == null) {
             try {
@@ -299,7 +312,6 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     }
     
     public synchronized void remove(final String [] entryNames) {
-        int size = m_entries.size();
         boolean changed = false;
         try {
             for ( String name : entryNames) {
@@ -314,10 +326,16 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         } finally {
             if ( changed) {
                 incrementChangeTicker();
-                fireTableChanged( new TableModelEvent( this, 0, size, 
-                        TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE));
+                fireTableChanged( new TableModelEvent( this));
             }
         }
+    }
+    
+    public synchronized void replace( String entryName, File file) {
+        int index = getEntryIndex(entryName);
+        m_entries.set(index, new FXZArchiveEntry(entryName, file));
+        incrementChangeTicker();
+        fireTableChanged( new TableModelEvent( this));
     }
     
     public int getChangeTicker() {
@@ -326,6 +344,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     
     public void incrementChangeTicker() {
         m_changeTicker++;
+        m_dObj.notifyEditorSupportModified();
     }
     
     public synchronized void save() throws FileAlreadyLockedException, IOException, BadLocationException {        
@@ -350,7 +369,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         builder.close();
         load();
     }    
-    
+        
     protected int getEntryIndex( String name) {
         assert name != null;
         for ( int i = m_entries.size() - 1; i >= 0; i--) {

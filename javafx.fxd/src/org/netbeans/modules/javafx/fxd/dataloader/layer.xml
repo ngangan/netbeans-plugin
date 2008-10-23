@@ -47,9 +47,11 @@ made subject to such option by the copyright holder.
         <folder name="MIMEResolver">
             <file name="FXZResolver.xml" url="FXZResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="position" intvalue="125"/>
             </file>
             <file name="FXDResolver.xml" url="FXDResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="position" intvalue="135"/>
             </file>
         </folder>
     </folder>

@@ -130,11 +130,8 @@ public final class FXDElement {
     Rectangle2D getBounds() {
         SGNode node = getController().getNode(m_id);
         assert node != null;
-        Rectangle2D b = node.getBounds();
-        double zoom = m_dObj.getDataModel().getZoomRatio();
-        
-        return new Rectangle2D.Double( b.getX() * zoom, b.getY() * zoom, 
-                                       b.getWidth() * zoom, b.getHeight() * zoom);
+        Rectangle2D tb = node.getTransformedBounds();
+        return tb;
     }
 
     public boolean isDeleted() {

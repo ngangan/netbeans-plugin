@@ -95,7 +95,7 @@ public final class FXDComposerController {
         assert previewTopComponent != null;
         m_previewTopComponent = previewTopComponent;
     }
-               
+                   
     public JSGPanel getSGPanel() {
         return m_previewTopComponent.getJSGPane();
     }
@@ -109,6 +109,10 @@ public final class FXDComposerController {
         }
     }
         
+    protected boolean hasPreviewTC() {
+        return m_previewTopComponent != null;
+    }
+    
     protected SGNode getRootNode() {
         JSGPanel panel = getSGPanel();
         if (panel != null) {
@@ -157,10 +161,12 @@ public final class FXDComposerController {
     public void setZoomRatio(float zoomRatio) {
         if ( m_dObj.getDataModel().setZoomRatio(zoomRatio)) {
             m_screenChangeTicker++;
-            FXNode scene = (FXNode) getSGPanel().getScene();
-            scene.setScaleX(zoomRatio);
-            scene.setScaleY(zoomRatio);
-            refresh();
+            if ( hasPreviewTC()) {
+                FXNode scene = (FXNode) getSGPanel().getScene();
+                scene.setScaleX(zoomRatio);
+                scene.setScaleY(zoomRatio);
+                refresh();
+            }
         }
     }
 

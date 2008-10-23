@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
+import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
@@ -78,6 +79,10 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         reset();
 //        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
     }
+            
+    public void notifyEditorSupportModified () {
+        m_edSup.notifyModified ();
+    }    
     
     public synchronized void reset() {
         m_ic = new InstanceContent();

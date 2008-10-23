@@ -39,14 +39,25 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXVar;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Modifier;
+import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
  *
@@ -54,15 +65,19 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
  */
 public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<UnitTree> {
     
-    private static final Logger logger = Logger.getLogger(FunctionDefinitionEnvironment.class.getName());
+    private static final Logger logger = Logger.getLogger(CompilationUnitEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(UnitTree t) throws IOException {
-        if (LOGGABLE) log("inside CompilationUnitTree " + t);
+    protected void inside(UnitTree ut) throws IOException {
+        if (LOGGABLE) log("inside CompilationUnitTree " + ut);
         Tree pkg = root.getPackageName();
+        boolean hasPublicDecls = hasPublicDeclarations(ut);
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {
-            addKeywordsForCU();
+            addKeywordsForCU(ut);
+            if (!hasPublicDecls) {
+                addKeywordsForStatement();
+            }
             return;
         }
         if (offset <= sourcePositions.getStartPosition(root, pkg)) {
@@ -70,10 +85,103 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
         } else {
             TokenSequence<JFXTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
             if (first != null && first.token().id() == JFXTokenId.SEMI) {
-                addKeywordsForCU();
-                addPackages("");
-                addLocalAndImportedTypes(null, null, null, false, null);
-                addLocalMembersAndVars(null);
+                addKeywordsForCU(ut);
+                if (!hasPublicDecls) {
+                    addKeywordsForStatement();
+                    addPackages("");
+                    addLocalAndImportedTypes(null, null, null, false, null);
+                    addLocalMembersAndVars(null);
+                    addLocalAndImportedFunctions();
+                }
+            }
+        }
+    }
+
+    private boolean hasPublicDeclarations(UnitTree ut) {
+        if (LOGGABLE) log("hasPublicDeclarations");
+        for (Tree tr : ut.getTypeDecls()) {
+            if (tr.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+                JFXClassDeclaration cl = (JFXClassDeclaration)tr;
+                if (LOGGABLE) log("   cl " + cl);
+                JavaFXTreePath tp = JavaFXTreePath.getPath(root, cl);
+                if (controller.getTreeUtilities().isSynthetic(tp)) {
+                    if (LOGGABLE) log("       isSynthetic ");
+                    for (Tree t : cl.getClassMembers()) {
+                        if (LOGGABLE) log("   t == " + t);
+                        if (t instanceof JFXFunctionDefinition) {
+                            JFXFunctionDefinition fd = (JFXFunctionDefinition)t;
+                            if (LOGGABLE) log("   fd == " + fd);
+                            JavaFXTreePath fp = JavaFXTreePath.getPath(root, fd);
+                            if (controller.getTreeUtilities().isSynthetic(fp)) {
+                                if (LOGGABLE) log("  ignoring " + fd + " because it is syntetic");
+                                continue;
+                            }
+                            if (fd.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                                if (LOGGABLE) log("   returning true because of " + fd);
+                                return true;
+                            }
+                        }
+                        if (t instanceof JFXVar) {
+                            JFXVar v = (JFXVar)t;
+                            if (LOGGABLE) log("   v == " + v);
+                            if (v.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                                if (LOGGABLE) log("   returning true because of " + v);
+                                return true;
+                            }
+                        }
+                        if (t instanceof JFXClassDeclaration) {
+                            JFXClassDeclaration inner = (JFXClassDeclaration)t;
+                            if (LOGGABLE) log("   inner == " + inner);
+                            if (inner.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                                if (LOGGABLE) log("   returning true because of " + inner);
+                                return true;
+                            }
+                        }
+                    }
+                } else {
+                    if (cl.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                        if (LOGGABLE) log("   returning true because the class is public");
+                        return true;
+                    }
+                }
+            }
+        }
+        if (LOGGABLE) log("hasPublicDeclarations returning false at the very end");
+        return false;
+    }
+
+    private void addKeywordsForCU(UnitTree ut) {
+        List<String> kws = new ArrayList<String>();
+        kws.add(ABSTRACT_KEYWORD);
+        kws.add(CLASS_KEYWORD);
+        kws.add(VAR_KEYWORD);
+        kws.add(DEF_KEYWORD);
+        kws.add(FUNCTION_KEYWORD);
+        kws.add(PUBLIC_KEYWORD);
+        kws.add(IMPORT_KEYWORD);
+        boolean beforeAnyClass = true;
+        for (Tree t : root.getTypeDecls()) {
+            if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+                int pos = (int) sourcePositions.getEndPosition(root, t);
+                if (pos != Diagnostic.NOPOS && offset >= pos) {
+                    beforeAnyClass = false;
+                }
+            }
+        }
+        if (beforeAnyClass) {
+            Tree firstImport = null;
+            for (Tree t : root.getImports()) {
+                firstImport = t;
+                break;
+            }
+            Tree pd = root.getPackageName();
+            if ((pd != null && offset <= sourcePositions.getStartPosition(root, root)) || (pd == null && (firstImport == null || sourcePositions.getStartPosition(root, firstImport) >= offset))) {
+                kws.add(PACKAGE_KEYWORD);
+            }
+        }
+        for (String kw : kws) {
+            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
+                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
             }
         }
     }

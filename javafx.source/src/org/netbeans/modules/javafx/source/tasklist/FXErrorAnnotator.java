@@ -48,14 +48,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.Action;
 import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
+import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
@@ -258,23 +261,39 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
     public boolean haveError(FileObject file, boolean recursive) {
         if (file.isData()) {
-            JavaFXSource fxSource = JavaFXSource.forFileObject(file);
-            if (fxSource == null)
+            if (!file.getExt().equals("fx")){
                 return false;
-            if (fxSource.currentInfo == null)
+            }
+            final JavaFXSource fxSource = JavaFXSource.forFileObject(file);
+            if (fxSource == null){
                 return false;
-//            List<Diagnostic> diag = fxSource.currentInfo.getDiagnostics();
-//            return !diag.isEmpty();
-            return fxSource.currentInfo.isErrors();
+            }
+            final boolean isErr[] = {false};
+            try{
+                fxSource.runUserActionTask(new CancellableTask<CompilationController>(){
+                    public void cancel() {
+                    }
+
+                    public void run(CompilationController cc) throws Exception {
+                        if (!cc.toPhase(Phase.PARSED).lessThan(Phase.PARSED)) {
+                            isErr[0] = fxSource.currentInfo.isErrors();
+                        }
+                    }
+
+                }, true);
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+
+            return isErr[0];
         } else {
-/* need to be implemented with java file checking for errors, temporary always without errors
             FileObject[] childs = file.getChildren();
             for(int i = 0;i < childs.length; i++){
                 if (haveError(childs[i], true)){
                     return true;
                 }
             }
- */
+ 
             return false;
         }
     }

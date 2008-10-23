@@ -112,7 +112,6 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
 
                     public void run(CompilationController controller) throws Exception {
                         controller.toPhase(JavaFXSource.Phase.ANALYZED);
-                        JavafxcScope scope = controller.getTrees().getScope(controller.getTreeUtilities().pathFor(substitutionOffset));
                         if (!isAnnonInner()) {
                             TypeElement e = null;
                             try {
@@ -193,14 +192,5 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
     
     boolean isAnnonInner() {
         return simpleName.length() == 0 || Character.isDigit(simpleName.charAt(0));
-    }
-    
-    private boolean isOfKind(Element e, EnumSet<ElementKind> kinds) {
-        if (kinds.contains(e.getKind()))
-            return true;
-        for (Element ee : e.getEnclosedElements())
-            if (isOfKind(ee, kinds))
-                return true;
-        return false;
     }
 }
