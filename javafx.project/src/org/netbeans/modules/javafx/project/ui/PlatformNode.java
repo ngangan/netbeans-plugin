@@ -74,6 +74,7 @@ import org.openide.util.WeakListeners;
 import org.openide.ErrorManager;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.java.project.support.ui.PackageView;
@@ -201,7 +202,7 @@ class PlatformNode extends AbstractNode implements ChangeListener {
                 return Collections.EMPTY_LIST;
             }
             //Todo: Should listen on returned classpath, but now the bootstrap libraries are read only
-            FileObject[] roots = platform.getBootstrapLibraries().getRoots();
+            FileObject[] roots = (platform instanceof JavaFXPlatform ? ((JavaFXPlatform)platform).getBootstrapLibraries(((PlatformNode)this.getNode()).pp.getProfile()) : platform.getBootstrapLibraries()).getRoots();
             List result = new ArrayList (roots.length);
             for (int i=0; i<roots.length; i++) {
                 try {
@@ -246,6 +247,10 @@ class PlatformNode extends AbstractNode implements ChangeListener {
             return this.evaluator.getProperty(this.platformPropName);
         }
         
+        public String getProfile() {
+            return evaluator.getProperty("javafx.profile"); //NOI18N
+        }
+        
         public JavaPlatform getPlatform () {
             if (platformCache == null) {
                 final String platformSystemName = getPlatformId();
@@ -276,7 +281,7 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         }
         
         public void propertyChange(PropertyChangeEvent evt) {
-            if (platformPropName.equals (evt.getPropertyName())) {
+            if (platformPropName.equals (evt.getPropertyName()) || "javafx.profile".equals(evt.getPropertyName())) {
                 platformCache = null;                
                 this.changeSupport.fireChange ();
             }

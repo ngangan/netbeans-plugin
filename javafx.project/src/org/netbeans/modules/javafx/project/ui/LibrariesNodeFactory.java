@@ -106,18 +106,18 @@ public final class LibrariesNodeFactory implements NodeFactory {
         public List<String> keys() {
             List<String> result = new ArrayList<String>();
             result.add(LIBRARIES);
-            URL[] testRoots = testSources.getRootURLs();
-            boolean addTestSources = false;
-            for (int i = 0; i < testRoots.length; i++) {
-                File f = new File(URI.create(testRoots[i].toExternalForm()));
-                if (f.exists()) {
-                    addTestSources = true;
-                    break;
-                }
-            }
-            if (addTestSources) {
-                result.add(TEST_LIBRARIES);
-            }
+//            URL[] testRoots = testSources.getRootURLs();
+//            boolean addTestSources = false;
+//            for (int i = 0; i < testRoots.length; i++) {
+//                File f = new File(URI.create(testRoots[i].toExternalForm()));
+//                if (f.exists()) {
+//                    addTestSources = true;
+//                    break;
+//                }
+//            }
+//            if (addTestSources) {
+//                result.add(TEST_LIBRARIES);
+//            }
             return result;
         }
 
