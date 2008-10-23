@@ -1206,13 +1206,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         final Elements elements = controller.getElements();
         for (Element local : from) {
             if (LOGGABLE) log("    local == " + local);
+            String name = local.getSimpleName().toString();
+            if (name.contains("$")) {
+                continue;
+            }
             if (local.getKind().isClass() || local.getKind() == ElementKind.INTERFACE) {
                 if (local.asType() == null || local.asType().getKind() != TypeKind.DECLARED) {
                     continue;
                 }
                 DeclaredType dt = (DeclaredType) local.asType();
                 TypeElement te = (TypeElement) local;
-                String name = local.getSimpleName().toString();
                 if (!controller.getTreeUtilities().isAccessible(originalScope, te)) {
                     if (LOGGABLE) log("    not accessible " + name);
                     continue;
@@ -1251,8 +1254,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (LOGGABLE) log("  scope == " + scope);
             for (Element local : scope.getLocalElements()) {
                 if (LOGGABLE) log("    local == " + local);
+                String name = local.getSimpleName().toString();
+                if (name.contains("$")) {
+                    continue;
+                }
                 if (local.getKind() == ElementKind.METHOD) {
-                    String name = local.getSimpleName().toString();
                     if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) {
                         addResult(JavaFXCompletionItem.createExecutableItem(
                                 (ExecutableElement) local,
