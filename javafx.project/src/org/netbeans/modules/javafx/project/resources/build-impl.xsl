@@ -271,6 +271,10 @@ is divided into following sections:
             <condition property="browser.args" value="/C">
                 <os family="windows"/>
             </condition>
+            <!-- Some argument should be set for MacOS 'open' command -->
+            <condition property="browser.args" value="-g">
+                <os family="mac"/>
+            </condition>
             <property name="browser.args" value=""/>
             <exec executable="${{browser}}" spawn="true">
                 <arg value="${{browser.args}}"/>
