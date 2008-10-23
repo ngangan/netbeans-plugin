@@ -64,6 +64,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
     private ImportsModel model;
     private Queue<Element> queue = new ConcurrentLinkedQueue<Element>();
     private static Logger log = Logger.getLogger(ImportResolverImpl.class.getName());
+    private static final TypesComparator TYPES_COMPARATOR = new TypesComparator();
 
     /**
      * Allocates a new <code>Thread</code> object. This constructor has
@@ -248,18 +249,20 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
     }
 
     private Set<ElementHandle<TypeElement>> filterResult(Set<ElementHandle<TypeElement>> types) {
-        Iterator<ElementHandle<TypeElement>> handleIterator = types.iterator();
-        while (handleIterator.hasNext()) {
-            ElementHandle<TypeElement> handle = handleIterator.next();
-            switch (handle.getKind()) {
-                case CLASS:
-                case INTERFACE:
-                    continue;
-                default:
-                    handleIterator.remove();
-            }
-        }
-        return types;
+        Set<ElementHandle<TypeElement>> set = new TreeSet<ElementHandle<TypeElement>>(TYPES_COMPARATOR);
+//        Iterator<ElementHandle<TypeElement>> handleIterator = types.iterator();
+//        while (handleIterator.hasNext()) {
+//            ElementHandle<TypeElement> handle = handleIterator.next();
+//            switch (handle.getKind()) {
+//                case CLASS:
+//                case INTERFACE:
+//                    continue;
+//                default:
+//                    handleIterator.remove();
+//            }
+//        }
+        set.addAll(types);
+        return set;
     }
 
     private String toSimpleName(Element e) {
@@ -289,4 +292,10 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
         }
     }
 
+    private static class TypesComparator implements Comparator<ElementHandle<TypeElement>> {
+        public int compare(ElementHandle<TypeElement> o1, ElementHandle<TypeElement> o2) {
+            String s1 = o1.getQualifiedName();
+            return s1 != null ? s1.compareTo(o2.getQualifiedName()) : 1;
+        }
+    }
 }

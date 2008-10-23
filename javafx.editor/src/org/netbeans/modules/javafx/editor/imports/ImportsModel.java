@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.JFXImportManager;
@@ -44,18 +45,51 @@ import java.util.logging.Logger;
  * @todo documentation
  */
 public final class ImportsModel {
+    public static final int UNSET = -1;
     public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
     private final Collection<ModelEntry> entries = new TreeSet<ModelEntry>();
-    private final CompilationInfo ci;
+    private final int start;
+    private final int end;
 
 
-    ImportsModel(List<? extends ImportTree> imports, CompilationInfo ci) {
-        if (imports == null) throw new IllegalArgumentException("List of imports cannot be null.");
-        for (ImportTree anImport : imports) {
-            entries.add(new ModelEntry(anImport));
-        }        
-        this.ci = ci;
+    ImportsModel(CompilationInfo ci) {
+        if (ci == null) throw new IllegalArgumentException("Compilation info cannot be null.");
+        List<? extends ImportTree> trees = ci.getCompilationUnit().getImports();
+        if (!trees.isEmpty()) {
+            int start = Integer.MAX_VALUE;
+            int end = 0;
+            for (ImportTree anImport : trees) {
+                entries.add(new ModelEntry(anImport));
+                start = Math.min(start, getStart(anImport, ci));
+                end = Math.max(end, getEnd(anImport, ci));
+            }
+            this.start = start;
+            this.end = end;
+        } else {
+            end = start = UNSET;            
+        }
     }
+
+    public int getStart() {
+        return start;
+    }
+
+    public int getEnd() {
+        return end;
+    }
+
+    private int getEnd(Tree node, CompilationInfo ci) {
+        return (int) sp(ci).getEndPosition(ci.getCompilationUnit(), node);
+    }
+
+    private SourcePositions sp(CompilationInfo ci) {
+        return ci.getTrees().getSourcePositions();
+    }
+
+    private int getStart(Tree node, CompilationInfo ci) {
+        return (int) sp(ci).getStartPosition(ci.getCompilationUnit(), node);
+    }
+
 
     public void addImport(String qn) {
         entries.add(new ModelEntry(qn));
@@ -77,125 +111,6 @@ public final class ImportsModel {
     }
 
 
-/*
-    void publish(final JTextComponent editor) {
-        publish(editor.getDocument(), editor);
-    }
-    
-    void publish(final Document doc, final JTextComponent editor) {
-        Runnable runnable = new Runnable() {
-            public void run() {
-                TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
-                final int startPos = quessImportsStart(ts);
-                final int endPos = quessImportsEnd(ts, startPos);
-                Reformat reformat = null;
-                try {
-                    Position end = doc.createPosition(endPos);
-                    int length = endPos - startPos;
-                    if (logger.isLoggable(Level.INFO)) {
-                        logger.info(doc.getText(startPos, length) + "\n");
-                        logger.info("Publishing following entries:");
-                    }
-                    doc.remove(startPos, length);
-                    int offset = startPos;
-                    boolean first = true;
-                    for (ModelEntry entry : entries) {
-                        if (entry.isUsed()) {
-                            logger.info("\t" + entry.toImportStatement());
-                            String text = (first ? "" : "\n") + entry.toImportStatement();
-                            first = false;
-                            doc.insertString(offset, text, null);
-                            offset += text.length();
-                        }
-                    }
-                    reformat = Reformat.get(doc);
-                    reformat.lock();
-                    reformat.reformat(0, end.getOffset());
-                } catch (BadLocationException e) {
-                    logger.severe(e.getLocalizedMessage());
-                } finally {
-                    if (reformat != null) {
-                        reformat.unlock();
-                    }
-                    editor.requestFocusInWindow();
-                }
-            }
-        };
-        if (doc instanceof GuardedDocument) {
-            GuardedDocument gd = (GuardedDocument) doc;
-            gd.runAtomic(runnable);
-        } else {
-            logger.warning("Running in non atomic fashion.");
-            runnable.run();
-        }
-
-    }
-
-    private int quessImportsEnd(TokenSequence<JFXTokenId> ts, int startPos) {
-        int result = startPos;
-        while (ts.moveNext()) {
-            JFXTokenId tid = ts.token().id();
-            switch (tid) {
-                case IMPORT: {
-                    moveTo(ts, JFXTokenId.SEMI);
-                    result = ts.offset() + 1;
-                    continue;
-                }
-                case WS:
-                    continue;
-                default: {
-                    return result;
-                }
-            }
-        }
-        return result;
-    }
-
-    private int quessImportsStart(TokenSequence<JFXTokenId> ts) {
-        int posibbleStart = 0;
-        while (ts.moveNext()) {
-            JFXTokenId tid = ts.token().id();
-            switch (tid) {
-                case PACKAGE: {
-                    moveTo(ts, JFXTokenId.SEMI);
-                    posibbleStart = ts.offset() + 1;
-                    continue;
-                }
-                case IMPORT: {
-                    posibbleStart = ts.offset();
-                    moveTo(ts, JFXTokenId.SEMI);
-                    return posibbleStart;
-                }
-                case WS:
-                case COMMENT:
-                case LINE_COMMENT:
-                case DOC_COMMENT:
-                    continue;
-                default: {
-                    return posibbleStart;
-                }
-            }
-        }
-        return posibbleStart;
-    }
-
-    private void moveTo(TokenSequence<JFXTokenId> ts, JFXTokenId id) {
-        while (ts.moveNext()) {
-            if (ts.token().id() == id) return;
-        }
-    }
-
-
-    @SuppressWarnings({"unchecked"})
-    private static <T extends TokenId> TokenSequence<T> getTokenSequence(Document doc, int dotPos) {
-        TokenHierarchy<Document> th = TokenHierarchy.get(doc);
-        TokenSequence<T> seq = (TokenSequence<T>) th.tokenSequence();
-        seq.move(dotPos);
-        return seq;
-    }
-
-*/
-
     void optimize() {
 
     }
@@ -204,25 +119,10 @@ public final class ImportsModel {
         entries.add(modelEntry);
     }
 
-    public Iterable<? extends ModelEntry> getEntries() {
+    public Iterable<ModelEntry> getEntries() {
         return entries;
     }
 
-//    private static class FixItemComparator implements Comparator<FixItem> {
-//        public static final Collator collator = Collator.getInstance();
-//        public static final Comparator<FixItem> instance = new FixItemComparator();
-//
-//        public static Comparator<FixItem> get() {
-//            return instance;
-//        }
-//
-//        public int compare(FixItem o1, FixItem o2) {
-//            if (o1.getSortPriority() == o2.getSortPriority()) {
-//                return collator.compare(o1.getElement(), o2.getElement());
-//            }
-//            return o1.getSortPriority() - o2.getSortPriority();
-//        }
-//    }
 
     static class ModelEntry implements Comparable<ModelEntry> {
         String type;
@@ -231,7 +131,7 @@ public final class ImportsModel {
         boolean dStared;
         boolean isUsed = false;
 
-        private ModelEntry(ImportTree tree) {
+        public ModelEntry(ImportTree tree) {
             this.tree = tree;
             Tree qi = tree.getQualifiedIdentifier();
             type = qi.toString();
