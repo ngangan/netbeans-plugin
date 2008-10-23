@@ -43,15 +43,14 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXVar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
@@ -66,15 +65,19 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  */
 public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<UnitTree> {
     
-    private static final Logger logger = Logger.getLogger(FunctionDefinitionEnvironment.class.getName());
+    private static final Logger logger = Logger.getLogger(CompilationUnitEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
     protected void inside(UnitTree ut) throws IOException {
         if (LOGGABLE) log("inside CompilationUnitTree " + ut);
         Tree pkg = root.getPackageName();
+        boolean hasPublicDecls = hasPublicDeclarations(ut);
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {
             addKeywordsForCU(ut);
+            if (!hasPublicDecls) {
+                addKeywordsForStatement();
+            }
             return;
         }
         if (offset <= sourcePositions.getStartPosition(root, pkg)) {
@@ -83,7 +86,8 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
             TokenSequence<JFXTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
             if (first != null && first.token().id() == JFXTokenId.SEMI) {
                 addKeywordsForCU(ut);
-                if (!hasPublicDeclarations(ut)) {
+                if (!hasPublicDecls) {
+                    addKeywordsForStatement();
                     addPackages("");
                     addLocalAndImportedTypes(null, null, null, false, null);
                     addLocalMembersAndVars(null);
@@ -100,24 +104,49 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
                 JFXClassDeclaration cl = (JFXClassDeclaration)tr;
                 if (LOGGABLE) log("   cl " + cl);
                 JavaFXTreePath tp = JavaFXTreePath.getPath(root, cl);
-                TypeMirror tm = controller.getTrees().getTypeMirror(tp);
-                DeclaredType dt = (DeclaredType)tm;
-                Element e = dt.asElement();
-                for (Element ele : e.getEnclosedElements()) {
-                    if (LOGGABLE) log("   ele " + ele);
-                    if (ele.getSimpleName().toString().equals("run")) {
-                        if (LOGGABLE) log("   returning true because of run found " + ele.getSimpleName());
-                        return true;
-                    }
-                    if (ele.getModifiers().contains(Modifier.PUBLIC)) {
-                        if (!ele.getSimpleName().toString().contains("$")) {
-                            if (LOGGABLE) log("   returning true because of " + ele.getSimpleName());
-                            return true;
+                if (controller.getTreeUtilities().isSynthetic(tp)) {
+                    if (LOGGABLE) log("       isSynthetic ");
+                    for (Tree t : cl.getClassMembers()) {
+                        if (LOGGABLE) log("   t == " + t);
+                        if (t instanceof JFXFunctionDefinition) {
+                            JFXFunctionDefinition fd = (JFXFunctionDefinition)t;
+                            if (LOGGABLE) log("   fd == " + fd);
+                            JavaFXTreePath fp = JavaFXTreePath.getPath(root, fd);
+                            if (controller.getTreeUtilities().isSynthetic(fp)) {
+                                if (LOGGABLE) log("  ignoring " + fd + " because it is syntetic");
+                                continue;
+                            }
+                            if (fd.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                                if (LOGGABLE) log("   returning true because of " + fd);
+                                return true;
+                            }
                         }
+                        if (t instanceof JFXVar) {
+                            JFXVar v = (JFXVar)t;
+                            if (LOGGABLE) log("   v == " + v);
+                            if (v.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                                if (LOGGABLE) log("   returning true because of " + v);
+                                return true;
+                            }
+                        }
+                        if (t instanceof JFXClassDeclaration) {
+                            JFXClassDeclaration inner = (JFXClassDeclaration)t;
+                            if (LOGGABLE) log("   inner == " + inner);
+                            if (inner.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                                if (LOGGABLE) log("   returning true because of " + inner);
+                                return true;
+                            }
+                        }
+                    }
+                } else {
+                    if (cl.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
+                        if (LOGGABLE) log("   returning true because the class is public");
+                        return true;
                     }
                 }
             }
         }
+        if (LOGGABLE) log("hasPublicDeclarations returning false at the very end");
         return false;
     }
 
@@ -154,9 +183,6 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
             if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
                 addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
             }
-        }
-        if (!hasPublicDeclarations(ut)) {
-            addKeywordsForStatement();
         }
     }
 
