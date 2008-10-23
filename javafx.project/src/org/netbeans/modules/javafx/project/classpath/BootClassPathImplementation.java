@@ -47,7 +47,6 @@ import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
 import org.netbeans.spi.java.classpath.ClassPathImplementation;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
-import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.java.classpath.ClassPath;
 import java.beans.PropertyChangeListener;
@@ -55,6 +54,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.util.WeakListeners;
 
@@ -62,6 +62,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
 
     private static final String PLATFORM_ACTIVE = "platform.active";        //NOI18N
     private static final String ANT_NAME = "platform.ant.name";             //NOI18N
+    private static final String JAVAFX_PROFILE = "javafx.profile";          //NOI18N
 
     private final PropertyEvaluator evaluator;
     private JavaPlatformManager platformManager;
@@ -80,11 +81,11 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
 
     public synchronized List<PathResourceImplementation> getResources() {
         if (this.resourcesCache == null) {
-            JavaPlatform jp = findActivePlatform ();
+            JavaFXPlatform jp = findActivePlatform ();
             if (jp != null) {
                 //TODO: May also listen on CP, but from Platform it should be fixed.
-                List<PathResourceImplementation> result = new ArrayList<PathResourceImplementation>();
-                for (ClassPath.Entry entry : jp.getBootstrapLibraries().entries()) {
+                List<PathResourceImplementation> result = new ArrayList<PathResourceImplementation>();                
+                for (ClassPath.Entry entry : jp.getBootstrapLibraries(this.evaluator.getProperty(JAVAFX_PROFILE)).entries()) {
                     result.add(ClassPathSupport.createResource(entry.getURL()));
                 }
                 resourcesCache = Collections.unmodifiableList (result);
@@ -104,20 +105,20 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
         this.support.removePropertyChangeListener (listener);
     }
 
-    private JavaPlatform findActivePlatform () {
+    private JavaFXPlatform findActivePlatform () {
         if (this.platformManager == null) {
             this.platformManager = JavaPlatformManager.getDefault();
             this.platformManager.addPropertyChangeListener(WeakListeners.propertyChange(this, this.platformManager));
         }                
         this.activePlatformName = evaluator.getProperty(PLATFORM_ACTIVE);
-        final JavaPlatform activePlatform = JavaFXProjectUtil.getActivePlatform (this.activePlatformName);
+        final JavaFXPlatform activePlatform = JavaFXProjectUtil.getActivePlatform (this.activePlatformName);
         this.isActivePlatformValid = activePlatform != null;
         return activePlatform;
     }
     
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() == this.evaluator && evt.getPropertyName().equals(PLATFORM_ACTIVE)) {
-            //Active platform was changed
+        if (evt.getSource() == this.evaluator && (evt.getPropertyName().equals(PLATFORM_ACTIVE) || evt.getPropertyName().equals(JAVAFX_PROFILE))) {
+            //Active platform or JavaFX profile was changed
             resetCache ();
         }
         else if (evt.getSource() == this.platformManager && JavaPlatformManager.PROP_INSTALLED_PLATFORMS.equals(evt.getPropertyName()) && activePlatformName != null) {

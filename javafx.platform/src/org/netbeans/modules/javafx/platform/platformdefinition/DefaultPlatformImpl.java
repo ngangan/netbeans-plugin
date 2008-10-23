@@ -97,10 +97,8 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
             if (sources == null) sources = src;
             if (javadoc == null) javadoc = jdc;
         }
-        if (properties == null || properties.size() == 0) {
-            properties = new HashMap<String,String> ();
-            loadProfileProperties(fxPath, properties);
-        }
+        if (properties == null) properties = new HashMap<String,String> ();
+        loadProfileProperties(fxPath, properties);
         return new DefaultPlatformImpl(javaFolders, fxFolder, properties, new HashMap(System.getProperties()), sources,javadoc);
     }
     

@@ -56,6 +56,7 @@ import org.netbeans.api.java.platform.Specification;
 import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.api.java.source.SourceUtils;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
 import org.netbeans.modules.javafx.project.ui.customizer.MainClassChooser;
@@ -181,17 +182,17 @@ public class JavaFXProjectUtil {
      * @return active {@link JavaPlatform} or null if the project's platform
      * is broken
      */
-    public static JavaPlatform getActivePlatform (final String activePlatformId) {
+    public static JavaFXPlatform getActivePlatform (final String activePlatformId) {
         final JavaPlatformManager pm = JavaPlatformManager.getDefault();
         if (activePlatformId == null) {
-            return pm.getDefaultPlatform();
+            return JavaFXPlatform.getDefaultFXPlatform();
         }
         else {
             JavaPlatform[] installedPlatforms = pm.getPlatforms(null, new Specification ("JavaFX",null));   //NOI18N
             for (int i=0; i<installedPlatforms.length; i++) {
                 String antName = (String) installedPlatforms[i].getProperties().get("platform.ant.name");        //NOI18N
-                if (antName != null && antName.equals(activePlatformId)) {
-                    return installedPlatforms[i];
+                if (installedPlatforms[i] instanceof JavaFXPlatform && antName != null && antName.equals(activePlatformId)) {
+                    return (JavaFXPlatform)installedPlatforms[i];
                 }
             }
             return null;

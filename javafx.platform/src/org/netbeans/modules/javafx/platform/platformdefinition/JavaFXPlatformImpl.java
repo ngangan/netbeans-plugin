@@ -43,6 +43,7 @@ package org.netbeans.modules.javafx.platform.platformdefinition;
 
 import java.io.IOException;
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.net.URL;
@@ -50,12 +51,12 @@ import java.io.File;
 
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.Map.Entry;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.platform.Specification;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.project.ProjectManager;
+import org.netbeans.spi.java.classpath.ClassPathImplementation;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -115,6 +116,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
      * Holds bootstrap libraries for the platform
      */
     Reference<ClassPath> bootstrap = new WeakReference<ClassPath>(null);
+    Map<String, Reference<ClassPath>> bootstrapMap = new HashMap<String, Reference<ClassPath>>();
     /**
      * Holds standard libraries of the platform
      */
@@ -206,39 +208,36 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             ClassPath cp = (bootstrap == null ? null : bootstrap.get());
             if (cp != null)
                 return cp;
-            String pathSpec = getProperties().get("compile_bootclasspath");
+            cp = Util.createClassPath(getBootstrapLibraries("desktop").toString() + File.pathSeparator + getBootstrapLibraries("mobile").toString());
+            bootstrap = new SoftReference<ClassPath>(cp);
+            return cp;
+        }
+    }
+    
+    public ClassPath getBootstrapLibraries(String profile) {
+        profile = profile == null ? "desktop_" : (profile.toLowerCase()+'_');
+        synchronized (this) {
+            Reference<ClassPath> ref = bootstrapMap.get(profile);
+            ClassPath cp = ref == null ? null : ref.get();
+            if (cp != null)
+                return cp;
+            String pathSpec = getProperties().get(profile + "compile_bootclasspath");
             if (pathSpec == null || pathSpec.length() == 0) {
-                String prep = getProperties().get("compile_bootclasspath_prepend");
+                String prep = getProperties().get(profile + "compile_bootclasspath_prepend");
                 prep = prep == null || prep.length() == 0 ? "" :  (prep + File.pathSeparator);
-                String app = getProperties().get("compile_bootclasspath_append");
+                String app = getProperties().get(profile + "compile_bootclasspath_append");
                 app = app == null || app.length() == 0 ? "" :  (File.pathSeparator + app);
                 pathSpec = prep + getSystemProperties().get(SYSPROP_BOOT_CLASSPATH) + app;
             }
 
             //adding here compile classpath to the platform bootstrap as a workaround
             //using platform standard libraries instead must be fixed and tested first
-            String ccp = getProperties().get("compile_classpath");
+            String ccp = getProperties().get(profile + "compile_classpath");
             ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
             pathSpec = pathSpec + ccp;
 
-            //merging mobile compile classpath to the platform bootstrap as a workaround
-            ccp = getProperties().get("mobile_compile_classpath");
-            ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
-            pathSpec = pathSpec + ccp;
-            
-            //adding path to the DLLs here
-            if (installFolders.size() == 2) try {
-                String fxRT = new File(new File(installFolders.get(1).toURI()), "lib/desktop").getAbsolutePath();
-                pathSpec = pathSpec + File.pathSeparator + fxRT;
-            } catch (URISyntaxException e) {
-                Exceptions.printStackTrace(e);
-            }
-            String extPathSpec = Util.getExtensions((String)getSystemProperties().get(SYSPROP_JAVA_EXT_PATH));
-            if (extPathSpec != null) {
-                pathSpec = pathSpec + File.pathSeparator + extPathSpec;
-            }
             cp = Util.createClassPath (pathSpec.replace(';', File.pathSeparatorChar));
-            bootstrap = new WeakReference<ClassPath>(cp);
+            bootstrapMap.put(profile, new SoftReference(cp));
             return cp;
         }
     }
@@ -350,35 +349,16 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
     }
     
     protected static void loadProfileProperties(File fxFolder, Map properties) {
-        FileInputStream in = null;
-        try {
+        FileInputStream in = null;        
+        for (File f : new File(fxFolder, "profiles").listFiles()) if (f.isFile() && f.getName().endsWith(".properties")) try {
+            String profile = f.getName().substring(0, f.getName().length() - 11).toLowerCase() + '_';
+            in = new FileInputStream(f);
             Properties p = new Properties();
-            in = new FileInputStream(new File(fxFolder, "profiles/desktop.properties"));
-            try {
-                p.load(in);
-                for (Entry e : p.entrySet()) {
-                    String val = e.getValue().toString();
-                    if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
-                    properties.put(e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
-                }
-                
-                //this is workaround to include mobile classpath into platform
-                //the workaround should be replace by multiple platform profiles implementation with alterantive classpath
-                File mf = new File(fxFolder, "profiles/mobile.properties");
-                if (mf.isFile()) {
-                    in = new FileInputStream(mf);
-                    p.clear();
-                    p.load(in);
-                    String val = p.getProperty("compile_classpath");
-                    if (val != null) {
-                        if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
-                        properties.put("mobile_compile_classpath", val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
-                    }
-                }
-                
-                
-            } finally {
-                in.close();
+            p.load(in);
+            for (Entry e : p.entrySet()) {
+                String val = e.getValue().toString();
+                if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
+                properties.put(profile + e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
             }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
