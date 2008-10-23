@@ -41,8 +41,8 @@ import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
-* @todo documentation
-*/
+ * @todo documentation
+ */
 class Publisher implements Runnable {
     private final Document doc;
     private static Logger log = Logger.getLogger(Publisher.class.getName());
@@ -55,18 +55,18 @@ class Publisher implements Runnable {
 
     public void run() {
         TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
-        final int startPos = quessImportsStart(ts);
-        final int endPos = quessImportsEnd(ts, startPos);
+
+        DocumentRange dr = getImportsRange(ts);
         Reformat reformat = null;
         try {
-            Position end = doc.createPosition(endPos);
-            int length = endPos - startPos;
+            Position end = doc.createPosition(dr.end);
+            int length = dr.end - dr.start;
             if (log.isLoggable(Level.INFO)) {
-                log.info(doc.getText(startPos, length) + "\n");
+                log.info(doc.getText(dr.start, length) + "\n");
                 log.info("Publishing following entries:");
             }
-            doc.remove(startPos, length);
-            int offset = startPos;
+            doc.remove(dr.start, length);
+            int offset = dr.start;
             boolean first = true;
             for (ImportsModel.ModelEntry entry : model.getEntries()) {
                 if (entry.isUsed()) {
@@ -89,60 +89,40 @@ class Publisher implements Runnable {
         }
     }
 
-    private int quessImportsEnd(TokenSequence<JFXTokenId> ts, int startPos) {
-        int result = startPos;
-        while (ts.moveNext()) {
-            JFXTokenId tid = ts.token().id();
-            switch (tid) {
-                case IMPORT: {
-                    moveTo(ts, JFXTokenId.SEMI);
-                    result = ts.offset() + 1;
-                    continue;
-                }
-                case WS:
-                    continue;
-                default: {
-                    return result;
-                }
-            }
+    private DocumentRange getImportsRange(TokenSequence<JFXTokenId> ts) {
+        if (model.getStart() == ImportsModel.UNSET || model.getEnd() == ImportsModel.UNSET) {
+            ts.move(0);
+            int pos = moveBehindPackage(ts);
+            return new DocumentRange(pos, pos);
+        } else {
+            int end = model.getEnd();
+            ts.move(end);
+            moveTo(ts, JFXTokenId.SEMI);
+            return new DocumentRange(model.getStart(), ts.offset() + 1);
         }
-        return result;
     }
 
-    private int quessImportsStart(TokenSequence<JFXTokenId> ts) {
-        int posibbleStart = 0;
+    @SuppressWarnings({"MethodWithMultipleLoops"})
+    private int moveBehindPackage(TokenSequence<JFXTokenId> ts) {
         while (ts.moveNext()) {
-            JFXTokenId tid = ts.token().id();
-            switch (tid) {
-                case PACKAGE: {
-                    moveTo(ts, JFXTokenId.SEMI);
-                    posibbleStart = ts.offset() + 1;
-                    continue;
-                }
-                case IMPORT: {
-                    posibbleStart = ts.offset();
-                    moveTo(ts, JFXTokenId.SEMI);
-                    return posibbleStart;
-                }
-                case WS:
-                case COMMENT:
-                case LINE_COMMENT:
-                case DOC_COMMENT:
-                    continue;
-                default: {
-                    return posibbleStart;
-                }
+            JFXTokenId id = ts.token().id();
+            if (JFXTokenId.isComment(id)
+                    || id == JFXTokenId.WS) {
+                continue;
+            } else if (id == JFXTokenId.PACKAGE) {
+                moveTo(ts, JFXTokenId.SEMI);
+                return ts.offset() + 1;
             }
+            break;
         }
-        return posibbleStart;
+        return ts.offset();
     }
 
     private void moveTo(TokenSequence<JFXTokenId> ts, JFXTokenId id) {
         while (ts.moveNext()) {
-            if (ts.token().id() == id) return;
+            if (ts.token().id() == id) break;
         }
     }
-
 
     @SuppressWarnings({"unchecked"})
     private static <T extends TokenId> TokenSequence<T> getTokenSequence(Document doc, int dotPos) {
@@ -150,5 +130,16 @@ class Publisher implements Runnable {
         TokenSequence<T> seq = (TokenSequence<T>) th.tokenSequence();
         seq.move(dotPos);
         return seq;
+    }
+
+
+    private static class DocumentRange {
+        private final int start;
+        private final int end;
+
+        private DocumentRange(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
     }
 }

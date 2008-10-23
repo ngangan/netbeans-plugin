@@ -108,9 +108,7 @@ public final class FixImportsLayout<T extends CompletionItem> {
     public void show(List<T> data, String title, int anchorOffset, ListSelectionListener lsl,
                      String additionalItemsText, String shortcutHint, int selectedIndex) {        
         fixPopup.show(data, title, anchorOffset, lsl, additionalItemsText, shortcutHint, selectedIndex);
-        fixPopup.completionScrollPane.requestFocus();
-//        updateLayout(fixPopup);
-//        fixPopup.getPopup().show();
+        fixPopup.getFocusListeningComponent().requestFocusInWindow();
     }
 
     public boolean hide() {
