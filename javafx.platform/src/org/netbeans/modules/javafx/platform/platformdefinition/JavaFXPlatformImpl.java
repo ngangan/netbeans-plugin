@@ -234,6 +234,12 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
             pathSpec = pathSpec + ccp;
 
+            //temporary bootclasspath includes all runtime implementation Jars
+            //this should be moved to a different classpath type in the future to stay hidden for users
+            String ecp = getProperties().get(profile + "execute_classpath");
+            ecp = ecp == null || ecp.length() == 0 ? "" :  (File.pathSeparator + ecp);
+            pathSpec = pathSpec + ecp;
+
             cp = Util.createClassPath (pathSpec.replace(';', File.pathSeparatorChar));
             bootstrapMap.put(profile, new SoftReference(cp));
             return cp;

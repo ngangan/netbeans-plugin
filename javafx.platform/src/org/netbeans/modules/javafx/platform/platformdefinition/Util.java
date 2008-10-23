@@ -67,11 +67,12 @@ public class Util {
     static ClassPath createClassPath(String classpath) {
         StringTokenizer tokenizer = new StringTokenizer(classpath, File.pathSeparator);
         List<PathResourceImplementation> list = new ArrayList<PathResourceImplementation>();
+        Set<URL> set = new HashSet<URL>();
         while (tokenizer.hasMoreTokens()) {
             String item = tokenizer.nextToken();
             File f = FileUtil.normalizeFile(new File(item));            
             URL url = getRootURL (f);
-            if (url!=null) {
+            if (url!=null && set.add(url)) {
                 list.add(ClassPathSupport.createResource(url));
             }
         }
