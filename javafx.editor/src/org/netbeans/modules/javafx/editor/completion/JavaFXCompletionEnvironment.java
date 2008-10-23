@@ -244,7 +244,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     
     protected void addMembers(final TypeMirror type,
             final boolean methods, final boolean fields,
-            String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
+            final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
         if (LOGGABLE) log("addMembers: " + type);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
@@ -278,16 +278,17 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 if (LOGGABLE) log("     is instance and we don't want them " + s);
                 continue;
             }
+            String tta = textToAdd;
             if (fields && member.getKind() == ElementKind.FIELD) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     if (":".equals(textToAdd)) {
                         JavafxTypes types = controller.getJavafxTypes();
                         TypeMirror tm = member.asType();
                         if (types.isSequence((Type) tm)) {
-                            textToAdd += " []";
+                            tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, textToAdd, true));
+                    addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, tta, true));
                 }
             }
         }
@@ -324,15 +325,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             query.anchorOffset, false, false, false, false));
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
+                String tta = textToAdd;
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     if (":".equals(textToAdd)) {
                         JavafxTypes types = controller.getJavafxTypes();
                         TypeMirror tm = member.asType();
                         if (types.isSequence((Type) tm)) {
-                            textToAdd += " []";
+                            tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, textToAdd, false));
+                    addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, tta, false));
                 }
             }
         }
