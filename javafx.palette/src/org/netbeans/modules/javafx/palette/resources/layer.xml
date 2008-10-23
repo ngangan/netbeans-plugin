@@ -16,7 +16,7 @@
         <folder name="Tools">
             <folder name="PaletteManager">
                 <file name="org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.instance">
-                    <attr name="position" intvalue="200"/>
+                    <attr name="position" intvalue="215"/>
                 </file>
             </folder>
         </folder>
@@ -42,7 +42,7 @@
                 <attr name="position" intvalue="100"/>
             </file>
             <file name="ComponentView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComponentView.xml">
-                <attr name="position" intvalue="100"/>
+                <attr name="position" intvalue="150"/>
             </file>
             <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
                 <attr name="position" intvalue="200"/>
