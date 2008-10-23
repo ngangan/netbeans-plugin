@@ -220,6 +220,12 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             String ccp = getProperties().get("compile_classpath");
             ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
             pathSpec = pathSpec + ccp;
+            
+            //adding here execute classpath to the platform bootstrap as a workaround
+            //using platform standard libraries instead must be fixed and tested first
+            ccp = getProperties().get("execute_classpath");
+            ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
+            pathSpec = pathSpec + ccp;
 
             //merging mobile compile classpath to the platform bootstrap as a workaround
             ccp = getProperties().get("mobile_compile_classpath");
