@@ -41,13 +41,7 @@ package org.netbeans.modules.javafx.sdksamples;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Logger;
-import javax.tools.FileObject;
-import org.netbeans.api.java.platform.JavaPlatform;
-import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.MultiFileSystem;
 import org.openide.filesystems.XMLFileSystem;
 import org.openide.modules.InstalledFileLocator;
@@ -65,13 +59,6 @@ public class SDKSamplesFileSystem extends MultiFileSystem {
 //        String samplesUrl = null;
         File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0dev/samples/layer.xml",
                 "org.netbeans.modules.javafx", false );
-//        for( JavaPlatform platform : JavaPlatformManager.getDefault().getInstalledPlatforms()) {
-//            if( platform instanceof JavaFXPlatform ) {
-//                JavaFXPlatform jfxp = (JavaFXPlatform) platform;
-//                JavaFXPlatform p = jfxp.getDefaultFXPlatform();
-//                samplesUrl = p.getJavaFXFolder().toExternalForm() + "samples/layer.xml";
-//            }
-//        }
         try {
             if( fxPath != null ) {
                 setDelegates( new XMLFileSystem( fxPath.toURI().toURL()));

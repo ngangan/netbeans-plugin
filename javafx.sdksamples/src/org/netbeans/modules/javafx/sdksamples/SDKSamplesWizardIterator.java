@@ -189,10 +189,19 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
         try {
             ZipInputStream str = new ZipInputStream(source);
             ZipEntry entry;
+            // Get root entry
+            String rootFileName = "";
+            ZipEntry root = str.getNextEntry();
+            if( root.isDirectory()) {
+                rootFileName = root.getName();
+            }
+
+            if( rootFileName == null ) return;
+            
             while(( entry = str.getNextEntry()) != null ) {
                 if( entry.isDirectory()) {
                     if( entry.getName().equals( filename )) continue;
-                    FileUtil.createFolder( projectRoot, entry.getName().substring( filename.length()));
+                    FileUtil.createFolder( projectRoot, entry.getName().substring( rootFileName.length()));
                 } else if( entry.getName().toLowerCase().endsWith( ".png" )){
                     FileObject fo = FileUtil.createData( projectRoot, entry.getName().substring( filename.length()));
                     FileLock lock = fo.lock();
@@ -207,7 +216,7 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
                         lock.releaseLock();
                     }
                 } else {
-                    FileObject fo = FileUtil.createData(projectRoot, entry.getName().substring( filename.length()));
+                    FileObject fo = FileUtil.createData(projectRoot, entry.getName().substring( rootFileName.length()));
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     FileUtil.copy(str, baos);
                     String content = baos.toString( "UTF-8" ).
