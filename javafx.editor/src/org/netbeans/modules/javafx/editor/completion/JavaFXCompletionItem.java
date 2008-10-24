@@ -99,6 +99,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     public static final String STRIKE_END = "</s>"; //NOI18N
     public static final String BOLD = "<b>"; //NOI18N
     public static final String BOLD_END = "</b>"; //NOI18N
+    public static final String SEQUENCE_PREFIX = "com.sun.javafx.runtime.sequence.Sequence<? extends ";
 
     public int substitutionOffset;
     public String textToAdd;
@@ -1530,6 +1531,28 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     private static String escape(String s) {
         if (s != null) {
             try {
+                if (s.startsWith(SEQUENCE_PREFIX)) {
+                    s = s.substring(SEQUENCE_PREFIX.length());
+                    s = s.substring(0, s.length()-1) + "[]";
+                }
+                if (s.startsWith("java.lang")) {
+                    s = s.substring("java.lang.".length());
+                }
+                if (s.startsWith("int")) {
+                    s = "Integer" + s.substring(3);
+                }
+                if (s.startsWith("double") || s.startsWith("Double")) {
+                    s = "Number" + s.substring("double".length());
+                }
+                if (s.startsWith("long")) {
+                    s = "Integer" + s.substring(4);
+                }
+                if (s.startsWith("boolean")) {
+                    s = "B" + s.substring(1);
+                }
+                if (s.startsWith("void")) {
+                    s = "V" + s.substring(1);
+                }
                 return XMLUtil.toAttributeValue(s);
             } catch (Exception ex) {}
         }
