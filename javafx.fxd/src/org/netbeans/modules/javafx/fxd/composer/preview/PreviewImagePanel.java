@@ -42,8 +42,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private final FXZDataObject      m_dObj;
     private final Action []          m_actions;
     private       JSGPanel           m_sgPanel = null;
-    //TODO Implement the ZoomToFit action
-    //private final ZoomToFitAction m_zoomToFitAction;
     private       int                m_changeTickerCopy = -1;
         
     PreviewImagePanel(final FXZDataObject dObj) {
@@ -120,16 +118,17 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             m_sgPanel.addMouseWheelListener(mec);
 
                                             m_changeTickerCopy = tickerCopy;
-                                            Rectangle2D bounds = fxNode.getTransformedBounds();
                                             updateZoom();
                                         } else {
-                                            removeAll();
-                                            add( new JLabel("Cannot show"));
+                                            //TODO 
+                                            label.setText("Cannot show");
+                                            label.setIcon(null);
                                         }
                                     } catch( Exception e) {
+                                        //TODO provide better error report
                                         e.printStackTrace();
-                                        removeAll();
-                                        add( new JLabel( e.getLocalizedMessage()), BorderLayout.CENTER);
+                                        label.setText(e.getLocalizedMessage());
+                                        label.setIcon(null);
                                     } finally {
                                         System.gc();                                
                                     }

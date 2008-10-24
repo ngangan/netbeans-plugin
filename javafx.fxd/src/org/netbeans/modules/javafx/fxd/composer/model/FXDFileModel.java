@@ -10,8 +10,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
@@ -39,7 +37,6 @@ public class FXDFileModel implements DocumentModelStateListener {
     private final    Object         m_lock = new Object();
     private volatile boolean        m_sourceChanged = false;
     private volatile boolean        m_updateInProgress = false;
-    private volatile boolean        m_updateInProcess = false;
     
     public interface ElementVisitor {
         public boolean visitElement( String elemType, String elemName, AttributeSet attrs) throws Exception;
@@ -253,7 +250,7 @@ public class FXDFileModel implements DocumentModelStateListener {
         synchronized (m_lock) {
             System.err.println("Document source changed."); //NOI18N
             m_sourceChanged = true;
-            m_archive.incrementChangeTicker();            
+            m_archive.incrementChangeTicker(false);            
             m_lock.notifyAll();
         }
     }
