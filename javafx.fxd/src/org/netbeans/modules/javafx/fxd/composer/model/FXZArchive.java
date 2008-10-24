@@ -49,7 +49,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     private          FXDFileModel             m_fileModel = null;
     private final    List<TableModelListener> m_tableListeners;
     private volatile int                      m_changeTicker = 0; 
-    private volatile int                      m_saveTickerCopy = 0;
+    private volatile boolean                  m_entryChanged = false;
     
     private final EntryValue [] m_values = new EntryValue[] {
         new EntryValue( "name", String.class, false) {  //NOI18N
@@ -185,7 +185,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         public void setName( String name) {
             if ( name != null && !name.equals(m_name)) {
                 m_name = name;
-                incrementChangeTicker();
+                incrementChangeTicker(true);
             }
         }
         
@@ -240,11 +240,11 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     }
         
     public void setIsSaved() {
-        m_saveTickerCopy = m_changeTicker;
+        m_entryChanged = false;
     }
     
-    public boolean isSaved() {
-        return m_saveTickerCopy == m_changeTicker;
+    public boolean areEntriesChanged() {
+        return m_entryChanged;
     }
     
     public synchronized void documentOpened( StyledDocument doc) {
@@ -306,7 +306,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         FXZArchiveEntry entry = new FXZArchiveEntry(file);
         int index = m_entries.size();
         m_entries.add( entry);
-        incrementChangeTicker();
+        incrementChangeTicker(true);
         fireTableChanged( new TableModelEvent( this, index, index, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT));
         return entry;
     }
@@ -325,7 +325,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             }
         } finally {
             if ( changed) {
-                incrementChangeTicker();
+                incrementChangeTicker(true);
                 fireTableChanged( new TableModelEvent( this));
             }
         }
@@ -334,7 +334,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     public synchronized void replace( String entryName, File file) {
         int index = getEntryIndex(entryName);
         m_entries.set(index, new FXZArchiveEntry(entryName, file));
-        incrementChangeTicker();
+        incrementChangeTicker(true);
         fireTableChanged( new TableModelEvent( this));
     }
     
@@ -342,9 +342,12 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return m_changeTicker;
     }
     
-    public void incrementChangeTicker() {
+    public void incrementChangeTicker(boolean entryChange) {
         m_changeTicker++;
-        m_dObj.notifyEditorSupportModified();
+        if ( entryChange) {
+            m_entryChanged = true;
+            m_dObj.notifyEditorSupportModified();
+        }
     }
     
     public synchronized void save() throws FileAlreadyLockedException, IOException, BadLocationException {        

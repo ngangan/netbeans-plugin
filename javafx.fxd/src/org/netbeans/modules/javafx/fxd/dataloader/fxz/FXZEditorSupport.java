@@ -98,9 +98,15 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
     @Override
     protected void notifyUnmodified() {
         FXZDataObject dObj = (FXZDataObject) getDataObject();
-        if ( dObj.getDataModel().getFXDContainer().isSaved()) {
-            super.notifyUnmodified();
-            dObj.m_ic.remove(env);
+        super.notifyUnmodified();
+        dObj.m_ic.remove(env);
+        if ( dObj.getDataModel().getFXDContainer().areEntriesChanged()) {
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    notifyModified();
+                }
+            });
+        } else {
             updateDisplayName();
         }
     }
