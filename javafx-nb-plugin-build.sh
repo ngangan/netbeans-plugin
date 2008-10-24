@@ -88,7 +88,7 @@ unzip -o /net/smetiste.czech.sun.com/space/builds/netbeans/6.5/rc1/latest/zip/ne
 ant init  build-one-cluster -Done.cluster.name=nb.cluster.javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
 
 ant build-nbms -Dmoduleconfig=javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
-ant generate-uc-catalog -Dcatalog.base.url=${HUDSON_URL}/job/JavaFX_NB_Plugin_NB65_daily/${BUILD_NUMBER}/artifact/main/nbbuild/nbms -Dcatalog.file=nbms/catalog.xml
+ant generate-uc-catalog -Dcatalog.base.url=${HUDSON_URL}job/${JOB_NAME}/${BUILD_NUMBER}/artifact/main/nbbuild/nbms -Dcatalog.file=nbms/catalog.xml
 
 #Build rip clusters
 ########################## 
