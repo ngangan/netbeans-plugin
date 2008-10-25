@@ -115,12 +115,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return new PackageItem(pkgFQN, substitutionOffset, isDeprecated);
     }
 
-    public static final JavaFXCompletionItem createVariableItem(String varName, int substitutionOffset, String textToAdd, boolean smartType) {
-        return new VariableItem(null, varName, substitutionOffset, textToAdd, smartType);
+    public static final JavaFXCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
+        return new VariableItem(type, varName, substitutionOffset, textToAdd, smartType);
     }
     
-    public static final JavaFXCompletionItem createVariableItem(String varName, int substitutionOffset, boolean smartType) {
-        return new VariableItem(null, varName, substitutionOffset, smartType);
+    public static final JavaFXCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
+        return new VariableItem(type, varName, substitutionOffset, smartType);
     }
     
     public static final JavaFXCompletionItem createExecutableItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {

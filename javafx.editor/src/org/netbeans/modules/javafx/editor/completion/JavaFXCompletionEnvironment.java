@@ -288,7 +288,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, tta, true));
+                    addResult(JavaFXCompletionItem.createVariableItem(member.asType(), s, query.anchorOffset, tta, true));
                 }
             }
         }
@@ -334,7 +334,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, tta, false));
+                    addResult(JavaFXCompletionItem.createVariableItem(member.asType(), s, query.anchorOffset, tta, false));
                 }
             }
         }
@@ -417,10 +417,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (LOGGABLE) log("    adding(2) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, fetic));
                     if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, true));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, true));
                     }
                     if (JavaFXCompletionProvider.startsWith(s, prefix)) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, false));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, false));
                     }
                 }
             }
@@ -432,10 +432,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (LOGGABLE) log("    adding(3) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, var));
                     if (smart != null && tm.getKind() == smart.getKind()) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, true));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, true));
                     }
                     if (JavaFXCompletionProvider.startsWith(s, prefix)) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s, query.anchorOffset, false));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, false));
                     }
                 }
             }
@@ -449,10 +449,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (LOGGABLE) log("    adding(4) " + s1 + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, varTree));
                     if (smart != null && tm.getKind() == smart.getKind()) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s1, query.anchorOffset, true));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s1, query.anchorOffset, true));
                     }
                     if (JavaFXCompletionProvider.startsWith(s1, prefix)) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s1, query.anchorOffset, false));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s1, query.anchorOffset, false));
                     }
                 }
                 VariableTree varTree2 = ort.getOldValue();
@@ -461,10 +461,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (LOGGABLE) log("    adding(5) " + s2 + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, varTree2));
                     if (smart != null && tm.getKind() == smart.getKind()) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s2, query.anchorOffset, true));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s2, query.anchorOffset, true));
                     }
                     if (JavaFXCompletionProvider.startsWith(s2, prefix)) {
-                        addResult(JavaFXCompletionItem.createVariableItem(s2, query.anchorOffset, false));
+                        addResult(JavaFXCompletionItem.createVariableItem(tm, s2, query.anchorOffset, false));
                     }
                 }
             }
@@ -497,11 +497,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix);
             TypeMirror tm = trees.getTypeMirror(expPath);
             if (smart != null && tm.getKind() == smart.getKind()) {
-                addResult(JavaFXCompletionItem.createVariableItem(
+                addResult(JavaFXCompletionItem.createVariableItem(tm,
                         s, query.anchorOffset, true));
             }
             if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
-                addResult(JavaFXCompletionItem.createVariableItem(
+                addResult(JavaFXCompletionItem.createVariableItem(tm,
                         s, query.anchorOffset, false));
             }
         }
