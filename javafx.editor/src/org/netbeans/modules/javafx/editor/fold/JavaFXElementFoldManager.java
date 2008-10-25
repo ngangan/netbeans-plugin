@@ -395,7 +395,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                         if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset);
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
                     }
-                    if (token.id() == JFXTokenId.COMMENT || token.id() == JFXTokenId.DOC_COMMENT) {
+                    if (token.id() == JFXTokenId.COMMENT) {
                         Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
                         if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]");
@@ -477,7 +477,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             try {
                 Document doc = operation.getHierarchy().getComponent().getDocument();
                 int start = findBodyStart(node, cu, sp, doc);
-                int end   = (int)sp.getEndPosition(cu, node);
+                int end   = findBodyEnd(node, cu, sp, doc);
                 JavaFXTreePath pa = JavaFXTreePath.getPath(cu, node);
                 if (start != (-1) && end != (-1) &&
                         !info.getTreeUtilities().isSynthetic(pa)) {
@@ -616,52 +616,82 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         }
         
     }
+
     public static int findBodyStart(final Tree cltree, final UnitTree cu, final SourcePositions positions, final Document doc) {
         final int[] result = new int[1];
-        
         doc.render(new Runnable() {
             public void run() {
                 result[0] = findBodyStartImpl(cltree, cu, positions, doc);
             }
         });
-        
         return result[0];
     }
     
     private static int findBodyStartImpl(Tree cltree, UnitTree cu, SourcePositions positions, Document doc) {
         int start = (int)positions.getStartPosition(cu, cltree);
         int end   = (int)positions.getEndPosition(cu, cltree);
-        
         if (start == (-1) || end == (-1)) {
-            // debug:
             dumpPositions(cltree, start, end);
             return -1;
         }
-        
         if (start > doc.getLength() || end > doc.getLength()) {
-            // debug:
             dumpPositions(cltree, start, end);
-            return (-1);
+            return -1;
         }
         try {
             String text = doc.getText(start, end - start);
-            
             int index = text.indexOf('{');
-            
             if (index == (-1)) {
                 return -1;
-//                throw new IllegalStateException("Should NEVER happen.");
             }
-            
             return start + index;
         } catch (BadLocationException e) {
             Exceptions.printStackTrace(e);
         }
-        
-        return (-1);
-
+        return -1;
     }
     
+    public static int findBodyEnd(final Tree cltree, final UnitTree cu, final SourcePositions positions, final Document doc) {
+        final int[] result = new int[1];
+        doc.render(new Runnable() {
+            public void run() {
+                result[0] = findBodyEndImpl(cltree, cu, positions, doc);
+            }
+        });
+        return result[0];
+    }
+
+    private static int findBodyEndImpl(Tree cltree, UnitTree cu, SourcePositions positions, Document doc) {
+        if (LOGGABLE) log("findBodyEndImpl for " + cltree);
+        int end   = (int)positions.getEndPosition(cu, cltree);
+        if (end <= 0) {
+            return -1;
+        }
+        if (end > doc.getLength()) {
+            return -1;
+        }
+        try {
+            String text = doc.getText(end-1, doc.getLength() - end + 1);
+            if (LOGGABLE) log("      text == " + text);
+            int index = text.indexOf('}');
+            if (LOGGABLE) log("      index == " + index);
+            if (index == -1) {
+                if (LOGGABLE) log("findBodyEndImpl returning original end (index==-1)" + end);
+                return end;
+            }
+            int ind2 = text.indexOf('{');
+            if (ind2 != -1 && ind2 < index) {
+                if (LOGGABLE) log("findBodyEndImpl returning original end " + end + " ind2 == " + ind2);
+                return end;
+            }
+            if (LOGGABLE) log("findBodyEndImpl returning " + (end + index) + " instead of " + end);
+            return end + index;
+        } catch (BadLocationException e) {
+            Exceptions.printStackTrace(e);
+        }
+        return -1;
+    }
+
     private static void log(String s) {
         if (LOGGABLE) {
             logger.fine(s);
