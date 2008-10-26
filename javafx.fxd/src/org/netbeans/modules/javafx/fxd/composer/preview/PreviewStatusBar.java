@@ -48,6 +48,7 @@ import org.openide.util.NbBundle;
         cell = cells[CELL_MODE] = new Cell( new String[] { LOCKED, UNLOCKED });
         cell.setHorizontalAlignment(SwingConstants.CENTER);
         cells[CELL_MAIN] = new Cell(null);
+        setFocusable(false);
         
         refreshPanel();        
     }

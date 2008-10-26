@@ -78,7 +78,6 @@ public final class FXDElement {
         m_dObj = dObj;
         m_id   = id;
 //        SceneManager.log(Level.FINE, "SVGObject created: " + m_elem); //NOI18N        
-        System.err.println("CREATED: " + toString());
     }
             
     public boolean isVisible() {

@@ -15,8 +15,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ComposerAction;
@@ -43,7 +43,23 @@ public final class FXDComposerController {
         m_dObj = dObj;
         m_actionController = new ActionController(dObj);
     }
+        
+    public synchronized void init() {
+        //System.err.println("Controller initalized.");
+    }
     
+    public synchronized void close() {
+        //System.err.println("Controller closed.");
+    }
+    
+    public void reload() {
+        try {
+            m_dObj.getDataModel().reload();
+            refresh();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        } 
+    }
     public ActionController getActionController() {
         return m_actionController;
     }

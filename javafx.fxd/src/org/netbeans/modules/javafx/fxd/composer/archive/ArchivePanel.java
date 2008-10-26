@@ -24,6 +24,7 @@ import org.openide.util.NbBundle;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.awt.Color;
 import java.awt.Dimension;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
@@ -152,16 +153,23 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                 if (!file.isFile()) {
                     DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
                             NbBundle.getMessage(ArchivePanel.class, "ERROR_NOT_A_FILE", file), //NOI18N
-                            NotifyDescriptor.Message.WARNING_MESSAGE));
+                            NotifyDescriptor.Message.ERROR_MESSAGE));
                 } else {
-                    try {
-                        m_archive.add(file);
-                        update();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                    File fxzFile = FileUtil.toFile( m_archive.getDataObject().getPrimaryFile());
+                    if ( file.equals( fxzFile)) {
                         DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
-                                NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_READ_FILE",  //NOI18N
-                                ex.getLocalizedMessage()), NotifyDescriptor.Message.ERROR_MESSAGE));
+                                NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_INSERT_ARCHIVE_ITSELF", file), //NOI18N
+                                NotifyDescriptor.Message.ERROR_MESSAGE));
+                    } else {
+                        try {
+                            m_archive.add(file);
+                            update();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                                    NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_READ_FILE",  //NOI18N
+                                    ex.getLocalizedMessage()), NotifyDescriptor.Message.ERROR_MESSAGE));
+                        }
                     }
                 }
             }
@@ -175,12 +183,24 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
         public void actionPerformed(ActionEvent e) {
             int [] selRows = tableContent.getSelectedRows();
             if ( selRows != null && selRows.length > 0) {
-                String [] selNames = new String[ selRows.length];
-                for (int i = 0; i < selNames.length; i++) {
-                    selNames[i] = getNameAt(selRows[0]);
+                String msg;
+                if ( selRows.length == 1) {
+                    msg = String.format( NbBundle.getMessage(ArchivePanel.class, "MSG_REMOVE_ENTRY"), getNameAt(selRows[0])); //NOI18N 
+                } else {
+                    msg = String.format( NbBundle.getMessage(ArchivePanel.class, "MSG_REMOVE_ENTRIES"), selRows.length); //NOI18N 
                 }
-                m_archive.remove( selNames);
-                update();
+                NotifyDescriptor d = new NotifyDescriptor.Confirmation( msg,
+                    NbBundle.getMessage(ArchivePanel.class, "TITLE_REMOVE_ENTRY"), //NOI18N 
+                    NotifyDescriptor.YES_NO_OPTION,   
+                    NotifyDescriptor.WARNING_MESSAGE);
+                if ( DialogDisplayer.getDefault().notify(d) == NotifyDescriptor.YES_OPTION) {
+                    String [] selNames = new String[ selRows.length];
+                    for (int i = 0; i < selNames.length; i++) {
+                        selNames[i] = getNameAt(selRows[i]);
+                    }
+                    m_archive.remove( selNames);
+                    update();
+                }
             }
         }
     };      

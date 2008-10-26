@@ -62,7 +62,7 @@ public final class UIStubGenerator {
         
         @Override
         public String toString() {
-            return String.format("AttributeDescription( type='%s', name='%s')", m_type, m_name);
+            return String.format("AttributeDescription( type='%s', name='%s')", m_type, m_name); //NOI18N
         }
     }
     
@@ -220,20 +220,12 @@ public final class UIStubGenerator {
         writer.write( "public class " + className + " extends UiStub {");  //NOI18N 
 
         writer.increaseIndent();
-
+        writer.write("");  //NOI18N 
+        writer.write( "override public var url = \"{__DIR__}" + stubFile.getName() + "\";");  //NOI18N 
+        writer.write("");  //NOI18N 
+        
         m_attrs.serializeDeclarations(writer, true);
 
-        writer.write("");  //NOI18N 
-
-        writer.write("init {");  //NOI18N 
-        writer.increaseIndent();
-        writer.write("if (url == null) {");  //NOI18N 
-        writer.increaseIndent(); 
-        writer.write("url = getURL();");  //NOI18N 
-        writer.decreaseIndent();
-        writer.write("}");  //NOI18N 
-        writer.decreaseIndent();
-        writer.write("}");   //NOI18N 
         writer.write("");  //NOI18N 
 
         writer.write("override protected function update() {"); //NOI18N 
@@ -257,12 +249,6 @@ public final class UIStubGenerator {
         writer.decreaseIndent();
         writer.write( "}");  //NOI18N 
         writer.write("");  //NOI18N 
-
-        writer.write("public function getURL() : String {");  //NOI18N 
-        writer.increaseIndent();
-        writer.write("return \"{__DIR__}" + stubFile.getParentFile().getName() + "\";");  //NOI18N 
-        writer.decreaseIndent();
-        writer.write("}");  //NOI18N 
 
         writer.close();
     }

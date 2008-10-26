@@ -62,7 +62,7 @@ final class PreviewToolbar extends FXDToolbar {
         constrains.anchor = GridBagConstraints.WEST;
         constrains.fill = GridBagConstraints.HORIZONTAL;
         constrains.weightx = 1.0;
-        add(new JPanel(), constrains);        
+        add(new JPanel(), constrains);   
     }
 
     void refresh() {

@@ -42,7 +42,6 @@ package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
-import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
@@ -60,6 +59,7 @@ import org.openide.windows.TopComponent;
 
 public final class FXZDataObject extends MultiDataObject implements Lookup.Provider {     
     private static final long  serialVersionUID = 1L;
+    public static final String PROP_EXT_CHANGE  = "external_change"; //NOI18N
     
     public static final String FXZ_EXT = "fxz";  //NOI18N
 
@@ -76,6 +76,7 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
             
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
+        
         reset();
 //        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
     }
@@ -84,6 +85,11 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         m_edSup.notifyModified ();
     }    
     
+    //TODO better name
+    public synchronized void init() {
+        getController().init();
+    }
+    
     public synchronized void reset() {
         m_ic = new InstanceContent();
         m_lookup = new AbstractLookup(m_ic);
@@ -91,7 +97,10 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         m_ic.add(this);     
         m_defaultViewIndex = VISUAL_VIEW_INDEX;
         m_model = null;
-        m_controller = null;
+        if ( m_controller != null) {
+            m_controller.close();
+            m_controller = null;
+        }
     }
 
     public void setDefaultView( int viewIndex) {
@@ -148,17 +157,4 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         Object o = m_lookup.lookup(type);
         return o instanceof Node.Cookie ? (Node.Cookie) o : null;
     }
-    
-    /*
-    public static boolean isFXZArchive( final FileObject fo) {
-        System.err.println("FO: " + fo);
-        File file = FileUtil.toFile(fo);
-        System.err.println("File: " + file);
-        if ( file.exists() && file.isFile()) {
-            if ( FXZ_EXT.equalsIgnoreCase(fo.getExt())) {
-                return true;
-            }
-        }
-        return false;
-    }*/
 }

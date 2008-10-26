@@ -15,7 +15,7 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
  */
 public class FXDComposerModel {
     //private transient final FXDDataObject         m_dObj;    
-    private transient final FXZArchive            m_fxzArchive;
+    private transient FXZArchive            m_fxzArchive;
     
     /** persistent properties */
     private boolean  m_isHighlightOn = true;   
@@ -27,17 +27,17 @@ public class FXDComposerModel {
         //m_dObj = dObj;
         m_fxzArchive = new FXZArchive(dObj);
     }
+            
+    void reload() throws FileNotFoundException, IOException {
+        m_fxzArchive.reload();
+        //m_fxzArchive = m_fxzArchive.reload();
+        //m_fxzArchive.incrementChangeTicker(false);
+    }
     
-        
     public FXZArchive getFXDContainer() {
         return m_fxzArchive;
     }
-    
-    /*
-    public FXDDataObject getDataObject() {
-        return m_dObj;
-    }*/
-        
+            
     public boolean getIsHighlightOn() {
         return m_isHighlightOn;
     }

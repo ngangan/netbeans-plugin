@@ -7,6 +7,9 @@ package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.scenario.scenegraph.JSGPanel;
 import java.awt.BorderLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -22,9 +25,11 @@ import org.openide.util.Lookup;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.FilterNode;
 import org.openide.util.Mutex;
+import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
@@ -50,9 +55,8 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
         setLayout( new BorderLayout());
         m_statusBar = new PreviewStatusBar();
 
-        m_imgPanel = new PreviewImagePanel(dObj);        
+        m_imgPanel = new PreviewImagePanel(dObj);       
         add( new JScrollPane(m_imgPanel), BorderLayout.CENTER);
-        
         
         add( m_statusBar, BorderLayout.SOUTH);
         
@@ -61,9 +65,9 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
             dObj.getController().getActionController()
         }));        
         dObj.getController().setPreviewComponent(this);
+        setFocusable(true);
     }
-            
-    
+                
     public JComponent getVisualRepresentation() {
         return this;
     }
@@ -115,13 +119,14 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
 
     @Override
     public void componentOpened() {
-//        throw new UnsupportedOperationException("Not supported yet.");
+        ((FXZDataObject) m_edSup.getDataObject()).init();
+        addFocusListener(m_focusListener);
     }
 
     @Override
     public void componentClosed() {
-        FXZDataObject dObj = (FXZDataObject) m_edSup.getDataObject();
-        dObj.reset();
+        removeFocusListener(m_focusListener);
+        ((FXZDataObject) m_edSup.getDataObject()).reset();
     }
 
     @Override
@@ -135,12 +140,10 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
 
     @Override
     public void componentActivated() {
-//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void componentDeactivated() {
-       // throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -190,4 +193,21 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
             }
         }
     }    
+    
+    private final FocusListener m_focusListener = new FocusAdapter() { 
+        public @Override void focusGained(FocusEvent evt) {
+            // Refresh file object when component made active
+            DataObject dob = m_edSup.getDataObject();
+            if (dob != null) {
+                final FileObject fo = dob.getPrimaryFile();
+                if (fo != null) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            fo.refresh();
+                        }
+                    });
+                }
+            }
+        }
+    };    
 }

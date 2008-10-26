@@ -36,7 +36,8 @@ public abstract class FXDToolbar extends JToolBar {
         setFloatable(false);
         setFocusable(true);
         Border b = (Border) UIManager.get("Nb.Editor.Toolbar.border"); //NOI18N
-        setBorder(b);        
+        setBorder(b);   
+        setFocusable(false);        
     }
     
     protected AbstractButton addButton( Action action) {

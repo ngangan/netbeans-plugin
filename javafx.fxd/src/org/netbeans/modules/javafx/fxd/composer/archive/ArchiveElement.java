@@ -6,6 +6,9 @@
 package org.netbeans.modules.javafx.fxd.composer.archive;
 
 import java.awt.BorderLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import org.netbeans.core.spi.multiview.CloseOperationState;
@@ -14,7 +17,10 @@ import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
+import org.openide.filesystems.FileObject;
+import org.openide.loaders.DataObject;
 import org.openide.util.Mutex;
+import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
 /**
@@ -34,6 +40,7 @@ final class ArchiveElement extends TopComponent implements MultiViewElement, Run
         m_panel = new ArchivePanel(((FXZDataObject) edSup.getDataObject()).getDataModel().getFXDContainer());
         setLayout( new BorderLayout());
         add( m_panel, BorderLayout.CENTER);
+        setFocusable(true);
     }
             
     
@@ -57,14 +64,16 @@ final class ArchiveElement extends TopComponent implements MultiViewElement, Run
     
     @Override
     public void componentOpened() {
-//        throw new UnsupportedOperationException("Not supported yet.");
+        ((FXZDataObject) m_edSup.getDataObject()).init();
+        addFocusListener(m_focusListener);
     }
 
     @Override
     public void componentClosed() {
-        //throw new UnsupportedOperationException("Not supported yet.");
+        removeFocusListener(m_focusListener);
+        ((FXZDataObject) m_edSup.getDataObject()).reset();
     }
-
+    
     @Override
     public void componentShowing() {
         //refresh();
@@ -121,4 +130,22 @@ final class ArchiveElement extends TopComponent implements MultiViewElement, Run
         return CloseOperationState.STATE_OK;
         //throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    private final FocusListener m_focusListener = new FocusAdapter() { 
+        public @Override void focusGained(FocusEvent evt) {
+            // Refresh file object when component made active
+            DataObject dob = m_edSup.getDataObject();
+            if (dob != null) {
+                final FileObject fo = dob.getPrimaryFile();
+                if (fo != null) {
+                    RequestProcessor.getDefault().post(new Runnable() {
+                        public void run() {
+                            fo.refresh();
+                        }
+                    });
+                }
+            }
+        }
+    };    
+    
 }

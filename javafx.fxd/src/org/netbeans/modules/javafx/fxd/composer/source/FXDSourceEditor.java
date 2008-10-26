@@ -86,10 +86,14 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
         tc.setHtmlDisplayName( this.getHtmlDisplayName());
     }
 
+    protected FXZDataObject getDataObject() {
+        return (FXZDataObject) ((FXZEditorSupport) cloneableEditorSupport()).getDataObject();
+    }
+    
     @Override
     public Lookup getLookup() {
         return new ProxyLookup(new org.openide.util.Lookup[] {                
-            ((FXZDataObject) ((FXZEditorSupport) cloneableEditorSupport()).getDataObject()).getNodeDelegate().getLookup(),
+            getDataObject().getNodeDelegate().getLookup(),
             Lookups.singleton( new SelectionCookie() {
                 public void updateSelection(FXZDataObject doj, FXDElement elem, boolean doubleClick) {
                     selectElement(doj, elem.getStartOffset(), doubleClick);
@@ -99,7 +103,8 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
     }    
 
     @Override    
-    public void componentOpened() {
+    public void componentOpened() { 
+        getDataObject().init();        
         super.componentOpened();
     }
 

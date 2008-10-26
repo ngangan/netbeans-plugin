@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
 import java.io.IOException;
 import java.io.InputStream;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
@@ -23,8 +24,12 @@ import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
 import org.openide.windows.CloneableTopComponent;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
+import java.io.OutputStream;
 import java.io.Serializable;
 import javax.swing.SwingUtilities;
+import javax.swing.text.EditorKit;
+import org.netbeans.editor.BaseDocument;
+import org.openide.util.Task;
 import org.openide.windows.TopComponent;
 
 /**
@@ -50,20 +55,6 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         return doc;
     }
     
-    @Override
-    public void saveDocument() throws IOException {
-        if( env.isModified() && getDataObject().getPrimaryFile().canWrite()) {
-            super.saveDocument();
-        }
-        try {
-            ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().save();
-        } catch( IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IOException( "Archive save failed - [" + e.getClass() + "-" + e.getMessage() + "]");
-        }
-    }
-            
     public void updateDisplayName() {
         final TopComponent tc = m_mvtc;
         if (tc == null) {
@@ -83,6 +74,28 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         });
     }
 
+    @Override
+    protected Task reloadDocument() {
+        System.err.println("Reloading document.");
+        final Task reloadTask = super.reloadDocument();
+        Thread th = new Thread() {
+            @Override
+            public void run() {
+                reloadTask.waitFinished();
+                SwingUtilities.invokeLater( new Runnable() {
+                    public void run() {
+                        FXZDataObject dObj = (FXZDataObject) getDataObject();
+                        dObj.getDataModel().getFXDContainer().incrementChangeTicker(false);
+                        dObj.getController().reload();
+                    }                    
+                });
+            }
+        };
+        th.setName("ReloadDocument-Thread"); //NOI18N
+        th.setPriority( Thread.MIN_PRIORITY);
+        th.start();
+        return reloadTask;
+    }
     
     @Override
     protected boolean notifyModified() {
@@ -110,8 +123,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
             updateDisplayName();
         }
     }
-    
-    
+        
     @Override
     protected CloneableEditorSupport.Pane createPane() {
         MultiViewDescription [] views = getViewDescriptions();
@@ -149,6 +161,12 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         return m_views;
     }
         
+    @Override
+    protected void saveFromKitToStream(StyledDocument doc, EditorKit kit, OutputStream stream)
+        throws IOException, BadLocationException {
+        ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer().save((BaseDocument)doc, kit, stream);
+    }
+    
     static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
         private static final long  serialVersionUID = 1L;
         
@@ -159,7 +177,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         public void save() throws IOException {
             FXZEditorSupport ed = (FXZEditorSupport)this.findCloneableOpenSupport();
             ed.saveDocument();
-            ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().setIsSaved();
+            FXZDataObject dObj = (FXZDataObject) getDataObject();
+            dObj.getDataModel().getFXDContainer().setIsSaved();
         }
         
         @Override
@@ -167,7 +186,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
             FXDContainer container = ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer();
             return container.open();
         }        
-        
+                
         @Override
         protected FileObject getFile() {
             return getDataObject().getPrimaryFile();
