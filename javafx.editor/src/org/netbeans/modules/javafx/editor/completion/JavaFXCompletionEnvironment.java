@@ -247,7 +247,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
         if (LOGGABLE) log("addMembers: " + type);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
-            if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
+            if (LOGGABLE) log("RETURNING: type.getKind() == " + (type != null ? type.getKind() : " type is null"));
             return;
         }
 
