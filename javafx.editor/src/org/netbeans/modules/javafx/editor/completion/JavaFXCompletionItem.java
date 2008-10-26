@@ -319,6 +319,16 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
         });
     }
+
+    private static boolean isAutoImported(String toImport) {
+        return "java.lang.Integer".equals(toImport) ||
+               "java.lang.Boolean".equals(toImport) ||
+               "java.lang.Number".equals(toImport) ||
+               "java.lang.String".equals(toImport) ||
+               (    toImport.startsWith("javafx.lang.") &&
+                    !"javafx.lang.Builtins".equals(toImport)
+               );
+    }
             
     static class KeywordItem extends JavaFXCompletionItem {
         
@@ -1238,7 +1248,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                         String textToReplace = doc.getText(offset, finalLen3);
                                         if (textToReplace.contentEquals(cs)) {
                                             if (insertImport && eleme != null) {
-                                                Imports.addImport(c, eleme.getQualifiedName().toString());
+                                                String qName = eleme.getQualifiedName().toString();
+                                                if (!isAutoImported(qName)) {
+                                                    Imports.addImport(c, qName);
+                                                }
                                             }
                                             return;
                                         }
@@ -1248,7 +1261,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                             doc.insertString(semiPosition.getOffset(), ";", null); //NOI18N
                                         }
                                         if (insertImport && eleme != null) {
-                                            Imports.addImport(c, eleme.getQualifiedName().toString());
+                                            String qName = eleme.getQualifiedName().toString();
+                                            if (!isAutoImported(qName)) {
+                                                Imports.addImport(c, qName);
+                                            }
                                         }
                                     } catch (BadLocationException e) {
                                         // Can't update
