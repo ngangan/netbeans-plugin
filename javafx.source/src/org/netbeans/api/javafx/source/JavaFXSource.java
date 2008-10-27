@@ -76,6 +76,7 @@ import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
@@ -265,10 +266,17 @@ public final class JavaFXSource {
             try {
                 FileObject f = file;
                 urls.add(f.getURL());
-                do {
-                    f = f.getParent();
-                    urls.add(f.getURL());
-                } while (FileOwnerQuery.getOwner(file).getProjectDirectory() != f);
+                Project proj = FileOwnerQuery.getOwner(file);
+                if (proj != null) {
+                    do {
+                        f = f.getParent();
+                        if (f != null) {
+                            urls.add(f.getURL());
+                        } else {
+                            break;
+                        }
+                    } while (proj.getProjectDirectory() != f);
+                }
             } catch (FileStateInvalidException ex) {
                 Exceptions.printStackTrace(ex);
             }
