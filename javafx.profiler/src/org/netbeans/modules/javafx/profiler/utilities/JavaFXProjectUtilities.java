@@ -86,7 +86,6 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.source.tree.ClassTree;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.profiler.utils.OutputParameter;
 
 /* 

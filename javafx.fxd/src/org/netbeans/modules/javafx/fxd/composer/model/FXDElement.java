@@ -102,12 +102,11 @@ public final class FXDElement {
         return getDocumentElement().getStartOffset();
     }
     
-    public FXDElement getParent() {
+    public FXDElement getVisibleParent() {
         DocumentElement de = getDocumentElement();
-        if ( de != null) {
+        while ( de != null) {
             de = de.getParentElement();
-            System.err.println("Parent: " + de); //NOI18N
-            if ( de != null) {
+            if ( de != null && FXDFileModel.FXD_NODE.equals(de.getType())) {
                 String id = FXDFileModel.getIdAttribute(de);
                 return new FXDElement(m_dObj, id);
             }
@@ -214,7 +213,9 @@ public final class FXDElement {
     
     public static void repaint( final FXDElement [] elems, final int overlap) {
         for (FXDElement elem : elems) {
-            elem.repaint(overlap);
+            if ( elem.isVisible()) {
+                elem.repaint(overlap);
+            }
         }
     }
 }

@@ -128,7 +128,6 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
     private final WeakHashMap uiCache = new WeakHashMap();
     
     public synchronized void navigate(final FXZDataObject dObj) throws Exception { 
-        System.err.println("Navigate: " + dObj);  //NOI18N
         if (dObj != peerDO) {
             if (peerDO != null) {
                 //peerDO.getSceneManager().removeSelectionListener(this);
@@ -141,7 +140,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
             if(panelWR != null) {
                 NavigatorContentPanel cp = (NavigatorContentPanel)panelWR.get();
                 if(cp != null) {
-                    System.out.println("panel is cached");  //NOI18N
+                    //System.out.println("panel is cached");  //NOI18N
                     //test if the document associated with the panel is the same we got now
                     if (cp.m_docModel == FXDFileModel.getDocumentModel(dObj)) {
                         cachedPanel = cp;
@@ -316,14 +315,12 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                 public void valueChanged(TreeSelectionEvent e) {
                     if ( !blockNotification) {
                         TreePath selPath = e.getPath();
-                        int      index   = -1;                    
                         String   id      = null;
 
                         if ( selPath != null && !selectionModel.isSelectionEmpty()) {
                             FXDNavigatorNode tna     = (FXDNavigatorNode)selPath.getLastPathComponent();                       
                             DocumentElement  de      = tna.getDocumentElement();
                             id     = getElementId(de);
-                            index  = de.getStartOffset();
                         }
                         TopComponent tc = m_doj.getMTVC();
 

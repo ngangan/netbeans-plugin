@@ -55,7 +55,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
 import org.openide.filesystems.FileObject;
-import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;

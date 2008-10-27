@@ -137,4 +137,17 @@ made subject to such option by the copyright holder.
         </folder>
     </folder>
     
+    <folder name="Templates">
+        <folder name="JavaFX">
+            <file name="FXZTemplate.fxz" url="nbres:/org/netbeans/modules/javafx/fxd/dataloader/fxz/FXZTemplate.fxz">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="template" boolvalue="true"/>
+		<attr name="position" intvalue="251"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/fxz/FXZTemplateHelp.html"/>
+                <attr name="templateCategory" stringvalue="javafx"/>                
+            </file>
+        </folder>
+    </folder>
+    
 </filesystem>

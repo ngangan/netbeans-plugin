@@ -137,9 +137,14 @@ public class FXDFileModel implements DocumentModelStateListener {
     /**
      * Convenience helper method.
      */
-    public static String getIdAttribute(DocumentElement de) {
+    public static String getIdAttribute(final DocumentElement de) {
         return String.valueOf(de.getStartOffset());
     }    
+    
+    public static boolean isSignificant(final DocumentElement de) {
+        String id = (String) de.getAttributes().getAttribute( FXDNode.ATTR_NAME_ID);
+        return id != null && id.length() > 0;
+    }
         
     public static DocumentModel getDocumentModel( final FXZDataObject dObj) {
         FXDFileModel fm = dObj.getDataModel().getFXDContainer().getFileModel(false);

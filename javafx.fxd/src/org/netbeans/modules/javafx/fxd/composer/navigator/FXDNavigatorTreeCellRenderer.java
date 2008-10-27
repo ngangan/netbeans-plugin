@@ -45,6 +45,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -62,6 +63,12 @@ import org.openide.util.ImageUtilities;
  * @version 1.0
  */
 final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer { 
+    private enum IconType {
+      NORMAL,
+      ERROR,
+      GRAY
+    };
+    
     private static final String IMAGE_BASE     = "org/netbeans/modules/javafx/fxd/composer/resources/";  //NOI18N
     private static final String ELEMENT        = IMAGE_BASE + "node_element.png";  //NOI18N
     private static final String NODE_ATTR      = IMAGE_BASE + "node_attr.png";  //NOI18N
@@ -89,7 +96,6 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         NODE_ICONS.put("RadialGradient", createIcons(IMAGE_BASE + "node_radialGradient.png"));//NOI18N
     }
         
-    private final Icon[] NODE_GRAY_ICON    = new Icon[]{getImageIcon(ELEMENT, false), getImageIcon(ELEMENT, true)};
     private final Icon[] NODE_ICON         = createIcons(ELEMENT);
     private final Icon[] ATTR_ICON         = createIcons(NODE_ATTR);
     private final Icon[] NODE_GENERAL_ICON = createIcons(NODE_GENERAL);
@@ -116,42 +122,41 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         
         boolean containsError = tna.getChildrenErrorCount() > 0;
         
-        if ( tna.getNodeVisibility() == FXDNavigatorTree.VISIBILITY_UNDIRECT) {
-            setIcon( NODE_GRAY_ICON, containsError);
-        } else {
-            //normal icons
-            if( FXDNavigatorTree.isTreeElement(de)) {
-                Icon [] icons = null;
-                String type = de.getType();
-                
-                if ( FXDFileModel.FXD_NODE.equals(type)) {
-                    icons = NODE_ICONS.get( de.getName());
-                } else if ( FXDFileModel.FXD_ATTRIBUTE.equals(type)) {
-                    icons = ATTR_ICON;
-                } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
-                    icons = ATTR_ICON;
-                } else if ( FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
-                    icons = NODE_GENERAL_ICON;
-                } else if ( FXDFileModel.DOCUMENT_ROOT_ELEMENT_TYPE.equals(type)) {
-                    icons = NODE_ICON;
-                } else {
-                    System.err.println("Unknown element type: " + type);  //NOI18N
-                }
-                if ( icons == null) {
-                    icons = NODE_ICON;
-                }
-                setIcon( icons, containsError);
-            }          
-        }
+        //normal icons
+        if( FXDNavigatorTree.isTreeElement(de)) {
+            Icon [] icons = null;
+            String type = de.getType();
+
+            if ( FXDFileModel.FXD_NODE.equals(type)) {
+                icons = NODE_ICONS.get( de.getName());
+            } else if ( FXDFileModel.FXD_ATTRIBUTE.equals(type)) {
+                icons = ATTR_ICON;
+            } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
+                icons = ATTR_ICON;
+            } else if ( FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
+                icons = NODE_GENERAL_ICON;
+            } else if ( FXDFileModel.DOCUMENT_ROOT_ELEMENT_TYPE.equals(type)) {
+                icons = NODE_ICON;
+            } else {
+                System.err.println("Unknown element type: " + type);  //NOI18N
+            }
+            if ( icons == null) {
+                icons = NODE_ICON;
+            }
+
+            if ( containsError) {
+                renderer.setIcon( icons[1]);
+            } else if ( tna.getNodeVisibility() == FXDNavigatorTree.VISIBILITY_UNDIRECT) {
+                renderer.setIcon(icons[2]);
+            } else {
+                renderer.setIcon(icons[0]);
+            }
+        }          
         
         return comp;
     }
-    
-    private void setIcon(Icon[] icons, boolean containsError) {
-        renderer.setIcon(icons[containsError ? 1 : 0]);
-    }
-    
-    private static ImageIcon getImageIcon(String name, boolean error){
+        
+    private static ImageIcon getImageIcon(String name, IconType iconType){
         ImageIcon icon = null;
         try {
             icon = new ImageIcon(ImageUtilities.loadImage(name));
@@ -160,13 +165,23 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
             e.printStackTrace();
         }
         
-        if(error)
-            return new ImageIcon(ImageUtilities.mergeImages( icon.getImage(), ERROR_IMAGE, 15, 7 ));
-        else
-            return icon;
+        switch( iconType) {
+            case ERROR:
+                icon = new ImageIcon(ImageUtilities.mergeImages( icon.getImage(), ERROR_IMAGE, 15, 7 ));
+                break;
+            case GRAY:
+                icon = new ImageIcon( GrayFilter.createDisabledImage(icon.getImage()));
+                break;
+                
+        }
+        return icon;
     }   
     
     private static Icon [] createIcons( String name) {
-        return new Icon[] { getImageIcon(name, false), getImageIcon(name, true)};
-    }    
+        return new Icon[] {
+            getImageIcon(name, IconType.NORMAL),
+            getImageIcon(name, IconType.ERROR),
+            getImageIcon(name, IconType.GRAY),
+        };
+    }        
 }

@@ -39,7 +39,6 @@
 
 package org.netbeans.modules.javafx.profiler.utilities;
 
-import com.sun.tools.javac.code.Symbol;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;

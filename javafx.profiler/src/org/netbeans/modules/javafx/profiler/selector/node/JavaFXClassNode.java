@@ -61,7 +61,6 @@ public class JavaFXClassNode extends ContainerNode {
     private ClasspathInfo cpInfo;
     private ElementHandle<TypeElement> classHandle;
 
-    /** Creates a new instance of AbstractClassNode */
     public JavaFXClassNode(ClasspathInfo cpInfo, Icon icon, TypeElement classElement, ContainerNode parent) {
         super(classElement.getSimpleName().toString(), icon, parent);
         this.classElement = classElement;
@@ -99,6 +98,10 @@ public class JavaFXClassNode extends ContainerNode {
     }
 
     protected SelectorChildren getChildren() {
-        return new JavaFXClassChildren();
+        boolean isLibraryNode = false;
+        if (parent instanceof JavaFXPackageNode) {
+            isLibraryNode = ((JavaFXPackageNode)parent).isLibraryNode();
+        }
+        return new JavaFXClassChildren(isLibraryNode);
     }    
 }

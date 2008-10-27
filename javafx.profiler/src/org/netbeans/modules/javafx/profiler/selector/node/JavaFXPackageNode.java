@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -122,8 +121,7 @@ public class JavaFXPackageNode extends ContainerNode {
             List<JavaFXPackageNode> nodes = new ArrayList<JavaFXPackageNode>();
 
             for (String pkgName : index.getPackageNames(parent.getName() + ".", true, parent.scope)) { // NOI18N
-                nodes.add(new JavaFXPackageNode(parent.cpInfo, pkgName, parent, parent.scope, parent.getJFXSource()));
-
+                nodes.add(new JavaFXPackageNode(parent.cpInfo, pkgName, parent, parent.scope, parent.getJFXSource(), parent.isLibraryNode()));
             }
 
             Collections.sort(nodes, COMPARATOR);
@@ -150,18 +148,24 @@ public class JavaFXPackageNode extends ContainerNode {
     private final Set<SearchScope> scope;
     private final String name;
     private final JavaFXSource js;
+    private final boolean isLibraryNode;
 
-    public JavaFXPackageNode(final ClasspathInfo cpInfo, String name, final ContainerNode parent, final Set<SearchScope> scope, final JavaFXSource js) {
+    public JavaFXPackageNode(final ClasspathInfo cpInfo, String name, final ContainerNode parent, final Set<SearchScope> scope, final JavaFXSource js, final boolean isLibraryNode) {
         super(stripName(defaultizeName(name)), IconResource.PACKAGE_ICON, parent);
         this.name = name;
         this.cpInfo = cpInfo;
         this.signature = new ClientUtils.SourceCodeSelection(name + ".**", null, null); // NOI18N
         this.scope = scope;
         this.js = js;
+        this.isLibraryNode = isLibraryNode;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean isLibraryNode() {
+        return isLibraryNode;
     }
 
     JavaFXSource getJFXSource() {
