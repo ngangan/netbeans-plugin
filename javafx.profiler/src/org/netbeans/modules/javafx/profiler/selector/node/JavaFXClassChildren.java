@@ -50,9 +50,19 @@ import java.util.List;
  * @author cms
  */
 public class JavaFXClassChildren extends SelectorChildren<JavaFXClassNode> {
+    private final boolean isLibraryNode;
+
+    public JavaFXClassChildren(final boolean isLibraryNode) {
+        this.isLibraryNode = isLibraryNode;
+    }
 
     protected List<SelectorNode> prepareChildren(final JavaFXClassNode parent) {
         List<SelectorNode> contents = new ArrayList<SelectorNode>();
+        // TODO support classes-level only for library nodes so far due to 
+        // restrictions from compiler
+        if (isLibraryNode)
+            return contents;
+
         SelectorNode content = null;
 
         content = new JavaFXFunctionsNode(parent.getCpInfo(), parent);

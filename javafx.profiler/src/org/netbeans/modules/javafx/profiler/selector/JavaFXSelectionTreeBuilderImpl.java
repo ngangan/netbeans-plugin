@@ -108,7 +108,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
         return getDisplayName();
     }
     
-    private class LibrariesNode extends ContainerNode {
+    public class LibrariesNode extends ContainerNode {
 
         private final boolean includeSubprojects;
 
@@ -122,7 +122,7 @@ public class JavaFXSelectionTreeBuilderImpl implements SelectionTreeBuilder {
         }
     }
 
-    private class SourcesNode extends ContainerNode {
+    public class SourcesNode extends ContainerNode {
         private final boolean includeSubprojects;
 
         public SourcesNode(final boolean includeSubprojects, final ContainerNode parent) {
