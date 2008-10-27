@@ -756,13 +756,14 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         try {
             final int offset = getStartPos(node);
             final Tree tree = getCurrentPath().getParentPath().getLeaf();
-            if (!holdOnLine(tree) || isFirstOnLine(offset)) {
+            boolean hold = holdOnLine(tree);
+            if (!hold || isFirstOnLine(offset)) {
                 processStandaloneNode(node, adjustments);
             }
             incIndent();
             super.visitInstantiate(node, adjustments);
             decIndent();
-            if (isMultiline(node)) {
+            if (isMultiline(node) && !endsOnSameLine(tree, node)) {
                 indentEndLine(node, adjustments);
             }
 
@@ -770,6 +771,10 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
         }
         return adjustments;
+    }
+
+    private boolean endsOnSameLine(Tree tree, Tree node) throws BadLocationException {
+        return ctx.lineStartOffset(getEndPos(node)) == ctx.lineStartOffset(getEndPos(tree));
     }
 
     private boolean holdOnLine(Tree tree) {
