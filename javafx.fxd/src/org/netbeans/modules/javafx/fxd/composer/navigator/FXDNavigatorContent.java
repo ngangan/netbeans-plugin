@@ -316,14 +316,12 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                 public void valueChanged(TreeSelectionEvent e) {
                     if ( !blockNotification) {
                         TreePath selPath = e.getPath();
-                        int      index   = -1;                    
                         String   id      = null;
 
                         if ( selPath != null && !selectionModel.isSelectionEmpty()) {
                             FXDNavigatorNode tna     = (FXDNavigatorNode)selPath.getLastPathComponent();                       
                             DocumentElement  de      = tna.getDocumentElement();
                             id     = getElementId(de);
-                            index  = de.getStartOffset();
                         }
                         TopComponent tc = m_doj.getMTVC();
 

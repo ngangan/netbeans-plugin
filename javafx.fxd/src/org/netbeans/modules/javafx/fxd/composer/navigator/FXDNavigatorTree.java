@@ -52,7 +52,6 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
@@ -67,14 +66,12 @@ final class FXDNavigatorTree extends JTree {
     static boolean showAttributes     = true;
     static boolean showIdOnly         = false;
     
-    private final FXZDataObject     m_dObj;
     private final DefaultTreeModel  m_treeModel;    
     private       boolean           m_firstPaint;
     private       FXDElement        m_selected = null;
 
     public FXDNavigatorTree(FXZDataObject dObj, final DocumentModel docModel) throws Exception {
         super();
-        m_dObj = dObj;
         
         m_firstPaint = true;
         setShowsRootHandles(true);
@@ -188,9 +185,7 @@ final class FXDNavigatorTree extends JTree {
     
     private static boolean isVisible(DocumentElement docElem) {
         if (showIdOnly) {
-            String id = FXDFileModel.getIdAttribute(docElem);
-
-            if (id == null || id.length() == 0) {
+            if ( !FXDFileModel.isSignificant(docElem)) {
                 return false;
             }
         }
