@@ -41,8 +41,6 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.tools.javac.code.Symbol;
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -50,18 +48,13 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
 
 /**
  * This task is called every time the caret position changes in a Java editor.
@@ -312,7 +305,17 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 //                Exceptions.printStackTrace(ex);
 //            }
 //        } else {
+
+//        final ClassIndex classIndex = compilationInfo.getJavaFXSource().getCpInfo().getClassIndex();
+//        Set<ElementHandle<TypeElement>> declaredTypes = classIndex.getDeclaredTypes(element.getSimpleName().toString(), NameKind.SIMPLE_NAME, EnumSet.allOf(SearchScope.class));
+//        Iterator<ElementHandle<TypeElement>> it = declaredTypes.iterator();
+//        if (it.hasNext()) {
+//            ElementHandle<TypeElement> eh = it.next();
+//            setJavadoc(ElementJavadoc.create(compilationInfo, eh.resolve(compilationInfo)));
+//        } else {
             setJavadoc(ElementJavadoc.create(compilationInfo, element));
+//        }
+
 //        }
     }
 

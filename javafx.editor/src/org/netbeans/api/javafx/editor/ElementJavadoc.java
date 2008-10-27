@@ -29,10 +29,10 @@ package org.netbeans.api.javafx.editor;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.ArrayList;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -47,7 +47,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import com.sun.javadoc.*;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
-import java.util.ArrayList;
+import com.sun.tools.javac.code.Symbol;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -211,6 +211,7 @@ public class ElementJavadoc {
         ElementUtilities eu = compilationInfo.getElementUtilities();
         this.cpInfo = compilationInfo.getJavaFXSource().getCpInfo();
         Doc doc = eu.javaDocFor(element);
+        boolean isJavaClass = (doc != null) && doc.isClass() && !compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
         boolean localized = false;
         if (element != null) {
             docURL = FXSourceUtils.getJavadoc(element, cpInfo);
@@ -241,7 +242,7 @@ public class ElementJavadoc {
                 }
             }
         }
-        this.content = prepareContent(eu, doc, localized);
+        this.content = prepareContent(eu, doc, localized, isJavaClass);
     }
 
     private ElementJavadoc(URL url) {
@@ -291,7 +292,7 @@ public class ElementJavadoc {
      * @param useJavadoc preffer javadoc to sources
      * @return Javadoc content
      */
-    private String prepareContent(ElementUtilities eu, Doc doc, final boolean useJavadoc) {
+    private String prepareContent(ElementUtilities eu, Doc doc, final boolean useJavadoc, boolean isJavaClass) {
         StringBuilder sb = new StringBuilder();
         if (doc != null) {
             if (doc instanceof ProgramElementDoc) {
@@ -302,7 +303,7 @@ public class ElementJavadoc {
             } else if (doc.isField() || doc.isEnumConstant()) {
                 sb.append(getFieldHeader(eu, (FieldDoc) doc));
             } else if (doc.isClass() || doc.isInterface() || doc.isAnnotationType()) {
-                sb.append(getClassHeader(eu, (ClassDoc) doc));
+                sb.append(getClassHeader(eu, (ClassDoc) doc, isJavaClass));
             } else if (doc instanceof PackageDoc) {
                 sb.append(getPackageHeader(eu, (PackageDoc) doc));
             }
@@ -660,16 +661,18 @@ public class ElementJavadoc {
         return sb;
     }
 
-    private CharSequence getClassHeader(ElementUtilities eu, ClassDoc cdoc) {
+    private CharSequence getClassHeader(ElementUtilities eu, ClassDoc cdoc, boolean isJavaClass) {
         StringBuilder sb = new StringBuilder();
         sb.append("<p><tt>"); //NOI18N
         sb.append(getAnnotations(eu, cdoc.annotations()));
-        // TODO modifierSpecifier() does not exist for javafx
-//        int mods = cdoc.modifierSpecifier() & ~Modifier.INTERFACE;
-//        if (cdoc.isEnum()) {
-//            mods &= ~Modifier.FINAL;
+        // TODO modifierSpecifier() equivalent for javafx?
+//        if (isJavaClass) {
+//            int mods = cdoc.modifierSpecifier() & ~Modifier.INTERFACE;
+//            if (cdoc.isEnum()) {
+//                mods &= ~Modifier.FINAL;
+//            }
+//            sb.append(Modifier.toString(mods));
 //        }
-//        sb.append(Modifier.toString(mods));
         if (sb.length() > 0) {
             sb.append(' '); //NOI18N
         }
@@ -683,16 +686,18 @@ public class ElementJavadoc {
             sb.append("class "); //NOI18N
         }
         sb.append("<b>").append(cdoc.simpleTypeName()); //NOI18N
-        TypeVariable[] tvars = cdoc.typeParameters();
-        if (tvars.length > 0) {
-            sb.append("&lt;"); //NOI18N
-            for (int i = 0; i < tvars.length; i++) {
-                appendType(eu, sb, tvars[i], false, true);
-                if (i < tvars.length - 1) {
-                    sb.append(","); //NOI18N
+        if (isJavaClass) {
+            TypeVariable[] tvars = cdoc.typeParameters();
+            if (tvars.length > 0) {
+                sb.append("&lt;"); //NOI18N
+                for (int i = 0; i < tvars.length; i++) {
+                    appendType(eu, sb, tvars[i], false, true);
+                    if (i < tvars.length - 1) {
+                        sb.append(","); //NOI18N
+                    }
                 }
+                sb.append("&gt;"); //NOI18N
             }
-            sb.append("&gt;"); //NOI18N
         }
         sb.append("</b>"); //NOi18N
         if (!cdoc.isAnnotationType()) {

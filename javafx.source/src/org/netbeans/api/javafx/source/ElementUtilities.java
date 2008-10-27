@@ -168,10 +168,10 @@ public final class ElementUtilities {
         if (element != null) {
             DocEnv env = DocEnv.instance(ctx);
             switch (element.getKind()) {
-//                case ANNOTATION_TYPE:
+                case ANNOTATION_TYPE:
                 case CLASS:
                 case ENUM:
-//                case INTERFACE:
+                case INTERFACE:
                     return env.getClassDoc((ClassSymbol) element);
                 case ENUM_CONSTANT:
                 case FIELD:
