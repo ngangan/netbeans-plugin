@@ -29,6 +29,7 @@ import java.io.Serializable;
 import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
 import org.netbeans.editor.BaseDocument;
+import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.openide.util.Task;
 import org.openide.windows.TopComponent;
 
@@ -113,7 +114,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         FXZDataObject dObj = (FXZDataObject) getDataObject();
         super.notifyUnmodified();
         dObj.m_ic.remove(env);
-        if ( dObj.getDataModel().getFXDContainer().areEntriesChanged()) {
+        FXZArchive fxz = dObj.getDataModel().getFXDContainer();
+        if ( fxz != null && fxz.areEntriesChanged()) {
             SwingUtilities.invokeLater( new Runnable() {
                 public void run() {
                     notifyModified();
