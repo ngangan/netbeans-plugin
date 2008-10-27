@@ -83,10 +83,10 @@ public class FunctionValueEnvironment extends JavaFXCompletionEnvironment<JFXFun
                     }
                 }
             }
+            path = JavaFXTreePath.getPath(root, bl);
+            localResult(null);
+            addKeywordsForStatement();
         }
-        path = JavaFXTreePath.getPath(root, bl);
-        localResult(null);
-        addKeywordsForStatement();
     }
 
     private static void log(String s) {
