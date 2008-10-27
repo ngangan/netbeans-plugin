@@ -47,6 +47,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXErroneous;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
 import com.sun.tools.javafx.tree.JFXSelect;
@@ -494,12 +495,15 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + 
                 " offset: " + offset + " prefix " + prefix); // NOI18N
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
+        if (LOGGABLE) log("   pathFor returned " + path.getLeaf());
         JavaFXTreePath pathOfBrother = controller.getTreeUtilities().pathFor(offset > 0 ? offset - 1 : offset);
         Tree t = path.getLeaf();
         Tree brother = pathOfBrother.getLeaf();
+        if (LOGGABLE) log("   borther == " + brother);
         if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
             if ((brother.getJavaFXKind() == JavaFXKind.OBJECT_LITERAL_PART) ||
                 (brother.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) ||
+                (brother instanceof JFXErroneous) ||
                 (brother.getJavaFXKind() == JavaFXKind.VARIABLE))
             {
                 path = pathOfBrother;
@@ -507,6 +511,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 path = pathOfBrother.getParentPath();
             }
             t = path.getLeaf();
+            if (LOGGABLE) log("   brother gave us " + t);
         } else {
             SourcePositions pos = controller.getTrees().getSourcePositions();
             UnitTree unit = controller.getCompilationUnit();
@@ -520,6 +525,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 path = path.getParentPath();
                 if (path != null) {
                     t = path.getLeaf();
+                    if (LOGGABLE) log("    updating t == " + t);
                 } else {
                     t = null;
                 }
@@ -527,6 +533,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 s = s1 < s ? s1 : s;
                 long e1 = pos.getEndPosition(unit, t);
                 e = e1 > e ? e1 : e;
+                if (LOGGABLE) log("   s ==" + s + " s1 ==" + s1 + "   e ==" + e + "   e1 == " + e1);
                 if ((t != null) &&
                         (t.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) &&
                         s1 == e1) {
@@ -554,7 +561,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
      */
     private boolean isBrokenAtTheEnd(CompilationController controller, Tree t, int offset) {
         if (LOGGABLE) log("isBrokenAtTheEnd " + t + " class == " + t.getClass());
-        if (t instanceof JFXErroneousType) {
+        if (t instanceof JFXErroneousType || t instanceof JFXErroneous) {
             SourcePositions pos = controller.getTrees().getSourcePositions();
             UnitTree unit = controller.getCompilationUnit();
             long s = pos.getStartPosition(unit, t);

@@ -66,13 +66,17 @@ import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
@@ -102,10 +106,13 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileSystem;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
@@ -117,6 +124,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     private static final Logger logger = Logger.getLogger(JavaFXCompletionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+    private static int usingFakeSource = 0;
     protected int offset;
     protected String prefix;
     protected boolean isCamelCasePrefix;
@@ -247,7 +255,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
         if (LOGGABLE) log("addMembers: " + type);
         if (type == null || type.getKind() != TypeKind.DECLARED) {
-            if (LOGGABLE) log("RETURNING: type.getKind() == " + type.getKind());
+            if (LOGGABLE) log("RETURNING: type.getKind() == " + (type != null ? type.getKind() : " type is null"));
             return;
         }
 
@@ -1424,7 +1432,64 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         return null;
     }
-    
+        /**
+     *
+     * @param source
+     */
+    protected void useFakeSource(String source, final int pos) {
+        if (LOGGABLE) log("useFakeSource " + source + " pos == " + pos);
+        if (usingFakeSource > 1) {
+            // allow to recurse only twice ;-)
+            return;
+        }
+        try {
+            usingFakeSource++;
+            FileSystem fs = FileUtil.createMemoryFileSystem();
+            final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
+            Writer w = new OutputStreamWriter(fo.getOutputStream());
+            w.write(source);
+            w.close();
+            if (LOGGABLE) log("  source written to " + fo);
+            ClasspathInfo info = ClasspathInfo.create(controller.getFileObject());
+            JavaFXSource s = JavaFXSource.create(info,Collections.singleton(fo));
+            if (LOGGABLE) log("  jfxsource obtained " + s);
+            s.runWhenScanFinished(new Task<CompilationController>() {
+                public void run(CompilationController fakeController) throws Exception {
+                    if (LOGGABLE) log("    scan finished");
+                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos,true);
+                    if (LOGGABLE) log("    env == " + env);
+                    if (fakeController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                        if (LOGGABLE) log("    fake failed to analyze -- returning");
+                        return;
+                    }
+                    if (LOGGABLE) log("    fake analyzed");
+                    if (! env.isTreeBroken()) {
+                        if (LOGGABLE) log("    fake non-broken tree");
+                        final Tree leaf = env.getPath().getLeaf();
+                        env.inside(leaf);
+                        // try to remove faked entries:
+                        String fakeName = fo.getName();
+                        Set<JavaFXCompletionItem> toRemove = new TreeSet<JavaFXCompletionItem>();
+                        for (JavaFXCompletionItem r : query.results) {
+                            if (LOGGABLE) log("    checking " + r.getLeftHtmlText());
+                            if (r.getLeftHtmlText().contains(fakeName)) {
+                                if (LOGGABLE) log("    will remove " + r);
+                                toRemove.add(r);
+                            }
+                        }
+                        query.results.removeAll(toRemove);
+                    }
+                }
+            },true);
+        } catch (IOException ex) {
+            if (LOGGABLE) {
+                logger.log(Level.FINE,"useFakeSource failed: ",ex);
+            }
+        } finally {
+            usingFakeSource--;
+        }
+    }
+
     protected static TokenSequence<JFXTokenId> nextNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
         while (ts.moveNext()) {
             switch (ts.token().id()) {
