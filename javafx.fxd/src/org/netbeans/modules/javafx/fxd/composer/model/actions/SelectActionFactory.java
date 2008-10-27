@@ -41,7 +41,6 @@
 package org.netbeans.modules.javafx.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -101,7 +100,7 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
             FXDElement [] selected = getSelection();
             if (selected != null && selected.length > 0) {
                 assert selected[0] != null;
-                FXDElement parent = selected[0].getParent();
+                FXDElement parent = selected[0].getVisibleParent();
                 if (parent != null) {
                     setSelection(parent, true);
                 }                           
@@ -115,9 +114,6 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
         
         public SelectAction(final FXDElement [] selected) {
             m_selected = selected;
-            for (FXDElement elem : selected) {
-                assert elem.isVisible();
-            }
             FXDElement.repaint(m_selected, FXDElementOutline.SELECTOR_OVERLAP);
         }
 
@@ -134,7 +130,7 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
         public void paint(Graphics g) {
             if ( !isCompleted()) {
                 for ( FXDElement elem : m_selected) {
-                    if ( !elem.isDeleted()) {
+                    if ( elem.isVisible() && !elem.isDeleted()) {
                         /*
                         System.err.println("Painting selected: " + elem);
                         FXDElementOutline outline = elem.getOutline();
@@ -285,8 +281,6 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
     }
     
     private void updateSelectionHistoryButtons() {
-        System.err.println(String.format("Updating buttons: <%d, %d>",  //NOI18N
-                m_selectionHistoryIndex, m_selectionHistory.size()));
         m_navigateBackAction.setEnabled( m_selectionHistoryIndex > 0);
         m_navigateForwardAction.setEnabled( m_selectionHistoryIndex < m_selectionHistory.size() - 1);
     }    

@@ -188,7 +188,6 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
     private final class FXDPreviewCookie implements SelectionCookie {
         public void updateSelection(final FXZDataObject doj, FXDElement elem, boolean doubleClick) {
             if ( elem.isVisible()) {
-                System.err.println( String.format("Selecting the element '%s' in the visual view #1", elem));
                 doj.getController().getSelectionModel().setSelection(elem, true);
             }
         }
