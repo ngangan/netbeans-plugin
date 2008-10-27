@@ -62,6 +62,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -215,7 +216,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
     }
 
     private void addMembers(final TypeElement e, final Description parentDescription, final CompilationInfo info, final Map<Element, Long> pos) {
-        if (e == null) {
+        if (e == null || e.asType().getKind() == TypeKind.ERROR) {
             return;
         }
         List<? extends Element> members = null;
