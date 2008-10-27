@@ -50,6 +50,7 @@ import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.SequenceExplicitTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
 import java.lang.ref.Reference;
@@ -419,6 +420,9 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     Document doc = operation.getHierarchy().getComponent().getDocument();
                     int start = (int)sp.getStartPosition(cu, node);
                     int end   = (int)sp.getEndPosition(cu, node);
+                    if (node.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                        end = findBodyEnd(node, cu, sp, doc);
+                    }
                     JavaFXTreePath pa = JavaFXTreePath.getPath(cu, node);
                     if (start != (-1) && end != (-1) &&
                             !info.getTreeUtilities().isSynthetic(pa)) {
