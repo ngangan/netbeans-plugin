@@ -45,8 +45,7 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
     private   final PreviewImagePanel    m_imgPanel;
     private   final PreviewToolbar       m_toolBar;
     private   final PreviewStatusBar     m_statusBar;
-    //protected       SGParent        m_root = null;
-    private Lookup m_lookup = null;
+    private         Lookup               m_lookup = null;
     
     public PreviewElement( final FXZEditorSupport edSup) {
         m_edSup = edSup;   
@@ -97,8 +96,7 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
     public JSGPanel getJSGPane() {
         return m_imgPanel.getJSGPanel();
     }
-    
-    
+        
     private Lookup createLookup() {
         DataObject dObj = m_edSup.getDataObject();
         return Lookups.fixed( new Object[] {            

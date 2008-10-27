@@ -59,7 +59,6 @@ import org.openide.windows.TopComponent;
 
 public final class FXZDataObject extends MultiDataObject implements Lookup.Provider {     
     private static final long  serialVersionUID = 1L;
-    public static final String PROP_EXT_CHANGE  = "external_change"; //NOI18N
     
     public static final String FXZ_EXT = "fxz";  //NOI18N
 
@@ -141,7 +140,7 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         //TODO Check if the view callback is not a better option
         return m_edSup.getMVTC();
     }
-
+    
     @Override
     protected Node createNodeDelegate() {
         return new FXZDataNode(this);

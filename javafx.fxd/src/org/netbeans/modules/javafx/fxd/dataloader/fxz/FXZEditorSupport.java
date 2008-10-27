@@ -137,7 +137,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
     public CloneableTopComponent getMVTC() {
         return m_mvtc;
     }
-    
+        
     @Override
     public String messageHtmlName() {
         return super.messageHtmlName();

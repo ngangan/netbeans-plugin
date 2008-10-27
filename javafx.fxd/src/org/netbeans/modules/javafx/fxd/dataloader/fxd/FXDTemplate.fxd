@@ -1,0 +1,10 @@
+/*
+ * Empty FXD file.
+ */
+//@version 1.0
+
+Group {
+    content: [
+        // enter your stuff here
+    ]
+}
