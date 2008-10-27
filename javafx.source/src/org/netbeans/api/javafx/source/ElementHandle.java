@@ -411,6 +411,19 @@ public class ElementHandle<T extends Element> {
                 sb.append(';');	    // NOI18N
                 break;
             }
+	    case TYPEVAR:
+            {
+		assert type instanceof TypeVariable;
+		TypeVariable tr = (TypeVariable) type;
+		TypeMirror upperBound = tr.getUpperBound();
+		if (upperBound.getKind() == TypeKind.NULL) {
+		    sb.append ("Ljava/lang/Object;");       // NOI18N
+		}
+		else {
+		    encodeType(upperBound, sb);
+		}
+		break;
+            }
             case ERROR: {                
                 TypeElement te = (TypeElement) ((ErrorType) type).asElement();
                 if (te != null) {
