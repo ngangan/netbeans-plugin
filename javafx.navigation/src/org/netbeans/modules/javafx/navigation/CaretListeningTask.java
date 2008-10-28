@@ -174,7 +174,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         ElementHandle<Element> eh = null;
         try {
             eh  = ElementHandle.create(element);
-        } catch (IllegalArgumentException iae) {
+        } catch (Exception ex) {
             // can't convert to element handler (incomplete element)
         }
         if (eh == null) {
