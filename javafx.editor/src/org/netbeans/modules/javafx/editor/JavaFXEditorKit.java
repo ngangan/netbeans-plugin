@@ -75,23 +75,11 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
     private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
     private static final String buttonPrintFXPreview = "print-fx-preview"; //NOI18N
-    private static final String FX_MIME_TYPE = "text/x-fx";
+    public static final String FX_MIME_TYPE = "text/x-fx";
     private static Logger log = Logger.getLogger(JavaFXEditorKit.class.getName());
 
     public JavaFXEditorKit() {
         super(FX_MIME_TYPE);
-
-        Settings.addInitializer(new Settings.Initializer() {
-            public String getName() {
-                return FX_MIME_TYPE;
-            }
-
-            @SuppressWarnings("unchecked")
-            public void updateSettingsMap(Class kitClass, Map settingsMap) {
-                settingsMap.put(SettingsNames.CODE_FOLDING_ENABLE, Boolean.TRUE);
-            }
-
-        });
     }
 
     @Override
