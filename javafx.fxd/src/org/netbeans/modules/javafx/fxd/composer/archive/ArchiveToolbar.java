@@ -24,12 +24,14 @@ final class ArchiveToolbar extends FXDToolbar {
         constrains.insets = new Insets(0, 3, 0, 2);
         add(createToolBarSeparator(), constrains);
         
-        addButton( lookup.get( ArchivePanel.AddArchiveEntryAction.class));
-        addButton( lookup.get( ArchivePanel.RemoveArchiveEntryAction.class));
-        addButton( lookup.get( ArchivePanel.ReplaceArchiveEntryAction.class));
-        
-        add(createToolBarSeparator(), constrains);
-        addButton( lookup.get(ActionController.GenerateUIStubAction.class));
+        if (lookup != null) {
+            addButton( lookup.get( ArchivePanel.AddArchiveEntryAction.class));
+            addButton( lookup.get( ArchivePanel.RemoveArchiveEntryAction.class));
+            addButton( lookup.get( ArchivePanel.ReplaceArchiveEntryAction.class));
+
+            add(createToolBarSeparator(), constrains);
+            addButton( lookup.get(ActionController.GenerateUIStubAction.class));
+        }
         
         constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;

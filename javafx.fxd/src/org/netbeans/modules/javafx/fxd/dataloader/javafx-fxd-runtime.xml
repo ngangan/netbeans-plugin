@@ -51,4 +51,8 @@ made subject to such option by the copyright holder.
         <type>classpath</type>
         <resource>jar:nbinst:///modules/ext/fxd/lib/javafx-fxd-1.0.jar!/</resource>
     </volume>
+    <volume>
+        <type>javadoc</type>
+        <resource>jar:nbinst:///modules/ext/fxd/doc/javafx-fxd-1.0-javadoc.zip!</resource>
+    </volume>    
 </library>

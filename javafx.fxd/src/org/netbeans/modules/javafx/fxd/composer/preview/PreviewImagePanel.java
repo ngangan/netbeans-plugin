@@ -42,6 +42,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     
     private final FXZDataObject      m_dObj;
     private final Action []          m_actions;
+    private final Color              m_defaultBackground;
     private       JSGPanel           m_sgPanel = null;
     private       int                m_changeTickerCopy = -1;
         
@@ -55,6 +56,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         };
         
         setLayout(new BorderLayout());
+        m_defaultBackground = getBackground();                
         setBackground( Color.WHITE);
     }
     
@@ -72,77 +74,90 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     synchronized void refresh() {
-        final int tickerCopy = m_dObj.getDataModel().getFXDContainer().getChangeTicker();
-        if (  tickerCopy != m_changeTickerCopy) {
-            removeAll();
-            final JLabel label = createWaitPanel();
-            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_PARSING")); //NOI18N            
-            
-            add( label, BorderLayout.CENTER);
-            m_sgPanel  = null;
+        FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
+        if (  fxzArchive != null) {
+            final int tickerCopy = fxzArchive.getChangeTicker();
+            if ( tickerCopy != m_changeTickerCopy) {
+                removeAll();
+                setBackground( Color.WHITE);
+                final JLabel label = createWaitPanel();
+                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_PARSING")); //NOI18N            
 
-            Thread th = new Thread() {
-                @Override
-                public void run() {
-                    final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
-                    fxz.getFileModel(false).updateModel();
+                add( label, BorderLayout.CENTER);
+                m_sgPanel  = null;
 
-                    SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {
-                            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N            
-                            SwingUtilities.invokeLater( new Runnable() {
-                                public void run() {
-                                    try {
-                                        javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(fxz);
-                                        //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
-                                        //Object   group  = m.invoke(fxNode);
-                                        FXNode fxNode = node.impl_getFXNode();  
+                Thread th = new Thread() {
+                    @Override
+                    public void run() {
+                        final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
+                        fxz.getFileModel(false).updateModel();
 
-                                        if (fxNode != null) {
-                                            m_sgPanel = new JSGPanel() {
-                                                @Override
-                                                public void paintComponent(java.awt.Graphics g) {
-                                                    super.paintComponent(g);
-                                                    m_dObj.getController().paintActions(g);
-                                                }
-                                            };
-                                            m_sgPanel.setBackground(Color.WHITE);
-                        //                    FXNode fNode = new FXNode(sgNode);
-                                            m_sgPanel.setScene( fxNode);
+                        SwingUtilities.invokeLater( new Runnable() {
+                            public void run() {
+                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N            
+                                SwingUtilities.invokeLater( new Runnable() {
+                                    public void run() {
+                                        try {
+                                            javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(fxz);
+                                            //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
+                                            //Object   group  = m.invoke(fxNode);
+                                            FXNode fxNode = node.impl_getFXNode();  
 
-                                            removeAll();
-                                            add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
+                                            if (fxNode != null) {
+                                                m_sgPanel = new JSGPanel() {
+                                                    @Override
+                                                    public void paintComponent(java.awt.Graphics g) {
+                                                        super.paintComponent(g);
+                                                        m_dObj.getController().paintActions(g);
+                                                    }
+                                                };
+                                                m_sgPanel.setBackground(Color.WHITE);
+                            //                    FXNode fNode = new FXNode(sgNode);
+                                                m_sgPanel.setScene( fxNode);
 
-                                            MouseEventCollector mec = new MouseEventCollector();
-                                            m_sgPanel.addMouseListener(mec);
-                                            m_sgPanel.addMouseMotionListener(mec);
-                                            m_sgPanel.addMouseWheelListener(mec);
+                                                removeAll();
+                                                add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
 
-                                            m_changeTickerCopy = tickerCopy;
-                                            updateZoom();
-                                        } else {
-                                            //TODO 
-                                            label.setText("Cannot show");
+                                                MouseEventCollector mec = new MouseEventCollector();
+                                                m_sgPanel.addMouseListener(mec);
+                                                m_sgPanel.addMouseMotionListener(mec);
+                                                m_sgPanel.addMouseWheelListener(mec);
+
+                                                m_changeTickerCopy = tickerCopy;
+                                                updateZoom();
+                                            } else {
+                                                //TODO 
+                                                label.setText("Cannot show");
+                                                label.setIcon(null);
+                                            }
+                                        } catch( Exception e) {
+                                            //TODO provide better error report
+                                            e.printStackTrace();
+                                            label.setText(e.getLocalizedMessage());
                                             label.setIcon(null);
+                                        } finally {
+                                            System.gc();                                
                                         }
-                                    } catch( Exception e) {
-                                        //TODO provide better error report
-                                        e.printStackTrace();
-                                        label.setText(e.getLocalizedMessage());
-                                        label.setIcon(null);
-                                    } finally {
-                                        System.gc();                                
-                                    }
-                                }                            
-                            });                            
-                        }
-                    });                    
-                }
-            };
-            th.setName("ModelUpdate-Thread");  //NOI18N
-            th.start();            
+                                    }                            
+                                });                            
+                            }
+                        });                    
+                    }
+                };
+                th.setName("ModelUpdate-Thread");  //NOI18N
+                th.start();            
+            } else {
+                updateZoom();
+            }
         } else {
-            updateZoom();
+            removeAll();
+            Exception error = m_dObj.getDataModel().getFXDContainerLoadError();
+            setBackground( m_defaultBackground);
+            
+            JLabel label = new JLabel( 
+                NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_LOAD", error.getLocalizedMessage()), //NOI18N                                
+                JLabel.CENTER);
+            add( label, BorderLayout.CENTER);
         }
     }
     

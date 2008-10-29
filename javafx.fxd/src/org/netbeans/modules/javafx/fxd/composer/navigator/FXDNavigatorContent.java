@@ -75,7 +75,6 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactor
 import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.nodes.Node.Cookie;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -164,14 +163,21 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                 RequestProcessor.getDefault().post(new Runnable() {
                     public void run() {
                         showWaitPanel();
-                        while( FXDFileModel.getDocumentModel(dObj) == null) {
-                            try {
-                                System.err.println("Waiting for document to come up ...");  //NOI18N
-                                Thread.sleep(5);
-                            } catch (InterruptedException ex) {
-                                Exceptions.printStackTrace(ex);
+                        try {
+                            while( FXDFileModel.getDocumentModel(dObj) == null) {
+                                try {
+                                    //System.err.println("Waiting for document to come up ...");  //NOI18N
+                                    Thread.sleep(15);
+                                } catch (InterruptedException ex) {
+                                    ex.printStackTrace();
+                                } 
                             }
+                        } catch( Exception e) {
+                            e.printStackTrace();
+                            showCannotNavigate();
+                            return;
                         }
+                        
                         final NavigatorContentPanel panel;
                         if ( cachedPanel == null) {
                             try {
