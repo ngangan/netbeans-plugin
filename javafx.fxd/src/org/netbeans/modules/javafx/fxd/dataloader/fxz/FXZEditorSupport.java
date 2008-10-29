@@ -51,7 +51,10 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
     public StyledDocument openDocument() throws IOException {
         StyledDocument doc = super.openDocument();
         synchronized(this) {
-            ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().documentOpened(doc);
+            FXZArchive fxzArchive = ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer();
+            if ( fxzArchive != null) {
+                fxzArchive.documentOpened(doc);
+            }
         }
         return doc;
     }
@@ -77,7 +80,6 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
 
     @Override
     protected Task reloadDocument() {
-        System.err.println("Reloading document.");
         final Task reloadTask = super.reloadDocument();
         Thread th = new Thread() {
             @Override

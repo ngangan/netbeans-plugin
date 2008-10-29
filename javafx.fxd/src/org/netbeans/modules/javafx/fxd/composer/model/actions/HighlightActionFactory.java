@@ -181,8 +181,8 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
         }
     };    
     
-    private final ToggleHighlightAction  m_highlightAction = new ToggleHighlightAction();
-    private final ToggleTooltipAction    m_tooltipAction   = new ToggleTooltipAction();
+    private ToggleHighlightAction  m_highlightAction = null;
+    private ToggleTooltipAction    m_tooltipAction   = null;
         
     public HighlightActionFactory(FXZDataObject dObj) {
         super(dObj);
@@ -203,7 +203,11 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
     }
 
     @Override
-    public Action [] getMenuActions() {
+    public synchronized Action [] getMenuActions() {
+        if ( m_highlightAction == null) {
+            m_highlightAction = new ToggleHighlightAction();
+            m_tooltipAction   = new ToggleTooltipAction();
+        }
         return new Action [] { m_highlightAction, m_tooltipAction};
     }    
 }

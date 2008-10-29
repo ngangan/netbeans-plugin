@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
@@ -35,15 +36,17 @@ final class ArchiveElement extends TopComponent implements MultiViewElement, Run
     
     public ArchiveElement( final FXZEditorSupport edSup) {
         m_edSup = edSup;   
-        //FXDDataObject dObj = ;
-
-        m_panel = new ArchivePanel(((FXZDataObject) edSup.getDataObject()).getDataModel().getFXDContainer());
-        setLayout( new BorderLayout());
-        add( m_panel, BorderLayout.CENTER);
+        FXZArchive fxzArchive = ((FXZDataObject) edSup.getDataObject()).getDataModel().getFXDContainer();
+        if ( fxzArchive != null) {
+            m_panel = new ArchivePanel(fxzArchive);
+            setLayout( new BorderLayout());
+            add( m_panel, BorderLayout.CENTER);
+        } else {
+            m_panel = null;
+        }
         setFocusable(true);
     }
-            
-    
+                
     public JComponent getVisualRepresentation() {
         return this;
     }
