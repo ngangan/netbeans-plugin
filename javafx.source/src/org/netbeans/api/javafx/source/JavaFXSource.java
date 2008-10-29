@@ -299,6 +299,9 @@ public final class JavaFXSource {
             } catch (RuntimeException analyzerError) {
                 LOGGER.log(Level.WARNING, "Error in analyzer", analyzerError); // NOI18N
                 return cc.phase;
+            } catch (AssertionError assErr) {
+                LOGGER.log(Level.WARNING, "Error in analyzer", assErr); // NOI18N
+                return cc.phase;
             }
             cc.setPhase(Phase.ANALYZED);
             long end = System.currentTimeMillis();
