@@ -50,7 +50,6 @@ import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
 import org.netbeans.modules.javafx.preview.Bridge;
 import org.netbeans.modules.javafx.preview.SerializableImage;
-import org.netbeans.modules.lexer.editorbridge.LexerEditorKit;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -64,13 +63,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
-import java.util.Map;
 import java.util.logging.Logger;
+import org.netbeans.modules.editor.NbEditorKit;
 
 /**
  * @author answer
  */
-public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.HelpCtx.Provider {
+public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.HelpCtx.Provider {
 
     private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
     private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
@@ -79,7 +78,7 @@ public class JavaFXEditorKit extends LexerEditorKit implements org.openide.util.
     private static Logger log = Logger.getLogger(JavaFXEditorKit.class.getName());
 
     public JavaFXEditorKit() {
-        super(FX_MIME_TYPE);
+        super();
     }
 
     @Override
