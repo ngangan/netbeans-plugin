@@ -325,7 +325,9 @@ public class Bridge extends ModuleInstall {
                     previewDispatcher.terminate();
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    if (process != null) process.destroy();
                 }
+                
                 nbDispatcher.clearStartedStatus();
                 previewDispatcher = null;
 
