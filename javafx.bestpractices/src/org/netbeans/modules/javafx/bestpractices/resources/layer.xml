@@ -280,7 +280,7 @@ made subject to such option by the copyright holder.
         <folder name="Project">
             <folder name="Samples">
                 <folder name="JavaFX">
-                    <folder name="Best Practices">
+                    <folder name="Building Blocks">
                         <folder name="Math">
                             <file name="Arctangent" url="../../../../../../demos/math/Arctangent.fx">
                                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
