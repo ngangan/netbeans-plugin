@@ -75,6 +75,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactor
 import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.nodes.Node.Cookie;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
@@ -84,7 +85,7 @@ import org.openide.windows.TopComponent;
  * @author Marek Fukala
  * @author Pavel Benes
  */
-class FXDNavigatorContent extends JPanel implements SelectActionFactory.SelectionListener {
+public class FXDNavigatorContent extends JPanel implements SelectActionFactory.SelectionListener {
     public static final String ATTRIBUTES_FILTER = "attrs"; //NOI18N
     public static final String ID_FILTER         = "id";    //NOI18N
     
@@ -96,6 +97,16 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
             s_navigatorContentInstance = new FXDNavigatorContent();
         }
         return s_navigatorContentInstance;
+    }
+
+    public static synchronized void reset() {
+        if(s_navigatorContentInstance != null) {
+            try {
+                s_navigatorContentInstance.navigate(null);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
     
     private final JPanel                 emptyPanel;    
@@ -124,7 +135,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
         }
     }
 
-    private final WeakHashMap uiCache = new WeakHashMap();
+    private final WeakHashMap<FXZDataObject, WeakReference<NavigatorContentPanel>> uiCache = new WeakHashMap<FXZDataObject, WeakReference<NavigatorContentPanel>>();
     
     public synchronized void navigate(final FXZDataObject dObj) throws Exception { 
         if (dObj != peerDO) {
@@ -135,9 +146,9 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                         
             //try to find the UI in the UIcache
             final NavigatorContentPanel cachedPanel;
-            WeakReference panelWR = (WeakReference)uiCache.get(dObj);
+            WeakReference<NavigatorContentPanel> panelWR = uiCache.get(dObj);
             if(panelWR != null) {
-                NavigatorContentPanel cp = (NavigatorContentPanel)panelWR.get();
+                NavigatorContentPanel cp = panelWR.get();
                 if(cp != null) {
                     //System.out.println("panel is cached");  //NOI18N
                     //test if the document associated with the panel is the same we got now
@@ -183,7 +194,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
                             try {
                                 //cache the newly created panel
                                 panel = new NavigatorContentPanel(dObj);
-                                uiCache.put(dObj, new WeakReference(panel));
+                                uiCache.put(dObj, new WeakReference<NavigatorContentPanel>(panel));
                             } catch (Exception ex) {
                                 System.err.println(ex.getClass().getName() + " " + ex.getLocalizedMessage());  //NOI18N
                                 ex.printStackTrace();
@@ -296,7 +307,7 @@ class FXDNavigatorContent extends JPanel implements SelectActionFactory.Selectio
             
             m_docModel = FXDFileModel.getDocumentModel(doj);
             //create the JTree pane
-            tree = new FXDNavigatorTree(doj, m_docModel);
+            tree = new FXDNavigatorTree(m_docModel);
             ToolTipManager.sharedInstance().registerComponent(tree);
             
             MouseListener ml = new MouseAdapter() {

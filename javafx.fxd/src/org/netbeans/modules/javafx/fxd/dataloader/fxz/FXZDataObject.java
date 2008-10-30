@@ -40,16 +40,23 @@
 package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
 import java.io.IOException;
+import org.netbeans.core.api.multiview.MultiViewHandler;
+import org.netbeans.core.api.multiview.MultiViewPerspective;
+import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
+import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.nodes.Node;
+import org.openide.nodes.CookieSet;
+import org.openide.nodes.Node.Cookie;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
 
 /**
@@ -66,22 +73,29 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     public static final int    TEXT_VIEW_INDEX    = 1;
     public static final int    ARCHIVE_VIEW_INDEX = 2;
     
-    InstanceContent m_ic;
-    private           AbstractLookup        m_lookup;
-    private           FXZEditorSupport      m_edSup;
-    private transient FXDComposerModel      m_model = null;
-    private transient FXDComposerController m_controller = null;
-    private transient int                   m_defaultViewIndex;
+    InstanceContent                                  m_ic;
+    private transient volatile Lookup                m_lookup;
+    private                    FXZEditorSupport      m_edSup = null;
+    private transient          FXDComposerModel      m_model = null;
+    private transient          FXDComposerController m_controller = null;
+    private transient          int                   m_defaultViewIndex;
             
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
+        getCookieSet().add(FXZEditorSupport.class, new CookieSet.Factory() {
+            public <T extends Cookie> T createCookie(Class<T> klass) {
+                return klass.cast(getEditorSupport());
+            }
+        });
         
-        reset();
+        m_ic = new InstanceContent();
+        m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
+        m_defaultViewIndex = VISUAL_VIEW_INDEX;
 //        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
     }
             
     public void notifyEditorSupportModified () {
-        m_edSup.notifyModified ();
+        getEditorSupport().notifyModified ();
     }    
     
     //TODO better name
@@ -89,11 +103,17 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         getController().init();
     }
     
+    private synchronized FXZEditorSupport getEditorSupport() {
+        if(m_edSup == null) {
+            m_edSup = new FXZEditorSupport(this);
+        }
+        return m_edSup;
+    }
+    
     public synchronized void reset() {
-        m_ic = new InstanceContent();
-        m_lookup = new AbstractLookup(m_ic);
-        m_ic.add( m_edSup = new FXZEditorSupport(this));
-        m_ic.add(this);     
+        m_ic     = new InstanceContent();
+        m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
+
         m_defaultViewIndex = VISUAL_VIEW_INDEX;
         m_model = null;
         if ( m_controller != null) {
@@ -108,6 +128,12 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     
     public int getDefaultView() {
         return m_defaultViewIndex;
+    }
+    
+    public void selectView( int index) {
+        MultiViewHandler handler = MultiViews.findMultiViewHandler( getEditorSupport().getMVTC());
+        MultiViewPerspective perspective =  handler.getPerspectives()[index];        
+        handler.requestActive(perspective);
     }
     
     public synchronized FXDComposerModel getDataModel() {
@@ -151,9 +177,12 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         return m_lookup;
     }
     
-    @Override
-    public Node.Cookie getCookie(Class type) {
-        Object o = m_lookup.lookup(type);
-        return o instanceof Node.Cookie ? (Node.Cookie) o : null;
-    }
+   public void addSaveCookie(SaveCookie cookie){
+        getCookieSet().add(cookie);
+     }
+
+    public void removeSaveCookie(){
+        Node.Cookie cookie = getCookie(SaveCookie.class);
+        if (cookie!=null) getCookieSet().remove(cookie);
+    }    
 }

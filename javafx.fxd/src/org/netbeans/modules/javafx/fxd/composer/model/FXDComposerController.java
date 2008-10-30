@@ -21,6 +21,7 @@ import org.openide.util.Utilities;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ComposerAction;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
+import org.netbeans.modules.javafx.fxd.composer.navigator.FXDNavigatorContent;
 import org.netbeans.modules.javafx.fxd.composer.preview.PreviewElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
@@ -49,7 +50,7 @@ public final class FXDComposerController {
     }
     
     public synchronized void close() {
-        //System.err.println("Controller closed.");
+        FXDNavigatorContent.reset();
     }
     
     public void reload() {

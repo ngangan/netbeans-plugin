@@ -12,6 +12,7 @@ import javax.swing.text.Document;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
@@ -137,7 +138,10 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
     }
 
     public CloseOperationState canCloseElement() {
-        return CloseOperationState.STATE_OK;
+        return MultiViewFactory.createUnsafeCloseState(
+            "ID_FXZ_CLOSING", // NOI18N
+            MultiViewFactory.NOOP_CLOSE_ACTION,
+            MultiViewFactory.NOOP_CLOSE_ACTION);
     }
     
     public static void selectElement( final FXZDataObject dDoj, int startOffset, final boolean requestFocus) {
@@ -168,7 +172,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
                             }
                             
                             if ( requestFocus) {
-                                System.err.println("Requesting focus ...");
+                                //System.err.println("Requesting focus ...");
                                 m_callback.requestActive();
                                 TopComponent tc = (TopComponent) SwingUtilities.getAncestorOfClass( TopComponent.class, pane);
                                 if (tc != null) {
@@ -190,17 +194,19 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
         });        
     }    
         
-    private static boolean openFileInEditor(FXZDataObject dObj) {
+    private static boolean openFileInEditor(FXZDataObject dObj) {  
+        dObj.selectView( FXZDataObject.TEXT_VIEW_INDEX);
+        
         EditCookie ck = dObj.getCookie(EditCookie.class);
         if (ck != null) {
-            System.err.println("Edit cookie found, editing ...");
+            //System.err.println("Edit cookie found, editing ...");
             ck.edit();
             return true;
         }
 
         OpenCookie oc = dObj.getCookie(OpenCookie.class);
         if (oc != null) {
-            System.err.println("Open cookie found, opening ...");
+            //System.err.println("Open cookie found, opening ...");
             oc.open();
             return true;
         }

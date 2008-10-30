@@ -19,7 +19,7 @@ public class FXDKit extends NbEditorKit implements org.openide.util.HelpCtx.Prov
     /** Serial Version UID */
     private static final long serialVersionUID =1L;
     
-    /** Default XML Mime Type. */
+    /** Default FXD Mime Type. */
     public static final String MIME_TYPE = "text/x-fxd"; // NOI18N
 
     

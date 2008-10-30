@@ -360,7 +360,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             m_dObj.notifyEditorSupportModified();
         }
     }
-        
+   
     public synchronized void save(BaseDocument doc, EditorKit kit, OutputStream fout) throws FileNotFoundException, IOException, BadLocationException  {        
         FXZContainerBuilder builder = new FXZContainerBuilder( fout);
 
@@ -380,7 +380,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         builder.close();
         load();
     }    
-            
+                
     protected int getEntryIndex( String name) {
         assert name != null;
         for ( int i = m_entries.size() - 1; i >= 0; i--) {

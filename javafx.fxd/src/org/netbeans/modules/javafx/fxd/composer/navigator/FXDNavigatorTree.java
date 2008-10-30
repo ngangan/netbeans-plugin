@@ -52,7 +52,6 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *
@@ -68,9 +67,9 @@ final class FXDNavigatorTree extends JTree {
     
     private final DefaultTreeModel  m_treeModel;    
     private       boolean           m_firstPaint;
-    private       FXDElement        m_selected = null;
+    //private       FXDElement        m_selected = null;
 
-    public FXDNavigatorTree(FXZDataObject dObj, final DocumentModel docModel) throws Exception {
+    public FXDNavigatorTree(final DocumentModel docModel) throws Exception {
         super();
         
         m_firstPaint = true;
@@ -127,7 +126,7 @@ final class FXDNavigatorTree extends JTree {
     }
         
     public void selectNode( FXDElement elem) {
-        m_selected = elem;
+        //m_selected = elem;
         
         if ( elem == null) {
             getSelectionModel().clearSelection();
