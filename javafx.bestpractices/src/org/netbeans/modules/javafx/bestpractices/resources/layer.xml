@@ -123,8 +123,6 @@ made subject to such option by the copyright holder.
                     <file name="BackgroundImage.fx" url="/demos/image/BackgroundImage.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>    
-                </folder>
-                <folder name="resources">
                     <file name="background.png" url="/resources/background.png"/>
                 </folder>
             </folder>    
@@ -133,8 +131,6 @@ made subject to such option by the copyright holder.
                     <file name="Displaying.fx" url="/demos/image/Displaying.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>    
-                </folder>
-                <folder name="resources">
                     <file name="background.png" url="/resources/background.png"/>
                 </folder>
             </folder>    
@@ -143,8 +139,6 @@ made subject to such option by the copyright holder.
                     <file name="Transparency.fx" url="/demos/image/Transparency.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>    
-                </folder>
-                <folder name="resources">
                     <file name="background.png" url="/resources/background.png"/>
                     <file name="overlay.png" url="/resources/overlay.png"/>
                 </folder>
@@ -267,8 +261,6 @@ made subject to such option by the copyright holder.
                     <file name="SmokeParticleSystem.fx" url="/demos/particles/SmokeParticleSystem.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>
-                </folder>
-                <folder name="resources">
                     <file name="texture.png" url="/resources/texture.png"/>
                 </folder>
             </folder>

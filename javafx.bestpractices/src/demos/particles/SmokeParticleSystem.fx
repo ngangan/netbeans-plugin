@@ -154,7 +154,7 @@ class Particle extends CustomNode {
     override function create(): Node {
         return ImageView {
             transforms: [ Translate{ x : bind x, y : bind y } ]
-            image : Image { url: "{__DIR__}../resources/texture.png" }
+            image : Image { url: "{__DIR__}texture.png" }
             opacity: bind timer / 100
         };
     }
