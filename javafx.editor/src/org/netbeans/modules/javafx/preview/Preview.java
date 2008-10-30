@@ -397,7 +397,10 @@ public class Preview {
                 height = d.height + 2;
                 set = true;
             }
-            if (set) previewFrame.setSize(width + borderWidth, height + borderHeight);
+            if (set) {
+                previewFrame.setSize(width + borderWidth, height + borderHeight);
+                previewFrame.validate();
+            }
         }
 
         private class ExceptionAwareThreadGroup extends ThreadGroup {

@@ -43,6 +43,10 @@ package org.netbeans.modules.javafx.navigation;
 
 import java.awt.event.*;
 import java.awt.*;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
@@ -56,9 +60,9 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.netbeans.editor.Settings;
-import org.netbeans.editor.ext.ExtSettingsDefaults;
-import org.netbeans.editor.ext.ExtSettingsNames;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
+import org.netbeans.api.editor.mimelookup.MimePath;
+import org.netbeans.api.editor.settings.SimpleValueNames;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
@@ -69,6 +73,9 @@ import org.openide.util.Utilities;
  * @author S. Aubrecht
  */
 final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener  {
+
+    private static final Logger LOG = Logger.getLogger(ToolTipManagerEx.class.getName());
+
     private Timer enterTimer;
     private Timer  exitTimer;
     private String toolTipText;
@@ -700,16 +707,33 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
             });
         }
     }
-    
     private Dimension getDefaultToolTipSize() {
-        Object val = Settings.getValue(null, ExtSettingsNames.JAVADOC_PREFERRED_SIZE);
-        if( !(val instanceof Dimension) ) {
-            val = ExtSettingsDefaults.defaultJavaDocPreferredSize;
+        Preferences prefs = MimeLookup.getLookup(MimePath.EMPTY).lookup(Preferences.class);
+        String size = prefs.get(SimpleValueNames.JAVADOC_PREFERRED_SIZE, null);
+        Dimension dim = size == null ? null : parseDimension(size);
+        return dim != null ? dim : new Dimension(500,300);
+    }
+    private static Dimension parseDimension(String s) {
+        StringTokenizer st = new StringTokenizer(s, ","); // NOI18N
+
+        int arr[] = new int[2];
+        int i = 0;
+        while (st.hasMoreElements()) {
+            if (i > 1) {
+                return null;
+            }
+            try {
+                arr[i] = Integer.parseInt(st.nextToken());
+            } catch (NumberFormatException nfe) {
+                LOG.log(Level.WARNING, null, nfe);
+                return null;
+            }
+            i++;
         }
-        if( val instanceof Dimension ) {
-            return (Dimension)val;
+        if (i != 2) {
+            return null;
         } else {
-            return new Dimension(500,300);
+            return new Dimension(arr[0], arr[1]);
         }
     }
     

@@ -104,8 +104,11 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
 
     @Override    
     public void componentOpened() { 
-        getDataObject().init();        
+        getDataObject().init();            
         super.componentOpened();
+        if ( getDataObject().getDataModel().getFXDContainer() == null) {
+            getEditorPane().setEnabled(false);
+        }
     }
 
     @Override

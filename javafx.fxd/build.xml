@@ -10,12 +10,14 @@
         <move todir="external/javafx-fxd-netbeans-support" flatten="true">
             <fileset dir="external">
               <include name="**/*.jar"/>
+              <include name="**/javafx-fxd-1.0-javadoc.zip"/>
             </fileset>
         </move>   
         
         <delete includeemptydirs="true">
             <fileset dir="external">
                 <exclude name="javafx-fxd-netbeans-support/*.jar"/>
+                <exclude name="javafx-fxd-netbeans-support/*.zip"/>
                 <exclude name="javafx-fxd-netbeans-support.zip"/>
             </fileset>
         </delete>

@@ -64,6 +64,7 @@ import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
@@ -71,6 +72,8 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import org.netbeans.api.editor.fold.Fold;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
+import org.netbeans.api.editor.settings.SimpleValueNames;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -78,10 +81,8 @@ import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.editor.SettingsChangeEvent;
-import org.netbeans.editor.SettingsUtil;
 import org.netbeans.editor.ext.java.JavaFoldManager;
-import org.netbeans.editor.ext.java.JavaSettingsNames;
+import org.netbeans.modules.javafx.editor.JavaFXEditorKit;
 import org.netbeans.modules.javafx.editor.semantic.ScanningCancellableTask;
 import org.netbeans.spi.editor.fold.FoldHierarchyTransaction;
 import org.netbeans.spi.editor.fold.FoldOperation;
@@ -116,8 +117,12 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
 
     public void init(FoldOperation operation) {
         this.operation = operation;
-        
-        settingsChange(null);
+        Preferences prefs = MimeLookup.getLookup(JavaFXEditorKit.FX_MIME_TYPE).lookup(Preferences.class);
+        foldInitialCommentsPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_INITIAL_COMMENT, foldInitialCommentsPreset);
+        foldImportsPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_IMPORT, foldImportsPreset);
+        foldCodeBlocksPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_METHOD, foldCodeBlocksPreset);
+        foldInnerClassesPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_INNERCLASS, foldInnerClassesPreset);
+        foldJavadocsPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_JAVADOC, foldJavadocsPreset);
     }
 
     public synchronized void initFolds(FoldHierarchyTransaction transaction) {
@@ -166,20 +171,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         currentFolds = null;
         importsFold  = null;
         initialCommentFold = null;
-    }
-    
-    public void settingsChange(SettingsChangeEvent evt) {
-        // Get folding presets
-        foldInitialCommentsPreset = getSetting(JavaSettingsNames.CODE_FOLDING_COLLAPSE_INITIAL_COMMENT);
-        foldImportsPreset = getSetting(JavaSettingsNames.CODE_FOLDING_COLLAPSE_IMPORT);
-        foldCodeBlocksPreset = getSetting(JavaSettingsNames.CODE_FOLDING_COLLAPSE_METHOD);
-        foldInnerClassesPreset = getSetting(JavaSettingsNames.CODE_FOLDING_COLLAPSE_INNERCLASS);
-        foldJavadocsPreset = getSetting(JavaSettingsNames.CODE_FOLDING_COLLAPSE_JAVADOC);
-    }
-    
-    private boolean getSetting(String settingName){
-        JTextComponent tc = operation.getHierarchy().getComponent();
-        return SettingsUtil.getBoolean(org.netbeans.editor.Utilities.getKitClass(tc), settingName, false);
     }
     
     private static void dumpPositions(Tree tree, int start, int end) {
