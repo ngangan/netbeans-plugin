@@ -61,6 +61,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(28, 2, 2, 2);
         add(noteLabel, gridBagConstraints);
 
+        widthLabel.setLabelFor(widthSpinner);
         org.openide.awt.Mnemonics.setLocalizedText(widthLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.widthLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -78,6 +79,7 @@ public class CustomizerApplet extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 60, 0, 10);
         add(widthSpinner, gridBagConstraints);
 
+        heightLabel.setLabelFor(heightSpinner);
         org.openide.awt.Mnemonics.setLocalizedText(heightLabel, org.openide.util.NbBundle.getMessage(CustomizerApplet.class, "CustomizerApplet.heightLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
