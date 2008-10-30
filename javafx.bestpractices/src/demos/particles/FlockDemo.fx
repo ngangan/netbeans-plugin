@@ -81,6 +81,7 @@ class Flock extends CustomNode {
         keyFrames :
             KeyFrame {
                 time : 20ms
+                canSkip : true
                 action : function() {
                     update();
                 }

@@ -96,6 +96,7 @@ class CustomCanvas extends CustomNode {
             keyFrames :
                 KeyFrame {
                     time : 16.6ms
+                    canSkip : true
                     action: function() {
                         update();
                     }
