@@ -167,7 +167,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             if (ID_FIELD.equals(result.identifier)) {
                 for (Result id : identifiers) {
                     final String idText = id.token.text() == null ? "" : id.token.text().toString();
-                    final String resText = result.token.text().toString();
+                    final String resText = result.token.text() == null ? "" : result.token.text().toString();
                     if (idText.equals(resText)) {
                         bag.addHighlight((int) id.start, (int) id.end, getAttributeSet(result));
                     }
