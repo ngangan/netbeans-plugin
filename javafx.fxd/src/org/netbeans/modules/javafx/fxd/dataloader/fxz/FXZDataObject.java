@@ -45,10 +45,10 @@ import org.netbeans.core.api.multiview.MultiViewPerspective;
 import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
-import org.openide.loaders.MultiDataObject;
 import org.openide.nodes.Node;
 import org.openide.nodes.CookieSet;
 import org.openide.nodes.Node.Cookie;
@@ -64,7 +64,7 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 
-public final class FXZDataObject extends MultiDataObject implements Lookup.Provider {     
+public final class FXZDataObject extends FXDZDataObject implements Lookup.Provider {     
     private static final long  serialVersionUID = 1L;
     
     public static final String FXZ_EXT = "fxz";  //NOI18N
@@ -75,7 +75,7 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     
     InstanceContent                                  m_ic;
     private transient volatile Lookup                m_lookup;
-    private                    FXZEditorSupport      m_edSup = null;
+    private transient          FXZEditorSupport      m_edSup = null;
     private transient          FXDComposerModel      m_model = null;
     private transient          FXDComposerController m_controller = null;
     private transient          int                   m_defaultViewIndex;
@@ -115,6 +115,9 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
 
         m_defaultViewIndex = VISUAL_VIEW_INDEX;
+        if ( m_edSup != null) {
+            m_edSup.resetMVTC();
+        }
         m_model = null;
         if ( m_controller != null) {
             m_controller.close();
@@ -131,9 +134,13 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
     }
     
     public void selectView( int index) {
-        MultiViewHandler handler = MultiViews.findMultiViewHandler( getEditorSupport().getMVTC());
-        MultiViewPerspective perspective =  handler.getPerspectives()[index];        
-        handler.requestActive(perspective);
+        MultiViewHandler handler = MultiViews.findMultiViewHandler( getMVTC());
+        if (handler != null) {
+            MultiViewPerspective perspective =  handler.getPerspectives()[index];        
+            handler.requestActive(perspective);
+        } else {
+            setDefaultView(index);
+        }
     }
     
     public synchronized FXDComposerModel getDataModel() {
@@ -162,7 +169,7 @@ public final class FXZDataObject extends MultiDataObject implements Lookup.Provi
         return m_ic;
     }
     
-    public TopComponent getMTVC() {
+    public TopComponent getMVTC() {
         //TODO Check if the view callback is not a better option
         return m_edSup.getMVTC();
     }

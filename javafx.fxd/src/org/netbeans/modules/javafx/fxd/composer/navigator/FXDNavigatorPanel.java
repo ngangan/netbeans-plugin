@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.fxd.composer.navigator;
 
 import java.util.Collection;
 import javax.swing.JComponent;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.util.Lookup;
@@ -89,7 +90,7 @@ public class FXDNavigatorPanel implements NavigatorPanel {
     }    
     
     public void panelActivated(Lookup context) {
-        m_dataObjectSelection = context.lookup(new Lookup.Template<FXZDataObject>(FXZDataObject.class));
+        m_dataObjectSelection = context.lookup(new Lookup.Template<FXDZDataObject>(FXDZDataObject.class));
         m_dataObjectSelection.addLookupListener(dataObjectListener);
         m_dataObjectSelection.allItems();
         dataObjectListener.resultChanged(null);
@@ -107,8 +108,8 @@ public class FXDNavigatorPanel implements NavigatorPanel {
             default:
                 System.err.println("Multiple selection not allowed; using first node ..."); //NOI18N
             case 1:
-                final FXZDataObject d = (FXZDataObject) selectedFiles.iterator().next();
-                m_navigator.navigate(d);        
+                final FXDZDataObject dObj = (FXDZDataObject) selectedFiles.iterator().next();
+                m_navigator.navigate(dObj);        
                 break;
             case 0:
                 m_navigator.navigate(null);

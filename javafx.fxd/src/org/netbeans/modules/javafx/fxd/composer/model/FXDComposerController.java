@@ -50,7 +50,6 @@ public final class FXDComposerController {
     }
     
     public synchronized void close() {
-        FXDNavigatorContent.reset();
     }
     
     public void reload() {

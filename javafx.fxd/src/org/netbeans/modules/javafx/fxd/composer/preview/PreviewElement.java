@@ -17,12 +17,15 @@ import org.openide.awt.UndoRedo;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
+import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.util.Lookup;
 
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.filesystems.FileObject;
@@ -184,9 +187,15 @@ public final class PreviewElement extends TopComponent implements MultiViewEleme
     }
         
     private final class FXDPreviewCookie implements SelectionCookie {
-        public void updateSelection(final FXZDataObject doj, FXDElement elem, boolean doubleClick) {
-            if ( elem.isVisible()) {
-                doj.getController().getSelectionModel().setSelection(elem, true);
+        public void updateSelection(final FXDZDataObject doj, DocumentElement de, boolean doubleClick) {
+            if ( doj instanceof FXZDataObject) {
+                FXZDataObject fxzDO = (FXZDataObject) doj;
+                FXDElement elem = new FXDElement( fxzDO, FXDFileModel.getElementId(de));
+                if ( elem.isVisible()) {
+                    fxzDO.getController().getSelectionModel().setSelection(elem, true);
+                }
+            } else {
+                System.err.println("Invalid data object: " + doj);
             }
         }
     }    

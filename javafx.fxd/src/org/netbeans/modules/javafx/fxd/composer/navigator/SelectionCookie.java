@@ -5,8 +5,8 @@
 
 package org.netbeans.modules.javafx.fxd.composer.navigator;
 
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.openide.nodes.Node;
 
 /**
@@ -14,5 +14,5 @@ import org.openide.nodes.Node;
  * @author Pavel Benes
  */
 public interface SelectionCookie extends Node.Cookie {
-    public void updateSelection(FXZDataObject doj, FXDElement elem, boolean doubleClick);
+    public void updateSelection(FXDZDataObject doj, DocumentElement de, boolean doubleClick);
 }    

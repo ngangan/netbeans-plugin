@@ -22,7 +22,7 @@ import org.openide.windows.TopComponent;
 public final class SourceViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
         
-    private transient final FXZEditorSupport m_support;
+    private final FXZEditorSupport m_support;
 
     public SourceViewDescription(FXZEditorSupport ed) {
         m_support = ed;

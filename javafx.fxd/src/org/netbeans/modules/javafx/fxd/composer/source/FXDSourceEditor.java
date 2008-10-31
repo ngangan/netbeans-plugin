@@ -13,8 +13,9 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
+import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.cookies.EditCookie;
@@ -96,8 +97,8 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
         return new ProxyLookup(new org.openide.util.Lookup[] {                
             getDataObject().getNodeDelegate().getLookup(),
             Lookups.singleton( new SelectionCookie() {
-                public void updateSelection(FXZDataObject doj, FXDElement elem, boolean doubleClick) {
-                    selectElement(doj, elem.getStartOffset(), doubleClick);
+                public void updateSelection(FXDZDataObject doj, DocumentElement de, boolean doubleClick) {
+                    selectElement(doj, de.getStartOffset(), doubleClick);
                 }
             })
         });
@@ -144,13 +145,13 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
             MultiViewFactory.NOOP_CLOSE_ACTION);
     }
     
-    public static void selectElement( final FXZDataObject dDoj, int startOffset, final boolean requestFocus) {
+    public static void selectElement( final FXDZDataObject dDoj, int startOffset, final boolean requestFocus) {
         if ( startOffset != -1) {
             selectPosition(dDoj, startOffset, requestFocus);
         }
     }
     
-    public static void selectPosition( final FXZDataObject dObj, final int position, final boolean requestFocus) {
+    public static void selectPosition( final FXDZDataObject dObj, final int position, final boolean requestFocus) {
         if ( requestFocus) {
             openFileInEditor(dObj);
         }
@@ -165,7 +166,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
                         JEditorPane [] opened = ed.getOpenedPanes();
                         if ( opened != null && opened.length > 0) {
                             final JEditorPane  pane = opened[0];
-                            m_callback.requestVisible();
+                            //m_callback.requestVisible();
                             if (position >= 0) {
                                 pane.setSelectionStart(position);
                                 pane.setSelectionEnd(position);
@@ -173,7 +174,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
                             
                             if ( requestFocus) {
                                 //System.err.println("Requesting focus ...");
-                                m_callback.requestActive();
+                                //m_callback.requestActive();
                                 TopComponent tc = (TopComponent) SwingUtilities.getAncestorOfClass( TopComponent.class, pane);
                                 if (tc != null) {
                                     tc.requestActive();
@@ -194,8 +195,10 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
         });        
     }    
         
-    private static boolean openFileInEditor(FXZDataObject dObj) {  
-        dObj.selectView( FXZDataObject.TEXT_VIEW_INDEX);
+    private static boolean openFileInEditor(FXDZDataObject dObj) {  
+        if ( dObj instanceof FXZDataObject) {
+            ((FXZDataObject)dObj).selectView( FXZDataObject.TEXT_VIEW_INDEX);
+        }
         
         EditCookie ck = dObj.getCookie(EditCookie.class);
         if (ck != null) {

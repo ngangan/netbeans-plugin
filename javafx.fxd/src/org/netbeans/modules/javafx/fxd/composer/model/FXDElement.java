@@ -44,6 +44,7 @@ import com.sun.scenario.scenegraph.SGNode;
 import java.awt.geom.Rectangle2D;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -95,7 +96,13 @@ public final class FXDElement {
     
     //TODO should be private
     public DocumentElement getDocumentElement() {
-        return m_dObj.getDataModel().getFXDContainer().getFileModel(false).getElementById(m_id);
+        try {
+            return m_dObj.getDataModel().getFXDContainer().getFileModel().getElementById(m_id);
+        } catch (Exception ex) {
+            //TODO Do not swallow it
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
     }
     
     public int getStartOffset() {

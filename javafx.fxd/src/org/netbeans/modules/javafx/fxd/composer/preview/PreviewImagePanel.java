@@ -90,7 +90,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                     @Override
                     public void run() {
                         final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
-                        fxz.getFileModel(false).updateModel();
+                        fxz.getFileModel().updateModel();
 
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {

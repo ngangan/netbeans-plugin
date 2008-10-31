@@ -7,7 +7,10 @@ package org.netbeans.modules.javafx.fxd.dataloader.fxd;
 
 import java.io.File;
 import java.io.IOException;
+import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.cookies.CloseCookie;
 import org.openide.cookies.EditCookie;
@@ -24,12 +27,13 @@ import org.openide.loaders.MultiDataObject;
 import org.openide.nodes.CookieSet;
 import org.openide.text.DataEditorSupport;
 import org.openide.windows.CloneableOpenSupport;
+import org.openide.windows.TopComponent;
 
 /**
  *
  * @author Pavel Benes
  */
-public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, EditCookie, EditorCookie.Observable, PrintCookie, CloseCookie {
+public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, EditCookie, EditorCookie.Observable, PrintCookie, CloseCookie, SelectionCookie  {
     /** SaveCookie for this support instance. The cookie is adding/removing 
      * data object's cookie set depending on if modification flag was set/unset. */
     private final SaveCookie saveCookie = new SaveCookie() {
@@ -74,6 +78,11 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
     public void edit() {
         super.edit();
     }
+    
+    TopComponent getTopComponent() {
+        return allEditors.getArbitraryComponent();        
+    }
+    
     /** 
      * Overrides superclass method. Adds adding of save cookie if the document has been marked modified.
      * @return true if the environment accepted being marked as modified
@@ -121,6 +130,11 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
         }
     }
 
+    public void updateSelection(FXDZDataObject doj, DocumentElement de, boolean doubleClick) {
+        if ( de != null) {
+            FXDSourceEditor.selectElement(doj, de.getStartOffset(), doubleClick);
+        }
+    }
     
     /** Nested class. Environment for this support. Extends
      * <code>DataEditorSupport.Env</code> abstract class.
