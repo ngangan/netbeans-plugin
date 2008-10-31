@@ -52,16 +52,24 @@ import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.javafx.preview.PreviewCodeGenerate;
 import org.netbeans.modules.javafx.preview.Bridge;
+import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -81,8 +89,16 @@ public class JavaFXDocument extends NbEditorDocument {
         Bridge.start();
     }
     
-    public JavaFXDocument(String mimeType) {
+    public JavaFXDocument(String mimeType)  {
         super(mimeType);
+    }
+    
+    public static Project getProject(Document doc){
+        return getProject(NbEditorUtilities.getFileObject(doc));
+    }
+
+    public static Project getProject(FileObject fileObject){
+        return FileOwnerQuery.getOwner(fileObject);
     }
     
     public JComponent getEditor() {
@@ -153,8 +169,18 @@ public class JavaFXDocument extends NbEditorDocument {
     public Dimension getPreviewSize() { 
         return previewSize;
     }
-            
+
     public void enableExecution(boolean enabled) {
+        if (enabled) {
+            Project project = getProject(this);
+            org.netbeans.spi.project.support.ant.PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
+            if (evaluator.getProperty("javafx.profile").toString().contentEquals("mobile")) {
+                String message = NbBundle.getMessage(JavaFXDocument.class, "PREVIEW_DISABLED_BY_PROFILE");
+                NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.INFORMATION_MESSAGE);
+                DialogDisplayer.getDefault().notify(d);
+                return;
+            }
+        }
         for (Component component : createToolbar(pane).getComponents()) {
             if (component instanceof JToggleButton) {
                 if (((JToggleButton)component).getClientProperty("enablePreviewMark") == Boolean.TRUE) {    //NOI18N
@@ -193,5 +219,5 @@ public class JavaFXDocument extends NbEditorDocument {
     
     public boolean executionAllowed(){
         return executionEnabled;
-    }    
+    }
 }

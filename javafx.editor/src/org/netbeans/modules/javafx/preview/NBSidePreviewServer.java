@@ -49,10 +49,6 @@ import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import java.beans.PropertyChangeListener;
-import javax.swing.text.Document;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.modules.editor.NbEditorUtilities;
-import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
 class NBSidePreviewServer extends UnicastRemoteObject implements NBSideServerFace, PropertyChangeListener {
@@ -62,7 +58,7 @@ class NBSidePreviewServer extends UnicastRemoteObject implements NBSideServerFac
     NBSidePreviewServer(JavaFXDocument document) throws RemoteException {
         super();
         this.document = document;
-        Project project = getProject(document);
+        Project project = JavaFXDocument.getProject(document);
         PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
         evaluator.addPropertyChangeListener(this);
     }
@@ -89,13 +85,5 @@ class NBSidePreviewServer extends UnicastRemoteObject implements NBSideServerFac
                 }
             }
         }
-    }
-    
-    public static Project getProject(Document doc){
-        return getProject(NbEditorUtilities.getFileObject(doc));
-    }
-
-    public static Project getProject(FileObject fileObject){
-        return FileOwnerQuery.getOwner(fileObject);
     }
 }
