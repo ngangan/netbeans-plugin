@@ -28,6 +28,8 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
+import org.netbeans.core.spi.multiview.CloseOperationHandler;
+import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.openide.util.Task;
@@ -40,8 +42,7 @@ import org.openide.windows.TopComponent;
 public final class FXZEditorSupport extends DataEditorSupport implements Serializable, OpenCookie, EditorCookie, EditCookie {
     private static final long  serialVersionUID = 1L;
         
-    protected CloneableTopComponent    m_mvtc  = null;
-    protected  MultiViewDescription [] m_views = null;
+    protected CloneableTopComponent m_mvtc  = null;
     
     public FXZEditorSupport( FXZDataObject dObj) {
         super(dObj, new FXDEnv(dObj));
@@ -102,37 +103,53 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
     
     @Override
     protected boolean notifyModified() {
-        boolean retValue = super.notifyModified();
-        if ( retValue) {
-            FXZDataObject dObj = (FXZDataObject) getDataObject();
-            dObj.m_ic.add(env);
+        if ( super.notifyModified()) {
+            addSaveCookie();
+            updateDisplayName();
+            return true;
+        } else {
+            return false; //still unmodified
         }
-        updateDisplayName();
-        return retValue;
+    }
+    
+    private void addSaveCookie() {
+        FXZDataObject dObj = (FXZDataObject) getDataObject();
+        dObj.addSaveCookie(new SaveCookie() {
+            public void save() throws IOException {
+                saveDocument();
+                ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().setIsSaved();
+            }
+        });
+    }
+
+    private void removeSaveCookie() {
+        FXZDataObject dObj = (FXZDataObject) getDataObject();
+        dObj.removeSaveCookie();
     }
     
     @Override
     protected void notifyUnmodified() {
-        FXZDataObject dObj = (FXZDataObject) getDataObject();
         super.notifyUnmodified();
-        dObj.m_ic.remove(env);
-        FXZArchive fxz = dObj.getDataModel().getFXDContainer();
-        if ( fxz != null && fxz.areEntriesChanged()) {
-            SwingUtilities.invokeLater( new Runnable() {
-                public void run() {
-                    notifyModified();
-                }
-            });
-        } else {
-            updateDisplayName();
-        }
+        removeSaveCookie();
+
+        //disabled since the hack seems to cause some problems with state un/modified handling
+//        FXZDataObject dObj = (FXZDataObject) getDataObject();
+//        if(dObj.getDataModel().getFXDContainer().areEntriesChanged()) {
+//            SwingUtilities.invokeLater(new Runnable() {
+//                public void run() {
+//                    notifyModified();
+//                }
+//            });
+//        }
+        updateDisplayName();
     }
         
     @Override
     protected CloneableEditorSupport.Pane createPane() {
-        MultiViewDescription [] views = getViewDescriptions();
+        MultiViewDescription [] views   = getViewDescriptions();
         int                     defView = ((FXZDataObject) getDataObject()).getDefaultView();
-        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[ defView]);
+        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[ defView],
+                new CloseHandler(this));
         return (CloneableEditorSupport.Pane)m_mvtc;
     }
     
@@ -150,39 +167,25 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         return super.messageName();        
     }
     
-    FXDEnv getEnv() {
-        return (FXDEnv) env;
-    }
-    
-    protected synchronized MultiViewDescription [] getViewDescriptions() {
-        if ( m_views == null) {
-            m_views = new MultiViewDescription[] {
-                new PreviewViewDescription(this),        
-                new SourceViewDescription(this),
-                new ArchiveViewDescription(this)
-            };
-        }
-        return m_views;
+    protected MultiViewDescription [] getViewDescriptions() {
+        return new MultiViewDescription[] {
+            new PreviewViewDescription(this),        
+            new SourceViewDescription(this),
+            new ArchiveViewDescription(this)
+        };
     }
         
     @Override
     protected void saveFromKitToStream(StyledDocument doc, EditorKit kit, OutputStream stream)
         throws IOException, BadLocationException {
-        ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer().save((BaseDocument)doc, kit, stream);
+        ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer().save( (BaseDocument) doc, kit, stream);
     }
     
-    static final class FXDEnv extends DataEditorSupport.Env implements SaveCookie {
+    static final class FXDEnv extends DataEditorSupport.Env {
         private static final long  serialVersionUID = 1L;
         
         public FXDEnv( FXZDataObject obj) {
             super(obj);
-        }
-
-        public void save() throws IOException {
-            FXZEditorSupport ed = (FXZEditorSupport)this.findCloneableOpenSupport();
-            ed.saveDocument();
-            FXZDataObject dObj = (FXZDataObject) getDataObject();
-            dObj.getDataModel().getFXDContainer().setIsSaved();
         }
         
         @Override
@@ -201,4 +204,21 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
             return ((FXZDataObject)getDataObject()).getPrimaryEntry().takeLock();
         }
     }
+    
+    private static class CloseHandler implements CloseOperationHandler, Serializable {
+        private static final long serialVersionUID =1L;
+
+        private FXZEditorSupport sup;
+
+        private CloseHandler() {
+        }
+
+        public CloseHandler(FXZEditorSupport formDO) {
+            sup = formDO;
+        }
+
+        public boolean resolveCloseOperation(CloseOperationState[] elements) {
+            return sup.canClose();
+        }
+    }   
 }

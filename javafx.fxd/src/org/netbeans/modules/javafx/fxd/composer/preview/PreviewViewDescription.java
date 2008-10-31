@@ -24,8 +24,6 @@ public class PreviewViewDescription implements MultiViewDescription, Serializabl
     private static final long serialVersionUID = 1L;
 
     private transient final FXZEditorSupport m_edSup;
-    //private transient PreviewElement      m_preview = null;
-
 
     public PreviewViewDescription(final FXZEditorSupport edSup) {
         m_edSup = edSup;
@@ -33,9 +31,6 @@ public class PreviewViewDescription implements MultiViewDescription, Serializabl
     
     public synchronized MultiViewElement createElement() {
         assert EventQueue.isDispatchThread();
-        //assert m_preview == null;
-        //m_preview = new PreviewElement(m_edSup);
-        //return m_preview;
         return new PreviewElement(m_edSup);
     }
 

@@ -22,8 +22,7 @@ import org.openide.windows.TopComponent;
 public final class SourceViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
         
-    private FXDSourceEditor        m_editor = null;
-    private final FXZEditorSupport m_support;
+    private transient final FXZEditorSupport m_support;
 
     public SourceViewDescription(FXZEditorSupport ed) {
         m_support = ed;
@@ -31,10 +30,7 @@ public final class SourceViewDescription implements MultiViewDescription, Serial
 
     public MultiViewElement createElement() {
         assert EventQueue.isDispatchThread();
-        if (m_editor == null) {
-            m_editor = new FXDSourceEditor(m_support);
-        }
-        return m_editor;
+        return new FXDSourceEditor(m_support);
     }
 
     public java.awt.Image getIcon() {

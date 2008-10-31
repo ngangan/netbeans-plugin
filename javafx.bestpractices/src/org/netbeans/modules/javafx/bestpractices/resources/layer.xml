@@ -101,17 +101,17 @@ made subject to such option by the copyright holder.
                 </folder>
             </folder>    
         </folder>
-        <folder name="forms">
+        <folder name="shapes">
             <folder name="PointsAndLines">
-                <folder name="forms">
-                    <file name="PointsAndLines.fx" url="/demos/forms/PointsAndLines.fx">
+                <folder name="shapes">
+                    <file name="PointsAndLines.fx" url="/demos/shapes/PointsAndLines.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>
                 </folder>
             </folder>
             <folder name="ShapePrimitives">
-                <folder name="forms">
-                    <file name="ShapePrimitives.fx" url="/demos/forms/ShapePrimitives.fx">
+                <folder name="shapes">
+                    <file name="ShapePrimitives.fx" url="/demos/shapes/ShapePrimitives.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>
                 </folder>
@@ -123,8 +123,6 @@ made subject to such option by the copyright holder.
                     <file name="BackgroundImage.fx" url="/demos/image/BackgroundImage.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>    
-                </folder>
-                <folder name="resources">
                     <file name="background.png" url="/resources/background.png"/>
                 </folder>
             </folder>    
@@ -133,8 +131,6 @@ made subject to such option by the copyright holder.
                     <file name="Displaying.fx" url="/demos/image/Displaying.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>    
-                </folder>
-                <folder name="resources">
                     <file name="background.png" url="/resources/background.png"/>
                 </folder>
             </folder>    
@@ -143,8 +139,6 @@ made subject to such option by the copyright holder.
                     <file name="Transparency.fx" url="/demos/image/Transparency.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>    
-                </folder>
-                <folder name="resources">
                     <file name="background.png" url="/resources/background.png"/>
                     <file name="overlay.png" url="/resources/overlay.png"/>
                 </folder>
@@ -267,8 +261,6 @@ made subject to such option by the copyright holder.
                     <file name="SmokeParticleSystem.fx" url="/demos/particles/SmokeParticleSystem.fx">
                         <attr name="mainclass" boolvalue="true"/>
                     </file>
-                </folder>
-                <folder name="resources">
                     <file name="texture.png" url="/resources/texture.png"/>
                 </folder>
             </folder>
@@ -288,7 +280,7 @@ made subject to such option by the copyright holder.
         <folder name="Project">
             <folder name="Samples">
                 <folder name="JavaFX">
-                    <folder name="Best Practices">
+                    <folder name="Building Blocks">
                         <folder name="Math">
                             <file name="Arctangent" url="../../../../../../demos/math/Arctangent.fx">
                                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
@@ -349,22 +341,22 @@ made subject to such option by the copyright holder.
                                 <attr name="file" stringvalue="demos/color/ColorWheel"/>
                             </file>
                         </folder>
-                        <folder name="Forms">
-                            <file name="Points and Lines" url="../../../../../../demos/forms/PointsAndLines.fx">
+                        <folder name="Shapes">
+                            <file name="Points and Lines" url="../../../../../../demos/shapes/PointsAndLines.fx">
                                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
                                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.bestpractices.resources.Bundle"/>
                                 <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.bestpractices.BestPracticesWizardIterator.createIterator"/>
-                                <attr name="instantiatingWizardURL" urlvalue="nbresloc:/demos/forms/PointsAndLines.html"/>
+                                <attr name="instantiatingWizardURL" urlvalue="nbresloc:/demos/shapes/PointsAndLines.html"/>
                                 <attr name="template" boolvalue="true"/>
-                                <attr name="file" stringvalue="demos/forms/PointsAndLines"/>
+                                <attr name="file" stringvalue="demos/shapes/PointsAndLines"/>
                             </file>
-                            <file name="Shape Primitives" url="../../../../../../demos/forms/ShapePrimitives.fx">
+                            <file name="Shape Primitives" url="../../../../../../demos/shapes/ShapePrimitives.fx">
                                 <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
                                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.bestpractices.resources.Bundle"/>
                                 <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.bestpractices.BestPracticesWizardIterator.createIterator"/>
-                                <attr name="instantiatingWizardURL" urlvalue="nbresloc:/demos/forms/ShapePrimitives.html"/>
+                                <attr name="instantiatingWizardURL" urlvalue="nbresloc:/demos/shapes/ShapePrimitives.html"/>
                                 <attr name="template" boolvalue="true"/>
-                                <attr name="file" stringvalue="demos/forms/ShapePrimitives"/>
+                                <attr name="file" stringvalue="demos/shapes/ShapePrimitives"/>
                             </file>
                         </folder>
                         <folder name="Image">

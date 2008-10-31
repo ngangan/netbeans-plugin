@@ -22,8 +22,7 @@ import org.openide.windows.TopComponent;
 public class ArchiveViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
         
-    private final FXZEditorSupport m_support;
-    private       ArchiveElement   m_elem;
+    private transient final FXZEditorSupport m_support;
 
     public ArchiveViewDescription(FXZEditorSupport ed) {
         m_support = ed;
@@ -31,10 +30,7 @@ public class ArchiveViewDescription implements MultiViewDescription, Serializabl
 
     public synchronized MultiViewElement createElement() {
         assert EventQueue.isDispatchThread();
-        if (m_elem == null) {
-            m_elem = new ArchiveElement(m_support);
-        }
-        return m_elem;
+        return new ArchiveElement(m_support);
     }
 
     public java.awt.Image getIcon() {

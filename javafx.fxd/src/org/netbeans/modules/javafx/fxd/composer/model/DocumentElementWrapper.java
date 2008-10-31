@@ -74,6 +74,7 @@ final class DocumentElementWrapper {
             }
         }
 
+        @SuppressWarnings("unchecked")         
         public Enumeration<String> getAttrNames() {
             return (Enumeration<String>) m_de.getAttributes().getAttributeNames();
         }

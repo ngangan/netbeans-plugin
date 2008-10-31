@@ -154,7 +154,6 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
          */
         @Override
         public CloneableOpenSupport findCloneableOpenSupport() {
-            System.err.println("findCloneableOpenSupport");
             return (FXDEditorSupport)getDataObject().getCookie(FXDEditorSupport.class);
         }
     } // End of nested Environment class.

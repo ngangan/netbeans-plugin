@@ -53,6 +53,7 @@ var timeline : Timeline = Timeline {
     keyFrames :
         KeyFrame {
             time : 16.6ms
+            canSkip : true
             action: function() {
                 update();
             }

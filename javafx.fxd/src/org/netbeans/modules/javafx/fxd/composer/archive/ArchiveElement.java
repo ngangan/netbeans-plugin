@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
+import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
@@ -130,8 +131,10 @@ final class ArchiveElement extends TopComponent implements MultiViewElement, Run
     }
 
     public CloseOperationState canCloseElement() {
-        return CloseOperationState.STATE_OK;
-        //throw new UnsupportedOperationException("Not supported yet.");
+        return MultiViewFactory.createUnsafeCloseState(
+            "ID_FXZ_CLOSING", // NOI18N
+            MultiViewFactory.NOOP_CLOSE_ACTION,
+            MultiViewFactory.NOOP_CLOSE_ACTION);
     }
     
     private final FocusListener m_focusListener = new FocusAdapter() { 

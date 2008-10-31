@@ -27,10 +27,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- package forms;
+package shapes;
 
-import javafx.scene.shape.Line;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
@@ -38,92 +40,39 @@ import javafx.scene.Scene;
  * @author Michal Skvor
  */
 
-var d = 40;
-var p1 = d;
-var p2 = p1 + d;
-var p3 = p2 + d;
-var p4 = p3 + d;
-
 Stage {
     scene : Scene {
         fill : Color.BLACK
         content : [
-        Line {
-            startX : p3
-            startY : p3
-            endX : p2
-            endY : p3
-            stroke : Color.LIGHTGREY
-        },
-        Line {
-            startX : p2
-            startY : p3
-            endX : p2
-            endY : p2
-            stroke : Color.LIGHTGREY
-        },
-        Line {
-            startX : p2
-            startY : p2
-            endX : p3
-            endY : p2
-            stroke : Color.LIGHTGREY
-        },
-        Line {
-            startX : p3
-            startY : p2
-            endX : p3
-            endY : p3
-            stroke : Color.LIGHTGREY
-        },
-        // Points
-        Line {
-            startX : p1
-            startY : p1
-            endX : p1
-            endY : p1
-            stroke : Color.WHITE
-        },
-        Line {
-            startX : p1
-            startY : p3
-            endX : p1
-            endY : p3
-            stroke : Color.WHITE
-        },
-        Line {
-            startX : p2
-            startY : p4
-            endX : p2
-            endY : p4
-            stroke : Color.WHITE
-        },
-        Line {
-            startX : p3
-            startY : p1
-            endX : p3
-            endY : p1
-            stroke : Color.WHITE
-        },
-        Line {
-            startX : p4
-            startY : p2
-            endX : p4
-            endY : p2
-            stroke : Color.WHITE
-        },
-        Line {
-            startX : p4
-            startY : p4
-            endX : p4
-            endY : p4
-            stroke : Color.WHITE
-        }
+            Polygon {
+                points : [ 10, 10, 10, 200, 45, 200 ]
+                fill : Color.LIGHTGREY
+            },
+            Rectangle {
+                x : 45
+                y : 34
+                width : 35
+                height : 35
+                fill : Color.LIGHTGREY
+            },
+            Polygon {
+                points : [ 105, 10, 120, 10, 120, 200, 80, 200 ]
+                fill : Color.LIGHTGREY
+            },
+            Circle {
+                centerX : 140
+                centerY : 80
+                radius : 20
+                fill : Color.LIGHTGREY
+            },
+            Polygon {
+                points : [ 160, 10, 195, 200, 160, 200 ]
+                fill : Color.LIGHTGREY
+            }
         ]
     };
 
-    visible : true
     width : 206
     height : 232
-    title : "Point and Lines"
+    title : "Shape Primitives"
 }
