@@ -58,6 +58,7 @@ import javax.swing.text.html.parser.ParserDelegator;
  *  HTML Parser. It retrieves sections of the javadoc HTML file.
  *
  * @author  Martin Roskanin
+ * @author  Anton Chechel - javafx modifications
  */
 class HTMLJavadocParser {
     
@@ -196,68 +197,24 @@ class HTMLJavadocParser {
     /** Retrieves the position (start offset and end offset) of class javadoc info
       * in the raw html file */
     private static int[] parseClass(Reader reader, final HTMLEditorKit.Parser parser, boolean ignoreCharset) throws IOException {
-        final int INIT = 0;
-        // javadoc HTML comment '======== START OF CLASS DATA ========'
-        final int CLASS_DATA_START = 1;
-        // start of the text we need. Located just after first P.
-        final int TEXT_START = 2;
-
-        final int state[] = new int[1];
-        final int offset[] = new int[2];
-
-        offset[0] = -1; //start offset
-        offset[1] = -1; //end offset
-        state[0] = INIT;
+        final int offset[] = {-1, -1};
 
         HTMLEditorKit.ParserCallback callback = new HTMLEditorKit.ParserCallback() {
-
-            int nextHRPos = -1;
-            int lastHRPos = -1;
-
-            public void handleSimpleTag(HTML.Tag t, MutableAttributeSet a, int pos) {
-                if (t == HTML.Tag.HR){
-                    if (state[0] == TEXT_START){
-                        nextHRPos = pos;
-                    }
-                    lastHRPos = pos;
-                }
-            }
-
             public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
-                if (t == HTML.Tag.P && state[0] == CLASS_DATA_START){
-                    state[0] = TEXT_START;
-                }
-                if (t == HTML.Tag.A && state[0] == TEXT_START) {
-                    String attrName = (String)a.getAttribute(HTML.Attribute.NAME);
-                    if (attrName!=null && attrName.length()>0){
-                        if (nextHRPos!=-1){
-                            offset[1] = nextHRPos;
-                        }else{
-                            offset[1] = pos;
-                        }
-                        state[0] = INIT;
+                if (t == HTML.Tag.DIV && a != null) {
+                    final Object classAttr = a.getAttribute(HTML.Attribute.CLASS);
+                    if ("overview".equals(classAttr)) { // NOI18N
+                        offset[0] = pos;
                     }
                 }
             }
 
-            public void handleComment(char[] data, int pos){
-                String comment = String.valueOf(data);
-                if (comment!=null){
-                    if (comment.indexOf("START OF CLASS DATA")>0){ //NOI18N
-                        state[0] = CLASS_DATA_START;
-                    } else if (comment.indexOf("NESTED CLASS SUMMARY")>0){ //NOI18N
-                        if (lastHRPos!=-1){
-                            offset[1] = lastHRPos;
-                        }else{
-                            offset[1] = pos;
-                        }
+            public void handleEndTag(HTML.Tag t, int pos) {
+                if (t == HTML.Tag.DIV) {
+                    if (offset[1] == -1 && offset[0] != -1 && pos > offset[0]) {
+                        offset[1] = pos;
                     }
                 }
-            }
-            
-            public void handleText(char[] data, int pos) {
-                if (state[0] == TEXT_START && offset[0] < 0)
-                    offset[0] = pos;
             }
         };        
 

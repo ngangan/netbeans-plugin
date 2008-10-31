@@ -214,13 +214,13 @@ public class ElementJavadoc {
         boolean isJavaClass = (doc != null) && doc.isClass() && !compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
         boolean localized = false;
         if (element != null) {
-            docURL = FXSourceUtils.getJavadoc(element, cpInfo);
+            docURL = FXSourceUtils.getJavadoc(element, compilationInfo);
             localized = isLocalized(docURL, element);
             if (!localized) {
                 final ElementHandle[] handle = new ElementHandle[1];
                 try {
                     handle[0]  = ElementHandle.create(element);
-                } catch (IllegalArgumentException iae) {
+                } catch (Exception iae) {
                     // can't convert to element handler (incomplete element)
                 }
                 if (handle[0] != null) {

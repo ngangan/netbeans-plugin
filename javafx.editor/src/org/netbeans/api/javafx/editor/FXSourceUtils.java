@@ -33,7 +33,7 @@ import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
@@ -392,20 +392,22 @@ public final class FXSourceUtils {
         return ret;
     }
 
-    public static URL getJavadoc(final Element element, final ClasspathInfo cpInfo) {
-        if (element == null || cpInfo == null) {
+    public static URL getJavadoc(final Element element, final CompilationInfo compilationInfo) {
+        if (element == null || compilationInfo == null) {
             throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.getJavadoc");  //NOI18N
         }
 
+        final boolean isJavaFXClass = isJavaFXClass(element, compilationInfo);
         ClassSymbol clsSym = null;
         String pkgName;
+        String pkgNameDots = null;
         String pageName;
         boolean buildFragment = false;
+
         if (element.getKind() == ElementKind.PACKAGE) {
             java.util.List<? extends Element> els = element.getEnclosedElements();
             for (Element e : els) {
-//                if (e.getKind().isClass() || e.getKind().isInterface()) {
-                if (e.getKind().isClass()) {
+                if (e.getKind().isClass() || e.getKind().isInterface()) {
                     clsSym = (ClassSymbol) e;
                     break;
                 }
@@ -422,13 +424,21 @@ public final class FXSourceUtils {
                 prev = enclosing;
                 enclosing = enclosing.getEnclosingElement();
             }
-//            if (prev == null || (!prev.getKind().isClass() && !prev.getKind().isInterface())) {
-            if (prev == null || !prev.getKind().isClass()) {
+            if (prev == null || (!prev.getKind().isClass() && !prev.getKind().isInterface())) {
                 return null;
             }
             clsSym = (ClassSymbol) prev;
-            pkgName = FileObjects.convertPackage2Folder(clsSym.getEnclosingElement().getQualifiedName().toString());
-            pageName = clsSym.getSimpleName().toString();
+
+            pkgNameDots = clsSym.getEnclosingElement().getQualifiedName().toString();
+            pkgName = FileObjects.convertPackage2Folder(pkgNameDots);
+
+            // javafxdoc pervertion
+            if (isJavaFXClass) {
+                pageName = pkgNameDots + '.' + clsSym.getSimpleName().toString(); // NOI18N
+            } else {
+                pageName = clsSym.getSimpleName().toString();
+            }
+
             buildFragment = element != prev;
         }
 
@@ -494,7 +504,7 @@ public final class FXSourceUtils {
             for (URL binary : binaries) {
                 URL[] result = JavadocForBinaryQuery.findJavadoc(binary).getRoots();
                 ClassPath cp = ClassPathSupport.createClassPath(result);
-                FileObject fo = cp.findResource(pkgName);
+                FileObject fo = cp.findResource(isJavaFXClass ? pkgNameDots : pkgName);
                 if (fo != null) {
                     for (FileObject child : fo.getChildren()) {
                         if (pageName.equals(child.getName()) && FileObjects.HTML.equalsIgnoreCase(child.getExt())) {
@@ -532,6 +542,13 @@ public final class FXSourceUtils {
             Exceptions.printStackTrace(e);
         }
         return null;
+    }
+
+    public static boolean isJavaFXClass(final Element element, final CompilationInfo compilationInfo) {
+        if (element == null || compilationInfo == null) {
+            throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.isJavaFXClass");
+        }
+        return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
     }
 
     private static CharSequence getFragment(Element e) {

@@ -41,6 +41,7 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -48,13 +49,18 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 
 /**
  * This task is called every time the caret position changes in a Java editor.
@@ -289,34 +295,19 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         if (isCancelled()) {
             return;
         }
-//        if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
-//            JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
-//            FileObject fo = JavaFXSourceUtils.getFile(element, javaFXSource.getCpInfo());
-//            if (fo != null) {
-//                javaFXSource = JavaFXSource.forFileObject(fo);
-//            }
-//            try {
-//                javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
-//                    public void run(CompilationController cc) throws Exception {
-//                        setJavadoc(ElementJavadoc.create(cc, element));
-//                    }
-//                }, true);
-//            } catch (IOException ex) {
-//                Exceptions.printStackTrace(ex);
-//            }
-//        } else {
-
-//        final ClassIndex classIndex = compilationInfo.getJavaFXSource().getCpInfo().getClassIndex();
-//        Set<ElementHandle<TypeElement>> declaredTypes = classIndex.getDeclaredTypes(element.getSimpleName().toString(), NameKind.SIMPLE_NAME, EnumSet.allOf(SearchScope.class));
-//        Iterator<ElementHandle<TypeElement>> it = declaredTypes.iterator();
-//        if (it.hasNext()) {
-//            ElementHandle<TypeElement> eh = it.next();
-//            setJavadoc(ElementJavadoc.create(compilationInfo, eh.resolve(compilationInfo)));
-//        } else {
-            setJavadoc(ElementJavadoc.create(compilationInfo, element));
-//        }
-
-//        }
+        JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
+        try {
+            javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
+                public void run(CompilationController cc) throws Exception {
+                    cc.moveToPhase(Phase.ANALYZED);
+                    ElementHandle eh = ElementHandle.create(element);
+                    Element e2 = eh.resolve(cc);
+                    setJavadoc(ElementJavadoc.create(cc, e2));
+                }
+            }, true);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
 //    private void computeAndSetDeclaration(CompilationInfo compilationInfo, Element element ) {
