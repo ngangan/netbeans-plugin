@@ -276,7 +276,7 @@ is divided into following sections:
                 <os family="mac"/>
             </condition>
             <property name="browser.args" value=""/>
-            <exec executable="${{browser}}" spawn="true" failonerror="true">
+            <exec executable="${{browser}}" spawn="true">
                 <arg value="${{browser.args}}"/>
                 <arg value="${{applet.url}}"/>
             </exec>
