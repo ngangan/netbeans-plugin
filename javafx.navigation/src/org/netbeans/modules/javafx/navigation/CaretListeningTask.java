@@ -41,6 +41,7 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.tools.javac.code.Symbol;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
@@ -54,6 +55,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -295,18 +297,27 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         if (isCancelled()) {
             return;
         }
-        JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
-        try {
-            javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
-                public void run(CompilationController cc) throws Exception {
-                    cc.moveToPhase(Phase.ANALYZED);
-                    ElementHandle eh = ElementHandle.create(element);
-                    Element e2 = eh.resolve(cc);
-                    setJavadoc(ElementJavadoc.create(cc, e2));
-                }
-            }, true);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+        if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
+            JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
+            FileObject fo = JavaFXSourceUtils.getFile(element, javaFXSource.getCpInfo());
+            if (fo != null) {
+                javaFXSource = JavaFXSource.forFileObject(fo);
+            }
+            try {
+                javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
+                    public void run(CompilationController cc) throws Exception {
+                        cc.moveToPhase(Phase.ANALYZED);
+                        ElementHandle eh = ElementHandle.create(element);
+                        Element e2 = eh.resolve(cc);
+                        setJavadoc(ElementJavadoc.create(cc, e2));
+                  }
+                }, true);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        } else {
+            // do nothing, otherwise a bunch of exceptions can happen
+            //setJavadoc(ElementJavadoc.create(compilationInfo, element));
         }
     }
 
