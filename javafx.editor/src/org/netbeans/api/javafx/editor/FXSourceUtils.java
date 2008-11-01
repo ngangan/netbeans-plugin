@@ -48,7 +48,6 @@ import org.openide.util.Exceptions;
 public final class FXSourceUtils {
 
     private static final char[] CODE_COMPL_SUBST_BREAKERS = {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', '(', ')', '{', '}', ' ', '\t', '\n', '\r'}; // NOI18N
-    private static final String PACKAGE_SUMMARY = "package-summary"; // NOI18N
 
     // colors for navigator
     private static final String TYPE_COLOR = "#707070"; // NOI18N
@@ -392,12 +391,22 @@ public final class FXSourceUtils {
         return ret;
     }
 
-    public static URL getJavadoc(final Element element, final CompilationInfo compilationInfo) {
+    public static class URLResult {
+        public URL url;
+        public boolean isJavaFXDoc;
+
+        public URLResult(URL url, boolean isJavaFXDoc) {
+            this.url = url;
+            this.isJavaFXDoc = isJavaFXDoc;
+        }
+    }
+
+    public static URLResult getJavadoc(final Element element, final CompilationInfo compilationInfo) {
         if (element == null || compilationInfo == null) {
             throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.getJavadoc");  //NOI18N
         }
 
-        final boolean isJavaFXClass = isJavaFXClass(element, compilationInfo);
+        boolean isJavaFXClass = isJavaFXClass(element, compilationInfo);
         ClassSymbol clsSym = null;
         String pkgName;
         String pkgNameDots = null;
@@ -409,14 +418,16 @@ public final class FXSourceUtils {
             for (Element e : els) {
                 if (e.getKind().isClass() || e.getKind().isInterface()) {
                     clsSym = (ClassSymbol) e;
+                    isJavaFXClass = isJavaFXClass(e, compilationInfo); // package
                     break;
                 }
             }
             if (clsSym == null) {
                 return null;
             }
-            pkgName = FileObjects.convertPackage2Folder(((PackageElement) element).getQualifiedName().toString());
-            pageName = PACKAGE_SUMMARY;
+            pkgNameDots = ((PackageElement) element).getQualifiedName().toString();
+            pkgName = FileObjects.convertPackage2Folder(pkgNameDots);
+            pageName = HTMLJavadocParser.PACKAGE_SUMMARY;
         } else {
             Element prev = null;
             Element enclosing = element;
@@ -428,11 +439,11 @@ public final class FXSourceUtils {
                 return null;
             }
             clsSym = (ClassSymbol) prev;
+            isJavaFXClass = isJavaFXClass(prev, compilationInfo); // members
 
             pkgNameDots = clsSym.getEnclosingElement().getQualifiedName().toString();
             pkgName = FileObjects.convertPackage2Folder(pkgNameDots);
 
-            // javafxdoc pervertion
             if (isJavaFXClass) {
                 pageName = pkgNameDots + '.' + clsSym.getSimpleName().toString(); // NOI18N
             } else {
@@ -521,7 +532,8 @@ public final class FXSourceUtils {
                                     // replaced with "%20"escape sequence here.
                                     String encodedfragment = URLEncoder.encode(fragment.toString(), "UTF-8"); // NOI18N
                                     encodedfragment = encodedfragment.replace("+", "%20"); // NOI18N
-                                    return new URI(url.toExternalForm() + '#' + encodedfragment).toURL();
+                                    final URL fragmentUrl = new URI(url.toExternalForm() + '#' + encodedfragment).toURL(); // NOI18N
+                                    return new URLResult(fragmentUrl, isJavaFXClass);
                                 } catch (URISyntaxException ex) {
                                     Exceptions.printStackTrace(ex);
                                 } catch (UnsupportedEncodingException ex) {
@@ -530,7 +542,7 @@ public final class FXSourceUtils {
                                     Exceptions.printStackTrace(ex);
                                 }
                             }
-                            return url;
+                            return new URLResult(url, isJavaFXClass);
                         }
                     }
                 }

@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeKind;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -297,27 +298,35 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         if (isCancelled()) {
             return;
         }
-        if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
-            JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
-            FileObject fo = JavaFXSourceUtils.getFile(element, javaFXSource.getCpInfo());
-            if (fo != null) {
-                javaFXSource = JavaFXSource.forFileObject(fo);
-            }
-            try {
-                javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
-                    public void run(CompilationController cc) throws Exception {
-                        cc.moveToPhase(Phase.ANALYZED);
-                        ElementHandle eh = ElementHandle.create(element);
-                        Element e2 = eh.resolve(cc);
-                        setJavadoc(ElementJavadoc.create(cc, e2));
-                  }
-                }, true);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+
+        final boolean hasDeclaredType = element.asType().getKind() == TypeKind.DECLARED;
+        if (hasDeclaredType) {
+            if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
+                JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
+                FileObject fo = JavaFXSourceUtils.getFile(element, javaFXSource.getCpInfo());
+                if (fo != null) {
+                    javaFXSource = JavaFXSource.forFileObject(fo);
+                }
+                try {
+                    javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
+                        public void run(CompilationController cc) throws Exception {
+                            cc.moveToPhase(Phase.ANALYZED);
+                            ElementHandle eh = ElementHandle.create(element);
+                            Element e2 = eh.resolve(cc);
+                            setJavadoc(ElementJavadoc.create(cc, e2));
+                        }
+                    }, true);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            } else {
+                // nenik: do nothing, otherwise a bunch of exceptions can happen
+                // manowar: I have uncommened this since I need javadoc for java (not javafx) classes as well
+                // no exceptions happen so far... but it need to be tested
+                setJavadoc(ElementJavadoc.create(compilationInfo, element));
             }
         } else {
-            // do nothing, otherwise a bunch of exceptions can happen
-            //setJavadoc(ElementJavadoc.create(compilationInfo, element));
+            setJavadoc(ElementJavadoc.create(compilationInfo, element));
         }
     }
 
