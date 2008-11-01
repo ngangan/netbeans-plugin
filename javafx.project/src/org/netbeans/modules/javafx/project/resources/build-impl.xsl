@@ -249,11 +249,11 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
-            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}"/>
+            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true"/>
         </target>
         <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
-            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
+            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}" failonerror="true">
                 <arg value="-Xdescriptor:${{jad.file}}"/>
             </exec>
         </target>
@@ -276,13 +276,13 @@ is divided into following sections:
                 <os family="mac"/>
             </condition>
             <property name="browser.args" value=""/>
-            <exec executable="${{browser}}" spawn="true">
+            <exec executable="${{browser}}" spawn="true" failonerror="true">
                 <arg value="${{browser.args}}"/>
                 <arg value="${{applet.url}}"/>
             </exec>
         </target>
         <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
-            <exec executable="${{java.home}}/bin/javaws">
+            <exec executable="${{java.home}}/bin/javaws" failonerror="true">
                 <env key="JAVAWS_VM_ARGS" value="${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
