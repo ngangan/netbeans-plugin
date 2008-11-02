@@ -31,7 +31,6 @@ import javax.swing.text.EditorKit;
 import org.netbeans.core.spi.multiview.CloseOperationHandler;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.editor.BaseDocument;
-import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.openide.util.Task;
 import org.openide.windows.TopComponent;
 
@@ -39,27 +38,16 @@ import org.openide.windows.TopComponent;
  *
  * @author Pavel Benes
  */
-public final class FXZEditorSupport extends DataEditorSupport implements Serializable, OpenCookie, EditorCookie, EditCookie {
-    private static final long  serialVersionUID = 1L;
+public final class FXZEditorSupport extends DataEditorSupport implements Serializable, OpenCookie, EditorCookie, EditorCookie.Observable, EditCookie {
+    private static final long serialVersionUID = 1L;    
         
+    //TODO Hack - I should not be holding this reference
     protected CloneableTopComponent m_mvtc  = null;
     
     public FXZEditorSupport( FXZDataObject dObj) {
         super(dObj, new FXDEnv(dObj));
     }
-        
-    @Override
-    public StyledDocument openDocument() throws IOException {
-        StyledDocument doc = super.openDocument();
-        synchronized(this) {
-            FXZArchive fxzArchive = ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer();
-            if ( fxzArchive != null) {
-                fxzArchive.documentOpened(doc);
-            }
-        }
-        return doc;
-    }
-    
+            
     public void updateDisplayName() {
         final TopComponent tc = m_mvtc;
         if (tc == null) {
@@ -153,8 +141,12 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         return (CloneableEditorSupport.Pane)m_mvtc;
     }
     
-    public CloneableTopComponent getMVTC() {
+    CloneableTopComponent getMVTC() {
         return m_mvtc;
+    }
+    
+    void resetMVTC() {
+        m_mvtc = null;
     }
         
     @Override
@@ -189,6 +181,11 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         }
         
         @Override
+        public boolean isModified() {
+            return super.isModified();
+        }
+        
+        @Override
         public InputStream inputStream() throws IOException {
             FXDContainer container = ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer();
             return container.open();
@@ -218,7 +215,21 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         }
 
         public boolean resolveCloseOperation(CloseOperationState[] elements) {
-            return sup.canClose();
+            boolean status = sup.canClose();
+            //hack or the only possible fix?
+            //we need to call support.canClose() here to get the status of the
+            //fxd editor. Once user chooses discard option the editor is not saved,
+            //and the whole multiview gets closed. During that FXDSourceEditor.componentClosed()
+            //is called. Then it runs to CloneableEditor.closeLast() which triggers
+            //support.canClose() again and the dialog is here once more.
+            //There doesn't seem to be a clean fix for that so setting the editor
+            //state to unmodified if the canClose() returns true (save or discard)
+            //so the next call to canClose() doesn't do anything (it tests the
+            //editor for modified state first).
+            if(status) {
+                sup.notifyUnmodified();
+            }   
+            return status;        
         }
     }   
 }

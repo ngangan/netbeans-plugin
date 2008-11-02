@@ -46,7 +46,7 @@ made subject to such option by the copyright holder.
     <folder name="Services">
         <folder name="JavaHelp">
             <file name="plugin-helpset.xml" url="plugin-helpset.xml">
-                <attr name="position" stringvalue="3085"/>
+                <attr name="position" intvalue="3085"/>
             </file>
         </folder>
     </folder>

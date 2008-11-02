@@ -33,7 +33,7 @@ import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
@@ -48,7 +48,6 @@ import org.openide.util.Exceptions;
 public final class FXSourceUtils {
 
     private static final char[] CODE_COMPL_SUBST_BREAKERS = {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', '(', ')', '{', '}', ' ', '\t', '\n', '\r'}; // NOI18N
-    private static final String PACKAGE_SUMMARY = "package-summary"; // NOI18N
 
     // colors for navigator
     private static final String TYPE_COLOR = "#707070"; // NOI18N
@@ -392,29 +391,43 @@ public final class FXSourceUtils {
         return ret;
     }
 
-    public static URL getJavadoc(final Element element, final ClasspathInfo cpInfo) {
-        if (element == null || cpInfo == null) {
+    public static class URLResult {
+        public URL url;
+        public boolean isJavaFXDoc;
+
+        public URLResult(URL url, boolean isJavaFXDoc) {
+            this.url = url;
+            this.isJavaFXDoc = isJavaFXDoc;
+        }
+    }
+
+    public static URLResult getJavadoc(final Element element, final CompilationInfo compilationInfo) {
+        if (element == null || compilationInfo == null) {
             throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.getJavadoc");  //NOI18N
         }
 
+        boolean isJavaFXClass = isJavaFXClass(element, compilationInfo);
         ClassSymbol clsSym = null;
         String pkgName;
+        String pkgNameDots = null;
         String pageName;
         boolean buildFragment = false;
+
         if (element.getKind() == ElementKind.PACKAGE) {
             java.util.List<? extends Element> els = element.getEnclosedElements();
             for (Element e : els) {
-//                if (e.getKind().isClass() || e.getKind().isInterface()) {
-                if (e.getKind().isClass()) {
+                if (e.getKind().isClass() || e.getKind().isInterface()) {
                     clsSym = (ClassSymbol) e;
+                    isJavaFXClass = isJavaFXClass(e, compilationInfo); // package
                     break;
                 }
             }
             if (clsSym == null) {
                 return null;
             }
-            pkgName = FileObjects.convertPackage2Folder(((PackageElement) element).getQualifiedName().toString());
-            pageName = PACKAGE_SUMMARY;
+            pkgNameDots = ((PackageElement) element).getQualifiedName().toString();
+            pkgName = FileObjects.convertPackage2Folder(pkgNameDots);
+            pageName = HTMLJavadocParser.PACKAGE_SUMMARY;
         } else {
             Element prev = null;
             Element enclosing = element;
@@ -422,13 +435,21 @@ public final class FXSourceUtils {
                 prev = enclosing;
                 enclosing = enclosing.getEnclosingElement();
             }
-//            if (prev == null || (!prev.getKind().isClass() && !prev.getKind().isInterface())) {
-            if (prev == null || !prev.getKind().isClass()) {
+            if (prev == null || (!prev.getKind().isClass() && !prev.getKind().isInterface())) {
                 return null;
             }
             clsSym = (ClassSymbol) prev;
-            pkgName = FileObjects.convertPackage2Folder(clsSym.getEnclosingElement().getQualifiedName().toString());
-            pageName = clsSym.getSimpleName().toString();
+            isJavaFXClass = isJavaFXClass(prev, compilationInfo); // members
+
+            pkgNameDots = clsSym.getEnclosingElement().getQualifiedName().toString();
+            pkgName = FileObjects.convertPackage2Folder(pkgNameDots);
+
+            if (isJavaFXClass) {
+                pageName = pkgNameDots + '.' + clsSym.getSimpleName().toString(); // NOI18N
+            } else {
+                pageName = clsSym.getSimpleName().toString();
+            }
+
             buildFragment = element != prev;
         }
 
@@ -494,7 +515,7 @@ public final class FXSourceUtils {
             for (URL binary : binaries) {
                 URL[] result = JavadocForBinaryQuery.findJavadoc(binary).getRoots();
                 ClassPath cp = ClassPathSupport.createClassPath(result);
-                FileObject fo = cp.findResource(pkgName);
+                FileObject fo = cp.findResource(isJavaFXClass ? pkgNameDots : pkgName);
                 if (fo != null) {
                     for (FileObject child : fo.getChildren()) {
                         if (pageName.equals(child.getName()) && FileObjects.HTML.equalsIgnoreCase(child.getExt())) {
@@ -511,7 +532,8 @@ public final class FXSourceUtils {
                                     // replaced with "%20"escape sequence here.
                                     String encodedfragment = URLEncoder.encode(fragment.toString(), "UTF-8"); // NOI18N
                                     encodedfragment = encodedfragment.replace("+", "%20"); // NOI18N
-                                    return new URI(url.toExternalForm() + '#' + encodedfragment).toURL();
+                                    final URL fragmentUrl = new URI(url.toExternalForm() + '#' + encodedfragment).toURL(); // NOI18N
+                                    return new URLResult(fragmentUrl, isJavaFXClass);
                                 } catch (URISyntaxException ex) {
                                     Exceptions.printStackTrace(ex);
                                 } catch (UnsupportedEncodingException ex) {
@@ -520,7 +542,7 @@ public final class FXSourceUtils {
                                     Exceptions.printStackTrace(ex);
                                 }
                             }
-                            return url;
+                            return new URLResult(url, isJavaFXClass);
                         }
                     }
                 }
@@ -532,6 +554,13 @@ public final class FXSourceUtils {
             Exceptions.printStackTrace(e);
         }
         return null;
+    }
+
+    public static boolean isJavaFXClass(final Element element, final CompilationInfo compilationInfo) {
+        if (element == null || compilationInfo == null) {
+            throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.isJavaFXClass");
+        }
+        return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
     }
 
     private static CharSequence getFragment(Element e) {

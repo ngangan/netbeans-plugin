@@ -56,7 +56,6 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.platform.Specification;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.spi.java.classpath.ClassPathImplementation;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -459,8 +458,9 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
 
         for (File root : folders) if (root != null ) try {
             File docs = new File (root,"docs"); //NOI18N
-            if (javadoc != null && docs.isDirectory() && docs.canRead()) 
-                javadoc.add(docs.toURI().toURL());
+            File docsApi = new File (docs, "api"); //NOI18N
+            if (javadoc != null && docsApi.isDirectory() && docsApi.canRead())
+                javadoc.add(docsApi.toURI().toURL());
             if (sources != null) 
                 for (File f : root.listFiles()) 
                     if ((f.getName().endsWith("src.zip") || f.getName().endsWith("src.jar")) && f.isFile() && f.canRead()) {

@@ -23,7 +23,7 @@ import org.openide.windows.TopComponent;
 public class PreviewViewDescription implements MultiViewDescription, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private transient final FXZEditorSupport m_edSup;
+    private final FXZEditorSupport m_edSup;
 
     public PreviewViewDescription(final FXZEditorSupport edSup) {
         m_edSup = edSup;

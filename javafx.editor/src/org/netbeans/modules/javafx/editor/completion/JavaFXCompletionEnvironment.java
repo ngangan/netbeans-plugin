@@ -296,7 +296,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(member.asType(), s, query.anchorOffset, tta, true));
+                    addResult(JavaFXCompletionItem.createVariableItem(ElementHandle.create(member), member.asType(), s, query.anchorOffset, tta, true));
                 }
             }
         }
@@ -342,7 +342,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(member.asType(), s, query.anchorOffset, tta, false));
+                    addResult(JavaFXCompletionItem.createVariableItem(ElementHandle.create(member), member.asType(), s, query.anchorOffset, tta, false));
                 }
             }
         }

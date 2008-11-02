@@ -69,7 +69,7 @@ final class FXDNavigatorTree extends JTree {
     private       boolean           m_firstPaint;
     //private       FXDElement        m_selected = null;
 
-    public FXDNavigatorTree(final DocumentModel docModel) throws Exception {
+    public FXDNavigatorTree(final DocumentModel docModel) {
         super();
         
         m_firstPaint = true;

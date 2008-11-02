@@ -61,9 +61,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Position;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -288,12 +286,21 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                             log.info("The " + phase + " phase has been reached ... OK!");
                         final int offset = context.startOffset();
                         final TreeUtilities tu = controller.getTreeUtilities();
-                        final JavaFXTreePath path = tu.pathFor(context.startOffset());
+                        JavaFXTreePath path;
+                        if (offset > 0) {
+                            path = tu.pathFor(offset);
+                        } else {
+                            path = tu.pathFor(offset);
+                            while (path.getParentPath() != null) {
+                                path = path.getParentPath();
+                            }
+                        }
                         final int position = (int) controller.getTrees().getSourcePositions()
                                 .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
                         int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
                         Visitor visitor = new Visitor(controller, context, dot);
-                        final LinkedList<Adjustment> adjustments = new LinkedList<Adjustment>();
+                        final Queue<Adjustment> adjustments = new MaskedQueue();
+//                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
                         visitor.scan(path, adjustments);
                         applyAdjustments(adjustments);
                     }
@@ -308,8 +315,105 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 
     }
 
+    private class MaskedQueue implements Queue<Adjustment> {
+        private final Queue<Adjustment> queue = new LinkedList<Adjustment>();
+
+        public int size() {
+            return queue.size();
+        }
+
+        public boolean isEmpty() {
+            return queue.isEmpty();
+        }
+
+        public boolean contains(Object o) {
+            return queue.contains(o);
+        }
+
+        public Iterator<Adjustment> iterator() {
+            return queue.iterator();
+        }
+
+        public Object[] toArray() {
+            return queue.toArray();
+        }
+
+        public <T> T[] toArray(T[] a) {
+            return queue.toArray(a);
+        }
+
+        public boolean remove(Object o) {
+            return queue.remove(o);
+        }
+
+        public boolean containsAll(Collection<?> c) {
+            return queue.containsAll(c);
+        }
+
+        public boolean addAll(Collection<? extends Adjustment> c) {
+            Thread.dumpStack();
+            return queue.addAll(c);
+        }
+
+        public boolean removeAll(Collection<?> c) {
+            return queue.removeAll(c);
+        }
+
+        public boolean retainAll(Collection<?> c) {
+            return queue.retainAll(c);
+        }
+
+        public void clear() {
+            queue.clear();
+        }
+
+        public boolean equals(Object o) {
+            return queue.equals(o);
+        }
+
+        public int hashCode() {
+            return queue.hashCode();
+        }
+
+        public boolean add(Adjustment adjustment) {
+            dumpStack();
+            return queue.add(adjustment);
+        }
+
+        public boolean offer(Adjustment adjustment) {
+            dumpStack();
+            return queue.offer(adjustment);
+        }
+
+        public Adjustment remove() {
+            return queue.remove();
+        }
+
+        public Adjustment poll() {
+            return queue.poll();
+        }
+
+        public Adjustment element() {
+            return queue.element();
+        }
+
+        public Adjustment peek() {
+            return queue.peek();
+        }
+
+        private void dumpStack() {
+            Exception e = new Exception("-------  StackTrace ---------- ");
+            StackTraceElement[] ste = e.getStackTrace();
+            System.err.println(e.getMessage());
+            for (int i = 0; i < Math.min(10, ste.length); i++) {
+                System.err.println("\t" + ste[i]);
+            }
+        }
+    }
+
     private void applyAdjustments(Queue<Adjustment> adjustments) throws BadLocationException {
-        if (adjustments == null) return;
+        if (adjustments == null || adjustments.isEmpty()) return;
+        log.info("Applying " + adjustments.size() + " adjustments into source code.");
         while (!adjustments.isEmpty()) {
             final Adjustment adjustment = adjustments.poll();
             adjustment.apply(context);

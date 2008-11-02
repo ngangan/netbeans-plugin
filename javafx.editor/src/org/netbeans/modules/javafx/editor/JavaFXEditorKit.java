@@ -146,7 +146,6 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             }
         }
 
-
         public java.awt.Component getToolbarPresenter() {
             PreviewButton b = new PreviewButton();
             b.setSelected(false);

@@ -20,9 +20,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
 import org.netbeans.editor.BaseDocument;
-import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.javafx.fxd.composer.misc.ByteArrayBuffer;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
@@ -34,6 +32,7 @@ import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
 import javax.swing.JEditorPane;
 import javax.swing.text.EditorKit;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataLoader;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -258,6 +257,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return m_entryChanged;
     }
     
+    /*
     public synchronized void documentOpened( StyledDocument doc) {
         if ( m_fileModel == null) {
             try {
@@ -271,7 +271,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                 Thread.dumpStack();
             }
         }
-    }
+    }*/
     
     protected static BaseDocument loadDocument(InputStream in) throws IOException, DocumentModelException, BadLocationException {
         EditorKit kit = JEditorPane.createEditorKitForContentType(FXZDataLoader.REQUIRED_MIME);
@@ -284,6 +284,18 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
     
+    public synchronized FXDFileModel getFileModel() {
+        if ( m_fileModel == null) {
+            try {
+                m_fileModel = new FXDFileModel(this);
+            } catch( Exception e) {
+                Exceptions.printStackTrace(e);
+            }
+        }
+        return m_fileModel;
+    }
+    
+    /*
     public synchronized FXDFileModel getFileModel(boolean create) {
         if ( m_fileModel == null) {
             if (create) {
@@ -303,7 +315,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             }
         }
         return m_fileModel;
-    }
+    }*/
 
     public synchronized long getSize() {
         long sum = 0;
@@ -410,9 +422,8 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     }
 
     @Override
-    public FXDNode getRoot( final String entryName) {
-        assert m_fileModel != null;
-        return m_fileModel.getRootNode();
+    public FXDNode getRoot( final String entryName) throws IOException, DocumentModelException {
+        return getFileModel().getRootNode();
     }
     
     public int getRowCount() {

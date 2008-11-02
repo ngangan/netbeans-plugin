@@ -93,6 +93,7 @@ public class ElementJavadoc {
     private Hashtable<String, ElementHandle<? extends Element>> links = new Hashtable<String, ElementHandle<? extends Element>>();
     private int linkCounter = 0;
     private URL docURL = null;
+    private boolean isJavaFXDoc;
     private AbstractAction goToSource = null;
 
     /** Creates an object describing the Javadoc of given element. The object
@@ -214,13 +215,17 @@ public class ElementJavadoc {
         boolean isJavaClass = (doc != null) && doc.isClass() && !compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
         boolean localized = false;
         if (element != null) {
-            docURL = FXSourceUtils.getJavadoc(element, cpInfo);
+            FXSourceUtils.URLResult res = FXSourceUtils.getJavadoc(element, compilationInfo);
+            if (res != null) {
+                docURL = res.url;
+                isJavaFXDoc = res.isJavaFXDoc;
+            }
             localized = isLocalized(docURL, element);
             if (!localized) {
                 final ElementHandle[] handle = new ElementHandle[1];
                 try {
                     handle[0]  = ElementHandle.create(element);
-                } catch (IllegalArgumentException iae) {
+                } catch (Exception iae) {
                     // can't convert to element handler (incomplete element)
                 }
                 if (handle[0] != null) {
@@ -528,7 +533,7 @@ public class ElementJavadoc {
                     }
                 }
             }
-            String jdText = docURL != null ? HTMLJavadocParser.getJavadocText(docURL, false) : null;
+            String jdText = docURL != null ? HTMLJavadocParser.getJavadocText(docURL, isJavaFXDoc) : null;
             if (jdText != null) {
                 sb.append(jdText);
             } else {

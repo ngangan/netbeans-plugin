@@ -148,6 +148,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
                         // default value, do not store as such
                         v = null;
                     }
+                    if (v != null && v.equals(""))
+                        v = " ";
                     configs.get(config).put(prop, v);
                     updateFont();
                 }

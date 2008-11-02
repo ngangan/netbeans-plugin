@@ -350,23 +350,4 @@ public final class FXDElementOutline {
 
         return points;        
     }
-    
-    /*
-    public static float [][] transformRectangle( Rectangle2D rect, Transform txf, float [][] coords) {
-        float x = (float) rect.getX(),
-              y = (float) rect.getY(),
-              w = (float) rect.getWidth(),
-              h = (float) rect.getHeight();
-
-        float [][] points = new float[][] {
-            {x, y}, {x+w, y}, {x+w, y+h}, {x, y+h}
-        };
-        assert coords.length == 4;
-        for (int i = 0; i < 4; i++) {
-            //TODO Fix me
-            //txf.transformPoint(points[i], coords[i]);
-        }
-        return coords;
-    } 
-     */   
-}
+ }

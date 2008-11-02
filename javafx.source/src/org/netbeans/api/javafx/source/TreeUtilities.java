@@ -194,7 +194,7 @@ public final class TreeUtilities {
                     super.scan(tree, p);
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
-                    if (start != -1 && start <= pos && end > pos) {
+                    if (start != -1 && start < pos && end >= pos) {
                         JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
                         boolean isSynteticMainBlock = isSynthetic(tp);
                         // we don't want to return the syntetic main block as the result

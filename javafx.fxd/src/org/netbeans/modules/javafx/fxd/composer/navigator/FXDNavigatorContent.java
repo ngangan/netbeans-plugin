@@ -47,12 +47,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -62,30 +68,35 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.Document;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
+import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelListener;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.openide.cookies.EditorCookie;
+import org.openide.loaders.DataObject;
 import org.openide.nodes.Node.Cookie;
-import org.openide.util.Exceptions;
+import org.openide.text.DataEditorSupport;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.UserQuestionException;
 import org.openide.windows.TopComponent;
 
 /**
  * @author Marek Fukala
  * @author Pavel Benes
  */
-public class FXDNavigatorContent extends JPanel implements SelectActionFactory.SelectionListener {
+public class FXDNavigatorContent extends JPanel implements SelectActionFactory.SelectionListener, PropertyChangeListener {
     public static final String ATTRIBUTES_FILTER = "attrs"; //NOI18N
     public static final String ID_FILTER         = "id";    //NOI18N
     
@@ -98,22 +109,14 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
         }
         return s_navigatorContentInstance;
     }
-
-    public static synchronized void reset() {
-        if(s_navigatorContentInstance != null) {
-            try {
-                s_navigatorContentInstance.navigate(null);
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-    }
     
-    private final JPanel                 emptyPanel;    
-    private final JLabel                 msgLabel;    
-    private       FXZDataObject          peerDO = null;
-    private       NavigatorContentPanel  navigatorPanel = null; 
-    private       boolean                blockNotification = false;
+    private final JPanel                emptyPanel;    
+    private final JLabel                msgLabel;    
+    private final WeakHashMap<FXDZDataObject, WeakReference<NavigatorContentPanel>> uiCache = new WeakHashMap<FXDZDataObject, WeakReference<NavigatorContentPanel>>();    
+    private       FXDZDataObject        peerDO = null;
+    private       NavigatorContentPanel navigatorPanel = null; 
+    private       boolean               blockNotification = false;
+    private       boolean               editorOpened      = false;    
         
     private FXDNavigatorContent() {
         setLayout(new BorderLayout());
@@ -134,91 +137,158 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             blockNotification = false;
         }
     }
-
-    private final WeakHashMap<FXZDataObject, WeakReference<NavigatorContentPanel>> uiCache = new WeakHashMap<FXZDataObject, WeakReference<NavigatorContentPanel>>();
-    
-    public synchronized void navigate(final FXZDataObject dObj) throws Exception { 
-        if (dObj != peerDO) {
-            if (peerDO != null) {
-                //peerDO.getSceneManager().removeSelectionListener(this);
-            }
-            peerDO = dObj;
-                        
-            //try to find the UI in the UIcache
-            final NavigatorContentPanel cachedPanel;
-            WeakReference<NavigatorContentPanel> panelWR = uiCache.get(dObj);
-            if(panelWR != null) {
-                NavigatorContentPanel cp = panelWR.get();
-                if(cp != null) {
-                    //System.out.println("panel is cached");  //NOI18N
-                    //test if the document associated with the panel is the same we got now
-                    if (cp.m_docModel == FXDFileModel.getDocumentModel(dObj)) {
-                        cachedPanel = cp;
-                    } else {
-                        //System.out.println("but the document is different - creating a new UI...");
-                        //remove the old mapping from the cache
-                        uiCache.remove(dObj);
-                        cachedPanel = null;
-                    }
-                } else {
-                    cachedPanel = null;
-                }
-            } else {
-                cachedPanel = null;
-            }
         
-            if (dObj != null) {
-                //TODO check if the listener needs to be removed
-                dObj.getController().getActionController().getSelectionModel().addSelectionListener( this);
-                
-                RequestProcessor.getDefault().post(new Runnable() {
-                    public void run() {
-                        showWaitPanel();
-                        try {
-                            while( FXDFileModel.getDocumentModel(dObj) == null) {
-                                try {
-                                    //System.err.println("Waiting for document to come up ...");  //NOI18N
-                                    Thread.sleep(15);
-                                } catch (InterruptedException ex) {
-                                    ex.printStackTrace();
-                                } 
-                            }
-                        } catch( Exception e) {
-                            e.printStackTrace();
-                            showCannotNavigate();
-                            return;
-                        }
-                        
-                        final NavigatorContentPanel panel;
-                        if ( cachedPanel == null) {
-                            try {
-                                //cache the newly created panel
-                                panel = new NavigatorContentPanel(dObj);
-                                uiCache.put(dObj, new WeakReference<NavigatorContentPanel>(panel));
-                            } catch (Exception ex) {
-                                System.err.println(ex.getClass().getName() + " " + ex.getLocalizedMessage());  //NOI18N
-                                ex.printStackTrace();
-                                //SceneManager.log(Level.SEVERE, "Navigator panel creation failed", ex); //NOI18N
-                                showCannotNavigate();
-                                return;
-                            }
-                        } else {
-                            panel = cachedPanel;
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                setContent(dObj, panel);
-                            }
-                        });
-                    }
-                });        
+    public void navigate(FXDZDataObject d) {
+        if(peerDO != null && peerDO != d) {
+            //release the original document (see closeDocument() javadoc)
+            closeDocument(peerDO);
+        }
+        
+        if ( d != null) {
+            EditorCookie ec = (EditorCookie)d.getCookie(EditorCookie.class);
+            if(ec == null) {
+    //            ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL, "The DataObject " + d.getName() + "(class=" + d.getClass().getName() + ") has no EditorCookie!?");
+                System.err.println("The DataObject " + d.getName() + "(class=" + d.getClass().getName() + ") has no EditorCookie!?");  //NOI18N
             } else {
-                setContent(null, null);
+                try {
+                    //System.err.println("[fxd navigator] navigating to DATAOBJECT " + d.hashCode());
+                    //test if the document is opened in editor
+                    BaseDocument bdoc = (BaseDocument)ec.openDocument();
+                    //create & show UI
+                    if(bdoc != null) {
+                        //there is something we can navigate in
+                        navigate(d, bdoc);
+                        //remember the peer dataobject to be able the call EditorCookie.close() when closing navigator
+                        this.peerDO = d;
+                        //check if the editor for the DO has an opened pane
+                        editorOpened = ec.getOpenedPanes() != null && ec.getOpenedPanes().length > 0;
+                    }
+
+                }catch(UserQuestionException uqe) {
+                    //do not open a question dialog when the document is just loaded into the navigator
+                    showError("LBL_TooLarge");  //NOI18N
+                    uqe.printStackTrace();
+                }catch(IOException e) {
+                    //ErrorManager.getDefault().notify(e);
+                    e.printStackTrace();
+                }
             }
+        } else {
+            setContent(null, null);
         }
     }
-
-    synchronized void setContent( final FXZDataObject obj, final NavigatorContentPanel panel) {
+    
+   /** A hacky fix for XMLSyncSupport - I need to call EditorCookie.close when the navigator
+     * is deactivated and there is not view pane for the navigated document. Then a the synchronization
+     * support releases a strong reference to NbEditorDocument. */
+    private void closeDocument(FXDZDataObject dobj) {
+        if(dobj != null) {
+            EditorCookie ec = (EditorCookie)peerDO.getCookie(EditorCookie.class);
+            if(ec != null) {
+                JEditorPane panes[] = ec.getOpenedPanes();
+                //call EC.close() if there isn't any pane and the editor was opened
+                if((panes == null || panes.length == 0)) {
+                    ((EditorCookie.Observable)ec).removePropertyChangeListener(this);
+                    
+                    if(editorOpened) {
+                        ec.close();
+                        //if(DEBUG) System.out.println("document instance for dataobject " + dobj.hashCode() + " closed.");
+                    }
+                }
+                editorOpened = false;
+            }
+        }
+    }    
+    
+    public void navigate(final FXDZDataObject documentDO, final BaseDocument bdoc) {
+        //if(DEBUG) System.out.println("[xml navigator] navigating to DOCUMENT " + bdoc.hashCode());
+        //called from AWT thread
+        showWaitPanel();
+        
+        //try to find the UI in the UIcache
+        final NavigatorContentPanel cachedPanel;
+        WeakReference<NavigatorContentPanel> panelWR = uiCache.get(documentDO);
+        if(panelWR != null) {
+            NavigatorContentPanel cp = panelWR.get();
+            if(cp != null) {
+                //if(DEBUG) System.out.println("panel is cached");
+                //test if the document associated with the panel is the same we got now
+                cachedPanel = bdoc == cp.getDocument() ? cp : null;
+                if(cachedPanel == null) {
+                    //if(DEBUG) System.out.println("but the document is different - creating a new UI...");
+                    //if(DEBUG) System.out.println("the cached document : " + cp.getDocument());
+                    
+                    //remove the old mapping from the cache
+                    uiCache.remove(documentDO);
+                }
+            } else
+                cachedPanel = null;
+        } else
+            cachedPanel = null;
+        
+        //get the model and create the new UI on background
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                //get document model for the file
+                try {
+                    final DocumentModel model;
+                    if(cachedPanel == null)
+                        model = DocumentModel.getDocumentModel(bdoc);
+                    else
+                        model = null; //if the panel is cached it holds a refs to the model - not need to init it again
+                    
+                    
+                    if(cachedPanel != null || model != null) {                        
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    showWaitPanel();
+                                    NavigatorContentPanel panel = null;
+                                    if(cachedPanel == null) {
+                                        try {
+                                            //lock the model for modifications during the
+                                            //navigator tree creation
+                                            model.readLock();
+                                            
+                                            //cache the newly created panel
+                                            panel = new NavigatorContentPanel(documentDO, model);
+                                            //use the document dataobject as a key since the document itself is very easily discarded and hence
+                                            //harly usable as a key of the WeakHashMap
+                                            uiCache.put(documentDO, new WeakReference<NavigatorContentPanel>(panel));
+                                            //if(DEBUG) System.out.println("[xml navigator] panel created");
+                                            
+                                            //start to listen to the document property changes - we need to get know when the document is being closed
+                                            EditorCookie.Observable eco = (EditorCookie.Observable)documentDO.getCookie(EditorCookie.Observable.class);
+                                            if(eco != null) {
+                                                eco.addPropertyChangeListener(FXDNavigatorContent.this);
+                                            } else {
+//                                                ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL, "The DataObject " + documentDO.getName() + "(class=" + documentDO.getClass().getName() + ") has no EditorCookie.Observable!");
+                                                System.err.println("The DataObject " + documentDO.getName() + "(class=" + documentDO.getClass().getName() + ") has no EditorCookie.Observable!"); //NOI18N
+                                            }
+                                        }finally{
+                                            //unlock the model
+                                            model.readUnlock();
+                                        }
+                                    } else {
+                                        panel = cachedPanel;
+                                        //if(DEBUG) System.out.println("[xml navigator] panel gotten from cache");
+                                    }
+                                    
+                                    setContent(peerDO, panel);
+                                }
+                            });
+                    } else {
+                        //model is null => show message
+                        showError( "LBL_CannotNavigate");  //NOI18N
+                    }
+                }catch(DocumentModelException dme) {
+                    dme.printStackTrace();
+//                    ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, dme);
+                }
+            }
+        });
+    }
+    
+    synchronized void setContent( final FXDZDataObject obj, final NavigatorContentPanel panel) {
         navigatorPanel = panel;
                 
         removeAll();
@@ -241,34 +311,31 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
         peerDO = null;
         repaint();
     }
-    
-    public void showCannotNavigate() {
+        
+    public void showError(String messageID) {
         removeAll();
         msgLabel.setIcon(null);
         msgLabel.setForeground(Color.GRAY);
-        msgLabel.setText(NbBundle.getMessage(FXDNavigatorContent.class, "LBL_CannotNavigate")); //NOI18N
+        msgLabel.setText(NbBundle.getMessage(FXDNavigatorContent.class, messageID));
         msgLabel.setHorizontalAlignment(SwingConstants.CENTER);
         add(emptyPanel, BorderLayout.CENTER);
+        revalidate();
         repaint();
     }
     
     private void showWaitPanel() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                removeAll();
-                msgLabel.setIcon(null);
-                msgLabel.setForeground(Color.GRAY);
-                msgLabel.setHorizontalAlignment(SwingConstants.LEFT);
-                msgLabel.setText(NbBundle.getMessage(FXDNavigatorContent.class, "LBL_Wait")); //NOI18N
-                add(emptyPanel, BorderLayout.NORTH);
-                repaint();
-            }
-        });
+        removeAll();
+        msgLabel.setIcon(null);
+        msgLabel.setForeground(Color.GRAY);
+        msgLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        msgLabel.setText(NbBundle.getMessage(FXDNavigatorContent.class, "LBL_Wait")); //NOI18N
+        add(emptyPanel, BorderLayout.NORTH);
+        repaint();
     }
 
      private class NavigatorContentPanel extends JPanel implements FiltersManager.FilterChangeListener {
-        private final FXZDataObject    m_doj;
-        private final DocumentModel    m_docModel;
+        private final FXDZDataObject   m_doj;
+        private final Document         m_doc;
         private final FXDNavigatorTree tree;
         private final FiltersManager   m_filters;
 
@@ -289,25 +356,13 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                 tree.repaint();
             }
         };       
-        
-        private String getElementId(DocumentElement de) {
-            if ( de.getStartOffset() < de.getEndOffset()) {
-                return FXDFileModel.getIdAttribute(de);
-            } else {
-                //TODO
-                System.err.println("Deleted element found: " + de);  //NOI18N
-                //SceneManager.log(Level.SEVERE, "Deleted element found: " + de); //NOI18N
-                return null;
-            }
-        }
-        
-        public NavigatorContentPanel(FXZDataObject doj) throws Exception {
-            m_doj = doj;
+                
+        public NavigatorContentPanel(FXDZDataObject dObj, DocumentModel dm)  {
             setLayout(new BorderLayout());
-            
-            m_docModel = FXDFileModel.getDocumentModel(doj);
+            m_doj = dObj;
+            m_doc = dm.getDocument();
             //create the JTree pane
-            tree = new FXDNavigatorTree(m_docModel);
+            tree = new FXDNavigatorTree(dm);
             ToolTipManager.sharedInstance().registerComponent(tree);
             
             MouseListener ml = new MouseAdapter() {
@@ -331,28 +386,26 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             selectionModel.addTreeSelectionListener( new TreeSelectionListener() { 
                 public void valueChanged(TreeSelectionEvent e) {
                     if ( !blockNotification) {
-                        TreePath selPath = e.getPath();
-                        String   id      = null;
-
+                        TreePath        selPath = e.getPath();
+                        DocumentElement de      = null;
+                        
                         if ( selPath != null && !selectionModel.isSelectionEmpty()) {
                             FXDNavigatorNode tna     = (FXDNavigatorNode)selPath.getLastPathComponent();                       
-                            DocumentElement  de      = tna.getDocumentElement();
-                            id     = getElementId(de);
+                            de = tna.getDocumentElement();
                         }
-                        TopComponent tc = m_doj.getMTVC();
+                        TopComponent tc = m_doj.getMVTC();
 
-//                        System.err.println("TC: " + tc);
-
-                        if ( tc != null) {
+                        if ( tc != null && de != null) {
                             Lookup           lkp    = tc.getLookup();                                
                             SelectionCookie  cookie = lkp.lookup(SelectionCookie.class);
-                            if ( cookie != null && id != null) {
-  //                              System.err.println("Selection cookie found.");
-                                cookie.updateSelection(m_doj, new FXDElement(m_doj, id), false);
+                            if ( cookie != null) {
+                                cookie.updateSelection( m_doj, de, false);
                             } else {
     //                            System.err.println("Selection cookie not found.");
                             }
                         }
+//                        System.err.println("TC: " + tc);
+
                     }
                 }
             });
@@ -366,44 +419,12 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             MouseListener pmml = new MouseAdapter() {
                 @Override
                 public void mousePressed(final MouseEvent e) {
-                    /*
                     if(e.getClickCount() == 1 && e.getModifiers() == MouseEvent.BUTTON3_MASK) {
                         //show popup
                         JPopupMenu pm = new JPopupMenu();
                         
-                        final AnimationCookie animCookie = (AnimationCookie) getCookie(AnimationCookie.class);                        
-                        final DocumentElement de         = getElementAt(e.getX(), e.getY());
-                        boolean         isReadOnly       = m_doj.getSceneManager().isReadOnly();
-                        
-                        if (animCookie != null && de != null && 
-                            SVGFileModel.isAnimation(de)) {
-
-                            JMenuItem animStart = new JMenuItem(NbBundle.getMessage(SVGNavigatorContent.class, "LBL_AnimStart")); //NOI18N
-                            animStart.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent evt) {
-                                    String id = getElementId(de);
-                                    if ( id != null) {
-                                        animCookie.startAnimation(m_doj, id);
-                                    }
-                                }
-                            });
-                            animStart.setEnabled(isReadOnly);
-                            pm.add(animStart);
-
-                            JMenuItem animStop = new JMenuItem(NbBundle.getMessage(SVGNavigatorContent.class, "LBL_AnimStop")); //NOI18N
-                            animStop.addActionListener(new java.awt.event.ActionListener() {
-                                public void actionPerformed(ActionEvent evt) {
-                                    String id = getElementId(de);
-                                    if ( id != null) {
-                                        animCookie.stopAnimation(m_doj, id);
-                                    }
-                                }
-                            });
-
-                            animStop.setEnabled(isReadOnly);
-                            pm.add(animStop);
-                        }
-                        
+//                        final DocumentElement de         = getElementAt(e.getX(), e.getY());
+                                                
                         JMenuItem[] items = new FilterActions(m_filters).createMenuItems();
                         //add filter actions
                         for(int i = 0; i < items.length; i++) {
@@ -412,7 +433,6 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                         pm.pack();
                         pm.show(tree, e.getX(), e.getY());
                     }
-                */
                 }
             };
             tree.addMouseListener(pmml);
@@ -445,13 +465,17 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             filtersPanel.add(m_filters.getComponent());
             
             add(filtersPanel, BorderLayout.SOUTH);
-            m_docModel.addDocumentModelListener(m_modelListener);
+            dm.addDocumentModelListener(m_modelListener);
         }        
 
+        public Document getDocument() {
+            return m_doc;
+        }
+        
         @SuppressWarnings("unchecked")
         protected Cookie getCookie(Class clazz) {
             Cookie       cookie = null;
-            TopComponent tc     = m_doj.getMTVC();
+            TopComponent tc     = m_doj.getMVTC();
 
             if ( tc != null) {
                 cookie = (Cookie) tc.getLookup().lookup(clazz);
@@ -518,6 +542,37 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                 }
             }
         }
-     }    
+     }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        if(evt.getPropertyName() == EditorCookie.Observable.PROP_DOCUMENT) {
+            if(evt.getNewValue() == null) {
+                final DataObject dobj = ((DataEditorSupport)evt.getSource()).getDataObject();
+                if(dobj != null) {
+                    editorOpened = false;
+                    //document is being closed
+                    //if(DEBUG) System.out.println("document has been closed for DO: " + dobj.hashCode());
+                    System.err.println("document has been closed for DO: " + dobj.hashCode());
+                    
+                    
+                    //remove the property change listener from the DataObject's EditorSupport
+                    EditorCookie ec = (EditorCookie)dobj.getCookie(EditorCookie.class);
+                    if(ec != null)
+                        ((EditorCookie.Observable)ec).removePropertyChangeListener(this);
+                    
+                    //and navigate the document again (must be called asynchronously
+                    //otherwise the ClonableEditorSupport locks itself (new call to CES from CES.propertyChange))
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if(dobj.isValid()) navigate( (FXDZDataObject) dobj);
+                        }
+                    });
+                }
+            } else {
+                //a new pane created
+                editorOpened = true;
+            }
+        }
+    }
 }
 

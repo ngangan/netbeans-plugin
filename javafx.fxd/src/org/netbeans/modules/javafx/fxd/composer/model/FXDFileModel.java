@@ -14,9 +14,12 @@ import javax.swing.text.AttributeSet;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
+import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelStateListener;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.FXDNode;
+import java.io.IOException;
+import org.openide.cookies.EditorCookie;
 /**
  *
  * @author Pavel Benes
@@ -46,11 +49,10 @@ public class FXDFileModel implements DocumentModelStateListener {
         public boolean visitAttribute( String attrName, String attrValue);
     }
         
-    public FXDFileModel( FXZArchive archive, DocumentModel docModel) {
+    public FXDFileModel( FXZArchive archive) throws IOException, DocumentModelException {
         assert archive != null;
-        assert docModel != null;
         m_archive  = archive;
-        m_docModel = docModel;
+        m_docModel = getDocumentModel( archive.getDataObject());
         m_docModel.addDocumentModelStateListener(this);
         //m_docModel.getDocument().addDocumentListener(this);
         System.err.println("File model created."); //NOI18N
@@ -141,14 +143,33 @@ public class FXDFileModel implements DocumentModelStateListener {
         return String.valueOf(de.getStartOffset());
     }    
     
+    public static String getElementId(final DocumentElement de) {
+        if ( de.getStartOffset() < de.getEndOffset()) {
+            return FXDFileModel.getIdAttribute(de);
+        } else {
+            //TODO
+            System.err.println("Deleted element found: " + de);  //NOI18N
+            //SceneManager.log(Level.SEVERE, "Deleted element found: " + de); //NOI18N
+            return null;
+        }
+    }
+    
     public static boolean isSignificant(final DocumentElement de) {
         String id = (String) de.getAttributes().getAttribute( FXDNode.ATTR_NAME_ID);
         return id != null && id.length() > 0;
     }
         
-    public static DocumentModel getDocumentModel( final FXZDataObject dObj) {
-        FXDFileModel fm = dObj.getDataModel().getFXDContainer().getFileModel(false);
-        return fm != null ? fm.getDocumentModel() : null;
+    public static BaseDocument getDocument( final FXZDataObject dObj) throws IOException {
+        EditorCookie ec = (EditorCookie)dObj.getCookie(EditorCookie.class);
+        if(ec == null) {
+            throw new IllegalArgumentException("The DataObject " + dObj.getName() + "(class=" + dObj.getClass().getName() + ") has no EditorCookie!?");
+        } else {
+            return (BaseDocument)ec.openDocument();
+        }
+    }
+    
+    public static DocumentModel getDocumentModel(final FXZDataObject dObj) throws IOException, DocumentModelException {
+        return DocumentModel.getDocumentModel(getDocument(dObj));
     }
     
     /**

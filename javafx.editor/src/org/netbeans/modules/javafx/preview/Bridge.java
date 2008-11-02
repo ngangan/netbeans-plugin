@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.preview;
 
+import java.beans.PropertyChangeEvent;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -40,11 +41,16 @@ import org.openide.util.RequestProcessor;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import org.openide.windows.OutputWriter;
+import java.beans.PropertyChangeListener;
+import org.netbeans.api.project.Project;
+import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 
 public class Bridge extends ModuleInstall {
     private static NbProcessDescriptor nb = null;
     private static HashMap <Document, PreviewSideServerFace> previewSideServerFaces = new HashMap <Document, PreviewSideServerFace>();
     private static HashMap <Document, NBSidePreviewServer> nbSideServers = new HashMap <Document, NBSidePreviewServer>();
+    private static HashMap <Document, PropertyChangeListener> projectListeners = new HashMap <Document, PropertyChangeListener>();
     private static Process process = null;
 
     @Override
@@ -78,6 +84,10 @@ public class Bridge extends ModuleInstall {
                 UnicastRemoteObject.unexportObject(nbSideServers.get(document), true);
                 previewSideServerFaces.remove(document);
                 nbSideServers.remove(document);
+                Project project = JavaFXDocument.getProject(document);
+                PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
+                evaluator.removePropertyChangeListener(projectListeners.get(document));
+                projectListeners.remove(document);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -110,10 +120,28 @@ public class Bridge extends ModuleInstall {
                 preview.setPreviewSideServerFace(previewSideServerFace);
                 previewSideServerFaces.put(document, previewSideServerFace);
                 nbSideServers.put(document, preview);
+                ProjectListener projectListener = new ProjectListener(document);
+                Project project = JavaFXDocument.getProject(document);
+                PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
+                evaluator.addPropertyChangeListener(projectListener);
+                projectListeners.put(document, projectListener);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
             return previewSideServerFace;
+        }
+    }
+    
+    static class ProjectListener implements PropertyChangeListener {
+        private JavaFXDocument document;
+        ProjectListener(JavaFXDocument document) {
+            this.document = document;
+        }
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().contentEquals("javafx.profile"))                             // NOI18N
+                if (evt.getNewValue().toString().contentEquals("mobile")) {
+                    document.enableExecution(false);
+                }
         }
     }
     

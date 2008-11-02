@@ -115,12 +115,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return new PackageItem(pkgFQN, substitutionOffset, isDeprecated);
     }
 
-    public static final JavaFXCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
-        return new VariableItem(type, varName, substitutionOffset, textToAdd, smartType);
+    public static final JavaFXCompletionItem createVariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
+        return new VariableItem(element, type, varName, substitutionOffset, textToAdd, smartType);
     }
     
     public static final JavaFXCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
-        return new VariableItem(type, varName, substitutionOffset, smartType);
+        // TODO extract element from David's treeJavaFXCompletionEnvironment
+        return new VariableItem(null, type, varName, substitutionOffset, smartType);
     }
     
     public static final JavaFXCompletionItem createExecutableItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {
@@ -573,26 +574,37 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private static final String PARAMETER_COLOR = "<font color=#00007c>"; //NOI18N
         private static ImageIcon icon;
 
+        ElementHandle element;
         private String varName;
         private boolean smartType;
         private String typeName;
         private String leftText;
         private String rightText;
         
-        private VariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
+        private VariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
             super(substitutionOffset);
+            this.element = element;
             this.varName = varName;
             this.smartType = smartType;
             this.typeName = type != null ? type.toString() : null;
         }
 
-        private VariableItem(TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
+        private VariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
             super(substitutionOffset, textToAdd);
+            this.element = element;
             this.varName = varName;
             this.smartType = smartType;
             this.typeName = type != null ? type.toString() : null;
         }
 
+        @Override
+        public CompletionTask createDocumentationTask() {
+            if (element == null) {
+                return null;
+            }
+            return JavaFXCompletionProvider.createDocTask(element);
+        }
+        
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {
