@@ -51,9 +51,9 @@ import org.netbeans.test.javafx.bestpractices.lib.Util;
 
 public class ShapePrimitives extends JavaFXTestCase {
 
-    public String _type = "Forms"; //Type of Sample
+    public String _type = "Shapes"; //Type of Sample
     public String _project = "Shape Primitives";
-    public String _projectPath = "Shape Primitives|Source Packages|forms|ShapePrimitives.fx";
+    public String _projectPath = "Shape Primitives|Source Packages|shapes|ShapePrimitives.fx";
     static String[] TESTS = {"testShapePrimitivesCreate", "testShapePrimitivesCompile", "testShapePrimitivesCloseProject"};
     
     public ShapePrimitives(String name) {
