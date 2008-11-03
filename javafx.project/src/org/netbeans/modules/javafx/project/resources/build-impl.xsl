@@ -132,6 +132,9 @@ is divided into following sections:
             <condition property="no.deps">
                 <istrue value="${{no.dependencies}}"/>
             </condition>
+            <condition property="codebase.arg" value="-appCodebase ${{codebase.url}}" else="">
+                <isset property="codebase.url"/>
+            </condition>
             <condition property="draggable.arg" value="-draggable" else="">
                 <istrue value="${{applet.draggable}}"/>
             </condition>
@@ -223,6 +226,7 @@ is divided into following sections:
                 <arg value="${{applet.height}}"/>
                 <arg value="-appclass"/>
                 <arg value="${{main.class}}"/>
+                <arg line="${{codebase.arg}}"/>
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
                 <arg value="-v"/>
@@ -259,7 +263,10 @@ is divided into following sections:
             </exec>
         </target>
         <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
-            <property name="applet.url" location="${{dist.dir}}/${{application.title}}.html"/>
+            <makeurl property="applet.local.url" file="${{dist.dir}}/${{application.title}}.html"/>
+            <condition property="applet.url" value="${{codebase.url}}/${{dist.dir}}/${{application.title}}.html" else="${{applet.local.url}}">
+                <isset property="codebase.url"/>
+            </condition>
             <condition property="browser" value="open">
                 <os family="mac"/>
             </condition>
@@ -269,7 +276,7 @@ is divided into following sections:
             <condition property="browser" value="cmd.exe">
                 <os family="windows"/>
             </condition>
-            <condition property="browser.args" value="/C">
+            <condition property="browser.args" value="/C start">
                 <os family="windows"/>
             </condition>
             <!-- Some argument should be set for MacOS 'open' command -->
@@ -278,7 +285,7 @@ is divided into following sections:
             </condition>
             <property name="browser.args" value=""/>
             <exec executable="${{browser}}" spawn="true">
-                <arg value="${{browser.args}}"/>
+                <arg line="${{browser.args}}"/>
                 <arg value="${{applet.url}}"/>
             </exec>
         </target>
