@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.editor.completion;
 
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
@@ -51,8 +52,11 @@ import com.sun.tools.javafx.tree.JFXErroneous;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
 import com.sun.tools.javafx.tree.JFXSelect;
+import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JFXVar;
+import com.sun.tools.javafx.tree.JavafxPretty;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -71,6 +75,7 @@ import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
@@ -496,9 +501,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + 
                 " offset: " + offset + " prefix " + prefix); // NOI18N
-        JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
+        JavaFXTreePath path = pathFor(controller, offset);
         if (LOGGABLE) log("   pathFor returned " + path.getLeaf());
-        JavaFXTreePath pathOfBrother = controller.getTreeUtilities().pathFor(offset > 0 ? offset - 1 : offset);
+        JavaFXTreePath pathOfBrother = pathFor(controller, offset > 0 ? offset - 1 : offset);
         Tree t = path.getLeaf();
         Tree brother = pathOfBrother.getLeaf();
         if (LOGGABLE) log("   borther == " + brother);
@@ -777,6 +782,137 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
         
         return result;
+    }
+    public static JavaFXTreePath pathFor(CompilationController info, int pos) {
+        return pathFor(info, new JavaFXTreePath(info.getCompilationUnit()), pos);
+    }
+
+    /*XXX: dbalek
+     */
+    public static JavaFXTreePath pathFor(CompilationController info, JavaFXTreePath path, int pos) {
+        return pathFor(info, path, pos, info.getTrees().getSourcePositions());
+    }
+
+    /*XXX: dbalek
+     */
+    public static JavaFXTreePath pathFor(final CompilationController info, JavaFXTreePath path, int pos, SourcePositions sourcePositions) {
+        if (info == null || path == null || sourcePositions == null)
+            throw new IllegalArgumentException();
+
+        class Result extends Error {
+            JavaFXTreePath path;
+            Result(JavaFXTreePath path) {
+                this.path = path;
+            }
+        }
+
+        class PathFinder extends JavaFXTreePathScanner<Void,Void> {
+            private int pos;
+            private SourcePositions sourcePositions;
+
+            private PathFinder(int pos, SourcePositions sourcePositions) {
+                this.pos = pos;
+                this.sourcePositions = sourcePositions;
+            }
+
+            @Override
+            public Void scan(Tree tree, Void p) {
+                if (tree != null) {
+                    super.scan(tree, p);
+                    long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
+                    long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
+                    if (start != -1 && start <= pos && end > pos) {
+                        JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
+                        boolean isSynteticMainBlock = info.getTreeUtilities().isSynthetic(tp);
+                        // we don't want to return the syntetic main block as the result
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
+                            JavaFXTreePath parentPath = tp.getParentPath();
+                            if (parentPath != null) {
+                                JavaFXTreePath grandParentPath = parentPath.getParentPath();
+                                if (grandParentPath != null) {
+                                    Tree grandParent = grandParentPath.getLeaf();
+                                    if (grandParent.getJavaFXKind() ==
+                                            Tree.JavaFXKind.FUNCTION_DEFINITION &&
+                                            info.getTreeUtilities().isSynthetic(grandParentPath)) {
+                                        isSynteticMainBlock = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_VALUE) {
+                            JavaFXTreePath parentPath = tp.getParentPath();
+                            if (parentPath != null) {
+                                Tree parent = parentPath.getLeaf();
+                                if (parent.getJavaFXKind() ==
+                                        Tree.JavaFXKind.FUNCTION_DEFINITION &&
+                                        info.getTreeUtilities().isSynthetic(parentPath)) {
+                                    isSynteticMainBlock = true;
+                                }
+                            }
+                        }
+                        if (!isSynteticMainBlock) {
+                            throw new Result(new JavaFXTreePath(getCurrentPath(), tree));
+                        }
+                    } else {
+                        if ((start == -1) || (end == -1)) {
+                            if (!info.getTreeUtilities().isSynthetic(getCurrentPath())) {
+                                // here we might have a problem
+                                if (LOGGABLE) {
+                                    logger.finest("SCAN: Cannot determine start and end for: " + treeToString(info, tree));
+                                }
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+        }
+
+        try {
+            new PathFinder(pos, sourcePositions).scan(path, null);
+        } catch (Result result) {
+            path = result.path;
+        }
+
+        if (path.getLeaf() == path.getCompilationUnit()) {
+            log("pathFor returning compilation unit for position: " + pos);
+            return path;
+        }
+        int start = (int)sourcePositions.getStartPosition(info.getCompilationUnit(), path.getLeaf());
+        int end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), path.getLeaf());
+        while (start == -1 || pos < start || pos > end) {
+            if (LOGGABLE) {
+                logger.finer("pathFor moving to parent: " + treeToString(info, path.getLeaf()));
+            }
+            path = path.getParentPath();
+            if (LOGGABLE) {
+                logger.finer("pathFor moved to parent: " + treeToString(info, path.getLeaf()));
+            }
+            if (path.getLeaf() == path.getCompilationUnit()) {
+                break;
+            }
+            start = (int)sourcePositions.getStartPosition(info.getCompilationUnit(), path.getLeaf());
+            end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), path.getLeaf());
+        }
+        if (LOGGABLE) {
+            log("pathFor(pos: " + pos + ") returning: " + treeToString(info, path.getLeaf()));
+        }
+        return path;
+    }
+    private static String treeToString(CompilationInfo info, Tree t) {
+        Tree.JavaFXKind k = null;
+        StringWriter s = new StringWriter();
+        try {
+            new JavafxPretty(s, false).printExpr((JFXTree)t);
+        } catch (Exception e) {
+            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e);
+        }
+        k = t.getJavaFXKind();
+        String res = k.toString();
+        SourcePositions pos = info.getTrees().getSourcePositions();
+        res = res + '[' + pos.getStartPosition(info.getCompilationUnit(), t) + ',' +
+                pos.getEndPosition(info.getCompilationUnit(), t) + "]:" + s.toString();
+        return res;
     }
             
     private static void log(String s) {

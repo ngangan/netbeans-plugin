@@ -873,7 +873,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
                             public void run(CompilationController controller) throws Exception {
                                 controller.toPhase(Phase.PARSED);
-                                JavaFXTreePath tp = controller.getTreeUtilities().pathFor(c.getSelectionEnd());
+                                JavaFXTreePath tp = JavaFXCompletionQuery.pathFor(controller, c.getSelectionEnd());
                                 Tree tree = tp.getLeaf();
                                 if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER /*|| tree.getJavaFXKind() == Tree.JavaFXKind.PRIMITIVE_TYPE*/)
                                     tp = tp.getParentPath();
@@ -1247,7 +1247,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                 public void run () {
                                     try {
                                         Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
-                                        JavaFXTreePath tp = controller.getTreeUtilities().pathFor(offset);
+                                        JavaFXTreePath tp = JavaFXCompletionQuery.pathFor(controller, offset);
                                         CharSequence cs = simpleName;
                                         if (eleme != null) {
                                             cs = eleme.getSimpleName();
@@ -1597,7 +1597,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 public void run(CompilationController controller) throws Exception {
                     controller.toPhase(JavaFXSource.Phase.PARSED);
                     Tree t = null;
-                    JavaFXTreePath tp = controller.getTreeUtilities().pathFor(offset);
+                    JavaFXTreePath tp = JavaFXCompletionQuery.pathFor(controller, offset);
                     while (t == null && tp != null) {
                         switch(tp.getLeaf().getJavaFXKind()) {
 /*                            case EXPRESSION_STATEMENT:
