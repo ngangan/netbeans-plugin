@@ -171,6 +171,7 @@ is divided into following sections:
                     </or>
                 </not>
             </condition>
+            <property name="run.jvmargs" value=""/>
         </target>
         <target name="-post-init">
         <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
