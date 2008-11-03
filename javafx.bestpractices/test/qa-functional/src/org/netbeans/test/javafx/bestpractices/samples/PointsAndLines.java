@@ -51,9 +51,9 @@ import org.netbeans.test.javafx.bestpractices.lib.Util;
 
 public class PointsAndLines extends JavaFXTestCase {
 
-    public String _type = "Forms"; //Type of Sample
+    public String _type = "Shapes"; //Type of Sample
     public String _project = "Points and Lines";
-    public String _projectPath = "Points and Lines|Source Packages|forms|PointsAndLines.fx";
+    public String _projectPath = "Points and Lines|Source Packages|shapes|PointsAndLines.fx";
     static String[] TESTS = {"testPointsAndLinesCreate", "testPointsAndLinesCompile", "testPointsAndLinesCloseProject"};
     
     public PointsAndLines(String name) {
