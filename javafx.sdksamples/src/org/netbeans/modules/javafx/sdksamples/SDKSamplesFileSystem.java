@@ -40,12 +40,20 @@
 package org.netbeans.modules.javafx.sdksamples;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Logger;
+import org.openide.filesystems.FileLock;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.MultiFileSystem;
+import org.openide.filesystems.Repository;
 import org.openide.filesystems.XMLFileSystem;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
+import org.openide.windows.WindowManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -55,20 +63,95 @@ import org.xml.sax.SAXException;
 public class SDKSamplesFileSystem extends MultiFileSystem {
 
     public SDKSamplesFileSystem() {
-
-//        String samplesUrl = null;
-        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0dev/samples/layer.xml",
-                "org.netbeans.modules.javafx", false );
-        try {
-            if( fxPath != null ) {
-                setDelegates( new XMLFileSystem( fxPath.toURI().toURL()));
+        WindowManager.getDefault().invokeWhenUIReady( new Runnable() {
+            public void run() {
+                try {
+                    URL layerURL = createLayer();
+                    if( layerURL != null ) {
+                        setDelegates( new XMLFileSystem( layerURL ));
+                    }
+                } catch( SAXException e ) {
+                    Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
+                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+                } catch( MalformedURLException e ) {
+                    Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
+                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+                } catch( IOException e ) {
+                    Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
+                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+                }
             }
-        } catch( SAXException e ) {
-            Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
-                    NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
-        } catch( MalformedURLException e ) {
-            Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
-                    NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+        });
+    }
+
+    private URL createLayer() throws IOException {
+        FileObject root = Repository.getDefault().getDefaultFileSystem().getRoot();
+        FileObject folder = FileUtil.createFolder(root, "javafx/samples" );
+        FileObject xml = FileUtil.createData( folder, "sdksamples.xml" );
+
+        // Get all files in samples
+        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0dev/samples",
+                "org.netbeans.modules.javafx", false );
+        if( fxPath == null ) return null;
+        String descriptionsXml = "", samplesXml = "";
+        FileObject sdkRoot = FileUtil.toFileObject( fxPath );
+        if( sdkRoot == null ) return null;
+        for( FileObject sample : sdkRoot.getChildren()) {
+            // Skip non folder
+            if( !sample.isFolder()) continue;
+            String sampleName = sample.getName();
+            FileObject zip = sample.getFileObject( sampleName + ".zip" );
+            // Skip directories without zip
+            if( zip == null ) continue;
+            // Descriptions
+            FileObject descriptionFO = sample.getFileObject( "description.html" );
+
+            if( descriptionFO != null ) {
+                descriptionsXml += "<folder name=\"" + sampleName + "\">";
+                descriptionsXml += "<file name=\"description.html\" url=\"" + descriptionFO.getURL().toString() + "\"/>";
+                descriptionsXml += "</folder>";
+            }
+
+            // file definition
+            samplesXml += "<file name=\"" + spaceName( sampleName ) + "\" url=\"" + zip.getURL().toString() + "\">";
+                samplesXml += "<attr name=\"SystemFileSystem.icon\" urlvalue=\"nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png\"/>";
+                samplesXml += "<attr name=\"SystemFileSystem.localizingBundle\" stringvalue=\"org.netbeans.modules.javafx.sdksamples.Bundle\"/>";
+                samplesXml += "<attr name=\"instantiatingIterator\" methodvalue=\"org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator.createIterator\"/>";
+                if( descriptionFO != null ) {
+                    samplesXml += "<attr name=\"instantiatingWizardURL\" urlvalue=\"nbfs:/SystemFileSystem/SDKSamples/" + sampleName + "/description.html\"/>";
+                }
+                samplesXml += "<attr name=\"template\" boolvalue=\"true\"/>";
+            samplesXml += "</file>";
         }
+
+        FileLock lock = xml.lock();
+        PrintStream os = new PrintStream( xml.getOutputStream( lock ));
+        os.println( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
+        os.println( "<filesystem>" );
+            os.println( "<folder name=\"SDKSamples\">" );
+                os.println( descriptionsXml );
+            os.println( "</folder>" );
+            os.println( "<folder name=\"Templates\">" );
+                os.println( "<folder name=\"Project\">" );
+                    os.println( "<folder name=\"Samples\">" );
+                        os.println( "<folder name=\"JavaFX\">" );
+                            os.println( samplesXml );
+                        os.println( "</folder>" );
+                    os.println( "</folder>" );
+                os.println( "</folder>" );
+            os.println( "</folder>" );
+        os.println( "</filesystem>" );
+        os.close();
+
+        return xml.getURL();
+    }
+
+    private String spaceName( String name ) {
+        String newName = "";
+        for( char c : name.toCharArray()) {
+            if( Character.isUpperCase( c )) newName += " ";
+            newName += c;
+        }
+        return newName.trim();
     }
 }
