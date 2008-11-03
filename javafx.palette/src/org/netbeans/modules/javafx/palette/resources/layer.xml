@@ -24,6 +24,7 @@
         
     <folder name="JavaFXPalette">
         <folder name="Applications">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="100"/>
             <file name="Stage.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stage.xml">
                 <attr name="position" intvalue="100"/>
@@ -37,6 +38,7 @@
         </folder>
         
         <folder name="Swing Components">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="800"/>
             <file name="SwingFrame.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingFrame.xml">
                 <attr name="position" intvalue="100"/>
@@ -80,6 +82,7 @@
         </folder>
         
         <folder name="Actions">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="300"/>
             <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
                 <attr name="position" intvalue="100"/>
@@ -168,6 +171,7 @@
         </folder>
         
         <folder name="Colors">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="600"/>            
             <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
@@ -210,6 +214,7 @@
             </file>
         </folder>
         <folder name="Animation">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="700"/>            
             <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
                 <attr name="position" intvalue="100"/>
