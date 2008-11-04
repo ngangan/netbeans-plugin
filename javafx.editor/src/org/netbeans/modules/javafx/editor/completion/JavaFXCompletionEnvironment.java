@@ -346,6 +346,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             }
         }
+
+        TypeMirror parent = te.getSuperclass();
+        if (parent != null) {
+            addMembers(parent, false, true, textToAdd, scope, statics, instance);
+        }
+        for (TypeMirror intf : te.getInterfaces()) {
+            addMembers(intf, false, true, textToAdd, scope, statics, instance);
+        }
     }
 
     protected void localResult(TypeMirror smart) {
