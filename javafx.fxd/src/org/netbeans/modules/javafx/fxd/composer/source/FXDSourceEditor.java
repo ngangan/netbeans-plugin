@@ -13,6 +13,9 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
+import org.netbeans.editor.EditorUI;
+import org.netbeans.editor.StatusBar;
+import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
@@ -21,6 +24,7 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
+import org.openide.loaders.DataObject;
 import org.openide.text.CloneableEditor;
 import org.openide.text.NbDocument;
 import org.openide.util.Lookup;
@@ -34,6 +38,8 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public class FXDSourceEditor extends CloneableEditor implements MultiViewElement, Runnable {
+    public static final String CELL_ERROR = "error";
+    
     private JComponent m_toolbar = null;
     private static MultiViewElementCallback m_callback;
     
@@ -43,7 +49,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
 
     public JComponent getVisualRepresentation() {
         //System.err.println("Asking for visual");
-        return this;
+        return this;        
     }
 
     public JComponent getToolbarRepresentation() {
@@ -67,7 +73,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
         m_callback = callback;
         updateName();
     }
-    
+       
     @Override
     public void updateName() {
         Mutex.EVENT.readAccess(this);
@@ -121,8 +127,31 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
     @Override
     public void componentShowing() {
         super.componentShowing();
+        addErrorStatusBarCell( getDataObject());
     }
 
+    public static void addErrorStatusBarCell( final DataObject dObj) {
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                EditorCookie ec = dObj.getCookie(EditorCookie.class);
+                if ( ec != null) {
+                    JEditorPane [] panes = ec.getOpenedPanes();
+                    if ( panes != null && panes.length > 0 && panes[0] != null) {
+                    EditorUI eui = Utilities.getEditorUI(panes[0]);
+                    StatusBar sBar = eui == null ? null : eui.getStatusBar();
+                    if (sBar != null) {
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < 60; i++) {
+                            sb.append( 'A');
+                        }
+                        sBar.addCell( CELL_ERROR, new String [] { sb.toString()});
+                        }
+                    }
+                }
+            }            
+        });        
+    }
+    
     @Override
     public void componentHidden() {
         super.componentHidden();

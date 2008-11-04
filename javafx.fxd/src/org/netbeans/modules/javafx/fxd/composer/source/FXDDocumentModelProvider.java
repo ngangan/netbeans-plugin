@@ -10,9 +10,16 @@ import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
+import javax.swing.JEditorPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import org.netbeans.editor.BaseDocument;
+import org.netbeans.editor.EditorUI;
+import org.netbeans.editor.StatusBar;
+import org.netbeans.editor.Utilities;
+import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModel.DocumentChange;
@@ -22,6 +29,8 @@ import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.spi.DocumentModelProvider;
 
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.openide.cookies.EditorCookie;
+import org.openide.loaders.DataObject;
 import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Direction.BACKWARD;
 
 /**
@@ -78,7 +87,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         
         TextParser textParser = new TextParser( doc.getText());
         
-        System.err.println("Model update started ...");
+        //System.err.println("Model update started ...");
 
         if ( textParser.gotoChar('{')) {
             textParser.fetchChar(BACKWARD);
@@ -112,13 +121,13 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     //System.err.println("Node ended");
                     NodeBuilder deb = (NodeBuilder) node;                    
                     DocumentElement de = model.getLeafElementForOffset(deb.m_startOffset);
-                    if ( de == null || de == model.getRootElement()) {
-                        deb.build(trans, endOff);
-                    } else {                        
+                    if ( de != model.getRootElement() && FXDFileModel.FXD_NODE.equals(de.getType())) {
                         if ( !deb.isEqual(de.getAttributes())) {
                             //System.err.println("Attributes changes for " + deb.m_typeName);
                             trans.updateDocumentElementAttribs(de, deb.getAttributeMap());
                         }
+                    } else {
+                        deb.build(trans, endOff);
                     }
                     m_isLastNode = true;
                 }
@@ -141,17 +150,76 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 
             }, nodesStartPos);
             
+            final StringBuilder statMsg = new StringBuilder(" ");
+            showStatusText(doc, " Parsing text...");
+            
             try {
                 fxdParser.parseObject();
                 reportDeletedElements(trans, model.getRootElement());
-            System.err.println("Model update done ...");
+            //System.err.println("Model update done ...");
             } catch( DocumentModelException e) {
                 throw e;
             } catch( DocumentModelTransactionCancelledException e) {
                 throw e;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                statMsg.append( "Syntax error: "); //NOI18N
+                String msg = ex.getLocalizedMessage();
+                //TODO Nasty hack, increase the row index where to error has been found
+                //to compensate the few lines at the top of the document that are not
+                //recognized by the FXD parser
+                try {
+                    int end;
+                    if ( (end=msg.lastIndexOf(']')) != -1) {
+                        int start;
+                        if ( (start=msg.lastIndexOf('[', end)) != -1) {
+                            StringTokenizer st = new StringTokenizer( msg.substring(start+1, end), ",");
+                            if ( st.countTokens() == 2) {
+                                int [] startCoords = FXDParser.index2coords(textParser.subsequence(0, textParser.getSize()), nodesStartPos);
+                                int [] coords = new int[2];
+                                for (int i = 0; i < coords.length; i++) {
+                                    coords[i] = Integer.parseInt(st.nextToken().trim());
+                                }
+                                msg = String.format( "%s[%d,%d]%s", 
+                                        msg.substring(0, start),
+                                        coords[0] + startCoords[0] - 1,
+                                        coords[1] - 1,
+                                        msg.substring(end+1));
+                                statMsg.append( msg);
+                            }
+                        }
+                    }
+                } catch( Exception e) {
+                    e.printStackTrace();
+                }
+            } finally {
+                showStatusText(doc, statMsg.toString());
             }
+        }
+    }
+    
+    protected static void showStatusText( BaseDocument doc, final String msg) {
+        DataObject dObj = NbEditorUtilities.getDataObject(doc);
+        final EditorCookie ec = dObj.getCookie( EditorCookie.class);
+        if ( ec != null) {
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    final JEditorPane [] panes = ec.getOpenedPanes();
+                    if ( panes != null && panes.length > 0 && panes[0] != null) {
+                        EditorUI eui = Utilities.getEditorUI(panes[0]);
+                        StatusBar sb = eui == null ? null : eui.getStatusBar();
+                        if (sb != null) {
+                            sb.setText(FXDSourceEditor.CELL_ERROR, msg);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    protected void cleanModel( final DocumentModelModificationTransaction trans, DocumentModel model) throws DocumentModelTransactionCancelledException {
+        DocumentElement root = model.getRootElement();
+        for ( int i = root.getElementCount() - 1; i >= 0; i--) {
+            trans.removeDocumentElement( root.getElement(i), true);
         }
     }
     

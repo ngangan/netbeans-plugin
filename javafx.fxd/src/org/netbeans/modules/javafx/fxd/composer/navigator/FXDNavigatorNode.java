@@ -383,22 +383,22 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
             int index = getChildTreeNodeIndex(ade);
             if(index == -1) {               
                 if (visibility != FXDNavigatorTree.VISIBILITY_NO) {
-                    FXDNavigatorNode tn = new FXDNavigatorNode(ade, m_nodeTree, this, visibility);
                     int insertIndex = getVisibleChildIndex(ade);
 
                     //check whether the insert index doesn't go beyond the actual children length (which states an error)
-                    if(m_children.size() < insertIndex /*||
+                    if( insertIndex < 0 || m_children.size() < insertIndex /*||
                             children.size() + 1 /* it doesn't contain the currently added element != getDocumentElement().getElementCount()*/) {
                         //error => try to recover by refreshing the current node
                         //debugError(e);
                         //notify treemodel
                         m_nodeTree.getTreeModel().nodeStructureChanged(this);
                     } else {
+                        FXDNavigatorNode tn = new FXDNavigatorNode(ade, m_nodeTree, this, visibility);
                         m_children.add(insertIndex, tn);
                         final int tnIndex = getIndex(tn);
                         m_nodeTree.getTreeModel().nodesWereInserted(this, new int[]{tnIndex});
+                        if(debug)System.out.println("<<<EVENT finished (node " + tn + " added)"); //NOI18N
                     }
-                    if(debug)System.out.println("<<<EVENT finished (node " + tn + " added)"); //NOI18N
                     
                     //TODO Maybe add
                     /*

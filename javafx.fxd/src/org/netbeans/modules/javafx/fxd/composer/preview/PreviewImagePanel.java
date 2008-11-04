@@ -29,6 +29,8 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import org.netbeans.modules.editor.structure.api.DocumentModelUtils;
+import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.openide.util.NbBundle;
 
@@ -90,7 +92,9 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                     @Override
                     public void run() {
                         final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
-                        fxz.getFileModel().updateModel();
+                        final FXDFileModel fModel = fxz.getFileModel();
+                        fModel.updateModel();
+                        //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
 
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
@@ -98,7 +102,13 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                 SwingUtilities.invokeLater( new Runnable() {
                                     public void run() {
                                         try {
-                                            javafx.scene.Node$Intf node = LoaderExtended.getLoaderExtended().load(fxz);
+                                            javafx.scene.Node$Intf node;                                            
+                                            try {
+                                                fModel.readLock();
+                                                node = LoaderExtended.getLoaderExtended().load(fxz);
+                                            } finally {
+                                                fModel.readUnlock();
+                                            }
                                             //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
                                             //Object   group  = m.invoke(fxNode);
                                             FXNode fxNode = node.impl_getFXNode();  

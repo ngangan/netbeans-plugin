@@ -55,7 +55,7 @@ public class FXDFileModel implements DocumentModelStateListener {
         m_docModel = getDocumentModel( archive.getDataObject());
         m_docModel.addDocumentModelStateListener(this);
         //m_docModel.getDocument().addDocumentListener(this);
-        System.err.println("File model created."); //NOI18N
+        //System.err.println("File model created."); //NOI18N
     }
           
     BaseDocument getDocument() {
@@ -71,22 +71,30 @@ public class FXDFileModel implements DocumentModelStateListener {
 
         synchronized (m_lock) {
             if (m_sourceChanged) {
-                System.err.println("Forcing model update"); //NOI18N
+                //System.err.println("Forcing model update"); //NOI18N
                 m_docModel.forceUpdate();
             } else if (!m_updateInProgress) {
-                System.err.println("Model already up to date."); //NOI18N
+                //System.err.println("Model already up to date."); //NOI18N
                 return;
             }
 
             while (m_sourceChanged || m_updateInProgress) {
-                System.err.println("Waiting for model update..."); //NOI18N
+                //System.err.println("Waiting for model update..."); //NOI18N
                 try {
                     m_lock.wait();
-                    System.err.println("Wait ended."); //NOI18N
+                    //System.err.println("Wait ended."); //NOI18N
                 } catch (InterruptedException ex) {
                 }
             }
         }
+    }
+    
+    public void readLock() {
+        m_docModel.readLock();
+    }
+    
+    public void readUnlock() {
+        m_docModel.readUnlock();
     }
     
     DocumentElement getElementById( String id) {
@@ -117,25 +125,6 @@ public class FXDFileModel implements DocumentModelStateListener {
         return result;
     }
         
-/*    
-    public void insertUpdate(DocumentEvent e) {
-        documentChanged(e);
-    }
-
-    public void removeUpdate(DocumentEvent e) {
-        documentChanged(e);
-    }
-
-    public void changedUpdate(DocumentEvent e) {
-        documentChanged(e);
-    }
-    
-    protected void documentChanged( DocumentEvent e) {
-        System.err.println("Document changed.");   //NOI18N
-        m_archive.incrementChangeTicker();
-        m_changed = true;
-    }
-/*    
     /**
      * Convenience helper method.
      */
@@ -171,7 +160,7 @@ public class FXDFileModel implements DocumentModelStateListener {
     public static DocumentModel getDocumentModel(final FXZDataObject dObj) throws IOException, DocumentModelException {
         return DocumentModel.getDocumentModel(getDocument(dObj));
     }
-    
+        
     /**
      * Convenience helper method.
      */
@@ -183,13 +172,7 @@ public class FXDFileModel implements DocumentModelStateListener {
         }
         return list;
     }   
-    
-//    public static FXDFileModel get( final DocumentModel docModel) {
-//        FXDFileModel fileModel = (FXDFileModel) docModel.getDocument().getProperty(PROP_FILE_MODEL);
-//        assert fileModel != null;
-//        return fileModel;
-//    }
-    
+        
     private static final int MAX_ATTR_VALUE_LENGTH = 50;
     
     public static void visitAttributes( final DocumentElement de, final ElementAttrVisitor visitor, boolean shortValues) {
@@ -202,14 +185,6 @@ public class FXDFileModel implements DocumentModelStateListener {
             String value = (String)attrs.getAttribute(name);
             
             if (value != null) {
-//                if ( FXDNode.ATTR_NAME_ID.equals(name) &&
-//                     value.startsWith(JSONObject.INJECTED_ID_PREFIX)) {
-//                     continue;
-//                }
-//                if ( JSONObject.ATTR_NODE_CLASS.equals(name)) {
-//                    continue;
-//                }
-                
                 if ( shortValues && value.length() > MAX_ATTR_VALUE_LENGTH) {
                     value = value.substring(0, MAX_ATTR_VALUE_LENGTH-3) + "...";   //NOI18N
                 }
@@ -274,7 +249,7 @@ public class FXDFileModel implements DocumentModelStateListener {
 
     public void sourceChanged() {
         synchronized (m_lock) {
-            System.err.println("Document source changed."); //NOI18N
+            //System.err.println("Document source changed."); //NOI18N
             m_sourceChanged = true;
             m_archive.incrementChangeTicker(false);            
             m_lock.notifyAll();
@@ -283,7 +258,7 @@ public class FXDFileModel implements DocumentModelStateListener {
 
     public void scanningStarted() {
         synchronized (m_lock) {
-            System.err.println("Document scanning started."); //NOI18N
+            //System.err.println("Document scanning started."); //NOI18N
             //getSceneManager().setBusyState(MODEL_UPDATE_TOKEN, true);
             m_updateInProgress = true;
             m_sourceChanged = false;
@@ -296,7 +271,7 @@ public class FXDFileModel implements DocumentModelStateListener {
 
     public void updateFinished() {
         synchronized (m_lock) {
-            System.err.println("Model update finished."); //NOI18N
+            //System.err.println("Model update finished."); //NOI18N
             m_updateInProgress = false;
             m_lock.notifyAll();
 //            getSceneManager().setBusyState(MODEL_UPDATE_TOKEN, false);
