@@ -44,7 +44,10 @@ package org.netbeans.modules.javafx.project;
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import javax.lang.model.element.TypeElement;
@@ -84,6 +88,7 @@ import org.netbeans.modules.javafx.project.ui.customizer.MainClassWarning;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
+import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.ui.support.DefaultProjectOperations;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -98,6 +103,8 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
+import org.openide.filesystems.Repository;
+import org.openide.filesystems.URLMapper;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -361,6 +368,35 @@ class JavaFXActionProvider implements ActionProvider {
         }
     }
 
+    String getCodebaseURL() {
+        URL base = URLMapper.findURL(Repository.getDefault().getDefaultFileSystem().findResource("HTTPServer_DUMMY"), URLMapper.NETWORK);// NOI18N
+        if (base == null) return null;
+        try {
+            return new URL(base.getProtocol(), "localhost", base.getPort(), encodeURL("/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/" + project.getProjectDirectory().getPath() + "/" + project.evaluator().evaluate("${dist.dir}/"))).toExternalForm(); // NOI18N
+        } catch (MalformedURLException e) {
+            ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, e);
+            return null;
+        }
+    }
+    
+    String encodeURL(final String orig) {
+        StringTokenizer slashTok = new StringTokenizer(orig, "/", true); // NOI18N
+        StringBuffer path = new StringBuffer();
+        while (slashTok.hasMoreTokens()) {
+            final String tok = slashTok.nextToken();
+            if (tok.startsWith("/")) { // NOI18N
+                path.append(tok);
+            } else {
+                try {
+                    path.append(URLEncoder.encode(tok, "UTF-8")); // NOI18N
+                } catch (UnsupportedEncodingException e) {
+                    path.append(URLEncoder.encode(tok));
+                }
+            }
+        }
+        return path.toString();
+    } 
+    
     /**
      * @return array of targets or null to stop execution; can return empty array
      */
@@ -420,6 +456,8 @@ class JavaFXActionProvider implements ActionProvider {
             p.setProperty("fix.classes", classes); // NOI18N
         }
         else if (command.equals (COMMAND_RUN) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_STEP_INTO)) {
+            String codeBaseURL = getCodebaseURL();
+            if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
             String config = project.evaluator().getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
             String path;
             if (config == null || config.length() == 0) {

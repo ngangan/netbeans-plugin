@@ -264,7 +264,7 @@ is divided into following sections:
         </target>
         <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
             <makeurl property="applet.local.url" file="${{dist.dir}}/${{application.title}}.html"/>
-            <condition property="applet.url" value="${{codebase.url}}/${{dist.dir}}/${{application.title}}.html" else="${{applet.local.url}}">
+            <condition property="applet.url" value="${{codebase.url}}/${{application.title}}.html" else="${{applet.local.url}}">
                 <isset property="codebase.url"/>
             </condition>
             <condition property="browser" value="open">
