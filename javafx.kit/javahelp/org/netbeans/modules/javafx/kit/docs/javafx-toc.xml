@@ -18,14 +18,15 @@
         <tocitem text="JavaFX Project Tasks: Quick Reference" target="javafx_proj_quickref"/>
         <tocitem text="Deleting a JavaFX Project" target="javafx_proj_deleting" />
         <tocitem text="Moving, Copying, and Renaming a JavaFX Project" target="javafx_proj_move_copy_rename" />
-	<tocitem text="Setting the Target JavaFX SDK Platform" target="javafx_proj_sdk" />
-	<tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
+        <tocitem text="Setting the Target JavaFX SDK in a JavaFX Project" target="javafx_proj_sdk" />
+        <tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
       </tocitem>
 
       <tocitem text="Editing JavaFX Source Files" >
         <tocitem text="Editing JavaFX Source Files" target="javafx_editing_source" />
         <tocitem text="About the JavaFX Palette" target="javafx_editing_palette" />
-	<tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
+        <tocitem text="Using the Navigator Window" target="javafx_nav_window" />
+        <tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
       </tocitem>
 
       <tocitem text="Building JavaFX Applications" >
