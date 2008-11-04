@@ -14,7 +14,7 @@
 <p>To set the main class and runtime arguments for your JavaFX project</p>
 <ol>
   <li>Right-click the JavaFX project node in the Projects window and choose  Properties.<br>
-    Alternatively, you can select the project in the Projects window and select File &gt; <i>&quot;&lt;JavaFX_project_name&gt;&quot;</i> Properties from the main menu. </li>
+    Alternatively, you can select the project in the Projects window and select File &gt;  Project Properties (<i>JavaFX_project_name</i>) from the main menu. </li>
   <li>Select the  Run node in the Categories pane of the dialog box.</li>
   <li>Type the fully qualified name of the main class in the Main Class field
   	 (for example, <tt>org.myCompany.myLib.MyLibClass</tt>). The main class must
@@ -24,17 +24,19 @@
     <li> If you use the Browse button to choose the project main class, the file
     	 chooser only displays classes in your project source directory. If you
     	want to specify a class in one the libraries on the classpath, you have
-    	to type the fully-qualified name of the class in the Main Class field.
-  </li>
-</ul>
+    	to type the fully-qualified name of the class in the Main Class field.</li>
+  </ul>
 
-  <li>Enter any  runtime arguments you require in the Arguments field.<p>The
+  <li>Select the Application Execution Model of your choice.<br> 
+  &lt;<font color="#FF0000">* explain the different options *</font>&gt; </li>
+  <li>Enter any  runtime arguments you require in the JVM Arguments field.
+    <p>The
   		IDE sets the project's main class and stores any newly-added arguments. 
   </li>
 </ol>
 
         <ul class="note">
-        <li>For JavaFX projects that have a main class is specified, the IDE automatically copies any JAR 
+        <li>For JavaFX projects that have a main class  specified, the IDE automatically copies any JAR 
         files on the project's classpath to the <tt>dist/lib</tt> folder.
         The IDE also adds each of the JAR files 
         to the Class-Path element in the application JAR's <tt>manifest.mf</tt> 
