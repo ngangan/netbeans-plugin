@@ -1,3 +1,4 @@
+extensions
 focused
 fullScreen
 height
@@ -8,6 +9,7 @@ onClose
 opacity
 resizable
 scene
+stages
 style
 title
 visible
