@@ -322,7 +322,8 @@ class JavaFXActionProvider implements ActionProvider {
             public void run () {
                 Properties p = new Properties();
                 String[] targetNames;
-
+                String codeBaseURL = getCodebaseURL();
+                if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
                 targetNames = getTargetNames(command, context, p);
                 if (targetNames == null) {
                     return;
@@ -456,8 +457,6 @@ class JavaFXActionProvider implements ActionProvider {
             p.setProperty("fix.classes", classes); // NOI18N
         }
         else if (command.equals (COMMAND_RUN) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_STEP_INTO)) {
-            String codeBaseURL = getCodebaseURL();
-            if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
             String config = project.evaluator().getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
             String path;
             if (config == null || config.length() == 0) {
