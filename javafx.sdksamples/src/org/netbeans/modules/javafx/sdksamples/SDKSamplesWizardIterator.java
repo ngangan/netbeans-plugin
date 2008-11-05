@@ -202,21 +202,7 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
                 if( entry.isDirectory()) {
                     if( entry.getName().equals( filename )) continue;
                     FileUtil.createFolder( projectRoot, entry.getName().substring( rootFileName.length()));
-                } else if( entry.getName().toLowerCase().endsWith( ".png" ) || entry.getName().toLowerCase().endsWith( ".jpg" ) ||
-                        entry.getName().toLowerCase().endsWith( ".gif" )) {
-                    FileObject fo = FileUtil.createData( projectRoot, entry.getName().substring( rootFileName.length()));
-                    FileLock lock = fo.lock();
-                    try {
-                        OutputStream out = fo.getOutputStream(lock);
-                        try {
-                            FileUtil.copy(str, out);
-                        } finally {
-                            out.close();
-                        }
-                    } finally {
-                        lock.releaseLock();
-                    }
-                } else {
+                } else if( isText( entry.getName())) {
                     FileObject fo = FileUtil.createData(projectRoot, entry.getName().substring( rootFileName.length()));
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     FileUtil.copy(str, baos);
@@ -234,10 +220,34 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
                     } finally {
                         lock.releaseLock();
                     }
+                } else {
+                    FileObject fo = FileUtil.createData( projectRoot, entry.getName().substring( rootFileName.length()));
+                    FileLock lock = fo.lock();
+                    try {
+                        OutputStream out = fo.getOutputStream(lock);
+                        try {
+                            FileUtil.copy(str, out);
+                        } finally {
+                            out.close();
+                        }
+                    } finally {
+                        lock.releaseLock();
+                    }
                 }
             }
         } finally {
             source.close();
         }
+    }
+
+    private static final String textFileExtensions[] = new String[] {
+        "xml", "html", "htm", "txt", "mf", "properties", "fx", "java"
+    };
+
+    private static boolean isText( String filename ) {
+        for( String ext : textFileExtensions ) {
+            if( filename.toLowerCase().endsWith( "." + ext )) return true;
+        }
+        return false;
     }
 }
