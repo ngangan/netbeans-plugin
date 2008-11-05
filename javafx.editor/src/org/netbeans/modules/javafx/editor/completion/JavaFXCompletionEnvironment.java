@@ -296,7 +296,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(ElementHandle.create(member), member.asType(), s, query.anchorOffset, tta, true));
+                    ElementHandle eh = null;
+                    try {
+                        eh = ElementHandle.create(member);
+                    } catch (IllegalArgumentException iae) {
+                        // cannot convert --> ignore
+                    }
+                    if (eh != null) {
+                        addResult(JavaFXCompletionItem.createVariableItem(eh, member.asType(), s, query.anchorOffset, tta, true));
+                    }
                 }
             }
         }
@@ -342,7 +350,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(ElementHandle.create(member), member.asType(), s, query.anchorOffset, tta, false));
+                    ElementHandle eh = null;
+                    try {
+                        eh = ElementHandle.create(member);
+                    } catch (IllegalArgumentException iae) {
+                        // cannot convert --> ignore
+                    }
+                    if (eh != null) {
+                        addResult(JavaFXCompletionItem.createVariableItem(eh, member.asType(), s, query.anchorOffset, tta, false));
+                    }
                 }
             }
         }
@@ -445,6 +461,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (VariableTree var : fvt.getParameters()) {
                     if (LOGGABLE) log("  var: " + var + "\n");
                     String s = var.getName().toString();
+                    if (s.contains("$")) {
+                        continue;
+                    }
                     if (LOGGABLE) log("    adding(3) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, var));
                     if (smart != null && tm.getKind() == smart.getKind()) {
