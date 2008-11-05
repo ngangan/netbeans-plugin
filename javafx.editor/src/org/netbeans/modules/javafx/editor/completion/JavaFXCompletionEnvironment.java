@@ -246,7 +246,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) {
         JavafxcScope sc = controller.getTreeUtilities().getScope(path);
+        if (LOGGABLE) log("     addMembers scope was computed from path == " + path.getLeaf());
         boolean isStatic = controller.getTreeUtilities().isStaticContext(sc);
+        if (path.getLeaf() != null && path.getLeaf().toString().startsWith("variable initialization for static script only (default) var")) {
+            isStatic = true;
+        }
+        if (LOGGABLE) log("         isStatic == " + isStatic);
         addMembers(type, methods, fields, null,sc, true, !isStatic);
     }
     
@@ -531,7 +536,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             String s = type.getSimpleName().toString();
             if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix);
             TypeMirror tm = trees.getTypeMirror(expPath);
-            if (smart != null && tm.getKind() == smart.getKind()) {
+            if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
                 addResult(JavaFXCompletionItem.createVariableItem(tm,
                         s, query.anchorOffset, true));
             }
