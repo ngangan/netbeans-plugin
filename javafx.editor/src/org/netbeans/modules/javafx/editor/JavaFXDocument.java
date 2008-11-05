@@ -174,12 +174,14 @@ public class JavaFXDocument extends NbEditorDocument {
         if (enabled) {
             Project project = getProject(this);
             org.netbeans.spi.project.support.ant.PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
-            if (evaluator.getProperty("javafx.profile").toString().contentEquals("mobile")) {
-                String message = NbBundle.getMessage(JavaFXDocument.class, "PREVIEW_DISABLED_BY_PROFILE");
-                NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.INFORMATION_MESSAGE);
-                DialogDisplayer.getDefault().notify(d);
-                return;
-            }
+            Object profile = evaluator.getProperty("javafx.profile");
+            if (profile != null)
+                if (profile.toString().contentEquals("mobile")) {
+                    String message = NbBundle.getMessage(JavaFXDocument.class, "PREVIEW_DISABLED_BY_PROFILE");
+                    NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.INFORMATION_MESSAGE);
+                    DialogDisplayer.getDefault().notify(d);
+                    return;
+                }
         }
         for (Component component : createToolbar(pane).getComponents()) {
             if (component instanceof JToggleButton) {

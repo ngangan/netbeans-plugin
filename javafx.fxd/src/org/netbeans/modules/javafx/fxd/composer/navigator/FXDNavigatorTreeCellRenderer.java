@@ -73,8 +73,8 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final String ELEMENT        = IMAGE_BASE + "node_element.png";  //NOI18N
     private static final String NODE_ATTR      = IMAGE_BASE + "node_attr.png";  //NOI18N
     private static final String NODE_GENERAL   = IMAGE_BASE + "node_node.png";  //NOI18N
-    private static final String ERROR          = "org/netbeans/modules/xml/text/navigator/resources/badge_error.png"; //NOI18N    
-    private static final Image  ERROR_IMAGE    = ImageUtilities.loadImage(ERROR, true);   
+    private static final String ERROR_BADGE    = "org/netbeans/modules/xml/text/navigator/resources/badge_error.png"; //NOI18N    
+    private static final Image  ERROR_IMAGE    = ImageUtilities.loadImage(ERROR_BADGE, true);   
     
     private static final Map<String, Icon[]> NODE_ICONS;
     
@@ -99,7 +99,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
     private final Icon[] NODE_ICON         = createIcons(ELEMENT);
     private final Icon[] ATTR_ICON         = createIcons(NODE_ATTR);
     private final Icon[] NODE_GENERAL_ICON = createIcons(NODE_GENERAL);
-
+    private final Icon[] FILE_ICON         = createIcons( "org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"); //NOI18N
     
     private final HtmlRenderer.Renderer renderer;
     
@@ -120,7 +120,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         comp.setEnabled(tree.isEnabled());
         ((JLabel)comp).setToolTipText(tna.getToolTipText().trim().length() > 0 ? tna.getToolTipText() : null);
         
-        boolean containsError = tna.getChildrenErrorCount() > 0;
+        boolean containsError = tna.containsError(); //getChildrenErrorCount() > 0;
         
         //normal icons
         if( FXDNavigatorTree.isTreeElement(de)) {
@@ -136,8 +136,8 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
             } else if ( FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
                 icons = NODE_GENERAL_ICON;
             } else if ( FXDFileModel.DOCUMENT_ROOT_ELEMENT_TYPE.equals(type)) {
-                icons = NODE_ICON;
-            } else {
+                icons = FILE_ICON;
+            }  else {    
                 System.err.println("Unknown element type: " + type);  //NOI18N
             }
             if ( icons == null) {
@@ -167,7 +167,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
         
         switch( iconType) {
             case ERROR:
-                icon = new ImageIcon(ImageUtilities.mergeImages( icon.getImage(), ERROR_IMAGE, 15, 7 ));
+                icon = new ImageIcon(ImageUtilities.mergeImages( icon.getImage(), ERROR_IMAGE, 10, 7 ));
                 break;
             case GRAY:
                 icon = new ImageIcon( GrayFilter.createDisabledImage(icon.getImage()));

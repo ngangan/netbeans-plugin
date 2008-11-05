@@ -72,6 +72,7 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
                 e.printStackTrace();
             }
         }
+        FXDSourceEditor.addErrorStatusBarCell(getDataObject());
     }
     
     @Override
