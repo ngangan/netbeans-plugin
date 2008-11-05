@@ -6,13 +6,14 @@
 -->
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="nbdocs:/org/netbeans/modules/usersguide/ide.css" rel="stylesheet" type="text/css">
 <title>Setting the Target JDK in a JavaFX Project</title>
-<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
 </head>
 <body>
 <h2>Setting the Target JavaFX SDK in a JavaFX Project</h2>
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
-<p>By default, every new JavaFX project uses the JavaFX SDK platform  as the default  platform the IDE uses for compilation, execution, debugging, and profiling of JavaFX applications. This platform is based on the bundled JavaFX libraries and the default Java SE platform (JDK) that is bundled with the IDE. You can view your IDE's JDK version by choosing Help &gt; About 
+<p>By default, a newly created JavaFX project uses the JavaFX SDK that came bundled with the JavaFX plugin.  It is the default  platform  used for compilation, execution, debugging, and profiling of JavaFX applications. This platform is based on the bundled JavaFX libraries and the Java SE platform (JDK) that you have selected to use during the IDE installation. You can view the JDK version your IDE installation is using by choosing Help &gt; About 
   and clicking 
   the Detail tab. (On a MacOS platform, choose NetBeans &gt; About NetBeans). The JDK version is listed in the Java field. 
 <ul class="note"> 
@@ -26,7 +27,7 @@
 <p><b>To set the default platform for a JavaFX project:</b></p>
 <ol>
   <li>Right-click the project's root node in the Projects window and choose Properties.<br>
-  Alternatively, on the Windows platform, you can select the project in the Projects window and select File &gt; <i>&quot;&lt;JavaFX_project_name&gt;&quot;</i> Properties from the main menu.  </li>
+  Alternatively, on the Windows platform, you can select the project in the Projects window and select File &gt;  Project Properties (<i>JavaFX_project_name</i>) from the main menu.  </li>
   <li>In the Project Properties dialog box, select the Libraries node in the
   	left pane. </li>
   <li>Choose the desired JavaFX platform in the JavaFX Platform combo box and click OK 
@@ -45,9 +46,9 @@
   <ol>
       <li>Choose Tools &gt; Java Platforms from the main menu of the IDE.</li>
       <li>From the Java Platform Manager, click the Add Platform button. </li>
-      <li>In the Add Java Platform wizard, select Java JavaFX Platform and click Next.</li>
-      <li>Specify the Platform Name you want assigned and the Java platform to use. Use the Browse button to navigate to the JDK/JRE you want to use.</li>
-      <li>Specify the folder that contains the necessary JavaFX libraries to use with the new JavaFX platform.</li>
+      <li>In the Add Java Platform wizard, select the JavaFX Platform type and click Next.</li>
+      <li>Specify the Platform Name you want assigned to the new platform configuration.</li>
+      <li>Specify the folder that contains the necessary JavaFX libraries to use with the new JavaFX platform. Use the Browse button to navigate to the folder of the JavaFX SDK instlalation you want to use.</li>
       <li>Click Finish. <br>
         The new platform is added to the list of available JavaFX platforms.</li>
       <li>Click Close to dismiss the Java Platform Manager dialog. </li>
