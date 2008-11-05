@@ -70,12 +70,12 @@ nb.cluster.javafx=\\
        contrib/javafx.fxd,\\
        contrib/javafx.sdksamples
 
-javafx-sdk.win.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-dev-windows-i586.zip
-javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-dev-macosx-universal.zip
-javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/artifact/jfx/build/linux-i586/release/bundles/javafx_sdk-1_0-dev-linux-i586.zip
-javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/artifact/jfx/build/solaris-sparc/release/bundles/javafx_sdk-1_0-dev-solaris-sparc.zip
-jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxc.jar
-jfxdoc.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0dev/lib/shared/javafxdoc.jar
+javafx-sdk.win.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-windows-i586.zip
+javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-macosx-universal.zip
+javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/artifact/jfx/build/linux-i586/release/bundles/javafx_sdk-1_0-linux-i586.zip
+javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/artifact/jfx/build/solaris-sparc/release/bundles/javafx_sdk-1_0-solaris-sparc.zip
+jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxc.jar
+jfxdoc.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
 javafx-fxd-netbeans-support.zip.url=http://getjfx.sfbay.sun.com/hudson/job/JavaFX_Production_Suite_Trunk/label=macosx-universal2/lastSuccessfulBuild/artifact/installer/macosx/build/javafx-fxd-netbeans-support-1.0-macosx-universal.zip
 
