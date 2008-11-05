@@ -74,7 +74,7 @@ final class FXDNavigatorTree extends JTree {
         
         m_firstPaint = true;
         setShowsRootHandles(true);
-        setRootVisible(false);
+        setRootVisible(true);
         putClientProperty("JTree.lineStyle", "Angled");  //NOI18N       
         
         DocumentElement rootElement = docModel.getRootElement();
@@ -121,8 +121,7 @@ final class FXDNavigatorTree extends JTree {
     }
     
     public static boolean isTreeElement(DocumentElement de) {
-        assert de != null;
-        return true;
+        return !FXDFileModel.isError(de);
     }
         
     public void selectNode( FXDElement elem) {

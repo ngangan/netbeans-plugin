@@ -11,6 +11,9 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.FXDElement;
 import com.sun.javafx.tools.fxd.FXDNode;
 import com.sun.javafx.tools.fxd.FXDNodeArray;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  *
@@ -21,9 +24,11 @@ final class DocumentElementWrapper {
     
     private static abstract class FXDElementWrapper implements FXDElement {
         protected DocumentElement m_de;
+        protected final boolean m_remapID;
         
-        public FXDElementWrapper( final DocumentElement de) {
+        public FXDElementWrapper( final DocumentElement de, boolean remapID) {
             m_de = de;
+            m_remapID = remapID;
         }
         
         public void release() {
@@ -31,9 +36,9 @@ final class DocumentElementWrapper {
         }
     }
     
-    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDNode {
-        public FXDNodeWrapper(final DocumentElement de) {
-            super(de);
+    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDNode {        
+        public FXDNodeWrapper(final DocumentElement de, boolean remapID) {
+            super(de, remapID);
         }        
 
         public String getTypeName() {
@@ -45,7 +50,7 @@ final class DocumentElementWrapper {
         }
 
         public Object getAttrValue(String name) {
-            if ( FXDNode.ATTR_NAME_ID.equals(name)) {
+            if ( m_remapID && FXDNode.ATTR_NAME_ID.equals(name)) {
                 //override existing ID with the element start offset
                 return Integer.toString(m_de.getStartOffset());
             } else {
@@ -60,10 +65,10 @@ final class DocumentElementWrapper {
                             if ( name.equals(de.getName())) {
                                 if ( FXDFileModel.FXD_ATTRIBUTE.equals( de.getType())) {
                                     assert de.getElementCount() == 1;
-                                    return wrap(de.getElement(0), false);
+                                    return wrap(de.getElement(0), false, m_remapID);
                                 } else {
                                     assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( de.getType());
-                                    return wrap(de, false);
+                                    return wrap(de, false, m_remapID);
                                 }
                             }
                         }
@@ -83,19 +88,46 @@ final class DocumentElementWrapper {
             return FXDElement.KIND_OBJECT;
         }
 
-        public boolean isLeaf() {
+        public boolean isLeaf() {            
             return m_de.getElementCount() == 0;
         }
 
         public Enumeration<FXDElement> children() {
-            //TODO Implement
-            throw new UnsupportedOperationException("Not supported yet."); //NOI18N
-        }
+            final List<DocumentElement> childDE = new ArrayList<DocumentElement>();
+            collectChildren(m_de, childDE);
+            return new Enumeration<FXDElement>() {
+                private int m_index = 0;
+
+                public boolean hasMoreElements() {
+                    return m_index < childDE.size();
+                }
+
+                public FXDElement nextElement() {
+                    if ( m_index >= childDE.size()) {
+                        throw new NoSuchElementException();
+                    }
+                    return wrap( childDE.get(m_index++), false, m_remapID);
+                }
+            };
+        }        
     }
 
+    private static void collectChildren( final DocumentElement de, List<DocumentElement> childrenList) {
+        for ( int i = 0; i < de.getElementCount(); i++) {
+            DocumentElement child = de.getElement(i);
+            String type = child.getType();
+            if ( FXDFileModel.FXD_NODE.equals( type) || 
+                 FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
+                childrenList.add( child);
+            } else {
+                collectChildren(child, childrenList);
+            }
+        }
+    }
+    
     private static final class FXDRootNodeWrapper extends FXDNodeWrapper {
-        public FXDRootNodeWrapper(final DocumentElement de) {
-            super(de);
+        public FXDRootNodeWrapper(final DocumentElement de, boolean remapID) {
+            super(de, remapID);
         }
         
         @Override
@@ -110,8 +142,8 @@ final class DocumentElementWrapper {
     
     private static final class FXDNodeArrayWrapper extends FXDElementWrapper implements FXDNodeArray {
 
-        public FXDNodeArrayWrapper(final DocumentElement de) {
-            super(de);
+        public FXDNodeArrayWrapper(final DocumentElement de, boolean remapID) {
+            super(de, remapID);
         }        
 
         public int getLength() {
@@ -124,7 +156,7 @@ final class DocumentElementWrapper {
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
                 return de.getName();
             } else {
-                return wrap( de, false);
+                return wrap( de, false, m_remapID);
             }
         }
 
@@ -137,17 +169,44 @@ final class DocumentElementWrapper {
         }
 
         public Enumeration<FXDElement> children() {
-            throw new UnsupportedOperationException("Not supported yet."); //NOI18N
+            return new Enumeration<FXDElement>() {
+                private int m_index = advance(0);
+
+                public boolean hasMoreElements() {
+                    return m_index < m_de.getElementCount();
+                }
+
+                public FXDElement nextElement() {
+                    if ( m_index >= m_de.getElementCount()) {
+                        throw new NoSuchElementException();
+                    }
+                    FXDElement elem = wrap( m_de.getElement(m_index), false, m_remapID);
+                    m_index = advance(m_index+1);
+                    return elem;
+                }
+                
+                private int advance(int index) {
+                    while( index < m_de.getElementCount() &&
+                       FXDFileModel.FXD_ARRAY_ELEM.equals(m_de.getElement(index).getType())) {
+                       index++;
+                    }
+                    return index;
+                }
+            };
         }        
     }
 
-    public static FXDElement wrap( final DocumentElement de, boolean isRoot) {
-        if ( FXDFileModel.FXD_NODE.equals( de.getType())) {
-            return isRoot ? new FXDRootNodeWrapper(de) : new FXDNodeWrapper(de);
-        } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(de.getType())) {
-            return new FXDNodeArrayWrapper(de);
-        } else {   
-            throw new RuntimeException( "Unknown DocumentElement type: " + de.getType()); //NOI18N
+    public static FXDElement wrap( final DocumentElement de, boolean isRoot, boolean remapId) {
+        String type = de.getType();
+        if ( FXDFileModel.FXD_NODE.equals( type)) {
+            return isRoot ? new FXDRootNodeWrapper(de, remapId) : new FXDNodeWrapper(de, remapId);
+        } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
+            return new FXDNodeArrayWrapper(de, remapId);
+        } else if ( FXDFileModel.FXD_ERROR.equals(type)) {
+            // nothing to do
+            return null;
+        } else {    
+            throw new RuntimeException( "Unknown DocumentElement type: " + type); //NOI18N
         }
     }
 }

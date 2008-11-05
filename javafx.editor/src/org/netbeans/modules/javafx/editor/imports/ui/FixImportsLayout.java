@@ -28,7 +28,6 @@
 
 package org.netbeans.modules.javafx.editor.imports.ui;
 
-import org.netbeans.api.editor.EditorRegistry;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.openide.util.NbBundle;
@@ -37,10 +36,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -53,7 +49,7 @@ import java.util.logging.LogRecord;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @version 0.9
  */
-public final class FixImportsLayout<T extends CompletionItem> {
+public final class FixImportsLayout<T extends CompletionItem> implements KeyListener, FocusListener, MouseListener {
 
     public static final int COMPLETION_ITEM_HEIGHT = 16;
 
@@ -73,11 +69,13 @@ public final class FixImportsLayout<T extends CompletionItem> {
 
     private final FixPopup<T> fixPopup;
     protected static FixImportsLayout<CompletionItem> instance = new FixImportsLayout<CompletionItem>();
+    private boolean canceled = false;
 
 //    private Stack<PopupWindow<T>> visiblePopups;
 
     @SuppressWarnings({"unchecked"})
     public static <T extends CompletionItem> FixImportsLayout<T> create() {
+        instance.canceled = false;
         return (FixImportsLayout<T>) instance;
     }
 
@@ -91,31 +89,48 @@ public final class FixImportsLayout<T extends CompletionItem> {
     /*public*/ JTextComponent getEditorComponent() {
         return (editorComponentRef != null)
                 ? editorComponentRef.get()
-                : EditorRegistry.lastFocusedComponent();
+                : null;
+//                : EditorRegistry.lastFocusedComponent();
     }
 
     public void setEditorComponent(JTextComponent editorComponent) {
+        unregister();
+        JTextComponent component;
         hideAll();
         this.editorComponentRef = new WeakReference<JTextComponent>(editorComponent);
+        component = getEditorComponent();
+        component.addKeyListener(this);
+        component.addMouseListener(this);
+        component.addFocusListener(this);
+    }
+
+    private void unregister() {
+        JTextComponent component = getEditorComponent();
+        if (component != null) {
+            component.removeKeyListener(this);
+            component.removeMouseListener(this);
+            component.removeFocusListener(this);
+        }
     }
 
     private void hideAll() {
-        fixPopup.hide();
-//        visiblePopups.clear();
+        hide();
     }
 
     @SuppressWarnings({"MethodWithTooManyParameters"})
     public void show(List<T> data, String title, int anchorOffset, ListSelectionListener lsl,
-                     String additionalItemsText, String shortcutHint, int selectedIndex) {        
+                     String additionalItemsText, String shortcutHint, int selectedIndex) {
+        hideAll();
+        canceled = false;
         fixPopup.show(data, title, anchorOffset, lsl, additionalItemsText, shortcutHint, selectedIndex);
-        fixPopup.getFocusListeningComponent().requestFocusInWindow();
+        //this is small trick to minimaze impact of change in HiRez mode.
+//        fixPopup.getFocusListeningComponent().requestFocusInWindow();
     }
 
     public boolean hide() {
         if (fixPopup.isVisible()) {
             fixPopup.hide();
             fixPopup.completionScrollPane = null;
-//            visiblePopups.remove(fixPopup);
             return true;
         } else { // not visible
             return false;
@@ -127,20 +142,25 @@ public final class FixImportsLayout<T extends CompletionItem> {
     }
 
     public T getSelectedItem() {
+        if (canceled) return null;
         return fixPopup.getSelectedCompletionItem();
     }
 
 
     public int getSelectedIndex() {
+        if (canceled) return -1;
         return fixPopup.getSelectedIndex();
     }
 
     public void processKeyEvent(KeyEvent evt) {
         if (fixPopup.isVisible()) {
             if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                fixPopup.completionScrollPane.clearSelection();
+                canceled = true;
+                hideAll();
+            } else {
+                fixPopup.processKeyEvent(evt);
             }
-            fixPopup.processKeyEvent(evt);
+            evt.consume();
         }
     }
 
@@ -152,6 +172,90 @@ public final class FixImportsLayout<T extends CompletionItem> {
 
     PopupWindow<T> testGetCompletionPopup() {
         return fixPopup;
+    }
+
+    /**
+     * Invoked when a key has been typed.
+     * See the class description for {@link java.awt.event.KeyEvent} for a definition of
+     * a key typed event.
+     */
+    public void keyTyped(KeyEvent e) {
+        e.consume();
+//        processKeyEvent(e);
+    }
+
+    /**
+     * Invoked when a key has been pressed.
+     * See the class description for {@link java.awt.event.KeyEvent} for a definition of
+     * a key pressed event.
+     */
+    public void keyPressed(KeyEvent e) {
+//        e.consume();
+        processKeyEvent(e);
+    }
+
+    /**
+     * Invoked when a key has been released.
+     * See the class description for {@link java.awt.event.KeyEvent} for a definition of
+     * a key released event.
+     */
+    public void keyReleased(KeyEvent e) {
+        e.consume();
+//        processKeyEvent(e);
+    }
+
+    /**
+     * Invoked when a component gains the keyboard focus.
+     */
+    public void focusGained(FocusEvent e) {
+    }
+
+    /**
+     * Invoked when a component loses the keyboard focus.
+     */
+    public void focusLost(FocusEvent e) {
+        canceled = true;
+        if (fixPopup != null && fixPopup.getSelectedCompletionItem() != null) {
+            fixPopup.getSelectedCompletionItem()
+                    .processKeyEvent(new KeyEvent(getEditorComponent(), 1, 1, 0, KeyEvent.VK_ESCAPE, KeyEvent.CHAR_UNDEFINED));
+        }
+        hideAll();
+    }
+
+    /**
+     * Invoked when the mouse button has been clicked (pressed
+     * and released) on a component.
+     */
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    /**
+     * Invoked when a mouse button has been pressed on a component.
+     */
+    public void mousePressed(MouseEvent e) {
+    }
+
+    /**
+     * Invoked when a mouse button has been released on a component.
+     */
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    /**
+     * Invoked when the mouse enters a component.
+     */
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    /**
+     * Invoked when the mouse exits a component.
+     */
+    public void mouseExited(MouseEvent e) {
+    }
+
+    public void finish() {
+        unregister();
+        hide();
     }
 
 
@@ -259,6 +363,8 @@ public final class FixImportsLayout<T extends CompletionItem> {
                         action.actionPerformed(new ActionEvent(completionScrollPane, 0, null));
                         evt.consume();
                     }
+                } else {
+                    completionScrollPane.processKeyEvent(evt);
                 }
             }
         }

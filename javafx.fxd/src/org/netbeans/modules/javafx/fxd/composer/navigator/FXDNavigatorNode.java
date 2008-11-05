@@ -220,6 +220,10 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                     text.append("<font color=888888>");  //NOI18N
                 }
             }
+            String name = getDocumentElement().getName();
+            if ( "root".equals(name)) {
+                name = "FXD";
+            }
             String id = (String) getDocumentElement().getAttributes().getAttribute("id"); //NOI18N
             
             if (id != null /*&& !id.startsWith(JSONObject.INJECTED_ID_PREFIX)*/) {
@@ -234,7 +238,7 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                 }
                 text.append(':');
             }
-            text.append(getDocumentElement().getName());
+            text.append(name);
             if (html) {
                 if (m_containsError) {
                     text.append("</b></font>");  //NOI18N
@@ -383,22 +387,22 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
             int index = getChildTreeNodeIndex(ade);
             if(index == -1) {               
                 if (visibility != FXDNavigatorTree.VISIBILITY_NO) {
-                    FXDNavigatorNode tn = new FXDNavigatorNode(ade, m_nodeTree, this, visibility);
                     int insertIndex = getVisibleChildIndex(ade);
 
                     //check whether the insert index doesn't go beyond the actual children length (which states an error)
-                    if(m_children.size() < insertIndex /*||
+                    if( insertIndex < 0 || m_children.size() < insertIndex /*||
                             children.size() + 1 /* it doesn't contain the currently added element != getDocumentElement().getElementCount()*/) {
                         //error => try to recover by refreshing the current node
                         //debugError(e);
                         //notify treemodel
                         m_nodeTree.getTreeModel().nodeStructureChanged(this);
                     } else {
+                        FXDNavigatorNode tn = new FXDNavigatorNode(ade, m_nodeTree, this, visibility);
                         m_children.add(insertIndex, tn);
                         final int tnIndex = getIndex(tn);
                         m_nodeTree.getTreeModel().nodesWereInserted(this, new int[]{tnIndex});
+                        if(debug)System.out.println("<<<EVENT finished (node " + tn + " added)"); //NOI18N
                     }
-                    if(debug)System.out.println("<<<EVENT finished (node " + tn + " added)"); //NOI18N
                     
                     //TODO Maybe add
                     /*
@@ -419,7 +423,9 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                     m_nodeTree.getTreeModel().nodesWereRemoved(this, new int[] {index}, new Object[] {removedNode});
                 } 
             }            
-        } 
+        } else if ( FXDFileModel.isError(ade)) {
+            markNodeAsError(this);
+        }
                 
         //fix: if a new nodes are added into the root element (set as invisible), the navigator
         //window is empty. So we need to always expand the root element when adding something into
@@ -498,7 +504,9 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                 //notify treemodel - do that in event dispath thread
                 m_nodeTree.getTreeModel().nodesWereRemoved(FXDNavigatorNode.this, new int[]{tnIndex}, new Object[]{tn});
             } else if(debug) System.out.println("Warning: TreeNode for removed element doesn't exist!!!");  //NOI18N
-        } 
+        } else if ( FXDFileModel.isError(rde)) {
+            unmarkNodeAsError(this);
+        }
         if(debug) System.out.println("<<<EVENT finished (node removed)");  //NOI18N
     }
         
@@ -659,7 +667,9 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                             m_children.remove(index);
                         }
                     }
-                } 
+                } else if ( FXDFileModel.isError(chde)) {
+                    markNodeAsError(this);
+                }
             }
         }
     }

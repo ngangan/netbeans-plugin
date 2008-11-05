@@ -47,6 +47,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.swing.SwingUtilities;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -299,7 +300,15 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             return;
         }
 
-        final boolean hasDeclaredType = element.asType().getKind() == TypeKind.DECLARED;
+        if (element == null) {
+            return;
+        }
+        final TypeMirror asType = element.asType();
+        if (asType == null) {
+            return;
+        }
+
+        final boolean hasDeclaredType = asType.getKind() == TypeKind.DECLARED;
         if (hasDeclaredType) {
             if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
                 JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
@@ -311,9 +320,16 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                     javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
                         public void run(CompilationController cc) throws Exception {
                             cc.moveToPhase(Phase.ANALYZED);
-                            ElementHandle eh = ElementHandle.create(element);
-                            Element e2 = eh.resolve(cc);
-                            setJavadoc(ElementJavadoc.create(cc, e2));
+                            ElementHandle eh = null;
+                            try {
+                                eh = ElementHandle.create(element);
+                            } catch (Exception e) {
+                                // can't create element handle
+                            }
+                            if (eh != null) {
+                                Element e2 = eh.resolve(cc);
+                                setJavadoc(ElementJavadoc.create(cc, e2));
+                            }
                         }
                     }, true);
                 } catch (IOException ex) {

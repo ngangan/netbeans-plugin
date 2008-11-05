@@ -68,6 +68,11 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
         if (LOGGABLE) log("   s = " + s + "  e == " + e);
         JavaFXTreePath p = JavaFXTreePath.getPath(root, t);
         
+        if (t.getErrorTrees().isEmpty()) {
+            fakeIt();
+            return;
+        }
+
         for (Tree tt : t.getErrorTrees()) {
             if (LOGGABLE) log("    tt == " + tt);
             if (LOGGABLE) log("    tt.getClass() == " + tt.getClass());
@@ -75,19 +80,24 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
             long et = pos.getEndPosition(root, tt);
             if (LOGGABLE) log("   st = " + st + "  et == " + et);
             if (et == offset-1) {
-                try {
-                    Document d = controller.getJavaFXSource().getDocument();
-                    String start = d.getText(0, offset);
-                    if (LOGGABLE) log("  start = " + start);
-                    String end = d.getText(offset, d.getLength()-offset);
-                    if (LOGGABLE) log("  end = " + end);
-                    useFakeSource(start+"x"+end, offset);
-                } catch (BadLocationException ble) {
-                    if (LOGGABLE) logger.log(Level.FINER, "ble", ble);
-                }
+                fakeIt();
             }
         }
     }
+
+    private void fakeIt() {
+        try {
+            Document d = controller.getJavaFXSource().getDocument();
+            String start = d.getText(0, offset);
+            if (LOGGABLE) log("  start = " + start);
+            String end = d.getText(offset, d.getLength()-offset);
+            if (LOGGABLE) log("  end = " + end);
+            useFakeSource(start+"x"+end, offset);
+        } catch (BadLocationException ble) {
+            if (LOGGABLE) logger.log(Level.FINER, "ble", ble);
+        }
+    }
+
     private static void log(String s) {
         if (LOGGABLE) {
             logger.fine(s);

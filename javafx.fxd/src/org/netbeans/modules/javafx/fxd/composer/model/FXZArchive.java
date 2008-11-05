@@ -256,34 +256,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     public boolean areEntriesChanged() {
         return m_entryChanged;
     }
-    
-    /*
-    public synchronized void documentOpened( StyledDocument doc) {
-        if ( m_fileModel == null) {
-            try {
-                m_fileModel = new FXDFileModel(this, DocumentModel.getDocumentModel(doc));
-            } catch (DocumentModelException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            if (m_fileModel.getDocument() != doc) {
-                //System.err.println("Document switch!");  //NOI18N
-                Thread.dumpStack();
-            }
-        }
-    }*/
-    
-    protected static BaseDocument loadDocument(InputStream in) throws IOException, DocumentModelException, BadLocationException {
-        EditorKit kit = JEditorPane.createEditorKitForContentType(FXZDataLoader.REQUIRED_MIME);
-        try {
-            BaseDocument doc = (BaseDocument) kit.createDefaultDocument();
-            kit.read(in, doc, 0);
-            return doc;
-        } finally {
-            in.close();
-        }
-    }
-    
+            
     public synchronized FXDFileModel getFileModel() {
         if ( m_fileModel == null) {
             try {
@@ -295,28 +268,6 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return m_fileModel;
     }
     
-    /*
-    public synchronized FXDFileModel getFileModel(boolean create) {
-        if ( m_fileModel == null) {
-            if (create) {
-                InputStream in = null;
-                try {
-                    try {
-                        //System.err.println("Loading the document ...");
-                        in = open();
-                        BaseDocument doc = loadDocument(in);
-                        m_fileModel = new FXDFileModel(this, DocumentModel.getDocumentModel(doc));
-                    } finally {
-                        in.close();
-                    }
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return m_fileModel;
-    }*/
-
     public synchronized long getSize() {
         long sum = 0;
         for ( FXZArchiveEntry entry : m_entries) {

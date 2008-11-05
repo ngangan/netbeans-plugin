@@ -552,7 +552,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                     editorOpened = false;
                     //document is being closed
                     //if(DEBUG) System.out.println("document has been closed for DO: " + dobj.hashCode());
-                    System.err.println("document has been closed for DO: " + dobj.hashCode());
+                    //System.err.println("document has been closed for DO: " + dobj.hashCode());
                     
                     
                     //remove the property change listener from the DataObject's EditorSupport

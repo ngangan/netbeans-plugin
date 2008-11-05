@@ -146,7 +146,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public synchronized FXDComposerModel getDataModel() {
         if (m_model == null) {
             try {
-                System.err.println("Creating the DataModel");
+                //System.err.println("Creating the DataModel");
                 m_model = new FXDComposerModel(this);
                 //SceneManager.log(Level.INFO, "SceneManager created for " + getPrimaryFile().getPath()); //NOI18N
             } catch (Exception ex) {
@@ -159,7 +159,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     
     public synchronized FXDComposerController getController() {
         if ( m_controller == null) {
-            System.err.println("Creating the Controller");
+            //System.err.println("Creating the Controller");
             m_controller = new FXDComposerController(this);
         }
         return m_controller;

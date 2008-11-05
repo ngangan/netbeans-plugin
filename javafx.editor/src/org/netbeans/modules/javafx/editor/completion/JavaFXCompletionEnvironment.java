@@ -246,7 +246,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addMembers(final TypeMirror type, final boolean methods, final boolean fields) {
         JavafxcScope sc = controller.getTreeUtilities().getScope(path);
+        if (LOGGABLE) log("     addMembers scope was computed from path == " + path.getLeaf());
         boolean isStatic = controller.getTreeUtilities().isStaticContext(sc);
+        if (path.getLeaf() != null && path.getLeaf().toString().startsWith("variable initialization for static script only (default) var")) {
+            isStatic = true;
+        }
+        if (LOGGABLE) log("         isStatic == " + isStatic);
         addMembers(type, methods, fields, null,sc, true, !isStatic);
     }
     
@@ -296,7 +301,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(ElementHandle.create(member), member.asType(), s, query.anchorOffset, tta, true));
+                    ElementHandle eh = null;
+                    try {
+                        eh = ElementHandle.create(member);
+                    } catch (IllegalArgumentException iae) {
+                        // cannot convert --> ignore
+                    }
+                    if (eh != null) {
+                        addResult(JavaFXCompletionItem.createVariableItem(eh, member.asType(), s, query.anchorOffset, tta, true));
+                    }
                 }
             }
         }
@@ -342,9 +355,25 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             tta += " []";
                         }
                     }
-                    addResult(JavaFXCompletionItem.createVariableItem(ElementHandle.create(member), member.asType(), s, query.anchorOffset, tta, false));
+                    ElementHandle eh = null;
+                    try {
+                        eh = ElementHandle.create(member);
+                    } catch (IllegalArgumentException iae) {
+                        // cannot convert --> ignore
+                    }
+                    if (eh != null) {
+                        addResult(JavaFXCompletionItem.createVariableItem(eh, member.asType(), s, query.anchorOffset, tta, false));
+                    }
                 }
             }
+        }
+
+        TypeMirror parent = te.getSuperclass();
+        if (parent != null) {
+            addMembers(parent, false, true, textToAdd, scope, statics, instance);
+        }
+        for (TypeMirror intf : te.getInterfaces()) {
+            addMembers(intf, false, true, textToAdd, scope, statics, instance);
         }
     }
 
@@ -437,6 +466,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (VariableTree var : fvt.getParameters()) {
                     if (LOGGABLE) log("  var: " + var + "\n");
                     String s = var.getName().toString();
+                    if (s.contains("$")) {
+                        continue;
+                    }
                     if (LOGGABLE) log("    adding(3) " + s + " with prefix " + prefix);
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, var));
                     if (smart != null && tm.getKind() == smart.getKind()) {
@@ -504,7 +536,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             String s = type.getSimpleName().toString();
             if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix);
             TypeMirror tm = trees.getTypeMirror(expPath);
-            if (smart != null && tm.getKind() == smart.getKind()) {
+            if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
                 addResult(JavaFXCompletionItem.createVariableItem(tm,
                         s, query.anchorOffset, true));
             }

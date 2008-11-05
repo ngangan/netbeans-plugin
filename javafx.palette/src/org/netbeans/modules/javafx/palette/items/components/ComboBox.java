@@ -60,7 +60,7 @@ public class ComboBox implements ActiveEditorDrop {
         
         // Import
         Imports.addImport( targetComponent, "javafx.ext.swing.SwingComboBox" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.ext.swing.ComboBoxItem" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.ext.swing.SwingComboBoxItem" ); // NOI18N
         
         return true;
     }    

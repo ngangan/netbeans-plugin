@@ -104,6 +104,10 @@ public final class FXSourceUtils {
     }
 
     private static String typeToString(JavafxTypes types, Type type) {
+        if (type == null) {
+            return "<null>";
+        }
+
         String suffix = ""; // NOI18N
         if (type instanceof FunctionType) {
             MethodType mtype = ((FunctionType) type).asMethodType();

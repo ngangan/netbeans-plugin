@@ -23,7 +23,7 @@ Stage {
     height: 80
     scene: Scene {
         content: Text {
-            Font {
+            font : Font {
                 size : 24
             }
             x: 10, y: 30
