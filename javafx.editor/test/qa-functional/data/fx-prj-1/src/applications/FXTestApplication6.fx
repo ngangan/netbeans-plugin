@@ -2,7 +2,6 @@ package applications;
 
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontStyle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -17,9 +16,7 @@ Stage{
             content: "Application content"
             font: Font {
                 size: 24
-                style: FontStyle {
-                    
-                }
+                
             }
         }
     }

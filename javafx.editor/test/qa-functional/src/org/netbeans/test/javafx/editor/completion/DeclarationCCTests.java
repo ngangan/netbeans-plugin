@@ -129,7 +129,7 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 getDataDir(),
                 "fx-prj-1",
                 "declarations/TopLvlVar3.fx",
-                5, // line number where the cursor should be
+                19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
 

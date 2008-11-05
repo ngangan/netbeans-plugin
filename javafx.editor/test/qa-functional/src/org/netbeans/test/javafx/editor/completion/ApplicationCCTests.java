@@ -160,12 +160,12 @@ public class ApplicationCCTests extends CompletionTestPerformer {
     public void testFXApplication06() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter,
-                "", // what should be typed in the editor
+                "style: ", // what should be typed in the editor
                 false,
                 getDataDir(),
                 "fx-prj-1",
                 "applications/FXTestApplication6.fx",
-                21, // line number where the cursor should be
+                19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
 

@@ -105,6 +105,7 @@ is divided into following sections:
                 </or>
             </not>
         </condition>
+        <property name="run.jvmargs" value=""/>
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization.-->
@@ -172,11 +173,11 @@ is divided into following sections:
                     =================
     -->
     <target depends="init,compile,jar" description="Run a main class." if="standard.execution.trigger" name="standard-run">
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}"/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}" jvmargs="${run.jvmargs}"/>
     </target>
     <target depends="jar" description="Start MIDP execution" if="midp.execution.trigger" name="midp-run">
         <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
-        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}" failonerror="true">
             <arg value="-Xdescriptor:${jad.file}"/>
         </exec>
     </target>
@@ -194,6 +195,9 @@ is divided into following sections:
         <condition property="browser.args" value="/C">
             <os family="windows"/>
         </condition>
+        <condition property="browser.args" value="-g">
+            <os family="mac"/>
+        </condition>
         <property name="browser.args" value=""/>
         <exec executable="${browser}" spawn="true">
             <arg value="${browser.args}"/>
@@ -201,7 +205,8 @@ is divided into following sections:
         </exec>
     </target>
     <target depends="jar" description="Start javaws execution" if="jnlp.execution.trigger" name="jws-run">
-        <exec executable="${java.home}/bin/javaws">
+        <exec executable="${java.home}/bin/javaws" failonerror="true">
+            <env key="JAVAWS_VM_ARGS" value="${run.jvmargs}"/>
             <arg file="${dist.dir}/${application.title}.jnlp"/>
         </exec>
     </target>
@@ -234,6 +239,7 @@ is divided into following sections:
     <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
         <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address}"/>
+            <jvmarg line="${run.jvmargs}"/>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
                 <mapper from="run-sys-prop.*" to="*" type="glob"/>
@@ -250,7 +256,7 @@ is divided into following sections:
     </target>
     <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
         <exec executable="${java.home}/bin/javaws">
-            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${javafx.address}"/>
+            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${javafx.address} ${run.jvmargs}"/>
             <arg file="${dist.dir}/${application.title}.jnlp"/>
         </exec>
     </target>

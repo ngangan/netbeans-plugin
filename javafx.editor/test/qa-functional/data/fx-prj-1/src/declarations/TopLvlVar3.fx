@@ -14,6 +14,6 @@ var leftEyebrow = Polyline {
     strokeWidth: 2.0
     stroke: bind colorSEQ[color]
     fill: bind colorSEQ[color]
-};
+}
 
 
