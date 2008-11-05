@@ -13,11 +13,15 @@
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
 
 
-<p>You can deploy your JavaFX application  as a standalone application, as an application enabled with Java Web Start, or as an applet viewable in a platform-independent applet viewer. </p>
+<p>You can deploy your JavaFX application  as a standalone application, as an application enabled with Java Web Start,  as an applet viewable in a web browser, or as an application running in a Mobile Emulator. </p>
 <p><b>To run a standalone application from the IDE: </b></p>
 <ol>
-      <li>In the Projects window, select the main node for your project and right-click it. </li>
-      <li>Select Run Project.</li>
+      <li>In the Projects window, right-click your project's root node and select Properties.<br>
+      Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu.      </li>
+      <li>In Project Properties dialog, select the Run category.</li>
+      <li>Select the Standard Execution radio button.</li>
+      <li>Click OK.</li>
+      <li>In the Projects window, right-click the project's root node again and select Run Project.
 </ol>
 <p><b>To run a standalone application from the command line: </b></p>
 <ol>
@@ -25,13 +29,13 @@
 	<li>Type the following at the command prompt: <br>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>javafx -jar <i>application_jar_name.jar &nbsp;main_JavaFX_class_name.Main</i></code></li>
 </ol>
-<p><b>To build  and run a JNLP application using the IDE:</b>
+<p><b>To run a JNLP application using the IDE:</b>
 <ol>
-<li>In the Projects window, right-click your project's node and select Properties.<br>
-  Alternatively, you can select the project in the Projects window and select File &gt; <i>&quot;&lt;JavaFX_project_name&gt;&quot;</i> Properties from the main menu.  </li>
-<li> In Project Properties dialog, select the Application &gt; WebStart category.</li>
-<li>Select the Enable Web Start and Compress JARs with Pack 200 checkboxes on the right-hand pane.</li>
-<li>In the Categories pane, select the Run cateogry and select the Enable Run with Java Web Start checkbox.</li>
+<li>In the Projects window, right-click your project's root node and select Properties.<br>
+  Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu.  </li>
+<li> In Project Properties dialog, select the Application  category.</li>
+<li>Under the Web Start Specific Properties section, select the  Self Signed JAR and the Pack200 Compression checkboxes.</li>
+<li>In the Categories pane, select the Run category and select the  Web Start Execution radio button.</li>
 <li>Click OK.</li>
 <li>In the Projects window, right-click the project's node again and select Run Project.<br>
     The IDE builds the project first, adds the following files to your project's folders, and then executes the project.
@@ -50,37 +54,36 @@ Do one of the following after you build the JNLP application for your JavaFX  pr
 
 	</li>
 </ul>
-<p><b>To create a JavaFX applet using the IDE:</b>
+<p><b>To run a JavaFX application in a web browser:</b>
 
-<p>Use either of the following sets of steps to create a new JavaFX applet:</p>
 <ol>
-<li>In the Projects window, right-click your project's main node and select New &gt; JavaFX Applet. </li>
-<li>Edit the new JavaFX applet file to include your applet code and save it. <br>
-  <br>
-  -or-</li>
+  <li>In the Projects window, right-click your project's root node and select Properties.<br>
+  Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu. </li>
+  <li>In Project Properties dialog, select the Application category.</li>
+  <li>Under the Applet Specific Properties section, set the desired width and height to use for your applet. The default is 200 pixels by 200 pixels.</li>
+  <li>Select the Draggable Applet checkbox. It is selected by default. <br>
+  Your web browser must have proper support for this feature. </li>
+  <li>In the Categories pane, select the Run category.</li>
+  <li>Select the Run in Browser radio button.</li>
+  <li>Click OK.</li>
+  <li>In the Projects window, right-click the project's root node again and select Run Project.
+    <br>
+    Your system's default web browser appears, respond to the questions in the dialogs that appear, and the application executes. 
 </ol>
+<p><b>To run a JavaFX applet outside of the IDE: </b></p>
+<ul>
+	<li>Navigate to the project's <code>dist</code> folder and double-click the the <code><i>&lt;projectname&gt;</i>.html</code> file.</li>
+</ul>
+<p><b>To run an application in the Mobile Emulator: </b></p>
 <ol>
-<li>Select the File &gt; New File from the main menu of the IDE.<br>
-  The New File wizard appears. </li>
-<li>In the Choose File Type page, select JavaFX category and the JavaFX Applet file type.</li>
-<li> Specify the name and location information.</li>
-<li> Click Finish. </li>
-<li>Edit the new JavaFX applet file to include your applet code and save it.</li>
+  <li>In the Projects window, right-click your project's root node and select Properties.<br>
+    Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu. </li>
+  <li>In Project Properties dialog, select the Run category.</li>
+  <li>Select the Run in Mobile Emulator radio button.</li>
+  <li>Click OK.</li>
+  <li>In the Projects window, right-click the project's root node again and select Run Project.</li>
 </ol>
-
-<p><b>To run a JavaFX applet: </b></p>
-<ol>
-	<li>In the Projects window or Files window, right-click the applet class for your project. </li>
-	<li>Select Run Applet (Ctrl+Shift+F11).</li>
-</ol>
-<p><b>To run a JavaFX applet in a browser: </b></p>
-<ol>
-	<li>In the Projects window, right-click  your project's node and select Properties. </li>
-	<li>In the Project Properties dialog, select the Application &gt; Applet category.</li>
-
-    <li>Select Run Applet in Browser checkbox on the right-hand pane. </li>
-</ol>
-
+<p>&nbsp;</p>
 <dl>
 <dt><a name="seealso">See Also</a></dt>
 <dd><a href="../about_javafx.html">About JavaFX Applications</a></dd>
