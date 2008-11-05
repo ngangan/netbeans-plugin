@@ -126,7 +126,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
             final int start = getStartPos(node);
             if (!holdOnLine(getParent())) {
-
+                hasComment(node, adjustments);
                 indentLine(start, adjustments);
             }
             if (isMultiline(node) && node.getOnReplaceTree() == null) {
@@ -141,6 +141,10 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
         super.visitVariable(node, adjustments);
         return adjustments;
+    }
+
+    private void hasComment(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
+        hasComment(node, adjustments, (TokenSequence<JFXTokenId>) ts());
     }
 
     private void indentLine(Element line, Queue<Adjustment> adjustments) throws BadLocationException {
@@ -172,6 +176,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private void processStandaloneNode(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
         final int position = getStartPos(node);
         if (isFirstOnLine(position)) {
+            hasComment(node, adjustments);
             indentLine(position, adjustments);
         } else {
             adjustments.offer(Adjustment.add(createPosition(position), NEW_LINE_STRING));
@@ -188,6 +193,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (isWidow(node)) {
                 final int position = getStartPos(node);
                 indentLine(position, adjustments);
+                hasComment(node, adjustments);
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
@@ -199,9 +205,14 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private boolean isWidow(Tree node) throws BadLocationException {
         final int endPos = getEndPos(node);
-        boolean probablyWidow = false;
+        int start = getStartPos(node);
 
-        final TokenSequence<JFXTokenId> ts = ts();
+        return isWidow(endPos, start);
+    }
+
+    private boolean isWidow(int endPos, int start) throws BadLocationException {
+        boolean probablyWidow = false;
+        final TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
         ts.move(endPos);
         while (ts.moveNext()) {
             if (JFXTokenId.WS == ts.token().id()) {
@@ -214,7 +225,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             break;
         }
 
-        return probablyWidow && isFirstOnLine(getStartPos(node));
+        return probablyWidow && isFirstOnLine(start);
     }
 
     @Override
@@ -232,6 +243,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         try {
             boolean blockRetVal = tree instanceof BlockExpressionTree && ((BlockExpressionTree) tree).getValue() == node;
             if (!holdOnLine(tree) && !blockRetVal) {
+                hasComment(node, adjustments);
                 processStandaloneNode(node, adjustments);
             } else if (blockRetVal) {
                 indentReturn(node, adjustments);
@@ -264,7 +276,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void indentReturn(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
-        TokenSequence<JFXTokenId> ts = ts();
+        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
         int start = getStartPos(node);
         ts.move(start);
         boolean terminate;
@@ -287,7 +299,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (terminate) break;
         }
         if (isFirstOnLine(start)) {
-            indentLine(getStartPos(node), adjustments);
+            hasComment(adjustments, ts, start);
+            indentLine(start, adjustments);
         } else {
             adjustments.offer(Adjustment.add(createPosition(start), NEW_LINE_STRING));
             adjustments.offer(Adjustment.indent(createPosition(start + 1), indentOffset));
@@ -303,6 +316,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         try {
             final int offset = getStartPos(node);
             if (isFirstOnLine(offset)) {
+                hasComment(node, adjustments);
                 indentLine(offset, adjustments);
             } else {
                 adjustments.offer(Adjustment.add(createPosition(offset), NEW_LINE_STRING));
@@ -361,6 +375,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitOnReplace(OnReplaceTree node, Queue<Adjustment> adjustments) {
         try {
+            hasComment(node, adjustments);
             int start = getStartPos(node);
             boolean firstOnLine = isFirstOnLine(start);
             if (firstOnLine) {
@@ -404,11 +419,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void indentSimpleStructure(Tree node, Queue<Adjustment> adjustments) throws BadLocationException {
-//        if (!holdOnLine(node)) {
-//            processStandaloneNode(node, adjustments);
-//        }
         int start = getStartPos(node);
         if (isFirstOnLine(start)) {
+            hasComment(node, adjustments);
             indentLine(start, adjustments);
         }
         if (isMultiline(node)) {
@@ -462,6 +475,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 //            indentSimpleStructure(node, adjustments);
             int start = getStartPos(node);
             if (isFirstOnLine(start)) {
+                hasComment(node, adjustments);
                 indentLine(start, adjustments);
             }
 
@@ -577,6 +591,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         } else {
             try {
                 if (isFirstOnLine(getStartPos(node))) {
+                    hasComment(node, adjustments);
                     indentLine(getStartPos(node), adjustments);
                 }
                 verifyFunctionSpaces(ts(node), node, adjustments);
@@ -621,12 +636,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             super.visitFunctionDefinition(node, adjustments);
             return adjustments;
         }
-        final TokenSequence<JFXTokenId> ts = ts();
+        final TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
         try {
             int index = node.getModifiers() != null ? getEndPos(node.getModifiers()) : getStartPos(node);
-            if (isPrecededByComment(ts, index)) {
-                reformatComment(ts, index, adjustments);
-            }
             processStandaloneNode(node, adjustments);
 
             ts.move(index);
@@ -650,20 +662,46 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
+    private void hasComment(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
+        int index = getStartPos(node);
+        hasComment(adjustments, ts, index);
+    }
+
+    private void hasComment(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts, int index) throws BadLocationException {
+        if (isPrecededByComment(ts, index)) {
+            reformatComment(ts, index, adjustments);
+        }
+    }
+
     private void reformatComment(TokenSequence<JFXTokenId> ts, int pos, Queue<Adjustment> adjustments) throws BadLocationException {
         int start = pos;
         while (isPrecededByComment(ts, start)) {
             start = ts.offset() - 1;
+//            start = ctx.lineStartOffset(ts.offset());
         }
         LineIterator<Element> li = new DocumentLinesIterator(ctx, start);
-        indentLines(pos, adjustments, li);
+//        indentLines(pos, adjustments, li);        
+        int oldIndent = indentOffset;
+        indentCommentLines(ts, pos, adjustments, li, oldIndent);
+        indentOffset = oldIndent;
     }
 
-    private void indentLines(int stop, Queue<Adjustment> adjustments, LineIterator<Element> li) throws BadLocationException {
+    private void indentCommentLines(TokenSequence<JFXTokenId> ts, int pos, Queue<Adjustment> adjustments, LineIterator<Element> li, int oldIndent) throws BadLocationException {
         while (li.hasNext()) {
-            Element element = li.next();
-            if (element.getEndOffset() <= stop) {
+            Element element = li.get();
+            if (element.getEndOffset() <= pos) {
                 indentLine(element, adjustments);
+                int index = element.getStartOffset();
+                ts.move(index);
+                if (ts.moveNext()) {
+                    JFXTokenId id = ts.token().id();
+                    if (id == JFXTokenId.DOC_COMMENT || id == JFXTokenId.COMMENT) {
+                        indentOffset = oldIndent + 1;
+                    }
+                }
+                li.next();
+            } else {
+                break;
             }
         }
     }
@@ -815,12 +853,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @SuppressWarnings({"unchecked"})
-    private <T extends TokenId> TokenSequence<T> ts() {
+    private /*<T extends TokenId> */TokenSequence<? extends TokenId> ts() {
         if (ts != null && ts.isValid()) {
-            return (TokenSequence<T>) ts;
+            return (TokenSequence) ts;
         }
         this.ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-        return (TokenSequence<T>) this.ts;
+        return (TokenSequence) this.ts;
     }
 
     @Override
@@ -841,7 +879,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             final Tree tree = getParent();
             boolean hold = holdOnLine(tree);
             boolean blockRetVal = tree instanceof BlockExpressionTree && ((BlockExpressionTree) tree).getValue() == node;
-            if ( !blockRetVal && (!hold || isFirstOnLine(offset))) {
+            if (!blockRetVal && (!hold || isFirstOnLine(offset))) {
                 processStandaloneNode(node, adjustments);
             } else if (blockRetVal) {
                 indentReturn(node, adjustments);
@@ -912,11 +950,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private int getStartPos(Tree node) {
-        int nodeStart = (int) sp().getStartPosition(cu(), node);
-        int modifiersStart = getModifiersStart(node);
-        return Math.min(nodeStart, modifiersStart);
+        return (int) sp().getStartPosition(cu(), node);
+        /*int modifiersStart = getModifiersStart(node);
+        return Math.min(nodeStart, modifiersStart);*/
     }
 
+/*
     private int getModifiersStart(Tree node) {
         if (node instanceof ClassDeclarationTree) {
             ClassDeclarationTree tree = (ClassDeclarationTree) node;
@@ -930,12 +969,15 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
         return Integer.MAX_VALUE;
     }
+*/
 
+/*
     private int includeModifiers(ModifiersTree modifiers) {
         final int startPos = getStartPos(modifiers);
         if (startPos < 0) return Integer.MAX_VALUE;
         return startPos;
     }
+*/
 
     @Override
     public Queue<Adjustment> visitCompilationUnit(UnitTree node, Queue<Adjustment> adjustments) {
@@ -1100,6 +1142,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (!(ml || isFirstOnLine(getStartPos(node)))) {
                 return adjustments;
             }
+            hasComment(node, adjustments);
             if (ml) {
                 li.moveTo(getStartPos(node));
                 int endPos = getEndPos(node);
@@ -1132,6 +1175,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         try {
             final int offset = getStartPos(literalTree);
             if (isFirstOnLine(offset)) {
+                hasComment(literalTree, adjustments);
                 indentLine(offset, adjustments, indentOffset);
 //                indentLine(offset, adjustments, isWidow(literalTree) ? indentOffset : (indentOffset + getCi()));
             }
@@ -1177,6 +1221,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitWhileLoop(WhileLoopTree node, Queue<Adjustment> adjustments) {
         try {
+            hasComment(node, adjustments);
             verifySpaceBefore(node, adjustments, cs.spaceBeforeWhile());
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
         } catch (BadLocationException e) {
@@ -1189,7 +1234,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private void verifySpaceBefore(Tree node, Queue<Adjustment> adjustments, boolean spaceBefore) throws BadLocationException {
         final int start = getStartPos(node);
         if (!isFirstOnLine(start) && spaceBefore) {
-            final TokenSequence<JFXTokenId> ts = ts();
+            final TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
             ts.move(start);
             if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
                 adjustments.offer(Adjustment.add(toPos(start), STRING_EMPTY_LENGTH_ONE));
@@ -1251,7 +1296,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeCatchLeftBrace());
                 verifyParens(node, adjustments, cs.spaceBeforeCatchParen(), false);
             } else if (!cs.placeCatchOnNewLine() && isFirstOnLine(start)) {
-                final TokenSequence<JFXTokenId> ts = ts();
+                final TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
                 ts.move(start);
                 while (ts.movePrevious()) {
                     if (ts.token().id() == JFXTokenId.RBRACE) {
@@ -1368,7 +1413,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private int skipPreviousComment(int pos) {
-        final TokenSequence<JFXTokenId> ts = ts();
+        final TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
         ts.move(pos);
         while (ts.movePrevious()) {
             JFXTokenId tid = ts.token().id();

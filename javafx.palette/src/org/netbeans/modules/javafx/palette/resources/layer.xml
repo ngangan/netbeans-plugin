@@ -24,6 +24,7 @@
         
     <folder name="JavaFXPalette">
         <folder name="Applications">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="100"/>
             <file name="Stage.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stage.xml">
                 <attr name="position" intvalue="100"/>
@@ -37,13 +38,8 @@
         </folder>
         
         <folder name="Swing Components">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="800"/>
-            <file name="SwingFrame.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingFrame.xml">
-                <attr name="position" intvalue="100"/>
-            </file>
-            <file name="ComponentView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComponentView.xml">
-                <attr name="position" intvalue="150"/>
-            </file>
             <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
                 <attr name="position" intvalue="200"/>
             </file>
@@ -58,12 +54,6 @@
             </file>
             <file name="Label.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Label.xml">
                 <attr name="position" intvalue="600"/>
-            </file>
-            <file name="Menu.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Menu.xml">
-                <attr name="position" intvalue="700"/>
-            </file>
-            <file name="MenuItem.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MenuItem.xml">
-                <attr name="position" intvalue="800"/>
             </file>
             <file name="RadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadioButton.xml">
                 <attr name="position" intvalue="900"/>
@@ -80,6 +70,7 @@
         </folder>
         
         <folder name="Actions">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="300"/>
             <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
                 <attr name="position" intvalue="100"/>
@@ -168,6 +159,7 @@
         </folder>
         
         <folder name="Colors">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="600"/>            
             <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
@@ -210,6 +202,7 @@
             </file>
         </folder>
         <folder name="Animation">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="700"/>            
             <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
                 <attr name="position" intvalue="100"/>

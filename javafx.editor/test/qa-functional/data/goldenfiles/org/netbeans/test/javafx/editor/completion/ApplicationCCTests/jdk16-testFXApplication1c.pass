@@ -1,10 +1,14 @@
-<ARGS>
+_$UNUSED$_$ARGS$_
 Node
 equals
 getClass
 hashCode
+isInitialized
+isSameObject
 notify
 notifyAll
+print
+println
 toString
 wait
 wait
@@ -29,7 +33,6 @@ frame
 fxprj1
 imports
 java
-javacard
 javafx
 javax
 org

@@ -299,8 +299,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                                 .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
                         int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
                         Visitor visitor = new Visitor(controller, context, dot);
-                        final Queue<Adjustment> adjustments = new MaskedQueue();
-//                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
+//                        final Queue<Adjustment> adjustments = new MaskedQueue();
+                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
                         visitor.scan(path, adjustments);
                         applyAdjustments(adjustments);
                     }

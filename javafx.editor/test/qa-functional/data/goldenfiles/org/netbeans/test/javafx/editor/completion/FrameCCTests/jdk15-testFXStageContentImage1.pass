@@ -2,6 +2,7 @@ fitHeight
 fitWidth
 image
 preserveRatio
+smooth
 viewport
 x
 y

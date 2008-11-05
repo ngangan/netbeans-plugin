@@ -2,8 +2,13 @@ h
 w
 x
 y
+isInitialized
+isSameObject
+print
+println
 abstract
 class
+def
 for
 function
 if
@@ -32,7 +37,6 @@ frame
 fxprj1
 imports
 java
-javacard
 javafx
 javax
 org
