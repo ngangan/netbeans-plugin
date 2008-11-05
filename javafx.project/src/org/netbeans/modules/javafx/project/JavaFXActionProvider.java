@@ -111,6 +111,7 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
+import org.openide.util.Utilities;
 
 /** Action provider of the JavaFX project. This is the place where to do
  * strange things to JavaFX actions. E.g. compile-single.
@@ -322,8 +323,10 @@ class JavaFXActionProvider implements ActionProvider {
             public void run () {
                 Properties p = new Properties();
                 String[] targetNames;
-                String codeBaseURL = getCodebaseURL();
-                if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
+                if (Utilities.isWindows() && "desktop".equalsIgnoreCase(project.evaluator().getProperty("javafx.profile"))) {
+                    String codeBaseURL = getCodebaseURL();
+                    if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
+                }
                 targetNames = getTargetNames(command, context, p);
                 if (targetNames == null) {
                     return;
