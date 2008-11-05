@@ -202,8 +202,9 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
                 if( entry.isDirectory()) {
                     if( entry.getName().equals( filename )) continue;
                     FileUtil.createFolder( projectRoot, entry.getName().substring( rootFileName.length()));
-                } else if( entry.getName().toLowerCase().endsWith( ".png" )){
-                    FileObject fo = FileUtil.createData( projectRoot, entry.getName().substring( filename.length()));
+                } else if( entry.getName().toLowerCase().endsWith( ".png" ) || entry.getName().toLowerCase().endsWith( ".jpg" ) ||
+                        entry.getName().toLowerCase().endsWith( ".gif" )) {
+                    FileObject fo = FileUtil.createData( projectRoot, entry.getName().substring( rootFileName.length()));
                     FileLock lock = fo.lock();
                     try {
                         OutputStream out = fo.getOutputStream(lock);
