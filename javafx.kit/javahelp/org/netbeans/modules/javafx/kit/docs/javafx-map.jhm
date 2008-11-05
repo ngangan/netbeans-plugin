@@ -18,7 +18,6 @@
 <!-- Building section -->
 	<mapID target="javafx_comp_about" url="compile/javafx_comp_about.html" />
 	<mapID target="javafx_comp_classpath" url="compile/javafx_comp_classpath.html" />
-<!--	<mapID target="javafx_comp_file" url="compile/javafx_comp_file.html" /> 		 -->
 	<mapID target="javafx_comp_project" url="compile/javafx_comp_project.html" />
 	<mapID target="javafx_comp_process" url="compile/javafx_comp_process.html" />
 
@@ -55,15 +54,8 @@
 	<mapID target="javafx_proj_process_top" url="project/javafx_proj_process.html#top"/>
 	<mapID target="javafx_proj_quickref" url="project/javafx_proj_quickref.html"/>
 	<mapID target="javafx_proj_sdk" url="project/javafx_proj_sdk.html" />
-<!--	<mapID target="javafx_proj_main" url="project/javafx_proj_main.html"/> -->
 
 	<mapID target="javafx_options" url="configure/javafx_options.html"/>
-
-	<mapID target="javafx_compile_about" url="compile/javafx_comp_about.html"/>
-	<mapID target="javafx_debug_about" url="debug/javafx_debug_about.html"/>
-	<mapID target="javafx_deploy" url="deploy/deploy_javafxapp.html"/>
-
-	<mapID target="javafx_profile_about" url="profiling/javafx_profile_about.html"/>
 
 <!-- CSH for Project Properties dialogs  -->
 	<mapID target="org.netbeans.modules.javafx.project.ui.customizer.CustomizerSources" url="project/csh/proj_javafx_props_sources.html" />
@@ -73,13 +65,8 @@
 	<mapID target="org.netbeans.modules.javafx.project.ui.customizer.CustomizerJavadoc" url="project/csh/proj_javafx_props_documenting.html" />
 	<mapID target="org.netbeans.modules.javafx.project.ui.customizer.CustomizerRun" url="project/csh/proj_javafx_props_run.html" />
 	<mapID target="org.netbeans.modules.javafx.project.ui.customizer.CustomizerApplication" url="project/csh/proj_javafx_props_app.html" />
-    <mapID target="org.netbeans.modules.javafx.project.ui.customizer.CustomizerWebStart" url="project/csh/proj_javafx_props_webstart.html" />
-
 
 <!-- Running section -->
-
-<!--	<mapID target="javafx_run_about" url="run/javafx_run_about.html" />  -->
-
 	<mapID target="javafx_run_app" url="run/javafx_run_app.html" />
 	<mapID target="javafx_run_args" url="run/javafx_run_args.html" />
 	<mapID target="javafx_run_classpath" url="run/javafx_run_classpath.html" />
