@@ -86,7 +86,6 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
         if ( prefSize != null) {
             jScrollPane1.getViewport().setSize( width, prefSize.height);
         }
-        System.err.println( tableContent.getPreferredSize());
         labelTotalSize.setText ( FXZArchive.getSizeText(m_archive.getSize()));
     }
     

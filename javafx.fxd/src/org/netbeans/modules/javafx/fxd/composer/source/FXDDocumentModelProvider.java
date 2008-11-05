@@ -32,6 +32,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Direction.BACKWARD;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -82,8 +83,27 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         }
     }
     
-    public void updateModel(final DocumentModelModificationTransaction trans, final DocumentModel model, final DocumentChange[] changes) throws DocumentModelException, DocumentModelTransactionCancelledException {
+    public static final String PROP_PARSE_ERROR = "parse-error";
+    
+    /*
+    private static FXDNode s_root = null;    
+    public static synchronized FXDNode getRoot() {
+        return s_root;
+    }*/
+    
+    public synchronized void updateModel(final DocumentModelModificationTransaction trans, final DocumentModel model, final DocumentChange[] changes) throws DocumentModelException, DocumentModelTransactionCancelledException {
+        //DocumentModelUtils.dumpElementStructure( model.getRootElement());
+        
         BaseDocument doc = (BaseDocument) model.getDocument();
+        final DataObject dObj = NbEditorUtilities.getDataObject(doc);
+        
+        DocumentElement rootDE = model.getRootElement();
+        if ( rootDE.getElementCount() == 1) {
+            DocumentElement childDE = rootDE.getElement(0);
+            if ( FXDFileModel.isError(childDE)) {
+                trans.removeDocumentElement(rootDE.getElement(0), true);
+            }            
+        }
         
         TextParser textParser = new TextParser( doc.getText());
         
@@ -95,7 +115,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             textParser.skipNonWhite(BACKWARD);
 
             int nodesStartPos = textParser.getPosition() + 1;
-            CharSequence nodes = textParser.subsequence(nodesStartPos, textParser.getSize());
+            int textSize      = textParser.getSize();
+            CharSequence nodes = textParser.subsequence(nodesStartPos, textSize);
             FXDParser fxdParser = new FXDParser(nodes, new ContentHandler() {
                 private boolean m_isLastNode = true;
                 
@@ -151,19 +172,26 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             }, nodesStartPos);
             
             final StringBuilder statMsg = new StringBuilder(" ");
-            showStatusText(doc, " Parsing text...");
+            showStatusText(dObj, " Parsing text...");
             
             try {
                 fxdParser.parseObject();
                 reportDeletedElements(trans, model.getRootElement());
+                doc.putProperty( PROP_PARSE_ERROR, null);
+                //s_root = com.sun.javafx.tools.fxd.container.scene.fxd.Parser.parse( nodes);
+                
             //System.err.println("Model update done ...");
             } catch( DocumentModelException e) {
+                //s_root = null;
                 throw e;
             } catch( DocumentModelTransactionCancelledException e) {
+                //s_root = null;
                 throw e;
             } catch (Exception ex) {
+                //s_root = null;
                 statMsg.append( "Syntax error: "); //NOI18N
                 String msg = ex.getLocalizedMessage();
+                doc.putProperty( PROP_PARSE_ERROR, msg);
                 //TODO Nasty hack, increase the row index where to error has been found
                 //to compensate the few lines at the top of the document that are not
                 //recognized by the FXD parser
@@ -191,14 +219,20 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 } catch( Exception e) {
                     e.printStackTrace();
                 }
+                doc.putProperty( PROP_PARSE_ERROR, statMsg.toString());
+                cleanModel(trans, model);
+                try {
+                    trans.addDocumentElement("Invalid FXD syntax", FXDFileModel.FXD_ERROR, NO_ATTRS, nodesStartPos, textSize);
+                } catch (BadLocationException ex1) {
+                    Exceptions.printStackTrace(ex1);
+                }
             } finally {
-                showStatusText(doc, statMsg.toString());
+                showStatusText(dObj, statMsg.toString());
             }
         }
     }
     
-    protected static void showStatusText( BaseDocument doc, final String msg) {
-        DataObject dObj = NbEditorUtilities.getDataObject(doc);
+    protected static void showStatusText( DataObject dObj, final String msg) {
         final EditorCookie ec = dObj.getCookie( EditorCookie.class);
         if ( ec != null) {
             SwingUtilities.invokeLater( new Runnable() {

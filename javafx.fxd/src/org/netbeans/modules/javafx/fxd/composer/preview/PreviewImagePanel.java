@@ -29,11 +29,9 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.editor.structure.api.DocumentModelUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.openide.util.NbBundle;
-
 
 /**
  *
@@ -76,7 +74,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     synchronized void refresh() {
-        FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
+        final FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
         if (  fxzArchive != null) {
             final int tickerCopy = fxzArchive.getChangeTicker();
             if ( tickerCopy != m_changeTickerCopy) {
@@ -95,9 +93,17 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         final FXDFileModel fModel = fxz.getFileModel();
                         fModel.updateModel();
                         //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
-
+                        
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
+                                if ( fxzArchive.getFileModel().isError()) {
+                                    setBackground( m_defaultBackground);
+                                    label.setIcon(null);
+                                    label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
+                                            fxzArchive.getFileModel().getErrorMsg()));
+                                    return;
+                                } 
+                                
                                 label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N            
                                 SwingUtilities.invokeLater( new Runnable() {
                                     public void run() {
@@ -136,14 +142,14 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 m_changeTickerCopy = tickerCopy;
                                                 updateZoom();
                                             } else {
-                                                //TODO 
-                                                label.setText("Cannot show");
+                                                setBackground( m_defaultBackground);
+                                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_EMPTY_DOCUMENT")); //NOI18N
                                                 label.setIcon(null);
                                             }
                                         } catch( Exception e) {
-                                            //TODO provide better error report
-                                            e.printStackTrace();
-                                            label.setText(e.getLocalizedMessage());
+                                            setBackground( m_defaultBackground);
+                                            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
+                                                e.getLocalizedMessage()));
                                             label.setIcon(null);
                                         } finally {
                                             System.gc();                                
@@ -160,15 +166,19 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 updateZoom();
             }
         } else {
-            removeAll();
             Exception error = m_dObj.getDataModel().getFXDContainerLoadError();
-            setBackground( m_defaultBackground);
-            
-            JLabel label = new JLabel( 
-                NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_LOAD", error.getLocalizedMessage()), //NOI18N                                
-                JLabel.CENTER);
-            add( label, BorderLayout.CENTER);
+            showError( error.getLocalizedMessage());
         }
+    }
+    
+    private void showError( final String msg) {
+        removeAll();
+        setBackground( m_defaultBackground);
+
+        JLabel label = new JLabel( 
+            NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", msg), //NOI18N                                
+            JLabel.CENTER);
+        add( label, BorderLayout.CENTER);
     }
     
     private void updateZoom() {

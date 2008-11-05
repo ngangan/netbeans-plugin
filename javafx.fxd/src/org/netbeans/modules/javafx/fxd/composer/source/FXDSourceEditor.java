@@ -137,14 +137,14 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
                 if ( ec != null) {
                     JEditorPane [] panes = ec.getOpenedPanes();
                     if ( panes != null && panes.length > 0 && panes[0] != null) {
-                    EditorUI eui = Utilities.getEditorUI(panes[0]);
-                    StatusBar sBar = eui == null ? null : eui.getStatusBar();
-                    if (sBar != null) {
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < 60; i++) {
-                            sb.append( 'A');
-                        }
-                        sBar.addCell( CELL_ERROR, new String [] { sb.toString()});
+                        EditorUI eui = Utilities.getEditorUI(panes[0]);
+                        StatusBar sBar = eui == null ? null : eui.getStatusBar();
+                        if (sBar != null && sBar.getCellByName(CELL_ERROR) == null) {
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < 60; i++) {
+                                sb.append( 'A');
+                            }
+                            sBar.addCell( CELL_ERROR, new String [] { sb.toString()});
                         }
                     }
                 }
