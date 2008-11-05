@@ -230,7 +230,8 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
         if (selection != null) {
             model.append(new ImportsModel.ModelEntry(selection.getElement()));
         }
-        fil.hide();
+//        fil.hide();
+        fil.finish();
     }
 
     private List<FixItem> convert(Set<ElementHandle<TypeElement>> types) {
