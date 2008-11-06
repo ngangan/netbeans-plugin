@@ -163,6 +163,7 @@ is divided into following sections:
                 <and>
                     <equals arg1="${{javafx.profile}}" arg2="desktop"/>
                     <equals arg1="${{execution.target}}" arg2="applet"/>
+                    <isset property="netbeans.home"/>
                 </and>    
             </condition>
             <condition property="standard.execution.trigger">
@@ -267,27 +268,7 @@ is divided into following sections:
             <condition property="applet.url" value="${{codebase.url}}/${{application.title}}.html" else="${{applet.local.url}}">
                 <isset property="codebase.url"/>
             </condition>
-            <condition property="browser" value="open">
-                <os family="mac"/>
-            </condition>
-            <condition property="browser" value="firefox">
-                <os family="unix"/>
-            </condition>
-            <condition property="browser" value="cmd.exe">
-                <os family="windows"/>
-            </condition>
-            <condition property="browser.args" value="/C start">
-                <os family="windows"/>
-            </condition>
-            <!-- Some argument should be set for MacOS 'open' command -->
-            <condition property="browser.args" value="-g">
-                <os family="mac"/>
-            </condition>
-            <property name="browser.args" value=""/>
-            <exec executable="${{browser}}" spawn="true">
-                <arg line="${{browser.args}}"/>
-                <arg value="${{applet.url}}"/>
-            </exec>
+            <nbbrowse url="${{applet.url}}"/>
         </target>
         <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
             <exec executable="${{java.home}}/bin/javaws" failonerror="true">
