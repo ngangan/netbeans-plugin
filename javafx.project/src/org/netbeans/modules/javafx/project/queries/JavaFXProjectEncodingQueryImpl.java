@@ -45,6 +45,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import org.netbeans.api.queries.FileEncodingQuery;
 import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
 import org.netbeans.spi.queries.FileEncodingQueryImplementation;
@@ -82,6 +83,8 @@ public class JavaFXProjectEncodingQueryImpl extends FileEncodingQueryImplementat
                     cache = enc == null ? FileEncodingQuery.getDefaultEncoding() : Charset.forName(enc);
                 } catch (IllegalCharsetNameException exception) {
                     return null;
+                } catch (UnsupportedCharsetException exception) {
+                    return null;
                 }
             }
             return cache;
@@ -95,6 +98,5 @@ public class JavaFXProjectEncodingQueryImpl extends FileEncodingQueryImplementat
                 cache = null;
             }
         }
-    }
-    
+    }  
 }

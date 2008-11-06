@@ -52,10 +52,8 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -81,6 +79,7 @@ import org.netbeans.modules.javafx.project.classpath.JavaFXProjectClassPathExten
 import org.netbeans.modules.javafx.project.classpath.JavaFXProjectClassPathModifier;
 import org.netbeans.modules.javafx.project.queries.BinaryForSourceQueryImpl;
 import org.netbeans.modules.javafx.project.queries.FXFileBuiltQueryImpl;
+import org.netbeans.modules.javafx.project.queries.JavaFXProjectEncodingQueryImpl;
 import org.netbeans.modules.javafx.project.ui.JavaFXLogicalViewProvider;
 import org.netbeans.modules.javafx.project.ui.customizer.CustomizerProviderImpl;
 import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
@@ -288,7 +287,8 @@ public final class JavaFXProject implements Project, AntProjectListener {
             UILookupMergerSupport.createPrivilegedTemplatesMerger(),
             UILookupMergerSupport.createRecommendedTemplatesMerger(),
             LookupProviderSupport.createSourcesMerger(),
-            QuerySupport.createFileEncodingQuery(evaluator(), JavaFXProjectProperties.SOURCE_ENCODING),
+//cms            QuerySupport.createFileEncodingQuery(evaluator(), JavaFXProjectProperties.SOURCE_ENCODING),
+            new JavaFXProjectEncodingQueryImpl(evaluator()),
             new JavaFXPropertyEvaluatorImpl(evaluator()),
 //            new JavaFXTemplateAttributesProvider(this.helper),
             ExtraSourceJavadocSupport.createExtraSourceQueryImplementation(this, helper, eval),
