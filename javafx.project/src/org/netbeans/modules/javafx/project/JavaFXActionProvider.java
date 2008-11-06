@@ -44,7 +44,10 @@ package org.netbeans.modules.javafx.project;
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import javax.lang.model.element.TypeElement;
@@ -84,6 +88,7 @@ import org.netbeans.modules.javafx.project.ui.customizer.MainClassWarning;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
+import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.ui.support.DefaultProjectOperations;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -98,12 +103,15 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
+import org.openide.filesystems.Repository;
+import org.openide.filesystems.URLMapper;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
+import org.openide.util.Utilities;
 
 /** Action provider of the JavaFX project. This is the place where to do
  * strange things to JavaFX actions. E.g. compile-single.
@@ -315,7 +323,10 @@ class JavaFXActionProvider implements ActionProvider {
             public void run () {
                 Properties p = new Properties();
                 String[] targetNames;
-
+                if (Utilities.isWindows() && "desktop".equalsIgnoreCase(project.evaluator().getProperty("javafx.profile"))) {
+                    String codeBaseURL = getCodebaseURL();
+                    if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
+                }
                 targetNames = getTargetNames(command, context, p);
                 if (targetNames == null) {
                     return;
@@ -361,6 +372,35 @@ class JavaFXActionProvider implements ActionProvider {
         }
     }
 
+    String getCodebaseURL() {
+        URL base = URLMapper.findURL(Repository.getDefault().getDefaultFileSystem().findResource("HTTPServer_DUMMY"), URLMapper.NETWORK);// NOI18N
+        if (base == null) return null;
+        try {
+            return new URL(base.getProtocol(), "localhost", base.getPort(), encodeURL("/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/" + project.getProjectDirectory().getPath() + "/" + project.evaluator().evaluate("${dist.dir}/"))).toExternalForm(); // NOI18N
+        } catch (MalformedURLException e) {
+            ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, e);
+            return null;
+        }
+    }
+    
+    String encodeURL(final String orig) {
+        StringTokenizer slashTok = new StringTokenizer(orig, "/", true); // NOI18N
+        StringBuffer path = new StringBuffer();
+        while (slashTok.hasMoreTokens()) {
+            final String tok = slashTok.nextToken();
+            if (tok.startsWith("/")) { // NOI18N
+                path.append(tok);
+            } else {
+                try {
+                    path.append(URLEncoder.encode(tok, "UTF-8")); // NOI18N
+                } catch (UnsupportedEncodingException e) {
+                    path.append(URLEncoder.encode(tok));
+                }
+            }
+        }
+        return path.toString();
+    } 
+    
     /**
      * @return array of targets or null to stop execution; can return empty array
      */
