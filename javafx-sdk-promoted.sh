@@ -5,6 +5,6 @@
 #########################################################################
 
 #!/bin/bash
-echo "Promoted JavaFX SDK build b47 (773)"
-export SDK_URL=http://getjfx.sfbay.sun.com/hudson/job/javafx1.0/773/
+echo "Promoted JavaFX SDK build b48 (774)"
+export SDK_URL=http://getjfx.sfbay.sun.com/hudson/job/javafx1.0/774/
 sh -x $WORKSPACE/main/contrib/javafx-nb-plugin-build.sh
