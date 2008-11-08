@@ -132,6 +132,9 @@ is divided into following sections:
             <condition property="no.deps">
                 <istrue value="${{no.dependencies}}"/>
             </condition>
+            <condition property="codebase.arg" value="-appCodebase ${{codebase.url}}" else="">
+                <isset property="codebase.url"/>
+            </condition>
             <condition property="draggable.arg" value="-draggable" else="">
                 <istrue value="${{applet.draggable}}"/>
             </condition>
@@ -160,6 +163,7 @@ is divided into following sections:
                 <and>
                     <equals arg1="${{javafx.profile}}" arg2="desktop"/>
                     <equals arg1="${{execution.target}}" arg2="applet"/>
+                    <isset property="netbeans.home"/>
                 </and>    
             </condition>
             <condition property="standard.execution.trigger">
@@ -223,6 +227,7 @@ is divided into following sections:
                 <arg value="${{applet.height}}"/>
                 <arg value="-appclass"/>
                 <arg value="${{main.class}}"/>
+                <arg line="${{codebase.arg}}"/>
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
                 <arg value="-v"/>
@@ -259,28 +264,11 @@ is divided into following sections:
             </exec>
         </target>
         <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
-            <property name="applet.url" location="${{dist.dir}}/${{application.title}}.html"/>
-            <condition property="browser" value="open">
-                <os family="mac"/>
+            <makeurl property="applet.local.url" file="${{dist.dir}}/${{application.title}}.html"/>
+            <condition property="applet.url" value="${{codebase.url}}/${{application.title}}.html" else="${{applet.local.url}}">
+                <isset property="codebase.url"/>
             </condition>
-            <condition property="browser" value="firefox">
-                <os family="unix"/>
-            </condition>
-            <condition property="browser" value="cmd.exe">
-                <os family="windows"/>
-            </condition>
-            <condition property="browser.args" value="/C">
-                <os family="windows"/>
-            </condition>
-            <!-- Some argument should be set for MacOS 'open' command -->
-            <condition property="browser.args" value="-g">
-                <os family="mac"/>
-            </condition>
-            <property name="browser.args" value=""/>
-            <exec executable="${{browser}}" spawn="true">
-                <arg value="${{browser.args}}"/>
-                <arg value="${{applet.url}}"/>
-            </exec>
+            <nbbrowse url="${{applet.url}}"/>
         </target>
         <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
             <exec executable="${{java.home}}/bin/javaws" failonerror="true">

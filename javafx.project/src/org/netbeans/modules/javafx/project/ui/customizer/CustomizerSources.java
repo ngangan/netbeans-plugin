@@ -53,6 +53,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.netbeans.api.queries.FileEncodingQuery;
@@ -73,6 +74,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
     
     
     private String originalEncoding;
+    private boolean notified;
 
     private final JavaFXProjectProperties uiProperties;
 
@@ -117,21 +119,44 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         if (this.originalEncoding == null) {
             this.originalEncoding = FileEncodingQuery.getDefaultEncoding().name();
         }
-        
+        this.encoding.setModel(new EncodingModel(this.originalEncoding));
+        this.encoding.setRenderer(new EncodingRenderer());
+        final String lafid = UIManager.getLookAndFeel().getID();
+        if (!"Aqua".equals(lafid)) { //NOI18N
+            this.encoding.putClientProperty ("JComboBox.isTableCellEditor", Boolean.TRUE);    //NOI18N
+            this.encoding.addItemListener(new java.awt.event.ItemListener(){ 
+                public void itemStateChanged(java.awt.event.ItemEvent e){ 
+                    javax.swing.JComboBox combo = (javax.swing.JComboBox)e.getSource(); 
+                    combo.setPopupVisible(false); 
+                } 
+            });
+        }
+        this.encoding.addActionListener(new ActionListener () {
+            public void actionPerformed(ActionEvent arg0) {
+                handleEncodingChange();
+            }            
+        });
     }
     
     
-//    private void handleEncodingChange () {
-//            Charset enc = (Charset) encoding.getSelectedItem();
-//            String encName;
-//            if (enc != null) {
-//                encName = enc.name();
-//            }
-//            else {
-//                encName = originalEncoding;
-//            }
-//            this.uiProperties.putAdditionalProperty(JavaFXProjectProperties.SOURCE_ENCODING, encName);
-//    }
+    private void handleEncodingChange () {
+            Charset enc = (Charset) encoding.getSelectedItem();
+            String encName;
+            if (enc != null) {
+                encName = enc.name();
+            }
+            else {
+                encName = originalEncoding;
+            }
+            if (!notified && encName!=null && !encName.equals(originalEncoding)) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                        NbBundle.getMessage(CustomizerSources.class,"MSG_EncodingWarning"), NotifyDescriptor.WARNING_MESSAGE));
+                notified=true;
+            }
+            this.uiProperties.putAdditionalProperty(JavaFXProjectProperties.SOURCE_ENCODING, encName);
+    }
+
+
 
     public HelpCtx getHelpCtx() {
         return new HelpCtx (CustomizerSources.class);
@@ -214,6 +239,8 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         upSourceRoot = new javax.swing.JButton();
         downSourceRoot = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        encoding = new javax.swing.JComboBox();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -345,6 +372,35 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         add(sourceRootsPanel, gridBagConstraints);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        jLabel3.setLabelFor(encoding);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(CustomizerSources.class, "TXT_Encoding")); // NOI18N
+        jLabel3.setMaximumSize(new java.awt.Dimension(54, 14));
+        jLabel3.setMinimumSize(new java.awt.Dimension(54, 14));
+        jLabel3.setPreferredSize(new java.awt.Dimension(54, 14));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 12);
+        jPanel1.add(jLabel3, gridBagConstraints);
+        jLabel3.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerSources.class, "AD_CustomizerSources_Encoding")); // NOI18N
+
+        encoding.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        encoding.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                encodingActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 0);
+        jPanel1.add(encoding, gridBagConstraints);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -355,13 +411,19 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void encodingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_encodingActionPerformed
+        // TODO add your handling code here:
+}//GEN-LAST:event_encodingActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addSourceRoot;
     private javax.swing.JButton downSourceRoot;
+    private javax.swing.JComboBox encoding;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField projectLocation;
