@@ -259,6 +259,29 @@ public final class JavaFXSource {
             assert !it.hasNext();
             cc.setPhase(Phase.PARSED);
 
+            long end = System.currentTimeMillis();
+            Logger.getLogger("TIMER").log(Level.FINE, "Compilation Unit", new Object[] {file, unit}); // log the instance
+            Logger.getLogger("TIMER").log(Level.FINE, "Parsed", new Object[] {file, end-start});
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished parsing " + file.getNameExt());
+        }
+
+        if (cc.phase == Phase.PARSED && !phase.lessThan(Phase.ANALYZED)) {
+            if (cancellable && CompilationJob.currentRequest.isCanceled()) {
+                return Phase.MODIFIED;
+            }
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to analyze " + file.getNameExt());
+            long start = System.currentTimeMillis();
+            try {
+                cc.getJavafxcTask().analyze();
+            } catch (RuntimeException analyzerError) {
+                LOGGER.log(Level.WARNING, "Error in analyzer", analyzerError); // NOI18N
+                return cc.phase;
+            } catch (AssertionError assErr) {
+                LOGGER.log(Level.WARNING, "Error in analyzer", assErr); // NOI18N
+                return cc.phase;
+            }
+            cc.setPhase(Phase.ANALYZED);
+
             //update error annotations in projects tree
 
             Set<URL> urls = new HashSet<URL>();
@@ -282,28 +305,6 @@ public final class JavaFXSource {
             }
             FXErrorAnnotator.getAnnotator().updateInError(urls);
 
-            long end = System.currentTimeMillis();
-            Logger.getLogger("TIMER").log(Level.FINE, "Compilation Unit", new Object[] {file, unit}); // log the instance
-            Logger.getLogger("TIMER").log(Level.FINE, "Parsed", new Object[] {file, end-start});
-            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished parsing " + file.getNameExt());
-        }
-
-        if (cc.phase == Phase.PARSED && !phase.lessThan(Phase.ANALYZED)) {
-            if (cancellable && CompilationJob.currentRequest.isCanceled()) {
-                return Phase.MODIFIED;
-            }
-            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to analyze " + file.getNameExt());
-            long start = System.currentTimeMillis();
-            try {
-                cc.getJavafxcTask().analyze();
-            } catch (RuntimeException analyzerError) {
-                LOGGER.log(Level.WARNING, "Error in analyzer", analyzerError); // NOI18N
-                return cc.phase;
-            } catch (AssertionError assErr) {
-                LOGGER.log(Level.WARNING, "Error in analyzer", assErr); // NOI18N
-                return cc.phase;
-            }
-            cc.setPhase(Phase.ANALYZED);
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
             if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished to analyze " + file.getNameExt());
@@ -372,7 +373,9 @@ public final class JavaFXSource {
             }
         }
         this.cpInfo.addChangeListener(WeakListeners.change(listener, this.cpInfo));
-        
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Created JavaFXSource for " + files);
+        }
     }
     
     
@@ -413,11 +416,18 @@ public final class JavaFXSource {
         Reference<JavaFXSource> ref = file2Source.get(fileObject);
         JavaFXSource source = ref != null ? ref.get() : null;
         if (source == null) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Not found in cache: " + fileObject);
+            }
+
             if (!"text/x-fx".equals(FileUtil.getMIMEType(fileObject)) && !"fx".equals(fileObject.getExt())) {  //NOI18N
                 return null;
             }
             source = create(ClasspathInfo.create(fileObject), Collections.singletonList(fileObject));
             file2Source.put(fileObject, new WeakReference<JavaFXSource>(source));
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Put into the cache: " + fileObject);
+            }
         }
         return source;
     }

@@ -88,6 +88,9 @@ public class FXErrorAnnotator extends AnnotationProvider {
     private static final Image ERROR_BADGE_SINGLE;
     private static final Image ERROR_BADGE_FOLDER;
 
+    /** Prevent never ending update loops */
+    private boolean dontUpdate;
+
     static {
         URL errorBadgeIconURL = FXErrorAnnotator.class.getClassLoader().getResource(ERROR_BADGE_URL);
         String errorBadgeSingleTP = "<img src=\"" + errorBadgeIconURL + "\">&nbsp;" + getMessage(FXErrorAnnotator.class, "TP_ErrorBadgeSingle");
@@ -191,6 +194,10 @@ public class FXErrorAnnotator extends AnnotationProvider {
     }
 
     public synchronized void updateInError(Set<URL> urls)  {
+        if (dontUpdate) {
+            // coming back from moveToSource that we triggered from bellow
+            return;
+        }
         Set<FileObject> toRefresh = new HashSet<FileObject>();
         for (Iterator<FileObject> it = knownFiles2Error.keySet().iterator(); it.hasNext(); ) {
             FileObject f = it.next();
@@ -275,11 +282,15 @@ public class FXErrorAnnotator extends AnnotationProvider {
                     }
 
                     public void run(CompilationController cc) throws Exception {
-                        if (!cc.toPhase(Phase.PARSED).lessThan(Phase.PARSED)) {
-                            isErr[0] = fxSource.currentInfo.isErrors();
+                        try {
+                            dontUpdate = true;
+                            if (!cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                                isErr[0] = fxSource.currentInfo.isErrors();
+                            }
+                        } finally {
+                            dontUpdate = false;
                         }
                     }
-
                 }, true);
             }catch(IOException e){
                 e.printStackTrace();
