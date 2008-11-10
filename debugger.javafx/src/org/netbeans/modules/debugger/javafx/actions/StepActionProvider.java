@@ -204,7 +204,7 @@ implements Executor {
                 ErrorManager.getDefault().notify(ErrorManager.USER,
                     ErrorManager.getDefault().annotate(e,
                         NbBundle.getMessage(StepActionProvider.class,
-                            "VMDisconnected")));
+                            "VMDisconnected")));	//NOI18N
             }   
             //S ystem.out.println("/nStepAction.doAction end");
         }
@@ -302,8 +302,8 @@ implements Executor {
             // Stop execution here?
             boolean fsh = getSmartSteppingFilterImpl ().stopHere (className);
             if (ssverbose)
-                System.out.println("SS  SmartSteppingFilter.stopHere (" + 
-                    className + ") ? " + fsh
+                System.out.println("SS  SmartSteppingFilter.stopHere (" + 	//NOI18N
+                    className + ") ? " + fsh	//NOI18N
                 );
             if (fsh) {
                 JavaFXThread t = getDebuggerImpl ().getThread (tr);

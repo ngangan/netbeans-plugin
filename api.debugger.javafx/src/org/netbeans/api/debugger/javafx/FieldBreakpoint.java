@@ -284,7 +284,7 @@ public class FieldBreakpoint extends JavaFXBreakpoint {
      * @return  a string representation of the object
      */
     public String toString () {
-        return "FieldBreakpoint " + className + "." + fieldName;
+        return "FieldBreakpoint " + className + "." + fieldName;	//NOI18N
     }
     
     private static final class FieldBreakpointImpl extends FieldBreakpoint implements ChangeListener {

@@ -65,7 +65,7 @@ public class ArgumentObjectVariable extends AbstractObjectVariable implements or
             debugger, 
             value, 
             name + className.hashCode() +
-                (value instanceof ObjectReference ? "^" : "")
+                (value instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.name = name;
         this.className = className;
@@ -133,6 +133,6 @@ public class ArgumentObjectVariable extends AbstractObjectVariable implements or
     }
     
     public String toString () {
-        return "ArgumentObjectVariable " + name;
+        return "ArgumentObjectVariable " + name;	//NOI18N
     }
 }

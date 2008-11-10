@@ -69,7 +69,7 @@ public class LaunchingSessionProvider extends SessionProvider {
     public String getSessionName () {
         Map arguments = contextProvider.lookupFirst(null, Map.class);
         if (arguments != null) {
-            String processName = (String) arguments.get ("name");
+            String processName = (String) arguments.get ("name");	//NOI18N
             if (processName != null)
                 return findUnique (processName);
         }
@@ -82,7 +82,7 @@ public class LaunchingSessionProvider extends SessionProvider {
     
     public String getLocationName () {
         return NbBundle.getMessage 
-            (LaunchingSessionProvider.class, "CTL_Localhost");
+            (LaunchingSessionProvider.class, "CTL_Localhost");	//NOI18N
     }
     
     public String getTypeID () {

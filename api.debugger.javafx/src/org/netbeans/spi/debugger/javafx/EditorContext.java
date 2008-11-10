@@ -57,36 +57,36 @@ import org.netbeans.api.debugger.javafx.Variable;
 public abstract class EditorContext {
 
     /** Annotation type constant. */
-    public static final String BREAKPOINT_ANNOTATION_TYPE = "Breakpoint";
+    public static final String BREAKPOINT_ANNOTATION_TYPE = "Breakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String DISABLED_BREAKPOINT_ANNOTATION_TYPE = "DisabledBreakpoint";
+    public static final String DISABLED_BREAKPOINT_ANNOTATION_TYPE = "DisabledBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String CONDITIONAL_BREAKPOINT_ANNOTATION_TYPE = "CondBreakpoint";
+    public static final String CONDITIONAL_BREAKPOINT_ANNOTATION_TYPE = "CondBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String DISABLED_CONDITIONAL_BREAKPOINT_ANNOTATION_TYPE = "DisabledCondBreakpoint";
+    public static final String DISABLED_CONDITIONAL_BREAKPOINT_ANNOTATION_TYPE = "DisabledCondBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String FIELD_BREAKPOINT_ANNOTATION_TYPE = "FieldBreakpoint";
+    public static final String FIELD_BREAKPOINT_ANNOTATION_TYPE = "FieldBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String DISABLED_FIELD_BREAKPOINT_ANNOTATION_TYPE = "DisabledFieldBreakpoint";
+    public static final String DISABLED_FIELD_BREAKPOINT_ANNOTATION_TYPE = "DisabledFieldBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String METHOD_BREAKPOINT_ANNOTATION_TYPE = "MethodBreakpoint";
+    public static final String METHOD_BREAKPOINT_ANNOTATION_TYPE = "MethodBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String DISABLED_METHOD_BREAKPOINT_ANNOTATION_TYPE = "DisabledMethodBreakpoint";
+    public static final String DISABLED_METHOD_BREAKPOINT_ANNOTATION_TYPE = "DisabledMethodBreakpoint";	//NOI18N
     /** Annotation type constant. */
-    public static final String CURRENT_LINE_ANNOTATION_TYPE = "CurrentPC";
+    public static final String CURRENT_LINE_ANNOTATION_TYPE = "CurrentPC";	//NOI18N
     /** Annotation type constant. */
-    public static final String CALL_STACK_FRAME_ANNOTATION_TYPE = "CallSite";
+    public static final String CALL_STACK_FRAME_ANNOTATION_TYPE = "CallSite";	//NOI18N
     /** Annotation type constant. */
-    public static final String CURRENT_LAST_OPERATION_ANNOTATION_TYPE = "LastOperation";
+    public static final String CURRENT_LAST_OPERATION_ANNOTATION_TYPE = "LastOperation";	//NOI18N
     /** Annotation type constant. */
-    public static final String CURRENT_OUT_OPERATION_ANNOTATION_TYPE = "StepOutOperation";
+    public static final String CURRENT_OUT_OPERATION_ANNOTATION_TYPE = "StepOutOperation";	//NOI18N
     /** Annotation type constant. */
-    public static final String CURRENT_EXPRESSION_SECONDARY_LINE_ANNOTATION_TYPE = "CurrentExpression";
+    public static final String CURRENT_EXPRESSION_SECONDARY_LINE_ANNOTATION_TYPE = "CurrentExpression";	//NOI18N
     /** Annotation type constant. */
-    public static final String CURRENT_EXPRESSION_CURRENT_LINE_ANNOTATION_TYPE = "CurrentExpressionLine";
+    public static final String CURRENT_EXPRESSION_CURRENT_LINE_ANNOTATION_TYPE = "CurrentExpressionLine";	//NOI18N
 
     /** Property name constant. */
-    public static final String PROP_LINE_NUMBER = "lineNumber";
+    public static final String PROP_LINE_NUMBER = "lineNumber";	//NOI18N
 
 
     /**

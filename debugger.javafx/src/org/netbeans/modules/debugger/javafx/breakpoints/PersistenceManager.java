@@ -74,10 +74,10 @@ import org.openide.filesystems.URLMapper;
 public class PersistenceManager implements LazyDebuggerManagerListener {
     
     public synchronized Breakpoint[] initBreakpoints () {
-        Properties p = Properties.getDefault ().getProperties ("debugger").
+        Properties p = Properties.getDefault ().getProperties ("debugger").	//NOI18N
             getProperties (DebuggerManager.PROP_BREAKPOINTS);
         Breakpoint[] breakpoints = (Breakpoint[]) p.getArray (
-            "javafx", 
+            "javafx", 	//NOI18N
             new Breakpoint [0]
         );
         for (int i = 0; i < breakpoints.length; i++) {
@@ -199,9 +199,9 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
     }
 
     static void storeBreakpoints() {
-        Properties.getDefault ().getProperties ("debugger").
+        Properties.getDefault ().getProperties ("debugger").	//NOI18N
             getProperties (DebuggerManager.PROP_BREAKPOINTS).setArray (
-                "javafx",
+                "javafx",	//NOI18N
                 getBreakpoints ()
             );
     }

@@ -79,7 +79,7 @@ public final class LaunchingDICookie extends AbstractDICookie {
     /**
      * Public ID used for registration in Meta-inf/debugger.
      */
-    public static final String ID = "netbeans-javafx-LaunchingDICookie";
+    public static final String ID = "netbeans-javafx-LaunchingDICookie";	//NOI18N
 
     private LaunchingConnector  launchingConnector;
     private Map<String, ? extends Argument> args;
@@ -141,23 +141,23 @@ public final class LaunchingDICookie extends AbstractDICookie {
         String argss = "";
         int i, k = args.length;
         for (i = 0; i < k; i++) {
-            argss += " \"" + args [i] + "\"";
+            argss += " \"" + args [i] + "\"";	//NOI18N
         }
         // TODO: This code is likely wrong, we need to run debuggee on JDK that
         //       is set on the project.
         // XXX: This method is likely not called from anywhere.
         //      But it's an impl. of API method JPDADebugger.launch().
         String commandLine = System.getProperty ("java.home") + 
-            "\\bin\\java -Xdebug -Xnoagent -Xrunjdwp:transport=" + 
+            "\\bin\\java -Xdebug -Xnoagent -Xrunjdwp:transport=" + 	//NOI18N
             getTransportName () + 
-            ",address=name,suspend=" + 
+            ",address=name,suspend=" + 	//NOI18N
             (suspend ? "y" : "n") +
-            " -classpath \"" + 
+            " -classpath \"" + 	//NOI18N
             classPath + 
-            "\" " +
+            "\" " +	//NOI18N
             mainClassName + 
             argss;
-        String address = "name";
+        String address = "name";	//NOI18N
         return new LaunchingDICookie (
             findLaunchingConnector (),
             getArgs (commandLine, address),
@@ -202,7 +202,7 @@ public final class LaunchingDICookie extends AbstractDICookie {
      * @return command line to be used
      */
     public String getCommandLine () {
-        Argument a = (Argument) args.get ("command");
+        Argument a = (Argument) args.get ("command");	//NOI18N
         if (a == null) return null;
         return a.value ();
     }
@@ -225,8 +225,8 @@ public final class LaunchingDICookie extends AbstractDICookie {
         String address
     ) {
         Map<String, ? extends Argument> args = findLaunchingConnector ().defaultArguments ();
-        args.get ("command").setValue (commandLine);
-        args.get ("address").setValue (address);
+        args.get ("command").setValue (commandLine);	//NOI18N
+        args.get ("address").setValue (address);	//NOI18N
         return args;
     }
     
@@ -235,7 +235,7 @@ public final class LaunchingDICookie extends AbstractDICookie {
             launchingConnectors ().iterator ();
         while (iter.hasNext ()) {
             LaunchingConnector lc = iter.next ();
-            if (lc.name ().indexOf ("RawCommandLineLaunch") > -1)
+            if (lc.name ().indexOf ("RawCommandLineLaunch") > -1)	//NOI18N
                 return lc;
         }
         return null;

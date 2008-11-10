@@ -150,7 +150,7 @@ import org.openide.util.NbBundle;
 public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationContext> {
 
     private static final Logger loggerMethod = Logger.getLogger("org.netbeans.modules.debugger.javafx.invokeMethod"); // NOI18N
-    private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI8N
+    private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI18N
     
     private Type newArrayType;
     
@@ -165,7 +165,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     @Override
     public Mirror visitMethodInvocation(FunctionInvocationTree arg0, EvaluationContext evaluationContext) {
         if (!evaluationContext.canInvokeMethods()) {
-            Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);
+            Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);	//NOI18N
         }
         if (loggerMethod.isLoggable(Level.FINE)) {
             loggerMethod.fine("STARTED : "+arg0+" in thread "+evaluationContext.getFrame().thread());
@@ -181,7 +181,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             object = mst.getExpression().accept(this, evaluationContext);
             methodName = mst.getIdentifier().toString();
             if (object == null) {
-                Assert2.error(arg0, "methodCallOnNull", methodName);
+                Assert2.error(arg0, "methodCallOnNull", methodName);	//NOI18N
             }
             if (currentPath != null) {
                 JavaFXTreePath memberSelectPath = JavaFXTreePath.getPath(currentPath, mst);
@@ -195,7 +195,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 JavaFXTreePath methodInvokePath = JavaFXTreePath.getPath(currentPath, arg0);
                 if (methodInvokePath == null) methodInvokePath = currentPath;
                 elm = evaluationContext.getTrees().getElement(methodInvokePath);
-                if (elm==null) Assert2.error(arg0, "methodCallOnNull: "+arg0.toString());
+                if (elm==null) Assert2.error(arg0, "methodCallOnNull: "+arg0.toString());	//NOI18N
                 methodName = elm.getSimpleName().toString();
             } else {
                 elm = null;
@@ -211,7 +211,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 elm = null;
             } else {
                 if (kind != TypeKind.EXECUTABLE) {
-                    Assert2.error(arg0, "noSuchMethod", elm.getSimpleName().toString(), elm.getEnclosingElement().getSimpleName().toString());
+                    Assert2.error(arg0, "noSuchMethod", elm.getSimpleName().toString(), elm.getEnclosingElement().getSimpleName().toString());	//NOI18N
                 }
                 ExecutableElement methodElement = (ExecutableElement) elm;
                 ExecutableType execTypeMirror = (ExecutableType) typeMirror;
@@ -221,7 +221,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 if (enclosing.getKind() == ElementKind.CLASS) {
                     TypeElement enclosingClassElement = (TypeElement) enclosing;
                     //TODO XXX
-                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);
+                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);	//NOI18N
                 }
             }
         }
@@ -240,7 +240,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             argTypes = new ArrayList<Type>(argVals.size());
             for (Value value : argVals) {
                 if (value == null) {
-                    argTypes.add(evaluationContext.getDebugger().getVirtualMachine().classesByName("java.lang.Object").get(0));
+                    argTypes.add(evaluationContext.getDebugger().getVirtualMachine().classesByName("java.lang.Object").get(0));	//NOI18N
                 } else {
                     argTypes.add(value.type());
                 }
@@ -286,12 +286,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 }
             }
             if (objectReference == null) {
-                Assert2.error(arg0, "methodCallOnNull", methodName);
+                Assert2.error(arg0, "methodCallOnNull", methodName);	//NOI18N
             }
         }
         ClassType cType;
         if (type instanceof ArrayType) {
-            Assert2.error(arg0, "methOnArray");
+            Assert2.error(arg0, "methOnArray");	//NOI18N
             return null;
         } else {
             cType = (ClassType) type;
@@ -320,31 +320,31 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 method = getConcreteMethod2(type, methodName, argTypes);
             }
         } catch (UnsuitableArgumentsException uaex) {
-            StringBuilder methodArgs = new StringBuilder("(");
+            StringBuilder methodArgs = new StringBuilder("(");	//NOI18N
             if (paramTypes != null) {
                  for (TypeMirror paramType : paramTypes) {
-                     if (methodArgs.length() > 1) methodArgs.append(", ");
+                     if (methodArgs.length() > 1) methodArgs.append(", ");	//NOI18N
                      methodArgs.append(paramType.toString());
                  }
             } else {
                 for (Type argType : argTypes) {
-                    if (methodArgs.length() > 1) methodArgs.append(", ");
+                    if (methodArgs.length() > 1) methodArgs.append(", ");	//NOI18N
                      methodArgs.append(argType.name());
                 }
             }
-            methodArgs.append(")");
-            if ("<init>".equals(methodName)) {
-                Assert2.error(arg0, "noSuchConstructorWithArgs", type.name(), methodArgs.toString());
+            methodArgs.append(")");	//NOI18N
+            if ("<init>".equals(methodName)) {	//NOI18N
+                Assert2.error(arg0, "noSuchConstructorWithArgs", type.name(), methodArgs.toString());	//NOI18N
             }
             if (methodArgs.length() == 2) {
-                Assert2.error(arg0, "noSuchMethod", methodName+methodArgs, type.name());
+                Assert2.error(arg0, "noSuchMethod", methodName+methodArgs, type.name());	//NOI18N
             } else {
-                Assert2.error(arg0, "noSuchMethodWithArgs", methodName, type.name(), methodArgs.toString());
+                Assert2.error(arg0, "noSuchMethodWithArgs", methodName, type.name(), methodArgs.toString());	//NOI18N
             }
             method = null;
         }
         if (method == null) {
-            Assert2.error(arg0, "noSuchMethod", methodName, type.name());
+            Assert2.error(arg0, "noSuchMethod", methodName, type.name());	//NOI18N
         }
         return method;
     }
@@ -356,7 +356,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     private static Method getConcreteMethod(ReferenceType type, String methodName, String firstParamSignature, List<? extends TypeMirror> typeArguments) throws UnsuitableArgumentsException {
         List<Method> methods = type.methodsByName(methodName);
         String signature = createSignature(firstParamSignature, typeArguments);
-        boolean constructor = "<init>".equals(methodName);
+        boolean constructor = "<init>".equals(methodName);	//NOI18N
         for (Method method : methods) {
             if (!method.isAbstract() &&
                 (!constructor || type.equals(method.declaringType())) &&
@@ -371,7 +371,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     private static Method getConcreteMethod2(ReferenceType type, String methodName, List<? extends Type> typeArguments) throws UnsuitableArgumentsException {
         List<Method> methods = type.methodsByName(methodName);
         List<Method> possibleMethods = new ArrayList<Method>();
-        boolean constructor = "<init>".equals(methodName);
+        boolean constructor = "<init>".equals(methodName);	//NOI18N
         for (Method method : methods) {
             if (!method.isAbstract() &&
                 (!constructor || type.equals(method.declaringType()))) {
@@ -504,21 +504,21 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     private static Type unboxType(Type t) {
         if (t instanceof ClassType) {
             String name = ((ClassType) t).name();
-            if (name.equals("java.lang.Boolean")) {
+            if (name.equals("java.lang.Boolean")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf(true).type();
-            } else if (name.equals("java.lang.Byte")) {
+            } else if (name.equals("java.lang.Byte")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf((byte) 10).type();
-            } else if (name.equals("java.lang.Character")) {
+            } else if (name.equals("java.lang.Character")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf('a').type();
-            } else if (name.equals("java.lang.Integer")) {
+            } else if (name.equals("java.lang.Integer")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf(10).type();
-            } else if (name.equals("java.lang.Long")) {
+            } else if (name.equals("java.lang.Long")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf(10l).type();
-            } else if (name.equals("java.lang.Short")) {
+            } else if (name.equals("java.lang.Short")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf((short)10).type();
-            } else if (name.equals("java.lang.Float")) {
+            } else if (name.equals("java.lang.Float")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf(10f).type();
-            } else if (name.equals("java.lang.Double")) {
+            } else if (name.equals("java.lang.Double")) {	//NOI18N
                 t = t.virtualMachine().mirrorOf(10.0).type();
             }
         }
@@ -526,15 +526,15 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     }
     
     private static boolean egualMethodSignatures(String s1, String s2) {
-        int i = s1.lastIndexOf(")");
+        int i = s1.lastIndexOf(")");	//NOI18N
         if (i > 0) s1 = s1.substring(0, i);
-        i = s2.lastIndexOf(")");
+        i = s2.lastIndexOf(")");	//NOI18N
         if (i > 0) s2 = s2.substring(0, i);
         return s1.equals(s2);
     }
     
     private static String createSignature(String firstParamSignature, List<? extends TypeMirror> typeArguments) {
-        StringBuilder signature = new StringBuilder("(");
+        StringBuilder signature = new StringBuilder("(");	//NOI18N
         if (firstParamSignature != null) {
             signature.append(firstParamSignature);
         }
@@ -550,7 +550,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     
     private static String getTypeName(TypeMirror type) {
         if (type.getKind() == TypeKind.ARRAY) {
-            return getTypeName(((javax.lang.model.type.ArrayType) type).getComponentType())+"[]";
+            return getTypeName(((javax.lang.model.type.ArrayType) type).getComponentType())+"[]";	//NOI18N
         }
         if (type.getKind() == TypeKind.TYPEVAR) {
             TypeVariable tv = (TypeVariable) type;
@@ -563,36 +563,36 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     }
     
     private static String getSignature(String javaType) {
-        if (javaType.equals("boolean")) {
-            return "Z";
-        } else if (javaType.equals("byte")) {
-            return "B";
-        } else if (javaType.equals("char")) {
-            return "C";
-        } else if (javaType.equals("short")) {
-            return "S";
-        } else if (javaType.equals("int")) {
-            return "I";
-        } else if (javaType.equals("long")) {
-            return "J";
-        } else if (javaType.equals("float")) {
-            return "F";
-        } else if (javaType.equals("double")) {
-            return "D";
-        } else if (javaType.endsWith("[]")) {
-            return "["+getSignature(javaType.substring(0, javaType.length() - 2));
+        if (javaType.equals("boolean")) {	//NOI18N
+            return "Z";	//NOI18N
+        } else if (javaType.equals("byte")) {	//NOI18N
+            return "B";	//NOI18N
+        } else if (javaType.equals("char")) {	//NOI18N
+            return "C";	//NOI18N
+        } else if (javaType.equals("short")) {	//NOI18N
+            return "S";	//NOI18N
+        } else if (javaType.equals("int")) {	//NOI18N
+            return "I";	//NOI18N
+        } else if (javaType.equals("long")) {	//NOI18N
+            return "J";	//NOI18N
+        } else if (javaType.equals("float")) {	//NOI18N
+            return "F";	//NOI18N
+        } else if (javaType.equals("double")) {	//NOI18N
+            return "D";	//NOI18N
+        } else if (javaType.endsWith("[]")) {	//NOI18N
+            return "["+getSignature(javaType.substring(0, javaType.length() - 2));	//NOI18N
         } else {
-            return "L"+javaType.replace('.', '/')+";";
+            return "L"+javaType.replace('.', '/')+";";	//NOI18N
         }
     }
     
     private static ReferenceType getClassType(Tree tree, TypeMirror type, EvaluationContext evaluationContext) {
         //TODO XXX
-        String className = "className";//ElementUtilities.getBinaryName((TypeElement) ((DeclaredType) type).asElement());
+        String className = "className";//ElementUtilities.getBinaryName((TypeElement) ((DeclaredType) type).asElement());	//NOI18N
         VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
         List<ReferenceType> classes = vm.classesByName(className);
         if (classes.size() == 0) {
-            Assert2.error(tree, "unknownType", className);
+            Assert2.error(tree, "unknownType", className);	//NOI18N
         }
         return classes.get(0);
     }
@@ -1196,21 +1196,21 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 TypeElement te = (TypeElement) elm;
                 String mainClassName = evaluationContext.getFrame().location().declaringType().name();
                 //TODO XXX HACK
-                String className = mainClassName+"$"+currentPath.getLeaf().toString();
+                String className = mainClassName+"$"+currentPath.getLeaf().toString();	//NOI18N
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() > 0) {
                     return classes.get(0);
                 }
-                Assert2.error(arg0, "unknownType", className);
+                Assert2.error(arg0, "unknownType", className);	//NOI18N
             case ENUM_CONSTANT:
                 return getEnumConstant(arg0, (VariableElement) elm, evaluationContext);
             case FIELD:
                 VariableElement ve = (VariableElement) elm;
                 String fieldName = ve.getSimpleName().toString();
-                if (fieldName.equals("this")) {
+                if (fieldName.equals("this")) {	//NOI18N
                     return evaluationContext.getFrame().thisObject();
                 }
-                if (fieldName.equals("super")) {
+                if (fieldName.equals("super")) {	//NOI18N
                     ReferenceType thisType = evaluationContext.getFrame().location().declaringType();
                     if (thisType instanceof ClassType) {
                         ClassType superClass = ((ClassType) thisType).superclass();
@@ -1227,16 +1227,16 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 if (enclosing.getKind() == ElementKind.CLASS) {
                     TypeElement enclosingClassElement = (TypeElement) enclosing;
                     //TODO XXX
-                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);
+                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);	//NOI18N
                 }
                 ReferenceType declaringType = evaluationContext.getFrame().location().declaringType();
                 if (enclosingClass != null) {
                     ReferenceType dt = findEnclosingType(declaringType, enclosingClass);
                     if (dt != null) declaringType = dt;
                 }
-                Field field = declaringType.fieldByName("$"+fieldName);
+                Field field = declaringType.fieldByName("$"+fieldName);	//NOI18N
                 if (field == null) {
-                    Assert2.error(arg0, "unknownVariable", "$"+fieldName);
+                    Assert2.error(arg0, "unknownVariable", "$"+fieldName);	//NOI18N
                 }
                 if (field.isStatic()) {
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field));
@@ -1245,7 +1245,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         ObjectReference ref =  (ObjectReference)v;
                         ReferenceType rt = ref.referenceType();
                         if (rt != null) {
-                            Field f = rt.fieldByName("$value");
+                            Field f = rt.fieldByName("$value");	//NOI18N
                             if (f != null) {
                                 Value val = ref.getValue(f);
                                 if (val instanceof PrimitiveValue) {
@@ -1271,7 +1271,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field, thisObject));
                     return thisObject.getValue(field);
                 } else {
-                    Assert2.error(arg0, "accessInstanceVariableFromStaticContext", fieldName);
+                    Assert2.error(arg0, "accessInstanceVariableFromStaticContext", fieldName);	//NOI18N
                     throw new IllegalStateException("No current instance available.");
                 }
             case LOCAL_VARIABLE:
@@ -1354,7 +1354,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (object.referenceType().equals(type)) {
             return object;
         }
-        Field outerRef = object.referenceType().fieldByName("this$0");
+        Field outerRef = object.referenceType().fieldByName("this$0");	//NOI18N
         if (outerRef == null) return null;
         object = (ObjectReference) object.getValue(outerRef);
         return findEnclosedObject(object, type);
@@ -1427,10 +1427,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         }
         if (value instanceof String) {
             StringReference str = vm.mirrorOf((String) value);
-            ClassType strClass = (ClassType) vm.classesByName("java.lang.String").get(0);
+            ClassType strClass = (ClassType) vm.classesByName("java.lang.String").get(0);	//NOI18N
             try {
                 List<Value> args = Collections.emptyList();
-                return invokeMethod(arg0, strClass.methodsByName("intern").get(0),
+                return invokeMethod(arg0, strClass.methodsByName("intern").get(0),	//NOI18N
                                     false, strClass, str, args, evaluationContext);
             } catch (Exception ex) {
                 return str;
@@ -1552,9 +1552,9 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     
     private Type getSubArrayType(Tree arg0, Type type) {
         String name = type.name();
-        if (name.endsWith("[]")) {
+        if (name.endsWith("[]")) {	//NOI18N
             name = name.substring(0, name.length() - 2);
-            if (!name.endsWith("[]")) {
+            if (!name.endsWith("[]")) {	//NOI18N
                 Type pType = getPrimitiveType(name, type.virtualMachine());
                 if (pType != null) return pType;
             }
@@ -1725,7 +1725,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     private Value getEnumConstant(Tree arg0, VariableElement ve, EvaluationContext evaluationContext) {
         String constantName = ve.getSimpleName().toString();
         ReferenceType enumType = getClassType(arg0, ve.asType(), evaluationContext);
-        Method valueOfMethod = enumType.methodsByName("valueOf").get(0);
+        Method valueOfMethod = enumType.methodsByName("valueOf").get(0);	//NOI18N
         VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
         StringReference constantNameRef = vm.mirrorOf(constantName);
         Value enumValue = invokeMethod(arg0, valueOfMethod, true, (ClassType) enumType, null,
@@ -1752,11 +1752,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             // try field:
             if (expression instanceof ClassType) {
                 ClassType clazz = (ClassType) expression;
-                if (name.equals("this")) {
+                if (name.equals("this")) {	//NOI18N
                     ObjectReference thisObject = evaluationContext.getFrame().thisObject();
                     while (thisObject != null && !((ReferenceType) thisObject.type()).equals(clazz)) {
                         ReferenceType thisClass = (ReferenceType) thisObject.type();
-                        Field outerThisField = thisClass.fieldByName("this$0");
+                        Field outerThisField = thisClass.fieldByName("this$0");	//NOI18N
                         if (outerThisField != null) {
                             thisObject = (ObjectReference) thisObject.getValue(outerThisField);
                         } else {
@@ -1769,7 +1769,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         return thisObject;
                     }
                 }
-                if (name.equals("class")) {
+                if (name.equals("class")) {	//NOI18N
                     return clazz.classObject();
                 }
                 Field f = clazz.fieldByName(name);
@@ -1777,11 +1777,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     return clazz.getValue(f);
                 }
             } else if (expression instanceof InterfaceType) {
-                if (name.equals("class")) {
+                if (name.equals("class")) {	//NOI18N
                     return ((InterfaceType) expression).classObject();
                 }
             } else if (expression instanceof ObjectReference) {
-                if (expression instanceof ArrayReference && "length".equals(name)) {
+                if (expression instanceof ArrayReference && "length".equals(name)) {	//NOI18N
                     return expression.virtualMachine().mirrorOf(((ArrayReference) expression).length());
                 }
                 ReferenceType type = ((ObjectReference) expression).referenceType();
@@ -1811,11 +1811,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 Mirror expression = arg0.getExpression().accept(this, evaluationContext);
                 if (expression instanceof ClassType) {
                     ClassType clazz = (ClassType) expression;
-                    if (fieldName.equals("this")) {
+                    if (fieldName.equals("this")) {	//NOI18N
                         ObjectReference thisObject = evaluationContext.getFrame().thisObject();
                         while (thisObject != null && !((ReferenceType) thisObject.type()).equals(clazz)) {
                             ReferenceType thisClass = (ReferenceType) thisObject.type();
-                            Field outerThisField = thisClass.fieldByName("this$0");
+                            Field outerThisField = thisClass.fieldByName("this$0");	//NOI18N
                             if (outerThisField != null) {
                                 thisObject = (ObjectReference) thisObject.getValue(outerThisField);
                             } else {
@@ -1828,36 +1828,36 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                             return thisObject;
                         }
                     }
-                    if (fieldName.equals("class")) {
+                    if (fieldName.equals("class")) {	//NOI18N
                         return clazz.classObject();
                     }
-                    Field f = clazz.fieldByName("$"+fieldName);
+                    Field f = clazz.fieldByName("$"+fieldName);	//NOI18N
                     if (f != null) {
                         return clazz.getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", "$"+fieldName);
+                        Assert2.error(arg0, "unknownField", "$"+fieldName);	//NOI18N
                         return null;
                     }
                 }
                 if (expression instanceof InterfaceType) {
                     InterfaceType intrfc = (InterfaceType) expression;
-                    if (fieldName.equals("class")) {
+                    if (fieldName.equals("class")) {	//NOI18N
                         return intrfc.classObject();
                     }
-                    Field f = intrfc.fieldByName("$"+fieldName);
+                    Field f = intrfc.fieldByName("$"+fieldName);	//NOI18N
                     if (f != null) {
                         return intrfc.getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", "$"+fieldName);
+                        Assert2.error(arg0, "unknownField", "$"+fieldName);	//NOI18N
                         return null;
                     }
                 }
                 if (expression instanceof ObjectReference) {
-                    if (expression instanceof ArrayReference && "length".equals(fieldName)) {
+                    if (expression instanceof ArrayReference && "length".equals(fieldName)) {	//NOI18N
                         return expression.virtualMachine().mirrorOf(((ArrayReference) expression).length());
                     }
                     ReferenceType type = ((ObjectReference) expression).referenceType();
-                    String ext = "$"+type.name().replace('.', '$')+"$";
+                    String ext = "$"+type.name().replace('.', '$')+"$";	//NOI18N
                     Field f = type.fieldByName(ext+fieldName);
                     if (f==null) {
 //Trying to search among all fields
@@ -1865,10 +1865,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         Iterator it = fields.iterator();
                         while(it.hasNext()) {
                             f = (Field) it.next();
-                            if (f.toString().indexOf("$"+fieldName)!=-1) {
+                            if (f.toString().indexOf("$"+fieldName)!=-1) {	//NOI18N
                                 break;
                             }
-                            if (f.toString().indexOf("."+fieldName)!=-1) {
+                            if (f.toString().indexOf("."+fieldName)!=-1) {	//NOI18N
                                 break;
                             }
                             f = null;
@@ -1880,7 +1880,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                             ObjectReference ref =  (ObjectReference)v;
                             ReferenceType rt = ref.referenceType();
                             if (rt != null) {
-                                Field vf = rt.fieldByName("$value");
+                                Field vf = rt.fieldByName("$value");	//NOI18N
                                 if (vf != null) {
                                     Value val = ref.getValue(vf);
                                     if (val instanceof PrimitiveValue) {
@@ -1906,7 +1906,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             case INTERFACE:
                 TypeElement te = (TypeElement) elm;
                 //TODO XXX
-                String className = "emptyClass";//ElementUtilities.getBinaryName(te);
+                String className = "emptyClass";//ElementUtilities.getBinaryName(te);	//NOI18N
                 VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() == 0) {
@@ -2316,7 +2316,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 TypeElement te = (TypeElement) elm;
                 String mainClassName = evaluationContext.getFrame().location().declaringType().name();
                 //TODO XXX HACK
-                String className = mainClassName+"$"+currentPath.getLeaf().toString();
+                String className = mainClassName+"$"+currentPath.getLeaf().toString();	//NOI18N
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() > 0) {
                     return classes.get(0);
@@ -2327,10 +2327,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             case FIELD:
                 VariableElement ve = (VariableElement) elm;
                 String fieldName = ve.getSimpleName().toString();
-                if (fieldName.equals("this")) {
+                if (fieldName.equals("this")) {	//NOI18N
                     return evaluationContext.getFrame().thisObject();
                 }
-                if (fieldName.equals("super")) {
+                if (fieldName.equals("super")) {	//NOI18N
                     ReferenceType thisType = evaluationContext.getFrame().location().declaringType();
                     if (thisType instanceof ClassType) {
                         ClassType superClass = ((ClassType) thisType).superclass();
@@ -2347,14 +2347,14 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 if (enclosing.getKind() == ElementKind.CLASS) {
                     TypeElement enclosingClassElement = (TypeElement) enclosing;
                     //TODO XXX
-                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);
+                    enclosingClass = "enclosingClass";//ElementUtilities.getBinaryName(enclosingClassElement);	//NOI18N
                 }
                 ReferenceType declaringType = evaluationContext.getFrame().location().declaringType();
                 if (enclosingClass != null) {
                     ReferenceType dt = findEnclosingType(declaringType, enclosingClass);
                     if (dt != null) declaringType = dt;
                 }
-                Field field = declaringType.fieldByName("$"+fieldName);
+                Field field = declaringType.fieldByName("$"+fieldName);	//NOI18N
                 if (field == null) {
                     Assert2.error(arg0, "unknownVariable", "$"+fieldName);
                 }
@@ -2365,7 +2365,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         ObjectReference ref =  (ObjectReference)v;
                         ReferenceType rt = ref.referenceType();
                         if (rt != null) {
-                            Field f = rt.fieldByName("$value");
+                            Field f = rt.fieldByName("$value");	//NOI18N
                             if (f != null) {
                                 Value val = ref.getValue(f);
                                 if (val instanceof PrimitiveValue) {
@@ -2538,7 +2538,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             throw new IllegalStateException(ieex);
         } catch (ObjectCollectedException ocex) {
             throw new IllegalStateException(new InvalidExpressionException(NbBundle.getMessage(
-                Evaluator.class, "CTL_EvalError_collected")));
+                Evaluator.class, "CTL_EvalError_collected")));	//NOI18N
         } finally {
             if (loggerMethod.isLoggable(Level.FINE)) {
                 loggerMethod.fine("FINISHED: "+objectReference+"."+method+" ("+argVals+") in thread "+evaluationThread);
@@ -2640,7 +2640,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             throw new IllegalStateException(ieex);
         } catch (ObjectCollectedException ocex) {
             throw new IllegalStateException(new InvalidExpressionException(NbBundle.getMessage(
-                Evaluator.class, "CTL_EvalError_collected")));
+                Evaluator.class, "CTL_EvalError_collected")));	//NOI18N
         } finally {
             if (methodCalled) {
                 if (loggerMethod.isLoggable(Level.FINE)) {
@@ -2703,42 +2703,42 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             if (name.equals(Boolean.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "booleanValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "booleanValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Byte.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "byteValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "byteValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Character.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "charValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "charValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Short.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "shortValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "shortValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Integer.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "intValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "intValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Long.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "longValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "longValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Float.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "floatValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "floatValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             if (name.equals(Double.class.getName())) {
                 unboxMethodToBeCalled(arg0, r, evaluationContext);
                 methodCalled = true;
-                return invokeUnboxingMethod(r, "doubleValue", evaluationContext.getFrame().thread());
+                return invokeUnboxingMethod(r, "doubleValue", evaluationContext.getFrame().thread());	//NOI18N
             }
             return r;
         } catch (InvalidTypeException itex) {
@@ -2759,7 +2759,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             throw new IllegalStateException(ieex);
         } catch (ObjectCollectedException ocex) {
             throw new IllegalStateException(new InvalidExpressionException(NbBundle.getMessage(
-                Evaluator.class, "CTL_EvalError_collected")));
+                Evaluator.class, "CTL_EvalError_collected")));	//NOI18N
         } finally {
             if (methodCalled) {
                 if (loggerMethod.isLoggable(Level.FINE)) {
@@ -2781,14 +2781,14 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                                                                        ClassNotLoadedException,
                                                                        IncompatibleThreadStateException,
                                                                        InvocationException {
-        if (type instanceof BooleanType) return invokeUnboxingMethod(val, "booleanValue", thread);
-        if (type instanceof ByteType) return invokeUnboxingMethod(val, "byteValue", thread);
-        if (type instanceof CharType) return invokeUnboxingMethod(val, "charValue", thread);
-        if (type instanceof ShortType) return invokeUnboxingMethod(val, "shortValue", thread);
-        if (type instanceof IntegerType) return invokeUnboxingMethod(val, "intValue", thread);
-        if (type instanceof LongType) return invokeUnboxingMethod(val, "longValue", thread);
-        if (type instanceof FloatType) return invokeUnboxingMethod(val, "floatValue", thread);
-        if (type instanceof DoubleType) return invokeUnboxingMethod(val, "doubleValue", thread);
+        if (type instanceof BooleanType) return invokeUnboxingMethod(val, "booleanValue", thread);	//NOI18N
+        if (type instanceof ByteType) return invokeUnboxingMethod(val, "byteValue", thread);	//NOI18N
+        if (type instanceof CharType) return invokeUnboxingMethod(val, "charValue", thread);	//NOI18N
+        if (type instanceof ShortType) return invokeUnboxingMethod(val, "shortValue", thread);	//NOI18N
+        if (type instanceof IntegerType) return invokeUnboxingMethod(val, "intValue", thread);	//NOI18N
+        if (type instanceof LongType) return invokeUnboxingMethod(val, "longValue", thread);	//NOI18N
+        if (type instanceof FloatType) return invokeUnboxingMethod(val, "floatValue", thread);	//NOI18N
+        if (type instanceof DoubleType) return invokeUnboxingMethod(val, "doubleValue", thread);	//NOI18N
         throw new RuntimeException("Invalid type while unboxing: " + type.signature());    // never happens
     }
     
@@ -2799,8 +2799,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                                                                       InvocationException {
         try {
             Method constructor = null;
-            List<Method> methods = type.methodsByName("<init>");
-            String signature = "("+v.type().signature()+")";
+            List<Method> methods = type.methodsByName("<init>");	//NOI18N
+            String signature = "("+v.type().signature()+")";	//NOI18N
             for (Method method : methods) {
                 if (!method.isAbstract() && egualMethodSignatures(method.signature(), signature)) {
                     constructor = method;
@@ -2884,11 +2884,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         List<? extends TypeMirror> typeArguments = Collections.emptyList();
         Method method;
         try {
-            method = getConcreteMethod((ReferenceType) ov.type(), "toString", typeArguments);
+            method = getConcreteMethod((ReferenceType) ov.type(), "toString", typeArguments);	//NOI18N
         } catch (UnsuitableArgumentsException uaex) {
             throw new IllegalStateException(uaex);
         }
-        ((ClassType) ov.type()).methodsByName("toString");
+        ((ClassType) ov.type()).methodsByName("toString");	//NOI18N
         List<Value> argVals = Collections.emptyList();
         Value sv = invokeMethod(arg0, method, false, null, ov, argVals, evaluationContext);
         if (sv instanceof StringReference) {

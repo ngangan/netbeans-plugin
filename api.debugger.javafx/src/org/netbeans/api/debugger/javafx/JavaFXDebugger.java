@@ -80,11 +80,11 @@ import org.openide.util.NbBundle;
 public abstract class JavaFXDebugger {
 
     /** Name of property for state of debugger. */
-    public static final String          PROP_STATE = "state";
+    public static final String          PROP_STATE = "state";	//NOI18N
     /** Name of property for current thread. */
-    public static final String          PROP_CURRENT_THREAD = "currentThread";
+    public static final String          PROP_CURRENT_THREAD = "currentThread";	//NOI18N
     /** Name of property for current stack frame. */
-    public static final String          PROP_CURRENT_CALL_STACK_FRAME = "currentCallStackFrame";
+    public static final String          PROP_CURRENT_CALL_STACK_FRAME = "currentCallStackFrame";	//NOI18N
     /** Property name constant. */
     public static final String          PROP_SUSPEND = "suspend"; // NOI18N
 
@@ -103,9 +103,9 @@ public abstract class JavaFXDebugger {
     public static final int             STATE_DISCONNECTED = 4;
 
     /** ID of JavaFX Debugger Engine. */
-    public static final String          ENGINE_ID = "netbeans-JavaFXSession/JavaFX";
+    public static final String          ENGINE_ID = "netbeans-JavaFXSession/JavaFX";	//NOI18N
     /** ID of JavaFX Debugger Engine. */
-    public static final String          SESSION_ID = "netbeans-JavaFXSession";
+    public static final String          SESSION_ID = "netbeans-JavaFXSession";	//NOI18N
     
 
     

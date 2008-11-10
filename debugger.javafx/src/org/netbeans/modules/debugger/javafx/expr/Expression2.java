@@ -60,8 +60,8 @@ import java.util.Random;
  */
 public class Expression2 {
 
-    private static final String REPLACE_return = "return01234";
-    private static final String REPLACE_class = "class01234";
+    private static final String REPLACE_return = "return01234";	//NOI18N
+    private static final String REPLACE_class = "class01234";	//NOI18N
 
     private String       strExpression;
     private String       language;

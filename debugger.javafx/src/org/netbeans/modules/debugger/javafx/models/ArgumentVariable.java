@@ -133,6 +133,6 @@ public class ArgumentVariable extends AbstractVariable implements org.netbeans.a
     }
     
     public String toString () {
-        return "ArgumentVariable " + name;
+        return "ArgumentVariable " + name;	//NOI18N
     }
 }

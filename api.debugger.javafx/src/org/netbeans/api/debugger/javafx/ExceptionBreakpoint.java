@@ -228,6 +228,6 @@ public final class ExceptionBreakpoint extends JavaFXBreakpoint {
      * @return  a string representation of the object
      */
     public String toString () {
-        return "ExceptionBreakpoint" + exceptionClassName;
+        return "ExceptionBreakpoint" + exceptionClassName;	//NOI18N
     }
 }

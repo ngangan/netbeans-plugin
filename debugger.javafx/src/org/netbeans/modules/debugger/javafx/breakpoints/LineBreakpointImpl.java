@@ -130,11 +130,11 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
         String reason = null;
         if (sourcePath == null) {
             reason = NbBundle.getMessage(LineBreakpointImpl.class,
-                    "MSG_NoSourceRoot",
+                    "MSG_NoSourceRoot",	//NOI18N
                     breakpoint.getURL());
         } else if (!isEnabled(sourcePath, preferredSourceRoot)) {
             reason = NbBundle.getMessage(LineBreakpointImpl.class,
-                    "MSG_DifferentPrefferedSourceRoot",
+                    "MSG_DifferentPrefferedSourceRoot",	//NOI18N
                     preferredSourceRoot[0]);
         }
         if (reason != null) {
@@ -315,7 +315,7 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
             // Something wrong in JDI
             ErrorManager.getDefault().annotate(iex,
                     NbBundle.getMessage(LineBreakpointImpl.class,
-                    "MSG_jdi_internal_error"));
+                    "MSG_jdi_internal_error"));	//NOI18N
             ErrorManager.getDefault().notify(iex);
             // We should indicate somehow that the breakpoint is invalid...
             reason[0] = iex.getLocalizedMessage();
@@ -338,10 +338,10 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
 
         if (logger.isLoggable(Level.FINER)) {
             logger.finer("LineBreakpoint: locations for ReferenceType=" +
-                    referenceType + ", stratum=" + stratum +
-                    ", source name=" + sourceName + ", bpSourcePath=" +
-                    bpSourcePath + ", lineNumber=" + lineNumber +
-                    " are: {" + list + "}");
+                    referenceType + ", stratum=" + stratum +	//NOI18N
+                    ", source name=" + sourceName + ", bpSourcePath=" +	//NOI18N
+                    bpSourcePath + ", lineNumber=" + lineNumber +	//NOI18N
+                    " are: {" + list + "}");	//NOI18N
         }
         if (!list.isEmpty()) {
             if (bpSourcePath == null) {
@@ -379,15 +379,15 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
      * @return normalized path without "." and ".." elements
      */
     private static String normalize(String path) {
-        Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");
-        Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");
+        Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");	//NOI18N
+        Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");	//NOI18N
 
         for (Matcher m = thisDirectoryPattern.matcher(path); m.find();) {
-            path = m.replaceAll("$1");
+            path = m.replaceAll("$1");	//NOI18N
             m = thisDirectoryPattern.matcher(path);
         }
         for (Matcher m = parentDirectoryPattern.matcher(path); m.find();) {
-            if (!m.group(2).equals("..")) {
+            if (!m.group(2).equals("..")) {	//NOI18N
                 path = path.substring(0, m.start()) + m.group(1) + path.substring(m.end());
                 m = parentDirectoryPattern.matcher(path);
             }

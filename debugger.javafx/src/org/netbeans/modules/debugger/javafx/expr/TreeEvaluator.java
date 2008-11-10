@@ -118,7 +118,7 @@ public class TreeEvaluator {
         currentPackage = (idx > 0) ? currentPackage.substring(0, idx + 1) : "";
         operators = new Operators(vm);
         int line = frame.location().lineNumber();
-        String url = evaluationContext.getDebugger().getEngineContext().getURL(frame, "JavaFX");//evaluationContext.getDebugger().getSession().getCurrentLanguage());
+        String url = evaluationContext.getDebugger().getEngineContext().getURL(frame, "JavaFX");//evaluationContext.getDebugger().getSession().getCurrentLanguage());	//NOI18N
         /*try {
             url = frame.location().sourcePath(expression.getLanguage());
         } catch (AbsentInformationException ex) {
@@ -196,7 +196,7 @@ public class TreeEvaluator {
             throw ieex;
         } catch (ObjectCollectedException ocex) {
             throw new InvalidExpressionException(NbBundle.getMessage(
-                TreeEvaluator.class, "CTL_EvalError_collected"));
+                TreeEvaluator.class, "CTL_EvalError_collected"));	//NOI18N
         } finally {
             if (loggerMethod.isLoggable(Level.FINE)) {
                 loggerMethod.fine("FINISHED: "+objectReference+"."+method+" ("+args+") in thread "+evaluationThread);

@@ -170,136 +170,136 @@ interface JavaFXParserConstants {
   int IN_CATEGORY_COMMENT = 5;
 
   String[] tokenImage = {
-    "<EOF>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\f\"",
-    "\"\\u001a\"",
-    "<token of kind 5>",
-    "\"\\n\"",
-    "\"\\r\"",
-    "\"\\r\\n\"",
-    "\"//\"",
-    "<token of kind 10>",
-    "\"/*\"",
-    "\"/*<\"",
-    "<SINGLE_LINE_COMMENT>",
-    "\"*/\"",
-    "\"*/\"",
-    "\"*/\"",
-    "<token of kind 17>",
-    "\"abstract\"",
-    "\"assert\"",
-    "\"boolean\"",
-    "\"break\"",
-    "\"byte\"",
-    "\"case\"",
-    "\"catch\"",
-    "\"char\"",
-    "\"class\"",
-    "\"const\"",
-    "\"continue\"",
-    "\"default\"",
-    "\"do\"",
-    "\"double\"",
-    "\"else\"",
-    "\"enum\"",
-    "\"extends\"",
-    "\"false\"",
-    "\"final\"",
-    "\"finally\"",
-    "\"float\"",
-    "\"for\"",
-    "\"goto\"",
-    "\"if\"",
-    "\"implements\"",
-    "\"import\"",
-    "\"instanceof\"",
-    "\"int\"",
-    "\"interface\"",
-    "\"long\"",
-    "\"native\"",
-    "\"new\"",
-    "\"null\"",
-    "\"package\"",
-    "\"private\"",
-    "\"protected\"",
-    "\"public\"",
-    "\"return\"",
-    "\"short\"",
-    "\"static\"",
-    "\"strictfp\"",
-    "\"super\"",
-    "\"switch\"",
-    "\"synchronized\"",
-    "\"this\"",
-    "\"throw\"",
-    "\"throws\"",
-    "\"transient\"",
-    "\"true\"",
-    "\"try\"",
-    "\"void\"",
-    "\"volatile\"",
-    "\"while\"",
-    "<INTEGER_LITERAL>",
-    "<DECIMAL_LITERAL>",
-    "<HEX_LITERAL>",
-    "<OCTAL_LITERAL>",
-    "<FLOATING_POINT_LITERAL>",
-    "<EXPONENT>",
-    "<CHARACTER_LITERAL>",
-    "<STRING_LITERAL>",
-    "<IDENTIFIER>",
-    "<LETTER>",
-    "<DIGIT>",
-    "\"(\"",
-    "\")\"",
-    "\"{\"",
-    "\"}\"",
-    "\"[\"",
-    "\"]\"",
-    "\";\"",
-    "\",\"",
-    "\".\"",
-    "\"...\"",
-    "\"=\"",
-    "\">\"",
-    "\"<\"",
-    "\"!\"",
-    "\"~\"",
-    "\"?\"",
-    "\":\"",
-    "\"==\"",
-    "\"<=\"",
-    "\">=\"",
-    "\"!=\"",
-    "\"||\"",
-    "\"&&\"",
-    "\"++\"",
-    "\"--\"",
-    "\"+\"",
-    "\"-\"",
-    "\"*\"",
-    "\"/\"",
-    "\"&\"",
-    "\"|\"",
-    "\"^\"",
-    "\"%\"",
-    "\"<<\"",
-    "\">>\"",
-    "\">>>\"",
-    "\"+=\"",
-    "\"-=\"",
-    "\"*=\"",
-    "\"/=\"",
-    "\"&=\"",
-    "\"|=\"",
-    "\"^=\"",
-    "\"%=\"",
-    "\"<<=\"",
-    "\">>=\"",
-    "\">>>=\"",
-    "\"@\"",
+    "<EOF>",    //NOI18N
+    "\" \"",    //NOI18N
+    "\"\\t\"",    //NOI18N
+    "\"\\f\"",    //NOI18N
+    "\"\\u001a\"",    //NOI18N
+    "<token of kind 5>",    //NOI18N
+    "\"\\n\"",    //NOI18N
+    "\"\\r\"",    //NOI18N
+    "\"\\r\\n\"",    //NOI18N
+    "\"//\"",    //NOI18N
+    "<token of kind 10>",    //NOI18N
+    "\"/*\"",    //NOI18N
+    "\"/*<\"",    //NOI18N
+    "<SINGLE_LINE_COMMENT>",    //NOI18N
+    "\"*/\"",    //NOI18N
+    "\"*/\"",    //NOI18N
+    "\"*/\"",    //NOI18N
+    "<token of kind 17>",    //NOI18N
+    "\"abstract\"",    //NOI18N
+    "\"assert\"",    //NOI18N
+    "\"boolean\"",    //NOI18N
+    "\"break\"",    //NOI18N
+    "\"byte\"",    //NOI18N
+    "\"case\"",    //NOI18N
+    "\"catch\"",    //NOI18N
+    "\"char\"",    //NOI18N
+    "\"class\"",    //NOI18N
+    "\"const\"",    //NOI18N
+    "\"continue\"",    //NOI18N
+    "\"default\"",    //NOI18N
+    "\"do\"",    //NOI18N
+    "\"double\"",    //NOI18N
+    "\"else\"",    //NOI18N
+    "\"enum\"",    //NOI18N
+    "\"extends\"",    //NOI18N
+    "\"false\"",    //NOI18N
+    "\"final\"",    //NOI18N
+    "\"finally\"",    //NOI18N
+    "\"float\"",    //NOI18N
+    "\"for\"",    //NOI18N
+    "\"goto\"",    //NOI18N
+    "\"if\"",    //NOI18N
+    "\"implements\"",    //NOI18N
+    "\"import\"",    //NOI18N
+    "\"instanceof\"",    //NOI18N
+    "\"int\"",    //NOI18N
+    "\"interface\"",    //NOI18N
+    "\"long\"",    //NOI18N
+    "\"native\"",    //NOI18N
+    "\"new\"",    //NOI18N
+    "\"null\"",    //NOI18N
+    "\"package\"",    //NOI18N
+    "\"private\"",    //NOI18N
+    "\"protected\"",    //NOI18N
+    "\"public\"",    //NOI18N
+    "\"return\"",    //NOI18N
+    "\"short\"",    //NOI18N
+    "\"static\"",    //NOI18N
+    "\"strictfp\"",    //NOI18N
+    "\"super\"",    //NOI18N
+    "\"switch\"",    //NOI18N
+    "\"synchronized\"",    //NOI18N
+    "\"this\"",    //NOI18N
+    "\"throw\"",    //NOI18N
+    "\"throws\"",    //NOI18N
+    "\"transient\"",    //NOI18N
+    "\"true\"",    //NOI18N
+    "\"try\"",    //NOI18N
+    "\"void\"",    //NOI18N
+    "\"volatile\"",    //NOI18N
+    "\"while\"",    //NOI18N
+    "<INTEGER_LITERAL>",    //NOI18N
+    "<DECIMAL_LITERAL>",    //NOI18N
+    "<HEX_LITERAL>",    //NOI18N
+    "<OCTAL_LITERAL>",    //NOI18N
+    "<FLOATING_POINT_LITERAL>",    //NOI18N
+    "<EXPONENT>",    //NOI18N
+    "<CHARACTER_LITERAL>",    //NOI18N
+    "<STRING_LITERAL>",    //NOI18N
+    "<IDENTIFIER>",    //NOI18N
+    "<LETTER>",    //NOI18N
+    "<DIGIT>",    //NOI18N
+    "\"(\"",    //NOI18N
+    "\")\"",    //NOI18N
+    "\"{\"",    //NOI18N
+    "\"}\"",    //NOI18N
+    "\"[\"",    //NOI18N
+    "\"]\"",    //NOI18N
+    "\";\"",    //NOI18N
+    "\",\"",    //NOI18N
+    "\".\"",    //NOI18N
+    "\"...\"",    //NOI18N
+    "\"=\"",    //NOI18N
+    "\">\"",    //NOI18N
+    "\"<\"",    //NOI18N
+    "\"!\"",    //NOI18N
+    "\"~\"",    //NOI18N
+    "\"?\"",    //NOI18N
+    "\":\"",    //NOI18N
+    "\"==\"",    //NOI18N
+    "\"<=\"",    //NOI18N
+    "\">=\"",    //NOI18N
+    "\"!=\"",    //NOI18N
+    "\"||\"",    //NOI18N
+    "\"&&\"",    //NOI18N
+    "\"++\"",    //NOI18N
+    "\"--\"",    //NOI18N
+    "\"+\"",    //NOI18N
+    "\"-\"",    //NOI18N
+    "\"*\"",    //NOI18N
+    "\"/\"",    //NOI18N
+    "\"&\"",    //NOI18N
+    "\"|\"",    //NOI18N
+    "\"^\"",    //NOI18N
+    "\"%\"",    //NOI18N
+    "\"<<\"",    //NOI18N
+    "\">>\"",    //NOI18N
+    "\">>>\"",    //NOI18N
+    "\"+=\"",    //NOI18N
+    "\"-=\"",    //NOI18N
+    "\"*=\"",    //NOI18N
+    "\"/=\"",    //NOI18N
+    "\"&=\"",    //NOI18N
+    "\"|=\"",    //NOI18N
+    "\"^=\"",    //NOI18N
+    "\"%=\"",    //NOI18N
+    "\"<<=\"",    //NOI18N
+    "\">>=\"",    //NOI18N
+    "\">>>=\"",    //NOI18N
+    "\"@\"",    //NOI18N
   };
 
 }

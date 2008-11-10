@@ -89,46 +89,46 @@ interface JavaFXParserTreeConstants
 
 
   public String[] jjtNodeName = {
-    "ReferenceTypeList",
-    "ActualTypeArgument",
-    "Identifier",
-    "void",
-    "ArrayInitializer",
-    "ReferenceType",
-    "TypeArguments",
-    "PrimitiveType",
-    "ResultType",
-    "Name",
-    "ClassOrInterfaceType",
-    "Expression",
-    "AssignmentOperator",
-    "ConditionalExpression",
-    "ConditionalOrExpression",
-    "ConditionalAndExpression",
-    "InclusiveOrExpression",
-    "ExclusiveOrExpression",
-    "AndExpression",
-    "EqualityExpression",
-    "InstanceOfExpression",
-    "RelationalExpression",
-    "ShiftExpression",
-    "AdditiveExpression",
-    "MultiplicativeExpression",
-    "UnaryExpression",
-    "PreIncrementExpression",
-    "PreDecrementExpression",
-    "UnaryExpressionNotPlusMinus",
-    "PostfixExpression",
-    "CastExpression",
-    "PrimaryExpression",
-    "PrimaryPrefix",
-    "PrimarySuffix",
-    "Literal",
-    "BooleanLiteral",
-    "NullLiteral",
-    "Arguments",
-    "ArgumentList",
-    "AllocationExpression",
-    "ArrayDimsAndInits",
+    "ReferenceTypeList",    //NOI18N
+    "ActualTypeArgument",    //NOI18N
+    "Identifier",    //NOI18N
+    "void",    //NOI18N
+    "ArrayInitializer",    //NOI18N
+    "ReferenceType",    //NOI18N
+    "TypeArguments",    //NOI18N
+    "PrimitiveType",    //NOI18N
+    "ResultType",    //NOI18N
+    "Name",    //NOI18N
+    "ClassOrInterfaceType",    //NOI18N
+    "Expression",    //NOI18N
+    "AssignmentOperator",    //NOI18N
+    "ConditionalExpression",    //NOI18N
+    "ConditionalOrExpression",    //NOI18N
+    "ConditionalAndExpression",    //NOI18N
+    "InclusiveOrExpression",    //NOI18N
+    "ExclusiveOrExpression",    //NOI18N
+    "AndExpression",    //NOI18N
+    "EqualityExpression",    //NOI18N
+    "InstanceOfExpression",    //NOI18N
+    "RelationalExpression",    //NOI18N
+    "ShiftExpression",    //NOI18N
+    "AdditiveExpression",    //NOI18N
+    "MultiplicativeExpression",    //NOI18N
+    "UnaryExpression",    //NOI18N
+    "PreIncrementExpression",    //NOI18N
+    "PreDecrementExpression",    //NOI18N
+    "UnaryExpressionNotPlusMinus",    //NOI18N
+    "PostfixExpression",    //NOI18N
+    "CastExpression",    //NOI18N
+    "PrimaryExpression",    //NOI18N
+    "PrimaryPrefix",    //NOI18N
+    "PrimarySuffix",    //NOI18N
+    "Literal",    //NOI18N
+    "BooleanLiteral",    //NOI18N
+    "NullLiteral",    //NOI18N
+    "Arguments",    //NOI18N
+    "ArgumentList",    //NOI18N
+    "AllocationExpression",    //NOI18N
+    "ArrayDimsAndInits",    //NOI18N
   };
 }

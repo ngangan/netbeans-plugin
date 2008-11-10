@@ -55,8 +55,8 @@ public class Expression {
     public static final String LANGUAGE_JAVA_1_4 = JavaFXParser.LANGUAGE_JAVA_1_4;
     public static final String LANGUAGE_JAVA_1_5 = JavaFXParser.LANGUAGE_JAVA_1_5;
     
-    private static final String REPLACE_return = "return01234";
-    private static final String REPLACE_class = "class01234";
+    private static final String REPLACE_return = "return01234";	//NOI18N
+    private static final String REPLACE_class = "class01234";	//NOI18N
 
     private String       strExpression;
     private String       language;

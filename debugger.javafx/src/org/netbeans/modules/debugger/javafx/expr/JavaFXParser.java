@@ -44,8 +44,8 @@ package org.netbeans.modules.debugger.javafx.expr;
 
 class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXParserConstants {/*@bgen(jjtree)*/
   protected JJTJavaFXParserState jjtree = new JJTJavaFXParserState();
-  public static final String LANGUAGE_JAVA_1_4 = "1.4.0";
-  public static final String LANGUAGE_JAVA_1_5 = "1.5.0";
+  public static final String LANGUAGE_JAVA_1_4 = "1.4.0";	//NOI18N
+  public static final String LANGUAGE_JAVA_1_5 = "1.5.0";	//NOI18N
 
   private String target_jdk;
   private boolean jdk1_5;
@@ -53,8 +53,8 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
 
   public void setTargetJDK(String target) {
      target_jdk = target;
-     jdk1_5 = "1.5.0".compareTo(target_jdk) <= 0;
-     generics = "1.5.0".compareTo(target_jdk) <= 0;
+     jdk1_5 = "1.5.0".compareTo(target_jdk) <= 0;	//NOI18N
+     generics = "1.5.0".compareTo(target_jdk) <= 0;	//NOI18N
   }
 
   private boolean expressionLookahead() {
@@ -232,8 +232,8 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
                  jjtc000 = false;
       tok2=tok.next;
       tok1=Token.newToken(GT);
-      tok.image=">";  tok.kind=GT;  tok.next=tok1;
-      tok1.image=">"; tok1.kind=GT; tok1.next=tok2;
+      tok.image=">";  tok.kind=GT;  tok.next=tok1;	//NOI18N
+      tok1.image=">"; tok1.kind=GT; tok1.next=tok2;	//NOI18N
         break;
       case RUNSIGNEDSHIFT:
         tok = jj_consume_token(RUNSIGNEDSHIFT);
@@ -241,9 +241,9 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
                   jjtc000 = false;
       tok3=tok.next;
       tok1=Token.newToken(GT); tok2=Token.newToken(GT);
-      tok.image=">";  tok.kind=GT;  tok.next=tok1;
-      tok1.image=">"; tok1.kind=GT; tok1.next=tok2;
-      tok2.image=">"; tok2.kind=GT; tok2.next=tok3;
+      tok.image=">";  tok.kind=GT;  tok.next=tok1;	//NOI18N
+      tok1.image=">"; tok1.kind=GT; tok1.next=tok2;	//NOI18N
+      tok2.image=">"; tok2.kind=GT; tok2.next=tok3;	//NOI18N
         break;
       default:
         jj_la1[1] = jj_gen;
@@ -281,18 +281,18 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       case HOOK:
         // Wildcard
           tok = jj_consume_token(HOOK);
-                              jjtn000.setAttribute("wildcard", tok);
+                              jjtn000.setAttribute("wildcard", tok);	//NOI18N
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case EXTENDS:
         case SUPER:
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case EXTENDS:
             tok = jj_consume_token(EXTENDS);
-                              jjtn000.setAttribute("token", tok);
+                              jjtn000.setAttribute("token", tok);	//NOI18N
             break;
           case SUPER:
             tok = jj_consume_token(SUPER);
-                              jjtn000.setAttribute("token", tok);
+                              jjtn000.setAttribute("token", tok);	//NOI18N
             break;
           default:
             jj_la1[2] = jj_gen;
@@ -352,7 +352,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       tok = jj_consume_token(IDENTIFIER);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      jjtn000.setAttribute("token", tok);
+      jjtn000.setAttribute("token", tok);	//NOI18N
     } finally {
       if (jjtc000) {
         jjtree.closeNodeScope(jjtn000, true);
@@ -479,7 +479,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
         }
         jjtree.closeNodeScope(jjtn000, true);
         jjtc000 = false;
-        jjtn000.setAttribute("arrayCount", new Integer(arrayCount));
+        jjtn000.setAttribute("arrayCount", new Integer(arrayCount));	//NOI18N
         break;
       case BOOLEAN:
       case BYTE:
@@ -506,7 +506,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
         }
         jjtree.closeNodeScope(jjtn000, true);
         jjtc000 = false;
-        jjtn000.setAttribute("arrayCount", new Integer(arrayCount));
+        jjtn000.setAttribute("arrayCount", new Integer(arrayCount));	//NOI18N
         break;
       default:
         jj_la1[10] = jj_gen;
@@ -568,8 +568,8 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
                  jjtc000 = false;
         tok2=tok.next;
         tok1=Token.newToken(GT);
-        tok.image=">";  tok.kind=GT;  tok.next=tok1;
-        tok1.image=">"; tok1.kind=GT; tok1.next=tok2;
+        tok.image=">";  tok.kind=GT;  tok.next=tok1;	//NOI18N
+        tok1.image=">"; tok1.kind=GT; tok1.next=tok2;	//NOI18N
         break;
       case RUNSIGNEDSHIFT:
         tok = jj_consume_token(RUNSIGNEDSHIFT);
@@ -577,9 +577,9 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
                   jjtc000 = false;
         tok3=tok.next;
         tok1=Token.newToken(GT); tok2=Token.newToken(GT);
-        tok.image=">";  tok.kind=GT;  tok.next=tok1;
-        tok1.image=">"; tok1.kind=GT; tok1.next=tok2;
-        tok2.image=">"; tok2.kind=GT; tok2.next=tok3;
+        tok.image=">";  tok.kind=GT;  tok.next=tok1;	//NOI18N
+        tok1.image=">"; tok1.kind=GT; tok1.next=tok2;	//NOI18N
+        tok2.image=">"; tok2.kind=GT; tok2.next=tok3;	//NOI18N
         break;
       default:
         jj_la1[11] = jj_gen;
@@ -645,7 +645,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       }
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    jjtn000.setAttribute("token", tok);
+    jjtn000.setAttribute("token", tok);	//NOI18N
     } finally {
   if (jjtc000) {
     jjtree.closeNodeScope(jjtn000, true);
@@ -664,7 +664,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
         jj_consume_token(VOID);
               jjtree.closeNodeScope(jjtn000, true);
               jjtc000 = false;
-              jjtn000.setAttribute("void", "void");
+              jjtn000.setAttribute("void", "void");	//NOI18N
         break;
       case BOOLEAN:
       case BYTE:
@@ -710,7 +710,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
     jjtree.openNodeScope(jjtn000);Token tok;
     try {
       tok = jj_consume_token(IDENTIFIER);
-    jjtn000.addAttribute("token", tok);
+    jjtn000.addAttribute("token", tok);	//NOI18N
       label_6:
       while (true) {
         if (jj_2_6(2)) {
@@ -720,7 +720,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
         }
         jj_consume_token(DOT);
         tok = jj_consume_token(IDENTIFIER);
-      jjtn000.addAttribute("token", tok);
+      jjtn000.addAttribute("token", tok);	//NOI18N
       }
     } finally {
     if (jjtc000) {
@@ -888,7 +888,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       }
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-        jjtn000.setAttribute("operator", tok);
+        jjtn000.setAttribute("operator", tok);	//NOI18N
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -952,7 +952,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           break label_8;
         }
         tok = jj_consume_token(SC_OR);
-                                  jjtn001.setAttribute("operator", tok);
+                                  jjtn001.setAttribute("operator", tok);	//NOI18N
         ConditionalAndExpression();
       }
     } catch (Throwable jjte001) {
@@ -994,7 +994,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           break label_9;
         }
         tok = jj_consume_token(SC_AND);
-                                  jjtn001.setAttribute("operator", tok);
+                                  jjtn001.setAttribute("operator", tok);	//NOI18N
         InclusiveOrExpression();
       }
     } catch (Throwable jjte001) {
@@ -1036,7 +1036,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           break label_10;
         }
         tok = jj_consume_token(BIT_OR);
-                                  jjtn001.addAttribute("operator", tok);
+                                  jjtn001.addAttribute("operator", tok);	//NOI18N
         ExclusiveOrExpression();
       }
     } catch (Throwable jjte001) {
@@ -1078,7 +1078,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           break label_11;
         }
         tok = jj_consume_token(XOR);
-                                  jjtn001.addAttribute("operator", tok);
+                                  jjtn001.addAttribute("operator", tok);	//NOI18N
         AndExpression();
       }
     } catch (Throwable jjte001) {
@@ -1120,7 +1120,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           break label_12;
         }
         tok = jj_consume_token(BIT_AND);
-                                  jjtn001.addAttribute("operator", tok);
+                                  jjtn001.addAttribute("operator", tok);	//NOI18N
         EqualityExpression();
       }
     } catch (Throwable jjte001) {
@@ -1174,7 +1174,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           jj_consume_token(-1);
           throw new ParseException();
         }
-                                  jjtn001.addAttribute("operator", tok);
+                                  jjtn001.addAttribute("operator", tok);	//NOI18N
         InstanceOfExpression();
       }
     } catch (Throwable jjte001) {
@@ -1271,7 +1271,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           jj_consume_token(-1);
           throw new ParseException();
         }
-      jjtn001.addAttribute("operator", token);
+      jjtn001.addAttribute("operator", token);	//NOI18N
         ShiftExpression();
       }
     } catch (Throwable jjte001) {
@@ -1329,7 +1329,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           jj_consume_token(-1);
           throw new ParseException();
         }
-        jjtn001.addAttribute("operator", tok);
+        jjtn001.addAttribute("operator", tok);	//NOI18N
         AdditiveExpression();
       }
     } catch (Throwable jjte001) {
@@ -1383,7 +1383,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           jj_consume_token(-1);
           throw new ParseException();
         }
-            jjtn001.addAttribute("operator", tok);
+            jjtn001.addAttribute("operator", tok);	//NOI18N
         MultiplicativeExpression();
       }
     } catch (Throwable jjte001) {
@@ -1441,7 +1441,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           jj_consume_token(-1);
           throw new ParseException();
         }
-        jjtn001.addAttribute("operator", tok);
+        jjtn001.addAttribute("operator", tok);	//NOI18N
         UnaryExpression();
       }
     } catch (Throwable jjte001) {
@@ -1486,7 +1486,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           jj_consume_token(-1);
           throw new ParseException();
         }
-      jjtn001.setAttribute("operator", tok);
+      jjtn001.setAttribute("operator", tok);	//NOI18N
         UnaryExpression();
         break;
       case INCR:
@@ -1532,7 +1532,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
     jjtree.openNodeScope(jjtn000);Token tok;
     try {
       tok = jj_consume_token(INCR);
-             jjtn000.setAttribute("operator", tok);
+             jjtn000.setAttribute("operator", tok);	//NOI18N
       PrimaryExpression();
     } catch (Throwable jjte000) {
     if (jjtc000) {
@@ -1562,7 +1562,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
     jjtree.openNodeScope(jjtn000);Token tok;
     try {
       tok = jj_consume_token(DECR);
-             jjtn000.setAttribute("operator", tok);
+             jjtn000.setAttribute("operator", tok);	//NOI18N
       PrimaryExpression();
     } catch (Throwable jjte000) {
     if (jjtc000) {
@@ -1609,7 +1609,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
             jj_consume_token(-1);
             throw new ParseException();
           }
-      jjtn001.setAttribute("operator", tok);
+      jjtn001.setAttribute("operator", tok);	//NOI18N
           UnaryExpression();
           break;
         case BOOLEAN:
@@ -1691,7 +1691,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       }
     jjtree.closeNodeScope(jjtn001,  tok != null);
     jjtc001 = false;
-    if (tok != null) jjtn001.setAttribute("operator", token);
+    if (tok != null) jjtn001.setAttribute("operator", token);	//NOI18N
     } catch (Throwable jjte001) {
   if (jjtc001) {
     jjtree.clearNodeScope(jjtn001);
@@ -1801,7 +1801,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
         tok = jj_consume_token(THIS);
                jjtree.closeNodeScope(jjtn000, true);
                jjtc000 = false;
-               jjtn000.setAttribute("this", "this");
+               jjtn000.setAttribute("this", "this");	//NOI18N
         break;
       default:
         jj_la1[42] = jj_gen;
@@ -1818,16 +1818,16 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
             }
             tok = jj_consume_token(IDENTIFIER);
             jj_consume_token(DOT);
-        name = name + tok.image + ".";
+        name = name + tok.image + ".";	//NOI18N
           }
           jj_consume_token(SUPER);
           jj_consume_token(DOT);
           tok = jj_consume_token(IDENTIFIER);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    jjtn000.setAttribute("qualifier", (name.length() > 0) ? name.substring(0, name.length() - 1) : "");
-    name = name + "super." + tok.image;
-    jjtn000.setAttribute("identifier", tok.image);
+    jjtn000.setAttribute("qualifier", (name.length() > 0) ? name.substring(0, name.length() - 1) : "");	//NOI18N
+    name = name + "super." + tok.image;	//NOI18N
+    jjtn000.setAttribute("identifier", tok.image);	//NOI18N
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case LPAREN:
@@ -1893,13 +1893,13 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           tok = jj_consume_token(THIS);
                       jjtree.closeNodeScope(jjtn000, true);
                       jjtc000 = false;
-                      jjtn000.setAttribute("token", tok);
+                      jjtn000.setAttribute("token", tok);	//NOI18N
           break;
         case SUPER:
           tok = jj_consume_token(SUPER);
                       jjtree.closeNodeScope(jjtn000, true);
                       jjtc000 = false;
-                      jjtn000.setAttribute("token", tok);
+                      jjtn000.setAttribute("token", tok);	//NOI18N
           break;
         case NEW:
           AllocationExpression();
@@ -1917,7 +1917,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
           tok = jj_consume_token(IDENTIFIER);
                          jjtree.closeNodeScope(jjtn000, true);
                          jjtc000 = false;
-                         jjtn000.setAttribute("token", tok);
+                         jjtn000.setAttribute("token", tok);	//NOI18N
           break;
         default:
           jj_la1[46] = jj_gen;
@@ -1927,7 +1927,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
         break;
       case LBRACKET:
         tok = jj_consume_token(LBRACKET);
-                      jjtn000.setAttribute("token", tok);
+                      jjtn000.setAttribute("token", tok);	//NOI18N
         Expression();
         tok = jj_consume_token(RBRACKET);
         break;
@@ -1996,7 +1996,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       }
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    if (tok != null) jjtn000.setAttribute("token", tok);
+    if (tok != null) jjtn000.setAttribute("token", tok);	//NOI18N
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -2038,7 +2038,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       }
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    jjtn000.setAttribute("token", tok);
+    jjtn000.setAttribute("token", tok);	//NOI18N
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -2055,7 +2055,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       jj_consume_token(NULL);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    jjtn000.setAttribute("token", token);
+    jjtn000.setAttribute("token", token);	//NOI18N
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -2256,7 +2256,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
             }
           }
           ArrayInitializer();
-      jjtn000.setAttribute("initializers", Boolean.TRUE);
+      jjtn000.setAttribute("initializers", Boolean.TRUE);	//NOI18N
           break;
         default:
           jj_la1[54] = jj_gen;
@@ -2266,7 +2266,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       }
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    jjtn000.setAttribute("dimensions", new Integer(arrayCount));
+    jjtn000.setAttribute("dimensions", new Integer(arrayCount));	//NOI18N
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);

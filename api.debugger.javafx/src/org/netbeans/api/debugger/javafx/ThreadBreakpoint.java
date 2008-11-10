@@ -111,6 +111,6 @@ public final class ThreadBreakpoint extends JavaFXBreakpoint {
      * @return  a string representation of the object
      */
     public String toString () {
-        return "ThreadBreakpoint " + breakpointType;
+        return "ThreadBreakpoint " + breakpointType;	//NOI18N
     }
 }

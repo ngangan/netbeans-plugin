@@ -58,7 +58,7 @@ import java.util.Set;
 public abstract class SourcePathProvider {
 
     /** Property name constant. */
-    public static final String PROP_SOURCE_ROOTS = "sourceRoots";
+    public static final String PROP_SOURCE_ROOTS = "sourceRoots";	//NOI18N
     
     /**
      * Returns relative path (java/lang/Thread.java) for given url 

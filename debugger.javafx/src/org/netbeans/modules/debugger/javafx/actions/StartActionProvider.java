@@ -108,7 +108,7 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
     
     public void doAction (Object action) {
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider.doAction ()");
+            System.out.println ("\nS StartActionProvider.doAction ()");	//NOI18N
         JavaFXDebuggerImpl debugger = (JavaFXDebuggerImpl) lookupProvider.
             lookupFirst (null, JavaFXDebugger.class);
         if ( debugger != null && 
@@ -120,18 +120,18 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
         final AbstractDICookie cookie = lookupProvider.lookupFirst(null, AbstractDICookie.class);
         doStartDebugger(cookie);
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider." +
-                "doAction () setStarting"
+            System.out.println ("\nS StartActionProvider." +	//NOI18N
+                "doAction () setStarting"	//NOI18N
             );
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider." +
-                "doAction () end"
+            System.out.println ("\nS StartActionProvider." +	//NOI18N
+                "doAction () end"	//NOI18N
             );
     }
     
     public void postAction(Object action, final Runnable actionPerformedNotifier) {
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider.postAction ()");
+            System.out.println ("\nS StartActionProvider.postAction ()");	//NOI18N
         JavaFXDebuggerImpl debugger = (JavaFXDebuggerImpl) lookupProvider.
             lookupFirst (null, JavaFXDebugger.class);
         if ( debugger != null && 
@@ -145,13 +145,13 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
         final AbstractDICookie cookie = lookupProvider.lookupFirst(null, AbstractDICookie.class);
         
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider." +
-                "postAction () setStarting"
+            System.out.println ("\nS StartActionProvider." +	//NOI18N
+                "postAction () setStarting"	//NOI18N
             );
         debuggerImpl.setStarting ();  // JS
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider." +
-                "postAction () setStarting end"
+            System.out.println ("\nS StartActionProvider." +	//NOI18N
+                "postAction () setStarting end"	//NOI18N
             );
         
         RequestProcessor.getDefault().post(new Runnable() {
@@ -179,8 +179,8 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
     
     private void doStartDebugger(AbstractDICookie cookie) {
         if (startVerbose)
-            System.out.println ("\nS StartActionProvider." +
-                "doAction ().thread"
+            System.out.println ("\nS StartActionProvider." +	//NOI18N
+                "doAction ().thread"	//NOI18N
             );
         Exception exception = null;
         try {
@@ -193,8 +193,8 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
             Operator o = createOperator (virtualMachine, startLock);
             synchronized (startLock) {
                 if (startVerbose) System.out.println (
-                        "\nS StartActionProvider.doAction () - " +
-                        "starting operator thread"
+                        "\nS StartActionProvider.doAction () - " +	//NOI18N
+                        "starting operator thread"	//NOI18N
                     );
                 o.start ();
                 if (cookie instanceof ListeningDICookie) 
@@ -216,8 +216,8 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
             // PATCHEND Hanz
 
             if (startVerbose)
-                System.out.println ("\nS StartActionProvider." +
-                    "doAction ().thread end: success"
+                System.out.println ("\nS StartActionProvider." +	//NOI18N
+                    "doAction ().thread end: success"	//NOI18N
                 );
         } catch (InterruptedException iex) {
             exception = iex;
@@ -230,8 +230,8 @@ public class StartActionProvider extends ActionsProvider implements Cancellable 
         }
         if (exception != null) {
             if (startVerbose)
-                System.out.println ("\nS StartActionProvider." +
-                    "doAction ().thread end: exception " + exception
+                System.out.println ("\nS StartActionProvider." +	//NOI18N
+                    "doAction ().thread end: exception " + exception	//NOI18N
                 );
             debuggerImpl.setException (exception);
             // kill the session that did not start properly

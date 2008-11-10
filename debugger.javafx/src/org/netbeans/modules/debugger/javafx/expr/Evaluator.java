@@ -69,7 +69,7 @@ public class Evaluator implements JavaFXParserVisitor {
         System.getProperty ("netbeans.debugger.noInvokeMethods") != null;
     
     private static final Logger loggerMethod = Logger.getLogger("org.netbeans.modules.debugger.javafx.invokeMethod"); // NOI18N
-    private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI8N
+    private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI18N
 
     private Expression              expression;
     private EvaluationContext       evaluationContext;
@@ -215,16 +215,16 @@ public class Evaluator implements JavaFXParserVisitor {
         case JavaFXParserTreeConstants.JJTNULLLITERAL:
             return null;
         }
-        return Assert.error(node, "unknownNonterminal");
+        return Assert.error(node, "unknownNonterminal");	//NOI18N
     }
 
     private ObjectReference primitiveClass(String name) throws IncompatibleThreadStateException {
-        ReferenceType primType = resolveType("java.lang." + name.substring(0, 1).toUpperCase() + name.substring(1));
+        ReferenceType primType = resolveType("java.lang." + name.substring(0, 1).toUpperCase() + name.substring(1));	//NOI18N
         try {
             if (loggerValue.isLoggable(Level.FINE)) {
                 loggerValue.fine("STARTED : "+primType+".getValue("+primType.fieldByName("TYPE")+")");
             }
-            return (ObjectReference) primType.getValue(primType.fieldByName("TYPE"));
+            return (ObjectReference) primType.getValue(primType.fieldByName("TYPE"));	//NOI18N
         } finally {
             if (loggerValue.isLoggable(Level.FINE)) {
                 loggerValue.fine("FINISHED: "+primType+".getValue("+primType.fieldByName("TYPE")+")");
@@ -234,15 +234,15 @@ public class Evaluator implements JavaFXParserVisitor {
 
     private Object visitResultType(SimpleNode node, Object data) {
         try {
-            if (node.getAttribute("void") != null) {
-                return primitiveClass("void");
+            if (node.getAttribute("void") != null) {	//NOI18N
+                return primitiveClass("void");	//NOI18N
             }
             Type type = (Type) node.jjtGetChild(0).jjtAccept(this, data);
             if (type instanceof ReferenceType) return type;
 
             return primitiveClass(type.name());
         } catch (IncompatibleThreadStateException e) {
-            return Assert.error(node, "internalErrorResolvingType", "void");
+            return Assert.error(node, "internalErrorResolvingType", "void");	//NOI18N
         }
     }
 
@@ -251,7 +251,7 @@ public class Evaluator implements JavaFXParserVisitor {
         for (int i = 0; i < values.length; i++) {
             values[i] = node.jjtGetChild(i).jjtAccept(this, data);
             if (!(values[i] instanceof Value) && !(values[i] instanceof Object[])) {
-                Assert.error(node, "invalidArrayInitializer", values[i]);
+                Assert.error(node, "invalidArrayInitializer", values[i]);	//NOI18N
             }
         }
         return values;
@@ -260,11 +260,11 @@ public class Evaluator implements JavaFXParserVisitor {
     private Object visitArrayDimsAndInits(SimpleNode node, Object data) {
 
         Type arrayType = (Type) data;
-        int dimensions = ((Integer) node.getAttribute("dimensions")).intValue();
+        int dimensions = ((Integer) node.getAttribute("dimensions")).intValue();	//NOI18N
         ArrayReference arrayRef = null;
 
         try {
-            if (node.getAttribute("initializers") != null) {
+            if (node.getAttribute("initializers") != null) {	//NOI18N
                 Object [] initValues = (Object []) node.jjtGetChild(0).jjtAccept(this, data);
                 return createArray(arrayType, dimensions, initValues);
             } else {
@@ -281,19 +281,19 @@ public class Evaluator implements JavaFXParserVisitor {
                 return createArray(arrayType, dimensions, sizes, 0);
             }
         } catch (IncompatibleThreadStateException e) {
-            Assert.error(node, "arrayCreateError", e);
+            Assert.error(node, "arrayCreateError", e);	//NOI18N
         } catch (ClassNotLoadedException e) {
-            Assert.error(node, "arrayCreateError", e);
+            Assert.error(node, "arrayCreateError", e);	//NOI18N
         } catch (InvalidTypeException e) {
-            Assert.error(node, "arrayCreateError", e);
+            Assert.error(node, "arrayCreateError", e);	//NOI18N
         } catch (UnsupportedOperationException uoex) {
-            return Assert.error(node, "calleeException", uoex);
+            return Assert.error(node, "calleeException", uoex);	//NOI18N
         }
 
         return arrayRef;
     }
 
-    private String brackets = "[[[[[[[[[[[[[[[[[[[";
+    private String brackets = "[[[[[[[[[[[[[[[[[[[";	//NOI18N
     private String brackets(int length) {
         if (brackets.length() < length) {
             char [] bracketsArray = new char[length];
@@ -338,7 +338,7 @@ public class Evaluator implements JavaFXParserVisitor {
         // new object creation
         if (((SimpleNode) node.jjtGetChild(1)).jjtGetID() == JavaFXParserTreeConstants.JJTARGUMENTS) {
             if (arrayType instanceof ClassType) {
-                Identifier fvmc = new Identifier(false, (ReferenceType) arrayType, "<init>");
+                Identifier fvmc = new Identifier(false, (ReferenceType) arrayType, "<init>");	//NOI18N
                 return node.jjtGetChild(1).jjtAccept(this, fvmc);
             }
             Assert.assertNotAssignable(arrayType, InterfaceType.class, node, "instantiateInterface", arrayType.name());
@@ -350,7 +350,7 @@ public class Evaluator implements JavaFXParserVisitor {
 
     private Object visitPrimitiveType(SimpleNode node, Object data) {
         //TODO: cache primitive types
-        Token token = (Token) node.getAttribute("token");
+        Token token = (Token) node.getAttribute("token");	//NOI18N
         switch (token.kind) {
         case JavaFXParserConstants.BOOLEAN:
             return vm.mirrorOf(true).type();
@@ -405,7 +405,7 @@ public class Evaluator implements JavaFXParserVisitor {
         // value is an object reference
         ObjectReference valueType = (ObjectReference) value;
         if (!instanceOf(valueType.type(), castType)) {
-            Assert.error(node, "castError", valueType.type(), castType);
+            Assert.error(node, "castError", valueType.type(), castType);	//NOI18N
         }
         return value;
     }
@@ -424,11 +424,11 @@ public class Evaluator implements JavaFXParserVisitor {
         Assert.assertAssignable(value, PrimitiveValue.class, node, "badOperandForPostfixOperator", value);
         Assert.assertNotAssignable(value, BooleanValue.class, node, "badOperandForPostfixOperator", value);
 
-        Token operator = (Token) node.getAttribute("operator");
+        Token operator = (Token) node.getAttribute("operator");	//NOI18N
         try {
             return operators.evaluate(operator, (PrimitiveValue) value);
         } catch (IllegalArgumentException e) {
-            return Assert.error(node, "postfixOperatorEvaluationError", operator, e);
+            return Assert.error(node, "postfixOperatorEvaluationError", operator, e);	//NOI18N
         }
     }
 
@@ -446,11 +446,11 @@ public class Evaluator implements JavaFXParserVisitor {
         Assert.assertAssignable(value, PrimitiveValue.class, node, "badOperandForPrefixOperator", value);
         Assert.assertNotAssignable(value, BooleanValue.class, node, "badOperandForPrefixOperator", value);
 
-        Token operator = (Token) node.getAttribute("operator");
+        Token operator = (Token) node.getAttribute("operator");	//NOI18N
         try {
             return operators.evaluate(operator, (PrimitiveValue) value);
         } catch (IllegalArgumentException e) {
-            return Assert.error(node, "prefixOperatorEvaluationError", operator, e);
+            return Assert.error(node, "prefixOperatorEvaluationError", operator, e);	//NOI18N
         }
     }
 
@@ -468,16 +468,16 @@ public class Evaluator implements JavaFXParserVisitor {
         //Assert.assertNotAssignable(value, BooleanValue.class, node, "badOperandForUnaryOperator", value);
        
 
-        Token operator = (Token) node.getAttribute("operator");
+        Token operator = (Token) node.getAttribute("operator");	//NOI18N
         try {
             return operators.evaluate(operator, (PrimitiveValue) value);
         } catch (IllegalArgumentException e) {
-            return Assert.error(node, "unaryOperatorEvaluationError", operator, e);
+            return Assert.error(node, "unaryOperatorEvaluationError", operator, e);	//NOI18N
         }
     }
 
     private Object visitIdentifier(SimpleNode node, Object data) {
-        return ((Token) node.getAttribute("token")).image;
+        return ((Token) node.getAttribute("token")).image;	//NOI18N
     }
 
     private Object visitClassOrInterfaceType(SimpleNode node, Object data) {
@@ -502,7 +502,7 @@ public class Evaluator implements JavaFXParserVisitor {
         try {
             return resolveType(name);
         } catch (IncompatibleThreadStateException e) {
-            return Assert.error(node, "internalErrorResolvingType", name);
+            return Assert.error(node, "internalErrorResolvingType", name);	//NOI18N
         }
     }
 
@@ -518,10 +518,10 @@ public class Evaluator implements JavaFXParserVisitor {
 
         if (name.charAt(0) == '[') {
             if ((type = getClass(name)) != null) return type;
-            Assert.error(currentNode, "unknownType", name);
+            Assert.error(currentNode, "unknownType", name);	//NOI18N
         }
 
-        String innerName = frame.location().declaringType().name() + "$" + name;
+        String innerName = frame.location().declaringType().name() + "$" + name;	//NOI18N
         if ((type = getClass(innerName)) != null) return type;
 
         int idx = name.lastIndexOf('.');
@@ -532,7 +532,7 @@ public class Evaluator implements JavaFXParserVisitor {
         }
 
         if (idx != -1) {
-            innerName = name.substring(0, idx) + "$" + name.substring(idx + 1);
+            innerName = name.substring(0, idx) + "$" + name.substring(idx + 1);	//NOI18N
             if (innerName.indexOf('.') == -1) innerName = currentPackage + innerName;
             if ((type = getClass(innerName)) != null) return type;
         }
@@ -542,13 +542,13 @@ public class Evaluator implements JavaFXParserVisitor {
             String importStatement = (String) i.next();
             int ix = importStatement.lastIndexOf('.');
             String qualifier = importStatement.substring(ix + 1);
-            if (!qualifier.equals("*") && !qualifier.equals(name)) continue;
+            if (!qualifier.equals("*") && !qualifier.equals(name)) continue;	//NOI18N
             String fullName = importStatement.substring(0, ix + 1) + name;
             type = getClass(fullName);
             if (type != null) return type;
         }
 
-        Assert.error(currentNode, "unknownType", name);
+        Assert.error(currentNode, "unknownType", name);	//NOI18N
         return null;
     }
 
@@ -596,12 +596,12 @@ public class Evaluator implements JavaFXParserVisitor {
 
     private Object visitReferenceType(SimpleNode node, Object data) {
         Type baseType = (Type) node.jjtGetChild(0).jjtAccept(this, data);
-        int dimensions = ((Integer) node.getAttribute("arrayCount")).intValue();
+        int dimensions = ((Integer) node.getAttribute("arrayCount")).intValue();	//NOI18N
         if (dimensions > 0) {
             try {
                 return resolveType(brackets(dimensions) + baseType.signature().replace('/', '.'));
             } catch (IncompatibleThreadStateException e) {
-                Assert.error(node, "internalError");
+                Assert.error(node, "internalError");	//NOI18N
             }
         }
         return baseType;
@@ -666,7 +666,7 @@ public class Evaluator implements JavaFXParserVisitor {
 
     private Object visitConditionalOrAndExpression(SimpleNode node, Object data) {
 
-        Token operator = (Token) node.getAttribute("operator");
+        Token operator = (Token) node.getAttribute("operator");	//NOI18N
 
         int n = node.jjtGetNumChildren();
         for (int i = 0; i < n; i++) {
@@ -695,12 +695,12 @@ public class Evaluator implements JavaFXParserVisitor {
     }
 
     private Object visitBooleanLiteral(SimpleNode node, Object data) {
-        Token token = (Token) node.getAttribute("token");
+        Token token = (Token) node.getAttribute("token");	//NOI18N
         return vm.mirrorOf(token.kind == JavaFXParserConstants.TRUE);
     }
 
     private Object visitName(SimpleNode node, Object data) {
-        Object [] tokens = node.getAttributes("token");
+        Object [] tokens = node.getAttributes("token");	//NOI18N
         StringBuffer name = new StringBuffer();
         for (int i = 0; i < tokens.length; i++) {
             name.append('.');
@@ -714,14 +714,14 @@ public class Evaluator implements JavaFXParserVisitor {
         if (node.jjtGetNumChildren() == 0) {
             ObjectReference thisObject = frame.thisObject();
             if (thisObject == null) {
-                Assert.error(node, "thisObjectUnavailable");
+                Assert.error(node, "thisObjectUnavailable");	//NOI18N
             }
 
             if (node.getAttribute("this") != null) return thisObject;     // this
 
             // (X.)*super.X?
-            String qualifier = (String) node.getAttribute("qualifier");
-            String identifier = (String) node.getAttribute("identifier");
+            String qualifier = (String) node.getAttribute("qualifier");	//NOI18N
+            String identifier = (String) node.getAttribute("identifier");	//NOI18N
 
             return new Identifier((ObjectReference) thisObject, identifier, qualifier);
         }
@@ -765,13 +765,13 @@ public class Evaluator implements JavaFXParserVisitor {
                     } catch (EvaluationException e) {
                         // unknown type
                     } catch (IncompatibleThreadStateException e) {
-                        Assert.error(node, "internalError");
+                        Assert.error(node, "internalError");	//NOI18N
                     }
                     idx = identifier.indexOf('.', idx + 1);
                     if (idx == -1) break;
                     name = identifier.substring(0, idx);
                 }
-                if (type == null) Assert.error(node, "unknownType", identifier);
+                if (type == null) Assert.error(node, "unknownType", identifier);	//NOI18N
             }
 
             // resolve dereferences until the last name component
@@ -847,7 +847,7 @@ public class Evaluator implements JavaFXParserVisitor {
         try {
             method = getConcreteMethod(ctx, args);
         } catch (UnsupportedOperationException uoex) {
-            return Assert.error(node, "calleeException", uoex, ctx);
+            return Assert.error(node, "calleeException", uoex, ctx);	//NOI18N
         }
 
         if (method.instanceContext != null) {
@@ -855,10 +855,10 @@ public class Evaluator implements JavaFXParserVisitor {
                 if (verbose) 
                     throw new UnsupportedOperationException (NbBundle.getMessage (
                         Evaluator.class, 
-                        "CTL_UnsupportedOperationException"
+                        "CTL_UnsupportedOperationException"	//NOI18N
                     )); 
                 if (!evaluationContext.canInvokeMethods()) {
-                    return Assert.error(node, "calleeException", new UnsupportedOperationException(), ctx);
+                    return Assert.error(node, "calleeException", new UnsupportedOperationException(), ctx);	//NOI18N
                 }
                 evaluationContext.methodToBeInvoked();
                 if (loggerMethod.isLoggable(Level.FINE)) {
@@ -867,17 +867,17 @@ public class Evaluator implements JavaFXParserVisitor {
                 return method.instanceContext.invokeMethod(frameThread, method.method, method.args,
                                                         ObjectReference.INVOKE_SINGLE_THREADED | ObjectReference.INVOKE_NONVIRTUAL);
             } catch (InvalidTypeException e) {
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (ClassNotLoadedException e) {
                 // TODO: load the class
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (IncompatibleThreadStateException e) {
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (InvocationException e) {
-                Assert.error(node, "calleeException", e, ctx);
+                Assert.error(node, "calleeException", e, ctx);	//NOI18N
             } catch (UnsupportedOperationException e) {
                 evaluationContext.setCanInvokeMethods(false);
-                Assert.error(node, "calleeException", e, ctx);
+                Assert.error(node, "calleeException", e, ctx);	//NOI18N
             }
             finally {
                 if (loggerMethod.isLoggable(Level.FINE)) {
@@ -893,7 +893,7 @@ public class Evaluator implements JavaFXParserVisitor {
                 try {
                     frame = frameThread.frame(frameIndex);
                 } catch (IncompatibleThreadStateException e) {
-                    Assert.error(node, "callException", e, ctx);
+                    Assert.error(node, "callException", e, ctx);	//NOI18N
                 }
             }
         }
@@ -905,39 +905,39 @@ public class Evaluator implements JavaFXParserVisitor {
                     if (verbose) 
                         throw new UnsupportedOperationException (NbBundle.getMessage (
                             Evaluator.class, 
-                            "CTL_UnsupportedOperationException"
+                            "CTL_UnsupportedOperationException"	//NOI18N
                         )); 
                     try {
                         return classContext.newInstance(frameThread, method.method, method.args, ClassType.INVOKE_SINGLE_THREADED);
                     } catch (UnsupportedOperationException uoex) {
-                        return Assert.error(node, "calleeException", uoex, ctx);
+                        return Assert.error(node, "calleeException", uoex, ctx);	//NOI18N
                     }
                 } else {
                     if (verbose) 
                         throw new UnsupportedOperationException (NbBundle.getMessage (
                             Evaluator.class, 
-                            "CTL_UnsupportedOperationException"
+                            "CTL_UnsupportedOperationException"	//NOI18N
                         )); 
                     if (!evaluationContext.canInvokeMethods()) {
-                        return Assert.error(node, "calleeException", new UnsupportedOperationException(), ctx);
+                        return Assert.error(node, "calleeException", new UnsupportedOperationException(), ctx);	//NOI18N
                     }
                     evaluationContext.methodToBeInvoked();
                     return classContext.invokeMethod(frameThread, method.method, method.args, ClassType.INVOKE_SINGLE_THREADED);
                 }
             } catch (InvalidTypeException e) {
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (ClassNotLoadedException e) {
                 // TODO: load the class
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (IncompatibleThreadStateException e) {
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (InvocationException e) {
-                Assert.error(node, "calleeException", e, ctx);
+                Assert.error(node, "calleeException", e, ctx);	//NOI18N
             } catch (IllegalArgumentException e) {
-                Assert.error(node, "callException", e, ctx);
+                Assert.error(node, "callException", e, ctx);	//NOI18N
             } catch (UnsupportedOperationException e) {
                 evaluationContext.setCanInvokeMethods(false);
-                Assert.error(node, "calleeException", e, ctx);
+                Assert.error(node, "calleeException", e, ctx);	//NOI18N
             }
             finally {
                 try {
@@ -950,12 +950,12 @@ public class Evaluator implements JavaFXParserVisitor {
                 try {
                     frame = frameThread.frame(frameIndex);
                 } catch (IncompatibleThreadStateException e) {
-                    Assert.error(node, "callException", e, ctx);
+                    Assert.error(node, "callException", e, ctx);	//NOI18N
                 }
             }
         }
 
-        return Assert.error(node, "noSuchMethod", ctx);
+        return Assert.error(node, "noSuchMethod", ctx);	//NOI18N
     }
 
     private boolean isAccessible(TypeComponent member) {
@@ -1000,7 +1000,7 @@ public class Evaluator implements JavaFXParserVisitor {
         ObjectReference object = ctx.instanceContext;
 
         if (ctx.superQualifier != null) {
-            if (!(ctx.typeContext instanceof ClassType)) Assert.error(currentNode, "superUsedOnNonClass", ctx);
+            if (!(ctx.typeContext instanceof ClassType)) Assert.error(currentNode, "superUsedOnNonClass", ctx);	//NOI18N
             if (ctx.superQualifier.length() > 0) {
                 object = getEnclosingObject(ctx.instanceContext, ctx.superQualifier);
                 Assert.assertNotNull(object, currentNode, "notEnclosingType", ctx);
@@ -1010,7 +1010,7 @@ public class Evaluator implements JavaFXParserVisitor {
         }
         
         if (ctx.typeContext == null) {
-            Assert.error(currentNode, "methodCallOnNull", ctx.identifier);
+            Assert.error(currentNode, "methodCallOnNull", ctx.identifier);	//NOI18N
         }
 
         List<Method> methods = getMethodsByName(type, ctx.identifier);
@@ -1020,7 +1020,7 @@ public class Evaluator implements JavaFXParserVisitor {
         ObjectReference origObject = object;
         
         while (methods.size() == 0) {
-            Field outerRef = type.fieldByName("this$0"); 
+            Field outerRef = type.fieldByName("this$0"); 	//NOI18N
             if (outerRef == null) {
                 //System.out.println("No outerRef.");
                 type = origType;
@@ -1075,7 +1075,7 @@ public class Evaluator implements JavaFXParserVisitor {
             }
 
             // TODO: probably incomplete handling of an implicit constructor of a nested type
-            if (args.length == 0 && "<init>".equals(ctx.identifier) && argTypes.size() == 1) {
+            if (args.length == 0 && "<init>".equals(ctx.identifier) && argTypes.size() == 1) {	//NOI18N
                 if (frame.thisObject() != null && argTypes.get(0).equals(frame.location().declaringType())) {
                     args = new Value[] { frame.thisObject() } ;
                 }
@@ -1270,21 +1270,21 @@ public class Evaluator implements JavaFXParserVisitor {
     private String wrapperSignature(char primitiveSignature) {
         switch (primitiveSignature) {
         case 'Z':
-            return "Ljava/lang/Boolean;";
+            return "Ljava/lang/Boolean;";	//NOI18N
         case 'B':
-            return "Ljava/lang/Byte;";
+            return "Ljava/lang/Byte;";	//NOI18N
         case 'C':
-            return "Ljava/lang/Character;";
+            return "Ljava/lang/Character;";	//NOI18N
         case 'S':
-            return "Ljava/lang/Short;";
+            return "Ljava/lang/Short;";	//NOI18N
         case 'I':
-            return "Ljava/lang/Integer;";
+            return "Ljava/lang/Integer;";	//NOI18N
         case 'J':
-            return "Ljava/lang/Long;";
+            return "Ljava/lang/Long;";	//NOI18N
         case 'F':
-            return "Ljava/lang/Float;";
+            return "Ljava/lang/Float;";	//NOI18N
         case 'D':
-            return "Ljava/lang/Double;";
+            return "Ljava/lang/Double;";	//NOI18N
         }
         throw new RuntimeException(); // never happens
     }
@@ -1292,21 +1292,21 @@ public class Evaluator implements JavaFXParserVisitor {
     private String wrapperClassname(char primitiveSignature) {
         switch (primitiveSignature) {
         case 'Z':
-            return "java.lang.Boolean";
+            return "java.lang.Boolean";	//NOI18N
         case 'B':
-            return "java.lang.Byte";
+            return "java.lang.Byte";	//NOI18N
         case 'C':
-            return "java.lang.Character";
+            return "java.lang.Character";	//NOI18N
         case 'S':
-            return "java.lang.Short";
+            return "java.lang.Short";	//NOI18N
         case 'I':
-            return "java.lang.Integer";
+            return "java.lang.Integer";	//NOI18N
         case 'J':
-            return "java.lang.Long";
+            return "java.lang.Long";	//NOI18N
         case 'F':
-            return "java.lang.Float";
+            return "java.lang.Float";	//NOI18N
         case 'D':
-            return "java.lang.Double";
+            return "java.lang.Double";	//NOI18N
         }
         throw new RuntimeException(); // never happens
     }
@@ -1314,7 +1314,7 @@ public class Evaluator implements JavaFXParserVisitor {
     private ObjectReference newInstance(ClassType type, Value [] constructorArgs) throws
             InvocationException, ClassNotLoadedException, IncompatibleThreadStateException, InvalidTypeException {
 
-        MethodCall method = getConcreteMethod(new Identifier(type, "<init>"), constructorArgs);
+        MethodCall method = getConcreteMethod(new Identifier(type, "<init>"), constructorArgs);	//NOI18N
         try {
             return type.newInstance(frameThread, method.method, method.args, ObjectReference.INVOKE_SINGLE_THREADED);
         } finally {
@@ -1324,14 +1324,14 @@ public class Evaluator implements JavaFXParserVisitor {
 
     private PrimitiveValue unbox(ObjectReference val, Type type) {
 
-        if (type instanceof BooleanType) return invokeUnboxingMethod(val, "booleanValue");
-        if (type instanceof ByteType) return invokeUnboxingMethod(val, "byteValue");
-        if (type instanceof CharType) return invokeUnboxingMethod(val, "charValue");
-        if (type instanceof ShortType) return invokeUnboxingMethod(val, "shortValue");
-        if (type instanceof IntegerType) return invokeUnboxingMethod(val, "intValue");
-        if (type instanceof LongType) return invokeUnboxingMethod(val, "longValue");
-        if (type instanceof FloatType) return invokeUnboxingMethod(val, "floatValue");
-        if (type instanceof DoubleType) return invokeUnboxingMethod(val, "doubleValue");
+        if (type instanceof BooleanType) return invokeUnboxingMethod(val, "booleanValue");	//NOI18N
+        if (type instanceof ByteType) return invokeUnboxingMethod(val, "byteValue");	//NOI18N
+        if (type instanceof CharType) return invokeUnboxingMethod(val, "charValue");	//NOI18N
+        if (type instanceof ShortType) return invokeUnboxingMethod(val, "shortValue");	//NOI18N
+        if (type instanceof IntegerType) return invokeUnboxingMethod(val, "intValue");	//NOI18N
+        if (type instanceof LongType) return invokeUnboxingMethod(val, "longValue");	//NOI18N
+        if (type instanceof FloatType) return invokeUnboxingMethod(val, "floatValue");	//NOI18N
+        if (type instanceof DoubleType) return invokeUnboxingMethod(val, "doubleValue");	//NOI18N
         throw new RuntimeException("Invalid type while unboxing: " + type.signature());    // never happens
     }
 
@@ -1341,7 +1341,7 @@ public class Evaluator implements JavaFXParserVisitor {
             if (verbose) 
                 throw new UnsupportedOperationException (NbBundle.getMessage (
                     Evaluator.class, 
-                    "CTL_UnsupportedOperationException"
+                    "CTL_UnsupportedOperationException"	//NOI18N
                 )); 
             if (!evaluationContext.canInvokeMethods()) {
                 throw new UnsupportedOperationException();
@@ -1378,13 +1378,13 @@ public class Evaluator implements JavaFXParserVisitor {
     }
 
     private static final String [] typeSignaturesSorted = {
-            "Ljava/lang/Byte;", "B",
-            "Ljava/lang/Character;", "C",
-            "Ljava/lang/Short;", "S",
-            "Ljava/lang/Integer;", "I",
-            "Ljava/lang/Long;", "J",
-            "Ljava/lang/Float;", "F",
-            "Ljava/lang/Double;", "D"
+            "Ljava/lang/Byte;", "B",	//NOI18N
+            "Ljava/lang/Character;", "C",	//NOI18N
+            "Ljava/lang/Short;", "S",	//NOI18N
+            "Ljava/lang/Integer;", "I",	//NOI18N
+            "Ljava/lang/Long;", "J",	//NOI18N
+            "Ljava/lang/Float;", "F",	//NOI18N
+            "Ljava/lang/Double;", "D"	//NOI18N
     };
 
     /**
@@ -1408,7 +1408,7 @@ public class Evaluator implements JavaFXParserVisitor {
         if (wide.equals(narrow)) return true;
 
         if (wide.length() == 1) {
-            if (wide.equals("Z")) return narrow.equals("Ljava/lang/Boolean;");
+            if (wide.equals("Z")) return narrow.equals("Ljava/lang/Boolean;");	//NOI18N
             for (int i = 0; i < typeSignaturesSorted.length; i++) {
                 if (narrow.equals(typeSignaturesSorted[i])) return true;
                 if (wide.equals(typeSignaturesSorted[i])) return false;
@@ -1416,10 +1416,10 @@ public class Evaluator implements JavaFXParserVisitor {
             return false;
         }
 
-        if (wide.equals("Ljava/lang/Object;")) return true;
+        if (wide.equals("Ljava/lang/Object;")) return true;	//NOI18N
 
         if (narrow.length() == 1) {
-            if (narrow.equals("Z")) return wide.equals("Ljava/lang/Boolean;");
+            if (narrow.equals("Z")) return wide.equals("Ljava/lang/Boolean;");	//NOI18N
             for (int i = 0; i < typeSignaturesSorted.length; i++) {
                 if (narrow.equals(typeSignaturesSorted[i])) {
                     for (int j = i - 1; j < typeSignaturesSorted.length; j++) {
@@ -1434,7 +1434,7 @@ public class Evaluator implements JavaFXParserVisitor {
     }
 
     private Object visitPrimarySuffix(SimpleNode node, Object data) {
-        Token token = (Token) node.getAttribute("token");
+        Token token = (Token) node.getAttribute("token");	//NOI18N
         if (token == null) {
             // AllocationExpression() | Arguments() | ReferenceTypeList()
             return node.jjtGetChild(0).jjtAccept(this, data);
@@ -1462,14 +1462,14 @@ public class Evaluator implements JavaFXParserVisitor {
         case JavaFXParserConstants.SUPER:
         {
             Identifier ctx = (Identifier) data;
-            if (!vm.canGetSyntheticAttribute()) Assert.error(node, "unknownType", ctx.identifier);
+            if (!vm.canGetSyntheticAttribute()) Assert.error(node, "unknownType", ctx.identifier);	//NOI18N
 
             ObjectReference enclosingObject = getEnclosingObject(frame.thisObject(), ctx.identifier);
             Assert.assertNotNull(enclosingObject, node, "unknownType", ctx.identifier);
             return enclosingObject;
         }
         }
-        return Assert.error(node, "internalError");
+        return Assert.error(node, "internalError");	//NOI18N
     }
 
     private ObjectReference getEnclosingObject(ObjectReference obj, String typeQualifier) {
@@ -1479,7 +1479,7 @@ public class Evaluator implements JavaFXParserVisitor {
             List fields = obj.referenceType().allFields();
             for (Iterator j = fields.iterator(); j.hasNext();) {
                 Field field = (Field) j.next();
-                if (field.isSynthetic() && field.name().startsWith("this$")) {
+                if (field.isSynthetic() && field.name().startsWith("this$")) {	//NOI18N
                     if (loggerValue.isLoggable(Level.FINE)) {
                         loggerValue.fine("STARTED : "+obj+".getValue("+field+")");
                     }
@@ -1540,7 +1540,7 @@ public class Evaluator implements JavaFXParserVisitor {
                 }
             }
             if (ctx.instanceContext instanceof ArrayReference) {
-                if (ctx.identifier.equals("length")) {
+                if (ctx.identifier.equals("length")) {	//NOI18N
                     return vm.mirrorOf(((ArrayReference) ctx.instanceContext).length());
                 }
             }
@@ -1563,13 +1563,13 @@ public class Evaluator implements JavaFXParserVisitor {
                     }
                 }
             } catch (IllegalArgumentException e) {
-                Assert.error(currentNode, "accessInstanceVariableFromStaticContext", ctx);
+                Assert.error(currentNode, "accessInstanceVariableFromStaticContext", ctx);	//NOI18N
             }
         }
         
         // local variable accessed from innerclass
         if (ctx.instanceContext != null) {
-            Field field = ctx.typeContext.fieldByName("val$" + ctx.identifier);
+            Field field = ctx.typeContext.fieldByName("val$" + ctx.identifier);	//NOI18N
             if (field != null) {
                 try {
                     if (loggerValue.isLoggable(Level.FINE)) {
@@ -1586,7 +1586,7 @@ public class Evaluator implements JavaFXParserVisitor {
         
         // outer field accessed from innerclass
         if (ctx.instanceContext != null) {
-            Field helpField = ctx.typeContext.fieldByName("this$0");
+            Field helpField = ctx.typeContext.fieldByName("this$0");	//NOI18N
             if (helpField != null) {
                 if (loggerValue.isLoggable(Level.FINE)) {
                     loggerValue.fine("STARTED : "+ctx.instanceContext+".getValue("+helpField+")");
@@ -1655,7 +1655,7 @@ public class Evaluator implements JavaFXParserVisitor {
             }
         }
 
-        return (Value) Assert.error(currentNode, "unknownVariable", ctx);
+        return (Value) Assert.error(currentNode, "unknownVariable", ctx);	//NOI18N
     }
 
     private Iterator<String> staticImportsIterator(String identifier) {
@@ -1668,7 +1668,7 @@ public class Evaluator implements JavaFXParserVisitor {
             String statement = i.next();
             int idx = statement.lastIndexOf('.');
             String qualifier = statement.substring(idx + 1);
-            if (qualifier.equals("*") || qualifier.equals(identifier)) {
+            if (qualifier.equals("*") || qualifier.equals(identifier)) {	//NOI18N
                 filteredList.add(statement.substring(0, idx));
             }
         }
@@ -1711,7 +1711,7 @@ public class Evaluator implements JavaFXParserVisitor {
     }
 
     private Object visitLiteral(SimpleNode node, Object data) {
-        Token token = (Token) node.getAttribute("token");
+        Token token = (Token) node.getAttribute("token");	//NOI18N
         if (token == null) return node.jjtGetChild(0).jjtAccept(this, data);
 
 
@@ -1721,14 +1721,14 @@ public class Evaluator implements JavaFXParserVisitor {
             case JavaFXParser.INTEGER_LITERAL:
                 // XXX might be simpler to use Long.decode()
                 String  name    = token.image.toLowerCase();
-                boolean isLong  = name.endsWith("l");
+                boolean isLong  = name.endsWith("l");	//NOI18N
                 long    value;
 
                 if (isLong) {
                     name = name.substring(0, name.length() -1);
                 }
 
-                if (name.startsWith("0x")) {
+                if (name.startsWith("0x")) {	//NOI18N
                     value = Long.parseLong(name.substring(2), 16);
                 }
                 else if (name.length() > 1 && name.charAt(0) == '0') {
@@ -1743,7 +1743,7 @@ public class Evaluator implements JavaFXParserVisitor {
                 }
                 else {
                     if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE) {
-                        Assert.error(node, "integerLiteralTooBig", name);
+                        Assert.error(node, "integerLiteralTooBig", name);	//NOI18N
                     }
                     else {
                         return vm.mirrorOf((int) value);
@@ -1765,10 +1765,10 @@ public class Evaluator implements JavaFXParserVisitor {
                 return vm.mirrorOf(resolveString(token.image.substring(1, token.image.length() - 1)).charAt(0));
 
             default:
-                return Assert.error(node, "unknownLiteralType", token.image);
+                return Assert.error(node, "unknownLiteralType", token.image);	//NOI18N
             }
         } catch (NumberFormatException e) {
-            return Assert.error(node, "badFormatOfIntegerLiteral", token.image);
+            return Assert.error(node, "badFormatOfIntegerLiteral", token.image);	//NOI18N
         }
     }
 
@@ -1787,7 +1787,7 @@ public class Evaluator implements JavaFXParserVisitor {
                     case 'n': c = '\n'; break;
                     case 'f': c = '\f'; break;
                     case 'r': c = '\r'; break;
-                    case '\"': c = '\"'; break;
+                    case '\"': c = '\"'; break;	//NOI18N
                     case '\'': c = '\''; break;
                     case '\\': c = '\\'; break;
 
@@ -1810,7 +1810,7 @@ public class Evaluator implements JavaFXParserVisitor {
     }
 
     private Object visitBinaryExpression(SimpleNode node, Object data) {
-        Object [] operators = node.getAttributes("operator");
+        Object [] operators = node.getAttributes("operator");	//NOI18N
         int n = node.jjtGetNumChildren();
 
         Value value = (Value) node.jjtGetChild(0).jjtAccept(this, data);
@@ -1819,7 +1819,7 @@ public class Evaluator implements JavaFXParserVisitor {
             try {
                 value = this.operators.evaluate(value, (Token) operators[i-1], next);
             } catch (IllegalArgumentException e) {
-                return Assert.error(node, "evaluateError", value, ((Token) operators[i-1]).image, next);
+                return Assert.error(node, "evaluateError", value, ((Token) operators[i-1]).image, next);	//NOI18N
             }
         }
         return value;
@@ -1835,7 +1835,7 @@ public class Evaluator implements JavaFXParserVisitor {
         if (verbose)
             throw new UnsupportedOperationException (NbBundle.getMessage (
                 Evaluator.class,
-                "CTL_UnsupportedOperationException"
+                "CTL_UnsupportedOperationException"	//NOI18N
             ));
         try {
             if (loggerMethod.isLoggable(Level.FINE)) {
@@ -1867,7 +1867,7 @@ public class Evaluator implements JavaFXParserVisitor {
             throw ieex;
         } catch (ObjectCollectedException ocex) {
             throw new InvalidExpressionException(NbBundle.getMessage(
-                Evaluator.class, "CTL_EvalError_collected"));
+                Evaluator.class, "CTL_EvalError_collected"));	//NOI18N
         } finally {
             if (loggerMethod.isLoggable(Level.FINE)) {
                 loggerMethod.fine("FINISHED: "+objectReference+"."+method+" ("+args+") in thread "+evaluationThread);

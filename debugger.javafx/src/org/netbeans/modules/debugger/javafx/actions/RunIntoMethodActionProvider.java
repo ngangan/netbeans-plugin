@@ -139,7 +139,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
             getActionsManager().isEnabled(ActionsManager.ACTION_CONTINUE) &&
             (debugger.getState () == debugger.STATE_STOPPED) &&
             (EditorContextBridge.getContext().getCurrentLineNumber () >= 0) && 
-            (EditorContextBridge.getContext().getCurrentURL ().endsWith (".java"))
+            (EditorContextBridge.getContext().getCurrentURL ().endsWith (".java"))	//NOI18N
         );
         if (debugger.getState () == debugger.STATE_DISCONNECTED) 
             destroy ();
@@ -177,7 +177,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
         if (method.length () < 1) {
             NotifyDescriptor.Message descriptor = new NotifyDescriptor.Message(
                 NbBundle.getMessage(RunIntoMethodActionProvider.class,
-                                    "MSG_Put_cursor_on_some_method_call")
+                                    "MSG_Put_cursor_on_some_method_call")	//NOI18N
             
             );
             DialogDisplayer.getDefault ().notify (descriptor);
@@ -214,7 +214,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
             //((JavaFXDebuggerImpl) debugger).resumeCurrentThread();
         } else {
             //((JavaFXDebuggerImpl) debugger).resume();
-            session.getEngineForLanguage ("JavaFX").getActionsManager ().doAction (
+            session.getEngineForLanguage ("JavaFX").getActionsManager ().doAction (	//NOI18N
                 ActionsManager.ACTION_CONTINUE
             );
         }
@@ -231,10 +231,10 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
             ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, aiex);
         }
         Logger.getLogger(RunIntoMethodActionProvider.class.getName()).
-                fine("doAction("+url+", "+clazz+", "+methodLine+", "+methodName+") locations = "+locations);
+                fine("doAction("+url+", "+clazz+", "+methodLine+", "+methodName+") locations = "+locations);	//NOI18N
         if (locations.isEmpty()) {
             String message = NbBundle.getMessage(RunIntoMethodActionProvider.class,
-                                                 "MSG_RunIntoMeth_absentInfo",
+                                                 "MSG_RunIntoMeth_absentInfo",	//NOI18N
                                                  clazz.name());
             NotifyDescriptor.Message descriptor = new NotifyDescriptor.Message(message);
             DialogDisplayer.getDefault().notify(descriptor);
@@ -259,7 +259,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
         }
         final VirtualMachine vm = debugger.getVirtualMachine();
         if (vm == null) return ;
-        final int line = bpLocation.lineNumber("JavaFX");
+        final int line = bpLocation.lineNumber("JavaFX");	//NOI18N
         CallStackFrameImpl csf = (CallStackFrameImpl) debugger.getCurrentCallStackFrame();
         if (csf != null && csf.getStackFrame().location().equals(bpLocation)) {
             // We're on the line from which the method is called
@@ -301,10 +301,10 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
                 JavaFXThread t = debugger.getCurrentThread();
                 int currentDepth = t.getStackDepth();
                 Logger.getLogger(RunIntoMethodActionProvider.class.getName()).
-                        fine("  depth = "+currentDepth+", target = "+depth);
+                        fine("  depth = "+currentDepth+", target = "+depth);	//NOI18N
                 if (currentDepth == depth) { // We're in the outer expression
                     try {
-                        if (t.getCallStack()[0].getLineNumber("JavaFX") != methodLine) {
+                        if (t.getCallStack()[0].getLineNumber("JavaFX") != methodLine) {	//NOI18N
                             // We've missed the method :-(
                             step.setHidden(false);
                         } else {
@@ -320,7 +320,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
                     if (t.getMethodName().equals(method)) {
                         // We've found it :-)
                         step.setHidden(false);
-                    } else if (t.getMethodName().equals("<init>") && (t.getClassName().endsWith("."+method) || t.getClassName().equals(method))) {
+                    } else if (t.getMethodName().equals("<init>") && (t.getClassName().endsWith("."+method) || t.getClassName().equals(method))) {	//NOI18N
                         // The method can be a constructor
                         step.setHidden(false);
                     } else {
@@ -344,7 +344,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
                 enabled &&
                 (debugger.getState () == debugger.STATE_STOPPED) &&
                 (EditorContextBridge.getContext().getCurrentLineNumber () >= 0) && 
-                (EditorContextBridge.getContext().getCurrentURL ().endsWith (".java"))
+                (EditorContextBridge.getContext().getCurrentURL ().endsWith (".java"))	//NOI18N
             );
         }
     }

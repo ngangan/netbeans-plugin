@@ -406,7 +406,7 @@ public class LineBreakpoint extends JavaFXBreakpoint {
             ErrorManager.getDefault().notify(ex);
         }
         if (fileName == null) fileName = url;
-        return "LineBreakpoint " + fileName + " : " + lineNumber;
+        return "LineBreakpoint " + fileName + " : " + lineNumber;	//NOI18N
     }
     
     private static class LineBreakpointImpl extends LineBreakpoint 

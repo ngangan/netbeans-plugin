@@ -76,9 +76,9 @@ public interface JavaFXThread {
     public static final int STATE_ZOMBIE = ThreadReference.THREAD_STATUS_ZOMBIE;
 
     /** Property name constant. */
-    public static final String PROP_CALLSTACK = "callStack";
+    public static final String PROP_CALLSTACK = "callStack";	//NOI18N
     /** Property name constant. */
-    public static final String PROP_VARIABLES = "variables";
+    public static final String PROP_VARIABLES = "variables";	//NOI18N
 
     
     

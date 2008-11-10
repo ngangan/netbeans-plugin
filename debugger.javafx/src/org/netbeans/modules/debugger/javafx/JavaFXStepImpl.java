@@ -555,7 +555,7 @@ public class JavaFXStepImpl extends JavaFXStep implements Executor {
                 try {
                     logger.fine("Can not stop at "+tr.frame(0)+", smart-stepping. Submitting step = "+stepRequest+"; depth = "+depth);
                 } catch (IncompatibleThreadStateException ex) {
-                    logger.throwing(getClass().getName(), "shouldNotStopHere", ex);
+                    logger.throwing(getClass().getName(), "shouldNotStopHere", ex);	//NOI18N
                 }
             }
             String[] exclusionPatterns = debuggerImpl.getSmartSteppingFilter().getExclusionPatterns();
@@ -604,7 +604,7 @@ public class JavaFXStepImpl extends JavaFXStep implements Executor {
         
         private static final int DELAY = 5000;
         
-        private static final RequestProcessor stepWatchRP = new RequestProcessor("Debugger Step Watch", 1);
+        private static final RequestProcessor stepWatchRP = new RequestProcessor("Debugger Step Watch", 1);	//NOI18N
         
         private static final Map<StepRequest, SingleThreadedStepWatch> STEP_WATCH_POOL = new HashMap<StepRequest, SingleThreadedStepWatch>();
         

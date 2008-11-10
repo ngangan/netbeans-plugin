@@ -65,10 +65,10 @@ import org.openide.ErrorManager;
  */
 public class EditorContextBridge {
 
-    public static final String FIELD = "field";
-    public static final String METHOD = "method";
-    public static final String CLASS = "class";
-    public static final String LINE = "line";
+    public static final String FIELD = "field";	//NOI18N
+    public static final String METHOD = "method";	//NOI18N
+    public static final String CLASS = "class";	//NOI18N
+    public static final String LINE = "line";	//NOI18N
 
     private static EditorContext context;
     
@@ -95,7 +95,7 @@ public class EditorContextBridge {
     public static Tree getExpressionTree(final String expression, String url, final int line) {
         // TODO: return getContext ().getExpressionTree ();
         try {
-            return (Tree) getContext ().getClass().getMethod("getExpressionTree", new Class[] { String.class, String.class, Integer.TYPE }).
+            return (Tree) getContext ().getClass().getMethod("getExpressionTree", new Class[] { String.class, String.class, Integer.TYPE }).	//NOI18N
                 invoke(getContext(), new Object[] { expression, url, line });
         } catch (java.lang.reflect.InvocationTargetException itex) {
             Throwable tex = itex.getTargetException();
@@ -123,7 +123,7 @@ public class EditorContextBridge {
         // TODO: return getContext ().parseExpression ();
         try {
             return (R) getContext ().getClass().getMethod(
-                    "parseExpression",
+                    "parseExpression",	//NOI18N
                     new Class[] { String.class, String.class, Integer.TYPE, JavaFXTreePathScanner.class, Object.class, SourcePathProvider.class, Integer.TYPE }).
                         invoke(getContext(), new Object[] { expression, url, line, visitor, context, sp, pos });
         } catch (java.lang.reflect.InvocationTargetException itex) {
@@ -193,7 +193,7 @@ public class EditorContextBridge {
         int i = className.indexOf ('$');
         if (i > 0) className = className.substring (0, i);
         String sourceName = className.replace 
-            ('.', '/') + ".java";
+            ('.', '/') + ".java";	//NOI18N
         return sourceName;
     }
     
@@ -204,7 +204,7 @@ public class EditorContextBridge {
     public static int getCurrentOffset() {
         // TODO: return getContext ().getCurrentOffset();
         try {
-            return (Integer) getContext ().getClass().getMethod("getCurrentOffset", new Class[] {}).
+            return (Integer) getContext ().getClass().getMethod("getCurrentOffset", new Class[] {}).	//NOI18N
                     invoke(getContext(), new Object[] {});
         } catch (java.lang.reflect.InvocationTargetException itex) {
             Throwable tex = itex.getTargetException();
@@ -281,7 +281,7 @@ public class EditorContextBridge {
         public int getCurrentOffset() {
             Integer i = null;
             try {
-                i = (Integer) cp1.getClass().getMethod("getCurrentOffset", new Class[] {}).
+                i = (Integer) cp1.getClass().getMethod("getCurrentOffset", new Class[] {}).	//NOI18N
                         invoke(getContext(), new Object[] {});
             } catch (java.lang.reflect.InvocationTargetException itex) {
                 Throwable tex = itex.getTargetException();
@@ -297,7 +297,7 @@ public class EditorContextBridge {
             }
             if (i == null || i.intValue() < 1) {
                 try {
-                    i = (Integer) cp2.getClass().getMethod("getCurrentOffset", new Class[] {}).
+                    i = (Integer) cp2.getClass().getMethod("getCurrentOffset", new Class[] {}).	//NOI18N
                             invoke(getContext(), new Object[] {});
                 } catch (java.lang.reflect.InvocationTargetException itex) {
                     Throwable tex = itex.getTargetException();
@@ -362,7 +362,7 @@ public class EditorContextBridge {
             R ret = null;
             try {
                 ret = (R) cp1.getClass().getMethod(
-                    "parseExpression",
+                    "parseExpression",	//NOI18N
                     new Class[] { String.class, String.class, Integer.TYPE, TreePathScanner.class, Object.class, SourcePathProvider.class }).
                         invoke(cp1, new Object[] { expression, url, line, visitor, context, sp });
             } catch (java.lang.reflect.InvocationTargetException itex) {
@@ -378,7 +378,7 @@ public class EditorContextBridge {
             if (ret == null) {
                 try {
                     ret = (R) cp2.getClass().getMethod(
-                    "parseExpression",
+                    "parseExpression",	//NOI18N
                     new Class[] { String.class, String.class, Integer.TYPE, TreePathScanner.class, Object.class, SourcePathProvider.class }).
                         invoke(cp2, new Object[] { expression, url, line, visitor, context, sp });
                 } catch (java.lang.reflect.InvocationTargetException itex) {

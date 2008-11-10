@@ -75,7 +75,7 @@ public final class AttachingDICookie extends AbstractDICookie {
     /**
      * Public ID used for registration in Meta-inf/debugger.
      */
-    public static final String ID = "netbeans-javafx-AttachingDICookie";
+    public static final String ID = "netbeans-javafx-AttachingDICookie";    //NOI18N
 
     private AttachingConnector attachingConnector;
     private Map<String,? extends Argument> args;
@@ -118,9 +118,9 @@ public final class AttachingDICookie extends AbstractDICookie {
         int portNumber
     ) {
         return new AttachingDICookie (
-            findAttachingConnector ("socket"),
+            findAttachingConnector ("socket"),		//NOI18N
             getArgs (
-                findAttachingConnector ("socket"), 
+                findAttachingConnector ("socket"),	//NOI18N 
                 hostName, 
                 portNumber
             )
@@ -137,9 +137,9 @@ public final class AttachingDICookie extends AbstractDICookie {
         String name
     ) {
         return new AttachingDICookie (
-            findAttachingConnector ("shmem"),
+            findAttachingConnector ("shmem"),	//NOI18N
             getArgs (
-                findAttachingConnector ("shmem"), 
+                findAttachingConnector ("shmem"), 	//NOI18N
                 name
             )
         );
@@ -169,7 +169,7 @@ public final class AttachingDICookie extends AbstractDICookie {
      * @return port number
      */
     public int getPortNumber () {
-        Argument a = args.get ("port");
+        Argument a = args.get ("port");	//NOI18N
         if (a == null) return -1;
         String pn = a.value ();
         if (pn == null) return -1;
@@ -182,7 +182,7 @@ public final class AttachingDICookie extends AbstractDICookie {
      * @return name of computer
      */
     public String getHostName () {
-        Argument a = args.get ("hostname");
+        Argument a = args.get ("hostname");	//NOI18N
         if (a == null) return null;
         return a.value ();
     }
@@ -193,7 +193,7 @@ public final class AttachingDICookie extends AbstractDICookie {
      * @return shared memory block name
      */
     public String getSharedMemoryName () {
-        Argument a = args.get ("name");
+        Argument a = args.get ("name");	//NOI18N
         if (a == null) return null;
         return a.value ();
     }
@@ -217,8 +217,8 @@ public final class AttachingDICookie extends AbstractDICookie {
         int portNumber
     ) {
         Map<String,? extends Argument> args = attachingConnector.defaultArguments ();
-        args.get ("hostname").setValue (hostName);
-        args.get ("port").setValue ("" + portNumber);
+        args.get ("hostname").setValue (hostName);	//NOI18N
+        args.get ("port").setValue ("" + portNumber);	//NOI18N
         return args;
     }
 
@@ -227,7 +227,7 @@ public final class AttachingDICookie extends AbstractDICookie {
         String name
     ) {
         Map<String,? extends Argument> args = attachingConnector.defaultArguments ();
-        args.get ("name").setValue (name);
+        args.get ("name").setValue (name);	//NOI18N
         return args;
     }
     

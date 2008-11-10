@@ -71,7 +71,7 @@ public abstract class JavaFXStep {
     /** Step to the next available location */
     public static final int STEP_MIN    =   StepRequest.STEP_MIN;
     /** Property fired when the step is executed */
-    public static final String PROP_STATE_EXEC = "exec";
+    public static final String PROP_STATE_EXEC = "exec";	//NOI18N
     
     /** Constructs a JavaFXStep for given {@link org.netbeans.api.debugger.JavaFX.JavaFXDebugger}, 
      *  size {@link #STEP_LINE}, {@link #STEP_MIN} 

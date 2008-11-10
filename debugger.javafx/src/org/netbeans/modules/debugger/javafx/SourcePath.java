@@ -396,7 +396,7 @@ public class SourcePath {
         int i = className.indexOf ('$');
         if (i > 0) className = className.substring (0, i);
         String sourceName = className.replace
-            ('.', '/') + ".java";
+            ('.', '/') + ".java";	//NOI18N
         return sourceName;
     }
 
@@ -581,7 +581,7 @@ public class SourcePath {
 
         @Override
         public String toString() {
-            return "CompoundContextProvider["+cp1.toString()+", "+cp2.toString()+"]";
+            return "CompoundContextProvider["+cp1.toString()+", "+cp2.toString()+"]";	//NOI18N
         }
         
         

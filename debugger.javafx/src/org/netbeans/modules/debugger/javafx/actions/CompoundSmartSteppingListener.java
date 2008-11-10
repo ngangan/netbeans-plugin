@@ -91,7 +91,7 @@ public class CompoundSmartSteppingListener extends SmartSteppingCallback {
         SmartSteppingFilter smartSteppingFilter
     ) {
         if (ssverbose)
-            System.out.println("\nSS  CompoundSmartSteppingListener.stopHere? : " + 
+            System.out.println("\nSS  CompoundSmartSteppingListener.stopHere? : " + 	//NOI18N
                 t.getClassName () + '.' +
                 t.getMethodName () + ':' +
                 t.getLineNumber (null)
@@ -104,8 +104,8 @@ public class CompoundSmartSteppingListener extends SmartSteppingCallback {
             boolean sh = ss.stopHere (lookupProvider, t, smartSteppingFilter);
             stop = stop && sh;
             if (ssverbose)
-                System.out.println("SS    " + ss.getClass () + 
-                    " = " + sh
+                System.out.println("SS    " + ss.getClass () + 	//NOI18N
+                    " = " + sh	//NOI18N
                 );
         }
         return stop;

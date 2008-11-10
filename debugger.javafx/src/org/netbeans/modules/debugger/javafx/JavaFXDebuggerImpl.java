@@ -132,9 +132,9 @@ import org.openide.ErrorManager;
 */
 public class JavaFXDebuggerImpl extends JavaFXDebugger {
     
-    private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx");
+    private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx");	//NOI18N
     
-    private static final boolean SINGLE_THREAD_STEPPING = Boolean.getBoolean("netbeans.debugger.singleThreadStepping");
+    private static final boolean SINGLE_THREAD_STEPPING = Boolean.getBoolean("netbeans.debugger.singleThreadStepping");	//NOI18N
 
 
     // variables ...............................................................
@@ -180,9 +180,9 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                 javaFXEngineProvider = (JavaFXEngineProvider) l.get (i);
         if (javaFXEngineProvider == null)
             throw new IllegalArgumentException
-                ("JavaFXEngineProvider have to be used to start JavaFXDebugger!");
+                ("JavaFXEngineProvider have to be used to start JavaFXDebugger!");	//NOI18N
         languages = new HashSet<String>();
-        languages.add ("JavaFX");
+        languages.add ("JavaFX");	//NOI18N
         threadsTranslation = ObjectTranslation.createThreadTranslation(this);
         localsTranslation = ObjectTranslation.createLocalsTranslation(this);
         this.expressionPool = new ExpressionPool();
@@ -396,7 +396,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     
     public void fixBreakpoints() {
         Session s = getSession();
-        DebuggerEngine de = s.getEngineForLanguage ("JavaFX");
+        DebuggerEngine de = s.getEngineForLanguage ("JavaFX");	//NOI18N
         BreakpointsEngineListener bel = null;
         List lazyListeners = de.lookup(null, LazyActionsManagerListener.class);
         for (int li = 0; li < lazyListeners.size(); li++) {
@@ -426,7 +426,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
             if (canBeModified == null) {
                 try {
                     java.lang.reflect.Method canBeModifiedMethod =
-                            com.sun.jdi.VirtualMachine.class.getMethod("canBeModified", new Class[] {});
+                            com.sun.jdi.VirtualMachine.class.getMethod("canBeModified", new Class[] {});	//NOI18N
                     Object modifiable = canBeModifiedMethod.invoke(vm, new Object[] {});
                     canBeModified = (Boolean) modifiable;
                 } catch (NoSuchMethodException nsmex) {
@@ -454,10 +454,10 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
         if (smartSteppingFilter == null) {
             smartSteppingFilter = lookupProvider.lookupFirst(null, SmartSteppingFilter.class);
             smartSteppingFilter.addExclusionPatterns (
-                (Set) Properties.getDefault ().getProperties ("debugger").
-                    getProperties ("sources").getProperties ("class_filters").
+                (Set) Properties.getDefault ().getProperties ("debugger").	//NOI18N
+                    getProperties ("sources").getProperties ("class_filters").	//NOI18N
                     getCollection (
-                        "enabled", 
+                        "enabled", 	//NOI18N
                         Collections.EMPTY_SET
                     )
             );
@@ -674,7 +674,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                 }
             }
             throw new InvalidExpressionException
-                    ("No current context (stack frame)");
+                    ("No current context (stack frame)");	//NOI18N
             
         }
     }
@@ -688,15 +688,15 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     throws InvalidExpressionException {
         synchronized (LOCK) {
             if (frame == null)
-                throw new InvalidExpressionException ("No current context");
+                throw new InvalidExpressionException ("No current context");	//NOI18N
 
             // TODO: get imports from the source file
             List<String> imports = new ArrayList<String>();
             List<String> staticImports = new ArrayList<String>();
-            imports.add ("java.lang.*");
+            imports.add ("java.lang.*");	//NOI18N
             try {
                 imports.addAll (Arrays.asList (EditorContextBridge.getContext().getImports (
-                    getEngineContext ().getURL (frame, "JavaFX")
+                    getEngineContext ().getURL (frame, "JavaFX")	//NOI18N
                 )));
                 final ThreadReference tr = frame.thread();
                 final List<EventRequest>[] disabledBreakpoints =
@@ -822,7 +822,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
         Value[] arguments
     ) throws InvalidExpressionException {
         if (currentThread == null)
-            throw new InvalidExpressionException ("No current context");
+            throw new InvalidExpressionException ("No current context"); //NOI18N	
         synchronized (LOCK) {
             if (methodCallsUnsupportedExc != null) {
                 throw methodCallsUnsupportedExc;
@@ -845,7 +845,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                 synchronized (thread) {
                     threadSuspended = thread.isSuspended();
                     if (!threadSuspended) {
-                        throw new InvalidExpressionException ("No current context");
+                        throw new InvalidExpressionException ("No current context");	//NOI18N
                     }
                     try {
                         thread.notifyMethodInvoking();
@@ -1347,7 +1347,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     // private helper methods ..................................................
     
     private static final java.util.regex.Pattern jvmVersionPattern =
-            java.util.regex.Pattern.compile ("(\\d+)\\.(\\d+)\\.(\\d+)(_\\d+)?(-\\w+)?");
+            java.util.regex.Pattern.compile ("(\\d+)\\.(\\d+)\\.(\\d+)(_\\d+)?(-\\w+)?");	//NOI18N
     private static java.lang.reflect.Method  tcGenericSignatureMethod;
     private static java.lang.reflect.Method  lvGenericSignatureMethod;
 
@@ -1366,9 +1366,9 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                 if (minor >= 5) {
                     try {
                         tcGenericSignatureMethod = TypeComponent.class.
-                            getMethod ("genericSignature", new Class [0]);
+                            getMethod ("genericSignature", new Class [0]);	//NOI18N
                         lvGenericSignatureMethod = LocalVariable.class.
-                            getMethod ("genericSignature", new Class [0]);
+                            getMethod ("genericSignature", new Class [0]);	//NOI18N
                     } catch (NoSuchMethodException e) {
                         // the method is not available, ignore generics
                     }
@@ -1383,7 +1383,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
         this.state = state;
         //PENDING HACK see issue 46287
         System.setProperty(
-            "org.openide.awt.SwingBrowserImpl.do-not-block-awt",
+            "org.openide.awt.SwingBrowserImpl.do-not-block-awt",	//NOI18N
             String.valueOf (state != STATE_DISCONNECTED)
         );
         return new PropertyChangeEvent(this, PROP_STATE, new Integer (o), new Integer (state));
@@ -1423,7 +1423,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     private LocalsTreeModel getLocalsTreeModel () {
         if (localsTreeModel == null)
             localsTreeModel = (LocalsTreeModel) lookupProvider.
-                lookupFirst ("LocalsView", TreeModel.class);
+                lookupFirst ("LocalsView", TreeModel.class);	//NOI18N
         return localsTreeModel;
     }
 
@@ -1442,7 +1442,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
             ThreadReference t = (ThreadReference) l.get (i);
             if (t.isSuspended ()) {
                 thread = t;
-                if (t.name ().equals ("Finalizer"))
+                if (t.name ().equals ("Finalizer"))	//NOI18N
                     return t;
             }
         }
@@ -1549,7 +1549,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                     javaFXEngineProvider.getSession ().setCurrentLanguage (stratum);
                 lastStratumn = stratum;
             } catch (AbsentInformationException e) {
-                System.out.println("NoInformationException");
+                System.out.println("NoInformationException");	//NOI18N
             }
     }
  
@@ -1562,7 +1562,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
         JSR45DebuggerEngineProvider provider = new JSR45DebuggerEngineProvider(language);
         jsr45EngineProviders.add(provider);
         return DebuggerInfo.create (
-            "netbeans-JavaFX-JSR45DICookie-" + language,
+            "netbeans-JavaFX-JSR45DICookie-" + language,	//NOI18N
             new Object[] {
                 new DelegatingSessionProvider () {
                     public Session getSession (
@@ -1633,7 +1633,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
                 return Java6Methods.instanceCounts(vm, types);
             }
         } else {
-            throw new UnsupportedOperationException("Not supported.");
+            throw new UnsupportedOperationException("Not supported.");	//NOI18N
         }
     }
     
@@ -1644,7 +1644,7 @@ public class JavaFXDebuggerImpl extends JavaFXDebugger {
     private static boolean canGetInstanceInfo(VirtualMachine vm) {
         if (Java6Methods.isJDK6()) {
             try {
-                java.lang.reflect.Method canGetInstanceInfoMethod = VirtualMachine.class.getMethod("canGetInstanceInfo", new Class[] {});
+                java.lang.reflect.Method canGetInstanceInfoMethod = VirtualMachine.class.getMethod("canGetInstanceInfo", new Class[] {});	//NOI18N
                 Object canGetInstanceInfo = canGetInstanceInfoMethod.invoke(vm, new Object[] {});
                 return Boolean.TRUE.equals(canGetInstanceInfo);
             } catch (Exception ex) {

@@ -132,33 +132,33 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
     }
     
     static String getValue (Value v) {
-        if (v == null) return "null";
-        if (v instanceof VoidValue) return "void";
+        if (v == null) return "null";	//NOI18N
+        if (v instanceof VoidValue) return "void";	//NOI18N
         if (v instanceof CharValue)
-            return "\'" + v.toString () + "\'";
+            return "\'" + v.toString () + "\'";	//NOI18N
         if (v instanceof PrimitiveValue)
             return v.toString ();
         if (v instanceof StringReference)
-            return "\"" +
+            return "\"" +	//NOI18N
                 ((StringReference) v).value ()
-                + "\"";
+                + "\"";	//NOI18N
         if (v instanceof ClassObjectReference)
-            return "class " + ((ClassObjectReference) v).reflectedType ().name ();
+            return "class " + ((ClassObjectReference) v).reflectedType ().name ();	//NOI18N
         if (v instanceof ArrayReference)
-            return "#" + ((ArrayReference) v).uniqueID () + 
-                "(length=" + ((ArrayReference) v).length () + ")";
-        if (v.type().name().indexOf("javafx.lang.Duration")!=-1) {
+            return "#" + ((ArrayReference) v).uniqueID () + 	//NOI18N
+                "(length=" + ((ArrayReference) v).length () + ")";	//NOI18N
+        if (v.type().name().indexOf("javafx.lang.Duration")!=-1) {	//NOI18N
             ObjectReference ref = (ObjectReference) v;
             ReferenceType rt = ref.referenceType();
                 if (rt != null) {
                     com.sun.jdi.Field lf = rt.fieldByName("millis");                 //NOI18N
                     if (lf != null) {
                         Value val = ref.getValue(lf);
-                        return val.toString()+"ms";
+                        return val.toString()+"ms";	//NOI18N
                     }
                 }
         }
-        return "#" + ((ObjectReference) v).uniqueID ();
+        return "#" + ((ObjectReference) v).uniqueID ();	//NOI18N
     }
 
     /**
@@ -173,7 +173,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
         }
         Value value;
         Value oldV = getInnerValue();
-        if (oldV instanceof CharValue && expression.startsWith("'") && expression.endsWith("'") && expression.length() > 1) {
+        if (oldV instanceof CharValue && expression.startsWith("'") && expression.endsWith("'") && expression.length() > 1) {	//NOI18N
             value = oldV.virtualMachine().mirrorOf(expression.charAt(1));
         } else if ((oldV instanceof StringReference || oldV == null) &&
                    expression.startsWith("\"") && expression.endsWith("\"") && expression.length() > 1) {
@@ -188,7 +188,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
             } else {
                 throw new InvalidExpressionException(expression);
             }
-        } else if ("null".equals(expression)) {
+        } else if ("null".equals(expression)) {	//NOI18N
             value = null;
         } else {
             // evaluate expression to Value
@@ -243,25 +243,25 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
             if (ct != null) {
                 PrimitiveValue pv = (PrimitiveValue) value;
                 String classType = type.name();
-                if (classType.equals("java.lang.Byte") && !(pv instanceof ByteValue)) {
+                if (classType.equals("java.lang.Byte") && !(pv instanceof ByteValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.byteValue());
                 }
-                if (classType.equals("java.lang.Character") && !(pv instanceof CharValue)) {
+                if (classType.equals("java.lang.Character") && !(pv instanceof CharValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.charValue());
                 }
-                if (classType.equals("java.lang.Short") && !(pv instanceof ShortValue)) {
+                if (classType.equals("java.lang.Short") && !(pv instanceof ShortValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.shortValue());
                 }
-                if (classType.equals("java.lang.Integer") && !(pv instanceof IntegerValue)) {
+                if (classType.equals("java.lang.Integer") && !(pv instanceof IntegerValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.intValue());
                 }
-                if (classType.equals("java.lang.Long") && !(pv instanceof LongValue)) {
+                if (classType.equals("java.lang.Long") && !(pv instanceof LongValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.longValue());
                 }
-                if (classType.equals("java.lang.Float") && !(pv instanceof FloatValue)) {
+                if (classType.equals("java.lang.Float") && !(pv instanceof FloatValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.floatValue());
                 }
-                if (classType.equals("java.lang.Double") && !(pv instanceof DoubleValue)) {
+                if (classType.equals("java.lang.Double") && !(pv instanceof DoubleValue)) {	//NOI18N
                     pv = pv.virtualMachine().mirrorOf(pv.doubleValue());
                 }
                 try {
@@ -315,16 +315,16 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
                 if (type instanceof IntegerType ||
                         type instanceof ShortType ||
                         type instanceof LongType) {
-                    return "Integer";
+                    return "Integer";	//NOI18N
                 }
                 if (type instanceof BooleanType) {
-                    return "Boolean";
+                    return "Boolean";	//NOI18N
                 }
                 if (type instanceof FloatType) {
-                    return "Number";
+                    return "Number";	//NOI18N
                 }
                 if (type instanceof DoubleType) {
-                    return "Number";
+                    return "Number";	//NOI18N
                 }
                 return type.name();
             }
@@ -381,7 +381,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
     protected void setInnerValue (Value v) {
         value = v;
         // refresh tree
-        PropertyChangeEvent evt = new PropertyChangeEvent(this, "value", null, value);
+        PropertyChangeEvent evt = new PropertyChangeEvent(this, "value", null, value);	//NOI18N
         Object[] ls;
         synchronized (listeners) {
             ls = listeners.toArray();
@@ -409,7 +409,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
     private int cloneNumber = 1;
     
     public Variable clone() {
-        AbstractVariable clon = new AbstractVariable(debugger, value, id + "_clone"+(cloneNumber++));
+        AbstractVariable clon = new AbstractVariable(debugger, value, id + "_clone"+(cloneNumber++));	//NOI18N
         return clon;
     }
     
@@ -422,7 +422,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
     }
     
     public String toString () {
-        return "Variable ";
+        return "Variable ";	//NOI18N
     }
     
     /* Uncomment when needed. Was used to create "readable" String and Char values.

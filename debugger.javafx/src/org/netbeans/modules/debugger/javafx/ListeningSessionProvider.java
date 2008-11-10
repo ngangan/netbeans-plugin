@@ -66,22 +66,22 @@ public class ListeningSessionProvider extends SessionProvider {
     public String getSessionName () {
         Map arguments = contextProvider.lookupFirst(null, Map.class);
         if (arguments != null) {
-            String processName = (String) arguments.get ("name");
+            String processName = (String) arguments.get ("name");	//NOI18N
             if (processName != null)
                 return LaunchingSessionProvider.findUnique (processName);
         }
         if (smadic.getSharedMemoryName () != null)
             return NbBundle.getMessage 
-                (ListeningSessionProvider.class, "CTL_Listening") + 
-                ":" + smadic.getSharedMemoryName ();
+                (ListeningSessionProvider.class, "CTL_Listening") + 	//NOI18N
+                ":" + smadic.getSharedMemoryName ();	//NOI18N
         return NbBundle.getMessage 
-            (ListeningSessionProvider.class, "CTL_Listening") + 
-            ":" + smadic.getPortNumber ();
+            (ListeningSessionProvider.class, "CTL_Listening") + 	//NOI18N
+            ":" + smadic.getPortNumber ();	//NOI18N
     }
     
     public String getLocationName () {
         return NbBundle.getMessage 
-            (ListeningSessionProvider.class, "CTL_Localhost");
+            (ListeningSessionProvider.class, "CTL_Localhost");	//NOI18N
     }
     
     public String getTypeID () {

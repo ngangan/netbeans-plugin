@@ -393,11 +393,11 @@ public abstract class BreakpointImpl implements Executor, PropertyChangeListener
                     final String message;
                     if (thisThreadHasStep) {
                         message = NbBundle.getMessage(BreakpointImpl.class,
-                                "MSG_StepThreadInterruptedByBR",
+                                "MSG_StepThreadInterruptedByBR",	//NOI18N
                                 breakpoint.toString());
                     } else {
                         message = NbBundle.getMessage(BreakpointImpl.class,
-                                "MSG_StepInterruptedByBR",
+                                "MSG_StepInterruptedByBR",	//NOI18N
                                 breakpoint.toString(),
                                 thread.name(),
                                 activeStepRequests.get(0).thread().name());
@@ -407,10 +407,10 @@ public abstract class BreakpointImpl implements Executor, PropertyChangeListener
                         javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
                             public void run() {
                                 tiPanelRef[0] = ThreadInfoPanel.create(message,
-                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn1"),
-                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn1_TIP"),
-                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn2"),
-                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn2_TIP"));
+                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn1"),	//NOI18N
+                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn1_TIP"),	//NOI18N
+                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn2"),	//NOI18N
+                                        NbBundle.getMessage(BreakpointImpl.class, "StepInterruptedByBR_Btn2_TIP"));	//NOI18N
                             }
                         });
                     } catch (InterruptedException iex) {
@@ -616,10 +616,10 @@ public abstract class BreakpointImpl implements Executor, PropertyChangeListener
      * Support method for simple patterns.
      */
     static boolean match (String name, String pattern) {
-        if (pattern.startsWith ("*"))
+        if (pattern.startsWith ("*"))	//NOI18N
             return name.endsWith (pattern.substring (1));
         else
-        if (pattern.endsWith ("*"))
+        if (pattern.endsWith ("*"))	//NOI18N
             return name.startsWith (
                 pattern.substring (0, pattern.length () - 1)
             );

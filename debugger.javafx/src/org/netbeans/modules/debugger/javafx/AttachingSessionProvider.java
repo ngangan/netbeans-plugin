@@ -66,12 +66,12 @@ public class AttachingSessionProvider extends SessionProvider {
     public String getSessionName () {
         Map arguments = contextProvider.lookupFirst(null, Map.class);
         if (arguments != null) {
-            String processName = (String) arguments.get ("name");
+            String processName = (String) arguments.get ("name");	//NOI18N
             if (processName != null)
                 return LaunchingSessionProvider.findUnique (processName);
         }
         if (sadic.getHostName () != null)
-            return sadic.getHostName () + ":" + sadic.getPortNumber ();
+            return sadic.getHostName () + ":" + sadic.getPortNumber ();	//NOI18N
         return LaunchingSessionProvider.findUnique 
             (sadic.getSharedMemoryName ());
     };
@@ -80,7 +80,7 @@ public class AttachingSessionProvider extends SessionProvider {
         if (sadic.getHostName () != null)
             return sadic.getHostName ();
         return NbBundle.getMessage 
-            (AttachingSessionProvider.class, "CTL_Localhost");
+            (AttachingSessionProvider.class, "CTL_Localhost");	//NOI18N
     }
     
     public String getTypeID () {

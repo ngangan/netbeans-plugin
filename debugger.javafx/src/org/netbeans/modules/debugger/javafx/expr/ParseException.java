@@ -146,17 +146,17 @@ public class ParseException extends Exception {
         maxSize = expectedTokenSequences[i].length;
       }
       for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-        expected += tokenImage[expectedTokenSequences[i][j]] + " ";
+        expected += tokenImage[expectedTokenSequences[i][j]] + " ";	//NOI18N
       }
       if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-        expected += "...";
+        expected += "...";	//NOI18N
       }
-      expected += eol + "    ";
+      expected += eol + "    ";	//NOI18N
     }
-    String retval = "Encountered \"";
+    String retval = "Encountered \"";	//NOI18N
     Token tok = currentToken.next;
     for (int i = 0; i < maxSize; i++) {
-      if (i != 0) retval += " ";
+      if (i != 0) retval += " ";	//NOI18N
       if (tok.kind == 0) {
         retval += tokenImage[0];
         break;
@@ -164,7 +164,7 @@ public class ParseException extends Exception {
       retval += add_escapes(tok.image);
       tok = tok.next; 
     }
-    retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
+    retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;	//NOI18N
     retval += "." + eol;
     if (expectedTokenSequences.length == 1) {
       retval += "Was expecting:" + eol + "    ";
@@ -194,33 +194,33 @@ public class ParseException extends Exception {
            case 0 :
               continue;
            case '\b':
-              retval.append("\\b");
+              retval.append("\\b");	//NOI18N
               continue;
            case '\t':
-              retval.append("\\t");
+              retval.append("\\t");	//NOI18N
               continue;
            case '\n':
-              retval.append("\\n");
+              retval.append("\\n");	//NOI18N
               continue;
            case '\f':
-              retval.append("\\f");
+              retval.append("\\f");	//NOI18N
               continue;
            case '\r':
-              retval.append("\\r");
+              retval.append("\\r");	//NOI18N
               continue;
            case '\"':
-              retval.append("\\\"");
+              retval.append("\\\"");	//NOI18N
               continue;
            case '\'':
-              retval.append("\\\'");
+              retval.append("\\\'");	//NOI18N
               continue;
            case '\\':
-              retval.append("\\\\");
+              retval.append("\\\\");	//NOI18N
               continue;
            default:
               if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-                 String s = "0000" + Integer.toString(ch, 16);
-                 retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+                 String s = "0000" + Integer.toString(ch, 16);	//NOI18N
+                 retval.append("\\u" + s.substring(s.length() - 4, s.length()));	//NOI18N
               } else {
                  retval.append(ch);
               }

@@ -51,7 +51,7 @@ import org.netbeans.spi.debugger.DebuggerEngineProvider;
  */
 public class JavaFXEngineProvider extends DebuggerEngineProvider{
 
-    static final String JAVAFX_LANGUAGE = "JavaFX";
+    static final String JAVAFX_LANGUAGE = "JavaFX";	//NOI18N
     private DebuggerEngine.Destructor destructor;
     private Session                     session;  
 

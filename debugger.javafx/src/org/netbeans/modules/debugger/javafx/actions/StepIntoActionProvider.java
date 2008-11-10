@@ -81,7 +81,7 @@ import org.openide.util.NbBundle;
 public class StepIntoActionProvider extends JavaFXDebuggerActionProvider 
 implements Executor, PropertyChangeListener {
     
-    public static final String SS_STEP_OUT = "SS_ACTION_STEPOUT";
+    public static final String SS_STEP_OUT = "SS_ACTION_STEPOUT";	//NOI18N
     
     private static final Logger smartLogger = Logger.getLogger("org.netbeans.modules.debugger.javafx.smartstepping"); // NOI18N
     private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.jdievents"); // NOI18N
@@ -161,7 +161,7 @@ implements Executor, PropertyChangeListener {
                 ErrorManager.getDefault().notify(ErrorManager.USER,
                     ErrorManager.getDefault().annotate(e,
                         NbBundle.getMessage(StepIntoActionProvider.class,
-                            "VMDisconnected")));
+                            "VMDisconnected")));	//NOI18N
             }
         }
     }

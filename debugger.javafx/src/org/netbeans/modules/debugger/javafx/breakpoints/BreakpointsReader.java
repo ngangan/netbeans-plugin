@@ -99,7 +99,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
         JavaFXBreakpoint b = null;
         // Read both LineBreakpoint and LineBreakpoint$LineBreakpointImpl
         if (typeID.equals (LineBreakpoint.class.getName ()) ||
-                typeID.equals (LineBreakpoint.class.getName ()+"$LineBreakpointImpl")) {
+                typeID.equals (LineBreakpoint.class.getName ()+"$LineBreakpointImpl")) {	//NOI18N
             LineBreakpoint lb = LineBreakpoint.create (
                 properties.getString (LineBreakpoint.PROP_URL, null),
                 properties.getInt (LineBreakpoint.PROP_LINE_NUMBER, 1)
@@ -120,7 +120,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
         }
 
         if (typeID.equals (MethodBreakpoint.class.getName ()) ||
-                typeID.equals (MethodBreakpoint.class.getName ()+"$MethodBreakpointImpl")) {
+                typeID.equals (MethodBreakpoint.class.getName ()+"$MethodBreakpointImpl")) {	//NOI18N
             MethodBreakpoint mb = MethodBreakpoint.create ();
             mb.setClassFilters (
                 (String[]) properties.getArray (
@@ -206,7 +206,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
             b = eb;
         }
         if (typeID.equals (FieldBreakpoint.class.getName ()) ||
-                typeID.equals (FieldBreakpoint.class.getName ()+"$FieldBreakpointImpl")) {
+                typeID.equals (FieldBreakpoint.class.getName ()+"$FieldBreakpointImpl")) {	//NOI18N
             FieldBreakpoint fb = FieldBreakpoint.create (
                 properties.getString (FieldBreakpoint.PROP_CLASS_NAME, null),
                 properties.getString (FieldBreakpoint.PROP_FIELD_NAME, null),
@@ -294,8 +294,8 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
                 LineBreakpoint.PROP_PREFERRED_CLASS_NAME,
                 lb.getPreferredClassName()
             );
-            properties.setString("className", findCachedClassName(lb));
-            properties.setString("sourceRoot", findCachedSourceRoot(lb));
+            properties.setString("className", findCachedClassName(lb));	//NOI18N
+            properties.setString("sourceRoot", findCachedSourceRoot(lb));	//NOI18N
             return;
         } else 
         if (object instanceof MethodBreakpoint) {
@@ -324,7 +324,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
                 MethodBreakpoint.PROP_BREAKPOINT_TYPE, 
                 mb.getBreakpointType ()
             );
-            properties.setString("sourceRoot", findCachedSourceRoot(mb));
+            properties.setString("sourceRoot", findCachedSourceRoot(mb));	//NOI18N
             return;
         } else 
         if (object instanceof ClassLoadUnloadBreakpoint) {
@@ -341,7 +341,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
                 ClassLoadUnloadBreakpoint.PROP_BREAKPOINT_TYPE, 
                 cb.getBreakpointType ()
             );
-            properties.setString("sourceRoot", findCachedSourceRoot(cb));
+            properties.setString("sourceRoot", findCachedSourceRoot(cb));	//NOI18N
             return;
         } else 
         if (object instanceof ExceptionBreakpoint) {
@@ -364,7 +364,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
                 ExceptionBreakpoint.PROP_CONDITION, 
                 eb.getCondition ()
             );
-            properties.setString("sourceRoot", findCachedSourceRoot(eb));
+            properties.setString("sourceRoot", findCachedSourceRoot(eb));	//NOI18N
             return;
         } else 
         if (object instanceof FieldBreakpoint) {
@@ -385,7 +385,7 @@ private Map<JavaFXBreakpoint, String> cachedClassNames = new WeakHashMap<JavaFXB
                 FieldBreakpoint.PROP_BREAKPOINT_TYPE, 
                 fb.getBreakpointType ()
             );
-            properties.setString("sourceRoot", findCachedSourceRoot(fb));
+            properties.setString("sourceRoot", findCachedSourceRoot(fb));	//NOI18N
             return;
         } else 
         if (object instanceof ThreadBreakpoint) {

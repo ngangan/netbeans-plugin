@@ -64,7 +64,7 @@ public class JSR45DebuggerEngineProvider extends DebuggerEngineProvider {
     }
 
     public String getEngineTypeID () {
-        return JavaFXDebugger.SESSION_ID + "/" + language;
+        return JavaFXDebugger.SESSION_ID + "/" + language;	//NOI18N
     }
 
     public Object[] getServices () {

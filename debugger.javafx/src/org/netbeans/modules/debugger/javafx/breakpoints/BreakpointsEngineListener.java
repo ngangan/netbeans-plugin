@@ -112,7 +112,7 @@ implements PropertyChangeListener, DebuggerManagerListener {
     }
     
     public String[] getProperties () {
-        return new String[] {"asd"};
+        return new String[] {"asd"};	//NOI18N
     }
 
     public void propertyChange (java.beans.PropertyChangeEvent evt) {

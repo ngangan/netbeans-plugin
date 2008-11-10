@@ -67,7 +67,7 @@ public class Java6Methods {
     
     public static long[] instanceCounts(VirtualMachine vm, List<ReferenceType> refTypes) {
         try {
-            java.lang.reflect.Method method = VirtualMachine.class.getMethod("instanceCounts", new Class[] { List.class });
+            java.lang.reflect.Method method = VirtualMachine.class.getMethod("instanceCounts", new Class[] { List.class });	//NOI18N
             Object instanceCounts = method.invoke(vm, new Object[] { refTypes });
             return (long[]) instanceCounts;
         } catch (Exception ex) {
@@ -78,7 +78,7 @@ public class Java6Methods {
     
     public static List<ObjectReference> instances(ReferenceType refType, long maxInstances) {
         try {
-            java.lang.reflect.Method method = ReferenceType.class.getMethod("instances", new Class[] { Long.TYPE });
+            java.lang.reflect.Method method = ReferenceType.class.getMethod("instances", new Class[] { Long.TYPE });	//NOI18N
             Object instances = method.invoke(refType, new Object[] { maxInstances });
             return (List<ObjectReference>) instances;
         } catch (Exception ex) {
@@ -90,7 +90,7 @@ public class Java6Methods {
     public static List<ObjectReference> referringObjects(ObjectReference ref, long maxReferrers) {
         
         try {
-            java.lang.reflect.Method method = ObjectReference.class.getMethod("referringObjects", new Class[] { Long.TYPE });
+            java.lang.reflect.Method method = ObjectReference.class.getMethod("referringObjects", new Class[] { Long.TYPE });	//NOI18N
             Object referringObjects = method.invoke(ref, new Object[] { maxReferrers });
             return (List<ObjectReference>) referringObjects;
         } catch (Exception ex) {

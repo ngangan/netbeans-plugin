@@ -59,7 +59,7 @@ public interface SmartSteppingFilter {
 
 
     /** Property name constant. */
-    public static final String PROP_EXCLUSION_PATTERNS = "exclusionPatterns";
+    public static final String PROP_EXCLUSION_PATTERNS = "exclusionPatterns";	//NOI18N
     
     
     /**

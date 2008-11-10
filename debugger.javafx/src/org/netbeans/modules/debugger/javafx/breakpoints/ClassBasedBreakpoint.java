@@ -151,7 +151,7 @@ public abstract class ClassBasedBreakpoint extends BreakpointImpl {
                 if (sourceRoot.equals(projectSourceRoots[i])) {
                     setValidity(VALIDITY.INVALID,
                                 NbBundle.getMessage(ClassBasedBreakpoint.class,
-                                            "MSG_DisabledSourceRoot",
+                                            "MSG_DisabledSourceRoot",	//NOI18N
                                             sourceRoot));
                     break;
                 }
@@ -198,7 +198,7 @@ public abstract class ClassBasedBreakpoint extends BreakpointImpl {
                 ClassPrepareRequest cpr = getEventRequestManager().createClassPrepareRequest ();
                 int i, k = classFilters.length;
                 for (i = 0; i < k; i++) {
-                    cpr.addClassFilter (classFilters [i]+"*");
+                    cpr.addClassFilter (classFilters [i]+"*");	//NOI18N
                     logger.fine("Set class load request: " + classFilters [i]);
                 }
                 k = classExclusionFilters.length;

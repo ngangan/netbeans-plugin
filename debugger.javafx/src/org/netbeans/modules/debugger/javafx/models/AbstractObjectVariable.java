@@ -87,7 +87,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
     // Customized for add/removePropertyChangeListener
     // Cloneable for fixed watches
     
-    private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI8N
+    private static final Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI18N
 
     private String          genericType;
     private Field[]         fields;
@@ -290,13 +290,13 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
             if (!(v.type () instanceof ClassType)) 
                 return AbstractVariable.getValue (v);
             if (v instanceof CharValue)
-                return "\'" + v.toString () + "\'";
+                return "\'" + v.toString () + "\'";	//NOI18N
             if (v instanceof StringReference)
-                return "\"" +
+                return "\"" +	//NOI18N
                     ((StringReference) v).value ()
                     + "\"";
             Method toStringMethod = ((ClassType) v.type ()).
-                concreteMethodByName ("toString", "()Ljava/lang/String;");
+                concreteMethodByName ("toString", "()Ljava/lang/String;");	//NOI18N
             StringReference sr = (StringReference) debugger.invokeMethod (
                 (ObjectReference) v,
                 toStringMethod,
@@ -358,8 +358,8 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                 for (j = 0; j < jj; j++)
                     System.out.println (((Method) l.get (j)).signature ());
                 throw new NoSuchMethodException (
-                    this.getInnerValue ().type ().name () + "." + 
-                        methodName + " : " + signature
+                    this.getInnerValue ().type ().name () + "." + 	//NOI18N
+                        methodName + " : " + signature	//NOI18N
                 );
             }
             
@@ -379,7 +379,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                 return new AbstractObjectVariable ( // It's also ObjectVariable
                         getDebugger(),
                         (ObjectReference) v,
-                        getID() + method + "^"
+                        getID() + method + "^"	//NOI18N
                     );
             return new AbstractVariable (getDebugger(), v, getID() + method);
         } catch (VMDisconnectedException ex) {
@@ -440,21 +440,21 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
         int c = signature.read();
         switch (c) {
         case 'Z':
-            return "boolean";
+            return "boolean";	//NOI18N
         case 'B':
-            return "byte";
+            return "byte";	//NOI18N
         case 'C':
-            return "char";
+            return "char";	//NOI18N
         case 'S':
-            return "short";
+            return "short";	//NOI18N
         case 'I':
-            return "int";
+            return "int";	//NOI18N
         case 'J':
-            return "long";
+            return "long";	//NOI18N
         case 'F':
-            return "float";
+            return "float";	//NOI18N
         case 'D':
-            return "double";
+            return "double";	//NOI18N
         case '[':
         {
             int arrayCount = 1;
@@ -464,7 +464,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                     break;
                 }
             }
-            return getTypeDescription(signature) + " " + brackets(arrayCount);
+            return getTypeDescription(signature) + " " + brackets(arrayCount);	//NOI18N
         }
         case 'L':
         {
@@ -472,14 +472,14 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
             for (;;) {
                 c = signature.read();
                 if (c == ';') {
-                    int idx = typeName.lastIndexOf("/");
+                    int idx = typeName.lastIndexOf("/");	//NOI18N
                     return idx == -1 ? 
                         typeName.toString() : typeName.substring(idx + 1);
                 }
                 else if (c == '<') {
-                    int idx = typeName.lastIndexOf("/");
+                    int idx = typeName.lastIndexOf("/");	//NOI18N
                     if (idx != -1) typeName.delete(0, idx + 1);
-                    typeName.append("<");
+                    typeName.append("<");	//NOI18N
                     for (;;) {
                         String td = getTypeDescription(signature);
                         typeName.append(td);
@@ -489,7 +489,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                         typeName.append(',');
                     }
                     signature.read();   // should be a semicolon
-                    typeName.append(">");
+                    typeName.append(">");	//NOI18N
                     return typeName.toString();
                 }
                 typeName.append((char)c);
@@ -502,7 +502,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
     private static String brackets (int arrayCount) {
         StringBuffer sb = new StringBuffer (arrayCount * 2);
         do {
-            sb.append ("[]");
+            sb.append ("[]");	//NOI18N
         } while (--arrayCount > 0);
         return sb.toString ();
     }
@@ -675,7 +675,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
                 return new AbstractList<ObjectVariable>() {
                     public ObjectVariable get(int i) {
                         ObjectReference obj = referrers.get(i);
-                        return new AbstractObjectVariable(getDebugger(), obj, name+" referrer "+i);
+                        return new AbstractObjectVariable(getDebugger(), obj, name+" referrer "+i);	//NOI18N
                     }
 
                     public int size() {
@@ -702,13 +702,13 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
     private int cloneNumber = 1;
     
     public Variable clone() {
-        AbstractObjectVariable clon = new AbstractObjectVariable(getDebugger(), getJDIValue(), getID() + "_clone"+(cloneNumber++));
+        AbstractObjectVariable clon = new AbstractObjectVariable(getDebugger(), getJDIValue(), getID() + "_clone"+(cloneNumber++));	//NOI18N
         clon.genericType = this.genericType;
         return clon;
     }
     
     public String toString () {
-        return "ObjectVariable ";
+        return "ObjectVariable ";	//NOI18N
     }
     
     /* Uncomment when needed. Was used to create "readable" String and Char values.

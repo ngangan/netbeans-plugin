@@ -342,8 +342,8 @@ public class MethodBreakpoint extends JavaFXBreakpoint {
      * @return  a string representation of the object
      */
     public String toString () {
-        return "MethodBreakpoint " + java.util.Arrays.asList(classFilters).toString() + "." + methodName +
-                ((methodSignature != null) ? " '"+methodSignature+"'" : "");
+        return "MethodBreakpoint " + java.util.Arrays.asList(classFilters).toString() + "." + methodName +	//NOI18N
+                ((methodSignature != null) ? " '"+methodSignature+"'" : "");	//NOI18N
     }
     
     private static final class MethodBreakpointImpl extends MethodBreakpoint implements ChangeListener {

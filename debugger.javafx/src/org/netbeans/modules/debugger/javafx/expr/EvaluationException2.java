@@ -84,112 +84,112 @@ public class EvaluationException2 extends RuntimeException {
 
         String [] msgParams = null;
 
-        if (reason.equals("internalError"))
+        if (reason.equals("internalError"))	//NOI18N
             msgParams = new String [] { null };
-        else if (reason.equals("invalidArrayInitializer"))
+        else if (reason.equals("invalidArrayInitializer"))	//NOI18N
             msgParams = new String [] { params[0] == null ? null : params[0].toString() };
-        else if (reason.equals("arraySizeBadType"))
+        else if (reason.equals("arraySizeBadType"))	//NOI18N
             msgParams = new String [] { params[0] == null ? null : params[0].toString() };
-        else if (reason.equals("arrayCreateError"))
+        else if (reason.equals("arrayCreateError"))	//NOI18N
             msgParams = new String [] { params[0] == null ? null : params[0].toString() };
-        else if (reason.equals("instantiateInterface"))
+        else if (reason.equals("instantiateInterface"))	//NOI18N
             msgParams = new String [] { params[0] == null ? null : params[0].toString() };
-        else if (reason.equals("castToBooleanRequired"))
+        else if (reason.equals("castToBooleanRequired"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("castFromBooleanRequired"))
+        else if (reason.equals("castFromBooleanRequired"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("castError"))
+        else if (reason.equals("castError"))	//NOI18N
             msgParams = new String [] { params[0].toString(), params[1].toString() };
-        else if (reason.equals("badOperandForPostfixOperator"))
+        else if (reason.equals("badOperandForPostfixOperator"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("postfixOperatorEvaluationError"))
+        else if (reason.equals("postfixOperatorEvaluationError"))	//NOI18N
             msgParams = new String [] { params[1].toString() };
-        else if (reason.equals("badOperandForPrefixOperator"))
+        else if (reason.equals("badOperandForPrefixOperator"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("prefixOperatorEvaluationError"))
+        else if (reason.equals("prefixOperatorEvaluationError"))	//NOI18N
             msgParams = new String [] { params[1].toString() };
-        else if (reason.equals("badOperandForUnaryOperator"))
+        else if (reason.equals("badOperandForUnaryOperator"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("unaryOperatorEvaluationError"))
+        else if (reason.equals("unaryOperatorEvaluationError"))	//NOI18N
             msgParams = new String [] { params[1].toString() };
-        else if (reason.equals("unknownType"))
+        else if (reason.equals("unknownType"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("internalErrorResolvingType"))
+        else if (reason.equals("internalErrorResolvingType"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("instanceOfLeftOperandNotAReference"))
+        else if (reason.equals("instanceOfLeftOperandNotAReference"))	//NOI18N
             msgParams = new String [] { ((Value)params[0]).type().name() };
-        else if (reason.equals("conditionalOrAndBooleanOperandRequired"))
+        else if (reason.equals("conditionalOrAndBooleanOperandRequired"))	//NOI18N
             msgParams = new String [] { ((Value)params[0]).type().name() };
-        else if (reason.equals("conditionalQuestionMarkBooleanOperandRequired"))
+        else if (reason.equals("conditionalQuestionMarkBooleanOperandRequired"))	//NOI18N
             msgParams = new String [] { ((Value)params[0]).type().name() };
-        else if (reason.equals("thisObjectUnavailable"))
+        else if (reason.equals("thisObjectUnavailable"))	//NOI18N
             msgParams = null;
-        else if (reason.equals("objectReferenceRequiredOnDereference"))
+        else if (reason.equals("objectReferenceRequiredOnDereference"))	//NOI18N
             msgParams = new String [] { ((Value)params[0]).type().name() };
-        else if (reason.equals("badArgument"))
+        else if (reason.equals("badArgument"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("argumentsBadSyntax"))
+        else if (reason.equals("argumentsBadSyntax"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("ambigousMethod"))
+        else if (reason.equals("ambigousMethod"))	//NOI18N
             msgParams = new String [] { params[0].toString(),  params[1].toString() };
-        else if (reason.equals("noSuchMethod"))
+        else if (reason.equals("noSuchMethod"))	//NOI18N
             msgParams = new String [] { (String) params[0], (String) params[1] };
-        else if (reason.equals("noSuchMethodWithArgs"))
+        else if (reason.equals("noSuchMethodWithArgs"))	//NOI18N
             msgParams = new String [] { (String) params[0], (String) params[1], (String) params[2] };
-        else if (reason.equals("noSuchConstructorWithArgs"))
+        else if (reason.equals("noSuchConstructorWithArgs"))	//NOI18N
             msgParams = new String [] { (String) params[0], (String) params[1] };
-        else if (reason.equals("callException"))
+        else if (reason.equals("callException"))	//NOI18N
             msgParams = new String [] { params[1].toString(), params[0].toString() };
-        else if (reason.equals("calleeException"))
+        else if (reason.equals("calleeException"))	//NOI18N
             msgParams = new String [] { ((Identifier)params[1]).typeContext.name(),  ((Identifier)params[1]).identifier,
                                         ((InvocationException)(params[0])).exception().toString() };
-        else if (reason.equals("identifierNotAReference"))
+        else if (reason.equals("identifierNotAReference"))	//NOI18N
             msgParams = new String [] { ((Value)params[0]).type().name() };
-        else if (reason.equals("notarray"))
+        else if (reason.equals("notarray"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("arrayIndexNAN"))
+        else if (reason.equals("arrayIndexNAN"))	//NOI18N
             msgParams = new String [] { params[1].toString() };
-        else if (reason.equals("arrayIndexOutOfBounds"))
+        else if (reason.equals("arrayIndexOutOfBounds"))	//NOI18N
             msgParams = new String [] { params[1].toString(), Integer.toString(((ArrayReference)params[0]).length() - 1) };
-        else if (reason.equals("unknownVariable"))
+        else if (reason.equals("unknownVariable"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("integerLiteralTooBig"))
+        else if (reason.equals("integerLiteralTooBig"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("badFormatOfIntegerLiteral"))
+        else if (reason.equals("badFormatOfIntegerLiteral"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("unknownLiteralType"))
+        else if (reason.equals("unknownLiteralType"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("evaluateError"))
+        else if (reason.equals("evaluateError"))	//NOI18N
 //            return Assert.error(node, "evaluateError", value, ((Token) operators[i-1]).image, next);
             msgParams = new String [] { params[1].toString(), params[0].toString(), params[2].toString() };
-        else if (reason.equals("notEnclosingType"))
+        else if (reason.equals("notEnclosingType"))	//NOI18N
             msgParams = new String [] { ((Identifier)params[0]).typeContext.name(),  ((Identifier)params[0]).superQualifier };
-        else if (reason.equals("accessInstanceVariableFromStaticContext"))
+        else if (reason.equals("accessInstanceVariableFromStaticContext"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("methodCallOnNull"))
+        else if (reason.equals("methodCallOnNull"))	//NOI18N
             msgParams = new String[] { params[0].toString() };
-        else if (reason.equals("fieldOnNull"))
+        else if (reason.equals("fieldOnNull"))	//NOI18N
             msgParams = new String[] { params[0].toString() };
-        else if (reason.equals("arrayIsNull"))
+        else if (reason.equals("arrayIsNull"))	//NOI18N
             msgParams = new String[] { params[0].toString() };
-        else if (reason.equals("unsupported"))
+        else if (reason.equals("unsupported"))	//NOI18N
             msgParams = new String[] { node.toString() };
-        else if (reason.equals("errorneous"))
+        else if (reason.equals("errorneous"))	//NOI18N
             msgParams = new String[] { node.toString() };
-        else if (reason.equals("unknownField"))
+        else if (reason.equals("unknownField"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("unknownOuterClass"))
+        else if (reason.equals("unknownOuterClass"))	//NOI18N
             msgParams = new String [] { params[0].toString() };
-        else if (reason.equals("notExpression"))
+        else if (reason.equals("notExpression"))	//NOI18N
             msgParams = new String [] {  };
-        else if (reason.equals("methOnArray"))
+        else if (reason.equals("methOnArray"))	//NOI18N
             msgParams = new String [] {  };
         else {
             msgParams = new String [] { reason };
-            reason = "unknownInternalError";
+            reason = "unknownInternalError";	//NOI18N
         }
 
-        message = formatMessage("CTL_EvalError_" + reason, msgParams);
+        message = formatMessage("CTL_EvalError_" + reason, msgParams);	//NOI18N
         //message = formatMessage("CTL_EvalErrorExpr", new String[] { node.toString(), message });
 
         return message;

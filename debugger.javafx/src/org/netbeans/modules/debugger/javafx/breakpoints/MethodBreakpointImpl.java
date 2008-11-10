@@ -97,7 +97,7 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
         boolean canGetMethodReturnValues = false;
         java.lang.reflect.Method m = null;
         try {
-            m = vm.getClass().getMethod("canGetMethodReturnValues", new Class[] {});
+            m = vm.getClass().getMethod("canGetMethodReturnValues", new Class[] {});	//NOI18N
         } catch (Exception ex) {
         }
         if (m != null) {
@@ -145,8 +145,8 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
                 }
             }
             Object entryMethodNames = oldRequest.getProperty("methodNames");
-            entryReq.putProperty("methodNames", entryMethodNames);
-            entryReq.putProperty("ReferenceType", referenceType);
+            entryReq.putProperty("methodNames", entryMethodNames);	//NOI18N
+            entryReq.putProperty("ReferenceType", referenceType);	//NOI18N
             return entryReq;
         }
         if (oldRequest instanceof MethodExitRequest) {
@@ -167,8 +167,8 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
                 }
             }
             Object exitMethodNames = oldRequest.getProperty("methodNames");
-            exitReq.putProperty("methodNames", exitMethodNames);
-            exitReq.putProperty("ReferenceType", referenceType);
+            exitReq.putProperty("methodNames", exitMethodNames);	//NOI18N
+            exitReq.putProperty("ReferenceType", referenceType);	//NOI18N
             return exitReq;
         }
         return null;
@@ -217,7 +217,7 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
                         //Value returnValue = ((MethodExitEvent) event).returnValue();
                         java.lang.reflect.Method m = null;
                         try {
-                            m = event.getClass().getDeclaredMethod("returnValue", new Class[] {});
+                            m = event.getClass().getDeclaredMethod("returnValue", new Class[] {});	//NOI18N
                         } catch (Exception ex) {
                             m = null;
                         }
@@ -255,7 +255,7 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
         int index = constructorName.lastIndexOf('.');
         if (index > 0) constructorName = constructorName.substring(index + 1);
         if (methodName.equals(constructorName)) {
-            methodName = "<init>"; // Constructor
+            methodName = "<init>"; // Constructor	//NOI18N
         }
         String signature = breakpoint.getMethodSignature();
         while (methods.hasNext ()) {
@@ -292,8 +292,8 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
                                 }
                             }
                             entryMethodNames = new HashSet<String>();
-                            entryReq.putProperty("methodNames", entryMethodNames);
-                            entryReq.putProperty("ReferenceType", referenceType);
+                            entryReq.putProperty("methodNames", entryMethodNames);	//NOI18N
+                            entryReq.putProperty("ReferenceType", referenceType);	//NOI18N
                         }
                         entryMethodNames.add(method.name ());
                     }
@@ -316,8 +316,8 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
                             }
                         }
                         exitMethodNames = new HashSet<String>();
-                        exitReq.putProperty("methodNames", exitMethodNames);
-                        exitReq.putProperty("ReferenceType", referenceType);
+                        exitReq.putProperty("methodNames", exitMethodNames);	//NOI18N
+                        exitReq.putProperty("ReferenceType", referenceType);	//NOI18N
                     }
                     exitMethodNames.add(method.name());
                 }
@@ -343,9 +343,9 @@ public class MethodBreakpointImpl extends ClassBasedBreakpoint {
     }
     
     private static boolean egualMethodSignatures(String s1, String s2) {
-        int i = s1.lastIndexOf(")");
+        int i = s1.lastIndexOf(")");	//NOI18N
         if (i > 0) s1 = s1.substring(0, i);
-        i = s2.lastIndexOf(")");
+        i = s2.lastIndexOf(")");	//NOI18N
         if (i > 0) s2 = s2.substring(0, i);
         return s1.equals(s2);
     }

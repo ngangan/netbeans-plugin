@@ -75,7 +75,7 @@ public final class ListeningDICookie extends AbstractDICookie {
     /**
      * Public ID used for registration in Meta-inf/debugger.
      */
-    public static final String ID = "netbeans-javafx-ListeningDICookie";
+    public static final String ID = "netbeans-javafx-ListeningDICookie";	//NOI18N
 
     private ListeningConnector listeningConnector;
     private Map<String, ? extends Argument> args;
@@ -115,9 +115,9 @@ public final class ListeningDICookie extends AbstractDICookie {
         int portNumber
     ) {
         return new ListeningDICookie (
-            findListeningConnector ("socket"),
+            findListeningConnector ("socket"),	//NOI18N
             getArgs (
-                findListeningConnector ("socket"),
+                findListeningConnector ("socket"),	//NOI18N
                 portNumber
             )
         );
@@ -133,9 +133,9 @@ public final class ListeningDICookie extends AbstractDICookie {
         String name
     ) {
         return new ListeningDICookie (
-            findListeningConnector ("socket"),
+            findListeningConnector ("socket"),	//NOI18N
             getArgs (
-                findListeningConnector ("socket"),
+                findListeningConnector ("socket"),	//NOI18N
                 name
             )
         );
@@ -157,7 +157,7 @@ public final class ListeningDICookie extends AbstractDICookie {
         int portNumber
     ) {
         Map<String, ? extends Argument> args = listeningConnector.defaultArguments ();
-        args.get ("port").setValue ("" + portNumber);
+        args.get ("port").setValue ("" + portNumber);	//NOI18N
         return args;
     }
 
@@ -166,7 +166,7 @@ public final class ListeningDICookie extends AbstractDICookie {
         String name
     ) {
         Map<String, ? extends Argument> args = listeningConnector.defaultArguments ();
-        args.get ("name").setValue (name);
+        args.get ("name").setValue (name);	//NOI18N
         return args;
     }
 
@@ -194,7 +194,7 @@ public final class ListeningDICookie extends AbstractDICookie {
      * @return port number
      */
     public int getPortNumber () {
-        Argument a = (Argument) args.get ("port");
+        Argument a = (Argument) args.get ("port");	//NOI18N
         if (a == null) return -1;
         String pn = a.value ();
         if (pn == null) return -1;
@@ -211,7 +211,7 @@ public final class ListeningDICookie extends AbstractDICookie {
      * @return shared memory block name
      */
     public String getSharedMemoryName () {
-        Argument a = (Argument) args.get ("name");
+        Argument a = (Argument) args.get ("name");	//NOI18N
         if (a == null) return null;
         return a.value ();
     }

@@ -66,10 +66,10 @@ public class SmartSteppingFilterImpl implements SmartSteppingFilter {
 
     {
         addExclusionPatterns (
-            (Set) Properties.getDefault ().getProperties ("debugger").
-                getProperties ("sources").getProperties ("class_filters").
+            (Set) Properties.getDefault ().getProperties ("debugger").	//NOI18N
+                getProperties ("sources").getProperties ("class_filters").	//NOI18N
                 getCollection (
-                    "enabled", 
+                    "enabled", 	//NOI18N
                     Collections.EMPTY_SET
                 )
         );
@@ -161,10 +161,10 @@ public class SmartSteppingFilterImpl implements SmartSteppingFilter {
         Iterator<String> i = newFilters.iterator ();
         while (i.hasNext ()) {
             String p = i.next ();
-            if (p.startsWith ("*"))
+            if (p.startsWith ("*"))	//NOI18N
                 end.add (p.substring (1));
             else
-            if (p.endsWith ("*"))
+            if (p.endsWith ("*"))	//NOI18N
                 start.add (p.substring (0, p.length () - 1));
             else
                 exact.add (p);

@@ -87,33 +87,33 @@ class TokenMgrError extends Error
            case 0 :
               continue;
            case '\b':
-              retval.append("\\b");
+              retval.append("\\b");	//NOI18N
               continue;
            case '\t':
-              retval.append("\\t");
+              retval.append("\\t");	//NOI18N
               continue;
            case '\n':
-              retval.append("\\n");
+              retval.append("\\n");	//NOI18N
               continue;
            case '\f':
-              retval.append("\\f");
+              retval.append("\\f");	//NOI18N
               continue;
            case '\r':
-              retval.append("\\r");
+              retval.append("\\r");	//NOI18N
               continue;
            case '\"':
-              retval.append("\\\"");
+              retval.append("\\\"");	//NOI18N
               continue;
            case '\'':
-              retval.append("\\\'");
+              retval.append("\\\'");	//NOI18N
               continue;
            case '\\':
-              retval.append("\\\\");
+              retval.append("\\\\");	//NOI18N
               continue;
            default:
               if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
                  String s = "0000" + Integer.toString(ch, 16);
-                 retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+                 retval.append("\\u" + s.substring(s.length() - 4, s.length()));	//NOI18N
               } else {
                  retval.append(ch);
               }

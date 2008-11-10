@@ -179,10 +179,10 @@ class Operators implements JavaFXParserConstants {
             && operator.kind == PLUS) {
             String s1 = null, s2 = null;
             if (left instanceof StringReference) s1 = ((StringReference)left).value();
-            else if (left == null) s1 = "null";
+            else if (left == null) s1 = "null";	//NOI18N
             else s1 = left.toString();
             if (right instanceof StringReference) s2 = ((StringReference)right).value();
-            else if (right == null) s2 = "null";
+            else if (right == null) s2 = "null";	//NOI18N
             else s2 = right.toString();
             return vm.mirrorOf(s1 + s2);
         }
