@@ -20,11 +20,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashSet;
 import javax.swing.JDialog;
 import javax.swing.event.MouseInputAdapter;
+import org.openide.filesystems.FileUtil;
 
 public class CodeUtils {
     private static final String[] getComponentNames = {"getComponent", "getJComponent"};                        // NOI18N
@@ -91,7 +94,26 @@ public class CodeUtils {
     
     public static ClassLoader getBootClassloader(Object context, ClassLoader parent) {
         Context env = (Context)context;
-        return new URLClassLoader(env.bootCP, parent, null);
+        final HashSet <String> searchPaths = new HashSet <String> ();
+        for (URL url : env.bootCP) {
+            try {
+                searchPaths.add(new File(FileUtil.getArchiveFile(url).toURI()).getParent());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return new URLClassLoader(env.bootCP, parent, null) {
+            @Override
+            protected String findLibrary(String libname) {
+                String mappedName = System.mapLibraryName(libname);
+                for (String path : searchPaths) {
+                    File f = new File(path, mappedName);
+                    if (f.exists())
+                        return f.getPath();
+                }
+                return super.findLibrary(libname);
+            }
+        };
     }
     
     public static Object run(Object context, ClassLoader bootClassLoader) {

@@ -82,6 +82,7 @@ class MemoryClassLoader extends ClassLoader {
 //    }
     
     public MemoryClassLoader(URL[] sourceCP, URL[] executeCP, ClassLoader bootClassLoader) {
+        super(bootClassLoader);
         classBytes = new HashMap<String, byte[]>();
         this.bootClassLoader = bootClassLoader;
         compositeClassLoader = new URLClassLoader(URLUtil.merge(sourceCP, executeCP), bootClassLoader, null);
