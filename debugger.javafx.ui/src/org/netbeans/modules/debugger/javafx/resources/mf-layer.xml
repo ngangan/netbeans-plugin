@@ -241,7 +241,7 @@ made subject to such option by the copyright holder.
             </file>
             <file name="org-netbeans-modules-debugger-ui-actions-EvaluateAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Debug/org-netbeans-modules-debugger-javafx-ui-actions-EvaluateAction.instance"/>
-                <attr name="position" intvalue="2600"/>
+                <attr name="position" intvalue="2601"/>
             </file>
             </folder>
         <folder name="Window">
