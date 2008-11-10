@@ -64,6 +64,7 @@ org.netbeans.api.debugger.javafx.LocalVariable {
     int                 depth;
     String              className;
     String              genericSignature;
+    private final String this_var = "receiver$";        //NOI18N
 
     ObjectLocalVariable (
         JavaFXDebuggerImpl debugger,
@@ -100,6 +101,8 @@ org.netbeans.api.debugger.javafx.LocalVariable {
         if (name.charAt(0)=='$' && name.length() > 1) {
             name = name.substring(1);
         }
+        if (this_var.equals(name))
+            name = "this";              //NOI18N
         return name;
 //        return local.name ();
     }
