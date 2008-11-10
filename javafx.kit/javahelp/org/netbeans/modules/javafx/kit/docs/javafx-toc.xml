@@ -39,12 +39,11 @@
       <tocitem text="Running JavaFX Applications" >
         <tocitem text="Working with JavaFX Project Execution" target="javafx_run_process" />
         <tocitem text="Running a JavaFX Application" target="javafx_run_app" />
-        <tocitem text="Setting the Runtime Classpath of JavaFX Projects" target="javafx_run_classpath" />
         <tocitem text="Setting the Main JavaFX Class and Runtime Arguments" target="javafx_run_args" />
       </tocitem>
       
       <tocitem text="Debugging JavaFX Applications" target="javafx_debug_about" />
 	  <tocitem text="Profiling JavaFX Applications" target="javafx_profile_about" />
-      <tocitem text="Deploying JavaFX Applications" target="javafx_deploy_about" />
+      <tocitem text="Preparing JavaFX Applications for Deployment" target="javafx_deploy_prep" />
     </tocitem>
 </toc>	

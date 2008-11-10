@@ -11,17 +11,17 @@
 <body>
 <h2>JavaFX Project Properties Dialog Box: Run</h2>
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
-<p>The Run page 
-  	  lets you configure options for running your JavaFX project. You can set the main
+<p>The Run panel 
+  	  enables you to configure options for executing your JavaFX project locally. You can set the main
 	  class and the application execution model to use for deployment. You
-can also specify a space-separated list of VM options in this panel. 
-<p>You open the JavaFX Project Properties dialog box by right-clicking the JavaFX project's main node &nbsp;and choosing Properties. 
-<p>The available application execution models on this page are the following:
+can also specify a space-separated list of JVM options in this panel. 
+<p>You open the JavaFX Project Properties dialog box by right-clicking the JavaFX project's root node &nbsp;and choosing Properties from the pop-up menu. 
+<p>The  application execution models available are the following:
 <ul>
   <li><b>Standard Execution.</b> The IDE uses settings that you specify in the project's Properties dialog box to build the project's files. The IDE runs the application from the class files in the project's <code>dist</code> folder. </li>
-  <li><b>WebStart Execution.</b> If selected, the IDE creates the necessary artifacts to make the application deployable with Java Web Start when you build the application. These artifacts can be found in the project's <code>dist</code> folder. </li>
-  <li><b>Run in Browser. </b>The IDE generates the necessary files, including a <i>&lt;project_name&gt;</i>.<code>HTML</code> file, to make the application run in a web browser. The generated files can be found in the project's  <code>dist</code> folder. When executed the application is run as an applet in your system's  default web browser.</li>
-  <li><b>Run in Mobile Emulator.</b>    When selected, the IDE creates the necessary .JAD (Java Application Descriptor) files and .JAR (Java Archive) files for your application. It then executes the application using the emulator binary (included with theJavaFX SDK) according to Unified Emulator Interface specification. JAD files describe the MIDlets (Java ME applications) that are distributed as JAR files. This option is currently available on the Microsoft platform only. <br> 
+  <li><b>WebStart Execution.</b> If selected, the IDE creates the necessary artifacts to execute your application using Java Web Start. These artifacts can be found in the project's <code>dist</code> folder and can be used for the application's deployment outside of the IDE. </li>
+  <li><b>Run in Browser. </b>The IDE generates the necessary files, including a <i>&lt;project_name&gt;</i>.<code>HTML</code> file, to enable the application to run in a web browser. The generated files can be found in the project's  <code>dist</code> folder. When executed the application is run as an applet in the web browser that the IDE uses for displaying web content, usually the system's default browser. </li>
+  <li><b>Run in Mobile Emulator.</b>    When selected, the IDE creates the necessary .JAD (Java Application Descriptor) files and .JAR (Java Archive) files for your application. It then executes the application using the mobile emulator tool. JAD files describe the MIDlets (Java ME applications) that are distributed as JAR files. This option is currently available on the Microsoft Windows platform only. <br> 
   </li>
 </ul>
 <p><b>Notes:</b>
@@ -30,11 +30,11 @@ can also specify a space-separated list of VM options in this panel.
     source folders. If you want to specify a class in one of the JAR files on 
     the project's classpath, type the fully qualified class name in the Main Class 
     field. </li>
-  <li>Arguments are passed only to the main class, not to individual files.</li>
 </ul>
 <dl>
     <dt><a name="seealso">See Also</a></dt>
-    <dd><a href="../javafx_proj_process.html">Working with JavaFX Projects</a><br>
+    <dd><a href="../javafx_proj_process.html">Working with JavaFX Projects</a>
+	<dd><a href="../javafx_proj_process.html">Preparing JavaFX Applications for Deployment</a><br>
   </dd>
 <dd>JavaFX Project Properties Dialog Box:</dd>
     <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_sources.html">Sources</a></dd>   

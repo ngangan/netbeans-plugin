@@ -25,7 +25,7 @@
 	<mapID target="javafx_debug_about" url="debug/javafx_debug_about.html" />
 	
 <!-- Deploying section -->
-	<mapID target="javafx_deploy_about" url="deploy/deploy_javafxapp.html" />
+	<mapID target="javafx_deploy_prep" url="deploy/javafx_deploy_prep.html" />
 	
 
 <!-- Editing section -->
@@ -69,7 +69,6 @@
 <!-- Running section -->
 	<mapID target="javafx_run_app" url="run/javafx_run_app.html" />
 	<mapID target="javafx_run_args" url="run/javafx_run_args.html" />
-	<mapID target="javafx_run_classpath" url="run/javafx_run_classpath.html" />
 	<mapID target="javafx_run_process" url="run/javafx_run_process.html" />
 
 </map>
