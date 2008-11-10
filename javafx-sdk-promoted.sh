@@ -7,4 +7,5 @@
 #!/bin/bash
 echo "Promoted JavaFX SDK build b48 (774)"
 export SDK_URL=http://getjfx.sfbay.sun.com/hudson/job/javafx1.0/774/
+export PRODUCTION_SUITE_URL=http://getjfx.sfbay.sun.com/hudson/job/JavaFX_Production_Suite_Trunk/434/
 sh -x $WORKSPACE/main/contrib/javafx-nb-plugin-build.sh
