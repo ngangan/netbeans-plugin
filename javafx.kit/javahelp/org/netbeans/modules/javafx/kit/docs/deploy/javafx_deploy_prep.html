@@ -5,52 +5,62 @@
 -->
 <html>
 <head>
-	<title>Deploying JavaFX Applications</title>
+	<title>Preparing JavaFX Applications for Deployment</title>
 <link href="nbdocs:/org/netbeans/modules/usersguide/ide.css"  rel="stylesheet" type="text/css">
 </head>
 <body>
-<h2>Deploying JavaFX Applications</h2>
+<h2>Preparing JavaFX Applications for Deployment </h2>
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
 
 
-<p>You can deploy your JavaFX application  as a standalone application, as an application enabled with Java Web Start,  as an applet viewable in a web browser, or as an application running in a Mobile Emulator. </p>
-<p><b>To run a standalone application from the IDE: </b></p>
+<p>Using the Project Properties dialog, you can configure your JavaFX application to execute using one of the available execution models: Standard Execution (standalone), Web Start Execution, Run in Browser, and Run in Mobile Emulator (Microsoft Windows platform only). The Standard Execution model is chosen by default. After you choose the execution model and you build the project, the IDE creates the necessary files and executes the application locally. The files created can then be used to package the application for deployment outside of the IDE. </p>
+<p><b>To run a standalone application using Standard Execution model: </b></p>
 <ol>
       <li>In the Projects window, right-click your project's root node and select Properties.<br>
       Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu.      </li>
       <li>In Project Properties dialog, select the Run category.</li>
-      <li>Select the Standard Execution radio button.</li>
+      <li>Select the Standard Execution execution model.</li>
       <li>Click OK.</li>
-      <li>In the Projects window, right-click the project's root node again and select Run Project.
+  <li>In the Projects window, right-click the project's root node and  select Run Project.
+        <br>
+  The IDE complies the project and creates the necessary class files in the project's <code>dist</code> folder. If successful, a separate window appears running your application.
 </ol>
 <p><b>To run a standalone application from the command line: </b></p>
 <ol>
 	<li>Navigate to the project's <code>dist</code> folder.</li>
-	<li>Type the following at the command prompt: <br>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>javafx -jar <i>application_jar_name.jar &nbsp;main_JavaFX_class_name.Main</i></code></li>
+  <li>Type the following at the command prompt: <br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>javafx -jar &lt;application_jar_name&gt;.jar</code><br>
+		or<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>javafx -classpath <i>application_jar_name.jar main_JavaFX_class_name</i></code></li>
 </ol>
-<p><b>To run a JNLP application using the IDE:</b>
+<p><b>To run an application using the Java Web Start execution model:</b>
 <ol>
 <li>In the Projects window, right-click your project's root node and select Properties.<br>
   Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu.  </li>
-<li> In Project Properties dialog, select the Application  category.</li>
-<li>Under the Web Start Specific Properties section, select the  Self Signed JAR and the Pack200 Compression checkboxes.</li>
-<li>In the Categories pane, select the Run category and select the  Web Start Execution radio button.</li>
+<li>(Optional) If your application requires access to any secured computer resources or secured Java classes and methods, do the following steps:</li>
+<ol type="a">
+<li>In Project Properties dialog, select the Application  category.</li>
+<li>Under the Web Start Specific Properties section, select the  Self Signed JAR and the Pack200 Compression check boxes.</li>
+</ol>
+<li>In the Categories pane, select the Run category and select the  Web Start Execution radio button on the right pane.</li>
 <li>Click OK.</li>
 <li>In the Projects window, right-click the project's node again and select Run Project.<br>
-    The IDE builds the project first, adds the following files to your project's folders, and then executes the project.
+    The IDE builds the project first, adds the following files to your project's <code>dist</code> folder, and then executes the project.
       <ul>
-    <li><code>jnlp-impl.xml</code> in <code>nbproject</code> folder - contains the set of ANT targets needed to generate the JNLP file, and all other related files. </li>
-	<li><code>master.jnlp</code> file in your project's main folder - used to create the <code>launhc.jnlp</code> file. </li>
-    <li><code>launch.jnlp</code> and <code>launch.html</code> files in the <code>dist</code> folder - the <code>launch.html</code> file is linked to <code>launch.jnlp</code> file</li>
-</ul>
+    <li><code><i>&lt;app-name&gt;</i>.html</code> - sample HTML page with the applet</li>
+	<li><code><i>&lt;app-name&gt;</i>_browser.jnlp</code> - JNLP descriptor file for JNLP-based Applet</li>
+    <li><code><i>&lt;app-name&gt;</i>.jnlp</code> - JNLP descriptor for direct WebStart execution</li>
+    <li><code><i>&lt;app-name&gt;</i>.jar</code> - application JAR file 
+    <li><code><i>&lt;app-name&gt;</i>.pack.gz</code> - Pack200 compressed application JAR file (if Pack200 option is set)</li>
+    <li><code>lib</code> folder with user libraries necessary for execution and, optionally, with Pack200-compressed user libraries.</li>
+    </ul>
 </ol>
 <p><b>To run a standalone application with Java Web Start: </b></p>
-Do one of the following after you build the JNLP application for your JavaFX  project:
+Do one of the following after you build the application for Java Web Start execution:
 <ul>
 	<li>Navigate to the project's <code>dist</code> folder and double-click the <code>launch.jnlp</code> file.</li>
-	<li></code>Navigate to the project's <code>dist</code> folder and type the following at the command prompt:<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>javaws launch.jnlp <i></i></code></li>
+  <li></code>Navigate to the project's <code>dist</code> folder and type the following at the command prompt:<br>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>javaws &lt;<i>app-name</i>&gt;.jnlp </code></li>
 
 	</li>
 </ul>
@@ -61,8 +71,8 @@ Do one of the following after you build the JNLP application for your JavaFX  pr
   Alternatively, you can select the project in the Projects window and select File &gt; Project Properties (<i>JavaFX_project_name</i>) from the main menu. </li>
   <li>In Project Properties dialog, select the Application category.</li>
   <li>Under the Applet Specific Properties section, set the desired width and height to use for your applet. The default is 200 pixels by 200 pixels.</li>
-  <li>Select the Draggable Applet checkbox. It is selected by default. <br>
-  Your web browser must have proper support for this feature. </li>
+  <li>(Optional) Unselect  the Draggable Applet checkbox, if desired. It is selected by default. <br>
+    This option allows your application to be dragged form the web browser to the desktop, if your browser has the correct version of the Java Runtime Environment (JRE) that supports this feature. </li>
   <li>In the Categories pane, select the Run category.</li>
   <li>Select the Run in Browser radio button.</li>
   <li>Click OK.</li>
@@ -87,6 +97,7 @@ Do one of the following after you build the JNLP application for your JavaFX  pr
 <dl>
 <dt><a name="seealso">See Also</a></dt>
 <dd><a href="../about_javafx.html">About JavaFX Applications</a></dd>
+<dd><a href="../run/javafx_run_app.html">Running  JavaFX Applications</a></dd>
 <dd><a href="../project/javafx_proj_process.html">Working with JavaFX Projects </a></dd>
 </dl>
 
