@@ -100,7 +100,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         if (pk != null) {
             JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
             if (jp instanceof JavaFXPlatform) try {
-                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator").isDirectory());
+                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator").isDirectory()); //NOI18N
             } catch (URISyntaxException e) {}
         }
         
@@ -413,6 +413,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         if (!name.equals(config)) {
             m.put("$label", name); // NOI18N
         }
+        m.put("javafx.profile", "desktop"); //NOI18N
+        m.put("execution.target", "standard"); //NOI18N
         configs.put(config, m);
         configChanged(config);
         uiProperties.activeConfig = config;
@@ -435,35 +437,35 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
     
 private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "desktop");
-    m.put("execution.target", "standard");
+    m.put("javafx.profile", "desktop"); //NOI18N
+    m.put("execution.target", "standard"); //NOI18N
 }//GEN-LAST:event_jRadioButton1ActionPerformed
 
 private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "desktop");
-    m.put("execution.target", "jnlp");
+    m.put("javafx.profile", "desktop"); //NOI18N
+    m.put("execution.target", "jnlp"); //NOI18N
 }//GEN-LAST:event_jRadioButton2ActionPerformed
 
 private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "desktop");
-    m.put("execution.target", "applet");
+    m.put("javafx.profile", "desktop"); //NOI18N
+    m.put("execution.target", "applet"); //NOI18N
 }//GEN-LAST:event_jRadioButton3ActionPerformed
 
 private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "mobile");
-    m.put("execution.target", "midp");
+    m.put("javafx.profile", "mobile"); //NOI18N
+    m.put("execution.target", "midp"); //NOI18N
 }//GEN-LAST:event_jRadioButton4ActionPerformed
     
     public void configUpdated() {
         Map<String, String> m = configs.get(uiProperties.activeConfig);
-        String run = m.get("execution.target");
-        if (run == null || run.equals("standard")) jRadioButton1.setSelected(true);
-        else if (run.equals("jnlp")) jRadioButton2.setSelected(true);
-        else if (run.equals("applet")) jRadioButton3.setSelected(true);
-        else if (run.equals("midp")) jRadioButton4.setSelected(true);
+        String run = m.get("execution.target"); //NOI18N
+        if (run == null || run.equals("standard")) jRadioButton1.setSelected(true); //NOI18N
+        else if (run.equals("jnlp")) jRadioButton2.setSelected(true); //NOI18N
+        else if (run.equals("applet")) jRadioButton3.setSelected(true); //NOI18N
+        else if (run.equals("midp")) jRadioButton4.setSelected(true); //NOI18N
     }
 
     
