@@ -154,6 +154,7 @@ public class DetectPanel extends javax.swing.JPanel {
         add(jdkName, gridBagConstraints);
         jdkName.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(DetectPanel.class).getString("AD_PlatformName")); // NOI18N
 
+        jLabel5.setLabelFor(fxFolder);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(DetectPanel.class, "TXT_FX")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
