@@ -271,7 +271,10 @@ is divided into following sections:
             <nbbrowse url="${{applet.url}}"/>
         </target>
         <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
-            <exec executable="${{java.home}}/bin/javaws" failonerror="true">
+            <condition property="javaws.home" value="/usr" else="${{java.home}}">
+                <os family="mac"/>
+            </condition>
+            <exec executable="${{javaws.home}}/bin/javaws" failonerror="true">
                 <env key="JAVAWS_VM_ARGS" value="${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
@@ -321,7 +324,10 @@ is divided into following sections:
             </exec>
         </target>
         <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
-            <exec executable="${{java.home}}/bin/javaws">
+            <condition property="javaws.home" value="/usr" else="${{java.home}}">
+                <os family="mac"/>
+            </condition>
+            <exec executable="${{javaws.home}}/bin/javaws">
                 <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}} ${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
