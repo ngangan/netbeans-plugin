@@ -65,6 +65,7 @@ import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
 import java.util.logging.Logger;
 import org.netbeans.modules.editor.NbEditorKit;
+import org.openide.util.WeakListeners;
 
 /**
  * @author answer
@@ -160,7 +161,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
             public PreviewButton() {
                 super();
-                Bridge.addStartListener(this);
+                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
             }
 
             public void stateChanged(ChangeEvent evt) {
@@ -229,13 +230,19 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
 
         private final class ResetButton extends JButton implements ChangeListener {
+            private boolean state;
             public ResetButton() {
                 super();
-                Bridge.addStartListener(this);
+                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
             }
 
             public void stateChanged(ChangeEvent e) {
-                setEnabled(Bridge.isStarted());
+                if (!Bridge.isStarted()) {
+                    state = isEnabled();
+                    setEnabled(false);
+                } else {
+                    setEnabled(state);
+                }
             }
         }
 
