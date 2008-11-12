@@ -248,7 +248,7 @@ public final class JavaFXSource {
             try {
                 trees = cc.getJavafxcTask().parse();
             } catch (RuntimeException parserError) {
-                LOGGER.log(Level.WARNING, "Error in parser", parserError); // NOI18N
+                LOGGER.log(Level.FINE, "Error in parser", parserError); // NOI18N
                 return cc.phase;
             }
 //                new JavaFileObject[] {currentInfo.jfo});
@@ -274,10 +274,10 @@ public final class JavaFXSource {
             try {
                 cc.getJavafxcTask().analyze();
             } catch (RuntimeException analyzerError) {
-                LOGGER.log(Level.WARNING, "Error in analyzer", analyzerError); // NOI18N
+                LOGGER.log(Level.FINE, "Error in analyzer", analyzerError); // NOI18N
                 return cc.phase;
             } catch (AssertionError assErr) {
-                LOGGER.log(Level.WARNING, "Error in analyzer", assErr); // NOI18N
+                LOGGER.log(Level.FINE, "Error in analyzer", assErr); // NOI18N
                 return cc.phase;
             }
             cc.setPhase(Phase.ANALYZED);
@@ -324,7 +324,7 @@ public final class JavaFXSource {
                 try {
                     bytes = cc.getJavafxcTask().generate();
                 } catch (RuntimeException generateError) {
-                    LOGGER.log(Level.WARNING, "Error in generate", generateError); // NOI18N
+                    LOGGER.log(Level.FINE, "Error in generate", generateError); // NOI18N
                     return cc.phase;
                 }
                 cc.setClassBytes(bytes);
