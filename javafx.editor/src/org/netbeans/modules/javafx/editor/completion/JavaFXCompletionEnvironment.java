@@ -304,7 +304,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     ElementHandle eh = null;
                     try {
                         eh = ElementHandle.create(member);
-                    } catch (IllegalArgumentException iae) {
+                    } catch (Exception ex) {
                         // cannot convert --> ignore
                     }
                     if (eh != null) {
@@ -358,7 +358,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     ElementHandle eh = null;
                     try {
                         eh = ElementHandle.create(member);
-                    } catch (IllegalArgumentException iae) {
+                    } catch (Exception ex) {
                         // cannot convert --> ignore
                     }
                     if (eh != null) {

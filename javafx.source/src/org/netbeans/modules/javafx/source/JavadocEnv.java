@@ -62,7 +62,6 @@ import com.sun.tools.javafxdoc.FieldDocImpl;
 import com.sun.tools.javafxdoc.FunctionDocImpl;
 import com.sun.tools.javafxdoc.ModifierFilter;
 import com.sun.tools.javafxdoc.PackageDocImpl;
-import java.io.IOException;
 import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -259,7 +258,7 @@ public class JavadocEnv extends DocEnv {
                     return ret[0] != null ? ret[0] : ""; //NOI18N
                 }
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
         return ""; //NOI18N

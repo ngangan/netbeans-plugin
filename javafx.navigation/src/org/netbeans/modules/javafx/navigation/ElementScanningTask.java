@@ -279,7 +279,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         ElementHandle<Element> eh = null;
         try {
             eh = ElementHandle.create(e);
-        } catch (IllegalArgumentException iae) {
+        } catch (Exception ex) {
             // can't convert to element handler (incomplete element)
         }
         if (eh == null) {

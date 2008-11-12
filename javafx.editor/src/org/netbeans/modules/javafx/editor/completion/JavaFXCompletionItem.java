@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -698,7 +699,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         private MethodItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {
             super(substitutionOffset);
-            this.elementHandle = ElementHandle.create(elem);
+            try {
+                this.elementHandle = ElementHandle.create(elem);
+            } catch (Exception ex) {
+            }
             this.isInherited = isInherited;
             this.isDeprecated = isDeprecated;
             this.inImport = inImport;
@@ -1105,7 +1109,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             if (type == null) {
                 return null;
             }
-            return JavaFXCompletionProvider.createDocTask(ElementHandle.create(type.asElement()));
+            ElementHandle<Element> eh = null;
+            try {
+                eh  = ElementHandle.create(type.asElement());
+            } catch (Exception ex) {
+            }
+            return eh != null ? JavaFXCompletionProvider.createDocTask(eh) : null;
         }
 
         @Override
@@ -1351,7 +1360,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
         private ParametersItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isDeprecated, int activeParamsIndex, String name) {
             super(substitutionOffset);
-            this.elementHandle = ElementHandle.create(elem);
+            try {
+                this.elementHandle = ElementHandle.create(elem);
+            } catch (Exception ex) {
+            }
             this.isDeprecated = isDeprecated;
             this.activeParamsIndex = activeParamsIndex;
             this.simpleName = name != null ? name : elem.getKind() == ElementKind.CONSTRUCTOR ? elem.getEnclosingElement().getSimpleName().toString() : elem.getSimpleName().toString();
