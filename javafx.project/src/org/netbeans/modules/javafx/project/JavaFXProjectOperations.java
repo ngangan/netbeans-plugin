@@ -153,7 +153,7 @@ public class JavaFXProjectOperations implements DeleteOperationImplementation, C
     public void notifyMoving() throws IOException {
         if (!this.project.getUpdateHelper().requestUpdate()) {
             throw new IOException (NbBundle.getMessage(JavaFXProjectOperations.class,
-                "MSG_OldProjectMetadata"));
+                "MSG_OldProjectMetadata")); // NOI18N
         }
         rememberLibraryLocation();
         readPrivateProperties ();        

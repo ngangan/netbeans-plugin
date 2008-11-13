@@ -65,7 +65,7 @@ public final class JavaFXTemplateAttributesProvider implements CreateFromTemplat
     
     public Map<String,? extends Object> attributesFor(DataObject template, DataFolder target, String name) {
         FileObject templateFO = template.getPrimaryFile();
-        if (!"fx".equals(templateFO.getExt()) || templateFO.isFolder()) {
+        if (!"fx".equals(templateFO.getExt()) || templateFO.isFolder()) { // NOI18N
             return null;
         }
         

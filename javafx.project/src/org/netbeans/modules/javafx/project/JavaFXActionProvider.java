@@ -315,7 +315,7 @@ class JavaFXActionProvider implements ActionProvider {
                     if (buildFo == null || !buildFo.isValid()) {
                         //The build.xml was deleted after the isActionEnabled was called
                         NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(JavaFXActionProvider.class,
-                                "LBL_No_Build_XML_Found"), NotifyDescriptor.WARNING_MESSAGE);
+                                "LBL_No_Build_XML_Found"), NotifyDescriptor.WARNING_MESSAGE); // NOI18N
                         DialogDisplayer.getDefault().notify(nd);
                     }
                     else {

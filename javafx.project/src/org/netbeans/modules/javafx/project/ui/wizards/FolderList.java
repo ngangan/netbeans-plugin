@@ -163,7 +163,7 @@ public final class FolderList extends javax.swing.JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         jLabel1.setLabelFor(roots);
-        jLabel1.setText("jLabel1");
+        jLabel1.setText("jLabel1"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;

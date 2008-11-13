@@ -164,7 +164,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
             int index = name.lastIndexOf('.');
             if (index > 0 && index < name.length() - 1) {
                 String ext = name.substring(index+1).toLowerCase();
-                if ("gif".equals(ext) || "png".equals(ext) || "jpg".equals(ext)) {
+                if ("gif".equals(ext) || "png".equals(ext) || "jpg".equals(ext)) { // NOI18N
                     return true;
                 }
             }
@@ -172,7 +172,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         }
         
         public String getDescription() {
-            return "Splash image files";
+            return "Splash image files"; // NOI18N
         }
         
     }

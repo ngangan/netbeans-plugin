@@ -334,7 +334,7 @@ public class CustomizerLibraries extends JPanel implements HelpCtx.Provider, Lis
         add(jCheckBoxBuildSubprojects, gridBagConstraints);
         jCheckBoxBuildSubprojects.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerLibraries.class, "AD_CheckBoxBuildSubprojects")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelErrorMessage, " ");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelErrorMessage, " "); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;

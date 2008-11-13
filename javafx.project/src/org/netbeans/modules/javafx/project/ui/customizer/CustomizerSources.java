@@ -282,7 +282,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
                 {null, null}
             },
             new String [] {
-                "Package Folder", "Label"
+                "Package Folder", "Label" // NOI18N
             }
         ) {
             Class[] types = new Class [] {
@@ -388,7 +388,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         jPanel1.add(jLabel3, gridBagConstraints);
         jLabel3.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerSources.class, "AD_CustomizerSources_Encoding")); // NOI18N
 
-        encoding.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        encoding.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" })); // NOI18N
         encoding.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 encodingActionPerformed(evt);

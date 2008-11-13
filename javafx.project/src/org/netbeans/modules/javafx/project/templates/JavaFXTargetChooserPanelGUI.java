@@ -174,7 +174,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
             String docName = preselectedPackage == null || preselectedPackage.toString().length() == 0 ? 
                 DEFAULT_NEW_PACKAGE_NAME : 
-                preselectedPackage.toString() + "." + DEFAULT_NEW_PACKAGE_NAME;
+                preselectedPackage.toString() + "." + DEFAULT_NEW_PACKAGE_NAME; // NOI18N
 
             documentNameTextField.setText( docName );                    
             int docNameLen = docName.length();
@@ -486,7 +486,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
             updatePackagesTask.cancel();
         }
         
-        updatePackagesTask = new RequestProcessor( "ComboUpdatePackages" ).post(
+        updatePackagesTask = new RequestProcessor( "ComboUpdatePackages" ).post( // NOI18N
             new Runnable() {
             
                 private ComboBoxModel model;

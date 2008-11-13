@@ -230,7 +230,7 @@ public class ClassPathSupport {
         String[] items = new String[ result.size() ];
         for( int i = 0; i < result.size(); i++) {
             if ( i < result.size() - 1 ) {
-                items[i] = result.get( i ) + ":";
+                items[i] = result.get( i ) + ":"; // NOI18N
             }
             else  {       
                 items[i] = (String)result.get( i );    //NOI18N
@@ -242,7 +242,7 @@ public class ClassPathSupport {
     
     public String getLibraryReference( Item item ) {
         if ( item.getType() != Item.TYPE_LIBRARY ) {
-            throw new IllegalArgumentException( "Item must be of type LIBRARY" );
+            throw new IllegalArgumentException( "Item must be of type LIBRARY" ); // NOI18N
         }
         return libraryPrefix + item.getLibrary().getName() + librarySuffix;        
     }
@@ -485,8 +485,8 @@ public class ClassPathSupport {
         ep.setProperty(libCpProperty, sb.toString());
         ep.setComment(libCpProperty, new String[]{
             // XXX this should be I18N! Not least because the English is wrong...
-            "# Property "+libCpProperty+" is set here just to make sharing of project simpler.",
-            "# The library definition has always preference over this property."}, false);
+            "# Property "+libCpProperty+" is set here just to make sharing of project simpler.", // NOI18N
+            "# The library definition has always preference over this property."}, false); // NOI18N
         return true;
     }
     

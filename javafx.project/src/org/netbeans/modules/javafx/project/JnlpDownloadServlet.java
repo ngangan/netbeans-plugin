@@ -25,19 +25,19 @@ public class JnlpDownloadServlet extends HttpServlet {
     
     private void handleRequest(HttpServletRequest request, HttpServletResponse response, boolean isHead) throws IOException {
         try {
-            File f = new File(URLDecoder.decode(request.getRequestURI().substring(request.getServletPath().length()).trim(), "UTF-8"));
+            File f = new File(URLDecoder.decode(request.getRequestURI().substring(request.getServletPath().length()).trim(), "UTF-8")); // NOI18N
             if (f.exists()) {
                 response.setContentLength((int)f.length());
-                if (f.lastModified() != 0) response.setDateHeader("Last-Modified", f.lastModified());
+                if (f.lastModified() != 0) response.setDateHeader("Last-Modified", f.lastModified()); // NOI18N
                 String name = f.getName();
-                if (name.endsWith(".pack.gz")) {
-                    response.setHeader("content-encoding", "pack200-gzip");
-                } else if (name.endsWith(".gz")) {
-                    response.setHeader("content-encoding", "gzip");
-                } else if (name.endsWith(".jar")) {
-                    response.setContentType("application/x-java-archive");
-                } else if (name.endsWith(".jnlp")) {
-                    response.setContentType("application/x-java-jnlp-file");
+                if (name.endsWith(".pack.gz")) { // NOI18N
+                    response.setHeader("content-encoding", "pack200-gzip"); // NOI18N
+                } else if (name.endsWith(".gz")) { // NOI18N
+                    response.setHeader("content-encoding", "gzip"); // NOI18N
+                } else if (name.endsWith(".jar")) { // NOI18N
+                    response.setContentType("application/x-java-archive"); // NOI18N
+                } else if (name.endsWith(".jnlp")) { // NOI18N
+                    response.setContentType("application/x-java-jnlp-file"); // NOI18N
                 }
                 if (isHead) {
                     response.sendError(HttpServletResponse.SC_OK);

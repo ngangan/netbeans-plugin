@@ -199,9 +199,9 @@ class ProjectNode extends AbstractNode {
         public void showJavadoc() {
             Set us = findJavadoc();
             URL[] urls = (URL[])us.toArray(new URL[us.size()]);
-            URL pageURL = ShowJavadocAction.findJavadoc("overview-summary.html",urls);
+            URL pageURL = ShowJavadocAction.findJavadoc("overview-summary.html",urls); // NOI18N
             if (pageURL == null) {
-                pageURL = ShowJavadocAction.findJavadoc("index.html",urls);
+                pageURL = ShowJavadocAction.findJavadoc("index.html",urls); // NOI18N
             }
             ProjectInformation info = null;
             Project p = this.antArtifact.getProject ();

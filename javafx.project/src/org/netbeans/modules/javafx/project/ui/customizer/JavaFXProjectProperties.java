@@ -137,8 +137,8 @@ public class JavaFXProjectProperties {
     public static final String DEBUG_CLASSPATH = "debug.classpath"; // NOI18N
     public static final String JAR_COMPRESS = "jar.compress"; // NOI18N
     public static final String MAIN_CLASS = "main.class"; // NOI18N
-    public static final String MAIN_FX_RUN_CLASS = "main.fx.class"; // NOI18M
-    public static final String MAIN_FX_BUILD_CLASS = "FXBuild.class"; // NOI18M
+    public static final String MAIN_FX_RUN_CLASS = "main.fx.class"; // NOI18M // NOI18N
+    public static final String MAIN_FX_BUILD_CLASS = "FXBuild.class"; // NOI18M // NOI18N
     public static final String JAVAC_SOURCE = "javac.source"; // NOI18N
     public static final String JAVAC_TARGET = "javac.target"; // NOI18N
     public static final String JAVAC_DEBUG = "javac.debug"; // NOI18N
@@ -178,10 +178,10 @@ public class JavaFXProjectProperties {
 */    
     //Applet properties
     
-    public static final String APPLET_DRAGGABLE = "applet.draggable";
-    public static final String APPLET_ARGUMENTS = "applet.java.arguments";
-    public static final String APPLET_WIDTH = "applet.width";
-    public static final String APPLET_HEIGHT = "applet.height";
+    public static final String APPLET_DRAGGABLE = "applet.draggable"; // NOI18N
+    public static final String APPLET_ARGUMENTS = "applet.java.arguments"; // NOI18N
+    public static final String APPLET_WIDTH = "applet.width"; // NOI18N
+    public static final String APPLET_HEIGHT = "applet.height"; // NOI18N
 
     // Properties stored in the PRIVATE.PROPERTIES
     public static final String APPLICATION_ARGS = "application.args"; // NOI18N
@@ -192,9 +192,9 @@ public class JavaFXProjectProperties {
     
     // Well known paths
     public static final String[] WELL_KNOWN_PATHS = new String[] {            
-            "${" + JAVAC_CLASSPATH + "}", 
-            "${" + RUN_CLASSPATH  + "}", 
-            "${" + BUILD_CLASSES_DIR  + "}", 
+            "${" + JAVAC_CLASSPATH + "}", // NOI18N
+            "${" + RUN_CLASSPATH  + "}", // NOI18N
+            "${" + BUILD_CLASSES_DIR  + "}", // NOI18N
     };
     
     // Prefixes and suffixes of classpath
@@ -480,13 +480,13 @@ public class JavaFXProjectProperties {
         privateGroup.store( privateProperties );
         
         storeRunConfigs(RUN_CONFIGS, projectProperties, privateProperties);
-        EditableProperties ep = updateHelper.getProperties("nbproject/private/config.properties");
+        EditableProperties ep = updateHelper.getProperties("nbproject/private/config.properties"); // NOI18N
         if (activeConfig == null) {
-            ep.remove("config");
+            ep.remove("config"); // NOI18N
         } else {
-            ep.setProperty("config", activeConfig);
+            ep.setProperty("config", activeConfig); // NOI18N
         }
-        updateHelper.putProperties("nbproject/private/config.properties", ep);
+        updateHelper.putProperties("nbproject/private/config.properties", ep); // NOI18N
         
         //Hotfix of the issue #70058
         //Should use the StoreGroup when the StoreGroup SPI will be extended to allow false default value in ToggleButtonModel
@@ -636,7 +636,7 @@ public class JavaFXProjectProperties {
                 explicitPlatform.setAttribute("explicit-source-supported", "true"); //NOI18N
                 changed = true;
             }
-            boolean javac = Util.findTool("javac", platform.getInstallFolders()) != null;
+            boolean javac = Util.findTool("javac", platform.getInstallFolders()) != null; // NOI18N
             if (javac != Boolean.parseBoolean(explicitPlatform.getAttribute("explicit-javac-supported"))) { //NOI18N
                 explicitPlatform.setAttribute("explicit-javac-supported", Boolean.toString(javac)); //NOI18N
                 changed = true;
@@ -773,7 +773,7 @@ public class JavaFXProjectProperties {
             return value ? "on" : "off"; // NOI18N
         }
         else if ( kind == BOOLEAN_KIND_YN ) { // NOI18N
-            return value ? "yes" : "no";
+            return value ? "yes" : "no"; // NOI18N
         }
         else {
             return value ? "true" : "false"; // NOI18N
@@ -822,7 +822,7 @@ public class JavaFXProjectProperties {
             }
         });
         Map<String,String> def = new TreeMap<String,String>();
-        for (String prop : new String[] {MAIN_CLASS, APPLICATION_ARGS, RUN_JVM_ARGS, RUN_WORK_DIR, "javafx.profile", "execution.target"}) {
+        for (String prop : new String[] {MAIN_CLASS, APPLICATION_ARGS, RUN_JVM_ARGS, RUN_WORK_DIR, "javafx.profile", "execution.target"}) { // NOI18N
             String v = updateHelper.getProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH).getProperty(prop);
             if (v == null) {
                 v = updateHelper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH).getProperty(prop);
@@ -832,19 +832,19 @@ public class JavaFXProjectProperties {
             }
         }
         m.put(null, def);
-        FileObject configs = project.getProjectDirectory().getFileObject("nbproject/configs");
+        FileObject configs = project.getProjectDirectory().getFileObject("nbproject/configs"); // NOI18N
         if (configs != null) {
             for (FileObject kid : configs.getChildren()) {
-                if (!kid.hasExt("properties")) {
+                if (!kid.hasExt("properties")) { // NOI18N
                     continue;
                 }
                 m.put(kid.getName(), new TreeMap<String,String>(updateHelper.getProperties(FileUtil.getRelativePath(project.getProjectDirectory(), kid))));
             }
         }
-        configs = project.getProjectDirectory().getFileObject("nbproject/private/configs");
+        configs = project.getProjectDirectory().getFileObject("nbproject/private/configs"); // NOI18N
         if (configs != null) {
             for (FileObject kid : configs.getChildren()) {
-                if (!kid.hasExt("properties")) {
+                if (!kid.hasExt("properties")) { // NOI18N
                     continue;
                 }
                 Map<String,String> c = m.get(kid.getName());

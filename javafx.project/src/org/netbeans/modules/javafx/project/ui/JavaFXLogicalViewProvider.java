@@ -225,7 +225,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
             return (javaSource != null && new SpecificationVersion (javaSource).compareTo(platformVersion)>0)
                    || (javaTarget != null && new SpecificationVersion (javaTarget).compareTo(platformVersion)>0);
         } catch (NumberFormatException nfe) {
-            ErrorManager.getDefault().log("Invalid javac.source: "+javaSource+" or javac.target: "+javaTarget+" of project:"
+            ErrorManager.getDefault().log("Invalid javac.source: "+javaSource+" or javac.target: "+javaTarget+" of project:" // NOI18N
                 +this.project.getProjectDirectory().getPath());
             return true;
         }
@@ -253,7 +253,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         private boolean illegalState;   //Represents a state where project is not in legal state, eg invalid source/target level
         
         public JavaFXLogicalViewRootNode() {
-            super(NodeFactorySupport.createCompositeChildren(project, "Projects/org-netbeans-modules-javafx-project/Nodes"), 
+            super(NodeFactorySupport.createCompositeChildren(project, "Projects/org-netbeans-modules-javafx-project/Nodes"), // NOI18N
                   Lookups.singleton(project));
             setIconBaseWithExtension("org/netbeans/modules/javafx/project/ui/resources/fx.png");
             super.setName( ProjectUtils.getInformation( project ).getDisplayName() );
