@@ -100,9 +100,9 @@ public class CallStackNodeModel implements NodeModel {
                     null
                 );
             return getCSFName (session, sf, false);
-        } else if ("No current thread" == o) {
+        } else if ("No current thread" == o) { // NOI18N
             return NbBundle.getMessage(CallStackNodeModel.class, "NoCurrentThread");
-        } else if ("Thread is running" == o) {
+        } else if ("Thread is running" == o) { // NOI18N
             return NbBundle.getMessage(CallStackNodeModel.class, "ThreadIsRunning");
         } else
         throw new UnknownTypeException (o);
@@ -111,14 +111,14 @@ public class CallStackNodeModel implements NodeModel {
     public String getShortDescription (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT) {
             return NbBundle.getBundle (CallStackNodeModel.class).getString
-                ("CTL_CallstackModel_Column_Name_Desc");
+                ("CTL_CallstackModel_Column_Name_Desc"); // NOI18N
         } else
         if (o instanceof CallStackFrame) {
             CallStackFrame sf = (CallStackFrame) o;
             return getCSFName (session, sf, true);
-        } else if ("No current thread" == o) {
+        } else if ("No current thread" == o) { // NOI18N
             return NbBundle.getMessage(CallStackNodeModel.class, "NoCurrentThread");
-        } else if ("Thread is running" == o) {
+        } else if ("Thread is running" == o) { // NOI18N
             return NbBundle.getMessage(CallStackNodeModel.class, "ThreadIsRunning");
         } else
         throw new UnknownTypeException (o);

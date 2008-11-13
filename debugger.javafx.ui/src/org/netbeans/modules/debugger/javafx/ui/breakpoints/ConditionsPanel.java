@@ -398,7 +398,7 @@ public class ConditionsPanel extends javax.swing.JPanel {
         panelHitCountFilter.add(tfHitCountFilter, gridBagConstraints);
         tfHitCountFilter.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(ConditionsPanel.class, "ACSN_HitCountTF")); // NOI18N
 
-        cbHitStyle.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "equals to", "is greater then", "is multiple of" }));
+        cbHitStyle.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "equals to", "is greater then", "is multiple of" })); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;

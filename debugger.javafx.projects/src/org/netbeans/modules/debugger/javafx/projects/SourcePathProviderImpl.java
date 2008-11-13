@@ -216,10 +216,10 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         
         if (verbose) 
             System.out.println 
-                ("SPPI: init originalSourcePath " + originalSourcePath);    
+                ("SPPI: init originalSourcePath " + originalSourcePath); // NOI18N
         if (verbose) 
             System.out.println (
-                "SPPI: init smartSteppingSourcePath " + smartSteppingSourcePath
+                "SPPI: init smartSteppingSourcePath " + smartSteppingSourcePath // NOI18N
             );    
     }
 
@@ -232,7 +232,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
      * @param global true if global path should be used
      * @return url or <code>null</code>
      */
-    public String getURL (String relativePath, boolean global) {    if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global);
+    public String getURL (String relativePath, boolean global) {    if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global); // NOI18N
         FileObject fo;
         relativePath = normalize(relativePath);
         if (originalSourcePath == null) {
@@ -241,17 +241,17 @@ public class SourcePathProviderImpl extends SourcePathProvider {
             synchronized (this) {
                 if (!global) {
                     fo = smartSteppingSourcePath.findResource(relativePath);
-                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo);
+                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo); // NOI18N
                 } else {
                     fo = originalSourcePath.findResource(relativePath);
-                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo);
+                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo); // NOI18N
                 }
             }
         }
         if (fo == null) return null;
         try {
             return fo.getURL ().toString ();
-        } catch (FileStateInvalidException e) {                     if (verbose) System.out.println ("SPPI:   FileStateInvalidException");
+        } catch (FileStateInvalidException e) {                     if (verbose) System.out.println ("SPPI:   FileStateInvalidException"); // NOI18N
             return null;
         }
     }
@@ -264,7 +264,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
      * @param global true if global path should be used
      * @return url
      */
-    public String[] getAllURLs (String relativePath, boolean global) {      if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global);
+    public String[] getAllURLs (String relativePath, boolean global) {      if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global); // NOI18N
         List<FileObject> fos;
         relativePath = normalize(relativePath);
         if (originalSourcePath == null) {
@@ -276,10 +276,10 @@ public class SourcePathProviderImpl extends SourcePathProvider {
             synchronized (this) {
                 if (!global) {
                     fos = smartSteppingSourcePath.findAllResources(relativePath);
-                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos);
+                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos); // NOI18N
                 } else {
                     fos = originalSourcePath.findAllResources(relativePath);
-                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos);
+                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos); // NOI18N
                 }
             }
         }
@@ -287,7 +287,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         for (FileObject fo : fos) {
             try {
                 urls.add(fo.getURL().toString());
-            } catch (FileStateInvalidException e) {                         if (verbose) System.out.println ("SPPI:   FileStateInvalidException for "+fo);
+            } catch (FileStateInvalidException e) {                         if (verbose) System.out.println ("SPPI:   FileStateInvalidException for "+fo); // NOI18N
                 // skip it
             }
         }
@@ -310,9 +310,9 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         boolean includeExtension
     ) {
         // 1) url -> FileObject
-        FileObject fo = null;                                       if (verbose) System.out.println ("SPPI: getRelativePath " + url);
+        FileObject fo = null;                                       if (verbose) System.out.println ("SPPI: getRelativePath " + url); // NOI18N
         try {
-            fo = URLMapper.findFileObject (new URL (url));          if (verbose) System.out.println ("SPPI:   fo " + fo);
+            fo = URLMapper.findFileObject (new URL (url));          if (verbose) System.out.println ("SPPI:   fo " + fo); // NOI18N
         } catch (MalformedURLException e) {
             //e.printStackTrace ();
             return null;

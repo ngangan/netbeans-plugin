@@ -268,9 +268,9 @@ public class CallStackFrameImpl implements CallStackFrame {
             }
             return locals;
         } catch (NativeMethodException ex) {
-            throw new AbsentInformationException ("native method");
+            throw new AbsentInformationException ("native method"); // NOI18N
         } catch (InvalidStackFrameException ex) {
-            throw new AbsentInformationException ("thread is running");
+            throw new AbsentInformationException ("thread is running"); // NOI18N
         } catch (VMDisconnectedException ex) {
             return new LocalVariable [0];
         }
@@ -304,9 +304,9 @@ public class CallStackFrameImpl implements CallStackFrame {
             }
             return local;
         } catch (NativeMethodException ex) {
-            throw new AbsentInformationException ("native method");
+            throw new AbsentInformationException ("native method"); // NOI18N
         } catch (InvalidStackFrameException ex) {
-            throw new AbsentInformationException ("thread is running");
+            throw new AbsentInformationException ("thread is running"); // NOI18N
         } catch (VMDisconnectedException ex) {
             return null;
         }

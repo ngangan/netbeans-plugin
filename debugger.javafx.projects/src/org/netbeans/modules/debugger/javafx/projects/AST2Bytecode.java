@@ -215,7 +215,7 @@ class AST2Bytecode {
                                         return null; // Unsupported
                                     }
                                 } else {
-                                    ErrorManager.getDefault().notify(new IllegalStateException("Unexpected type "+type+" in "+treeNodes));
+                                    ErrorManager.getDefault().notify(new IllegalStateException("Unexpected type "+type+" in "+treeNodes)); // NOI18N
                                     return null;
                                 }
 //                                methodClassType = ElementUtilities.getBinaryName(te)+array;

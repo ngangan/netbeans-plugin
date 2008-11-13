@@ -92,6 +92,6 @@ public final class SessionsTableModelFilter implements TableModelFilter {
     }
 
     public Object getValueAt(TableModel original, Object node, String columnID) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 }

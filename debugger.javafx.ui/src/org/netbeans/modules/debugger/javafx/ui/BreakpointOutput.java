@@ -322,7 +322,7 @@ PropertyChangeListener {
                 synchronized (lock) {
                     if (ioManager != null) {
                         ioManager.println (
-                            "Cannot evaluate expression '" + expression + "' : " + msg, 
+                            "Cannot evaluate expression '" + expression + "' : " + msg, // NOI18N
                             null
                         );
                     }

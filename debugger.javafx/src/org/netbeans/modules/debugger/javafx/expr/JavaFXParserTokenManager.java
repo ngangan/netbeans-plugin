@@ -1720,7 +1720,7 @@ protected char curChar;
 public JavaFXParserTokenManager(SimpleCharStream stream)
 {
    if (SimpleCharStream.staticFlag)
-      throw new Error("ERROR: Cannot use a static CharStream class with a non-static lexical analyzer.");
+      throw new Error("ERROR: Cannot use a static CharStream class with a non-static lexical analyzer."); // NOI18N
    input_stream = stream;
 }
 public JavaFXParserTokenManager(SimpleCharStream stream, int lexState)
@@ -1750,7 +1750,7 @@ public void ReInit(SimpleCharStream stream, int lexState)
 public void SwitchTo(int lexState)
 {
    if (lexState >= 6 || lexState < 0)
-      throw new TokenMgrError("Error: Ignoring invalid lexical state : " + lexState + ". State unchanged.", TokenMgrError.INVALID_LEXICAL_STATE);
+      throw new TokenMgrError("Error: Ignoring invalid lexical state : " + lexState + ". State unchanged.", TokenMgrError.INVALID_LEXICAL_STATE); // NOI18N
    else
       curLexState = lexState;
 }
@@ -1949,7 +1949,7 @@ void SkipLexicalActions(Token matchedToken)
             image = new StringBuffer(new String(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1))));
          else
             image.append(new String(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1))));
-              System.out.println("Warning: cntl-z found at end of file");
+              System.out.println("Warning: cntl-z found at end of file"); // NOI18N
          break;
       default :
          break;
@@ -1966,7 +1966,7 @@ void MoreLexicalActions()
          else
             image.append(new String(input_stream.GetSuffix(jjimageLen)));
          jjimageLen = 0;
-               System.out.println("Error: no characters should follow cntl-z at end of file");
+               System.out.println("Error: no characters should follow cntl-z at end of file"); // NOI18N
          break;
       case 10 :
          if (image == null)

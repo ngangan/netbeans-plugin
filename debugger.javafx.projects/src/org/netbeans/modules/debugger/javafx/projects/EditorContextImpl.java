@@ -153,7 +153,7 @@ public class EditorContextImpl extends EditorContext {
     {
         pcs = new PropertyChangeSupport (this);
         
-        refreshProcessor = new RequestProcessor("Refresh Editor Context", 1);
+        refreshProcessor = new RequestProcessor("Refresh Editor Context", 1); // NOI18N
 
         resDataObject = Utilities.actionsGlobalContext().lookup(new Lookup.Template(DataObject.class));
         resDataObject.addLookupListener(new EditorLookupListener(DataObject.class));
@@ -186,7 +186,7 @@ public class EditorContextImpl extends EditorContext {
         Line l = LineTranslations.getTranslations().getLine (url, lineNumber, timeStamp); // false = use original ln
         if (l == null) {
             ErrorManager.getDefault().log(ErrorManager.WARNING,
-                    "Show Source: Have no line for URL = "+url+", line number = "+lineNumber);
+                    "Show Source: Have no line for URL = "+url+", line number = "+lineNumber); // NOI18N
             return null;
         }
         if ("true".equalsIgnoreCase(fronting) || Utilities.isWindows()) {	//NOI18N
@@ -209,7 +209,7 @@ public class EditorContextImpl extends EditorContext {
         Line l = LineTranslations.getTranslations().getLine (url, lineNumber, timeStamp); // false = use original ln
         if (l == null) {
             ErrorManager.getDefault().log(ErrorManager.WARNING,
-                    "Show Source: Have no line for URL = "+url+", line number = "+lineNumber);
+                    "Show Source: Have no line for URL = "+url+", line number = "+lineNumber); // NOI18N
             return false;
         }
         if ("true".equalsIgnoreCase(fronting) || Utilities.isWindows()) {	//NOI18N
@@ -296,7 +296,7 @@ public class EditorContextImpl extends EditorContext {
         try {
             annotation = new DebuggerAnnotation(annotationType, highlight, URLMapper.findFileObject(new URL(url)));
         } catch (MalformedURLException ex) {
-            RuntimeException rex = new RuntimeException("Bad URL: "+url);
+            RuntimeException rex = new RuntimeException("Bad URL: "+url); // NOI18N
             rex.initCause(ex);
             throw rex;
         }
@@ -730,9 +730,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getFileObject()/*.getCompilationUnit().getSourceFile()*/+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getFileObject()/*.getCompilationUnit().getSourceFile()*/+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     Elements elms = ci.getElements();                    
@@ -840,9 +840,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     TypeElement classElement = getTypeElement(ci, className, classExcludeNames);
@@ -914,9 +914,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     int offset = currentOffset;
@@ -1112,9 +1112,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
@@ -1123,7 +1123,7 @@ public class EditorContextImpl extends EditorContext {
                         result[0] = getBinaryName(te);
                     } else {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "No enclosing class for "+ci.getCompilationUnit().getSourceFile()+", offset = "+offset);
+                                "No enclosing class for "+ci.getCompilationUnit().getSourceFile()+", offset = "+offset); // NOI18N
                     }
                 }
             }, true);
@@ -1197,9 +1197,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         ops[0] = new Operation[] {};
                         return;
                     }
@@ -1368,9 +1368,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     int offset = operation.getMethodEndPosition().getOffset();
@@ -1419,9 +1419,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     JavafxcScope scope = ci.getTreeUtilities().scopeFor(offset);
@@ -1467,9 +1467,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.PARSED).compareTo(Phase.PARSED) < 0) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.PARSED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.PARSED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     List importDecl = ci.getCompilationUnit().getImports();
@@ -1716,9 +1716,9 @@ public class EditorContextImpl extends EditorContext {
                 public void run(CompilationController ci) throws Exception {
                     if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                         ErrorManager.getDefault().log(ErrorManager.WARNING,
-                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                                "Unable to resolve "+ci.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+ci.getPhase()+ // NOI18N
+                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+ // NOI18N
+                                "\nFree memory = "+Runtime.getRuntime().freeMemory()); // NOI18N
                         return;
                     }
                     Element el = null;

@@ -358,7 +358,7 @@ public class ClassesTreeModel implements TreeModel {
                 // cancel old task
                 task.cancel ();
                 if (verbose)
-                    System.out.println ("ClTM cancel old task " + task);
+                    System.out.println ("ClTM cancel old task " + task); // NOI18N
                 task = null;
             }
         }
@@ -390,23 +390,23 @@ public class ClassesTreeModel implements TreeModel {
                     // cancel old task
                     task.cancel ();
                     if (verbose)
-                        System.out.println ("ClTM cancel old task " + task);
+                        System.out.println ("ClTM cancel old task " + task); // NOI18N
                     task = null;
                 }
                 task = RequestProcessor.getDefault ().post (new Runnable () {
                     public void run () {
                         if (debugger.getState () != debugger.STATE_STOPPED) {
                             if (verbose)
-                                System.out.println ("ClTM cancel started task " + task);
+                                System.out.println ("ClTM cancel started task " + task); // NOI18N
                             return;
                         }
                         if (verbose)
-                            System.out.println ("ClTM do task " + task);
+                            System.out.println ("ClTM do task " + task); // NOI18N
                         ltm.fireTreeChanged ();
                     }
                 }, 500);
                 if (verbose)
-                    System.out.println ("ClTM  create task " + task);
+                    System.out.println ("ClTM  create task " + task); // NOI18N
             } else
             if ( (e.getPropertyName () == debugger.PROP_STATE) &&
                  (debugger.getState () != debugger.STATE_STOPPED) &&
@@ -416,7 +416,7 @@ public class ClassesTreeModel implements TreeModel {
                 // =>> cancel task
                 task.cancel ();
                 if (verbose)
-                    System.out.println ("ClTM cancel task " + task);
+                    System.out.println ("ClTM cancel task " + task); // NOI18N
                 task = null;
             }
         }

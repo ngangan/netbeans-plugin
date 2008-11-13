@@ -161,7 +161,7 @@ public class ThreadsTableModel implements TableModel, Constants {
                     ThreadsTableModel.class, 
                     "CTL_Thread_State_Zombie"	//NOI18N
                 );
-            default: ErrorManager.getDefault().log(ErrorManager.WARNING, "Unknown thread state: "+state);
+            default: ErrorManager.getDefault().log(ErrorManager.WARNING, "Unknown thread state: "+state); // NOI18N
                     return null;
         }
     }

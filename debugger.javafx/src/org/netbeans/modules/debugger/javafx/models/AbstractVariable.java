@@ -176,7 +176,7 @@ class AbstractVariable implements JDIVariable, Customizer, Cloneable {
         if (oldV instanceof CharValue && expression.startsWith("'") && expression.endsWith("'") && expression.length() > 1) {	//NOI18N
             value = oldV.virtualMachine().mirrorOf(expression.charAt(1));
         } else if ((oldV instanceof StringReference || oldV == null) &&
-                   expression.startsWith("\"") && expression.endsWith("\"") && expression.length() > 1) {
+                   expression.startsWith("\"") && expression.endsWith("\"") && expression.length() > 1) { // NOI18N
             value = debugger.getVirtualMachine().mirrorOf(expression.substring(1, expression.length() - 1));
         } else if (oldV instanceof ObjectReference &&
                    ((ObjectReference) oldV).referenceType() instanceof ClassType &&

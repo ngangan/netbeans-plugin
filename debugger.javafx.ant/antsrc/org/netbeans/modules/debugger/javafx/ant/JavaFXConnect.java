@@ -104,19 +104,19 @@ public class JavaFXConnect extends Task {
     
     public void addClasspath (Path path) {
         if (classpath != null)
-            throw new BuildException ("Only one classpath subelement is supported");
+            throw new BuildException ("Only one classpath subelement is supported"); // NOI18N
         classpath = path;
     }
     
     public void addBootclasspath (Path path) {
         if (bootclasspath != null)
-            throw new BuildException ("Only one bootclasspath subelement is supported");
+            throw new BuildException ("Only one bootclasspath subelement is supported"); // NOI18N
         bootclasspath = path;
     }
     
     public void addSourcepath (Path path) {
         if (sourcepath != null)
-            throw new BuildException ("Only one sourcepath subelement is supported");
+            throw new BuildException ("Only one sourcepath subelement is supported"); // NOI18N
         sourcepath = path;
     }
     
@@ -145,13 +145,13 @@ public class JavaFXConnect extends Task {
         
         if (name == null)
             throw new BuildException (
-                "name attribute must specify name of this debugging session", 
+                "name attribute must specify name of this debugging session", // NOI18N
                 getLocation ()
             );
         if (address == null)
             throw new BuildException (
-                "address attribute must specify port number or memory " +
-                "allocation unit name of connection", 
+                "address attribute must specify port number or memory " + // NOI18N
+                "allocation unit name of connection", // NOI18N
                 getLocation ()
             );
         if (transport == null)
@@ -205,8 +205,8 @@ public class JavaFXConnect extends Task {
                                     );
                                 } catch (NumberFormatException e) {
                                     throw new BuildException (
-                                        "address attribute must specify port " +
-                                        "number for dt_socket connection", 
+                                        "address attribute must specify port " + // NOI18N
+                                        "number for dt_socket connection", // NOI18N
                                         getLocation ()
                                     );
                                 }
@@ -244,9 +244,9 @@ public class JavaFXConnect extends Task {
 
         }
         if (host == null)
-            log ("Attached JavaFX debugger to " + address);
+            log ("Attached JavaFX debugger to " + address); // NOI18N
         else
-            log ("Attached JavaFX debugger to " + host + ":" + address);
+            log ("Attached JavaFX debugger to " + host + ":" + address); // NOI18N
         logger.fine("JavaFXConnect.execute () " + "end: success"); // NOI18N
     }
 }

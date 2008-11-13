@@ -136,7 +136,7 @@ public class ClassesNodeModel implements NodeModel {
             );
             ClassLoaderReference cl = ((ReferenceType) o).classLoader ();
             if (cl != null) {
-                name += " " + java.text.MessageFormat.format (
+                name += " " + java.text.MessageFormat.format ( // NOI18N
                     NbBundle.getBundle (ClassesNodeModel.class).getString (
                     "CTL_ClassesModel_Column_Name_LoadedBy"), 	//NOI18N
                     new Object [] {cl.referenceType ().name ()}

@@ -440,10 +440,10 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
             CallStackFrameImpl callStackFrame = (CallStackFrameImpl) debugger.
                 getCurrentCallStackFrame ();
             if (callStackFrame == null) 
-                return new String [] {"No current thread"};
+                return new String [] {"No current thread"}; // NOI18N
             StackFrame stackFrame = callStackFrame.getStackFrame ();
             if (stackFrame == null) 
-                return new String [] {"No current thread"};
+                return new String [] {"No current thread"}; // NOI18N
             try {
                 ObjectReference thisR = stackFrame.thisObject ();
                 List<Operation> operations = callStackFrame.getThread().getLastOperations();
@@ -520,7 +520,7 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                     return result;
                 }            
             } catch (NativeMethodException nmex) {
-                return new String[] { "NativeMethodException" };
+                return new String[] { "NativeMethodException" }; // NOI18N
             } catch (InternalException ex) {
                 return new String [] {ex.getMessage ()};
             }
@@ -656,7 +656,7 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                 // cancel old task
                 task.cancel ();
                 if (verbose)
-                    System.out.println("LTM cancel old task " + task);
+                    System.out.println("LTM cancel old task " + task); // NOI18N
                 task = null;
             }
         }
@@ -688,23 +688,23 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                     // cancel old task
                     task.cancel ();
                     if (verbose)
-                        System.out.println("LTM cancel old task " + task);
+                        System.out.println("LTM cancel old task " + task); // NOI18N
                     task = null;
                 }
                 task = RequestProcessor.getDefault ().post (new Runnable () {
                     public void run () {
                         if (debugger.getState () != JavaFXDebugger.STATE_STOPPED) {
                             if (verbose)
-                                System.out.println("LTM cancel started task " + task);
+                                System.out.println("LTM cancel started task " + task); // NOI18N
                             return;
                         }
                         if (verbose)
-                            System.out.println("LTM do task " + task);
+                            System.out.println("LTM do task " + task); // NOI18N
                         ltm.fireTreeChanged ();
                     }
                 }, 500);
                 if (verbose)
-                    System.out.println("LTM  create task " + task);
+                    System.out.println("LTM  create task " + task); // NOI18N
             } else
             if ( (e.getPropertyName () == JavaFXDebugger.PROP_STATE) &&
                  (debugger.getState () != JavaFXDebugger.STATE_STOPPED) &&
@@ -714,7 +714,7 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                 // =>> cancel task
                 task.cancel ();
                 if (verbose)
-                    System.out.println("LTM cancel task " + task);
+                    System.out.println("LTM cancel task " + task); // NOI18N
                 task = null;
             }
         }

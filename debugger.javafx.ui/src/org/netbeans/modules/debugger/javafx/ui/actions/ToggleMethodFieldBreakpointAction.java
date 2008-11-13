@@ -184,7 +184,7 @@ public class ToggleMethodFieldBreakpointAction extends AbstractAction {//impleme
                     { cex, fex, mex };
             synchronized (this) {
                 if (postponedToggleRP == null) {
-                    postponedToggleRP = new RequestProcessor("Postponed ToggleMethodFieldBreakpointAction", 1);
+                    postponedToggleRP = new RequestProcessor("Postponed ToggleMethodFieldBreakpointAction", 1); // NOI18N
                 }
             }
             postponedToggleRP.post(new Runnable() {

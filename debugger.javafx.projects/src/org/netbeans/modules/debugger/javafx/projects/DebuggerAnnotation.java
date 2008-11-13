@@ -133,7 +133,7 @@ public class DebuggerAnnotation extends Annotation {
         if (type == EditorContext.DISABLED_METHOD_BREAKPOINT_ANNOTATION_TYPE)
             return NbBundle.getBundle (DebuggerAnnotation.class).getString 
                 ("TOOLTIP_DISABLED_METHOD_BREAKPOINT"); // NOI18N
-        ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, new IllegalStateException("Unknown breakpoint type '"+type+"'."));
+        ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, new IllegalStateException("Unknown breakpoint type '"+type+"'.")); // NOI18N
         return null;
     }
     

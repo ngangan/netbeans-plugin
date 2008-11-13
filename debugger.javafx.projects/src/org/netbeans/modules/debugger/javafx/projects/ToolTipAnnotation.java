@@ -167,7 +167,7 @@ public class ToolTipAnnotation extends Annotation implements Runnable {
                 toolTipText = expression + " = " + 	//NOI18N
                     (type.length () == 0 ? 
                         "" : 
-                        "(" + type + ") ") +
+                        "(" + type + ") ") + // NOI18N
                     value;
         } catch (InvalidExpressionException e) {
             toolTipText = expression + " = >" + e.getMessage () + "<";

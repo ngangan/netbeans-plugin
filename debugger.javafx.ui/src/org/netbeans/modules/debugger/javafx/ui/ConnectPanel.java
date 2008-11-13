@@ -570,7 +570,7 @@ Controller, ActionListener {
         try {
             return NbBundle.getMessage(ConnectPanel.class, "CTL_CA_"+str);
         } catch (MissingResourceException mrex) {
-            ErrorManager.getDefault().log(ErrorManager.WARNING, "Missing resource "+"CTL_CA_"+str+" from "+ConnectPanel.class.getName());
+            ErrorManager.getDefault().log(ErrorManager.WARNING, "Missing resource "+"CTL_CA_"+str+" from "+ConnectPanel.class.getName()); // NOI18N
             return null;
         }
     }

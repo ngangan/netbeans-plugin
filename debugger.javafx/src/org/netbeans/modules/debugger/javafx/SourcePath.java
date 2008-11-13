@@ -142,7 +142,7 @@ public class SourcePath {
                 new java.net.URL(url);
             } catch (java.net.MalformedURLException muex) {
                 Logger.getLogger(SourcePath.class.getName()).log(Level.WARNING,
-                        "Malformed URL '"+url+"' produced by "+getContext (), muex);
+                        "Malformed URL '"+url+"' produced by "+getContext (), muex); // NOI18N
                 return null;
             }
         }
@@ -357,8 +357,8 @@ public class SourcePath {
             }
             if (url == null) {
                 ErrorManager.getDefault().log(ErrorManager.WARNING,
-                        "Show Source: No URL for source path "+csf.getSourcePath (stratumn)+
-                        "\nThe reason is likely no opened project for this source file.");
+                        "Show Source: No URL for source path "+csf.getSourcePath (stratumn)+ // NOI18N
+                        "\nThe reason is likely no opened project for this source file."); // NOI18N
                 return false;
             }
             int lineNumber = csf.getLineNumber (stratumn);
@@ -374,8 +374,8 @@ public class SourcePath {
             );
             if (url == null) {
                 ErrorManager.getDefault().log(ErrorManager.WARNING,
-                        "Show Source: No source URL for class "+csf.getClassName()+
-                        "\nThe reason is likely no opened project for the source file.");
+                        "Show Source: No source URL for class "+csf.getClassName()+ // NOI18N
+                        "\nThe reason is likely no opened project for the source file."); // NOI18N
                 return false;
             }
             return EditorContextBridge.getContext().showSource (
@@ -473,7 +473,7 @@ public class SourcePath {
                     return p1;
                 } catch (java.net.MalformedURLException muex) {
                     Logger.getLogger(SourcePath.class.getName()).log(Level.WARNING,
-                            "Malformed URL '"+p1+"' produced by "+cp1, muex);
+                            "Malformed URL '"+p1+"' produced by "+cp1, muex); // NOI18N
                 }
             }
             p1 = cp2.getURL (relativePath, global);
@@ -482,7 +482,7 @@ public class SourcePath {
                     new java.net.URL(p1);
                 } catch (java.net.MalformedURLException muex) {
                     Logger.getLogger(SourcePath.class.getName()).log(Level.WARNING,
-                            "Malformed URL '"+p1+"' produced by "+cp2, muex);
+                            "Malformed URL '"+p1+"' produced by "+cp2, muex); // NOI18N
                     p1 = null;
                 }
             }

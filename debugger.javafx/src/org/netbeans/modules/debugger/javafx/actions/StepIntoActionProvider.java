@@ -289,7 +289,7 @@ implements Executor, PropertyChangeListener {
             if (smartLogger.isLoggable(Level.FINER))
                 if (stop) {
                     smartLogger.finer("FINISH IN CLASS " +  
-                        t.getClassName () + " ********"
+                        t.getClassName () + " ********" // NOI18N
                     );
                 }
             return !stop;

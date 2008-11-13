@@ -294,7 +294,7 @@ class AbstractObjectVariable extends AbstractVariable implements ObjectVariable 
             if (v instanceof StringReference)
                 return "\"" +	//NOI18N
                     ((StringReference) v).value ()
-                    + "\"";
+                    + "\""; // NOI18N
             Method toStringMethod = ((ClassType) v.type ()).
                 concreteMethodByName ("toString", "()Ljava/lang/String;");	//NOI18N
             StringReference sr = (StringReference) debugger.invokeMethod (

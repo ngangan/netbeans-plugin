@@ -767,7 +767,7 @@ public class Evaluator extends javax.swing.JPanel {
         }
 
         public String getIconBase(Object node) throws UnknownTypeException {
-            throw new UnsupportedOperationException("Not supported.");
+            throw new UnsupportedOperationException("Not supported."); // NOI18N
         }
 
         public String getShortDescription(Object node) throws UnknownTypeException {

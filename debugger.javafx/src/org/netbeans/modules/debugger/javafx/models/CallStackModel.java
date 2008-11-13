@@ -71,55 +71,55 @@ public class CallStackModel implements TreeModel, NodeModel,
     }
 
     public Object[] getChildren(Object parent, int from, int to) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public boolean isLeaf(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public int getChildrenCount(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public void addModelListener(ModelListener l) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public void removeModelListener(ModelListener l) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getDisplayName(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getIconBase(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getShortDescription(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public void performDefaultAction(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public Action[] getActions(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public Object getValueAt(Object node, String columnID) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public boolean isReadOnly(Object node, String columnID) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public void setValueAt(Object node, String columnID, Object value) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
      public void fireChanges() {
         for (ModelListener listener : listeners) {

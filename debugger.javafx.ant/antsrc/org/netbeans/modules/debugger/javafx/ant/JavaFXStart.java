@@ -156,19 +156,19 @@ public class JavaFXStart extends Task implements Runnable {
     
     public void addClasspath (Path path) {
         if (classpath != null)
-            throw new BuildException ("Only one classpath subelement is supported");
+            throw new BuildException ("Only one classpath subelement is supported"); // NOI18N
         classpath = path;
     }
     
     public void addBootclasspath (Path path) {
         if (bootclasspath != null)
-            throw new BuildException ("Only one bootclasspath subelement is supported");
+            throw new BuildException ("Only one bootclasspath subelement is supported"); // NOI18N
         bootclasspath = path;
     }
     
     public void addSourcepath (Path path) {
         if (sourcepath != null)
-            throw new BuildException ("Only one sourcepath subelement is supported");
+            throw new BuildException ("Only one sourcepath subelement is supported"); // NOI18N
         sourcepath = path;
     }
     
@@ -180,7 +180,7 @@ public class JavaFXStart extends Task implements Runnable {
             File file = FileUtil.normalizeFile 
                 (project.resolveFile (pathName));
             if (!file.exists()) {
-                project.log("Non-existing path \""+pathName+"\" provided.", Project.MSG_WARN);
+                project.log("Non-existing path \""+pathName+"\" provided.", Project.MSG_WARN); // NOI18N
                 //throw new BuildException("Non-existing path \""+paths[i]+"\" provided.");
             }
         }
@@ -197,9 +197,9 @@ public class JavaFXStart extends Task implements Runnable {
             logger.fine("JavaFXStart.execute()"); // NOI18N
             debug ("Execute started"); // NOI18N
             if (name == null)
-                throw new BuildException ("name attribute must specify name of this debugging session", getLocation ());
+                throw new BuildException ("name attribute must specify name of this debugging session", getLocation ()); // NOI18N
             if (addressProperty == null)
-                throw new BuildException ("addressproperty attribute must specify name of property to which address will be set", getLocation ());
+                throw new BuildException ("addressproperty attribute must specify name of property to which address will be set", getLocation ()); // NOI18N
             if (transport == null)
                 transport = "dt_socket"; // NOI18N
             debug ("Entering synch lock"); // NOI18N
@@ -246,7 +246,7 @@ public class JavaFXStart extends Task implements Runnable {
                 }
                 if (lc == null) 
                     throw new BuildException
-                        ("No trasports named " + transport + " found!");
+                        ("No trasports named " + transport + " found!"); // NOI18N
 
                 // TODO: revisit later when http://developer.java.sun.com/developer/bugParade/bugs/4932074.html gets integrated into JDK
                 // This code parses the address string "HOST:PORT" to extract PORT and then point debugee to localhost:PORT
@@ -256,10 +256,10 @@ public class JavaFXStart extends Task implements Runnable {
                 try {
                     address = lc.startListening (args);
                 } catch (java.io.IOException ioex) {
-                    getProject().log("Listening failed with arguments: "+args);
+                    getProject().log("Listening failed with arguments: "+args); // NOI18N
                     throw ioex;
                 } catch (com.sun.jdi.connect.IllegalConnectorArgumentsException iaex) {
-                    getProject().log("Listening failed with arguments: "+args);
+                    getProject().log("Listening failed with arguments: "+args); // NOI18N
                     throw iaex;
                 }
                 int port = -1;
@@ -363,7 +363,7 @@ public class JavaFXStart extends Task implements Runnable {
     private MethodBreakpoint createBreakpoint (String stopClassName) {
         MethodBreakpoint breakpoint = MethodBreakpoint.create (
             stopClassName,
-            "*"
+            "*" // NOI18N
         );
         breakpoint.setHidden (true);
         DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
@@ -373,8 +373,8 @@ public class JavaFXStart extends Task implements Runnable {
     private final static void debug (String msg) {
         if (!logger.isLoggable(Level.FINER)) return;
         logger.finer (
-            new Date() + " [" + Thread.currentThread().getName() + 
-            "] - " + msg
+            new Date() + " [" + Thread.currentThread().getName() + // NOI18N
+            "] - " + msg // NOI18N
         );
     }
 
@@ -488,13 +488,13 @@ public class JavaFXStart extends Task implements Runnable {
         try {
             FileObject fileObject = FileUtil.toFileObject (file);
             if (fileObject == null) {
-                project.log("Have no FileObject for "+file.getAbsolutePath(), Project.MSG_WARN);
+                project.log("Have no FileObject for "+file.getAbsolutePath(), Project.MSG_WARN); // NOI18N
                 return null;
             }
             if (FileUtil.isArchiveFile (fileObject)) {
                 fileObject = FileUtil.getArchiveRoot (fileObject);
                 if (fileObject == null) {
-                    project.log("Bad archive "+file.getAbsolutePath(), Project.MSG_WARN);
+                    project.log("Bad archive "+file.getAbsolutePath(), Project.MSG_WARN); // NOI18N
                     /*
                     ErrorManager.getDefault().notify(ErrorManager.getDefault().annotate(
                             new NullPointerException("Bad archive "+file.toString()),

@@ -76,7 +76,7 @@ import org.openide.util.NbBundle;
 public class SourcesModel implements TreeModel, TableModel,
 NodeActionsProvider {
     
-    private static final String     FILTER_PREFIX = "Do not stop in: ";
+    private static final String     FILTER_PREFIX = "Do not stop in: "; // NOI18N
     private static final String     DISP_FILTER_PREFIX = NbBundle.getBundle
         (SourcesModel.class).getString ("CTL_SourcesModel_Name_DoNotStopIn");
     
@@ -208,7 +208,7 @@ NodeActionsProvider {
     
     public Object getValueAt (Object node, String columnID) throws 
     UnknownTypeException {
-        if ("use".equals (columnID)) {
+        if ("use".equals (columnID)) { // NOI18N
             if (node instanceof String)
                 return Boolean.valueOf (
                     isEnabled ((String) node)
@@ -219,7 +219,7 @@ NodeActionsProvider {
     
     public boolean isReadOnly (Object node, String columnID) throws 
     UnknownTypeException {
-        if ( "use".equals (columnID) &&
+        if ( "use".equals (columnID) && // NOI18N
              (node instanceof String))
             return false;
         throw new UnknownTypeException (node);
@@ -227,7 +227,7 @@ NodeActionsProvider {
     
     public void setValueAt (Object node, String columnID, Object value) 
     throws UnknownTypeException {
-        if ("use".equals (columnID)) {
+        if ("use".equals (columnID)) { // NOI18N
             if (node instanceof String) {
                 setEnabled ((String) node, ((Boolean) value).booleanValue ());
                 return;

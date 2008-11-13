@@ -144,30 +144,30 @@ public class VariablesModel implements TreeModel, ExtendedNodeModel, TableModel 
     }
 
     public Object[] getChildren(Object parent, int from, int to) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public boolean isLeaf(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public int getChildrenCount(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getIconBaseWithExtension(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getDisplayName(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getShortDescription(Object node) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public Object getValueAt(Object node, String columnID) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 }

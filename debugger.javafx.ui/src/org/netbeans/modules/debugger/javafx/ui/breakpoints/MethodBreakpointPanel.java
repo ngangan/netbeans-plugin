@@ -163,7 +163,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         if (signature == null || signature.length() == 0) return "";
         int end = signature.lastIndexOf(")");	//NOI18N
         if (end < 0) {
-            ErrorManager.getDefault().notify(new IllegalArgumentException("Bad signature: "+signature));
+            ErrorManager.getDefault().notify(new IllegalArgumentException("Bad signature: "+signature)); // NOI18N
             return "";
         }
         StringBuilder paramTypes = new StringBuilder("(");	//NOI18N
@@ -208,7 +208,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         } else if (javaType.equals("short")) {	//NOI18N
             return "S";	//NOI18N
         } else if (javaType.equals("int")) {	//NOI18N
-            return "I";
+            return "I"; // NOI18N
         } else if (javaType.equals("long")) {	//NOI18N
             return "J";	//NOI18N
         } else if (javaType.equals("float")) {	//NOI18N
@@ -260,7 +260,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
             pos[0]++;
             int typeEnd = signature.indexOf(";", pos[0]);	//NOI18N
             if (typeEnd < 0) {
-                throw new IllegalArgumentException("Bad signature: '"+signature+"', 'L' not followed by ';' at position "+pos[0]);
+                throw new IllegalArgumentException("Bad signature: '"+signature+"', 'L' not followed by ';' at position "+pos[0]); // NOI18N
             }
             String type = signature.substring(pos[0], typeEnd);
             type = type.replace('/', '.');
@@ -272,7 +272,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
             String type = getType(signature, pos);
             return type + "[]";	//NOI18N
         }
-        throw new IllegalArgumentException("Bad signature: '"+signature+"', unrecognized element '"+c+"' at position "+pos[0]);
+        throw new IllegalArgumentException("Bad signature: '"+signature+"', unrecognized element '"+c+"' at position "+pos[0]); // NOI18N
     }
     
     // <RAVE>

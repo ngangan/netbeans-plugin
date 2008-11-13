@@ -167,7 +167,7 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
         CallStackFrameImpl frame = (CallStackFrameImpl) debugger.
             getCurrentCallStackFrame ();
         if (frame == null)
-            throw new InvalidExpressionException ("No curent frame.");
+            throw new InvalidExpressionException ("No curent frame."); // NOI18N
         LocalVariable local;
         try {
             local = frame.getLocalVariable(getExpression ());
@@ -220,7 +220,7 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
         } else {
             ObjectReference thisObject = frame.getStackFrame ().thisObject ();
             if (thisObject == null) {
-                throw new InvalidExpressionException ("no instance context.");
+                throw new InvalidExpressionException ("no instance context."); // NOI18N
             }
             try {
                 thisObject.setValue (field, value);

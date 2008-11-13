@@ -153,7 +153,7 @@ ObjectVariable {
         CallStackFrameImpl frame = (CallStackFrameImpl) debugger.
             getCurrentCallStackFrame ();
         if (frame == null)
-            throw new InvalidExpressionException ("No curent frame.");
+            throw new InvalidExpressionException ("No curent frame."); // NOI18N
         
         // 2) try to set as a local variable value
         try {
@@ -174,7 +174,7 @@ ObjectVariable {
         Field field1 = clazz.fieldByName("$"+getExpression());	//NOI18N
         if (field1 == null) {
             throw new InvalidExpressionException (
-                "Can not set value to expression.");
+                "Can not set value to expression."); // NOI18N
         }
         if (field1.isStatic()) {
             if (clazz instanceof ClassType) {
@@ -202,20 +202,20 @@ ObjectVariable {
                 }
             } else {
                 throw new InvalidExpressionException
-                 ("Can not set value to expression.");
+                 ("Can not set value to expression."); // NOI18N
             }
         } else {
         // 3) try tu set as a field
         ObjectReference thisObject = frame.getStackFrame ().thisObject ();
         if (thisObject == null) {
                     throw new InvalidExpressionException
-                     ("Can not set value to expression.");
+                     ("Can not set value to expression."); // NOI18N
         }
         Field field = thisObject.referenceType ().fieldByName
             ("$"+getExpression ());	//NOI18N
         if (field == null)
             throw new InvalidExpressionException 
-                ("Can not set value to expression.");
+                ("Can not set value to expression."); // NOI18N
         try {
             thisObject.setValue (field, value);
         } catch (InvalidTypeException ex) {

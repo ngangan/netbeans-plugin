@@ -320,7 +320,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
     }
     
     public String getIconBase (Object o) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported.");
+        throw new UnsupportedOperationException("Not supported."); // NOI18N
     }
 
     public boolean canRename(Object node) throws UnknownTypeException {
@@ -337,12 +337,12 @@ public class VariablesNodeModel implements ExtendedNodeModel {
 
     public Transferable clipboardCopy(Object node) throws IOException,
                                                           UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public Transferable clipboardCut(Object node) throws IOException,
                                                          UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public PasteType[] getPasteTypes(Object node, Transferable t) throws UnknownTypeException {
@@ -350,7 +350,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
     }
 
     public void setName(Object node, String name) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getIconBaseWithExtension(Object node) throws UnknownTypeException {

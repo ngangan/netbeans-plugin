@@ -234,7 +234,7 @@ public class LineBreakpointPanel extends JPanel implements Controller, org.openi
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
         pSettings.add(tfLineNumber, gridBagConstraints);
-        tfLineNumber.getAccessibleContext().setAccessibleName("Line number");
+        tfLineNumber.getAccessibleContext().setAccessibleName("Line number"); // NOI18N
         tfLineNumber.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_TF_Line_Breakpoint_Line_Number")); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();

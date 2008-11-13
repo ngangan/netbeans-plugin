@@ -93,9 +93,9 @@ public class EvaluationContext {
                              List<String> imports, List<String> staticImports,
                              boolean canInvokeMethods, Runnable methodInvokePreproc,
                              JavaFXDebuggerImpl debugger) {
-        if (frame == null) throw new IllegalArgumentException("Frame argument must not be null");
-        if (imports == null) throw new IllegalArgumentException("Imports argument must not be null");
-        if (staticImports == null) throw new IllegalArgumentException("Static imports argument must not be null");
+        if (frame == null) throw new IllegalArgumentException("Frame argument must not be null"); // NOI18N
+        if (imports == null) throw new IllegalArgumentException("Imports argument must not be null"); // NOI18N
+        if (staticImports == null) throw new IllegalArgumentException("Static imports argument must not be null"); // NOI18N
         this.frame = frame;
         this.frameDepth = frameDepth;
         this.sourceImports = imports;

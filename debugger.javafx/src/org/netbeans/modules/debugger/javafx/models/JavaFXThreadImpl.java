@@ -360,17 +360,17 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
                 }
             }
             if (from < 0) {
-                throw new IndexOutOfBoundsException("from = "+from);
+                throw new IndexOutOfBoundsException("from = "+from); // NOI18N
             }
             if (from == to) {
                 return new CallStackFrame[0];
             }
             if (from >= max) {
-                throw new IndexOutOfBoundsException("from = "+from+" is too high, frame count = "+max);
+                throw new IndexOutOfBoundsException("from = "+from+" is too high, frame count = "+max); // NOI18N
             }
             int length = to - from;
             if (length < 0 || (from+length) > max) {
-                throw new IndexOutOfBoundsException("from = "+from+", to = "+to+", frame count = "+max);
+                throw new IndexOutOfBoundsException("from = "+from+", to = "+to+", frame count = "+max); // NOI18N
             }
             List l = threadReference.frames (from, length);
             int n = l.size();
@@ -437,9 +437,9 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
             cleanCachedFrames();
             setReturnVariable(null); // Clear the return var
         } catch (IllegalThreadStateException ex) {
-            throw new IncompatibleThreadStateException("Thread exited.");
+            throw new IncompatibleThreadStateException("Thread exited."); // NOI18N
         } catch (ObjectCollectedException ex) {
-            throw new IncompatibleThreadStateException("Thread died.");
+            throw new IncompatibleThreadStateException("Thread died."); // NOI18N
         } catch (NativeMethodException nmex) {
             cleanCachedFrames();
             ErrorManager.getDefault().notify(
@@ -593,10 +593,10 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
     public void notifyMethodInvoking() throws PropertyVetoException {
         synchronized (this) {
             if (methodInvokingDisabledUntilResumed) {
-                throw new PropertyVetoException("disabled until resumed", null);
+                throw new PropertyVetoException("disabled until resumed", null); // NOI18N
             }
             if (methodInvoking) {
-                throw new PropertyVetoException("Already invoking!", null);
+                throw new PropertyVetoException("Already invoking!", null); // NOI18N
             }
             methodInvoking = true;
         }
@@ -682,21 +682,21 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
             } catch (ObjectCollectedException ex) {
                 return null;
             } catch (IncompatibleThreadStateException e) {
-                String msg = "Thread '"+threadReference.name()+
-                             "': status = "+threadReference.status()+
-                             ", is suspended = "+threadReference.isSuspended()+
-                             ", suspend count = "+threadReference.suspendCount()+
-                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+
-                             ", internal suspend status = "+suspended;
+                String msg = "Thread '"+threadReference.name()+ // NOI18N
+                             "': status = "+threadReference.status()+ // NOI18N
+                             ", is suspended = "+threadReference.isSuspended()+ // NOI18N
+                             ", suspend count = "+threadReference.suspendCount()+ // NOI18N
+                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+ // NOI18N
+                             ", internal suspend status = "+suspended; // NOI18N
                 Logger.getLogger(JavaFXThreadImpl.class.getName()).log(Level.WARNING, msg, e);
                 return null;
             } catch (com.sun.jdi.InternalException iex) {
-                String msg = "Thread '"+threadReference.name()+
-                             "': status = "+threadReference.status()+
-                             ", is suspended = "+threadReference.isSuspended()+
-                             ", suspend count = "+threadReference.suspendCount()+
-                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+
-                             ", internal suspend status = "+suspended;
+                String msg = "Thread '"+threadReference.name()+ // NOI18N
+                             "': status = "+threadReference.status()+ // NOI18N
+                             ", is suspended = "+threadReference.isSuspended()+ // NOI18N
+                             ", suspend count = "+threadReference.suspendCount()+ // NOI18N
+                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+ // NOI18N
+                             ", internal suspend status = "+suspended; // NOI18N
                 Logger.getLogger(JavaFXThreadImpl.class.getName()).log(Level.WARNING, msg, iex);
                 return null;
             }
@@ -724,7 +724,7 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
         List l;
         synchronized (this) {
             if (!isSuspended()) return new ObjectVariable [0];
-            if ("DestroyJavaVM".equals(threadReference.name())) {
+            if ("DestroyJavaVM".equals(threadReference.name())) { // NOI18N
                 // See defect #6474293
                 return new ObjectVariable[0];
             }
@@ -736,21 +736,21 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
             } catch (ObjectCollectedException ex) {
                 return new ObjectVariable [0];
             } catch (IncompatibleThreadStateException e) {
-                String msg = "Thread '"+threadReference.name()+
-                             "': status = "+threadReference.status()+
-                             ", is suspended = "+threadReference.isSuspended()+
-                             ", suspend count = "+threadReference.suspendCount()+
-                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+
-                             ", internal suspend status = "+suspended;
+                String msg = "Thread '"+threadReference.name()+ // NOI18N
+                             "': status = "+threadReference.status()+ // NOI18N
+                             ", is suspended = "+threadReference.isSuspended()+ // NOI18N
+                             ", suspend count = "+threadReference.suspendCount()+ // NOI18N
+                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+ // NOI18N
+                             ", internal suspend status = "+suspended; // NOI18N
                 Logger.getLogger(JavaFXThreadImpl.class.getName()).log(Level.WARNING, msg, e);
                 return new ObjectVariable [0];
             } catch (com.sun.jdi.InternalException iex) {
-                String msg = "Thread '"+threadReference.name()+
-                             "': status = "+threadReference.status()+
-                             ", is suspended = "+threadReference.isSuspended()+
-                             ", suspend count = "+threadReference.suspendCount()+
-                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+
-                             ", internal suspend status = "+suspended;
+                String msg = "Thread '"+threadReference.name()+ // NOI18N
+                             "': status = "+threadReference.status()+ // NOI18N
+                             ", is suspended = "+threadReference.isSuspended()+ // NOI18N
+                             ", suspend count = "+threadReference.suspendCount()+ // NOI18N
+                             ", is at breakpoint = "+threadReference.isAtBreakpoint()+ // NOI18N
+                             ", internal suspend status = "+suspended; // NOI18N
                 Logger.getLogger(JavaFXThreadImpl.class.getName()).log(Level.WARNING, msg, iex);
                 return new ObjectVariable [0];
             }
@@ -789,7 +789,7 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
     }
 
     public void setObject(Object bean) {
-        throw new UnsupportedOperationException("Not supported, do not call. Implementing Customizer interface just because of add/remove PropertyChangeListener.");
+        throw new UnsupportedOperationException("Not supported, do not call. Implementing Customizer interface just because of add/remove PropertyChangeListener."); // NOI18N
     }
 
 }

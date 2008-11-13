@@ -323,7 +323,7 @@ implements Executor {
 
             // do not stop here -> start smart stepping!
             if (ssverbose)
-                System.out.println("\nSS:  SMART STEPPING START! ********** ");
+                System.out.println("\nSS:  SMART STEPPING START! ********** "); // NOI18N
             if (smartSteppingStepOut) {
                 getStepIntoActionProvider ().doAction(ActionsManager.ACTION_STEP_OUT);
             } else {

@@ -112,7 +112,7 @@ class TokenMgrError extends Error
               continue;
            default:
               if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-                 String s = "0000" + Integer.toString(ch, 16);
+                 String s = "0000" + Integer.toString(ch, 16); // NOI18N
                  retval.append("\\u" + s.substring(s.length() - 4, s.length()));	//NOI18N
               } else {
                  retval.append(ch);
@@ -136,11 +136,11 @@ class TokenMgrError extends Error
     * Note: You can customize the lexical error message by modifying this method.
     */
    protected static String LexicalError(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, char curChar) {
-      return("Lexical error at line " +
-           errorLine + ", column " +
-           errorColumn + ".  Encountered: " +
-           (EOFSeen ? "<EOF> " : ("\"" + addEscapes(String.valueOf(curChar)) + "\"") + " (" + (int)curChar + "), ") +
-           "after : \"" + addEscapes(errorAfter) + "\"");
+      return("Lexical error at line " + // NOI18N
+           errorLine + ", column " + // NOI18N
+           errorColumn + ".  Encountered: " + // NOI18N
+           (EOFSeen ? "<EOF> " : ("\"" + addEscapes(String.valueOf(curChar)) + "\"") + " (" + (int)curChar + "), ") + // NOI18N
+           "after : \"" + addEscapes(errorAfter) + "\""); // NOI18N
    }
 
    /**

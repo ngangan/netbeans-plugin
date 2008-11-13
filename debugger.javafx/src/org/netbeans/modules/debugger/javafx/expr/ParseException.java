@@ -165,11 +165,11 @@ public class ParseException extends Exception {
       tok = tok.next; 
     }
     retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;	//NOI18N
-    retval += "." + eol;
+    retval += "." + eol; // NOI18N
     if (expectedTokenSequences.length == 1) {
-      retval += "Was expecting:" + eol + "    ";
+      retval += "Was expecting:" + eol + "    "; // NOI18N
     } else {
-      retval += "Was expecting one of:" + eol + "    ";
+      retval += "Was expecting one of:" + eol + "    "; // NOI18N
     }
     retval += expected;
     return retval;
