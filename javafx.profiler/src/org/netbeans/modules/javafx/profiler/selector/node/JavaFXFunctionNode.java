@@ -73,7 +73,7 @@ public class JavaFXFunctionNode extends SelectorNode {
     };
 
     private ClientUtils.SourceCodeSelection rootMethod;
-    private String signature = "signature";
+    private String signature = "";   // NOI18N
 
     /** Creates a new instance of MethodNode */
     public JavaFXFunctionNode(ClasspathInfo cpInfo, final Element method, JavaFXFunctionsNode parent) {
