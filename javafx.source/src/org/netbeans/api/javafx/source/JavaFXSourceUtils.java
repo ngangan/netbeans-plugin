@@ -205,7 +205,10 @@ public class JavaFXSourceUtils {
             String[] signature = handle.getSignatures();
             assert signature.length >= 1;
 
-            String name = signature[0].replace('.', '/') + ".fx"; // NOI18N
+            String baseCls = signature[0];
+            int dollar = baseCls.indexOf('$'); // NOI18N
+            if (dollar >= 0) baseCls = baseCls.substring(0, dollar);
+            String name = baseCls.replace('.', '/') + ".fx"; // NOI18N
 
             ClassPath[] all = new ClassPath[]{
                 cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT),
