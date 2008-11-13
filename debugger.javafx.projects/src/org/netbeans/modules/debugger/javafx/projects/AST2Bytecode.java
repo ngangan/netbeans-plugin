@@ -156,7 +156,7 @@ class AST2Bytecode {
                         if (kind.equals(Tree.JavaFXKind.CLASS_DECLARATION)) {
 //                            identifier = ((NewClassTree) node).getIdentifier();
                             identifier = null;//((ClassDeclarationTree)node).get
-                            methodName = "<init>";
+                            methodName = "<init>";	//NOI18N
 //                            TreePath iPath = TreePath.getPath(cu, identifier);
 //                            TypeMirror type = trees.getTypeMirror(iPath);
                             JavaFXTreePath iPath = JavaFXTreePath.getPath((UnitTree)cu, identifier);
@@ -197,7 +197,7 @@ class AST2Bytecode {
                                 String array = "";
                                 while (type.getKind() == TypeKind.ARRAY) {
                                     type = ((ArrayType) type).getComponentType();
-                                    array += "[]";
+                                    array += "[]";	//NOI18N
                                 }
                                 if (type.getKind() == TypeKind.DECLARED) {
                                     te = (TypeElement) types.asElement(type);

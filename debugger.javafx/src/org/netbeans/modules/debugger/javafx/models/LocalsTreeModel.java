@@ -231,7 +231,7 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
                 try {
                     arguments = frame.findOperationArguments(currentOperation);//currentOperation.getArgumentValues();
                 } catch (NativeMethodException nmex) {
-                    return new Object[] { "NativeMethodException" };
+                    return new Object[] { "NativeMethodException" };	//NOI18N
                 }
                 if (arguments == null) {
                     return new Object[] {};
@@ -360,14 +360,14 @@ public class LocalsTreeModel implements TreeModel, PropertyChangeListener {
             return false;
         if (o instanceof AbstractVariable)
             return !(((AbstractVariable) o).getInnerValue () instanceof ObjectReference);
-        if (o.toString().startsWith("SubArray")) {
+        if (o.toString().startsWith("SubArray")) {	//NOI18N
             return false;
         }
         if (o.equals ("NoInfo")) // NOI18N
             return true;
         if (o instanceof JavaFXClassType) return false;
         if (o instanceof Operation) return false;
-        if (o == "lastOperations") return false;
+        if (o == "lastOperations") return false;	//NOI18N
         if (o instanceof String && ((String) o).startsWith("operationArguments")) { // NOI18N
             return false;
         }

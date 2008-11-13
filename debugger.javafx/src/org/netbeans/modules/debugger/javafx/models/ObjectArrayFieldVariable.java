@@ -77,7 +77,7 @@ org.netbeans.api.debugger.javafx.Field {
             debugger, 
             value, 
             parentID + '.' + index +
-                (value instanceof ObjectReference ? "^" : "")
+                (value instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.index = index;
         this.maxIndexLog = ArrayFieldVariable.log10(maxIndex);
@@ -131,6 +131,6 @@ org.netbeans.api.debugger.javafx.Field {
     // other methods ...........................................................
 
     public String toString () {
-        return "ObjectArrayFieldVariable " + getName ();
+        return "ObjectArrayFieldVariable " + getName ();	//NOI18N
     }
 }

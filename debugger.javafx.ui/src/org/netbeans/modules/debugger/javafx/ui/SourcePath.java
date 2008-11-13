@@ -104,11 +104,11 @@ public class SourcePath {
     
     static SourcePathProvider getDefaultContext() {
         List providers = DebuggerManager.getDebuggerManager().
-                lookup("netbeans-JavaFXSession", SourcePathProvider.class);
+                lookup("netbeans-JavaFXSession", SourcePathProvider.class);	//NOI18N
         for (Iterator it = providers.iterator(); it.hasNext(); ) {
             Object provider = it.next();
             // Hack - find our provider:
-            if (provider.getClass().getName().equals("org.netbeans.modules.debugger.javafx.projects.SourcePathProviderImpl")) {
+            if (provider.getClass().getName().equals("org.netbeans.modules.debugger.javafx.projects.SourcePathProviderImpl")) {	//NOI18N
                 return (SourcePathProvider) provider;
             }
         }
@@ -380,7 +380,7 @@ public class SourcePath {
         int i = className.indexOf ('$');
         if (i > 0) className = className.substring (0, i);
         String sourceName = className.replace
-            ('.', '/') + ".fx";
+            ('.', '/') + ".fx";	//NOI18N
         return sourceName;
     }
 
@@ -652,7 +652,7 @@ public class SourcePath {
     
     private void initSourcePaths () {
         Properties properties = Properties.getDefault ().
-            getProperties ("debugger").getProperties ("sources");
+            getProperties ("debugger").getProperties ("sources");	//NOI18N
         Set originalSourceRoots = new HashSet (Arrays.asList (
             sourcePathProvider.getOriginalSourceRoots ()
         ));
@@ -660,15 +660,15 @@ public class SourcePath {
             sourcePathProvider.getSourceRoots ()
         ));
 
-        Iterator enabledSourceRoots = properties.getProperties ("source_roots").
-            getCollection ("enabled", Collections.EMPTY_SET).iterator ();
+        Iterator enabledSourceRoots = properties.getProperties ("source_roots").	//NOI18N
+            getCollection ("enabled", Collections.EMPTY_SET).iterator ();	//NOI18N
         while (enabledSourceRoots.hasNext ()) {
             String root = (String) enabledSourceRoots.next ();
             if (originalSourceRoots.contains (root)) 
                 sourceRoots.add (root);
         }
-        Iterator disabledSourceRoots = properties.getProperties ("source_roots").
-            getCollection ("disabled", Collections.EMPTY_SET).iterator ();
+        Iterator disabledSourceRoots = properties.getProperties ("source_roots").	//NOI18N
+            getCollection ("disabled", Collections.EMPTY_SET).iterator ();	//NOI18N
         while (disabledSourceRoots.hasNext ()) {
             String root = (String) disabledSourceRoots.next ();
             sourceRoots.remove (root);

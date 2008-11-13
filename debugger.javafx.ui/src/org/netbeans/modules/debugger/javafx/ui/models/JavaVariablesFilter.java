@@ -63,40 +63,40 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     
     public String[] getSupportedTypes () {
         return new String[] {
-            "java.lang.String",
-            "java.lang.StringBuffer",
+            "java.lang.String",	//NOI18N
+            "java.lang.StringBuffer",	//NOI18N
             
-            "java.lang.Character",
-            "java.lang.Integer",
-            "java.lang.Float",
-            "java.lang.Byte",
-            "java.lang.Boolean",
-            "java.lang.Double",
-            "java.lang.Long",
-            "java.lang.Short",
+            "java.lang.Character",	//NOI18N
+            "java.lang.Integer",	//NOI18N
+            "java.lang.Float",	//NOI18N
+            "java.lang.Byte",	//NOI18N
+            "java.lang.Boolean",	//NOI18N
+            "java.lang.Double",	//NOI18N
+            "java.lang.Long",	//NOI18N
+            "java.lang.Short",	//NOI18N
             
-            "java.lang.ref.WeakReference",
+            "java.lang.ref.WeakReference",	//NOI18N
             
-            "java.util.ArrayList",
-            "java.util.HashSet",
-            "java.util.LinkedHashSet",
-            "java.util.LinkedList",
-            "java.util.Stack",
-            "java.util.TreeSet",
-            "java.util.Vector",
-            "java.util.Hashtable",
-            "java.util.Hashtable$Entry",
-            "java.util.HashMap",
-            "java.util.HashMap$Entry",
-            "java.util.IdentityHashMap",
-            "java.util.AbstractMap$SimpleEntry",
-            "java.util.TreeMap",
-            "java.util.TreeMap$Entry",
-            "java.util.WeakHashMap",
-            "java.util.LinkedHashMap",
-            "java.util.LinkedHashMap$Entry",
+            "java.util.ArrayList",	//NOI18N
+            "java.util.HashSet",	//NOI18N
+            "java.util.LinkedHashSet",	//NOI18N
+            "java.util.LinkedList",	//NOI18N
+            "java.util.Stack",	//NOI18N
+            "java.util.TreeSet",	//NOI18N
+            "java.util.Vector",	//NOI18N
+            "java.util.Hashtable",	//NOI18N
+            "java.util.Hashtable$Entry",	//NOI18N
+            "java.util.HashMap",	//NOI18N
+            "java.util.HashMap$Entry",	//NOI18N
+            "java.util.IdentityHashMap",	//NOI18N
+            "java.util.AbstractMap$SimpleEntry",	//NOI18N
+            "java.util.TreeMap",	//NOI18N
+            "java.util.TreeMap$Entry",	//NOI18N
+            "java.util.WeakHashMap",	//NOI18N
+            "java.util.LinkedHashMap",	//NOI18N
+            "java.util.LinkedHashMap$Entry",	//NOI18N
             
-            "java.beans.PropertyChangeSupport"
+            "java.beans.PropertyChangeSupport"	//NOI18N
         };
     }
     
@@ -131,8 +131,8 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
             ObjectVariable ov = (ObjectVariable) variable;
             try {
                 ov = (ObjectVariable) ov.invokeMethod (
-                    "toArray",
-                    "()[Ljava/lang/Object;",
+                    "toArray",	//NOI18N
+                    "()[Ljava/lang/Object;",	//NOI18N
                     new Variable [0]
                 );
                 if (ov == null) {
@@ -140,7 +140,7 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
                 }
                 return original.getChildren(ov, from, to);
             } catch (NoSuchMethodException e) {
-                Field elementData = ov.getField("elementData");
+                Field elementData = ov.getField("elementData");	//NOI18N
                 if (elementData != null) {
                     return original.getChildren(elementData, from, to);
                 } else {
@@ -157,16 +157,16 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
             try {
                 ObjectVariable ov = (ObjectVariable) variable;
                 ov = (ObjectVariable) ov.invokeMethod (
-                    "entrySet",
-                    "()Ljava/util/Set;",
+                    "entrySet",	//NOI18N
+                    "()Ljava/util/Set;",	//NOI18N
                     new Variable [0]
                 );
                 if (ov == null) {
                     return new Object[] {};
                 }
                 ov = (ObjectVariable) ov.invokeMethod (
-                    "toArray",
-                    "()[Ljava/lang/Object;",
+                    "toArray",	//NOI18N
+                    "()[Ljava/lang/Object;",	//NOI18N
                     new Variable [0]
                 );
                 if (ov == null) {
@@ -185,17 +185,17 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
         ) {
             ObjectVariable ov = (ObjectVariable) variable;
             Field[] fs = new Field [2];
-            fs [0] = ov.getField ("key");
-            fs [1] = ov.getField ("value");
+            fs [0] = ov.getField ("key");	//NOI18N
+            fs [1] = ov.getField ("value");	//NOI18N
             return fs;
         }
-        if ( "java.beans.PropertyChangeSupport".equals (type)
+        if ( "java.beans.PropertyChangeSupport".equals (type)	//NOI18N
         ) 
             try {
                 ObjectVariable ov = (ObjectVariable) variable;
                 return ((ObjectVariable) ov.invokeMethod (
                     "getPropertyChangeListeners",
-                    "()[Ljava/beans/PropertyChangeListener;",
+                    "()[Ljava/beans/PropertyChangeListener;",	//NOI18N
                     new Variable [0]
                 )).getFields (from, to);
             } catch (InvalidExpressionException e) {
@@ -218,10 +218,10 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
 //            } catch (NoSuchMethodException e) {
 //                e.printStackTrace ();
 //            }
-        if ( "java.lang.ref.WeakReference".equals (type)
+        if ( "java.lang.ref.WeakReference".equals (type)	//NOI18N
         ) {
             ObjectVariable ov = (ObjectVariable) variable;
-            return new Object [] {ov.getField ("referent")};
+            return new Object [] {ov.getField ("referent")};	//NOI18N
         }
         return original.getChildren (variable, from, to);
     }
@@ -280,21 +280,21 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
              ( columnID == Constants.LOCALS_VALUE_COLUMN_ID ||
                columnID == Constants.WATCH_VALUE_COLUMN_ID)
         ) {
-            return ov.getField ("key").getValue () + "=>" + 
-                   ov.getField ("value").getValue ();
+            return ov.getField ("key").getValue () + "=>" + 	//NOI18N
+                   ov.getField ("value").getValue ();	//NOI18N
         }
         if ( isGetValueType (type) &&
              ( columnID == Constants.LOCALS_VALUE_COLUMN_ID ||
                columnID == Constants.WATCH_VALUE_COLUMN_ID)
         ) {
-            return ov.getField ("value").getValue ();
+            return ov.getField ("value").getValue ();	//NOI18N
         }
         if ( isToStringValueType (type) &&
              ( columnID == Constants.LOCALS_VALUE_COLUMN_ID ||
                columnID == Constants.WATCH_VALUE_COLUMN_ID)
         ) {
             try {
-                return "\""+ov.getToStringValue ()+"\"";
+                return "\""+ov.getToStringValue ()+"\"";	//NOI18N
             } catch (InvalidExpressionException ex) {
                 // Not a supported operation (e.g. J2ME, see #45543)
                 // Or missing context or any other reason
@@ -319,9 +319,9 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
             (columnID == Constants.LOCALS_VALUE_COLUMN_ID ||
              columnID == Constants.WATCH_VALUE_COLUMN_ID)) {
             String expression = (String) value;
-            if (expression.startsWith("\"") && expression.endsWith("\"") && expression.length() > 1) {
+            if (expression.startsWith("\"") && expression.endsWith("\"") && expression.length() > 1) {	//NOI18N
                 // Create a new StringBuffer object with the desired content:
-                expression = "new " + type + "(\"" + convertToStringInitializer(expression.substring(1, expression.length() - 1)) + "\")";
+                expression = "new " + type + "(\"" + convertToStringInitializer(expression.substring(1, expression.length() - 1)) + "\")";	//NOI18N
                 original.setValueAt(variable, columnID, expression);
                 return ;
             }
@@ -335,25 +335,25 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
         for (i = 0; i < k; i++)
             switch (s.charAt (i)) {
                 case '\b':
-                    sb.append ("\\b");
+                    sb.append ("\\b");	//NOI18N
                     break;
                 case '\f':
-                    sb.append ("\\f");
+                    sb.append ("\\f");	//NOI18N
                     break;
                 case '\\':
-                    sb.append ("\\\\");
+                    sb.append ("\\\\");	//NOI18N
                     break;
                 case '\t':
-                    sb.append ("\\t");
+                    sb.append ("\\t");	//NOI18N
                     break;
                 case '\r':
-                    sb.append ("\\r");
+                    sb.append ("\\r");	//NOI18N
                     break;
                 case '\n':
-                    sb.append ("\\n");
+                    sb.append ("\\n");	//NOI18N
                     break;
                 case '\"':
-                    sb.append ("\\\"");
+                    sb.append ("\\\"");	//NOI18N
                     break;
                 default:
                     sb.append (s.charAt (i));
@@ -368,14 +368,14 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     private static boolean isGetValueType (String type) {
         if (getValueType == null) {
             getValueType = new HashSet ();
-            getValueType.add ("java.lang.Character");
-            getValueType.add ("java.lang.Integer");
-            getValueType.add ("java.lang.Float");
-            getValueType.add ("java.lang.Byte");
-            getValueType.add ("java.lang.Boolean");
-            getValueType.add ("java.lang.Double");
-            getValueType.add ("java.lang.Long");
-            getValueType.add ("java.lang.Short");
+            getValueType.add ("java.lang.Character");	//NOI18N
+            getValueType.add ("java.lang.Integer");	//NOI18N
+            getValueType.add ("java.lang.Float");	//NOI18N
+            getValueType.add ("java.lang.Byte");	//NOI18N
+            getValueType.add ("java.lang.Boolean");	//NOI18N
+            getValueType.add ("java.lang.Double");	//NOI18N
+            getValueType.add ("java.lang.Long");	//NOI18N
+            getValueType.add ("java.lang.Short");	//NOI18N
         }
         return getValueType.contains (type);
     }
@@ -384,15 +384,15 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     private static boolean isLeafType (String type) {
         if (leafType == null) {
             leafType = new HashSet ();
-            leafType.add ("java.lang.String");
-            leafType.add ("java.lang.Character");
-            leafType.add ("java.lang.Integer");
-            leafType.add ("java.lang.Float");
-            leafType.add ("java.lang.Byte");
-            leafType.add ("java.lang.Boolean");
-            leafType.add ("java.lang.Double");
-            leafType.add ("java.lang.Long");
-            leafType.add ("java.lang.Short");
+            leafType.add ("java.lang.String");	//NOI18N
+            leafType.add ("java.lang.Character");	//NOI18N
+            leafType.add ("java.lang.Integer");	//NOI18N
+            leafType.add ("java.lang.Float");	//NOI18N
+            leafType.add ("java.lang.Byte");	//NOI18N
+            leafType.add ("java.lang.Boolean");	//NOI18N
+            leafType.add ("java.lang.Double");	//NOI18N
+            leafType.add ("java.lang.Long");	//NOI18N
+            leafType.add ("java.lang.Short");	//NOI18N
         }
         return leafType.contains (type);
     }
@@ -401,7 +401,7 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     private static boolean isToStringValueType (String type) {
         if (toStringValueType == null) {
             toStringValueType = new HashSet ();
-            toStringValueType.add ("java.lang.StringBuffer");
+            toStringValueType.add ("java.lang.StringBuffer");	//NOI18N
         }
         return toStringValueType.contains (type);
     }
@@ -410,11 +410,11 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     private static boolean isMapEntryType (String type) {
         if (mapEntryType == null) {
             mapEntryType = new HashSet ();
-            mapEntryType.add ("java.util.HashMap$Entry");
-            mapEntryType.add ("java.util.Hashtable$Entry");
-            mapEntryType.add ("java.util.AbstractMap$SimpleEntry");
-            mapEntryType.add ("java.util.LinkedHashMap$Entry");
-            mapEntryType.add ("java.util.TreeMap$Entry");
+            mapEntryType.add ("java.util.HashMap$Entry");	//NOI18N
+            mapEntryType.add ("java.util.Hashtable$Entry");	//NOI18N
+            mapEntryType.add ("java.util.AbstractMap$SimpleEntry");	//NOI18N
+            mapEntryType.add ("java.util.LinkedHashMap$Entry");	//NOI18N
+            mapEntryType.add ("java.util.TreeMap$Entry");	//NOI18N
         }
         return mapEntryType.contains (type);
     }
@@ -423,14 +423,14 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     private static boolean isMapMapType (String type) {
         if (mapMapType == null) {
             mapMapType = new HashSet ();
-            mapMapType.add ("java.util.HashMap");
-            mapMapType.add ("java.util.IdentityHashMap");
-            mapMapType.add ("java.util.Hashtable");
-            mapMapType.add ("java.util.TreeMap");
-            mapMapType.add ("java.util.WeakHashMap");
-            mapMapType.add ("java.util.LinkedHashMap");
-            mapMapType.add ("java.util.concurrent.ConcurrentHashMap");
-            mapMapType.add ("java.util.EnumMap");
+            mapMapType.add ("java.util.HashMap");	//NOI18N
+            mapMapType.add ("java.util.IdentityHashMap");	//NOI18N
+            mapMapType.add ("java.util.Hashtable");	//NOI18N
+            mapMapType.add ("java.util.TreeMap");	//NOI18N
+            mapMapType.add ("java.util.WeakHashMap");	//NOI18N
+            mapMapType.add ("java.util.LinkedHashMap");	//NOI18N
+            mapMapType.add ("java.util.concurrent.ConcurrentHashMap");	//NOI18N
+            mapMapType.add ("java.util.EnumMap");	//NOI18N
         }
         return mapMapType.contains (type);
     }
@@ -439,15 +439,15 @@ public class JavaVariablesFilter extends VariablesFilterAdapter {
     private static boolean isToArrayType (String type) {
         if (toArrayType == null) {
             toArrayType = new HashSet ();
-            toArrayType.add ("java.util.ArrayList");
-            toArrayType.add ("java.util.HashSet");
-            toArrayType.add ("java.util.LinkedHashSet");
-            toArrayType.add ("java.util.LinkedList");
-            toArrayType.add ("java.util.Stack");
-            toArrayType.add ("java.util.TreeSet");
-            toArrayType.add ("java.util.Vector");
-            toArrayType.add ("java.util.concurrent.CopyOnWriteArraySet");
-            toArrayType.add ("java.util.EnumSet");
+            toArrayType.add ("java.util.ArrayList");	//NOI18N
+            toArrayType.add ("java.util.HashSet");	//NOI18N
+            toArrayType.add ("java.util.LinkedHashSet");	//NOI18N
+            toArrayType.add ("java.util.LinkedList");	//NOI18N
+            toArrayType.add ("java.util.Stack");	//NOI18N
+            toArrayType.add ("java.util.TreeSet");	//NOI18N
+            toArrayType.add ("java.util.Vector");	//NOI18N
+            toArrayType.add ("java.util.concurrent.CopyOnWriteArraySet");	//NOI18N
+            toArrayType.add ("java.util.EnumSet");	//NOI18N
         }
         return toArrayType.contains (type);
     }

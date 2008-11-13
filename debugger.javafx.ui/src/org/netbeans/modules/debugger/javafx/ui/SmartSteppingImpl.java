@@ -104,7 +104,7 @@ PropertyChangeListener {
             n1 = name.substring (0, i);
         } while (!ectx.sourceAvailable (n1, false));
         HashSet s = new HashSet ();
-        s.add (name.replace ('/', '.') + ".*");
+        s.add (name.replace ('/', '.') + ".*");	//NOI18N
         addExclusionPatterns (s);
         return false;
     }

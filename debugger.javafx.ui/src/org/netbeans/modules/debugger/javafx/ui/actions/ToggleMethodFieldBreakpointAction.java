@@ -348,18 +348,18 @@ public class ToggleMethodFieldBreakpointAction extends AbstractAction {//impleme
     
     // Compares whether the two signatures have the same arguments. We ignore return value.
     private static boolean egualMethodSignatures(String s1, String s2) {
-        int i = s1.lastIndexOf(")");
+        int i = s1.lastIndexOf(")");	//NOI18N
         if (i > 0) s1 = s1.substring(0, i);
-        i = s2.lastIndexOf(")");
+        i = s2.lastIndexOf(")");	//NOI18N
         if (i > 0) s2 = s2.substring(0, i);
         return s1.equals(s2);
     }
     
     private static boolean match (String name, String pattern) {
-        if (pattern.startsWith ("*"))
+        if (pattern.startsWith ("*"))	//NOI18N
             return name.endsWith (pattern.substring (1));
         else
-        if (pattern.endsWith ("*"))
+        if (pattern.endsWith ("*"))	//NOI18N
             return name.startsWith (
                 pattern.substring (0, pattern.length () - 1)
             );

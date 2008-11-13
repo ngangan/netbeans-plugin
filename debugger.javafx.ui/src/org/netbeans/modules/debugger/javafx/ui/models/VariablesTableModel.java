@@ -119,7 +119,7 @@ public class VariablesTableModel implements TableModel, Constants {
             if (row instanceof Variable)
                 return getShort (((Variable) row).getType ());
             if (row instanceof javax.swing.JToolTip) {
-                row = ((javax.swing.JToolTip) row).getClientProperty("getShortDescription");
+                row = ((javax.swing.JToolTip) row).getClientProperty("getShortDescription");	//NOI18N
                 if (row instanceof Variable) {
                     if (row instanceof Refreshable && !((Refreshable) row).isCurrent()) {
                         return "";
@@ -135,7 +135,7 @@ public class VariablesTableModel implements TableModel, Constants {
                 JavaFXWatch w = (JavaFXWatch) row;
                 String e = w.getExceptionDescription ();
                 if (e != null)
-                    return ">" + e + "<";
+                    return ">" + e + "<";	//NOI18N
                 try {
                     return w.getValue ();
                 } finally {
@@ -196,7 +196,7 @@ public class VariablesTableModel implements TableModel, Constants {
         if (row instanceof JavaFXClassType) {
             return true;
         }
-        if (row.toString().startsWith("SubArray")) {
+        if (row.toString().startsWith("SubArray")) {	//NOI18N
             return true;
         }
         if (row instanceof Operation) {
@@ -306,6 +306,6 @@ public class VariablesTableModel implements TableModel, Constants {
         if (m == null) {
             m = NbBundle.getMessage(VariablesTableModel.class, "MSG_NA");
         }
-        return ">" + m + "<";
+        return ">" + m + "<";	//NOI18N
     }
 }

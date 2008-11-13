@@ -355,7 +355,7 @@ public class CallStackFrameImpl implements CallStackFrame {
                 step.addCountFilter(1);
                 step.setSuspendPolicy(com.sun.jdi.request.StepRequest.SUSPEND_EVENT_THREAD);
                 step.enable();
-                step.putProperty("silent", Boolean.TRUE);
+                step.putProperty("silent", Boolean.TRUE);	//NOI18N
                 final Boolean[] stepDone = new Boolean[] { null };
                 debugger.getOperator().register(step, new Executor() {
                     public boolean exec(com.sun.jdi.event.Event event) {

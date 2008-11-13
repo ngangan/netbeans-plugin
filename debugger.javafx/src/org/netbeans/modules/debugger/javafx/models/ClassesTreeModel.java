@@ -247,7 +247,7 @@ public class ClassesTreeModel implements TreeModel {
             if (clr == null)
                 loaders.add (NULL_CLASS_LOADER);
             else
-            if (clr.referenceType ().name ().equals ("sun.reflect.DelegatingClassLoader"))
+            if (clr.referenceType ().name ().equals ("sun.reflect.DelegatingClassLoader"))	//NOI18N
                 continue;
             else
                 loaders.add (clr);

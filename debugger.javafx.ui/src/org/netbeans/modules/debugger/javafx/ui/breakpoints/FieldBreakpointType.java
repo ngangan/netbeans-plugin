@@ -61,7 +61,7 @@ public class FieldBreakpointType extends BreakpointType {
     public String getCategoryDisplayName () {
         return NbBundle.getMessage (
             FieldBreakpointType.class,
-            "CTL_Java_breakpoint_events_cathegory_name"
+            "CTL_Java_breakpoint_events_cathegory_name"	//NOI18N
         );
     }
     
@@ -72,7 +72,7 @@ public class FieldBreakpointType extends BreakpointType {
     public String getTypeDisplayName () {
         return NbBundle.getMessage (
             FieldBreakpointType.class, 
-            "CTL_Variable_event_type_name"
+            "CTL_Variable_event_type_name"	//NOI18N
         );
     }
     

@@ -91,10 +91,10 @@ public class SourcePathProviderImpl extends SourcePathProvider {
     private static boolean          verbose = 
         System.getProperty ("netbeans.debugger.sourcepathproviderimpl") != null;
     
-    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.projects");
+    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.projects");	//NOI18N
     
-    private static final Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");
-    private static final Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");
+    private static final Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");	//NOI18N
+    private static final Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");	//NOI18N
 
     /** Contains all known source paths + jdk source path for JavaFXStart task */
     private ClassPath               originalSourcePath;
@@ -118,8 +118,8 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         
         // 2) get default allSourceRoots of source roots used for stepping
         if (properties != null) {
-            smartSteppingSourcePath = (ClassPath) properties.get ("sourcepath");
-            ClassPath jdkCP = (ClassPath) properties.get ("jdksources");
+            smartSteppingSourcePath = (ClassPath) properties.get ("sourcepath");	//NOI18N
+            ClassPath jdkCP = (ClassPath) properties.get ("jdksources");	//NOI18N
             if ( (jdkCP == null) && (JavaPlatform.getDefault () != null) )
                 jdkCP = JavaPlatform.getDefault ().getSourceFolders ();
             originalSourcePath = jdkCP == null ? 
@@ -522,12 +522,12 @@ public class SourcePathProviderImpl extends SourcePathProvider {
     public static String normalize(String path) {
       for (Matcher m = thisDirectoryPattern.matcher(path); m.find(); )
       {
-        path = m.replaceAll("$1");
+        path = m.replaceAll("$1");	//NOI18N
         m = thisDirectoryPattern.matcher(path);
       }
       for (Matcher m = parentDirectoryPattern.matcher(path); m.find(); )
       {
-        if (!m.group(2).equals("..")) {
+        if (!m.group(2).equals("..")) {	//NOI18N
           path = path.substring(0, m.start()) + m.group(1) + path.substring(m.end());
           m = parentDirectoryPattern.matcher(path);        
         }

@@ -240,7 +240,7 @@ public class WatchesModel implements TreeModel {
     LocalsTreeModel getLocalsTreeModel () {
         if (localsTreeModel == null)
             localsTreeModel = (LocalsTreeModel) lookupProvider.
-                lookupFirst ("LocalsView", TreeModel.class);
+                lookupFirst ("LocalsView", TreeModel.class);	//NOI18N
         return localsTreeModel;
     }
 
@@ -265,7 +265,7 @@ public class WatchesModel implements TreeModel {
         }
         
         private JavaFXWatchEvaluating(WatchesModel model, Watch w, JavaFXDebuggerImpl debugger, int cloneNumber) {
-            super(debugger, null, (cloneNumber > 0) ? w + "_clone" + cloneNumber : "" + w);
+            super(debugger, null, (cloneNumber > 0) ? w + "_clone" + cloneNumber : "" + w);	//NOI18N
             this.model = model;
             this.w = w;
             this.debugger = debugger;

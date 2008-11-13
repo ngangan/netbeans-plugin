@@ -79,7 +79,7 @@ public class ClassesActionsProvider implements NodeActionsProvider {
 
     public ClassesActionsProvider (ContextProvider lookupProvider) {
         //debugger = (JavaFXDebugger) lookupProvider.lookupFirst(null, JavaFXDebugger.class);
-        tree = lookupProvider.lookupFirst("ClassesView", TreeModel.class);
+        tree = lookupProvider.lookupFirst("ClassesView", TreeModel.class);	//NOI18N
     }
     
     public Action[] getActions (Object node) throws UnknownTypeException {
@@ -122,12 +122,12 @@ public class ClassesActionsProvider implements NodeActionsProvider {
             item.setSelected(flat == isFlat);
             item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    classesProperties.setBoolean("flat", flat);
+                    classesProperties.setBoolean("flat", flat);	//NOI18N
                     // Refresh the classes view
                     // It's in a different module => we have to use reflection :-(
                     try {
                         Method fireTreeChangedMethod =
-                                tree.getClass().getMethod("fireTreeChanged", new Class[] {});
+                                tree.getClass().getMethod("fireTreeChanged", new Class[] {});	//NOI18N
                         try {
                             fireTreeChangedMethod.invoke(tree, new Object[] {});
                         } catch (IllegalArgumentException ex) {

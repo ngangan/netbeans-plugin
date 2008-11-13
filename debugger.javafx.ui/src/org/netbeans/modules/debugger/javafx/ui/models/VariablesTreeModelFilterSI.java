@@ -71,42 +71,42 @@ public class VariablesTreeModelFilterSI implements TreeModelFilter,
 NodeModel, TableModel, NodeActionsProvider {
 
     public static final String INHERITED =
-        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable";
+        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable";	//NOI18N
     public static final String STATIC =
-        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable";
+        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable";	//NOI18N
     private static final Set ignore = new HashSet (Arrays.asList (new String[] {
-        "java.lang.String",
-        "java.lang.StringBuffer",
-        "java.lang.Character",
-        "java.lang.Integer",
-        "java.lang.Float",
-        "java.lang.Byte",
-        "java.lang.Boolean",
-        "java.lang.Double",
-        "java.lang.Long",
-        "java.lang.Short",
+        "java.lang.String",	//NOI18N
+        "java.lang.StringBuffer",	//NOI18N
+        "java.lang.Character",	//NOI18N
+        "java.lang.Integer",	//NOI18N
+        "java.lang.Float",	//NOI18N
+        "java.lang.Byte",	//NOI18N
+        "java.lang.Boolean",	//NOI18N
+        "java.lang.Double",	//NOI18N
+        "java.lang.Long",	//NOI18N
+        "java.lang.Short",	//NOI18N
 
-        "java.lang.ref.WeakReference",
+        "java.lang.ref.WeakReference",	//NOI18N
         
-        "java.util.ArrayList",
-        "java.util.HashSet",
-        "java.util.LinkedHashSet",
-        "java.util.LinkedList",
-        "java.util.Stack",
-        "java.util.TreeSet",
-        "java.util.Vector",
-        "java.util.Hashtable",
-        "java.util.Hashtable$Entry",
-        "java.util.HashMap",
-        "java.util.HashMap$Entry",
-        "java.util.IdentityHashMap",
-        "java.util.AbstractMap$SimpleEntry",
-        "java.util.TreeMap",
-        "java.util.TreeMap$Entry",
-        "java.util.WeakHashMap",
-        "java.util.LinkedHashMap",
-        "java.util.LinkedHashMap$Entry",
-        "java.beans.PropertyChangeSupport"
+        "java.util.ArrayList",	//NOI18N
+        "java.util.HashSet",	//NOI18N
+        "java.util.LinkedHashSet",	//NOI18N
+        "java.util.LinkedList",	//NOI18N
+        "java.util.Stack",	//NOI18N
+        "java.util.TreeSet",	//NOI18N
+        "java.util.Vector",	//NOI18N
+        "java.util.Hashtable",	//NOI18N
+        "java.util.Hashtable$Entry",	//NOI18N
+        "java.util.HashMap",	//NOI18N
+        "java.util.HashMap$Entry",	//NOI18N
+        "java.util.IdentityHashMap",	//NOI18N
+        "java.util.AbstractMap$SimpleEntry",	//NOI18N
+        "java.util.TreeMap",	//NOI18N
+        "java.util.TreeMap$Entry",	//NOI18N
+        "java.util.WeakHashMap",	//NOI18N
+        "java.util.LinkedHashMap",	//NOI18N
+        "java.util.LinkedHashMap$Entry",	//NOI18N
+        "java.beans.PropertyChangeSupport"	//NOI18N
     }));
     private ContextProvider lookupProvider;
     

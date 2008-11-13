@@ -103,10 +103,10 @@ class ClassScanner extends JavaFXTreePathScanner<TypeElement, Void>{//TreePathSc
     }
     
     private static boolean match (String name, String pattern) {
-        if (pattern.startsWith ("*"))
+        if (pattern.startsWith ("*"))	//NOI18N
             return name.endsWith (pattern.substring (1));
         else
-        if (pattern.endsWith ("*"))
+        if (pattern.endsWith ("*"))	//NOI18N
             return name.startsWith (
                 pattern.substring (0, pattern.length () - 1)
             );

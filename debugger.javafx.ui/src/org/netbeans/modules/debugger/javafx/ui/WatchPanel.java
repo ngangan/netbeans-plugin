@@ -98,7 +98,7 @@ public class WatchPanel {
     }
     
     public static void setupContext(JEditorPane editorPane) {
-        EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-fx");
+        EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-fx");	//NOI18N
         editorPane.setEditorKit(kit);
         DebuggerEngine en = DebuggerManager.getDebuggerManager ().getCurrentEngine();
         JavaFXDebugger d = en.lookupFirst(null, JavaFXDebugger.class);

@@ -95,7 +95,7 @@ public class WatchesActionsProvider implements NodeActionsProvider {
     static { 
         DELETE_ACTION.putValue (
             Action.ACCELERATOR_KEY,
-            KeyStroke.getKeyStroke ("DELETE")
+            KeyStroke.getKeyStroke ("DELETE")	//NOI18N
         );
     };
     private static final Action CUSTOMIZE_ACTION = Models.createAction (

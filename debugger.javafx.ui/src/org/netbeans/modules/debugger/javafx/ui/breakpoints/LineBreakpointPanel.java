@@ -91,7 +91,7 @@ public class LineBreakpointPanel extends JPanel implements Controller, org.openi
         );
         mb.setPrintText (
             NbBundle.getBundle (LineBreakpointPanel.class).getString 
-                ("CTL_Line_Breakpoint_Print_Text")
+                ("CTL_Line_Breakpoint_Print_Text")	//NOI18N
         );
         return mb;
     }
@@ -126,10 +126,10 @@ public class LineBreakpointPanel extends JPanel implements Controller, org.openi
         conditionsPanel.setCondition(b.getCondition());
         conditionsPanel.setHitCountFilteringStyle(b.getHitCountFilteringStyle());
         conditionsPanel.setHitCount(b.getHitCountFilter());
-        cPanel.add(conditionsPanel, "Center");
+        cPanel.add(conditionsPanel, "Center");	//NOI18N
         
         actionsPanel = new ActionsPanel (b);
-        pActions.add (actionsPanel, "Center");
+        pActions.add (actionsPanel, "Center");	//NOI18N
     }
     
     private static int findNumLines(String url) {

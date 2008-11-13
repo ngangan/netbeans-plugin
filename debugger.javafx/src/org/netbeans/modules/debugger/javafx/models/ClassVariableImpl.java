@@ -64,7 +64,7 @@ public class ClassVariableImpl extends AbstractObjectVariable implements ClassVa
         super (
             debugger,
             clazz,
-            parentID + ".class"
+            parentID + ".class"	//NOI18N
         );
         this.clazz = clazz;
     }
@@ -75,12 +75,12 @@ public class ClassVariableImpl extends AbstractObjectVariable implements ClassVa
 
     public ClassVariableImpl clone() {
         ClassVariableImpl clon = new ClassVariableImpl(getDebugger(), clazz,
-                getID().substring(0, getID().length() - ".class".length()));
+                getID().substring(0, getID().length() - ".class".length()));	//NOI18N
         return clon;
     }
     
     public String toString () {
-        return "ClassVariable " + getClassType();
+        return "ClassVariable " + getClassType();	//NOI18N
     }
 
 }

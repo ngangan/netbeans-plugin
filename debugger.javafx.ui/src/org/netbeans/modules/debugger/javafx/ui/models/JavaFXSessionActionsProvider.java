@@ -113,7 +113,7 @@ public class JavaFXSessionActionsProvider implements NodeActionsProviderFilter {
         }
 
         public JMenuItem getPopupPresenter() {
-            JMenu displayAsPopup = new JMenu(localize("CTL_Session_Popup_Language"));
+            JMenu displayAsPopup = new JMenu(localize("CTL_Session_Popup_Language"));	//NOI18N
 
             String [] languages = session.getSupportedLanguages();
             String currentLanguage = session.getCurrentLanguage();
@@ -144,17 +144,17 @@ public class JavaFXSessionActionsProvider implements NodeActionsProviderFilter {
 
         public JMenuItem getPopupPresenter() {
             JMenu displayAsPopup = new JMenu 
-                (localize ("CTL_Session_Resume_Threads"));
+                (localize ("CTL_Session_Resume_Threads"));	//NOI18N
 
             JRadioButtonMenuItem resumeAllItem = new JRadioButtonMenuItem (
-                new AbstractAction (localize ("CTL_Session_Resume_All_Threads")
+                new AbstractAction (localize ("CTL_Session_Resume_All_Threads")	//NOI18N
             ) {
                 public void actionPerformed (ActionEvent e) {
                     dbg.setSuspend (JavaFXDebugger.SUSPEND_ALL);
                 }
             });
             JRadioButtonMenuItem resumeCurrentItem = new JRadioButtonMenuItem (
-                new AbstractAction (localize ("CTL_Session_Resume_Current_Thread")
+                new AbstractAction (localize ("CTL_Session_Resume_Current_Thread")	//NOI18N
             ) {
                 public void actionPerformed(ActionEvent e) {
                     dbg.setSuspend (JavaFXDebugger.SUSPEND_EVENT_THREAD);

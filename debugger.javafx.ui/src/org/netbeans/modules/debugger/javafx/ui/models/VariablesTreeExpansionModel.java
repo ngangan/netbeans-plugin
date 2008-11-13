@@ -64,8 +64,8 @@ public class VariablesTreeExpansionModel implements TreeExpansionModel {
      */
     public boolean isExpanded (Object node) 
     throws UnknownTypeException {
-        if (node instanceof String && ((String) node).startsWith("operationArguments ")) {
-            node = "operationArguments";
+        if (node instanceof String && ((String) node).startsWith("operationArguments ")) {	//NOI18N
+            node = "operationArguments";	//NOI18N
         }
         synchronized (this) {
             if (expandedNodes.contains(node)) {
@@ -76,7 +76,7 @@ public class VariablesTreeExpansionModel implements TreeExpansionModel {
             }
         }
         // Default behavior follows:
-        if ("lastOperations".equals(node)) {
+        if ("lastOperations".equals(node)) {	//NOI18N
             return true;
         }
         if (node instanceof Operation) {
@@ -91,8 +91,8 @@ public class VariablesTreeExpansionModel implements TreeExpansionModel {
      * @param node a expanded node
      */
     public void nodeExpanded (Object node) {
-        if (node instanceof String && ((String) node).startsWith("operationArguments ")) {
-            node = "operationArguments";
+        if (node instanceof String && ((String) node).startsWith("operationArguments ")) {	//NOI18N
+            node = "operationArguments";	//NOI18N
         }
         synchronized (this) {
             expandedNodes.add(node);
@@ -106,8 +106,8 @@ public class VariablesTreeExpansionModel implements TreeExpansionModel {
      * @param node a collapsed node
      */
     public void nodeCollapsed (Object node) {
-        if (node instanceof String && ((String) node).startsWith("operationArguments ")) {
-            node = "operationArguments";
+        if (node instanceof String && ((String) node).startsWith("operationArguments ")) {	//NOI18N
+            node = "operationArguments";	//NOI18N
         }
         synchronized (this) {
             collapsedNodes.add(node);

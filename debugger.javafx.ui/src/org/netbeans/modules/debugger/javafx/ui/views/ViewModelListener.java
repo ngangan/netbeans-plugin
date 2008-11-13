@@ -171,14 +171,14 @@ class ViewModelListener extends DebuggerManagerAdapter {
         
         public String getDisplayName (Object node) throws UnknownTypeException {
             if (node == TreeModel.ROOT) {
-                return "Name"; // TODO: Localized ???
+                return "Name"; // TODO: Localized ???	//NOI18N
             }
             throw new UnknownTypeException (node);
         }
         
         public String getIconBase (Object node) throws UnknownTypeException {
             if (node == TreeModel.ROOT) {
-                return "org/netbeans/modules/debugger/resources/DebuggerTab";
+                return "org/netbeans/modules/debugger/resources/DebuggerTab";	//NOI18N
             }
             throw new UnknownTypeException (node);
         }

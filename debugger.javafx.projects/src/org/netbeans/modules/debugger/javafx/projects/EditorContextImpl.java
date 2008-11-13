@@ -189,7 +189,7 @@ public class EditorContextImpl extends EditorContext {
                     "Show Source: Have no line for URL = "+url+", line number = "+lineNumber);
             return null;
         }
-        if ("true".equalsIgnoreCase(fronting) || Utilities.isWindows()) {
+        if ("true".equalsIgnoreCase(fronting) || Utilities.isWindows()) {	//NOI18N
             l.show (Line.SHOW_REUSE);
             l.show (Line.SHOW_TOFRONT); //FIX 47825
         } else {
@@ -212,7 +212,7 @@ public class EditorContextImpl extends EditorContext {
                     "Show Source: Have no line for URL = "+url+", line number = "+lineNumber);
             return false;
         }
-        if ("true".equalsIgnoreCase(fronting) || Utilities.isWindows()) {
+        if ("true".equalsIgnoreCase(fronting) || Utilities.isWindows()) {	//NOI18N
             l.show (Line.SHOW_TOFRONT, column); //FIX 47825
         } else {
             l.show (Line.SHOW_GOTO, column);
@@ -306,8 +306,8 @@ public class EditorContextImpl extends EditorContext {
     }
     
     private static Color getColor(String annotationType) {
-        if (annotationType.endsWith("_broken")) {
-            annotationType = annotationType.substring(0, annotationType.length() - "_broken".length());
+        if (annotationType.endsWith("_broken")) {	//NOI18N
+            annotationType = annotationType.substring(0, annotationType.length() - "_broken".length());	//NOI18N
         }
         if (EditorContext.BREAKPOINT_ANNOTATION_TYPE.equals(annotationType)) {
             return new Color(0xFC9D9F);
@@ -852,7 +852,7 @@ public class EditorContextImpl extends EditorContext {
                         Element elm = (Element) it.next();
                         if (elm.getKind() == ElementKind.METHOD || elm.getKind() == ElementKind.CONSTRUCTOR) {
                             String name;
-                            if (elm.getKind() == ElementKind.CONSTRUCTOR && !methodName.equals("<init>")) {
+                            if (elm.getKind() == ElementKind.CONSTRUCTOR && !methodName.equals("<init>")) {	//NOI18N
                                 name = elm.getEnclosingElement().getSimpleName().toString();
                             } else {
                                 name = elm.getSimpleName().toString();
@@ -882,9 +882,9 @@ public class EditorContextImpl extends EditorContext {
     }
     
     private static boolean egualMethodSignatures(String s1, String s2) {
-        int i = s1.lastIndexOf(")");
+        int i = s1.lastIndexOf(")");	//NOI18N
         if (i > 0) s1 = s1.substring(0, i);
-        i = s2.lastIndexOf(")");
+        i = s2.lastIndexOf(")");	//NOI18N
         if (i > 0) s2 = s2.substring(0, i);
         return s1.equals(s2);
     }
@@ -970,7 +970,7 @@ public class EditorContextImpl extends EditorContext {
                         //Element el = ci.getTrees().getElement(ci.getTreeUtilities().pathFor(offset));
                         if (el != null && (el.getKind() == ElementKind.METHOD || el.getKind() == ElementKind.CONSTRUCTOR)) {
                             currentMethodPtr[0] = el.getSimpleName().toString();
-                            if (currentMethodPtr[0].equals("<init>")) {
+                            if (currentMethodPtr[0].equals("<init>")) {	//NOI18N
                                 // The constructor name is the class name:
                                 currentMethodPtr[0] = el.getEnclosingElement().getSimpleName().toString();
                             }
@@ -1043,7 +1043,7 @@ public class EditorContextImpl extends EditorContext {
 
     
     private static String createSignature(ExecutableElement elm) {
-        StringBuilder signature = new StringBuilder("(");
+        StringBuilder signature = new StringBuilder("(");	//NOI18N
         for (VariableElement param : elm.getParameters()) {
             String paramType = param.asType().toString();
             signature.append(getSignature(paramType));
@@ -1055,26 +1055,26 @@ public class EditorContextImpl extends EditorContext {
     }
     
     private static String getSignature(String javaType) {
-        if (javaType.equals("boolean")) {
-            return "Z";
-        } else if (javaType.equals("byte")) {
-            return "B";
-        } else if (javaType.equals("char")) {
-            return "C";
-        } else if (javaType.equals("short")) {
-            return "S";
-        } else if (javaType.equals("int")) {
-            return "I";
-        } else if (javaType.equals("long")) {
-            return "J";
-        } else if (javaType.equals("float")) {
-            return "F";
-        } else if (javaType.equals("double")) {
-            return "D";
-        } else if (javaType.endsWith("[]")) {
-            return "["+getSignature(javaType.substring(0, javaType.length() - 2));
+        if (javaType.equals("boolean")) {	//NOI18N
+            return "Z";	//NOI18N
+        } else if (javaType.equals("byte")) {	//NOI18N
+            return "B";	//NOI18N
+        } else if (javaType.equals("char")) {	//NOI18N
+            return "C";	//NOI18N
+        } else if (javaType.equals("short")) {	//NOI18N
+            return "S";	//NOI18N
+        } else if (javaType.equals("int")) {	//NOI18N
+            return "I";	//NOI18N
+        } else if (javaType.equals("long")) {	//NOI18N
+            return "J";	//NOI18N
+        } else if (javaType.equals("float")) {	//NOI18N
+            return "F";	//NOI18N
+        } else if (javaType.equals("double")) {	//NOI18N
+            return "D";	//NOI18N
+        } else if (javaType.endsWith("[]")) {	//NOI18N
+            return "["+getSignature(javaType.substring(0, javaType.length() - 2));	//NOI18N
         } else {
-            return "L"+javaType.replace('.', '/')+";";
+            return "L"+javaType.replace('.', '/')+";";	//NOI18N
         }
     }
     
@@ -1560,7 +1560,7 @@ public class EditorContextImpl extends EditorContext {
                     }
                     Tree tree;
                     if (pos == 0) {
-                        tree = ci.getTreeUtilities().parseExpression(expression+";", offset);
+                        tree = ci.getTreeUtilities().parseExpression(expression+";", offset);	//NOI18N
                     } else {
                         JavaFXTreePath p = ci.getTreeUtilities().pathFor(pos);
                         tree=(ExpressionTree)p.getLeaf();
@@ -1572,20 +1572,20 @@ public class EditorContextImpl extends EditorContext {
                     try {
                         //context.setTrees(ci.getTrees());
                         java.lang.reflect.Method setTreesMethod =
-                                context.getClass().getMethod("setTrees", new Class[] { JavafxcTrees.class });
+                                context.getClass().getMethod("setTrees", new Class[] { JavafxcTrees.class });	//NOI18N
                         setTreesMethod.invoke(context, ci.getTrees());
                     } catch (Exception ex) {}
                     try {
                         //context.setCompilationUnit(ci.getCompilationUnit());
                         java.lang.reflect.Method setCompilationUnitMethod =
-                                context.getClass().getMethod("setCompilationUnit", new Class[] { UnitTree.class });
+                                context.getClass().getMethod("setCompilationUnit", new Class[] { UnitTree.class });	//NOI18N
                         setCompilationUnitMethod.invoke(context, ci.getCompilationUnit());
                     } catch (Exception ex) {}
                     JavaFXTreePath treePath = null;
                     try {
                         //context.setTrees(ci.getTrees());
                         java.lang.reflect.Method setTreePathMethod =
-                                context.getClass().getMethod("setTreePath", new Class[] { JavaFXTreePath.class });
+                                context.getClass().getMethod("setTreePath", new Class[] { JavaFXTreePath.class });	//NOI18N
                         if (doc != null) {
                             treePath = ci.getTreeUtilities().pathFor(offset);
                             treePath = new JavaFXTreePath(treePath, tree);
@@ -1747,7 +1747,7 @@ public class EditorContextImpl extends EditorContext {
                                 //TODO XXX Durty Hack
                                 String packageName = ci.getTrees().getElement(currentPath).getSimpleName().toString();
                                 String className = ci.getFileObject().getName();
-                                currentElementPtr[0] = packageName+"."+className;
+                                currentElementPtr[0] = packageName+"."+className;	//NOI18N
                                 te = null;
                             } else {
                                 JavafxcScope scope = ci.getTreeUtilities().scopeFor(currentOffset);
@@ -1763,7 +1763,7 @@ public class EditorContextImpl extends EditorContext {
                         el = scope.getEnclosingMethod();
                         if (el != null) {
                             currentElementPtr[0] = el.getSimpleName().toString();
-                            if (currentElementPtr[0].equals("<init>")) {
+                            if (currentElementPtr[0].equals("<init>")) {	//NOI18N
                                 // The constructor name is the class name:
                                 currentElementPtr[0] = el.getEnclosingElement().getSimpleName().toString();
                             }

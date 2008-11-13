@@ -214,7 +214,7 @@ public class BreakpointAnnotationProvider implements AnnotationProvider,
         } else {
             throw new IllegalStateException(b.toString());
         }
-        if (isInvalid && b.isEnabled ()) annotationType += "_broken";
+        if (isInvalid && b.isEnabled ()) annotationType += "_broken";	//NOI18N
         return annotationType;
     }
     
@@ -244,7 +244,7 @@ public class BreakpointAnnotationProvider implements AnnotationProvider,
             int[] lns = new int[] {};
             for (int i = 0; i < filters.length; i++) {
                 // TODO: annotate also other matched classes
-                if (!filters[i].startsWith("*") && !filters[i].endsWith("*")) {
+                if (!filters[i].startsWith("*") && !filters[i].endsWith("*")) {	//NOI18N
                     int[] newlns = EditorContextImpl.getMethodLineNumbers(
                             fo, filters[i], mb.getClassExclusionFilters(),
                             mb.getMethodName(),

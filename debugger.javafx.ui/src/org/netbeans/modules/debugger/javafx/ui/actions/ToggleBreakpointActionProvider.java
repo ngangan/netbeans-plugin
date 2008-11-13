@@ -144,7 +144,7 @@ implements PropertyChangeListener {
         );
         lb.setPrintText (
             NbBundle.getBundle (ToggleBreakpointActionProvider.class).getString 
-                ("CTL_Line_Breakpoint_Print_Text")
+                ("CTL_Line_Breakpoint_Print_Text")	//NOI18N
         );
         d.addBreakpoint (lb);
     }

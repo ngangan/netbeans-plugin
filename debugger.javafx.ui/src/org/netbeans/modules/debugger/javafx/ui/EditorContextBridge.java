@@ -69,10 +69,10 @@ import org.openide.ErrorManager;
  */
 public class EditorContextBridge {
 
-    public static final String FIELD = "field";
-    public static final String METHOD = "method";
-    public static final String CLASS = "class";
-    public static final String LINE = "line";
+    public static final String FIELD = "field";	//NOI18N
+    public static final String METHOD = "method";	//NOI18N
+    public static final String CLASS = "class";	//NOI18N
+    public static final String LINE = "line";	//NOI18N
 
     private static EditorContext context;
     
@@ -102,7 +102,7 @@ public class EditorContextBridge {
     public static String getCurrentMethodSignature () {
         // TODO: return getContext ().getCurrentMethodSignature ();
         try {
-        return (String) getContext ().getClass().getMethod("getCurrentMethodSignature", new Class[] {}).
+        return (String) getContext ().getClass().getMethod("getCurrentMethodSignature", new Class[] {}).	//NOI18N
                 invoke(getContext(), new Object[] {});
         } catch (java.lang.reflect.InvocationTargetException itex) {
             Throwable tex = itex.getTargetException();
@@ -174,7 +174,7 @@ public class EditorContextBridge {
                              EditorContext.BREAKPOINT_ANNOTATION_TYPE) :
             (isConditional ? EditorContext.DISABLED_CONDITIONAL_BREAKPOINT_ANNOTATION_TYPE :
                              EditorContext.DISABLED_BREAKPOINT_ANNOTATION_TYPE);
-        if (isInvalid && b.isEnabled ()) annotationType += "_broken";
+        if (isInvalid && b.isEnabled ()) annotationType += "_broken";	//NOI18N
 
         return getContext().annotate (
             url,
@@ -208,7 +208,7 @@ public class EditorContextBridge {
             int[] lns = new int[] {};
             for (int i = 0; i < filters.length; i++) {
                 // TODO: annotate also other matched classes
-                if (!filters[i].startsWith("*") && !filters[i].endsWith("*")) {
+                if (!filters[i].startsWith("*") && !filters[i].endsWith("*")) {	//NOI18N
                     String[] newUrls = getClassURLs(SourcePath.convertClassNameToRelativePath(filters[i]));
                     int[] newlns = new int[newUrls.length];
                     for (int j = 0; j < newUrls.length; j++) {
@@ -260,7 +260,7 @@ public class EditorContextBridge {
         } else {
             return null;
         }
-        if (isInvalid && b.isEnabled ()) annotationType += "_broken";
+        if (isInvalid && b.isEnabled ()) annotationType += "_broken";	//NOI18N
 
         List annotations = new ArrayList(URLs.length);
         for (int i = 0; i < URLs.length; i++) {
@@ -282,7 +282,7 @@ public class EditorContextBridge {
         SourcePathProvider spp = SourcePath.getDefaultContext();
         // TODO: spp.getAllURLs(className, true);
         try {
-        return (String[]) spp.getClass().getMethod("getAllURLs", new Class[] { String.class, Boolean.TYPE }).
+        return (String[]) spp.getClass().getMethod("getAllURLs", new Class[] { String.class, Boolean.TYPE }).	//NOI18N
                 invoke(spp, new Object[] { className, Boolean.TRUE });
         } catch (Exception ex) {
             ErrorManager.getDefault().notify(ex);
@@ -318,7 +318,7 @@ public class EditorContextBridge {
         int i = className.indexOf ('$');
         if (i > 0) className = className.substring (0, i);
         String sourceName = className.replace 
-            ('.', '/') + ".fx";
+            ('.', '/') + ".fx";	//NOI18N
         return sourceName;
     }
     

@@ -61,7 +61,7 @@ public class MethodBreakpointType extends BreakpointType {
     public String getCategoryDisplayName () {
         return NbBundle.getMessage (
             MethodBreakpointType.class,
-            "CTL_Java_breakpoint_events_cathegory_name"
+            "CTL_Java_breakpoint_events_cathegory_name"	//NOI18N
         );
     }
     
@@ -71,7 +71,7 @@ public class MethodBreakpointType extends BreakpointType {
     
     public String getTypeDisplayName () {
         return NbBundle.getMessage (MethodBreakpointType.class, 
-            "CTL_Method_event_type_name"
+            "CTL_Method_event_type_name"	//NOI18N
         );
     }
     

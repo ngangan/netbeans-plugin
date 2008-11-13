@@ -79,7 +79,7 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
     /**
      * Suspended property of the thread. Fired when isSuspended() changes.
      */
-    public static final String PROP_SUSPENDED = "suspended";
+    public static final String PROP_SUSPENDED = "suspended";	//NOI18N
     
     private ThreadReference     threadReference;
     private JavaFXDebuggerImpl    debugger;
@@ -670,7 +670,7 @@ public final class JavaFXThreadImpl implements JavaFXThread, Customizer {
         ObjectReference or;
         synchronized (this) {
             if (!isSuspended()) return null;
-            if ("DestroyJavaVM".equals(threadReference.name())) {
+            if ("DestroyJavaVM".equals(threadReference.name())) {	//NOI18N
                 // See defect #6474293
                 return null;
             }

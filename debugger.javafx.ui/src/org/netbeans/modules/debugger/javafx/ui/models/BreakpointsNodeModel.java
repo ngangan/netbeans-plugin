@@ -67,27 +67,27 @@ import org.openide.util.NbBundle;
 public class BreakpointsNodeModel implements NodeModel {
 
     public static final String BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/NonLineBreakpoint";
+        "org/netbeans/modules/debugger/resources/breakpointsView/NonLineBreakpoint";	//NOI18N
     public static final String LINE_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/Breakpoint";
+        "org/netbeans/modules/debugger/resources/breakpointsView/Breakpoint";	//NOI18N
     public static final String CURRENT_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/NonLineBreakpointHit";
+        "org/netbeans/modules/debugger/resources/breakpointsView/NonLineBreakpointHit";	//NOI18N
     public static final String CURRENT_LINE_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/BreakpointHit";
+        "org/netbeans/modules/debugger/resources/breakpointsView/BreakpointHit";	//NOI18N
     public static final String DISABLED_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledNonLineBreakpoint";
+        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledNonLineBreakpoint";	//NOI18N
     public static final String DISABLED_LINE_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledBreakpoint";
+        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledBreakpoint";	//NOI18N
     public static final String DISABLED_CURRENT_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledNonLineBreakpointHit";
+        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledNonLineBreakpointHit";	//NOI18N
     public static final String DISABLED_CURRENT_LINE_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledBreakpointHit";
+        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledBreakpointHit";	//NOI18N
     public static final String LINE_CONDITIONAL_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/ConditionalBreakpoint";
+        "org/netbeans/modules/debugger/resources/breakpointsView/ConditionalBreakpoint";	//NOI18N
     public static final String CURRENT_LINE_CONDITIONAL_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/ConditionalBreakpointHit";
+        "org/netbeans/modules/debugger/resources/breakpointsView/ConditionalBreakpointHit";	//NOI18N
     public static final String DISABLED_LINE_CONDITIONAL_BREAKPOINT =
-        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledConditionalBreakpoint";
+        "org/netbeans/modules/debugger/resources/breakpointsView/DisabledConditionalBreakpoint";	//NOI18N
 
     private Vector listeners = new Vector ();
 
@@ -127,7 +127,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 b,
                 NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Line_Breakpoint",
+                        "CTL_Line_Breakpoint",	//NOI18N
                         EditorContextBridge.getFileName (b),
                         line
                     )
@@ -138,18 +138,18 @@ public class BreakpointsNodeModel implements NodeModel {
             if (b.getBreakpointType () == b.TYPE_THREAD_STARTED)
                 return bold (b, NbBundle.getMessage (
                     BreakpointsNodeModel.class,
-                    "CTL_Thread_Started_Breakpoint"
+                    "CTL_Thread_Started_Breakpoint"	//NOI18N
                 ));
             else
             if (b.getBreakpointType () == b.TYPE_THREAD_DEATH)
                 return bold (b, NbBundle.getMessage (
                     BreakpointsNodeModel.class,
-                    "CTL_Thread_Death_Breakpoint"
+                    "CTL_Thread_Death_Breakpoint"	//NOI18N
                 ));
             else
                 return bold (b, NbBundle.getMessage (
                     BreakpointsNodeModel.class,
-                    "CTL_Thread_Breakpoint"
+                    "CTL_Thread_Breakpoint"	//NOI18N
                 ));
         } else
         if (o instanceof FieldBreakpoint) {
@@ -158,7 +158,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Field_Access_Breakpoint",
+                        "CTL_Field_Access_Breakpoint",	//NOI18N
                         getShort (b.getClassName ()),
                         b.getFieldName ()
                     )
@@ -167,7 +167,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Field_Modification_Breakpoint",
+                        "CTL_Field_Modification_Breakpoint",	//NOI18N
                         getShort (b.getClassName ()),
                         b.getFieldName ()
                     )
@@ -176,7 +176,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Field_Access_or_Modification_Breakpoint",
+                        "CTL_Field_Access_or_Modification_Breakpoint",	//NOI18N
                         getShort (b.getClassName ()),
                         b.getFieldName ()
                     )
@@ -191,7 +191,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_All_Methods_Breakpoint",
+                        "CTL_All_Methods_Breakpoint",	//NOI18N
                         getShort (className)
                     )
                 );
@@ -199,7 +199,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Method_Breakpoint",
+                        "CTL_Method_Breakpoint",	//NOI18N
                         getShort (className),
                         b.getMethodName ()
                     )
@@ -219,7 +219,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Class_Loaded_Breakpoint",
+                        "CTL_Class_Loaded_Breakpoint",	//NOI18N
                         getShort (className)
                     )
                 );
@@ -228,7 +228,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Class_Unloaded_Breakpoint",
+                        "CTL_Class_Unloaded_Breakpoint",	//NOI18N
                         getShort (className)
                     )
                 );
@@ -236,7 +236,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Class_Breakpoint",
+                        "CTL_Class_Breakpoint",	//NOI18N
                         getShort (className)
                     )
                 );
@@ -247,7 +247,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Exception_Catched_Breakpoint",
+                        "CTL_Exception_Catched_Breakpoint",	//NOI18N
                         getShort (b.getExceptionClassName ())
                     )
                 );
@@ -256,7 +256,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Exception_Uncatched_Breakpoint",
+                        "CTL_Exception_Uncatched_Breakpoint",	//NOI18N
                         getShort (b.getExceptionClassName ())
                     )
                );
@@ -264,7 +264,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 return bold (b,
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Exception_Breakpoint",
+                        "CTL_Exception_Breakpoint",	//NOI18N
                         getShort (b.getExceptionClassName ())
                     )
                 );
@@ -285,15 +285,15 @@ public class BreakpointsNodeModel implements NodeModel {
             message = brkp.getValidityMessage();
             if (valid) {
                 appendMsg = NbBundle.getMessage(BreakpointsNodeModel.class,
-                                                "CTL_APPEND_BP_Valid");
+                                                "CTL_APPEND_BP_Valid");	//NOI18N
             }
             if (invalid) {
                 if (message != null) {
                     appendMsg = NbBundle.getMessage(BreakpointsNodeModel.class,
-                                                    "CTL_APPEND_BP_Invalid_with_reason", message);
+                                                    "CTL_APPEND_BP_Invalid_with_reason", message);	//NOI18N
                 } else {
                     appendMsg = NbBundle.getMessage(BreakpointsNodeModel.class,
-                                                    "CTL_APPEND_BP_Invalid");
+                                                    "CTL_APPEND_BP_Invalid");	//NOI18N
                 }
             }
         }
@@ -302,7 +302,7 @@ public class BreakpointsNodeModel implements NodeModel {
             description = 
                 NbBundle.getMessage (
                     BreakpointsNodeModel.class,
-                    "CTL_Line_Breakpoint",
+                    "CTL_Line_Breakpoint",	//NOI18N
                     EditorContextBridge.getFileName ((LineBreakpoint) o),
                     String.valueOf(((LineBreakpoint) o).getLineNumber ())
                 );
@@ -312,18 +312,18 @@ public class BreakpointsNodeModel implements NodeModel {
             if (b.getBreakpointType () == b.TYPE_THREAD_STARTED)
                 description = NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Thread_Started_Breakpoint"
+                        "CTL_Thread_Started_Breakpoint"	//NOI18N
                     );
             else
             if (b.getBreakpointType () == b.TYPE_THREAD_DEATH)
                 description = NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Thread_Death_Breakpoint"
+                        "CTL_Thread_Death_Breakpoint"	//NOI18N
                     );
             else
                 description = NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Thread_Breakpoint"
+                        "CTL_Thread_Breakpoint"	//NOI18N
                     );
         } else
         if (o instanceof FieldBreakpoint) {
@@ -332,7 +332,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Field_Access_Breakpoint",
+                        "CTL_Field_Access_Breakpoint",	//NOI18N
                         b.getClassName (),
                         b.getFieldName ()
                     );
@@ -340,7 +340,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Field_Modification_Breakpoint",
+                        "CTL_Field_Modification_Breakpoint",	//NOI18N
                         b.getClassName (),
                         b.getFieldName ()
                     );
@@ -348,7 +348,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Field_Access_or_Modification_Breakpoint",
+                        "CTL_Field_Access_or_Modification_Breakpoint",	//NOI18N
                         b.getClassName (),
                         b.getFieldName ()
                     );
@@ -362,14 +362,14 @@ public class BreakpointsNodeModel implements NodeModel {
                 description =
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_All_Methods_Breakpoint",
+                        "CTL_All_Methods_Breakpoint",	//NOI18N
                         className
                     );
             else
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Method_Breakpoint",
+                        "CTL_Method_Breakpoint",	//NOI18N
                         className,
                         b.getMethodName ()
                     );
@@ -388,7 +388,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Class_Loaded_Breakpoint",
+                        "CTL_Class_Loaded_Breakpoint",	//NOI18N
                         className
                     );
             else
@@ -396,14 +396,14 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Class_Unloaded_Breakpoint",
+                        "CTL_Class_Unloaded_Breakpoint",	//NOI18N
                         className
                     );
             else
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Class_Breakpoint",
+                        "CTL_Class_Breakpoint",	//NOI18N
                         className
                     );
         } else
@@ -413,7 +413,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Exception_Catched_Breakpoint",
+                        "CTL_Exception_Catched_Breakpoint",	//NOI18N
                         b.getExceptionClassName ()
                     );
             else
@@ -421,20 +421,20 @@ public class BreakpointsNodeModel implements NodeModel {
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Exception_Uncatched_Breakpoint",
+                        "CTL_Exception_Uncatched_Breakpoint",	//NOI18N
                         b.getExceptionClassName ()
                     );
             else
                 description = 
                     NbBundle.getMessage (
                         BreakpointsNodeModel.class,
-                        "CTL_Exception_Breakpoint",
+                        "CTL_Exception_Breakpoint",	//NOI18N
                         b.getExceptionClassName ()
                     );
         } else
         throw new UnknownTypeException (o);
         if (appendMsg != null) {
-            description = description + " " + appendMsg;
+            description = description + " " + appendMsg;	//NOI18N
         }
         return description;
     }
@@ -475,7 +475,7 @@ public class BreakpointsNodeModel implements NodeModel {
                 }
             }
             if (invalid && !disabled) {
-                iconBase += "_broken";
+                iconBase += "_broken";	//NOI18N
             }
             return iconBase;
         } else
@@ -497,7 +497,7 @@ public class BreakpointsNodeModel implements NodeModel {
             } else {
                 iconBase = BREAKPOINT;
                 if (invalid) {
-                    iconBase += "_broken";
+                    iconBase += "_broken";	//NOI18N
                 }
             }
             return iconBase;

@@ -94,7 +94,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         } catch (java.awt.IllegalComponentStateException icsex) {}
         mb.setPrintText (
             NbBundle.getBundle (MethodBreakpointPanel.class).getString 
-                ("CTL_Method_Breakpoint_Print_Text")
+                ("CTL_Method_Breakpoint_Print_Text")	//NOI18N
         );
         return mb;
     }
@@ -114,7 +114,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         String className = "";
         String[] cf = b.getClassFilters ();
         className = ClassBreakpointPanel.concatClassFilters(cf);
-        tfClassName = new JEditorPane("text/x-fx", className);
+        tfClassName = new JEditorPane("text/x-fx", className);	//NOI18N
         tfClassName.getAccessibleContext().setAccessibleName(NbBundle.getMessage(MethodBreakpointPanel.class, "ACSN_Method_Breakpoint_ClassName"));
         tfClassName.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(MethodBreakpointPanel.class, "ACSD_Method_Breakpoint_ClassName"));
         jLabel3.setLabelFor(tfClassName);
@@ -124,7 +124,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
             cbAllMethods.setSelected (true);
             tfMethodName.setEnabled (false);
         } else {
-            tfMethodName.setText (b.getMethodName () + " " + createParamTypesFromSignature(b.getMethodSignature()));
+            tfMethodName.setText (b.getMethodName () + " " + createParamTypesFromSignature(b.getMethodSignature()));	//NOI18N
         }
         cbBreakpointType.addItem (NbBundle.getMessage(MethodBreakpointPanel.class, "LBL_Method_Breakpoint_Type_Entry"));
         cbBreakpointType.addItem (NbBundle.getMessage(MethodBreakpointPanel.class, "LBL_Method_Breakpoint_Type_Exit"));
@@ -146,10 +146,10 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         conditionsPanel.setCondition(b.getCondition());
         conditionsPanel.setHitCountFilteringStyle(b.getHitCountFilteringStyle());
         conditionsPanel.setHitCount(b.getHitCountFilter());
-        cPanel.add(conditionsPanel, "Center");
+        cPanel.add(conditionsPanel, "Center");	//NOI18N
         
         actionsPanel = new ActionsPanel (b);
-        pActions.add (actionsPanel, "Center");
+        pActions.add (actionsPanel, "Center");	//NOI18N
         // <RAVE>
         // The help IDs for the AddBreakpointPanel panels have to be different from the
         // values returned by getHelpCtx() because they provide different help
@@ -161,12 +161,12 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
     /** @return comma-separated parameter types */
     private static String createParamTypesFromSignature(String signature) {
         if (signature == null || signature.length() == 0) return "";
-        int end = signature.lastIndexOf(")");
+        int end = signature.lastIndexOf(")");	//NOI18N
         if (end < 0) {
             ErrorManager.getDefault().notify(new IllegalArgumentException("Bad signature: "+signature));
             return "";
         }
-        StringBuilder paramTypes = new StringBuilder("(");
+        StringBuilder paramTypes = new StringBuilder("(");	//NOI18N
         int[] s = new int[] { 1 }; // skipping the opening '('
         while (s[0] < signature.length()) {
             if (signature.charAt(s[0]) == ')') {
@@ -181,7 +181,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
     
     /** @param paramTypes comma-separated parameter types */
     private static String createSignatureFromParamTypes(String paramTypes) {
-        StringBuilder signature = new StringBuilder("(");
+        StringBuilder signature = new StringBuilder("(");	//NOI18N
         int s = 0;
         int e;
         while (s < paramTypes.length()) {
@@ -199,26 +199,26 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
     }
     
     private static String getSignature(String javaType) {
-        if (javaType.equals("boolean")) {
-            return "Z";
-        } else if (javaType.equals("byte")) {
-            return "B";
-        } else if (javaType.equals("char")) {
-            return "C";
-        } else if (javaType.equals("short")) {
-            return "S";
-        } else if (javaType.equals("int")) {
+        if (javaType.equals("boolean")) {	//NOI18N
+            return "Z";	//NOI18N
+        } else if (javaType.equals("byte")) {	//NOI18N
+            return "B";	//NOI18N
+        } else if (javaType.equals("char")) {	//NOI18N
+            return "C";	//NOI18N
+        } else if (javaType.equals("short")) {	//NOI18N
+            return "S";	//NOI18N
+        } else if (javaType.equals("int")) {	//NOI18N
             return "I";
-        } else if (javaType.equals("long")) {
-            return "J";
-        } else if (javaType.equals("float")) {
-            return "F";
-        } else if (javaType.equals("double")) {
-            return "D";
-        } else if (javaType.endsWith("[]")) {
-            return "["+getSignature(javaType.substring(0, javaType.length() - 2));
+        } else if (javaType.equals("long")) {	//NOI18N
+            return "J";	//NOI18N
+        } else if (javaType.equals("float")) {	//NOI18N
+            return "F";	//NOI18N
+        } else if (javaType.equals("double")) {	//NOI18N
+            return "D";	//NOI18N
+        } else if (javaType.endsWith("[]")) {	//NOI18N
+            return "["+getSignature(javaType.substring(0, javaType.length() - 2));	//NOI18N
         } else {
-            return "L"+javaType.replace('.', '/')+";";
+            return "L"+javaType.replace('.', '/')+";";	//NOI18N
         }
     }
     
@@ -226,39 +226,39 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         char c = signature.charAt(pos[0]);
         if (c == 'Z') {
             pos[0]++;
-            return "boolean";
+            return "boolean";	//NOI18N
         }
         if (c == 'B') {
             pos[0]++;
-            return "byte";
+            return "byte";	//NOI18N
         }
         if (c == 'C') {
             pos[0]++;
-            return "char";
+            return "char";	//NOI18N
         }
         if (c == 'S') {
             pos[0]++;
-            return "short";
+            return "short";	//NOI18N
         }
         if (c == 'I') {
             pos[0]++;
-            return "int";
+            return "int";	//NOI18N
         }
         if (c == 'J') {
             pos[0]++;
-            return "long";
+            return "long";	//NOI18N
         }
         if (c == 'F') {
             pos[0]++;
-            return "float";
+            return "float";	//NOI18N
         }
         if (c == 'D') {
             pos[0]++;
-            return "double";
+            return "double";	//NOI18N
         }
         if (c == 'L') {
             pos[0]++;
-            int typeEnd = signature.indexOf(";", pos[0]);
+            int typeEnd = signature.indexOf(";", pos[0]);	//NOI18N
             if (typeEnd < 0) {
                 throw new IllegalArgumentException("Bad signature: '"+signature+"', 'L' not followed by ';' at position "+pos[0]);
             }
@@ -270,7 +270,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         if (c == '[') {
             pos[0]++;
             String type = getType(signature, pos);
-            return type + "[]";
+            return type + "[]";	//NOI18N
         }
         throw new IllegalArgumentException("Bad signature: '"+signature+"', unrecognized element '"+c+"' at position "+pos[0]);
     }
@@ -456,13 +456,13 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
             String methodAndSignature = tfMethodName.getText ().trim ();
             String methodName;
             String signature;
-            int index = methodAndSignature.indexOf("(");
+            int index = methodAndSignature.indexOf("(");	//NOI18N
             if (index < 0) {
                 methodName = methodAndSignature;
                 signature = null;
             } else {
                 methodName = methodAndSignature.substring(0, index).trim();
-                int end = methodAndSignature.indexOf(")", index);
+                int end = methodAndSignature.indexOf(")", index);	//NOI18N
                 if (end < 0) {
                     end = methodAndSignature.length();
                 }

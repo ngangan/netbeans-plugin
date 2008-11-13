@@ -67,9 +67,9 @@ import org.openide.util.NbBundle;
 public class CallStackNodeModel implements NodeModel {
 
     public static final String CALL_STACK =
-        "org/netbeans/modules/debugger/resources/callStackView/NonCurrentFrame";
+        "org/netbeans/modules/debugger/resources/callStackView/NonCurrentFrame";	//NOI18N
     public static final String CURRENT_CALL_STACK =
-        "org/netbeans/modules/debugger/resources/callStackView/CurrentFrame";
+        "org/netbeans/modules/debugger/resources/callStackView/CurrentFrame";	//NOI18N
 
     private JavaFXDebugger debugger;
     private Session session;
@@ -85,7 +85,7 @@ public class CallStackNodeModel implements NodeModel {
     public String getDisplayName (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT) {
             return NbBundle.getBundle (CallStackNodeModel.class).getString
-                ("CTL_CallstackModel_Column_Name_Name");
+                ("CTL_CallstackModel_Column_Name_Name");	//NOI18N
         } else
         if (o instanceof CallStackFrame) {
             CallStackFrame sf = (CallStackFrame) o;
@@ -172,17 +172,17 @@ public class CallStackNodeModel implements NodeModel {
         String fileName = l ? 
             sf.getClassName () :
             BreakpointsNodeModel.getShort (sf.getClassName ());
-        if ("JavaFX".equals (language))
-            fileName += "." + sf.getMethodName ();
+        if ("JavaFX".equals (language))	//NOI18N
+            fileName += "." + sf.getMethodName ();	//NOI18N
         else
             try {
                 fileName = sf.getSourcePath (language);
             } catch (AbsentInformationException e) {
-                fileName += "." + sf.getMethodName ();
+                fileName += "." + sf.getMethodName ();	//NOI18N
             }
         if (ln < 0)
             return fileName;
-        return fileName + ":" + ln;
+        return fileName + ":" + ln;	//NOI18N
     }
             
     

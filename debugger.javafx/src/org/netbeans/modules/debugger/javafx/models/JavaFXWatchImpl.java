@@ -77,7 +77,7 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
             debugger,
             v, 
             "" + watch +
-                (v instanceof ObjectReference ? "^" : "")
+                (v instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.debugger = debugger;
         this.watch = watch;
@@ -184,7 +184,7 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
         }
         // try to set as a field
         ReferenceType clazz = frame.getStackFrame().location().declaringType();
-        Field field = clazz.fieldByName("$"+getExpression());
+        Field field = clazz.fieldByName("$"+getExpression());	//NOI18N
         if (field == null) {
             throw new InvalidExpressionException (
                 NbBundle.getMessage(JavaFXWatchImpl.class, "MSG_CanNotSetValue", getExpression()));
@@ -199,7 +199,7 @@ class JavaFXWatchImpl extends AbstractVariable implements JavaFXWatch {
                             ObjectReference ref = (ObjectReference)v;
                             ReferenceType rt = ref.referenceType();
                             if (rt!=null){
-                                Field valueField = rt.fieldByName("$value");
+                                Field valueField = rt.fieldByName("$value");	//NOI18N
                                 if (valueField!=null) {
                                     ref.setValue(valueField, value);
                                 }

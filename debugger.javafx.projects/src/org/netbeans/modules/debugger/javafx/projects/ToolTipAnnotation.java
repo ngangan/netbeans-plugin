@@ -151,20 +151,20 @@ public class ToolTipAnnotation extends Annotation implements Runnable {
             String value = v.getValue ();
             if (v instanceof ObjectVariable)
                 try {
-                    toolTipText = expression + " = " + 
+                    toolTipText = expression + " = " + 	//NOI18N
                         (type.length () == 0 ? 
                             "" : 
-                            "(" + type + ") ") +
+                            "(" + type + ") ") +	//NOI18N
                         ((ObjectVariable) v).getToStringValue ();
                 } catch (InvalidExpressionException ex) {
-                    toolTipText = expression + " = " +
+                    toolTipText = expression + " = " +	//NOI18N
                         (type.length () == 0 ? 
                             "" : 
-                            "(" + type + ") ") +
+                            "(" + type + ") ") +	//NOI18N
                         value;
                 }
             else 
-                toolTipText = expression + " = " + 
+                toolTipText = expression + " = " + 	//NOI18N
                     (type.length () == 0 ? 
                         "" : 
                         "(" + type + ") ") +

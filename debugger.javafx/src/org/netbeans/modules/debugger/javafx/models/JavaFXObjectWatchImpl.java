@@ -77,7 +77,7 @@ ObjectVariable {
             debugger, 
             v, 
             "" + watch +
-                (v instanceof ObjectReference ? "^" : "")
+                (v instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.debugger = debugger;
         this.watch = watch;
@@ -157,7 +157,7 @@ ObjectVariable {
         
         // 2) try to set as a local variable value
         try {
-            LocalVariable local = frame.getLocalVariable("$"+getExpression ());
+            LocalVariable local = frame.getLocalVariable("$"+getExpression ());	//NOI18N
             if (local != null) {
                 if (local instanceof Local) {
                     ((Local) local).setValue(value);
@@ -171,7 +171,7 @@ ObjectVariable {
         }
         // 2,5) try to set as static field
         ReferenceType clazz = frame.getStackFrame().location().declaringType();
-        Field field1 = clazz.fieldByName("$"+getExpression());
+        Field field1 = clazz.fieldByName("$"+getExpression());	//NOI18N
         if (field1 == null) {
             throw new InvalidExpressionException (
                 "Can not set value to expression.");
@@ -186,7 +186,7 @@ ObjectVariable {
                             ObjectReference ref = (ObjectReference)v;
                             ReferenceType rt = ref.referenceType();
                             if (rt!=null){
-                                Field valueField = rt.fieldByName("$value");
+                                Field valueField = rt.fieldByName("$value");	//NOI18N
                                 if (valueField!=null) {
                                     ref.setValue(valueField, value);
                                 }
@@ -212,7 +212,7 @@ ObjectVariable {
                      ("Can not set value to expression.");
         }
         Field field = thisObject.referenceType ().fieldByName
-            ("$"+getExpression ());
+            ("$"+getExpression ());	//NOI18N
         if (field == null)
             throw new InvalidExpressionException 
                 ("Can not set value to expression.");

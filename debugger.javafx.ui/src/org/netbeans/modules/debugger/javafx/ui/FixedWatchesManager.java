@@ -69,10 +69,10 @@ public class FixedWatchesManager implements TreeModelFilter,
 NodeActionsProviderFilter, ExtendedNodeModelFilter {
             
     public static final String FIXED_WATCH =
-        "org/netbeans/modules/debugger/resources/watchesView/FixedWatch.gif";
+        "org/netbeans/modules/debugger/resources/watchesView/FixedWatch.gif";	//NOI18N
     private final Action DELETE_ACTION = Models.createAction (
         NbBundle.getBundle (FixedWatchesManager.class).getString 
-            ("CTL_DeleteFixedWatch_Label"),
+            ("CTL_DeleteFixedWatch_Label"),	//NOI18N
         new Models.ActionPerformer () {
             public boolean isEnabled (Object node) {
                 return !WatchesNodeModel.isEmptyWatch(node);
@@ -92,12 +92,12 @@ NodeActionsProviderFilter, ExtendedNodeModelFilter {
     { 
         DELETE_ACTION.putValue (
             Action.ACCELERATOR_KEY,
-            KeyStroke.getKeyStroke ("DELETE")
+            KeyStroke.getKeyStroke ("DELETE")	//NOI18N
         );
     };
     private final Action CREATE_FIXED_WATCH_ACTION = Models.createAction (
         NbBundle.getBundle (FixedWatchesManager.class).getString 
-            ("CTL_CreateFixedWatch_Label"),
+            ("CTL_CreateFixedWatch_Label"),	//NOI18N
         new Models.ActionPerformer () {
             public boolean isEnabled (Object node) {
                 return !WatchesNodeModel.isEmptyWatch(node) && !isPrimitive(node);
@@ -117,14 +117,14 @@ NodeActionsProviderFilter, ExtendedNodeModelFilter {
                 }
                 String type = v.getType ();
                 return "".equals(type)        ||
-                        "boolean".equals(type)||
-                        "byte".equals (type)  || 
-                        "char".equals (type)  || 
-                        "short".equals (type) ||
-                        "int".equals (type)   || 
-                        "long".equals (type)  || 
-                        "float".equals (type) || 
-                        "double".equals (type);
+                        "boolean".equals(type)||	//NOI18N
+                        "byte".equals (type)  || 	//NOI18N
+                        "char".equals (type)  || 	//NOI18N
+                        "short".equals (type) ||	//NOI18N
+                        "int".equals (type)   || 	//NOI18N
+                        "long".equals (type)  || 	//NOI18N
+                        "float".equals (type) || 	//NOI18N
+                        "double".equals (type);	//NOI18N
             }
 
         },
@@ -290,11 +290,11 @@ NodeActionsProviderFilter, ExtendedNodeModelFilter {
             } else if (variable instanceof Field) {
                 name = ((Field) variable).getName();
             } else if (variable instanceof This) {
-                name = "this";
+                name = "this";	//NOI18N
             } else if (variable instanceof ObjectVariable) {
-                name = "object";
+                name = "object";	//NOI18N
             } else {
-                name = "unnamed";
+                name = "unnamed";	//NOI18N
             }
             addFixedWatch (name, variable);
         }
@@ -304,7 +304,7 @@ NodeActionsProviderFilter, ExtendedNodeModelFilter {
         // Clone the variable to assure that it's unique and sticks to the JDI value.
         if (variable instanceof Cloneable) {
             try { // terrible code to invoke the clone() method
-                java.lang.reflect.Method cloneMethod = variable.getClass().getMethod("clone", new Class[] {});
+                java.lang.reflect.Method cloneMethod = variable.getClass().getMethod("clone", new Class[] {});	//NOI18N
                 cloneMethod.setAccessible(true);
                 Object newVar = cloneMethod.invoke(variable, new Object[] {});
                 if (newVar instanceof Variable) {

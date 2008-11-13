@@ -77,7 +77,7 @@ org.netbeans.api.debugger.javafx.LocalVariable {
             debugger, 
             value, 
             local.name () + local.hashCode() +
-                (value instanceof ObjectReference ? "^" : "")
+                (value instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.local = local;
         if (frame != null) {
@@ -151,6 +151,6 @@ org.netbeans.api.debugger.javafx.LocalVariable {
     }
     
     public String toString () {
-        return "LocalVariable " + local.name ();
+        return "LocalVariable " + local.name ();	//NOI18N
     }
 }

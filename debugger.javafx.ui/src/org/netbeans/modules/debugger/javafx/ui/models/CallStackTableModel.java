@@ -69,7 +69,7 @@ public class CallStackTableModel implements TableModel, Constants {
                 } catch (AbsentInformationException e) {
                     return NbBundle.getMessage (
                         CallStackTableModel.class, 
-                        "MSG_Callstack_NoInformation"
+                        "MSG_Callstack_NoInformation"	//NOI18N
                     );
                 }
         }

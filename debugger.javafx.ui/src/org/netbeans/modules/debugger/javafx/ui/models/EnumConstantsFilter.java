@@ -65,7 +65,7 @@ public class EnumConstantsFilter extends VariablesFilterAdapter {
     
     public String[] getSupportedAncestors () {
         return new String[] {
-            "java.lang.Enum"
+            "java.lang.Enum"	//NOI18N
         };
     }
     
@@ -97,11 +97,11 @@ public class EnumConstantsFilter extends VariablesFilterAdapter {
             }
         } else if (columnID == Constants.LOCALS_TYPE_COLUMN_ID || columnID == Constants.WATCH_TYPE_COLUMN_ID) {
             String typeName = ov.getType();
-            int idx = typeName.lastIndexOf("$");
+            int idx = typeName.lastIndexOf("$");	//NOI18N
             if (idx != -1) {
                 return typeName.substring(idx + 1);
             }
-            idx = typeName.lastIndexOf(".");
+            idx = typeName.lastIndexOf(".");	//NOI18N
             if (idx != -1) {
                 return typeName.substring(idx + 1);
             }

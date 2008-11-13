@@ -69,7 +69,7 @@ import org.netbeans.api.debugger.javafx.ObjectVariable;
  */
 public class JavaFXClassTypeImpl implements JavaFXClassType {
     
-    private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI8N
+    private static final Logger loggerValue = Logger.getLogger("org.netbeans.modules.debugger.javafx.getValue"); // NOI18N
     
     private JavaFXDebuggerImpl debugger;
     private ReferenceType classType;
@@ -100,7 +100,7 @@ public class JavaFXClassTypeImpl implements JavaFXClassType {
     }
     
     public ObjectVariable getClassLoader() {
-        return new AbstractObjectVariable(debugger, classType.classLoader(), "Loader "+getName());
+        return new AbstractObjectVariable(debugger, classType.classLoader(), "Loader "+getName());	//NOI18N
     }
     
     public Object getSuperClass() {
@@ -230,7 +230,7 @@ public class JavaFXClassTypeImpl implements JavaFXClassType {
             return new AbstractList<ObjectVariable>() {
                 public ObjectVariable get(int i) {
                     ObjectReference obj = instances.get(i);
-                    return new AbstractObjectVariable(debugger, obj, classType.name()+" instance "+i);
+                    return new AbstractObjectVariable(debugger, obj, classType.name()+" instance "+i);	//NOI18N
                 }
 
                 public int size() {

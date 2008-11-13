@@ -66,7 +66,7 @@ class SuperVariable extends AbstractObjectVariable implements Super {
         super (
             debugger, 
             value, 
-            parentID + ".super^"
+            parentID + ".super^"	//NOI18N
         );
         this.classType = classType;
     }
@@ -90,13 +90,13 @@ class SuperVariable extends AbstractObjectVariable implements Super {
 
     public SuperVariable clone() {
         return new SuperVariable(getDebugger(), (ObjectReference) getJDIValue(), classType,
-                getID().substring(0, getID().length() - ".super^".length()));
+                getID().substring(0, getID().length() - ".super^".length()));	//NOI18N
     }
     
     // other methods ...........................................................
         
     public String toString () {
-        return "SuperVariable " + getType();
+        return "SuperVariable " + getType();	//NOI18N
     }
     
     public String getType () {
