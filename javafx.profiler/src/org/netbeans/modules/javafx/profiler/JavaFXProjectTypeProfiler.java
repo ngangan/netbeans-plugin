@@ -172,8 +172,8 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     @Override
     public boolean isFileObjectSupported(final Project project, final FileObject fo) {
-        if (!"java".equals(fo.getExt()) && !"class".equals(fo.getExt()) &&
-            !"fx".equals(fo.getExt())) {
+        if (!"java".equals(fo.getExt()) && !"class".equals(fo.getExt()) &&       // NOI18N
+            !"fx".equals(fo.getExt())) {                                         // NOI18N
             return false; // NOI18N
         }
         
@@ -242,7 +242,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
         JavaPlatformManager jpm = JavaPlatformManager.getDefault();
 
-        if (platformName.equals("default_platform")) {
+        if (platformName.equals("default_platform")) {  // NOI18N
             return jpm.getDefaultPlatform(); // NOI18N
         }
 
@@ -301,7 +301,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         // 2. the profiler version has been changed (see above)
         // 3. the stylesheet changed (usually should be caught by 2.)
         final GeneratedFilesHelper gfh = new GeneratedFilesHelper(project.getProjectDirectory());
-        int flags = gfh.getBuildScriptState("nbproject/profiler-build-impl.xml",
+        int flags = gfh.getBuildScriptState("nbproject/profiler-build-impl.xml",                                     // NOI18N
                                             JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
 
         if (((flags & GeneratedFilesHelper.FLAG_MISSING) != 0) || ((flags & GeneratedFilesHelper.FLAG_OLD_STYLESHEET) != 0)) {
@@ -309,14 +309,14 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 if ((flags & GeneratedFilesHelper.FLAG_MODIFIED) != 0) {
                     if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(REGENERATE_BUILDSCRIPT_MSG,
                                                                                                           new Object[] {
-                                                                                                              "profiler-build-impl.xml"
-                                                                                                          }), // NOI18N
+                                                                                                              "profiler-build-impl.xml"  // NOI18N
+                                                                                                          }),
                                                                                      NotifyDescriptor.OK_CANCEL_OPTION)) != NotifyDescriptor.OK_OPTION) {
                         return false;
                     }
                 }
 
-                gfh.generateBuildScriptFromStylesheet("nbproject/profiler-build-impl.xml",
+                gfh.generateBuildScriptFromStylesheet("nbproject/profiler-build-impl.xml",  // NOI18N
                                                       JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
             } catch (IOException e1) {
                 err.notify(ErrorManager.WARNING, e1);
@@ -326,7 +326,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         }
 
         // store info about profiler with project's auxiliary configuration
-        final Element profilerFragment = XMLUtil.createDocument("ignore", null, null, null)
+        final Element profilerFragment = XMLUtil.createDocument("ignore", null, null, null)   // NOI18N
                                                 .createElementNS(ProjectUtilities.PROFILER_NAME_SPACE, "data"); // NOI18N
         profilerFragment.setAttribute(PROFILE_VERSION_ATTRIBUTE, VERSION_NUMBER);
         ((AuxiliaryConfiguration) project.getLookup().lookup(AuxiliaryConfiguration.class)).putConfigurationFragment(profilerFragment,
@@ -366,9 +366,9 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             // notify the user that the build script cannot be modified, and he should perform the change himself
             ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(MODIFY_BUILDSCRIPT_MANUALLY_MSG,
                                                                                      new Object[] {
-                                                                                         "build.xml",
-                                                                                         "<import file=\"nbproject/profiler-build-impl.xml\"/>"
-                                                                                     }), // NOI18N
+                                                                                         "build.xml",                                           // NOI18N
+                                                                                         "<import file=\"nbproject/profiler-build-impl.xml\"/>" // NOI18N
+                                                                                     }),
                                                                 NotifyDescriptor.WARNING_MESSAGE));
 
             return false;
@@ -453,12 +453,12 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                     AppletSupport.generateSecurityPolicy(project.getProjectDirectory(), buildFolder);
 
                     if ((jvmargs == null) || (jvmargs.length() == 0)) {
-                        props.setProperty("run.jvmargs",
-                                          "-Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath() + File.separator
+                        props.setProperty("run.jvmargs",  // NOI18N
+                                          "-Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath() + File.separator  // NOI18N
                                           + "applet.policy"); //NOI18N
                     } else {
-                        props.setProperty("run.jvmargs",
-                                          jvmargs + " -Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath()
+                        props.setProperty("run.jvmargs",                       // NOI18N
+                                          jvmargs + " -Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath()  // NOI18N
                                           + File.separator + "applet.policy"); //NOI18N
                     }
                 }

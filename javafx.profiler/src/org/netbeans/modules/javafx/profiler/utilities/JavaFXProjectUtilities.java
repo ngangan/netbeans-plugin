@@ -220,7 +220,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                                         return getBinaryName(classElement, classElement.getEnclosingElement());
                                     } catch (NullPointerException e) {
                                         ProfilerLogger.log(e);
-                                        return "";
+                                        return ""; //NOI18N
                                     }
                                 }
                             };
@@ -337,12 +337,12 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
             StringBuffer projectPackages = new StringBuffer();
 
             for (int i = 0; i < projectPackagesDescr[0].length; i++) {
-                projectPackages.append("".equals(projectPackagesDescr[0][i]) ? getDefaultPackageClassNames(project)
+                projectPackages.append("".equals(projectPackagesDescr[0][i]) ? getDefaultPackageClassNames(project) //NOI18N
                         : (projectPackagesDescr[0][i] + ". ")); //NOI18N
             }
             
             // TBD: correct filter name!!!
-            return new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
+            return new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, //NOI18N
                     projectPackages.toString().trim());
         } else if (FILTER_PROJECT_SUBPROJECTS_ONLY.equals(predefinedInstrFilter)) {
             computeProjectPackages(project, true, projectPackagesDescr);
@@ -350,11 +350,11 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
             StringBuffer projectPackages = new StringBuffer();
 
             for (int i = 0; i < projectPackagesDescr[1].length; i++) {
-                projectPackages.append("".equals(projectPackagesDescr[1][i]) ? getDefaultPackageClassNames(project)
+                projectPackages.append("".equals(projectPackagesDescr[1][i]) ? getDefaultPackageClassNames(project) //NOI18N
                         : (projectPackagesDescr[1][i] + ". ")); //NOI18N // TODO: default packages need to be processed also for subprojects!!!
             }
             // TBD: correct filter name!!!
-            return new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE,
+            return new SimpleFilter("", SimpleFilter.SIMPLE_FILTER_INCLUSIVE, //NOI18N
                     projectPackages.toString().trim());
         }
 
@@ -579,9 +579,8 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                     return "java.lang.Object"; // NOI18N // Shouldn't happen
                 }
 
-                if ((subTypes.size() > 1) && subTypes.get(0).toString().equals("java.lang.Object")
-                        && getDeclaredType(subTypes.get(1)).getKind().isInterface()) {
-                    // NOI18N
+                if ((subTypes.size() > 1) && subTypes.get(0).toString().equals("java.lang.Object") // NOI18N
+                        && getDeclaredType(subTypes.get(1)).getKind().isInterface()) {                    
                     // Master type is interface
                     return getRealTypeName(subTypes.get(1), ci);
                 } else {

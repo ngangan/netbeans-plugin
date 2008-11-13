@@ -91,18 +91,18 @@ class MemoryFileObject extends SimpleJavaFileObject {
     }
 
     private static URI toURI(String className) {
-        return URI.create("./" + getFilePath(className));                           //NOI18
+        return URI.create("./" + getFilePath(className));                           //NOI18N
     }
     
     private static String getFileName(String className){
-        return className.substring(className.lastIndexOf('.') + 1) + ".fx";         //NOI18
+        return className.substring(className.lastIndexOf('.') + 1) + ".fx";         //NOI18N
     }
     
     private static String getFilePath(String className){
-        return className.replace('.','/') + ".fx";                                  //NOI18
+        return className.replace('.','/') + ".fx";                                  //NOI18N
     }
 
     private void print(String text) {
-        System.out.println("[file object] " + text);                                //NOI18
+        System.out.println("[file object] " + text);                                //NOI18N
     }    
 }
