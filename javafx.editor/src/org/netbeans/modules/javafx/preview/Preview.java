@@ -92,7 +92,7 @@ public class Preview {
             try {
                 PreviewSideServer engine = previewSideServers.get(hashCode);
                 engine.remove();
-                registry.unbind(PREVIEW_SIDE + " " + hashCode);                         //NOI18
+                registry.unbind(PREVIEW_SIDE + SPACE + hashCode);
                 UnicastRemoteObject.unexportObject(engine, true);
                 previewSideServers.remove(hashCode);    
             } catch (NotBoundException ex) {
@@ -103,12 +103,12 @@ public class Preview {
         }
         public void createPreview(int hashCode, String fileName, Point previewLocation, Dimension previewSize) throws RemoteException {
             try {
-                NBSideServerFace nbSideServerFace = (NBSideServerFace) registry.lookup(NB_SIDE + " " + hashCode);                           //NOI18
+                NBSideServerFace nbSideServerFace = (NBSideServerFace) registry.lookup(NB_SIDE + SPACE + hashCode);
                 PreviewSideServer engine = new PreviewSideServer(nbSideServerFace, hashCode, fileName, lf, previewLocation, previewSize);
                 previewSideServers.put(hashCode, engine);
                 UnicastRemoteObject.unexportObject(engine, true);
                 PreviewSideServerFace stub = (PreviewSideServerFace) UnicastRemoteObject.exportObject(engine, 0);
-                registry.rebind(PREVIEW_SIDE + " " + hashCode, stub);                                                                       //NOI18
+                registry.rebind(PREVIEW_SIDE + SPACE + hashCode, stub);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -301,7 +301,7 @@ public class Preview {
 
             scrollComponent = new JScrollPane();
             blockProcessing = true;
-            previewFrame = new JFrame(DESIGN_PREVIEW + " [" + fileName + "]"); // NOI18
+            previewFrame = new JFrame(DESIGN_PREVIEW + " [" + fileName + "]");  // NOI18N
             blockProcessing = false;
             previewFrame.setSize(previewSize);
             previewFrame.setLocation(previewLocation);
@@ -318,7 +318,7 @@ public class Preview {
             EventQueue eq = null;
             ThreadGroup tg = null;
             public ACThread(ThreadGroup tg, String lf) {
-                super(tg, "SACT");                          //NOI18
+                super(tg, "SACT");                                              //NOI18N
                 this.tg = tg;
                 this.lf = lf;
             }
@@ -444,7 +444,7 @@ public class Preview {
         private volatile boolean check = false;
         public void  run(final Object context)  throws RemoteException {
             if (threadGroup == null) {
-                threadGroup = new ExceptionAwareThreadGroup("SACG" + instanceCounter++);      //NOI18
+                threadGroup = new ExceptionAwareThreadGroup("SACG" + instanceCounter++);      //NOI18N
                 acTread = new ACThread(threadGroup, lf);
                 acTread.start();
                 try {
@@ -549,19 +549,19 @@ public class Preview {
     }
 
     public void start(int instance) {
-        System.setProperty("apple.awt.UIElement", "true");
-        NB_SIDE = instance + " " +  NB_SIDE;
-        PREVIEW_SIDE = instance +  " " + PREVIEW_SIDE;
+        System.setProperty(UI_ELEMENT, TRUE);
+        NB_SIDE = instance + SPACE +  NB_SIDE;
+        PREVIEW_SIDE = instance +  SPACE + PREVIEW_SIDE;
         try {
             URL.setURLStreamHandlerFactory( (URLStreamHandlerFactory) new MFOURLStreamHanfler.Factory());
             System.setSecurityManager(new RMISecurityManager() {
 
                 @Override
                 public void checkPermission(Permission perm) {
-                    if (perm.getName().contains("exitVM")) {
+                    if (perm.getName().contains(EXIT_VM)) {
                         if (!permissionToExitIsGranted) {
                             previewSideDispatcherServer.processExitVM(Thread.currentThread().getThreadGroup());
-                            throw new SecurityException("Attempt to exit from Preview JVM");
+                            throw new SecurityException(EXIT_ATTEMPT);
                         }
                     }
                 }
@@ -599,13 +599,18 @@ public class Preview {
     }
 
     private static int instanceCounter = 0;
-    
-    private static String NB_SIDE = "NBSide";                               // NOI18N
-    private static String PREVIEW_SIDE = "PreviewSide";                     // NOI18N
-    private static String APC = "sun.awt.AppContext";                       // NOI18N
-    private static String DSP = "dispose";                                  // NOI18N
-    private static String CNAC = "createNewAppContext";                     // NOI18N
-    private static String SAST = "sun.awt.SunToolkit";                      // NOI18N
-    private static String DESIGN_PREVIEW = "Design Preview";                // NOI18N
+ 
+    private static String SPACE = " ";                                          // NOI18N
+    private static String TRUE = "true";                                        // NOI18N
+    private static String UI_ELEMENT = "apple.awt.UIElement";                   // NOI18N
+    private static String EXIT_VM = "exitVM";                                   // NOI18N
+    private static String EXIT_ATTEMPT = "Attempt to exit from Preview JVM";    // NOI18N
+    private static String NB_SIDE = "NBSide";                                   // NOI18N
+    private static String PREVIEW_SIDE = "PreviewSide";                         // NOI18N
+    private static String APC = "sun.awt.AppContext";                           // NOI18N
+    private static String DSP = "dispose";                                      // NOI18N
+    private static String CNAC = "createNewAppContext";                         // NOI18N
+    private static String SAST = "sun.awt.SunToolkit";                          // NOI18N
+    private static String DESIGN_PREVIEW = "Design Preview";                    // NOI18N
     private static String EDT_HANGS = "Preview cancelled due to problems in previewed code.";                      // NOI18N
 }

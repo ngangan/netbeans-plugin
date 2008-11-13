@@ -174,18 +174,18 @@ public class JavaFXDocument extends NbEditorDocument {
         if (enabled) {
             Project project = getProject(this);
             org.netbeans.spi.project.support.ant.PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
-            Object profile = evaluator.getProperty("javafx.profile");
+            Object profile = evaluator.getProperty("javafx.profile");                                                   //NOI18N
             if (profile != null)
-                if (profile.toString().contentEquals("mobile")) {
-                    String message = NbBundle.getMessage(JavaFXDocument.class, "PREVIEW_DISABLED_BY_PROFILE");
-                    NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.INFORMATION_MESSAGE);
+                if (profile.toString().contentEquals("mobile")) {                                                       //NOI18N
+                    String message = NbBundle.getMessage(JavaFXDocument.class, "PREVIEW_DISABLED_BY_PROFILE");          //NOI18N
+                    NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.INFORMATION_MESSAGE);  
                     DialogDisplayer.getDefault().notify(d);
                     return;
                 }
         }
         for (Component component : createToolbar(pane).getComponents()) {
             if (component instanceof JToggleButton) {
-                if (((JToggleButton)component).getClientProperty("enablePreviewMark") == Boolean.TRUE) {    //NOI18N
+                if (((JToggleButton)component).getClientProperty("enablePreviewMark") == Boolean.TRUE) {                //NOI18N
                     ((JToggleButton)component).setSelected(enabled);
                 }
             }

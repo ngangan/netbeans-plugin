@@ -80,7 +80,7 @@ public class Bridge extends ModuleInstall {
             try {
                 previewDispatcher.stopPreview(document.hashCode());
                 Integer hashCode = document.hashCode();
-                registry.unbind(NB_SIDE + " " + hashCode);
+                registry.unbind(NB_SIDE + SPACE + hashCode);
                 UnicastRemoteObject.unexportObject(nbSideServers.get(document), true);
                 previewSideServerFaces.remove(document);
                 nbSideServers.remove(document);
@@ -114,9 +114,9 @@ public class Bridge extends ModuleInstall {
                 UnicastRemoteObject.unexportObject(preview, true);
                 NBSideServerFace stub = (NBSideServerFace) UnicastRemoteObject.exportObject(preview, 0);     
                 Integer hashCode = document.hashCode();
-                registry.rebind(NB_SIDE + " " + hashCode, stub);                                                                    
+                registry.rebind(NB_SIDE + SPACE + hashCode, stub);
                 previewDispatcher.createPreview(document.hashCode(), document.getDataObject().getPrimaryFile().getNameExt(), document.getPreviewLocation(), document.getPreviewSize());
-                previewSideServerFace = (PreviewSideServerFace) registry.lookup(PREVIEW_SIDE + " " + hashCode);
+                previewSideServerFace = (PreviewSideServerFace) registry.lookup(PREVIEW_SIDE + SPACE + hashCode);
                 preview.setPreviewSideServerFace(previewSideServerFace);
                 previewSideServerFaces.put(document, previewSideServerFace);
                 nbSideServers.put(document, preview);
@@ -139,7 +139,7 @@ public class Bridge extends ModuleInstall {
         }
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().contentEquals("javafx.profile"))                             // NOI18N
-                if (evt.getNewValue().toString().contentEquals("mobile")) {
+                if (evt.getNewValue().toString().contentEquals("mobile")) {                        // NOI18N
                     document.enableExecution(false);
                 }
         }
@@ -150,41 +150,41 @@ public class Bridge extends ModuleInstall {
         String exePath = null;
         String exe = JAVA;
         if (home.length() > 0) {
-            String os_arch = System.getProperty("os.arch");                     //NOI18
-            if ("SunOS".equals(System.getProperty("os.name")) &&                //NOI18
-               ("sparcv9".equals(os_arch) || "amd64".equals(os_arch))) {        //NOI18
-                exePath = home + File.separator + "bin" + File.separator +      //NOI18
+            String os_arch = System.getProperty("os.arch");                     //NOI18N
+            if ("SunOS".equals(System.getProperty("os.name")) &&                //NOI18N
+               ("sparcv9".equals(os_arch) || "amd64".equals(os_arch))) {        //NOI18N
+                exePath = home + File.separator + "bin" + File.separator +      //NOI18N
                     os_arch + File.separator + exe;
             } else {
-                exePath = home + File.separator + "bin" + File.separator + exe; //NOI18
+                exePath = home + File.separator + "bin" + File.separator + exe; //NOI18N
             }
         } else {
             exePath = exe;
         }
         if (hasWhitespace(exe)) {
-            exePath = "\"" + exePath + "\"";
+            exePath = "\"" + exePath + "\"";                                    // NOI18N
         }
         
-        String classs = "org/netbeans/modules/javafx/preview/Main";                                                                             //NOI18
+        String classs = "org/netbeans/modules/javafx/preview/Main";             //NOI18N
         String path = "";
         try {
-            path = URLDecoder.decode(Bridge.class.getClassLoader().getResource(classs + ".class").getPath(), new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding());                                   //NOI18
+            path = URLDecoder.decode(Bridge.class.getClassLoader().getResource(classs + ".class").getPath(), new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding());                                   //NOI18N
         } catch (UnsupportedEncodingException uex) {
             uex.printStackTrace();
         }
-        String jarPath = path.substring(0, path.indexOf('!')).substring(5);                                                                     //NOI18
-        String args = "-Dcom.apple.backgroundOnly=true -Djava.class.path=\"" + System.getProperty("java.class.path") + File.pathSeparator + jarPath + File.pathSeparator +      // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-openide-loaders.jar" + File.pathSeparator +                                         // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-openide-nodes.jar" + File.pathSeparator +                                           // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-openide-execution.jar" + File.pathSeparator +                                       // NOI18
-                System.getProperty(NB_HOME) + "/core/org-openide-filesystems.jar" + File.pathSeparator +                                        // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-netbeans-swing-tabcontrol.jar" + File.pathSeparator +                               // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-openide-awt.jar" + File.pathSeparator +                                             // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-openide-windows.jar" + File.pathSeparator +                                         // NOI18
-                System.getProperty(NB_HOME) + "/lib/org-openide-util.jar" + File.pathSeparator +                                                // NOI18
-                System.getProperty(NB_HOME) + "/modules/org-openide-text.jar" + "\" " +                                                         // NOI18
-        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                          // NOI18
-        classs + " " + bridgeInstaceNum;                                                                                                        // NOI18
+        String jarPath = path.substring(0, path.indexOf('!')).substring(5);                                                                     //NOI18N
+        String args = "-Dcom.apple.backgroundOnly=true -Djava.class.path=\"" + System.getProperty("java.class.path") + File.pathSeparator + jarPath + File.pathSeparator +      // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-openide-loaders.jar" + File.pathSeparator +                                         // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-openide-nodes.jar" + File.pathSeparator +                                           // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-openide-execution.jar" + File.pathSeparator +                                       // NOI18N
+                System.getProperty(NB_HOME) + "/core/org-openide-filesystems.jar" + File.pathSeparator +                                        // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-netbeans-swing-tabcontrol.jar" + File.pathSeparator +                               // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-openide-awt.jar" + File.pathSeparator +                                             // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-openide-windows.jar" + File.pathSeparator +                                         // NOI18N
+                System.getProperty(NB_HOME) + "/lib/org-openide-util.jar" + File.pathSeparator +                                                // NOI18N
+                System.getProperty(NB_HOME) + "/modules/org-openide-text.jar" + "\" " +                                                         // NOI18N
+        "" + //"-agentlib:jdwp=transport=dt_socket,address=8003,server=y,suspend=n " +                                                          // NOI18N
+        classs + SPACE + bridgeInstaceNum;
         
         nb = new NbProcessDescriptor(exePath, args);
         try {
@@ -293,14 +293,14 @@ public class Bridge extends ModuleInstall {
                     NBSideDispatchingServerFace nbSideDispatchingStub = (NBSideDispatchingServerFace) UnicastRemoteObject.exportObject(nbDispatcher, 0);     
                     while (true) {
                         try {
-                            registry.bind(++bridgeInstaceNum + " " + NB_SIDE, nbSideDispatchingStub);
+                            registry.bind(++bridgeInstaceNum + SPACE + NB_SIDE, nbSideDispatchingStub);
                             break;
                         } catch (AlreadyBoundException ex) {
                         }
                     }
                     
-                    NB_SIDE = bridgeInstaceNum + " " + NB_SIDE;
-                    PREVIEW_SIDE = bridgeInstaceNum + " " + PREVIEW_SIDE;
+                    NB_SIDE = bridgeInstaceNum + SPACE + NB_SIDE;
+                    PREVIEW_SIDE = bridgeInstaceNum + SPACE + PREVIEW_SIDE;
 
                     startClient();
 
@@ -401,10 +401,11 @@ public class Bridge extends ModuleInstall {
         }.start();
     }
     
-    private static String PREVIEW_SIDE = "PreviewSide";         // NOI18
-    private static String NB_SIDE = "NBSide";                   // NOI18
-    private static String NB_HOME = "netbeans.home";            // NOI18
-    private static String JAVA_HOME = "java.home";              // NOI18
-    private static String JAVA = "java";                        // NOI18
-    private static String PREVIEW_OUTPUT = "Preview Output";    // NOI18
+    private static String SPACE = " ";                          // NOI18N
+    private static String PREVIEW_SIDE = "PreviewSide";         // NOI18N
+    private static String NB_SIDE = "NBSide";                   // NOI18N
+    private static String NB_HOME = "netbeans.home";            // NOI18N
+    private static String JAVA_HOME = "java.home";              // NOI18N
+    private static String JAVA = "java";                        // NOI18N
+    private static String PREVIEW_OUTPUT = "Preview Output";    // NOI18N
 }

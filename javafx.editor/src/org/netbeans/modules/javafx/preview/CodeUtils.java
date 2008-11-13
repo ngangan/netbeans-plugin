@@ -51,6 +51,7 @@ public class CodeUtils {
     private static final String objectVariableClassName = "com.sun.javafx.runtime.location.ObjectVariable";     // NOI18N
     private static final String sequenceVariableClassName = "com.sun.javafx.runtime.location.SequenceVariable"; // NOI18N
     private static final String contentFieldName = "$content";                                                  // NOI18N
+    private static final String jComponent = "javax.swing.JComponent";                                          // NOI18N
 
     public static class Context implements Serializable {
         Context(
@@ -198,7 +199,7 @@ public class CodeUtils {
     private static JComponent parseTrueJComponentObj(Object obj) {
         Class cl = obj.getClass(); 
         while (cl != null) {
-            if (cl.getName().contentEquals("javax.swing.JComponent"))
+            if (cl.getName().contentEquals(jComponent))
                 return (JComponent) obj;
             cl = cl.getSuperclass();
         }
