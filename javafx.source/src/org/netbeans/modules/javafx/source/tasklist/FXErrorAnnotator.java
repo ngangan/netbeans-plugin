@@ -84,7 +84,7 @@ import static org.openide.util.NbBundle.getMessage;
  */
 public class FXErrorAnnotator extends AnnotationProvider {
 
-    private static final String ERROR_BADGE_URL = "org/netbeans/modules/javafx/source/resources/icons/error-badge.gif";
+    private static final String ERROR_BADGE_URL = "org/netbeans/modules/javafx/source/resources/icons/error-badge.gif"; // NOI18N
     private static final Image ERROR_BADGE_SINGLE;
     private static final Image ERROR_BADGE_FOLDER;
 
@@ -127,7 +127,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
                         if (inError)
                             continue;
                     } else {
-                        if (f.isData() && "fx".equals(f.getExt())) {
+                        if (f.isData() && "fx".equals(f.getExt())) { // NOI18N
                             if (isInError(f, true, !inError)) {
                                 inError = true;
                             }
@@ -268,7 +268,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
     public boolean haveError(FileObject file, boolean recursive) {
         if (file.isData()) {
-            if (!file.getExt().equals("fx")){
+            if (!file.getExt().equals("fx")){ // NOI18N
                 return false;
             }
             final JavaFXSource fxSource = JavaFXSource.forFileObject(file);
@@ -320,7 +320,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
     private Collection<FileObject> toProcess = null;
 
-    private final RequestProcessor.Task WORKER = new RequestProcessor("ErrorAnnotator worker", 1).create(new Runnable() {
+    private final RequestProcessor.Task WORKER = new RequestProcessor("ErrorAnnotator worker", 1).create(new Runnable() { // NOI18N
         public void run() {
             Collection<FileObject> toProcess;
 
@@ -339,7 +339,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
                     Project p = FileOwnerQuery.getOwner(f);
 
                     if (p != null) {
-                        for (SourceGroup sg : ProjectUtils.getSources(p).getSourceGroups("java")) {
+                        for (SourceGroup sg : ProjectUtils.getSources(p).getSourceGroups("java")) { // NOI18N
                             FileObject sgRoot = sg.getRootFolder();
 
                             if ((FileUtil.isParentOf(f, sgRoot) || f == sgRoot) && haveError(sgRoot, true)) {

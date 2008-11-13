@@ -223,7 +223,7 @@ public class BuildArtifactMapperImpl {
         delete(targetFolder, cleanCompletely);
         
         if (!targetFolder.exists() && !targetFolder.mkdirs()) {
-            throw new IOException("Cannot create destination folder: " + targetFolder.getAbsolutePath());
+            throw new IOException("Cannot create destination folder: " + targetFolder.getAbsolutePath()); // NOI18N
         }
 
         sources(targetFolder, sources);
@@ -297,7 +297,7 @@ public class BuildArtifactMapperImpl {
         final File parent = target.getParentFile();
         if (parent != null && !parent.exists()) {
             if (!parent.mkdirs()) {
-                throw new IOException("Cannot create folder: " + parent.getAbsolutePath());
+                throw new IOException("Cannot create folder: " + parent.getAbsolutePath()); // NOI18N
             }
         }
             
@@ -333,11 +333,11 @@ public class BuildArtifactMapperImpl {
         if (source.isDirectory()) {
             if (!target.exists()) {
                 if (!target.mkdirs()) {
-                    throw new IOException("Cannot create folder: " + target.getAbsolutePath());
+                    throw new IOException("Cannot create folder: " + target.getAbsolutePath()); // NOI18N
                 }
             } else {
                 if (!target.isDirectory()) {
-                    throw new IOException("Cannot create folder: " + target.getAbsolutePath() + ", already exists as a file.");
+                    throw new IOException("Cannot create folder: " + target.getAbsolutePath() + ", already exists as a file."); // NOI18N
                 }
             }
             
@@ -352,7 +352,7 @@ public class BuildArtifactMapperImpl {
             }
         } else {
             if (target.isDirectory()) {
-                throw new IOException("Cannot create file: " + target.getAbsolutePath() + ", already exists as a folder.");
+                throw new IOException("Cannot create file: " + target.getAbsolutePath() + ", already exists as a folder."); // NOI18N
             }
 
             copyFile(source, target);
@@ -375,7 +375,7 @@ public class BuildArtifactMapperImpl {
                 file.delete();
             }
         } else {
-            if (cleanCompletely || file.getName().endsWith(".class")) {
+            if (cleanCompletely || file.getName().endsWith(".class")) { // NOI18N
                 file.delete();
             }
         }
