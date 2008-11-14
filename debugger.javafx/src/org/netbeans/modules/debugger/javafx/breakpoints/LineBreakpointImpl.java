@@ -139,8 +139,8 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
         }
         if (reason != null) {
             ErrorManager.getDefault().log(ErrorManager.WARNING,
-                    "Unable to submit line breakpoint to " + breakpoint.getURL() +
-                    " at line " + lineNumber + ", reason: " + reason);
+                    "Unable to submit line breakpoint to " + breakpoint.getURL() + // NOI18N
+                    " at line " + lineNumber + ", reason: " + reason); // NOI18N
             setValidity(Breakpoint.VALIDITY.INVALID, reason);
             return;
         }
@@ -191,8 +191,8 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
                 reason);
         if (locations.isEmpty()) {
             ErrorManager.getDefault().log(ErrorManager.WARNING,
-                    "Unable to submit line breakpoint to " + referenceType.name() +
-                    " at line " + lineNumber + ", reason: " + reason[0]);
+                    "Unable to submit line breakpoint to " + referenceType.name() + // NOI18N
+                    " at line " + lineNumber + ", reason: " + reason[0]); // NOI18N
             setValidity(Breakpoint.VALIDITY.INVALID, reason[0]);
             return;
         }
@@ -356,7 +356,7 @@ public class LineBreakpointImpl extends ClassBasedBreakpoint {
                 if (lSourcePath.equals(bpSourcePath)) {
                     locations.add(l);
                 } else {
-                    reason[0] = "Breakpoint source path '" + bpSourcePath + "' is different from the location source path '" + lSourcePath + "'.";
+                    reason[0] = "Breakpoint source path '" + bpSourcePath + "' is different from the location source path '" + lSourcePath + "'."; // NOI18N
                 }
             }
             if (logger.isLoggable(Level.FINER)) {

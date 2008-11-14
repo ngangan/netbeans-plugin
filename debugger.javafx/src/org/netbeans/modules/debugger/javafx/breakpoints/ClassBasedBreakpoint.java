@@ -142,8 +142,8 @@ public abstract class ClassBasedBreakpoint extends BreakpointImpl {
             }
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Breakpoint "+getBreakpoint()+
-                            " NOT submitted because it's source root "+sourceRoot+
-                            " is not contained in debugger's source roots: "+
+                            " NOT submitted because it's source root "+sourceRoot+ // NOI18N
+                            " is not contained in debugger's source roots: "+ // NOI18N
                             java.util.Arrays.asList(sourceRoots));
             }
             String[] projectSourceRoots = getDebugger().getEngineContext().getProjectSourceRoots();
@@ -169,7 +169,7 @@ public abstract class ClassBasedBreakpoint extends BreakpointImpl {
             }
             String url = getDebugger().getEngineContext().getURL(sourcePath, true);
             if (url == null) { // In some pathological situations, the source is not found.
-                ErrorManager.getDefault().log(ErrorManager.WARNING, "No URL found for source path "+sourcePath);
+                ErrorManager.getDefault().log(ErrorManager.WARNING, "No URL found for source path "+sourcePath); // NOI18N
                 return false;
             }
             String urlRoot = getDebugger().getEngineContext().getSourceRoot(url);

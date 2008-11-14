@@ -97,27 +97,27 @@ public class JavaFXReload extends Task {
             logger.fine("JavaFXReload.execute(), filesets = "+filesets);
         }
         if (filesets.size() == 0) {
-            throw new BuildException ("A nested fileset with class to refresh in VM must be specified.");
+            throw new BuildException ("A nested fileset with class to refresh in VM must be specified."); // NOI18N
         }
         
         // check debugger state
         DebuggerEngine debuggerEngine = DebuggerManager.getDebuggerManager ().
             getCurrentEngine ();
         if (debuggerEngine == null) {
-            throw new BuildException ("No debugging sessions was found.");
+            throw new BuildException ("No debugging sessions was found."); // NOI18N
         }
         JavaFXDebugger debugger = debuggerEngine.lookupFirst(null, JavaFXDebugger.class);
         if (debugger == null) {
-            throw new BuildException("Current debugger is not JavaFX one.");
+            throw new BuildException("Current debugger is not JavaFX one."); // NOI18N
         }
         if (!debugger.canFixClasses ()) {
-            throw new BuildException("The debugger does not support Fix action.");
+            throw new BuildException("The debugger does not support Fix action."); // NOI18N
         }
         if (debugger.getState () == JavaFXDebugger.STATE_DISCONNECTED) {
-            throw new BuildException ("The debugger is not running");
+            throw new BuildException ("The debugger is not running"); // NOI18N
         }
         
-        System.out.println ("Classes to be reloaded:");
+        System.out.println ("Classes to be reloaded:"); // NOI18N
         
         FileUtils fileUtils = FileUtils.newFileUtils ();
         Map map = new HashMap ();
@@ -152,7 +152,7 @@ public class JavaFXReload extends Task {
                                 className, 
                                 bytecode
                             );
-                            System.out.println (" " + className);
+                            System.out.println (" " + className); // NOI18N
                         } catch (IOException ex) {
                             ex.printStackTrace ();
                         }
@@ -164,24 +164,24 @@ public class JavaFXReload extends Task {
             logger.fine("Reloaded classes: "+map.keySet());
         }
         if (map.size () == 0) {
-            System.out.println (" No class to reload");
+            System.out.println (" No class to reload"); // NOI18N
             return;
         }
         String error = null;
         try {
             debugger.fixClasses (map);
         } catch (UnsupportedOperationException uoex) {
-            error = "The virtual machine does not support this operation: "+uoex.getLocalizedMessage();
+            error = "The virtual machine does not support this operation: "+uoex.getLocalizedMessage(); // NOI18N
         } catch (NoClassDefFoundError ncdfex) {
-            error = "The bytes don't correspond to the class type (the names don't match): "+ncdfex.getLocalizedMessage();
+            error = "The bytes don't correspond to the class type (the names don't match): "+ncdfex.getLocalizedMessage(); // NOI18N
         } catch (VerifyError ver) {
-            error = "A \"verifier\" detects that a class, though well formed, contains an internal inconsistency or security problem: "+ver.getLocalizedMessage();
+            error = "A \"verifier\" detects that a class, though well formed, contains an internal inconsistency or security problem: "+ver.getLocalizedMessage(); // NOI18N
         } catch (UnsupportedClassVersionError ucver) {
-            error = "The major and minor version numbers in bytes are not supported by the VM. "+ucver.getLocalizedMessage();
+            error = "The major and minor version numbers in bytes are not supported by the VM. "+ucver.getLocalizedMessage(); // NOI18N
         } catch (ClassFormatError cfer) {
-            error = "The bytes do not represent a valid class. "+cfer.getLocalizedMessage();
+            error = "The bytes do not represent a valid class. "+cfer.getLocalizedMessage(); // NOI18N
         } catch (ClassCircularityError ccer) {
-            error = "A circularity has been detected while initializing a class: "+ccer.getLocalizedMessage();
+            error = "A circularity has been detected while initializing a class: "+ccer.getLocalizedMessage(); // NOI18N
         }
         if (error != null) {
             getProject().log(error, Project.MSG_ERR);
@@ -195,7 +195,7 @@ public class JavaFXReload extends Task {
             FileObject root = cp.findOwnerRoot (fo);
             String resourceName = cp.getResourceName (fo, '/', false);
             if (resourceName == null) {
-                getProject().log("Can not find classpath resource for "+fo+", skipping...", Project.MSG_ERR);
+                getProject().log("Can not find classpath resource for "+fo+", skipping...", Project.MSG_ERR); // NOI18N
                 return null;
             }
             int i = resourceName.indexOf ('$');

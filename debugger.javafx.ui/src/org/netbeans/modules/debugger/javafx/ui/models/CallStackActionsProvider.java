@@ -205,18 +205,18 @@ public class CallStackActionsProvider implements NodeActionsProvider {
 
             for (i = 0; i < k; i++) {
                 frameStr.append(stack[i].getClassName());
-                frameStr.append(".");
+                frameStr.append(".");	//NOI18N
                 frameStr.append(stack[i].getMethodName());
                 try {
                     String sourceName = stack[i].getSourceName(null);
-                    frameStr.append("(");
+                    frameStr.append("(");	//NOI18N
                     frameStr.append(sourceName);
                     int line = stack[i].getLineNumber(null);
                     if (line > 0) {
-                        frameStr.append(":");
+                        frameStr.append(":");	//NOI18N
                         frameStr.append(line);
                     }
-                    frameStr.append(")");
+                    frameStr.append(")");	//NOI18N
                 } catch (AbsentInformationException ex) {
                     //frameStr.append(NbBundle.getMessage(CallStackActionsProvider.class, "MSG_NoSourceInfo"));
                     // Ignore, do not provide source name.

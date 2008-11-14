@@ -69,19 +69,19 @@ implements DebuggerManagerListener, JavaFXBreakpointListener,
 PropertyChangeListener {
 
     private static final Pattern dollarEscapePattern = Pattern.compile
-        ("\\$");
+        ("\\$");	//NOI18N
     private static final Pattern backslashEscapePattern = Pattern.compile
-        ("\\\\");
+        ("\\\\");	//NOI18N
     private static final Pattern threadNamePattern = Pattern.compile
-        ("\\{threadName\\}");
+        ("\\{threadName\\}");	//NOI18N
     private static final Pattern classNamePattern = Pattern.compile
-        ("\\{className\\}");
+        ("\\{className\\}");	//NOI18N
     private static final Pattern methodNamePattern = Pattern.compile
-        ("\\{methodName\\}");
+        ("\\{methodName\\}");	//NOI18N
     private static final Pattern lineNumberPattern = Pattern.compile
-        ("\\{lineNumber\\}");
+        ("\\{lineNumber\\}");	//NOI18N
     private static final Pattern expressionPattern = Pattern.compile
-        ("\\{=(.*?)\\}");
+        ("\\{=(.*?)\\}");	//NOI18N
 
     private IOManager               ioManager;
     private JavaFXDebugger            debugger;
@@ -252,22 +252,22 @@ PropertyChangeListener {
         if (t != null) {
             // replace \ by \\
             String name = backslashEscapePattern.matcher (t.getName ()).
-                replaceAll ("\\\\\\\\");
+                replaceAll ("\\\\\\\\");	//NOI18N
             // replace $ by \$
-            name = dollarEscapePattern.matcher (name).replaceAll ("\\\\\\$");
+            name = dollarEscapePattern.matcher (name).replaceAll ("\\\\\\$");	//NOI18N
             printText = threadNamePattern.matcher (printText).replaceAll (name);
         }
         else
-            printText = threadNamePattern.matcher (printText).replaceAll ("?");
+            printText = threadNamePattern.matcher (printText).replaceAll ("?");	//NOI18N
         
         // 2) replace {className} by the name of current class
         if (event.getReferenceType () != null) {
             // replace $ by \$
             String name = dollarEscapePattern.matcher 
-                (event.getReferenceType ().name ()).replaceAll ("\\\\\\$");
+                (event.getReferenceType ().name ()).replaceAll ("\\\\\\$");	//NOI18N
             printText = classNamePattern.matcher (printText).replaceAll (name);
         } else
-            printText = classNamePattern.matcher (printText).replaceAll ("?");
+            printText = classNamePattern.matcher (printText).replaceAll ("?");	//NOI18N
 
         // 3) replace {methodName} by the name of current method
         Session session = null;
@@ -280,10 +280,10 @@ PropertyChangeListener {
         }
         String language = (session != null) ? session.getCurrentLanguage() : null;
         String methodName = t.getMethodName ();
-        if ("".equals (methodName)) methodName = "?";
+        if ("".equals (methodName)) methodName = "?";	//NOI18N
         // replace $ by \$
         methodName = dollarEscapePattern.matcher (methodName).replaceAll 
-            ("\\\\\\$");
+            ("\\\\\\$");	//NOI18N
         printText = methodNamePattern.matcher (printText).replaceAll 
             (methodName);
         
@@ -291,7 +291,7 @@ PropertyChangeListener {
         int lineNumber = t.getLineNumber (language);
         if (lineNumber < 0)
             printText = lineNumberPattern.matcher (printText).replaceAll 
-                ("?");
+                ("?");	//NOI18N
         else
             printText = lineNumberPattern.matcher (printText).replaceAll 
                 (String.valueOf (lineNumber));
@@ -312,9 +312,9 @@ PropertyChangeListener {
                 }
                 value = theDebugger.evaluate (expression).getValue ();
                 value = backslashEscapePattern.matcher (value).
-                    replaceAll ("\\\\\\\\");
+                    replaceAll ("\\\\\\\\");	//NOI18N
                 value = dollarEscapePattern.matcher (value).
-                    replaceAll ("\\\\\\$");
+                    replaceAll ("\\\\\\$");	//NOI18N
             } catch (InvalidExpressionException e) {
                 // expression is invalid or cannot be evaluated
                 String msg = e.getCause () != null ? 
@@ -322,7 +322,7 @@ PropertyChangeListener {
                 synchronized (lock) {
                     if (ioManager != null) {
                         ioManager.println (
-                            "Cannot evaluate expression '" + expression + "' : " + msg, 
+                            "Cannot evaluate expression '" + expression + "' : " + msg, // NOI18N
                             null
                         );
                     }
@@ -332,7 +332,7 @@ PropertyChangeListener {
         }
         Throwable thr = event.getConditionException();
         if (thr != null) {
-            printText = printText + "\n***\n"+ thr.getLocalizedMessage()+"\n***\n";
+            printText = printText + "\n***\n"+ thr.getLocalizedMessage()+"\n***\n";	//NOI18N
         }
         return printText;
     }
@@ -387,7 +387,7 @@ PropertyChangeListener {
     private BreakpointsNodeModel getBreakpointsNodeModel () {
         if (breakpointsNodeModel == null) {
             List l = DebuggerManager.getDebuggerManager ().lookup
-                ("BreakpointsView", NodeModel.class);
+                ("BreakpointsView", NodeModel.class);	//NOI18N
             Iterator it = l.iterator ();
             while (it.hasNext ()) {
                 NodeModel nm = (NodeModel) it.next ();

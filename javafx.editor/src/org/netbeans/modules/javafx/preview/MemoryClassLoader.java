@@ -107,7 +107,7 @@ class MemoryClassLoader extends ClassLoader {
     static URI toMFOURI(String name) {
         try {
             final StringBuilder newUri = new StringBuilder();
-            newUri.append("mfo:///");
+            newUri.append("mfo:///");                                           // NOI18N
             newUri.append(name);
             return URI.create(newUri.toString());
         } catch (Exception exp) {
@@ -118,13 +118,13 @@ class MemoryClassLoader extends ClassLoader {
     @Override
     protected URL findResource(String name) {
         URL url = null;
-        if (name.startsWith("/")) name = name.substring(1);
+        if (name.startsWith("/")) name = name.substring(1);                     // NOI18N
         String ext = FileUtil.getExtension(name);
-        if (ext.contentEquals("class")) {
+        if (ext.contentEquals("class")) {                                       // NOI18N
             String pureName = name.substring(0, name.length() - ext.length() - 1);
-            pureName = pureName.replaceAll("[/,\\\\]", ".");
+            pureName = pureName.replaceAll("[/,\\\\]", ".");                    // NOI18N
             if (classBytes.containsKey(pureName)) {
-                try {
+                try {           
                     url = toMFOURI(name).toURL();
                 } catch (MalformedURLException ex) {
                     Exceptions.printStackTrace(ex);

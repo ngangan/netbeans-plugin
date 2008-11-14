@@ -65,16 +65,17 @@ import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
 import java.util.logging.Logger;
 import org.netbeans.modules.editor.NbEditorKit;
+import org.openide.util.WeakListeners;
 
 /**
  * @author answer
  */
 public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.HelpCtx.Provider {
 
-    private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution"; //NOI18N
-    private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution"; //NOI18N
-    private static final String buttonPrintFXPreview = "print-fx-preview"; //NOI18N
-    public static final String FX_MIME_TYPE = "text/x-fx";
+    private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution";               //NOI18N
+    private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution";    //NOI18N
+    private static final String buttonPrintFXPreview = "print-fx-preview";                              //NOI18N
+    public static final String FX_MIME_TYPE = "text/x-fx";                                              //NOI18N
     private static Logger log = Logger.getLogger(JavaFXEditorKit.class.getName());
 
     public JavaFXEditorKit() {
@@ -90,9 +91,9 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     @Override
     public Document createDefaultDocument() {
         Document doc = new JavaFXDocument(FX_MIME_TYPE);
-        Object mimeType = doc.getProperty("mimeType");
+        Object mimeType = doc.getProperty("mimeType");                          //NOI18N
         if (mimeType == null) {
-            doc.putProperty("mimeType", getContentType());
+            doc.putProperty("mimeType", getContentType());                      //NOI18N
         }
         return doc;
     }
@@ -103,8 +104,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         ResetFXPreviewExecution resetAction = new ResetFXPreviewExecution();
         PrintFXPreview previewAction = new PrintFXPreview();
         Action[] javafxActions = new Action[]{
-                new CommentAction("//"),
-                new UncommentAction("//"),
+                new CommentAction("//"),                                        //NOI18N
+                new UncommentAction("//"),                                      //NOI18N
                 new ToggleFXPreviewExecution(resetAction, previewAction),
                 resetAction,
                 previewAction,
@@ -133,8 +134,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             this.resetAction = resetAction;
             this.previewAction = previewAction;
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));
+                    "org/netbeans/modules/javafx/editor/resources/preview.png")));                                                  // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));        // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -151,7 +152,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             b.setSelected(false);
             b.setAction(this);
             b.setEnabled(Bridge.isStarted());
-            b.putClientProperty("enablePreviewMark", Boolean.TRUE); //NOI18N
+            b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
             b.setText("");
             return b;
         }
@@ -160,7 +161,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
             public PreviewButton() {
                 super();
-                Bridge.addStartListener(this);
+                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
             }
 
             public void stateChanged(ChangeEvent evt) {
@@ -217,8 +218,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         public ResetFXPreviewExecution() {
             super(buttonResetFXPreviewExecution);
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/reset_preview.png"))); // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("reset-fx-preview-execution"));
+                    "org/netbeans/modules/javafx/editor/resources/reset_preview.png")));                                    // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("reset-fx-preview-execution")); // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -229,20 +230,26 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
 
         private final class ResetButton extends JButton implements ChangeListener {
+            private boolean state;
             public ResetButton() {
                 super();
-                Bridge.addStartListener(this);
+                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
             }
 
             public void stateChanged(ChangeEvent e) {
-                setEnabled(Bridge.isStarted());
+                if (!Bridge.isStarted()) {
+                    state = isEnabled();
+                    setEnabled(false);
+                } else {
+                    setEnabled(state);
+                }
             }
         }
 
         public java.awt.Component getToolbarPresenter() {
             ResetButton b = new ResetButton();
             b.setAction(this);
-            b.putClientProperty("resetPreviewMark", Boolean.TRUE);                  //NOI18N
+            b.putClientProperty("resetPreviewMark", Boolean.TRUE);              // NOI18N
             b.setText("");
             b.setEnabled(false);
             return b;
@@ -257,7 +264,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
             public JPrintPanel() {
                 super();
-                putClientProperty("print.printable", Boolean.TRUE); // NOI18N
+                putClientProperty("print.printable", Boolean.TRUE);             // NOI18N
             }
 
             public void setImage(SerializableImage image) {
@@ -279,8 +286,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         public PrintFXPreview() {
             super(buttonPrintFXPreview);
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/print_preview.png"))); // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("print-fx-preview"));
+                    "org/netbeans/modules/javafx/editor/resources/print_preview.png")));                            // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("print-fx-preview"));   // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -316,7 +323,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                                     Caret caret, String str,
                                     boolean overwrite) throws BadLocationException {
             char insertedChar = str.charAt(0);
-            if (insertedChar == '\"' || insertedChar == '\'') {
+            if (insertedChar == '\"' || insertedChar == '\'') {                 // NOI18N
                 boolean inserted = BracketCompletion.completeQuote(doc, dotPos, caret, insertedChar);
                 if (inserted) {
                     caret.setDot(dotPos + 1);
@@ -339,7 +346,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 throws BadLocationException {
             char insertedChar = str.charAt(0);
             Document doc = target.getDocument();
-            if (insertedChar == '\"' || insertedChar == '\'') {
+            if (insertedChar == '\"' || insertedChar == '\'') {                 // NOI18N
                 if (doc != null) {
                     try {
                         boolean inserted = false;
@@ -384,26 +391,26 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             int dotPos = caret.getDot();
             if (BracketCompletion.posWithinString(doc, dotPos)) {
                 try {
-                    doc.insertString(dotPos, "\"  \"", null); //NOI18N
+                    doc.insertString(dotPos, "\"  \"", null);                       // NOI18N
                     dotPos += 3;
                     caret.setDot(dotPos);
                     return dotPos;
                 } catch (BadLocationException ex) {
-                    log.severe("Excetion thrown during InsertBreakAction. " + ex);
+                    log.severe("Excetion thrown during InsertBreakAction. " + ex);  // NOI18N
                 }
             } else {
                 try {
                     TokenSequence<JFXTokenId> seq = BracketCompletion.getTokenSequence(doc, dotPos);
                     JFXTokenId id = seq.moveNext() ? seq.token().id() : null;
                     if ((id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) && seq.offset() < dotPos) {
-                        doc.insertString(dotPos, "* ", null);
+                        doc.insertString(dotPos, "* ", null);                       // NOI18N
                         caret.setDot(dotPos);
                         return dotPos + 3;
                     } else {
                         return processRawString(doc, caret);
                     }
                 } catch (BadLocationException ex) {
-                    log.severe("Excetion thrown during InsertBreakAction. " + ex);
+                    log.severe("Excetion thrown during InsertBreakAction. " + ex);  // NOI18N
                 }
             }
             return null;
@@ -414,21 +421,21 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             Indent indent = Indent.get(doc);
             if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
                 int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
-                doc.insertString(end, "}", null); // NOI18N
+                doc.insertString(end, "}", null);                               // NOI18N
                 indent.reindent(end);
                 caret.setDot(dotPos);
                 return Boolean.TRUE;
             } else {
                 final String epsylon = doc.getText(dotPos - 1, 2);
                 final char c = epsylon.charAt(0);
-                if (c == '[' || c == '(' || c == '{') {
+                if (c == '[' || c == '(' || c == '{') {                         // NOI18N
                     if (epsylon.charAt(1) == BracketCompletion.matching(c)) {
-                        doc.insertString(dotPos + 1, "\n", null);
+                        doc.insertString(dotPos + 1, "\n", null);               // NOI18N
                         indent.reindent(dotPos);
                         caret.setDot(dotPos);
                         return Boolean.TRUE;
                     }
-                } else if (c == '*') {
+                } else if (c == '*') {                                          //NOI18N
                     return processStartOfComment(doc, caret, indent);
                 }
             }
@@ -439,8 +446,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             int dotPos = caret.getDot();
             int start = Math.max(dotPos - 3, 0);
             String material = doc.getText(start, dotPos).trim();
-            if (material.startsWith("/*")) {
-                doc.insertString(dotPos, " * \n */\n", null);
+            if (material.startsWith("/*")) {                                        // NOI18N
+                doc.insertString(dotPos, " * \n */\n", null);                       // NOI18N
                 indent.reindent(start, Math.min(start + 8, doc.getLength() - 1));
                 caret.setDot(dotPos);
                 return dotPos + 4;
@@ -458,7 +465,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                     try {
                         Indent.get(doc).reindent(newDot);
                     } catch (BadLocationException ex) {
-                        log.severe("Excetion throw during InsertBreakAction. " + ex);
+                        log.severe("Excetion throw during InsertBreakAction. " + ex);   // NOI18N
                     }
                     if (newDot > nowDotPos + 1) {
                         caret.setDot(newDot);

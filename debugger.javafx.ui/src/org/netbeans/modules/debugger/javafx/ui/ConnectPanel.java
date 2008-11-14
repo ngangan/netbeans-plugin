@@ -127,9 +127,9 @@ Controller, ActionListener {
             if (index >= 0)
                     name = name.substring(index + 1);
            
-            if (name.equalsIgnoreCase("SACoreAttachingConnector") || 
-                name.equalsIgnoreCase("SAPIDAttachingConnector") ||
-                name.equalsIgnoreCase("SADebugServerAttachingConnector"))
+            if (name.equalsIgnoreCase("SACoreAttachingConnector") || 	//NOI18N
+                name.equalsIgnoreCase("SAPIDAttachingConnector") ||	//NOI18N
+                name.equalsIgnoreCase("SADebugServerAttachingConnector"))	//NOI18N
                 ci.remove();
         }
                 
@@ -149,7 +149,7 @@ Controller, ActionListener {
             cbConnectors.getAccessibleContext ().setAccessibleDescription (
                 NbBundle.getMessage (ConnectPanel.class, "ACSD_CTL_Connector")
             );
-            String lacn = Properties.getDefault ().getProperties ("debugger").
+            String lacn = Properties.getDefault ().getProperties ("debugger").	//NOI18N
                 getString ("last_attaching_connector", "");
             int i, k = connectors.size ();
             for (i = 0; i < k; i++) {
@@ -162,10 +162,10 @@ Controller, ActionListener {
                     connector.name () : 
                     connector.name ().substring (jj + 1);
                 cbConnectors.addItem (
-                    s + " (" + connector.description () + ")"
+                    s + " (" + connector.description () + ")"	//NOI18N
                 );
             }
-            cbConnectors.setActionCommand ("SwitchMe!");
+            cbConnectors.setActionCommand ("SwitchMe!");	//NOI18N
             cbConnectors.addActionListener (this);
         }
         
@@ -253,7 +253,7 @@ Controller, ActionListener {
             Argument a = (Argument) args.get (name);
             String label = translate (a.name());
             if (label == null) {
-                label = "&"+a.label();
+                label = "&"+a.label();	//NOI18N
             }
                 c = new GridBagConstraints ();
                 c.insets = new Insets (6, 0, 0, 3);
@@ -267,7 +267,7 @@ Controller, ActionListener {
                 tfParam.setName (name);
                 tfParam.getAccessibleContext ().setAccessibleDescription (
                     new MessageFormat (NbBundle.getMessage (
-                        ConnectPanel.class, "ACSD_CTL_Argument"
+                        ConnectPanel.class, "ACSD_CTL_Argument"	//NOI18N
                     )).format (new Object[] { label })
                 ); 
                 tfParam.setToolTipText (a.description ());
@@ -468,8 +468,8 @@ Controller, ActionListener {
         Map args = connector.defaultArguments ();
 
         // 2) load saved version of args
-        Map savedArgs = Properties.getDefault ().getProperties ("debugger").
-                getMap ("connection_settings", new HashMap ());
+        Map savedArgs = Properties.getDefault ().getProperties ("debugger").	//NOI18N
+                getMap ("connection_settings", new HashMap ());	//NOI18N
         savedArgs = (Map) savedArgs.get (connector.name ());
         if (savedArgs == null) return args;
         
@@ -516,7 +516,7 @@ Controller, ActionListener {
                         label,
                         NbBundle.getMessage (
                             ConnectPanel.class, 
-                            "CTL_Required_value_title"
+                            "CTL_Required_value_title"	//NOI18N
                         )
                     );
                 else
@@ -524,7 +524,7 @@ Controller, ActionListener {
                         label,
                         NbBundle.getMessage (
                             ConnectPanel.class, 
-                            "CTL_Invalid_value_title"
+                            "CTL_Invalid_value_title"	//NOI18N
                         )
                     );
                 if (DialogDisplayer.getDefault ().notify (in) == 
@@ -556,21 +556,21 @@ Controller, ActionListener {
                 argsToSave.put (argName, value.value ());
         }
 
-        Map m = Properties.getDefault ().getProperties ("debugger").
-            getMap ("connection_settings", new HashMap ());
+        Map m = Properties.getDefault ().getProperties ("debugger").	//NOI18N
+            getMap ("connection_settings", new HashMap ());	//NOI18N
         String name = connector.name ();
         m.put (name, argsToSave);
-        Properties.getDefault ().getProperties ("debugger").
-                setString ("last_attaching_connector", name);
-        Properties.getDefault ().getProperties ("debugger").
-                setMap ("connection_settings", m);
+        Properties.getDefault ().getProperties ("debugger").	//NOI18N
+                setString ("last_attaching_connector", name);	//NOI18N
+        Properties.getDefault ().getProperties ("debugger").	//NOI18N
+                setMap ("connection_settings", m);	//NOI18N
     }
     
     private static String translate (String str) {
         try {
             return NbBundle.getMessage(ConnectPanel.class, "CTL_CA_"+str);
         } catch (MissingResourceException mrex) {
-            ErrorManager.getDefault().log(ErrorManager.WARNING, "Missing resource "+"CTL_CA_"+str+" from "+ConnectPanel.class.getName());
+            ErrorManager.getDefault().log(ErrorManager.WARNING, "Missing resource "+"CTL_CA_"+str+" from "+ConnectPanel.class.getName()); // NOI18N
             return null;
         }
     }

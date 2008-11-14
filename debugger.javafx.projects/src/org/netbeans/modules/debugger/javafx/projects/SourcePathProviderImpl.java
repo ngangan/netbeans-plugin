@@ -91,10 +91,10 @@ public class SourcePathProviderImpl extends SourcePathProvider {
     private static boolean          verbose = 
         System.getProperty ("netbeans.debugger.sourcepathproviderimpl") != null;
     
-    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.projects");
+    private static Logger logger = Logger.getLogger("org.netbeans.modules.debugger.javafx.projects");	//NOI18N
     
-    private static final Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");
-    private static final Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");
+    private static final Pattern thisDirectoryPattern = Pattern.compile("(/|\\A)\\./");	//NOI18N
+    private static final Pattern parentDirectoryPattern = Pattern.compile("(/|\\A)([^/]+?)/\\.\\./");	//NOI18N
 
     /** Contains all known source paths + jdk source path for JavaFXStart task */
     private ClassPath               originalSourcePath;
@@ -118,8 +118,8 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         
         // 2) get default allSourceRoots of source roots used for stepping
         if (properties != null) {
-            smartSteppingSourcePath = (ClassPath) properties.get ("sourcepath");
-            ClassPath jdkCP = (ClassPath) properties.get ("jdksources");
+            smartSteppingSourcePath = (ClassPath) properties.get ("sourcepath");	//NOI18N
+            ClassPath jdkCP = (ClassPath) properties.get ("jdksources");	//NOI18N
             if ( (jdkCP == null) && (JavaPlatform.getDefault () != null) )
                 jdkCP = JavaPlatform.getDefault ().getSourceFolders ();
             originalSourcePath = jdkCP == null ? 
@@ -216,10 +216,10 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         
         if (verbose) 
             System.out.println 
-                ("SPPI: init originalSourcePath " + originalSourcePath);    
+                ("SPPI: init originalSourcePath " + originalSourcePath); // NOI18N
         if (verbose) 
             System.out.println (
-                "SPPI: init smartSteppingSourcePath " + smartSteppingSourcePath
+                "SPPI: init smartSteppingSourcePath " + smartSteppingSourcePath // NOI18N
             );    
     }
 
@@ -232,7 +232,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
      * @param global true if global path should be used
      * @return url or <code>null</code>
      */
-    public String getURL (String relativePath, boolean global) {    if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global);
+    public String getURL (String relativePath, boolean global) {    if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global); // NOI18N
         FileObject fo;
         relativePath = normalize(relativePath);
         if (originalSourcePath == null) {
@@ -241,17 +241,17 @@ public class SourcePathProviderImpl extends SourcePathProvider {
             synchronized (this) {
                 if (!global) {
                     fo = smartSteppingSourcePath.findResource(relativePath);
-                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo);
+                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo); // NOI18N
                 } else {
                     fo = originalSourcePath.findResource(relativePath);
-                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo);
+                                                                    if (verbose) System.out.println ("SPPI:   fo " + fo); // NOI18N
                 }
             }
         }
         if (fo == null) return null;
         try {
             return fo.getURL ().toString ();
-        } catch (FileStateInvalidException e) {                     if (verbose) System.out.println ("SPPI:   FileStateInvalidException");
+        } catch (FileStateInvalidException e) {                     if (verbose) System.out.println ("SPPI:   FileStateInvalidException"); // NOI18N
             return null;
         }
     }
@@ -264,7 +264,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
      * @param global true if global path should be used
      * @return url
      */
-    public String[] getAllURLs (String relativePath, boolean global) {      if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global);
+    public String[] getAllURLs (String relativePath, boolean global) {      if (verbose) System.out.println ("SPPI: getURL " + relativePath + " global " + global); // NOI18N
         List<FileObject> fos;
         relativePath = normalize(relativePath);
         if (originalSourcePath == null) {
@@ -276,10 +276,10 @@ public class SourcePathProviderImpl extends SourcePathProvider {
             synchronized (this) {
                 if (!global) {
                     fos = smartSteppingSourcePath.findAllResources(relativePath);
-                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos);
+                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos); // NOI18N
                 } else {
                     fos = originalSourcePath.findAllResources(relativePath);
-                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos);
+                                                                            if (verbose) System.out.println ("SPPI:   fos " + fos); // NOI18N
                 }
             }
         }
@@ -287,7 +287,7 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         for (FileObject fo : fos) {
             try {
                 urls.add(fo.getURL().toString());
-            } catch (FileStateInvalidException e) {                         if (verbose) System.out.println ("SPPI:   FileStateInvalidException for "+fo);
+            } catch (FileStateInvalidException e) {                         if (verbose) System.out.println ("SPPI:   FileStateInvalidException for "+fo); // NOI18N
                 // skip it
             }
         }
@@ -310,9 +310,9 @@ public class SourcePathProviderImpl extends SourcePathProvider {
         boolean includeExtension
     ) {
         // 1) url -> FileObject
-        FileObject fo = null;                                       if (verbose) System.out.println ("SPPI: getRelativePath " + url);
+        FileObject fo = null;                                       if (verbose) System.out.println ("SPPI: getRelativePath " + url); // NOI18N
         try {
-            fo = URLMapper.findFileObject (new URL (url));          if (verbose) System.out.println ("SPPI:   fo " + fo);
+            fo = URLMapper.findFileObject (new URL (url));          if (verbose) System.out.println ("SPPI:   fo " + fo); // NOI18N
         } catch (MalformedURLException e) {
             //e.printStackTrace ();
             return null;
@@ -522,12 +522,12 @@ public class SourcePathProviderImpl extends SourcePathProvider {
     public static String normalize(String path) {
       for (Matcher m = thisDirectoryPattern.matcher(path); m.find(); )
       {
-        path = m.replaceAll("$1");
+        path = m.replaceAll("$1");	//NOI18N
         m = thisDirectoryPattern.matcher(path);
       }
       for (Matcher m = parentDirectoryPattern.matcher(path); m.find(); )
       {
-        if (!m.group(2).equals("..")) {
+        if (!m.group(2).equals("..")) {	//NOI18N
           path = path.substring(0, m.start()) + m.group(1) + path.substring(m.end());
           m = parentDirectoryPattern.matcher(path);        
         }

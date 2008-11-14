@@ -104,7 +104,7 @@ public class Evaluator implements JavaFXParserVisitor {
         frameThread = frame.thread();
         frameIndex = indexOf(frameThread.frames(), frame);
         if (frameIndex == -1) {
-            throw new IncompatibleThreadStateException("Thread does not contain current frame");
+            throw new IncompatibleThreadStateException("Thread does not contain current frame"); // NOI18N
         }
         currentPackage = evaluationContext.getFrame().location().declaringType().name();
         int idx = currentPackage.lastIndexOf('.');
@@ -369,7 +369,7 @@ public class Evaluator implements JavaFXParserVisitor {
         case JavaFXParserConstants.DOUBLE:
             return vm.mirrorOf(1.0).type();
         default:
-            throw new RuntimeException("Unknown primitive type: " + token.image);
+            throw new RuntimeException("Unknown primitive type: " + token.image); // NOI18N
         }
     }
 
@@ -717,7 +717,7 @@ public class Evaluator implements JavaFXParserVisitor {
                 Assert.error(node, "thisObjectUnavailable");	//NOI18N
             }
 
-            if (node.getAttribute("this") != null) return thisObject;     // this
+            if (node.getAttribute("this") != null) return thisObject;     // this // NOI18N
 
             // (X.)*super.X?
             String qualifier = (String) node.getAttribute("qualifier");	//NOI18N
@@ -1258,7 +1258,7 @@ public class Evaluator implements JavaFXParserVisitor {
             return newInstance(type, new Value[] { primitiveValue });
         } catch (Exception e) {
             // this should never happen, indicates an internal error
-            throw new RuntimeException("Unexpected exception while invoking boxing method", e);
+            throw new RuntimeException("Unexpected exception while invoking boxing method", e); // NOI18N
         }
     }
 
@@ -1332,7 +1332,7 @@ public class Evaluator implements JavaFXParserVisitor {
         if (type instanceof LongType) return invokeUnboxingMethod(val, "longValue");	//NOI18N
         if (type instanceof FloatType) return invokeUnboxingMethod(val, "floatValue");	//NOI18N
         if (type instanceof DoubleType) return invokeUnboxingMethod(val, "doubleValue");	//NOI18N
-        throw new RuntimeException("Invalid type while unboxing: " + type.signature());    // never happens
+        throw new RuntimeException("Invalid type while unboxing: " + type.signature());    // never happens // NOI18N
     }
 
     private PrimitiveValue invokeUnboxingMethod(ObjectReference reference, String methodName) {
@@ -1354,10 +1354,10 @@ public class Evaluator implements JavaFXParserVisitor {
         } catch (UnsupportedOperationException uoex) {
             evaluationContext.setCanInvokeMethods(false);
             // this can happen on VMs that can not invoke methods...
-            throw new RuntimeException("Unexpected exception while invoking unboxing method", uoex);
+            throw new RuntimeException("Unexpected exception while invoking unboxing method", uoex); // NOI18N
         } catch (Exception e) {
             // this should never happen, indicates an internal error
-            throw new RuntimeException("Unexpected exception while invoking unboxing method", e);
+            throw new RuntimeException("Unexpected exception while invoking unboxing method", e); // NOI18N
         } finally {
             if (loggerMethod.isLoggable(Level.FINE)) {
                 loggerMethod.fine("FINISHED: "+reference+"."+toCall+" () in thread "+frameThread);
@@ -1372,7 +1372,7 @@ public class Evaluator implements JavaFXParserVisitor {
             try {
                 frame = frameThread.frame(frameIndex);
             } catch (IncompatibleThreadStateException e) {
-                throw new RuntimeException("Unexpected exception while invoking unboxing method", e);
+                throw new RuntimeException("Unexpected exception while invoking unboxing method", e); // NOI18N
             }
         }
     }

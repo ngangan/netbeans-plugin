@@ -63,20 +63,20 @@ import org.openide.util.NbBundle;
  */
 public class JavaFXCompositePanelProvider implements ProjectCustomizer.CompositeCategoryProvider {
     
-    private static final String SOURCES = "Sources";
-    static final String LIBRARIES = "Libraries";
+    private static final String SOURCES = "Sources"; // NOI18N
+    static final String LIBRARIES = "Libraries"; // NOI18N
     
-    private static final String BUILD = "Build";
+    private static final String BUILD = "Build"; // NOI18N
 //    private static final String BUILD_TESTS = "BuildTests";
-    private static final String JAR = "Jar";
-    private static final String JAVADOC = "Javadoc";
-    public static final String RUN = "Run";
+    private static final String JAR = "Jar"; // NOI18N
+    private static final String JAVADOC = "Javadoc"; // NOI18N
+    public static final String RUN = "Run"; // NOI18N
 //    private static final String RUN_TESTS = "RunTests";
-    private static final String APPLICATION = "Application";
+    private static final String APPLICATION = "Application"; // NOI18N
     
-    private static final String WEBSTART = "WebStart";
+    private static final String WEBSTART = "WebStart"; // NOI18N
     
-    private static final String APPLET = "Applet";
+    private static final String APPLET = "Applet"; // NOI18N
     
     private String name;
     

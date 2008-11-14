@@ -232,26 +232,26 @@ public final class JavaFXAntLogger extends AntLogger {
         m = HYPERLINK.matcher(line);
         if (m.matches()) {
             String path = m.group(1);
-            if (path.startsWith("file:")) {
+            if (path.startsWith("file:")) { // NOI18N
                 try{
                     File file = new File(new URI(path));
                     FileObject fileObject = FileUtil.toFileObject(file);
-                    if (fileObject.getExt().equalsIgnoreCase("fx")){
+                    if (fileObject.getExt().equalsIgnoreCase("fx")){ // NOI18N
                         event.consume();
                         session.println(line, true, null);
                     }
                 } catch (Exception e) {
                 }
             } else {
-                 if (path.startsWith("Error in file:")) {
+                 if (path.startsWith("Error in file:")) { // NOI18N
                     try{
                         path = path.substring(9);
                         File file = new File(new URI(path));
                         FileObject fileObject = FileUtil.toFileObject(file);
-                        if (fileObject.getExt().equalsIgnoreCase("fx")){
+                        if (fileObject.getExt().equalsIgnoreCase("fx")){ // NOI18N
                             event.consume();
                             int lineNumber = Integer.parseInt(m.group(2));
-                            hyperlink(line.replace("%20", " "), session, event, fileObject, messageLevel, sessionLevel, data, lineNumber);
+                            hyperlink(line.replace("%20", " "), session, event, fileObject, messageLevel, sessionLevel, data, lineNumber); // NOI18N
                         }
                     } catch (Exception e) {
                     }

@@ -293,7 +293,7 @@ public class JavaFXProjectClassPathModifier extends ProjectClassPathModifierImpl
         assert type != null : "Type cannot be null";  //NOI18N
         final String classPathProperty = project.getClassPathProvider().getPropertyName (sg, type);
         if (classPathProperty == null) {
-            throw new UnsupportedOperationException ("Modification of [" + sg.getRootFolder().getPath() +", " + type + "] is not supported"); //NOI8N
+            throw new UnsupportedOperationException ("Modification of [" + sg.getRootFolder().getPath() +", " + type + "] is not supported"); //NOI8N // NOI18N
         }
         return classPathProperty;
     }

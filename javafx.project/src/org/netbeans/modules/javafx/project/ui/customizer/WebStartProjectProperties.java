@@ -74,22 +74,22 @@ import org.openide.util.NbBundle;
  */
 public class WebStartProjectProperties {
 
-    public static final String JNLP_ICON = "jnlp.icon";
-    public static final String JNLP_OFFLINE = "jnlp.offline-allowed";
-    public static final String JNLP_CBASE_TYPE = "jnlp.codebase.type";
-    public static final String JNLP_CBASE_USER = "jnlp.codebase.user";
-    public static final String JNLP_CBASE_URL = "jnlp.codebase.url";
-    public static final String JNLP_SPEC = "jnlp.spec";
-    public static final String JNLP_INIT_HEAP = "jnlp.initial-heap-size";
-    public static final String JNLP_MAX_HEAP = "jnlp.max-heap-size";
-    public static final String JNLP_SIGNED = "jnlp.signed";
-    public static final String CB_TYPE_LOCAL = "local";
-    public static final String CB_TYPE_USER = "user";
-    public static final String PACK200_COMPRESS_MODEL="pack200.jar.compress";
-    public static final String PACK200_ENABLE_MODEL = "jnlp.packEnabled";
+    public static final String JNLP_ICON = "jnlp.icon"; // NOI18N
+    public static final String JNLP_OFFLINE = "jnlp.offline-allowed"; // NOI18N
+    public static final String JNLP_CBASE_TYPE = "jnlp.codebase.type"; // NOI18N
+    public static final String JNLP_CBASE_USER = "jnlp.codebase.user"; // NOI18N
+    public static final String JNLP_CBASE_URL = "jnlp.codebase.url"; // NOI18N
+    public static final String JNLP_SPEC = "jnlp.spec"; // NOI18N
+    public static final String JNLP_INIT_HEAP = "jnlp.initial-heap-size"; // NOI18N
+    public static final String JNLP_MAX_HEAP = "jnlp.max-heap-size"; // NOI18N
+    public static final String JNLP_SIGNED = "jnlp.signed"; // NOI18N
+    public static final String CB_TYPE_LOCAL = "local"; // NOI18N
+    public static final String CB_TYPE_USER = "user"; // NOI18N
+    public static final String PACK200_COMPRESS_MODEL="pack200.jar.compress"; // NOI18N
+    public static final String PACK200_ENABLE_MODEL = "jnlp.packEnabled"; // NOI18N
     // special value to persist Ant script handling
-    public static final String CB_URL_WEB_PROP_VALUE = "$$$$codebase";
-    public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value";
+    public static final String CB_URL_WEB_PROP_VALUE = "$$$$codebase"; // NOI18N
+    public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value"; // NOI18N
     private StoreGroup jnlpPropGroup = new StoreGroup();
     private PropertyEvaluator evaluator;
     private JavaFXProject javafxProject;
@@ -156,7 +156,7 @@ public class WebStartProjectProperties {
     public void store() throws IOException {
 
         final EditableProperties ep = new EditableProperties(true);
-        final FileObject projPropsFO = javafxProject.getProjectDirectory().getFileObject("nbproject/project.properties");
+        final FileObject projPropsFO = javafxProject.getProjectDirectory().getFileObject("nbproject/project.properties"); // NOI18N
 
         try {
             final InputStream is = projPropsFO.getInputStream();

@@ -123,7 +123,7 @@ public class PanelProjectTypesVisual extends SettingsPanel {
         NewJavaFXProjectWizardIterator.WizardType projectType;
         if (jRadioButton1.isSelected()) projectType = NewJavaFXProjectWizardIterator.WizardType.APP;
             else projectType = NewJavaFXProjectWizardIterator.WizardType.EXT;
-        wd.putProperty("projectType", projectType);
+        wd.putProperty("projectType", projectType); // NOI18N
     }
     
     /** This method is called from within the constructor to

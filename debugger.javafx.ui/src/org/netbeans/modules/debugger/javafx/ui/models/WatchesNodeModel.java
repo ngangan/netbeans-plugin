@@ -64,7 +64,7 @@ import org.openide.util.datatransfer.PasteType;
 public class WatchesNodeModel extends VariablesNodeModel {
 
     public static final String WATCH =
-        "org/netbeans/modules/debugger/resources/watchesView/watch_16.png";
+        "org/netbeans/modules/debugger/resources/watchesView/watch_16.png";	//NOI18N
 
 
     public WatchesNodeModel (ContextProvider lookupProvider) {
@@ -72,7 +72,7 @@ public class WatchesNodeModel extends VariablesNodeModel {
     }
     
     public static boolean isEmptyWatch(Object node) {
-        return "EmptyWatch".equals(node.getClass().getSimpleName());
+        return "EmptyWatch".equals(node.getClass().getSimpleName());	//NOI18N
     }
     
     public String getDisplayName (Object o) throws UnknownTypeException {
@@ -101,13 +101,13 @@ public class WatchesNodeModel extends VariablesNodeModel {
             }
             String e = w.getExceptionDescription ();
             if (e != null)
-                return w.getExpression () + " = >" + e + "<";
+                return w.getExpression () + " = >" + e + "<";	//NOI18N
             String t = w.getType ();
             if (t == null)
-                return w.getExpression () + " = " + w.getValue ();
+                return w.getExpression () + " = " + w.getValue ();	//NOI18N
             else
                 try {
-                    return w.getExpression () + " = (" + w.getType () + ") " + 
+                    return w.getExpression () + " = (" + w.getType () + ") " + 	//NOI18N
                         w.getToStringValue ();
                 } catch (InvalidExpressionException ex) {
                     return ex.getLocalizedMessage ();

@@ -231,7 +231,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         for (ExpressionTree arg : args) {
             Mirror argValue = arg.accept(this, evaluationContext);
             if (!(argValue instanceof Value)) {
-                Assert2.error(arg, "Not a value");
+                Assert2.error(arg, "Not a value"); // NOI18N
             }
             argVals.add((Value) argValue);
         }
@@ -475,7 +475,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 return false;
             }
         } else {
-            throw new IllegalStateException("Unknown ReferenceType: "+t2);
+            throw new IllegalStateException("Unknown ReferenceType: "+t2); // NOI18N
         }
     }
     
@@ -686,7 +686,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                    v |= e; break;
 //                case XOR_ASSIGNMENT:
 //                    v ^= e; break;
-                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
+                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0); // NOI18N
             }
 //            Value value = vm.mirrorOf(v);
 //            setToMirror(arg0.getVariable(), value, evaluationContext);
@@ -704,7 +704,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     v *= e; break;
                 case PLUS_ASSIGNMENT:
                     v += e; break;
-                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
+                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0); // NOI18N
             }
             Value value = vm.mirrorOf(v);
             setToMirror(arg0.getVariable(), value, evaluationContext);
@@ -722,7 +722,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     v *= e; break;
                 case PLUS_ASSIGNMENT:
                     v += e; break;
-                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
+                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0); // NOI18N
             }
             Value value = vm.mirrorOf(v);
             setToMirror(arg0.getVariable(), value, evaluationContext);
@@ -754,7 +754,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                    v >>>= e; break;
 //                case XOR_ASSIGNMENT:
 //                    v ^= e; break;
-                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
+                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0); // NOI18N
             }
             Value value = vm.mirrorOf(v);
             setToMirror(arg0.getVariable(), value, evaluationContext);
@@ -786,7 +786,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                    v >>>= e; break;
 //                case XOR_ASSIGNMENT:
 //                    v ^= e; break;
-                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
+                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0); // NOI18N
             }
             Value value = vm.mirrorOf(v);
             setToMirror(arg0.getVariable(), value, evaluationContext);
@@ -798,13 +798,13 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             switch (kind) {
                 case PLUS_ASSIGNMENT:
                     v += e; break;
-                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0);
+                default: throw new IllegalStateException("Unknown assignment: "+kind+" of "+arg0); // NOI18N
             }
             Value value = vm.mirrorOf(v);
             setToMirror(arg0.getVariable(), value, evaluationContext);
             return value;
         }
-        throw new IllegalStateException("Unknown assignment var type: "+var);
+        throw new IllegalStateException("Unknown assignment var type: "+var); // NOI18N
     }
 
     @Override
@@ -832,7 +832,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                case OR: res = op1 | op2; break;
 //                case XOR: res = op1 ^ op2; break;
                 default:
-                    throw new IllegalArgumentException("Unhandled binary tree: "+arg0);
+                    throw new IllegalArgumentException("Unhandled binary tree: "+arg0); // NOI18N
             }
             return vm.mirrorOf(res);
         }
@@ -866,7 +866,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         b = l <= r; break;
                     case NOT_EQUAL_TO:
                         b = l != r; break;
-                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
+                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0); // NOI18N
                 }
                 if (isBoolean) {
                     return vm.mirrorOf(b);
@@ -901,7 +901,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         b = l <= r; break;
                     case NOT_EQUAL_TO:
                         b = l != r; break;
-                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
+                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0); // NOI18N
                 }
                 if (isBoolean) {
                     return vm.mirrorOf(b);
@@ -950,7 +950,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         b = l <= r; isBoolean = true; break;
                     case NOT_EQUAL_TO:
                         b = l != r; isBoolean = true; break;
-                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
+                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0); // NOI18N
                 }
                 if (isBoolean) {
                     return vm.mirrorOf(b);
@@ -1000,7 +1000,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         b = l <= r; isBoolean = true; break;
                     case NOT_EQUAL_TO:
                         b = l != r; isBoolean = true; break;
-                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
+                    default: throw new IllegalStateException("Unhandled binary tree: "+arg0); // NOI18N
                 }
                 if (isBoolean) {
                     return vm.mirrorOf(b);
@@ -1016,7 +1016,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             switch (kind) {
                 case PLUS:
                     return vm.mirrorOf(s1 + s2);
-                default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
+                default: throw new IllegalStateException("Unhandled binary tree: "+arg0); // NOI18N
             }
         }
         if ((left instanceof StringReference || right instanceof StringReference) && kind == Tree.JavaFXKind.PLUS) {
@@ -1029,19 +1029,19 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 return vm.mirrorOf(left == right || (left != null && left.equals(right)));
             case NOT_EQUAL_TO:
                 return vm.mirrorOf(left == null && right != null || (left != null && !left.equals(right)));
-            default: throw new IllegalStateException("Unhandled binary tree: "+arg0);
+            default: throw new IllegalStateException("Unhandled binary tree: "+arg0); // NOI18N
         }
     }
 
     @Override
     public Mirror visitBlockExpression(BlockExpressionTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
     @Override
     public Mirror visitBreak(BreakTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1054,7 +1054,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitCatch(CatchTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1066,7 +1066,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //    }
     @Override
     public Mirror visitClassDeclaration(ClassDeclarationTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1074,7 +1074,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     public Mirror visitConditionalExpression(ConditionalExpressionTree arg0, EvaluationContext evaluationContext) {
         Mirror condition = arg0.getCondition().accept(this, evaluationContext);
         if (!(condition instanceof BooleanValue)) {
-            throw new IllegalStateException("Condition must be boolean: "+arg0.getCondition());
+            throw new IllegalStateException("Condition must be boolean: "+arg0.getCondition()); // NOI18N
         }
         boolean isTrue = ((BooleanValue) condition).value();
         if (isTrue) {
@@ -1086,7 +1086,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitContinue(ContinueTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1099,7 +1099,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitErroneous(ErroneousTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "errorneous");
+        Assert2.error(arg0, "errorneous"); // NOI18N
         return null;
     }
 
@@ -1130,10 +1130,10 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         }
         // Class not found. If the source is not fully resolved, we may
         // get a field or local variable here:
-        if (name.equals("this")) {
+        if (name.equals("this")) { // NOI18N
             return evaluationContext.getFrame().thisObject();
         }
-        if (name.equals("super")) {
+        if (name.equals("super")) { // NOI18N
             ReferenceType thisType = evaluationContext.getFrame().location().declaringType();
             if (thisType instanceof ClassType) {
                 ClassType superClass = ((ClassType) thisType).superclass();
@@ -1160,12 +1160,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         try {
             LocalVariable lv = evaluationContext.getFrame().visibleVariableByName(name);
             if (lv == null) {
-                Assert2.error(arg0, "unknownVariable", name);
+                Assert2.error(arg0, "unknownVariable", name); // NOI18N
             }
             evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
             return evaluationContext.getFrame().getValue(lv);
         } catch (AbsentInformationException aiex) {}
-        Assert2.error(arg0, "unknownType", name);
+        Assert2.error(arg0, "unknownType", name); // NOI18N
         return null;
     }
 
@@ -1186,7 +1186,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             return getIdentifierByName(arg0, evaluationContext);
         }
         if (elm==null) {
-            Assert2.error(arg0, "unknownType");
+            Assert2.error(arg0, "unknownType"); // NOI18N
             return null;
         }
         switch(elm.getKind()) {
@@ -1272,7 +1272,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     return thisObject.getValue(field);
                 } else {
                     Assert2.error(arg0, "accessInstanceVariableFromStaticContext", fieldName);	//NOI18N
-                    throw new IllegalStateException("No current instance available.");
+                    throw new IllegalStateException("No current instance available."); // NOI18N
                 }
             case LOCAL_VARIABLE:
             case EXCEPTION_PARAMETER:
@@ -1281,12 +1281,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 try {
                     LocalVariable lv = evaluationContext.getFrame().visibleVariableByName(varName);
                     if (lv == null) {
-                        Assert2.error(arg0, "unknownVariable", varName);
+                        Assert2.error(arg0, "unknownVariable", varName); // NOI18N
                     }
                     evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
                     return evaluationContext.getFrame().getValue(lv);
                 } catch (AbsentInformationException aiex) {
-                    return (Value) Assert2.error(arg0, "unknownVariable", varName);
+                    return (Value) Assert2.error(arg0, "unknownVariable", varName); // NOI18N
                 }
             case PARAMETER:
                 ve = (VariableElement) elm;
@@ -1295,7 +1295,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 try {
                     LocalVariable lv = frame.visibleVariableByName(paramName);
                     if (lv == null) {
-                        Assert2.error(arg0, "unknownVariable", paramName);
+                        Assert2.error(arg0, "unknownVariable", paramName); // NOI18N
                     }
                     evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
                     return frame.getValue(lv);
@@ -1313,12 +1313,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     } catch (NativeMethodException nmex) {
                         // ignore - no arguments available
                     }
-                    return (Value) Assert2.error(arg0, "unknownVariable", paramName);
+                    return (Value) Assert2.error(arg0, "unknownVariable", paramName); // NOI18N
                 }
             case PACKAGE:
-                return (Value) Assert2.error(arg0, "notExpression");
+                return (Value) Assert2.error(arg0, "notExpression"); // NOI18N
             default:
-                throw new UnsupportedOperationException("Not supported element kind:"+elm.getKind()+" Tree = '"+arg0+"'");
+                throw new UnsupportedOperationException("Not supported element kind:"+elm.getKind()+" Tree = '"+arg0+"'"); // NOI18N
         }
     }
     
@@ -1369,7 +1369,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitImport(ImportTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1439,7 +1439,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (value == null) {
             return null;
         }
-        throw new UnsupportedOperationException("Unsupported value: "+value);
+        throw new UnsupportedOperationException("Unsupported value: "+value); // NOI18N
     }
 
 //TODO
@@ -1451,7 +1451,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitModifiers(ModifiersTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1560,7 +1560,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             }
             List<ReferenceType> classes = type.virtualMachine().classesByName(name);
             if (classes.size() == 0) {
-                Assert2.error(arg0, "unknownType", name);
+                Assert2.error(arg0, "unknownType", name); // NOI18N
             }
             type = classes.get(0);
         }
@@ -1718,7 +1718,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitReturn(ReturnTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -1764,7 +1764,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                         }
                     }
                     if (thisObject == null) {
-                        Assert2.error(arg0, "unknownOuterClass", clazz.name());
+                        Assert2.error(arg0, "unknownOuterClass", clazz.name()); // NOI18N
                     } else {
                         return thisObject;
                     }
@@ -1791,13 +1791,13 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 }
             }
             if (expression == null) {
-                Assert2.error(arg0, "fieldOnNull", name);
+                Assert2.error(arg0, "fieldOnNull", name); // NOI18N
             }
             // try class
             VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
             List<ReferenceType> classes = vm.classesByName(name);
             if (classes.size() == 0) {
-                Assert2.error(arg0, "unknownType", name);
+                Assert2.error(arg0, "unknownType", name); // NOI18N
             }
             return classes.get(0);
         }
@@ -1823,7 +1823,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                             }
                         }
                         if (thisObject == null) {
-                            Assert2.error(arg0, "unknownOuterClass", clazz.name());
+                            Assert2.error(arg0, "unknownOuterClass", clazz.name()); // NOI18N
                         } else {
                             return thisObject;
                         }
@@ -1894,14 +1894,14 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 //                    if (f != null) {
 //                        return ((ObjectReference) expression).getValue(f);
                     } else {
-                        Assert2.error(arg0, "unknownField", fieldName);
+                        Assert2.error(arg0, "unknownField", fieldName); // NOI18N
                         return null;
                     }
                 }
                 if (expression == null) {
-                    Assert2.error(arg0, "fieldOnNull", fieldName);
+                    Assert2.error(arg0, "fieldOnNull", fieldName); // NOI18N
                 }
-                throw new IllegalArgumentException("Wrong expression value: "+expression);
+                throw new IllegalArgumentException("Wrong expression value: "+expression); // NOI18N
             case CLASS:
             case INTERFACE:
                 TypeElement te = (TypeElement) elm;
@@ -1910,21 +1910,21 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 VirtualMachine vm = evaluationContext.getDebugger().getVirtualMachine();
                 List<ReferenceType> classes = vm.classesByName(className);
                 if (classes.size() == 0) {
-                    Assert2.error(arg0, "unknownType", className);
+                    Assert2.error(arg0, "unknownType", className); // NOI18N
                 }
                 return classes.get(0);
             case PACKAGE:
-                return (Value) Assert2.error(arg0, "notExpression");
+                return (Value) Assert2.error(arg0, "notExpression"); // NOI18N
             case METHOD:
-                return (Value) Assert2.error(arg0, "notExpression");
+                return (Value) Assert2.error(arg0, "notExpression"); // NOI18N
             default:
-                throw new UnsupportedOperationException("Not supported yet."+" Tree = '"+arg0+"', element kind = "+elm.getKind());
+                throw new UnsupportedOperationException("Not supported yet."+" Tree = '"+arg0+"', element kind = "+elm.getKind()); // NOI18N
         }
     }
 
     @Override
     public Mirror visitFunctionDefinition(FunctionDefinitionTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 //TODO
@@ -1948,19 +1948,19 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
 
     @Override
     public Mirror visitThrow(ThrowTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
     @Override
     public Mirror visitCompilationUnit(UnitTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
     @Override
     public Mirror visitTry(TryTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 
@@ -2016,7 +2016,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             }
         }
         if (!instanceOf(((ObjectReference) expression).type(), (Type) type)) {
-            Assert2.error(arg0, "castError", ((ObjectReference) expression).type(), type);
+            Assert2.error(arg0, "castError", ((ObjectReference) expression).type(), type); // NOI18N
         }
         return expression;
     }
@@ -2079,7 +2079,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 case LOGICAL_COMPLEMENT:
                     v = !v;
                     break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2108,7 +2108,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     return vm.mirrorOf(i);
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2137,7 +2137,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     return vm.mirrorOf(i);
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2166,7 +2166,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     return vm.mirrorOf(i);
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2195,7 +2195,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     break;
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2224,7 +2224,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     break;
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2250,7 +2250,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     break;
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
@@ -2276,11 +2276,11 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     break;
 //                case UNARY_PLUS:
 //                    break;
-                default: throw new IllegalStateException("Tree = "+arg0);
+                default: throw new IllegalStateException("Tree = "+arg0); // NOI18N
             }
             return vm.mirrorOf(v);
         }
-        throw new IllegalStateException("Bad expression type: "+expression);
+        throw new IllegalStateException("Bad expression type: "+expression); // NOI18N
     }
 
     @Override
@@ -2306,7 +2306,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             return expression;
         }
         if (elm==null) {
-            Assert2.error(arg0, "element is null");
+            Assert2.error(arg0, "element is null"); // NOI18N
             return null;
         }
         switch(elm.getKind()) {
@@ -2321,7 +2321,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 if (classes.size() > 0) {
                     return classes.get(0);
                 }
-                Assert2.error(arg0, "unknownType", className);
+                Assert2.error(arg0, "unknownType", className); // NOI18N
             case ENUM_CONSTANT:
                 return getEnumConstant(arg0, (VariableElement) elm, evaluationContext);
             case FIELD:
@@ -2356,7 +2356,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 }
                 Field field = declaringType.fieldByName("$"+fieldName);	//NOI18N
                 if (field == null) {
-                    Assert2.error(arg0, "unknownVariable", "$"+fieldName);
+                    Assert2.error(arg0, "unknownVariable", "$"+fieldName); // NOI18N
                 }
                 if (field.isStatic()) {
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field));
@@ -2391,8 +2391,8 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     evaluationContext.getVariables().put(arg0, new VariableInfo(field, thisObject));
                     return thisObject.getValue(field);
                 } else {
-                    Assert2.error(arg0, "accessInstanceVariableFromStaticContext", fieldName);
-                    throw new IllegalStateException("No current instance available.");
+                    Assert2.error(arg0, "accessInstanceVariableFromStaticContext", fieldName); // NOI18N
+                    throw new IllegalStateException("No current instance available."); // NOI18N
                 }
             case LOCAL_VARIABLE:
             case EXCEPTION_PARAMETER:
@@ -2401,12 +2401,12 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 try {
                     LocalVariable lv = evaluationContext.getFrame().visibleVariableByName(varName);
                     if (lv == null) {
-                        Assert2.error(arg0, "unknownVariable", varName);
+                        Assert2.error(arg0, "unknownVariable", varName); // NOI18N
                     }
                     evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
                     return evaluationContext.getFrame().getValue(lv);
                 } catch (AbsentInformationException aiex) {
-                    return (Value) Assert2.error(arg0, "unknownVariable", varName);
+                    return (Value) Assert2.error(arg0, "unknownVariable", varName); // NOI18N
                 }
             case PARAMETER:
                 ve = (VariableElement) elm;
@@ -2415,7 +2415,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 try {
                     LocalVariable lv = frame.visibleVariableByName(paramName);
                     if (lv == null) {
-                        Assert2.error(arg0, "unknownVariable", paramName);
+                        Assert2.error(arg0, "unknownVariable", paramName); // NOI18N
                     }
                     evaluationContext.getVariables().put(arg0, new VariableInfo(lv));
                     return frame.getValue(lv);
@@ -2433,19 +2433,19 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     } catch (NativeMethodException nmex) {
                         // ignore - no arguments available
                     }
-                    return (Value) Assert2.error(arg0, "unknownVariable", paramName);
+                    return (Value) Assert2.error(arg0, "unknownVariable", paramName); // NOI18N
                 }
             case PACKAGE:
-                return (Value) Assert2.error(arg0, "notExpression");
+                return (Value) Assert2.error(arg0, "notExpression"); // NOI18N
             default:
-                throw new UnsupportedOperationException("Not supported element kind:"+elm.getKind()+" Tree = '"+arg0+"'");
+                throw new UnsupportedOperationException("Not supported element kind:"+elm.getKind()+" Tree = '"+arg0+"'"); // NOI18N
         }
 
     }
 
     @Override
     public Mirror visitWhileLoop(WhileLoopTree arg0, EvaluationContext evaluationContext) {
-        Assert2.error(arg0, "unsupported");
+        Assert2.error(arg0, "unsupported"); // NOI18N
         return null;
     }
 //TODO
@@ -2464,7 +2464,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     private void setToMirror(Tree var, Value value, EvaluationContext evaluationContext) {
         VariableInfo varInfo = evaluationContext.getVariables().get(var);
         if (varInfo == null) {
-            throw new IllegalStateException("Unknown variable "+var);
+            throw new IllegalStateException("Unknown variable "+var); // NOI18N
         }
         try {
             if (varInfo.field != null) {
@@ -2487,7 +2487,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                                ObjectReference objectReference, List<Value> argVals,
                                EvaluationContext evaluationContext) {
         if (!evaluationContext.canInvokeMethods()) {
-            Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);
+            Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext); // NOI18N
         }
         ThreadReference evaluationThread = evaluationContext.getFrame().thread();
         try {
@@ -2591,7 +2591,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     if (v instanceof ObjectReference) {
                         if (!methodCalled) {
                             if (!evaluationContext.canInvokeMethods()) {
-                                Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);
+                                Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext); // NOI18N
                             }
                             evaluationThread = evaluationContext.getFrame().thread();
                             if (loggerMethod.isLoggable(Level.FINE)) {
@@ -2609,7 +2609,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                     if (v instanceof PrimitiveValue) {
                         if (!methodCalled) {
                             if (!evaluationContext.canInvokeMethods()) {
-                                Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);
+                                Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext); // NOI18N
                             }
                             evaluationThread = evaluationContext.getFrame().thread();
                             if (loggerMethod.isLoggable(Level.FINE)) {
@@ -2659,7 +2659,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
     
     private static void unboxMethodToBeCalled(Tree arg0, Mirror v, EvaluationContext evaluationContext) {
         if (!evaluationContext.canInvokeMethods()) {
-            Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext);
+            Assert2.error(arg0, "calleeException", new UnsupportedOperationException(), evaluationContext); // NOI18N
         }
         if (loggerMethod.isLoggable(Level.FINE)) {
             loggerMethod.fine("STARTED : Unbox "+v+" in thread "+evaluationContext.getFrame().thread());
@@ -2789,7 +2789,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (type instanceof LongType) return invokeUnboxingMethod(val, "longValue", thread);	//NOI18N
         if (type instanceof FloatType) return invokeUnboxingMethod(val, "floatValue", thread);	//NOI18N
         if (type instanceof DoubleType) return invokeUnboxingMethod(val, "doubleValue", thread);	//NOI18N
-        throw new RuntimeException("Invalid type while unboxing: " + type.signature());    // never happens
+        throw new RuntimeException("Invalid type while unboxing: " + type.signature());    // never happens // NOI18N
     }
     
     public static ObjectReference box(PrimitiveValue v, ReferenceType type,
@@ -2807,7 +2807,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
                 }
             }
             if (constructor == null) {
-                throw new RuntimeException("No constructor "+type+" "+signature);
+                throw new RuntimeException("No constructor "+type+" "+signature); // NOI18N
             }
             return ((ClassType) type).newInstance(thread, constructor, Arrays.asList(new Value[] { v }), ObjectReference.INVOKE_SINGLE_THREADED);
         } catch (InvalidTypeException itex) {
@@ -2820,7 +2820,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             throw iex;
         } catch (Exception e) {
             // this should never happen, indicates an internal error
-            throw new RuntimeException("Unexpected exception while invoking boxing method", e);
+            throw new RuntimeException("Unexpected exception while invoking boxing method", e); // NOI18N
         }
     }
 
@@ -2842,7 +2842,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             throw iex;
         } catch (Exception e) {
             // this should never happen, indicates an internal error
-            throw new RuntimeException("Unexpected exception while invoking unboxing method", e);
+            throw new RuntimeException("Unexpected exception while invoking unboxing method", e); // NOI18N
         }
     }
 
@@ -2874,7 +2874,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
             if (t instanceof DoubleType) {
                 return Double.toString(pv.doubleValue());
             }
-            throw new IllegalStateException("Unknown primitive type: "+t);
+            throw new IllegalStateException("Unknown primitive type: "+t); // NOI18N
         }
         if (v == null) {
             return ""+null;
@@ -2894,7 +2894,7 @@ public class EvaluatorVisitor extends JavaFXTreePathScanner<Mirror, EvaluationCo
         if (sv instanceof StringReference) {
             return ((StringReference) sv).value();
         } else {
-            throw new IllegalStateException("Result of toString() call on "+ov+" is not a String, but: "+sv);
+            throw new IllegalStateException("Result of toString() call on "+ov+" is not a String, but: "+sv); // NOI18N
         }
     }
     

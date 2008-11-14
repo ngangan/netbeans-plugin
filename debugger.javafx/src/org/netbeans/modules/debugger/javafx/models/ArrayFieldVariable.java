@@ -72,7 +72,7 @@ org.netbeans.api.debugger.javafx.Field {
             debugger, 
             value, 
             parentID + '.' + index +
-                (value instanceof ObjectReference ? "^" : "")
+                (value instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.index = index;
         this.maxIndexLog = log10(maxIndex);
@@ -96,9 +96,9 @@ org.netbeans.api.debugger.javafx.Field {
     static String getName(int maxIndexLog, int index) {
         int num0 = maxIndexLog - log10(index);
         if (num0 > 0) {
-            return "[" + zeros(num0) + index + "]";
+            return "[" + zeros(num0) + index + "]";	//NOI18N
         } else {
-            return "[" + index + "]";
+            return "[" + index + "]";	//NOI18N
         }
     }
     
@@ -176,7 +176,7 @@ org.netbeans.api.debugger.javafx.Field {
                 array,
                 index,
                 0,
-                getID().substring(0, getID().length() - ('.' + index + (getJDIValue() instanceof ObjectReference ? "^" : "")).length()));
+                getID().substring(0, getID().length() - ('.' + index + (getJDIValue() instanceof ObjectReference ? "^" : "")).length()));	//NOI18N
         clon.maxIndexLog = this.maxIndexLog;
         return clon;
     }
@@ -184,7 +184,7 @@ org.netbeans.api.debugger.javafx.Field {
     // other methods ...........................................................
 
     public String toString () {
-        return "FieldVariable " + getName ();
+        return "FieldVariable " + getName ();	//NOI18N
     }
 }
 

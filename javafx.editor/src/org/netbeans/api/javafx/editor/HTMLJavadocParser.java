@@ -349,6 +349,7 @@ final class HTMLJavadocParser {
 
         class CallbackJavaFX extends HTMLEditorKit.ParserCallback {
             private boolean insideFieldBlock = false;
+            private boolean insideNameBlock = false;
 
             @Override
             public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
@@ -359,6 +360,11 @@ final class HTMLJavadocParser {
                         offset[0] = pos;
                     } else if (name.equals(nameAttr)) {
                         offset[0] = pos;
+                    }
+                } else if (t == HTML.Tag.B && a != null) {
+                    final Object classAttr = a.getAttribute(HTML.Attribute.CLASS);
+                    if ("name".equals(classAttr)) {
+                        insideNameBlock = true;
                     }
                 } else if (t == HTML.Tag.DIV && a != null) {
                     final Object classAttr = a.getAttribute(HTML.Attribute.CLASS);
@@ -374,8 +380,9 @@ final class HTMLJavadocParser {
                 String dataStr = new String(data);
                 if (dataStr.indexOf("&nbsp;") != -1 && offset[0] != -1 && offset[1] == -1) {
                     offset[1] = pos;
-                } else if (offset[0] == -1 && name.indexOf("(") == -1 && dataStr.indexOf(name) != -1) { // fields: name attr is not been parsed for some magic reason
+                } else if (offset[0] == -1 && name.indexOf("(") == -1 && dataStr.indexOf(name) != -1 && insideNameBlock) { // fields: name attr is not been parsed for some magic reason
                     insideFieldBlock = true;
+                    insideNameBlock = false;
                 }
             }
         }

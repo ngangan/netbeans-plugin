@@ -58,15 +58,15 @@ import org.openide.util.NbBundle;
 public class ClassesNodeModel implements NodeModel {
 
     private static final String CLASS =
-        "org/netbeans/modules/debugger/javafx/resources/class";
+        "org/netbeans/modules/debugger/javafx/resources/class";	//NOI18N
     private static final String INTERFACE =
-        "org/netbeans/modules/debugger/javafx/resources/interface";
+        "org/netbeans/modules/debugger/javafx/resources/interface";	//NOI18N
     private static final String PACKAGE =
-        "org/netbeans/modules/debugger/javafx/resources/package";
+        "org/netbeans/modules/debugger/javafx/resources/package";	//NOI18N
     private static final String FIELD =
-        "org/netbeans/modules/debugger/javafx/resources/field";
+        "org/netbeans/modules/debugger/javafx/resources/field";	//NOI18N
     private static final String CLASS_LOADER =
-        "org/netbeans/modules/debugger/javafx/resources/classLoader";
+        "org/netbeans/modules/debugger/javafx/resources/classLoader";	//NOI18N
     
     private Properties classesProperties = Properties.getDefault().
             getProperties("debugger").getProperties("classesView"); // NOI18N
@@ -75,7 +75,7 @@ public class ClassesNodeModel implements NodeModel {
     public String getDisplayName (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT)
             return NbBundle.getBundle (ClassesNodeModel.class).getString
-                ("CTL_ClassesModel_Column_Name_Name");
+                ("CTL_ClassesModel_Column_Name_Name");	//NOI18N
         if (o instanceof Object[]) {
             String name = (String) ((Object[]) o) [0];
             boolean flat = classesProperties.getBoolean("flat", true);
@@ -98,18 +98,18 @@ public class ClassesNodeModel implements NodeModel {
         }
         if (o instanceof ClassLoaderReference) {
             String name = ((ClassLoaderReference) o).referenceType ().name ();
-            if (name.endsWith ("AppClassLoader"))
+            if (name.endsWith ("AppClassLoader"))	//NOI18N
                 return NbBundle.getBundle (ClassesNodeModel.class).getString
-                    ("CTL_ClassesModel_Column_Name_AppClassLoader");
+                    ("CTL_ClassesModel_Column_Name_AppClassLoader");	//NOI18N
             return java.text.MessageFormat.format (NbBundle.getBundle
                 (ClassesNodeModel.class).getString (
-                    "CTL_ClassesModel_Column_Name_ClassLoader"), 
+                    "CTL_ClassesModel_Column_Name_ClassLoader"), 	//NOI18N
                     new Object [] {name}
                 );
         }
         if (o instanceof Integer) {
             return NbBundle.getBundle (ClassesNodeModel.class).getString 
-                ("CTL_ClassesModel_Column_Name_SystemClassLoader");
+                ("CTL_ClassesModel_Column_Name_SystemClassLoader");	//NOI18N
         }
         throw new UnknownTypeException (o);
     }
@@ -117,28 +117,28 @@ public class ClassesNodeModel implements NodeModel {
     public String getShortDescription (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT)
             return NbBundle.getBundle (ClassesNodeModel.class).getString
-                ("CTL_ClassesModel_Column_Name_Desc");
+                ("CTL_ClassesModel_Column_Name_Desc");	//NOI18N
         if (o instanceof Object[])
             return java.text.MessageFormat.format (NbBundle.getBundle
                 (ClassesNodeModel.class).getString (
-                    "CTL_ClassesModel_Column_Name_Package"), 
+                    "CTL_ClassesModel_Column_Name_Package"), 	//NOI18N
                 (Object []) o
             );
         if (o instanceof ReferenceType) {
             String format = (o instanceof ClassType) ?
                     NbBundle.getBundle (ClassesNodeModel.class).getString
-                        ("CTL_ClassesModel_Column_Name_Class") :
+                        ("CTL_ClassesModel_Column_Name_Class") :	//NOI18N
                     NbBundle.getBundle (ClassesNodeModel.class).getString
-                        ("CTL_ClassesModel_Column_Name_Interface");
+                        ("CTL_ClassesModel_Column_Name_Interface");	//NOI18N
             String name = java.text.MessageFormat.format (
                 format, 
                 new Object [] {((ReferenceType) o).name ()}
             );
             ClassLoaderReference cl = ((ReferenceType) o).classLoader ();
             if (cl != null) {
-                name += " " + java.text.MessageFormat.format (
+                name += " " + java.text.MessageFormat.format ( // NOI18N
                     NbBundle.getBundle (ClassesNodeModel.class).getString (
-                    "CTL_ClassesModel_Column_Name_LoadedBy"), 
+                    "CTL_ClassesModel_Column_Name_LoadedBy"), 	//NOI18N
                     new Object [] {cl.referenceType ().name ()}
                 );
             }
@@ -198,7 +198,7 @@ public class ClassesNodeModel implements NodeModel {
          * @return unique ID of this column
          */
         public String getID () {
-            return "DefaultClassesColumn";
+            return "DefaultClassesColumn";	//NOI18N
         }
 
         /** 
@@ -223,7 +223,7 @@ public class ClassesNodeModel implements NodeModel {
          */
         public String getShortDescription () {
             return NbBundle.getBundle (DefaultClassesColumn.class).getString
-                ("CTL_ClassesModel_Column_Name_Desc");
+                ("CTL_ClassesModel_Column_Name_Desc");	//NOI18N
         }
 
         /**

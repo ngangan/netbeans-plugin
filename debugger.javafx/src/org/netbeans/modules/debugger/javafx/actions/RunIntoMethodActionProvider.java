@@ -271,7 +271,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
 
                 public boolean exec(Event event) {
                     Logger.getLogger(RunIntoMethodActionProvider.class.getName()).
-                        fine("Calling location reached, tracing for "+methodName+"()");
+                        fine("Calling location reached, tracing for "+methodName+"()"); // NOI18N
                     vm.eventRequestManager().deleteEventRequest(brReq);
                     debugger.getOperator().unregister(brReq);
                     traceLineForMethod(methodName, line);
@@ -294,7 +294,7 @@ public class RunIntoMethodActionProvider extends ActionsProviderSupport
             public void propertyChange(PropertyChangeEvent evt) {
                 if (Logger.getLogger(RunIntoMethodActionProvider.class.getName()).isLoggable(Level.FINE)) {
                     Logger.getLogger(RunIntoMethodActionProvider.class.getName()).
-                        fine("traceLineForMethod("+method+") step is at "+debugger.getCurrentThread().getClassName()+":"+debugger.getCurrentThread().getMethodName());
+                        fine("traceLineForMethod("+method+") step is at "+debugger.getCurrentThread().getClassName()+":"+debugger.getCurrentThread().getMethodName()); // NOI18N
                 }
                 //System.err.println("RunIntoMethodActionProvider: Step fired, at "+
                 //                   debugger.getCurrentThread().getMethodName()+"()");

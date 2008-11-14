@@ -77,7 +77,7 @@ ObjectVariable {
             debugger, 
             v, 
             "" + watch +
-                (v instanceof ObjectReference ? "^" : "")
+                (v instanceof ObjectReference ? "^" : "")	//NOI18N
         );
         this.debugger = debugger;
         this.watch = watch;
@@ -153,11 +153,11 @@ ObjectVariable {
         CallStackFrameImpl frame = (CallStackFrameImpl) debugger.
             getCurrentCallStackFrame ();
         if (frame == null)
-            throw new InvalidExpressionException ("No curent frame.");
+            throw new InvalidExpressionException ("No curent frame."); // NOI18N
         
         // 2) try to set as a local variable value
         try {
-            LocalVariable local = frame.getLocalVariable("$"+getExpression ());
+            LocalVariable local = frame.getLocalVariable("$"+getExpression ());	//NOI18N
             if (local != null) {
                 if (local instanceof Local) {
                     ((Local) local).setValue(value);
@@ -171,10 +171,10 @@ ObjectVariable {
         }
         // 2,5) try to set as static field
         ReferenceType clazz = frame.getStackFrame().location().declaringType();
-        Field field1 = clazz.fieldByName("$"+getExpression());
+        Field field1 = clazz.fieldByName("$"+getExpression());	//NOI18N
         if (field1 == null) {
             throw new InvalidExpressionException (
-                "Can not set value to expression.");
+                "Can not set value to expression."); // NOI18N
         }
         if (field1.isStatic()) {
             if (clazz instanceof ClassType) {
@@ -186,7 +186,7 @@ ObjectVariable {
                             ObjectReference ref = (ObjectReference)v;
                             ReferenceType rt = ref.referenceType();
                             if (rt!=null){
-                                Field valueField = rt.fieldByName("$value");
+                                Field valueField = rt.fieldByName("$value");	//NOI18N
                                 if (valueField!=null) {
                                     ref.setValue(valueField, value);
                                 }
@@ -202,20 +202,20 @@ ObjectVariable {
                 }
             } else {
                 throw new InvalidExpressionException
-                 ("Can not set value to expression.");
+                 ("Can not set value to expression."); // NOI18N
             }
         } else {
         // 3) try tu set as a field
         ObjectReference thisObject = frame.getStackFrame ().thisObject ();
         if (thisObject == null) {
                     throw new InvalidExpressionException
-                     ("Can not set value to expression.");
+                     ("Can not set value to expression."); // NOI18N
         }
         Field field = thisObject.referenceType ().fieldByName
-            ("$"+getExpression ());
+            ("$"+getExpression ());	//NOI18N
         if (field == null)
             throw new InvalidExpressionException 
-                ("Can not set value to expression.");
+                ("Can not set value to expression."); // NOI18N
         try {
             thisObject.setValue (field, value);
         } catch (InvalidTypeException ex) {

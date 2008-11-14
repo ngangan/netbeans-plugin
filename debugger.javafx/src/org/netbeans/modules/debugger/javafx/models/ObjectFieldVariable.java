@@ -75,7 +75,7 @@ implements org.netbeans.api.debugger.javafx.Field {
         super (
             debugger, 
             value, 
-            parentID + '.' + field.name () + "^"
+            parentID + '.' + field.name () + "^"	//NOI18N
         );
         this.field = field;
         //this.className = className;
@@ -174,7 +174,7 @@ implements org.netbeans.api.debugger.javafx.Field {
                         ObjectReference ref = (ObjectReference)v;
                         ReferenceType rt = ref.referenceType();
                         if (rt!=null) {
-                            Field valueField = rt.fieldByName("$value");
+                            Field valueField = rt.fieldByName("$value");	//NOI18N
                             if (valueField!=null) {
                                 ref.setValue(valueField, value);
                                 set=true;
@@ -195,7 +195,7 @@ implements org.netbeans.api.debugger.javafx.Field {
                             ObjectReference ref = (ObjectReference)v;
                             ReferenceType lrt = ref.referenceType();
                             if (lrt!=null){
-                                Field valueField = lrt.fieldByName("$value");
+                                Field valueField = lrt.fieldByName("$value");	//NOI18N
                                 if (valueField!=null) {
                                     ref.setValue(valueField, value);
                                     set=true;
@@ -221,7 +221,7 @@ implements org.netbeans.api.debugger.javafx.Field {
 
     public ObjectFieldVariable clone() {
         return new ObjectFieldVariable(getDebugger(), (ObjectReference) getJDIValue(), field,
-                getID().substring(0, getID().length() - ("." + field.name() + (getJDIValue() instanceof ObjectReference ? "^" : "")).length()),
+                getID().substring(0, getID().length() - ("." + field.name() + (getJDIValue() instanceof ObjectReference ? "^" : "")).length()),	//NOI18N
                 genericSignature, objectReference);
     }
 
@@ -229,6 +229,6 @@ implements org.netbeans.api.debugger.javafx.Field {
     // other methods ...........................................................
 
     public String toString () {
-        return "ObjectFieldVariable " + field.name ();
+        return "ObjectFieldVariable " + field.name ();	//NOI18N
     }
 }

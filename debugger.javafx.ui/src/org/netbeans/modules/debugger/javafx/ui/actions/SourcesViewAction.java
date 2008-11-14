@@ -70,7 +70,7 @@ public class SourcesViewAction extends AbstractAction {
             Action.NAME, 
             NbBundle.getMessage (
                 SourcesViewAction.class, 
-                "CTL_SourcesViewAction"
+                "CTL_SourcesViewAction"	//NOI18N
             )
         );
         putValue (

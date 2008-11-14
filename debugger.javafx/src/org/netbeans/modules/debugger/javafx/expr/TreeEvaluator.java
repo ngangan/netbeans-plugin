@@ -111,7 +111,7 @@ public class TreeEvaluator {
         frameThread = frame.thread();
         frameIndex = indexOf(frameThread.frames(), frame);
         if (frameIndex == -1) {
-            throw new IncompatibleThreadStateException("Thread does not contain current frame");
+            throw new IncompatibleThreadStateException("Thread does not contain current frame"); // NOI18N
         }
         currentPackage = evaluationContext.getFrame().location().declaringType().name();
         int idx = currentPackage.lastIndexOf('.');

@@ -113,10 +113,10 @@ public class JavaFXSharabilityQuery implements SharabilityQueryImplementation, P
         String[] testProps = testRoots.getRootProperties();
         String[] props = new String [srcProps.length + testProps.length];
         for (int i=0; i<srcProps.length; i++) {
-            props[i] = "${"+srcProps[i]+"}";
+            props[i] = "${"+srcProps[i]+"}"; // NOI18N
         }
         for (int i=0; i<testProps.length; i++) {
-            props[srcProps.length+i] = "${"+testProps[i]+"}";
+            props[srcProps.length+i] = "${"+testProps[i]+"}"; // NOI18N
         }
         return helper.createSharabilityQuery(this.evaluator, props,
             new String[] {

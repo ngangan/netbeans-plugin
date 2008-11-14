@@ -76,7 +76,7 @@ import org.openide.util.NbBundle;
 public class SourcesModel implements TreeModel, TableModel,
 NodeActionsProvider {
     
-    private static final String     FILTER_PREFIX = "Do not stop in: ";
+    private static final String     FILTER_PREFIX = "Do not stop in: "; // NOI18N
     private static final String     DISP_FILTER_PREFIX = NbBundle.getBundle
         (SourcesModel.class).getString ("CTL_SourcesModel_Name_DoNotStopIn");
     
@@ -92,7 +92,7 @@ NodeActionsProvider {
     private Set<String>             disabledSourceRoots = new HashSet<String>();
     private List<String>            additionalSourceRoots = new ArrayList<String>();
     private Properties              filterProperties = Properties.
-        getDefault ().getProperties ("debugger").getProperties ("sources");
+        getDefault ().getProperties ("debugger").getProperties ("sources");	//NOI18N
     
     
     public SourcesModel (ContextProvider lookupProvider) {
@@ -208,7 +208,7 @@ NodeActionsProvider {
     
     public Object getValueAt (Object node, String columnID) throws 
     UnknownTypeException {
-        if ("use".equals (columnID)) {
+        if ("use".equals (columnID)) { // NOI18N
             if (node instanceof String)
                 return Boolean.valueOf (
                     isEnabled ((String) node)
@@ -219,7 +219,7 @@ NodeActionsProvider {
     
     public boolean isReadOnly (Object node, String columnID) throws 
     UnknownTypeException {
-        if ( "use".equals (columnID) &&
+        if ( "use".equals (columnID) && // NOI18N
              (node instanceof String))
             return false;
         throw new UnknownTypeException (node);
@@ -227,7 +227,7 @@ NodeActionsProvider {
     
     public void setValueAt (Object node, String columnID, Object value) 
     throws UnknownTypeException {
-        if ("use".equals (columnID)) {
+        if ("use".equals (columnID)) { // NOI18N
             if (node instanceof String) {
                 setEnabled ((String) node, ((Boolean) value).booleanValue ());
                 return;
@@ -322,32 +322,32 @@ NodeActionsProvider {
 
     private void loadFilters () {
         filters = new HashSet (
-            filterProperties.getProperties ("class_filters").getCollection (
-                "all", 
+            filterProperties.getProperties ("class_filters").getCollection (	//NOI18N
+                "all", 	//NOI18N
                 Collections.EMPTY_SET
             )
         );
         enabledFilters = new HashSet (
-            filterProperties.getProperties ("class_filters").getCollection (
-                "enabled", 
+            filterProperties.getProperties ("class_filters").getCollection (	//NOI18N
+                "enabled", 	//NOI18N
                 Collections.EMPTY_SET
             )
         );
         enabledSourceRoots = new HashSet (
-            filterProperties.getProperties ("source_roots").getCollection (
-                "enabled", 
+            filterProperties.getProperties ("source_roots").getCollection (	//NOI18N
+                "enabled", 	//NOI18N
                 Collections.EMPTY_SET
             )
         );
         disabledSourceRoots = new HashSet (
-            filterProperties.getProperties ("source_roots").getCollection (
-                "disabled", 
+            filterProperties.getProperties ("source_roots").getCollection (	//NOI18N
+                "disabled", 	//NOI18N
                 Collections.EMPTY_SET
             )
         );
         additionalSourceRoots = new ArrayList(
-            filterProperties.getProperties("additional_source_roots").getCollection(
-                "src_roots",
+            filterProperties.getProperties("additional_source_roots").getCollection(	//NOI18N
+                "src_roots",	//NOI18N
                 Collections.EMPTY_LIST)
         );
         if (additionalSourceRoots.size() > 0) {
@@ -364,16 +364,16 @@ NodeActionsProvider {
     }
 
     private synchronized void saveFilters () {
-        filterProperties.getProperties ("class_filters").
-            setCollection ("all", filters);
-        filterProperties.getProperties ("class_filters").
-            setCollection ("enabled", enabledFilters);
-        filterProperties.getProperties ("source_roots").setCollection 
-            ("enabled", enabledSourceRoots);
-        filterProperties.getProperties ("source_roots").setCollection 
-            ("disabled", disabledSourceRoots);
-        filterProperties.getProperties("additional_source_roots").
-            setCollection("src_roots", additionalSourceRoots);
+        filterProperties.getProperties ("class_filters").	//NOI18N
+            setCollection ("all", filters);	//NOI18N
+        filterProperties.getProperties ("class_filters").	//NOI18N
+            setCollection ("enabled", enabledFilters);	//NOI18N
+        filterProperties.getProperties ("source_roots").setCollection 	//NOI18N
+            ("enabled", enabledSourceRoots);	//NOI18N
+        filterProperties.getProperties ("source_roots").setCollection 	//NOI18N
+            ("disabled", disabledSourceRoots);	//NOI18N
+        filterProperties.getProperties("additional_source_roots").	//NOI18N
+            setCollection("src_roots", additionalSourceRoots);	//NOI18N
     }
 
     
@@ -391,7 +391,7 @@ NodeActionsProvider {
          * @return unique ID of this column
          */
         public String getID () {
-            return "DefaultSourcesColumn";
+            return "DefaultSourcesColumn";	//NOI18N
         }
 
         /** 
@@ -406,7 +406,7 @@ NodeActionsProvider {
 
         public Character getDisplayedMnemonic() {
             return new Character(NbBundle.getBundle(SourcesModel.class).getString 
-                ("CTL_SourcesModel_Column_Name_Name_Mnc").charAt(0));
+                ("CTL_SourcesModel_Column_Name_Name_Mnc").charAt(0));	//NOI18N
         }
 
         /**
@@ -416,7 +416,7 @@ NodeActionsProvider {
          */
         public String getShortDescription () {
             return NbBundle.getBundle (DefaultSourcesColumn.class).getString
-                ("CTL_SourcesModel_Column_Name_Desc");
+                ("CTL_SourcesModel_Column_Name_Desc");	//NOI18N
         }
 
         /**
@@ -441,7 +441,7 @@ NodeActionsProvider {
          * @return unique ID of this column
          */
         public String getID () {
-            return "use";
+            return "use";	//NOI18N
         }
 
         /** 
@@ -451,12 +451,12 @@ NodeActionsProvider {
          */
         public String getDisplayName () {
             return NbBundle.getBundle (SourcesModel.class).getString 
-                ("CTL_SourcesModel_Column_Debugging_Name");
+                ("CTL_SourcesModel_Column_Debugging_Name");	//NOI18N
         }
 
         public Character getDisplayedMnemonic() {
             return new Character(NbBundle.getBundle(SourcesModel.class).getString 
-                ("CTL_SourcesModel_Column_Debugging_Name_Mnc").charAt(0));
+                ("CTL_SourcesModel_Column_Debugging_Name_Mnc").charAt(0));	//NOI18N
         }
 
         /**
@@ -476,7 +476,7 @@ NodeActionsProvider {
          */
         public String getShortDescription () {
             return NbBundle.getBundle (SourcesModel.class).getString 
-                ("CTL_SourcesModel_Column_Debugging_Desc");
+                ("CTL_SourcesModel_Column_Debugging_Desc");	//NOI18N
         }
 
         /**
@@ -542,14 +542,14 @@ NodeActionsProvider {
     
     private final Action NEW_FILTER_ACTION = new AbstractAction
         (NbBundle.getBundle (SourcesModel.class).getString 
-            ("CTL_SourcesModel_Action_AddFilter")) {
+            ("CTL_SourcesModel_Action_AddFilter")) {	//NOI18N
             public void actionPerformed (ActionEvent e) {
                 NotifyDescriptor.InputLine descriptor = new 
                     NotifyDescriptor.InputLine (
                         NbBundle.getBundle (SourcesModel.class).getString 
-                            ("CTL_SourcesModel_NewFilter_Filter_Label"),
+                            ("CTL_SourcesModel_NewFilter_Filter_Label"),	//NOI18N
                         NbBundle.getBundle (SourcesModel.class).getString 
-                            ("CTL_SourcesModel_NewFilter_Title")
+                            ("CTL_SourcesModel_NewFilter_Title")	//NOI18N
                     );
                 if (DialogDisplayer.getDefault ().notify (descriptor) == 
                     NotifyDescriptor.OK_OPTION
@@ -569,7 +569,7 @@ NodeActionsProvider {
     };
     private final Action DELETE_ACTION = Models.createAction (
         NbBundle.getBundle (SourcesModel.class).getString
-            ("CTL_SourcesModel_Action_Delete"),
+            ("CTL_SourcesModel_Action_Delete"),	//NOI18N
         new Models.ActionPerformer () {
             public boolean isEnabled (Object node) {
                 return true;
@@ -652,7 +652,7 @@ NodeActionsProvider {
     public abstract static class AbstractColumn extends ColumnModel {
         
         Properties properties = Properties.getDefault ().
-            getProperties ("debugger").getProperties ("views");
+            getProperties ("debugger").getProperties ("views");	//NOI18N
 
         
         /**
@@ -661,7 +661,7 @@ NodeActionsProvider {
          * @param visible set true if column is visible
          */
         public void setVisible (boolean visible) {
-            properties.setBoolean (getID () + ".visible", visible);
+            properties.setBoolean (getID () + ".visible", visible);	//NOI18N
         }
 
         /**
@@ -670,7 +670,7 @@ NodeActionsProvider {
          * @param sorted set true if column should be sorted by default 
          */
         public void setSorted (boolean sorted) {
-            properties.setBoolean (getID () + ".sorted", sorted);
+            properties.setBoolean (getID () + ".sorted", sorted);	//NOI18N
         }
 
         /**
@@ -680,7 +680,7 @@ NodeActionsProvider {
          *        in descending order
          */
         public void setSortedDescending (boolean sortedDescending) {
-            properties.setBoolean (getID () + ".sortedDescending", sortedDescending);
+            properties.setBoolean (getID () + ".sortedDescending", sortedDescending);	//NOI18N
         }
     
         /**
@@ -689,7 +689,7 @@ NodeActionsProvider {
          * @return current order number of this column
          */
         public int getCurrentOrderNumber () {
-            return properties.getInt (getID () + ".currentOrderNumber", -1);
+            return properties.getInt (getID () + ".currentOrderNumber", -1);	//NOI18N
         }
 
         /**
@@ -698,7 +698,7 @@ NodeActionsProvider {
          * @param newOrderNumber new order number
          */
         public void setCurrentOrderNumber (int newOrderNumber) {
-            properties.setInt (getID () + ".currentOrderNumber", newOrderNumber);
+            properties.setInt (getID () + ".currentOrderNumber", newOrderNumber);	//NOI18N
         }
 
         /**
@@ -707,7 +707,7 @@ NodeActionsProvider {
          * @return column width of this column
          */
         public int getColumnWidth () {
-            return properties.getInt (getID () + ".columnWidth", 150);
+            return properties.getInt (getID () + ".columnWidth", 150);	//NOI18N
         }
 
         /**
@@ -716,7 +716,7 @@ NodeActionsProvider {
          * @param newColumnWidth a new column width
          */
         public void setColumnWidth (int newColumnWidth) {
-            properties.setInt (getID () + ".columnWidth", newColumnWidth);
+            properties.setInt (getID () + ".columnWidth", newColumnWidth);	//NOI18N
         }
 
         /**

@@ -104,11 +104,11 @@ public class SourcePath {
     
     static SourcePathProvider getDefaultContext() {
         List providers = DebuggerManager.getDebuggerManager().
-                lookup("netbeans-JavaFXSession", SourcePathProvider.class);
+                lookup("netbeans-JavaFXSession", SourcePathProvider.class);	//NOI18N
         for (Iterator it = providers.iterator(); it.hasNext(); ) {
             Object provider = it.next();
             // Hack - find our provider:
-            if (provider.getClass().getName().equals("org.netbeans.modules.debugger.javafx.projects.SourcePathProviderImpl")) {
+            if (provider.getClass().getName().equals("org.netbeans.modules.debugger.javafx.projects.SourcePathProviderImpl")) {	//NOI18N
                 return (SourcePathProvider) provider;
             }
         }
@@ -153,7 +153,7 @@ public class SourcePath {
                 new java.net.URL(url);
             } catch (java.net.MalformedURLException muex) {
                 Logger.getLogger(SourcePath.class.getName()).log(Level.WARNING,
-                        "Malformed URL '"+url+"' produced by "+getContext (), muex);
+                        "Malformed URL '"+url+"' produced by "+getContext (), muex); // NOI18N
                 return null;
             }
         }
@@ -321,8 +321,8 @@ public class SourcePath {
             }
             if (url == null) {
                 ErrorManager.getDefault().log(ErrorManager.WARNING,
-                        "Show Source: No URL for source path "+csf.getSourcePath (stratumn)+
-                        "\nThe reason is likely no opened project for this source file.");
+                        "Show Source: No URL for source path "+csf.getSourcePath (stratumn)+ // NOI18N
+                        "\nThe reason is likely no opened project for this source file."); // NOI18N
                 return false;
             }
             int lineNumber = csf.getLineNumber (stratumn);
@@ -338,8 +338,8 @@ public class SourcePath {
             );
             if (url == null) {
                 ErrorManager.getDefault().log(ErrorManager.WARNING,
-                        "Show Source: No source URL for class "+csf.getClassName()+
-                        "\nThe reason is likely no opened project for the source file.");
+                        "Show Source: No source URL for class "+csf.getClassName()+ // NOI18N
+                        "\nThe reason is likely no opened project for the source file."); // NOI18N
                 return false;
             }
             return EditorContextBridge.getContext().showSource (
@@ -380,7 +380,7 @@ public class SourcePath {
         int i = className.indexOf ('$');
         if (i > 0) className = className.substring (0, i);
         String sourceName = className.replace
-            ('.', '/') + ".fx";
+            ('.', '/') + ".fx";	//NOI18N
         return sourceName;
     }
 
@@ -582,7 +582,7 @@ public class SourcePath {
                     return p1;
                 } catch (java.net.MalformedURLException muex) {
                     Logger.getLogger(SourcePath.class.getName()).log(Level.WARNING,
-                            "Malformed URL '"+p1+"' produced by "+cp1, muex);
+                            "Malformed URL '"+p1+"' produced by "+cp1, muex); // NOI18N
                 } 
             }
             p1 = cp2.getURL (relativePath, global);
@@ -591,7 +591,7 @@ public class SourcePath {
                     new java.net.URL(p1);
                 } catch (java.net.MalformedURLException muex) {
                     Logger.getLogger(SourcePath.class.getName()).log(Level.WARNING,
-                            "Malformed URL '"+p1+"' produced by "+cp2, muex);
+                            "Malformed URL '"+p1+"' produced by "+cp2, muex); // NOI18N
                     p1 = null;
                 }
             }
@@ -652,7 +652,7 @@ public class SourcePath {
     
     private void initSourcePaths () {
         Properties properties = Properties.getDefault ().
-            getProperties ("debugger").getProperties ("sources");
+            getProperties ("debugger").getProperties ("sources");	//NOI18N
         Set originalSourceRoots = new HashSet (Arrays.asList (
             sourcePathProvider.getOriginalSourceRoots ()
         ));
@@ -660,15 +660,15 @@ public class SourcePath {
             sourcePathProvider.getSourceRoots ()
         ));
 
-        Iterator enabledSourceRoots = properties.getProperties ("source_roots").
-            getCollection ("enabled", Collections.EMPTY_SET).iterator ();
+        Iterator enabledSourceRoots = properties.getProperties ("source_roots").	//NOI18N
+            getCollection ("enabled", Collections.EMPTY_SET).iterator ();	//NOI18N
         while (enabledSourceRoots.hasNext ()) {
             String root = (String) enabledSourceRoots.next ();
             if (originalSourceRoots.contains (root)) 
                 sourceRoots.add (root);
         }
-        Iterator disabledSourceRoots = properties.getProperties ("source_roots").
-            getCollection ("disabled", Collections.EMPTY_SET).iterator ();
+        Iterator disabledSourceRoots = properties.getProperties ("source_roots").	//NOI18N
+            getCollection ("disabled", Collections.EMPTY_SET).iterator ();	//NOI18N
         while (disabledSourceRoots.hasNext ()) {
             String root = (String) disabledSourceRoots.next ();
             sourceRoots.remove (root);

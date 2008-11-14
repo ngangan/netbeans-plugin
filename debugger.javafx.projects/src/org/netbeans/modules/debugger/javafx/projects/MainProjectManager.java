@@ -86,7 +86,7 @@ public class MainProjectManager implements ProjectActionPerformer {
         if (mainProject != p) {
             Project o = mainProject;
             mainProject = p;
-            pcs.firePropertyChange ("mainProject", o, mainProject);
+            pcs.firePropertyChange ("mainProject", o, mainProject);	//NOI18N
         }
         return true; // unused
     }

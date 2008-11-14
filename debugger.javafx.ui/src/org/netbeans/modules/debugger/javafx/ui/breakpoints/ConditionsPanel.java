@@ -176,7 +176,7 @@ public class ConditionsPanel extends javax.swing.JPanel {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < filter.length; i++) {
             if (i > 0) {
-                sb.append(", ");
+                sb.append(", ");	//NOI18N
             }
             sb.append(filter[i]);
         }
@@ -195,7 +195,7 @@ public class ConditionsPanel extends javax.swing.JPanel {
         int i = 0;
         int s = 0;
         while (s < filterStr.length()) {
-            int e = filterStr.indexOf(",", s);
+            int e = filterStr.indexOf(",", s);	//NOI18N
             if (e < 0) e = filterStr.length();
             filter[i++] = filterStr.substring(s, e).trim();
             s = e + 1;
@@ -398,7 +398,7 @@ public class ConditionsPanel extends javax.swing.JPanel {
         panelHitCountFilter.add(tfHitCountFilter, gridBagConstraints);
         tfHitCountFilter.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(ConditionsPanel.class, "ACSN_HitCountTF")); // NOI18N
 
-        cbHitStyle.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "equals to", "is greater then", "is multiple of" }));
+        cbHitStyle.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "equals to", "is greater then", "is multiple of" })); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -433,7 +433,7 @@ public class ConditionsPanel extends javax.swing.JPanel {
         spCondition = WatchPanel.createScrollableLineEditor(tfCondition);
         spCondition.setToolTipText(org.openide.util.NbBundle.getMessage(ConditionsPanel.class, "ConditionsPanel.spCondition.toolTipText")); // NOI18N
 
-        tfCondition.setContentType("text/x-fx");
+        tfCondition.setContentType("text/x-fx");	//NOI18N
         tfCondition.setToolTipText(org.openide.util.NbBundle.getMessage(ConditionsPanel.class, "ConditionsPanel.tfCondition.toolTipText")); // NOI18N
         spCondition.setViewportView(tfCondition);
         tfCondition.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(ConditionsPanel.class, "ACSN_ConditionTF")); // NOI18N

@@ -78,21 +78,21 @@ import org.openide.util.datatransfer.PasteType;
 public class VariablesNodeModel implements ExtendedNodeModel { 
 
     public static final String FIELD =
-        "org/netbeans/modules/debugger/resources/watchesView/Field.gif";
+        "org/netbeans/modules/debugger/resources/watchesView/Field.gif";	//NOI18N
     public static final String LOCAL =
-        "org/netbeans/modules/debugger/resources/localsView/local_variable_16.png";
+        "org/netbeans/modules/debugger/resources/localsView/local_variable_16.png";	//NOI18N
     public static final String FIXED_WATCH =
-        "org/netbeans/modules/debugger/resources/watchesView/FixedWatch.gif";
+        "org/netbeans/modules/debugger/resources/watchesView/FixedWatch.gif";	//NOI18N
     public static final String STATIC_FIELD =
-        "org/netbeans/modules/debugger/resources/watchesView/StaticField.gif";
+        "org/netbeans/modules/debugger/resources/watchesView/StaticField.gif";	//NOI18N
     public static final String SUPER =
-        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable.gif";
+        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable.gif";	//NOI18N
     public static final String STATIC =
-        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable.gif";
+        "org/netbeans/modules/debugger/resources/watchesView/SuperVariable.gif";	//NOI18N
     public static final String RETURN =
-        "org/netbeans/modules/debugger/javafx/resources/Filter.gif";
+        "org/netbeans/modules/debugger/javafx/resources/Filter.gif";	//NOI18N
     public static final String EXPR_ARGUMENTS =
-        "org/netbeans/modules/debugger/javafx/resources/ExprArguments.gif";
+        "org/netbeans/modules/debugger/javafx/resources/ExprArguments.gif";	//NOI18N
 
     
     private JavaFXDebugger debugger;
@@ -109,7 +109,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
     public String getDisplayName (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT)
             return NbBundle.getBundle (VariablesNodeModel.class).getString 
-                ("CTL_LocalsModel_Column_Name_Name");
+                ("CTL_LocalsModel_Column_Name_Name");	//NOI18N
         if (o instanceof Field)
             return ((Field) o).getName ();
         if (o instanceof LocalVariable)
@@ -127,10 +127,10 @@ public class VariablesNodeModel implements ExtendedNodeModel {
             return NbBundle.getMessage(VariablesNodeModel.class, "MSG_VariablesFilter_StaticNode");    // NOI18N
         }
         if (o instanceof ClassVariable) {
-            return "class";
+            return "class";	//NOI18N
         }
         if (o instanceof ReturnVariable) {
-            return "return "+((ReturnVariable) o).methodName()+"()";
+            return "return "+((ReturnVariable) o).methodName()+"()";	//NOI18N
         }
         if (o instanceof Operation) {
             Operation op = (Operation) o;
@@ -157,7 +157,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
         if (o instanceof String && ((String) o).startsWith("operationArguments ")) { // NOI18N
             return NbBundle.getMessage(VariablesNodeModel.class, "operationArgumentsNode", ((String) o).substring("operationArguments ".length()));
         }
-        if (o == "NativeMethodException") {
+        if (o == "NativeMethodException") {	//NOI18N
             return NbBundle.getMessage(VariablesNodeModel.class, "NativeMethod");
         }
         String str = o.toString();
@@ -166,7 +166,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
             //int from = Integer.parseInt(str.substring(8, index));
             //int to = Integer.parseInt(str.substring(index + 1));
             return NbBundle.getMessage (VariablesNodeModel.class,
-                    "CTL_LocalsModel_Column_Name_SubArray",
+                    "CTL_LocalsModel_Column_Name_SubArray",	//NOI18N
                     str.substring(8, index), str.substring(index + 1));
         }
         throw new UnknownTypeException (o);
@@ -206,14 +206,14 @@ public class VariablesNodeModel implements ExtendedNodeModel {
         if (o instanceof String && ((String) o).startsWith("operationArguments ")) { // NOI18N
             return NbBundle.getMessage(VariablesNodeModel.class, "operationArgumentsNode_descr", ((String) o).substring("operationArguments ".length()));
         }
-        if (o == "NativeMethodException") {
+        if (o == "NativeMethodException") {	//NOI18N
             return NbBundle.getMessage(VariablesNodeModel.class, "NativeMethod_descr");
         }
         String str = o.toString();
         if (str.startsWith("SubArray")) { // NOI18N
             int index = str.indexOf('-');
             return NbBundle.getMessage (VariablesNodeModel.class,
-                    "CTL_LocalsModel_Column_Descr_SubArray",
+                    "CTL_LocalsModel_Column_Descr_SubArray",	//NOI18N
                     str.substring(8, index), str.substring(index + 1));
         }
         synchronized (shortDescriptionMap) {
@@ -248,20 +248,20 @@ public class VariablesNodeModel implements ExtendedNodeModel {
                 String declaredType = ((Field) o).getDeclaredType ();
                 if (type.equals (declaredType))
                     try {
-                        return "(" + type + ") " + 
+                        return "(" + type + ") " + 	//NOI18N
                             ((ObjectVariable) o).getToStringValue ();
                     } catch (InvalidExpressionException ex) {
                         return ex.getLocalizedMessage ();
                     }
                 else
                     try {
-                        return "(" + declaredType + ") " + "(" + type + ") " + 
+                        return "(" + declaredType + ") " + "(" + type + ") " + 	//NOI18N
                             ((ObjectVariable) o).getToStringValue ();
                     } catch (InvalidExpressionException ex) {
                         return ex.getLocalizedMessage ();
                     }
             } else
-                return "(" + ((Field) o).getDeclaredType () + ") " + 
+                return "(" + ((Field) o).getDeclaredType () + ") " + 	//NOI18N
                     ((Field) o).getValue ();
         }
         if (o instanceof LocalVariable) {
@@ -270,27 +270,27 @@ public class VariablesNodeModel implements ExtendedNodeModel {
                 String declaredType = ((LocalVariable) o).getDeclaredType ();
                 if (type.equals (declaredType))
                     try {
-                        return "(" + type + ") " + 
+                        return "(" + type + ") " + 	//NOI18N
                             ((ObjectVariable) o).getToStringValue ();
                     } catch (InvalidExpressionException ex) {
                         return ex.getLocalizedMessage ();
                     }
                 else
                     try {
-                        return "(" + declaredType + ") " + "(" + type + ") " + 
+                        return "(" + declaredType + ") " + "(" + type + ") " + 	//NOI18N
                             ((ObjectVariable) o).getToStringValue ();
                     } catch (InvalidExpressionException ex) {
                         return ex.getLocalizedMessage ();
                     }
             } else
-                return "(" + ((LocalVariable) o).getDeclaredType () + ") " + 
+                return "(" + ((LocalVariable) o).getDeclaredType () + ") " + 	//NOI18N
                     ((LocalVariable) o).getValue ();
         }
         if (o instanceof Super)
             return ((Super) o).getType ();
         if (o instanceof This)
             try {
-                return "(" + ((This) o).getType () + ") " + 
+                return "(" + ((This) o).getType () + ") " + 	//NOI18N
                     ((This) o).getToStringValue ();
             } catch (InvalidExpressionException ex) {
                 return ex.getLocalizedMessage ();
@@ -320,7 +320,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
     }
     
     public String getIconBase (Object o) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported.");
+        throw new UnsupportedOperationException("Not supported."); // NOI18N
     }
 
     public boolean canRename(Object node) throws UnknownTypeException {
@@ -337,12 +337,12 @@ public class VariablesNodeModel implements ExtendedNodeModel {
 
     public Transferable clipboardCopy(Object node) throws IOException,
                                                           UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public Transferable clipboardCut(Object node) throws IOException,
                                                          UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public PasteType[] getPasteTypes(Object node, Transferable t) throws UnknownTypeException {
@@ -350,7 +350,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
     }
 
     public void setName(Object node, String name) throws UnknownTypeException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public String getIconBaseWithExtension(Object node) throws UnknownTypeException {
@@ -377,7 +377,7 @@ public class VariablesNodeModel implements ExtendedNodeModel {
         if (node instanceof Operation) {
             return EXPR_ARGUMENTS;
         }
-        if (node instanceof ReturnVariable || node == "lastOperations") {
+        if (node instanceof ReturnVariable || node == "lastOperations") {	//NOI18N
             return RETURN;
         }
         if (node instanceof String && ((String) node).startsWith("operationArguments ")) { // NOI18N

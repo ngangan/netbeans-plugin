@@ -59,7 +59,7 @@ class ThisVariable extends AbstractObjectVariable implements This {
         super (
             debugger,
             value,
-            parentID + ".this^"
+            parentID + ".this^"	//NOI18N
         );
     }
 
@@ -68,12 +68,12 @@ class ThisVariable extends AbstractObjectVariable implements This {
 
     public ThisVariable clone() {
         return new ThisVariable(getDebugger(), getJDIValue(),
-                getID().substring(0, getID().length() - ".this^".length()));
+                getID().substring(0, getID().length() - ".this^".length()));	//NOI18N
     }
 
     // other methods ...........................................................
     
     public String toString () {
-        return "ThisVariable this";
+        return "ThisVariable this";	//NOI18N
     }
 }

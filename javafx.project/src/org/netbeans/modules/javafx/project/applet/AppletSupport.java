@@ -90,9 +90,9 @@ public class AppletSupport {
     /** constank for jnlp extension */
     private static final String JNLP_EXT = "jnlp"; // NOI18N
 
-    private final static String POLICY_FILE_NAME = "applet";
-    private final static String POLICY_FILE_EXT = "policy";
-    private final static String APPLET_MAIN_CLASS = "com.sun.javafx.runtime.adapter.Applet";
+    private final static String POLICY_FILE_NAME = "applet"; // NOI18N
+    private final static String POLICY_FILE_EXT = "policy"; // NOI18N
+    private final static String APPLET_MAIN_CLASS = "com.sun.javafx.runtime.adapter.Applet"; // NOI18N
     private final static int defaultWidth=200;
     private final static int defaultHeight=150;
 
@@ -279,7 +279,7 @@ public class AppletSupport {
             }catch(NumberFormatException nfe) {
 
             }
-            if (appletFile.getExt().equals("fx")) {
+            if (appletFile.getExt().equals("fx")) { // NOI18N
                 JavaFXProject project = (JavaFXProject) getProject(appletFile);
 
                 String distJAR = project.evaluator().getProperty("dist.jar");
@@ -291,7 +291,7 @@ public class AppletSupport {
                     list = fxFolder.list(new FilenameFilter() {
 
                         public boolean accept(File dir, String name) {
-                            if (name.endsWith(".jar")) {
+                            if (name.endsWith(".jar")) { // NOI18N
                                 return true;
                             } else {
                                 return false;
@@ -302,10 +302,10 @@ public class AppletSupport {
                 }
 
                 path = path.substring(0, path.length() - 3);
-                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, true, list, distJAR, width, height);
+                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, true, list, distJAR, width, height); // NOI18N
             } else {
                 path = path.substring(0, path.length() - 5);
-                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, false, null, null, width, height);
+                fillInJNLPFile(writer, path.replaceAll("/", "."), jnlpFile.getNameExt(),codebase, false, null, null, width, height); // NOI18N
             }
         } finally {
             lock.releaseLock();
@@ -396,8 +396,8 @@ public class AppletSupport {
 
                 }
                 //Workaround to get it work in windows
-                path = path.replaceAll(" ", "%20");
-                url = new URL("file", null, path);
+                path = path.replaceAll(" ", "%20"); // NOI18N
+                url = new URL("file", null, path); // NOI18N
             } catch (MalformedURLException e) {
                 ErrorManager.getDefault().notify(e);
             }
@@ -441,8 +441,8 @@ public class AppletSupport {
         writer.println("<P>"); // NOI18N
 
         if (jnlpFileName != null) {
-            writer.println("<APPLET width="+width+" height="+height+">");
-            writer.println("    <param name=\"jnlp_href\" value=\"" + jnlpFileName + "\">");
+            writer.println("<APPLET width="+width+" height="+height+">"); // NOI18N
+            writer.println("    <param name=\"jnlp_href\" value=\"" + jnlpFileName + "\">"); // NOI18N
         } else {
             if (codebase == null) {
                 writer.print("<APPLET code="); // NOI18N
@@ -466,12 +466,12 @@ public class AppletSupport {
             }
         }
         if (draggable != null) {
-            if ("true".equals(draggable)) {
-                writer.println("    <param name=\"draggable\" value=\"true\">");
+            if ("true".equals(draggable)) { // NOI18N
+                writer.println("    <param name=\"draggable\" value=\"true\">"); // NOI18N
             }
         }
         if (java_args != null) {
-            writer.println("    <param name=\"java_arguments\" value=\"" + java_args + "\">");
+            writer.println("    <param name=\"java_arguments\" value=\"" + java_args + "\">"); // NOI18N
         }
         writer.println("</APPLET>"); // NOI18N
 
@@ -519,12 +519,12 @@ public class AppletSupport {
         writer.println("<P>"); // NOI18N
 
         writer.println("<script src=\"http://java.com/js/deployJava.js\"></script><br>");
-        writer.println("<script>");
-        writer.println("    var attributes = {");
+        writer.println("<script>"); // NOI18N
+        writer.println("    var attributes = {"); // NOI18N
         if (jnlpFileName != null) {
-            writer.println("    };");
-            writer.println("    var parameters = {");
-            writer.println("            jnlp_href:'" + jnlpFileName + "',");
+            writer.println("    };"); // NOI18N
+            writer.println("    var parameters = {"); // NOI18N
+            writer.println("            jnlp_href:'" + jnlpFileName + "',"); // NOI18N
 
         } else {
             if (codebase == null) {
@@ -535,30 +535,30 @@ public class AppletSupport {
 
             }
             if (isFX) {
-                writer.println("'" + APPLET_MAIN_CLASS + "',");
-                writer.println("            width: "+width+",");
-                writer.println("            height: "+height);
-                writer.println("    };");
-                writer.println("    var parameters = {");
-                writer.println("        ApplicationClass:" + "'" + name + "',");
+                writer.println("'" + APPLET_MAIN_CLASS + "',"); // NOI18N
+                writer.println("            width: "+width+","); // NOI18N
+                writer.println("            height: "+height); // NOI18N
+                writer.println("    };"); // NOI18N
+                writer.println("    var parameters = {"); // NOI18N
+                writer.println("        ApplicationClass:" + "'" + name + "',"); // NOI18N
             } else {
-                writer.println("'" + name + "'");
-                writer.println("    };");
-                writer.print("    var parameters = {");
+                writer.println("'" + name + "'"); // NOI18N
+                writer.println("    };"); // NOI18N
+                writer.print("    var parameters = {"); // NOI18N
             }
         } 
         if (draggable != null) {
-            if ("true".equals(draggable)) {
-                writer.println("            draggable: 'true',");
+            if ("true".equals(draggable)) { // NOI18N
+                writer.println("            draggable: 'true',"); // NOI18N
             }
         }
         if (java_args != null) {
-            writer.println("        java_arguments: '" + java_args + "'");
+            writer.println("        java_arguments: '" + java_args + "'"); // NOI18N
         }
-        writer.println("    };");
+        writer.println("    };"); // NOI18N
         //XXX TODO Java Hardcoded here
-        writer.println("    deployJava.runApplet( attributes, parameters, \"1.5\" );");
-        writer.println("</script>");
+        writer.println("    deployJava.runApplet( attributes, parameters, \"1.5\" );"); // NOI18N
+        writer.println("</script>"); // NOI18N
         writer.println("</P>\n"); // NOI18N
 
         writer.print("<HR WIDTH=\"100%\"><FONT SIZE=-1><I>"); // NOI18N
@@ -598,6 +598,9 @@ public class AppletSupport {
         writer.println("        </information>"); // NOI18N
 
         writer.println("        <resources>"); // NOI18N
+
+
+        writer.println("<security><all-permissions/></security>"); // NOI18N
         //TODO XXX hardcoded Java version
 
         writer.println("            <j2se version=\"1.6+\" href=\"http://java.sun.com/products/autodl/j2se\"/>"); // NOI18N
@@ -606,8 +609,8 @@ public class AppletSupport {
 
         String mainJar = "";
         for (int i = 0; i < libs.length; i++) {
-            if (libs[i].equals("javafxgui.jar")) {
-                mainJar = " main=\"true\"";
+            if (libs[i].equals("javafxgui.jar")) { // NOI18N
+                mainJar = " main=\"true\""; // NOI18N
             } else {
                 mainJar = "";
             }

@@ -100,7 +100,7 @@ public class ThreadsNodeModel implements NodeModel {
     public String getDisplayName (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT) {
             return NbBundle.getBundle (ThreadsNodeModel.class).getString
-                ("CTL_ThreadsModel_Column_Name_Name");
+                ("CTL_ThreadsModel_Column_Name_Name");	//NOI18N
         } else
         if (o instanceof JavaFXThread) {
             if (debugger.getCurrentThread () == o) {
@@ -144,7 +144,7 @@ public class ThreadsNodeModel implements NodeModel {
     public String getShortDescription (Object o) throws UnknownTypeException {
         if (o == TreeModel.ROOT) {
             return NbBundle.getBundle (ThreadsNodeModel.class).getString
-                ("CTL_ThreadsModel_Column_Name_Desc");
+                ("CTL_ThreadsModel_Column_Name_Desc");	//NOI18N
         } else
         if (o instanceof JavaFXThread) {
             JavaFXThread t = (JavaFXThread) o;
@@ -153,7 +153,7 @@ public class ThreadsNodeModel implements NodeModel {
             switch (i) {
                 case JavaFXThread.STATE_UNKNOWN:
                     s = NbBundle.getBundle (ThreadsNodeModel.class).getString
-                        ("CTL_ThreadsModel_State_Unknown");
+                        ("CTL_ThreadsModel_State_Unknown");	//NOI18N
                     break;
                 case JavaFXThread.STATE_MONITOR:
                     ObjectVariable ov = t.getContendedMonitor ();
@@ -166,7 +166,7 @@ public class ThreadsNodeModel implements NodeModel {
                                 format (
                                     NbBundle.getBundle (ThreadsNodeModel.class).
                                         getString (
-                                    "CTL_ThreadsModel_State_ConcreteMonitor"), 
+                                    "CTL_ThreadsModel_State_ConcreteMonitor"), 	//NOI18N
                                     new Object [] { ov.getToStringValue () });
                         } catch (InvalidExpressionException ex) {
                             s = ex.getLocalizedMessage ();
@@ -174,15 +174,15 @@ public class ThreadsNodeModel implements NodeModel {
                     break;
                 case JavaFXThread.STATE_NOT_STARTED:
                     s = NbBundle.getBundle (ThreadsNodeModel.class).getString
-                        ("CTL_ThreadsModel_State_NotStarted");
+                        ("CTL_ThreadsModel_State_NotStarted");	//NOI18N
                     break;
                 case JavaFXThread.STATE_RUNNING:
                     s = NbBundle.getBundle (ThreadsNodeModel.class).getString
-                        ("CTL_ThreadsModel_State_Running");
+                        ("CTL_ThreadsModel_State_Running");	//NOI18N
                     break;
                 case JavaFXThread.STATE_SLEEPING:
                     s = NbBundle.getBundle (ThreadsNodeModel.class).getString
-                        ("CTL_ThreadsModel_State_Sleeping");
+                        ("CTL_ThreadsModel_State_Sleeping");	//NOI18N
                     break;
                 case JavaFXThread.STATE_WAIT:
                     ov = t.getContendedMonitor ();
@@ -201,13 +201,13 @@ public class ThreadsNodeModel implements NodeModel {
                     break;
                 case JavaFXThread.STATE_ZOMBIE:
                     s = NbBundle.getBundle (ThreadsNodeModel.class).getString
-                        ("CTL_ThreadsModel_State_Zombie");
+                        ("CTL_ThreadsModel_State_Zombie");	//NOI18N
                     break;
             }
             if (t.isSuspended () && (t.getStackDepth () > 0)) {
                 try { 
                     CallStackFrame sf = t.getCallStack (0, 1) [0];
-                    s += " " + CallStackNodeModel.getCSFName (session, sf, true);
+                    s += " " + CallStackNodeModel.getCSFName (session, sf, true);	//NOI18N
                 } catch (AbsentInformationException e) {
                 }
             }

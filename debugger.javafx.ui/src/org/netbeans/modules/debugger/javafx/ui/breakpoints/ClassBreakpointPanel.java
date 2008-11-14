@@ -84,7 +84,7 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
         );
         mb.setPrintText (
             NbBundle.getBundle (ClassBreakpointPanel.class).getString 
-                ("CTL_Class_Breakpoint_Print_Text")
+                ("CTL_Class_Breakpoint_Print_Text")	//NOI18N
         );
         return mb;
     }
@@ -120,7 +120,7 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
         }
         
         conditionsPanel = new ConditionsPanel();
-        cPanel.add(conditionsPanel, "Center");
+        cPanel.add(conditionsPanel, "Center");	//NOI18N
         conditionsPanel.showExclusionClassFilter(true);
         conditionsPanel.showCondition(false);
         conditionsPanel.setClassExcludeFilter(b.getClassExclusionFilters());
@@ -128,7 +128,7 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
         conditionsPanel.setHitCount(b.getHitCountFilter());
         
         actionsPanel = new ActionsPanel (b);
-        pActions.add (actionsPanel, "Center");
+        pActions.add (actionsPanel, "Center");	//NOI18N
         // <RAVE>
         // The help IDs for the AddBreakpointPanel panels have to be different from the
         // values returned by getHelpCtx() because they provide different help
@@ -308,7 +308,7 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
         if (cf.length > 0) {
             StringBuilder sb = new StringBuilder(cf[0]);
             for (int i = 1; i < cf.length; i++) {
-                sb.append(", ");
+                sb.append(", ");	//NOI18N
                 sb.append(cf[i]);
             }
             return sb.toString();
@@ -333,7 +333,7 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
             int i = 0;
             int pos = 0;
             while (pos < length) {
-                int end = classFilter.indexOf(",");
+                int end = classFilter.indexOf(",");	//NOI18N
                 if (end < 0) end = length;
                 classFilters[i] = classFilter.substring(pos, end).trim();
                 i++;

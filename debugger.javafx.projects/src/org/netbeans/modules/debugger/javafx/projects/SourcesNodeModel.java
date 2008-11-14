@@ -61,9 +61,9 @@ import org.openide.util.NbBundle;
 public class SourcesNodeModel implements NodeModel {
 
     public static final String SOURCE_ROOT =
-        "org/netbeans/modules/debugger/javafx/resources/root";
+        "org/netbeans/modules/debugger/javafx/resources/root";	//NOI18N
     public static final String FILTER =
-        "org/netbeans/modules/debugger/javafx/resources/Filter";
+        "org/netbeans/modules/debugger/javafx/resources/Filter";	//NOI18N
     
     
     public String getDisplayName (Object o) throws UnknownTypeException {
@@ -79,10 +79,10 @@ public class SourcesNodeModel implements NodeModel {
                     ProjectInformation pi = (ProjectInformation) p.getLookup ().
                         lookup (ProjectInformation.class);
                     return java.text.MessageFormat.format(NbBundle.getBundle(SourcesNodeModel.class).getString(
-                            "CTL_SourcesModel_Column_Name_ProjectSources"), new Object [] { f.getPath(), pi.getDisplayName() });
+                            "CTL_SourcesModel_Column_Name_ProjectSources"), new Object [] { f.getPath(), pi.getDisplayName() });	//NOI18N
                 }
                 return java.text.MessageFormat.format(NbBundle.getBundle(SourcesNodeModel.class).getString(
-                        "CTL_SourcesModel_Column_Name_LibrarySources"), new Object [] { f.getPath() });
+                        "CTL_SourcesModel_Column_Name_LibrarySources"), new Object [] { f.getPath() });	//NOI18N
             } else
             return (String) o;
         } else
@@ -93,7 +93,7 @@ public class SourcesNodeModel implements NodeModel {
         if (o == TreeModel.ROOT)
             return NbBundle.getBundle(SourcesNodeModel.class).getString("CTL_SourcesModel_Column_Name_Desc");
         if (o instanceof String) {
-            if (((String) o).startsWith ("D"))
+            if (((String) o).startsWith ("D"))	//NOI18N
                 return NbBundle.getBundle(SourcesNodeModel.class).getString("CTL_SourcesModel_Column_Name_DescExclusion");
             else
                 return NbBundle.getBundle(SourcesNodeModel.class).getString("CTL_SourcesModel_Column_Name_DescRoot");
@@ -103,7 +103,7 @@ public class SourcesNodeModel implements NodeModel {
     
     public String getIconBase (Object o) throws UnknownTypeException {
         if (o instanceof String) {
-            if (((String) o).startsWith ("D"))
+            if (((String) o).startsWith ("D"))	//NOI18N
                 return FILTER;
             else
                 return SOURCE_ROOT;

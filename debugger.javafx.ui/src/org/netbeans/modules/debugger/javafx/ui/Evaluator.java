@@ -250,7 +250,7 @@ public class Evaluator extends javax.swing.JPanel {
         Container hackedFCR = (Container) ((Container) ((Container) tree.getComponents()[0]).getComponents()[0]).getComponents()[0];
         hackedFCR = (Container) tree.getComponents()[0];
         try {
-            java.lang.reflect.Field treeTableField = hackedFCR.getClass().getSuperclass().getDeclaredField("treeTable");
+            java.lang.reflect.Field treeTableField = hackedFCR.getClass().getSuperclass().getDeclaredField("treeTable");	//NOI18N
             treeTableField.setAccessible(true);
             hackedFCR = (Container) treeTableField.get(hackedFCR);
         } catch (Exception ex) {
@@ -460,7 +460,7 @@ public class Evaluator extends javax.swing.JPanel {
         
         public void propertyChange(PropertyChangeEvent evt) {
             Session currentSession = DebuggerManager.getDebuggerManager().getCurrentSession();
-            if (currentSession != null && "JavaFX".equals(currentSession.getCurrentLanguage())) {
+            if (currentSession != null && "JavaFX".equals(currentSession.getCurrentLanguage())) {	//NOI18N
                 if (autoClosed) {
                     DebuggerEngine de = DebuggerManager.getDebuggerManager().getCurrentEngine();
                     if (de == null) return ;
@@ -558,7 +558,7 @@ public class Evaluator extends javax.swing.JPanel {
                     // Must take the value from the editor and get the value and cast it to the new type.
                     Class cls = oldValue.getClass();
                     try {
-                        Method method = cls.getMethod("valueOf", new Class[]{String.class});
+                        Method method = cls.getMethod("valueOf", new Class[]{String.class});	//NOI18N
                         newValue = method.invoke(oldValue, new Object[] { editor.getText()});
                     } catch (Exception ex) {
                         // Fail silently and return the newValue (a String object)
@@ -767,7 +767,7 @@ public class Evaluator extends javax.swing.JPanel {
         }
 
         public String getIconBase(Object node) throws UnknownTypeException {
-            throw new UnsupportedOperationException("Not supported.");
+            throw new UnsupportedOperationException("Not supported."); // NOI18N
         }
 
         public String getShortDescription(Object node) throws UnknownTypeException {

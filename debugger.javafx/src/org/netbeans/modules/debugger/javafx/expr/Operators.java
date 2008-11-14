@@ -105,7 +105,7 @@ class Operators implements JavaFXParserConstants {
             }
 
         }
-        throw new IllegalArgumentException("badUnarySemantics");
+        throw new IllegalArgumentException("badUnarySemantics"); // NOI18N
     }
 
     public Value evaluate(Value left, Token operator, Value right) {
@@ -121,7 +121,7 @@ class Operators implements JavaFXParserConstants {
                 case BIT_AND: res = op1 & op2; break;
                 case XOR: res = op1 ^ op2; break;
                 default:
-                    throw new IllegalArgumentException("badBinarySemantics");
+                    throw new IllegalArgumentException("badBinarySemantics"); // NOI18N
             }
             return vm.mirrorOf(res);
         } // (boolean, bin_op, boolean)
@@ -187,7 +187,7 @@ class Operators implements JavaFXParserConstants {
             return vm.mirrorOf(s1 + s2);
         }
 
-        throw new IllegalArgumentException("Bad semantics for binary operator");
+        throw new IllegalArgumentException("Bad semantics for binary operator"); // NOI18N
     }
 
     private PrimitiveValue evaluateAddOperator(PrimitiveValue op1, PrimitiveValue op2, int id) {
@@ -246,7 +246,7 @@ class Operators implements JavaFXParserConstants {
     private PrimitiveValue evaluateShiftOperator(PrimitiveValue op1, PrimitiveValue op2, int id) {
         if ((op1 instanceof FloatValue) || (op1 instanceof DoubleValue) ||
             (op2 instanceof FloatValue) || (op2 instanceof DoubleValue)) {
-                throw new IllegalArgumentException("Bad semantics for shift operator");
+                throw new IllegalArgumentException("Bad semantics for shift operator"); // NOI18N
         }
         if (op1 instanceof LongValue) {
             long n1 = op1.longValue ();
@@ -274,7 +274,7 @@ class Operators implements JavaFXParserConstants {
     private PrimitiveValue evaluateBitOperator(PrimitiveValue op1, PrimitiveValue op2, int id)  {
         if ((op1 instanceof FloatValue) || (op1 instanceof DoubleValue) ||
             (op2 instanceof FloatValue) || (op2 instanceof DoubleValue)) {
-                throw new IllegalArgumentException("Bad semantics for bit operator");
+                throw new IllegalArgumentException("Bad semantics for bit operator"); // NOI18N
         }
         if ((op1 instanceof LongValue) || (op2 instanceof LongValue)) {
             long n1 = op1.longValue ();

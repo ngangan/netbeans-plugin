@@ -198,7 +198,7 @@ public class CurrentThreadAnnotationListener extends DebuggerManagerAdapter {
     // do not need synchronization, called in a 1-way RP
     private HashMap               stackAnnotations = new HashMap ();
     
-    private RequestProcessor rp = new RequestProcessor("Debugger Thread Annotation Refresher");
+    private RequestProcessor rp = new RequestProcessor("Debugger Thread Annotation Refresher"); // NOI18N
 
     // currently waiting / running refresh task
     // there is at most one

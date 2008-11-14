@@ -129,39 +129,39 @@ public class ThreadsTableModel implements TableModel, Constants {
             case JavaFXThread.STATE_MONITOR:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_OnMonitor"
+                    "CTL_Thread_State_OnMonitor"	//NOI18N
                 );
             case JavaFXThread.STATE_NOT_STARTED:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_NotStarted"
+                    "CTL_Thread_State_NotStarted"	//NOI18N
                 );
             case JavaFXThread.STATE_RUNNING:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_Running"
+                    "CTL_Thread_State_Running"	//NOI18N
                 );
             case JavaFXThread.STATE_SLEEPING:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_Sleeping"
+                    "CTL_Thread_State_Sleeping"	//NOI18N
                 );
             case JavaFXThread.STATE_UNKNOWN:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_Unknown"
+                    "CTL_Thread_State_Unknown"	//NOI18N
                 );
             case JavaFXThread.STATE_WAIT:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_Waiting"
+                    "CTL_Thread_State_Waiting"	//NOI18N
                 );
             case JavaFXThread.STATE_ZOMBIE:
                 return NbBundle.getMessage (
                     ThreadsTableModel.class, 
-                    "CTL_Thread_State_Zombie"
+                    "CTL_Thread_State_Zombie"	//NOI18N
                 );
-            default: ErrorManager.getDefault().log(ErrorManager.WARNING, "Unknown thread state: "+state);
+            default: ErrorManager.getDefault().log(ErrorManager.WARNING, "Unknown thread state: "+state); // NOI18N
                     return null;
         }
     }
@@ -285,7 +285,7 @@ public class ThreadsTableModel implements TableModel, Constants {
         public ThreadStateChangeRefresher(ThreadsTableModel tm, Map<JavaFXThread, Integer> threads) {
             tmRef = new WeakReference<ThreadsTableModel>(tm);
             this.threads = threads;
-            refreshTask = new RequestProcessor("Threads Refresh", 1).create(this);
+            refreshTask = new RequestProcessor("Threads Refresh", 1).create(this);	//NOI18N
             refreshTask.schedule(1000);
         }
 

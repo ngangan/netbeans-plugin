@@ -83,7 +83,7 @@ public class ExceptionBreakpointPanel extends JPanel implements Controller, org.
         );
         mb.setPrintText (
             NbBundle.getBundle (ExceptionBreakpointPanel.class).getString 
-                ("CTL_Exception_Breakpoint_Print_Text")
+                ("CTL_Exception_Breakpoint_Print_Text")	//NOI18N
         );
         return mb;
     }
@@ -125,10 +125,10 @@ public class ExceptionBreakpointPanel extends JPanel implements Controller, org.
         conditionsPanel.setCondition(b.getCondition());
         conditionsPanel.setHitCountFilteringStyle(b.getHitCountFilteringStyle());
         conditionsPanel.setHitCount(b.getHitCountFilter());
-        cPanel.add(conditionsPanel, "Center");
+        cPanel.add(conditionsPanel, "Center");	//NOI18N
         
         actionsPanel = new ActionsPanel (b);
-        pActions.add (actionsPanel, "Center");
+        pActions.add (actionsPanel, "Center");	//NOI18N
         // <RAVE>
         // The help IDs for the AddBreakpointPanel panels have to be different from the
         // values returned by getHelpCtx() because they provide different help

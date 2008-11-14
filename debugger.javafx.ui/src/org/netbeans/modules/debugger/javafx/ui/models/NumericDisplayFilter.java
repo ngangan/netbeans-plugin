@@ -182,81 +182,81 @@ NodeActionsProviderFilter, Constants {
         try {
             switch (settings.getDisplayAs ()) {
             case NumericDisplaySettings.DECIMAL:
-                if ("char".equals(type)) {
+                if ("char".equals(type)) {	//NOI18N
                     int c = getChar(var.getValue());
                     return Integer.toString(c);
                 } else {
                     return var.getValue ();
                 }
             case NumericDisplaySettings.HEXADECIMAL:
-                if ("int".equals (type))
-                    return "0x" + Integer.toHexString (
+                if ("int".equals (type))	//NOI18N
+                    return "0x" + Integer.toHexString (	//NOI18N
                         Integer.parseInt (var.getValue ())
                     );
                 else
-                if ("short".equals (type)) {
+                if ("short".equals (type)) {	//NOI18N
                     String rv = Integer.toHexString(Short.parseShort(var.getValue()));
                     if (rv.length() > 4) rv = rv.substring(rv.length() - 4, rv.length());
-                    return "0x" + rv;
-                } else if ("byte".equals(type)) {
+                    return "0x" + rv;	//NOI18N
+                } else if ("byte".equals(type)) {	//NOI18N
                     String rv = Integer.toHexString(Byte.parseByte(var.getValue()));
                     if (rv.length() > 2) rv = rv.substring(rv.length() - 2, rv.length());
-                    return "0x" + rv;
-                } else if ("char".equals(type)) {
+                    return "0x" + rv;	//NOI18N
+                } else if ("char".equals(type)) {	//NOI18N
                     int c = getChar(var.getValue());
-                    return "0x" + Integer.toHexString(c);
+                    return "0x" + Integer.toHexString(c);	//NOI18N
                 } else {//if ("long".equals(type)) {
-                    return "0x" + Long.toHexString (
+                    return "0x" + Long.toHexString (	//NOI18N
                         Long.parseLong (var.getValue ())
                     );
                 }
             case NumericDisplaySettings.OCTAL:
-                if ("int".equals (type))
-                    return "0" + Integer.toOctalString (
+                if ("int".equals (type))	//NOI18N
+                    return "0" + Integer.toOctalString (	//NOI18N
                         Integer.parseInt (var.getValue ())
                     );
                 else
-                if ("short".equals(type)) {
+                if ("short".equals(type)) {	//NOI18N
                     String rv = Integer.toOctalString(Short.parseShort(var.getValue()));
                     if (rv.length() > 5) rv = rv.substring(rv.length() - 5, rv.length());
-                    return "0" + (rv.charAt(0) == '0' ? "1" : "") + rv;
+                    return "0" + (rv.charAt(0) == '0' ? "1" : "") + rv;	//NOI18N
                 } else
-                if ("byte".equals(type)) {
+                if ("byte".equals(type)) {	//NOI18N
                     String rv = Integer.toOctalString(Byte.parseByte(var.getValue()));
-                    if (rv.length() > 3) rv = "1" + rv.substring(rv.length() - 2, rv.length());
-                    return "0" + rv;
-                } else if ("char".equals(type)) {
+                    if (rv.length() > 3) rv = "1" + rv.substring(rv.length() - 2, rv.length());	//NOI18N
+                    return "0" + rv;	//NOI18N
+                } else if ("char".equals(type)) {	//NOI18N
                     int c = getChar(var.getValue());
-                    return "0" + Integer.toOctalString(c);
+                    return "0" + Integer.toOctalString(c);	//NOI18N
                 } else {//if ("long".equals(type)) {
-                    return "0" + Long.toOctalString (
+                    return "0" + Long.toOctalString (	//NOI18N
                         Long.parseLong (var.getValue ())
                     );
                 }
             case NumericDisplaySettings.BINARY:
-                if ("int".equals(type))
+                if ("int".equals(type))	//NOI18N
                     return Integer.toBinaryString(Integer.parseInt(var.getValue()));
-                else if ("short".equals(type)) {
+                else if ("short".equals(type)) {	//NOI18N
                     String rv = Integer.toBinaryString(Short.parseShort(var.getValue()));
                     if (rv.length() > 16) rv = rv.substring(rv.length() - 16, rv.length());
                     return rv;
-                } else if ("byte".equals(type)) {
+                } else if ("byte".equals(type)) {	//NOI18N
                     String rv = Integer.toBinaryString(Byte.parseByte(var.getValue()));
                     if (rv.length() > 8) rv = rv.substring(rv.length() - 8, rv.length());
                     return rv;
-                } else if ("char".equals(type)) {
+                } else if ("char".equals(type)) {	//NOI18N
                     int c = getChar(var.getValue());
                     return Integer.toBinaryString(c);
                 } else {//if ("long".equals(type)) {
                     return Long.toBinaryString (Long.parseLong (var.getValue ()));
                 }
             case NumericDisplaySettings.CHAR:
-                if ("char".equals(type)) {
+                if ("char".equals(type)) {	//NOI18N
                     return var.getValue ();
                 }
-                return "'" + new Character (
+                return "'" + new Character (	//NOI18N
                     (char) Integer.parseInt (var.getValue ())
-                ) + "'";
+                ) + "'";	//NOI18N
             default:
                 return var.getValue ();
             }
@@ -271,16 +271,16 @@ NodeActionsProviderFilter, Constants {
         try {
             switch (settings.getDisplayAs ()) {
             case NumericDisplaySettings.BINARY:
-                if ("int".equals(type))
+                if ("int".equals(type))	//NOI18N
                     return Integer.toString(Integer.parseInt(origValue, 2));
-                else if ("short".equals(type)) {
+                else if ("short".equals(type)) {	//NOI18N
                     return Short.toString(Short.parseShort(origValue, 2));
-                } else if ("byte".equals(type)) {
+                } else if ("byte".equals(type)) {	//NOI18N
                     return Byte.toString(Byte.parseByte(origValue, 2));
-                } else if ("char".equals(type)) {
-                    return "'"+Character.toString((char) Integer.parseInt(origValue, 2))+"'";
+                } else if ("char".equals(type)) {	//NOI18N
+                    return "'"+Character.toString((char) Integer.parseInt(origValue, 2))+"'";	//NOI18N
                 } else {//if ("long".equals(type)) {
-                    return Long.toString(Long.parseLong(origValue, 2))+"l";
+                    return Long.toString(Long.parseLong(origValue, 2))+"l";	//NOI18N
                 }
             default:
                 return origValue;
@@ -296,11 +296,11 @@ NodeActionsProviderFilter, Constants {
         }
         
         String type = v.getType ();
-        return "int".equals (type) || 
-            "char".equals (type) || 
-            "byte".equals (type) || 
-            "long".equals (type) || 
-            "short".equals (type);
+        return "int".equals (type) || 	//NOI18N
+            "char".equals (type) || 	//NOI18N
+            "byte".equals (type) || 	//NOI18N
+            "long".equals (type) || 	//NOI18N
+            "short".equals (type);	//NOI18N
     }
 
     private String localize(String s) {
@@ -323,11 +323,11 @@ NodeActionsProviderFilter, Constants {
 
         public JMenuItem getPopupPresenter() {
             JMenu displayAsPopup = new JMenu 
-                (localize ("CTL_Variable_DisplayAs_Popup"));
+                (localize ("CTL_Variable_DisplayAs_Popup"));	//NOI18N
 
             JRadioButtonMenuItem decimalItem = new JRadioButtonMenuItem (
                 new AbstractAction (
-                    localize ("CTL_Variable_DisplayAs_Decimal")
+                    localize ("CTL_Variable_DisplayAs_Decimal")	//NOI18N
                 ) {
                     public void actionPerformed (ActionEvent e) {
                         onDisplayAs (NumericDisplaySettings.DECIMAL);
@@ -336,7 +336,7 @@ NodeActionsProviderFilter, Constants {
             );
             JRadioButtonMenuItem hexadecimalItem = new JRadioButtonMenuItem (
                 new AbstractAction (
-                    localize ("CTL_Variable_DisplayAs_Hexadecimal")
+                    localize ("CTL_Variable_DisplayAs_Hexadecimal")	//NOI18N
                 ) {
                     public void actionPerformed (ActionEvent e) {
                         onDisplayAs (NumericDisplaySettings.HEXADECIMAL);
@@ -345,7 +345,7 @@ NodeActionsProviderFilter, Constants {
             );
             JRadioButtonMenuItem octalItem = new JRadioButtonMenuItem (
                 new AbstractAction (
-                    localize ("CTL_Variable_DisplayAs_Octal")
+                    localize ("CTL_Variable_DisplayAs_Octal")	//NOI18N
                 ) {
                     public void actionPerformed (ActionEvent e) {
                         onDisplayAs (NumericDisplaySettings.OCTAL);
@@ -354,7 +354,7 @@ NodeActionsProviderFilter, Constants {
             );
             JRadioButtonMenuItem binaryItem = new JRadioButtonMenuItem (
                 new AbstractAction (
-                    localize ("CTL_Variable_DisplayAs_Binary")
+                    localize ("CTL_Variable_DisplayAs_Binary")	//NOI18N
                 ) {
                     public void actionPerformed (ActionEvent e) {
                         onDisplayAs (NumericDisplaySettings.BINARY);
@@ -363,7 +363,7 @@ NodeActionsProviderFilter, Constants {
             );
             JRadioButtonMenuItem charItem = new JRadioButtonMenuItem (
                 new AbstractAction (
-                    localize ("CTL_Variable_DisplayAs_Character")
+                    localize ("CTL_Variable_DisplayAs_Character")	//NOI18N
                 ) {
                     public void actionPerformed (ActionEvent e) {
                         onDisplayAs (NumericDisplaySettings.CHAR);
@@ -392,7 +392,7 @@ NodeActionsProviderFilter, Constants {
                     break;
                 }
             } else {
-                if ("char".equals(type)) {
+                if ("char".equals(type)) {	//NOI18N
                     charItem.setSelected(true);
                 } else {
                     decimalItem.setSelected (true);
@@ -411,7 +411,7 @@ NodeActionsProviderFilter, Constants {
             NumericDisplaySettings lds = (NumericDisplaySettings) 
                 variableToDisplaySettings.get (variable);
             if (lds == null) {
-                if ("char".equals(type)) {
+                if ("char".equals(type)) {	//NOI18N
                     lds = new NumericDisplaySettings 
                         (NumericDisplaySettings.CHAR);
                 } else {

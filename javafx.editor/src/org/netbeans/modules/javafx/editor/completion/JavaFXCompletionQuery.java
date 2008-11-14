@@ -371,7 +371,12 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     }
 
     private void resolveDocumentation(CompilationController controller) throws IOException {
-        if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+        Phase toPhase = null;
+        try {
+            toPhase  = controller.toPhase(Phase.ANALYZED);
+        } catch (Exception ex) {
+        }
+        if (toPhase != null && toPhase.lessThan(Phase.ANALYZED)) {
             return;
         }
         Element el = null;

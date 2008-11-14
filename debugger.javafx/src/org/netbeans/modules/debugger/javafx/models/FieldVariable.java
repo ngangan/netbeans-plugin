@@ -159,7 +159,7 @@ org.netbeans.api.debugger.javafx.Field {
     public FieldVariable clone() {
         FieldVariable clon;
         clon = new FieldVariable(getDebugger(), (PrimitiveValue) getJDIValue(), field,
-                getID().substring(0, getID().length() - ("." + field.name() + (getJDIValue() instanceof ObjectReference ? "^" : "")).length()),
+                getID().substring(0, getID().length() - ("." + field.name() + (getJDIValue() instanceof ObjectReference ? "^" : "")).length()),	//NOI18N
                 objectReference);
         return clon;
     }
@@ -167,7 +167,7 @@ org.netbeans.api.debugger.javafx.Field {
     // other methods ...........................................................
 
     public String toString () {
-        return "FieldVariable " + field.name ();
+        return "FieldVariable " + field.name ();	//NOI18N
     }
 }
 

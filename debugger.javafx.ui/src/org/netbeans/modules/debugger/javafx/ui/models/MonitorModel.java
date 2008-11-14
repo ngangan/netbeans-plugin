@@ -209,7 +209,7 @@ NodeActionsProviderFilter, TableModel, Constants {
         if (o instanceof ContendedMonitor) {
             ObjectVariable v = ((ContendedMonitor) o).variable;
             return java.text.MessageFormat.format(NbBundle.getBundle(MonitorModel.class).getString(
-                    "CTL_MonitorModel_Column_ContendedMonitor"), new Object [] { v.getType(), v.getValue() });
+                    "CTL_MonitorModel_Column_ContendedMonitor"), new Object [] { v.getType(), v.getValue() });	//NOI18N
         } else
         if (o instanceof ThreadWithBordel) {
             return model.getDisplayName (
@@ -222,7 +222,7 @@ NodeActionsProviderFilter, TableModel, Constants {
         if (o instanceof ObjectVariable) {
             ObjectVariable v = (ObjectVariable) o;
             return java.text.MessageFormat.format(NbBundle.getBundle(MonitorModel.class).getString(
-                    "CTL_MonitorModel_Column_Monitor"), new Object [] { v.getType(), v.getValue() });
+                    "CTL_MonitorModel_Column_Monitor"), new Object [] { v.getType(), v.getValue() });	//NOI18N
         } else
         return model.getDisplayName (o);
     }
@@ -248,7 +248,7 @@ NodeActionsProviderFilter, TableModel, Constants {
                 if (o instanceof ContendedMonitor) {
                     ObjectVariable v = ((ContendedMonitor) o).variable;
                     try {
-                        shortDescription = "(" + v.getType () + ") " + v.getToStringValue ();
+                        shortDescription = "(" + v.getType () + ") " + v.getToStringValue ();	//NOI18N
                     } catch (InvalidExpressionException ex) {
                         shortDescription = ex.getLocalizedMessage ();
                     }
@@ -268,7 +268,7 @@ NodeActionsProviderFilter, TableModel, Constants {
                 if (o instanceof ObjectVariable) {
                     ObjectVariable v = (ObjectVariable) o;
                     try {
-                        shortDescription = "(" + v.getType () + ") " + v.getToStringValue ();
+                        shortDescription = "(" + v.getType () + ") " + v.getToStringValue ();	//NOI18N
                     } catch (InvalidExpressionException ex) {
                         shortDescription = ex.getLocalizedMessage ();
                     }

@@ -58,7 +58,7 @@ public class ThreadInfoPanel extends javax.swing.JPanel {
     /** Creates new form ThreadInfoPanel */
     private ThreadInfoPanel(String message, String btn1, String tip1, String btn2, String tip2) {
         initComponents();
-        messageLabel.setText("<html>"+message+"</html>");
+        messageLabel.setText("<html>"+message+"</html>"); // NOI18N
         button1.setText(btn1);
         button1.setToolTipText(tip1);
         button2.setText(btn2);
@@ -134,21 +134,21 @@ public class ThreadInfoPanel extends javax.swing.JPanel {
         messageLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
-        button1.setText("jButton1");
+        button1.setText("jButton1"); // NOI18N
         button1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 button1ActionPerformed(evt);
             }
         });
 
-        button2.setText("jButton2");
+        button2.setText("jButton2"); // NOI18N
         button2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 button2ActionPerformed(evt);
             }
         });
 
-        messageLabel.setText("<html>Text</html>");
+        messageLabel.setText("<html>Text</html>"); // NOI18N
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/netbeans/modules/debugger/javafx/util/information_16.png")));
 

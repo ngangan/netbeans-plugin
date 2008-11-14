@@ -81,7 +81,7 @@ public class JavaFXAppReloaded extends Task {
             return ;
         }
         try {
-            Method fixBreakpointsMethod = debugger.getClass().getMethod("fixBreakpoints", new Class[] {});
+            Method fixBreakpointsMethod = debugger.getClass().getMethod("fixBreakpoints", new Class[] {});	//NOI18N
             fixBreakpointsMethod.invoke(debugger, new Object[] {});
         } catch (Exception ex) {
             throw new BuildException(ex);

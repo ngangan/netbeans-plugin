@@ -225,7 +225,7 @@ public class ElementJavadoc {
                 final ElementHandle[] handle = new ElementHandle[1];
                 try {
                     handle[0]  = ElementHandle.create(element);
-                } catch (Exception iae) {
+                } catch (Exception ex) {
                     // can't convert to element handler (incomplete element)
                 }
                 if (handle[0] != null) {
@@ -705,26 +705,46 @@ public class ElementJavadoc {
             }
         }
         sb.append("</b>"); //NOi18N
-        if (!cdoc.isAnnotationType()) {
-            if (cdoc.isClass()) {
-                Type supercls = cdoc.superclassType();
-                if (supercls != null) {
-                    sb.append("\nextends "); //NOI18N
-                    appendType(eu, sb, supercls, false, false);
-                }
 
+        if (isJavaClass) {
+            if (!cdoc.isAnnotationType()) {
+                if (cdoc.isClass()) {
+                    Type supercls = cdoc.superclassType();
+                    if (supercls != null) {
+                        sb.append("\nextends "); //NOI18N
+                        appendType(eu, sb, supercls, false, false);
+                    }
+                }
+                Type[] ifaces = cdoc.interfaceTypes();
+                if (ifaces.length > 0) {
+                    sb.append(cdoc.isInterface() ? "\nextends " : "\nimplements "); //NOI18N
+                    for (int i = 0; i < ifaces.length; i++) {
+                        appendType(eu, sb, ifaces[i], false, false);
+                        if (i < ifaces.length - 1) {
+                            sb.append(", "); //NOI18N
+                        }
+                    }
+                }
             }
+        } else {
             Type[] ifaces = cdoc.interfaceTypes();
-            if (ifaces.length > 0) {
-                sb.append(cdoc.isInterface() ? "\nextends " : "\nimplements "); //NOI18N
+            if (ifaces.length > 1) { // java fx multiple inheritance
+                sb.append("\nextends "); //NOI18N
                 for (int i = 0; i < ifaces.length; i++) {
                     appendType(eu, sb, ifaces[i], false, false);
                     if (i < ifaces.length - 1) {
                         sb.append(", "); //NOI18N
                     }
                 }
+            } else {
+                Type supercls = cdoc.superclassType();
+                if (supercls != null) {
+                    sb.append("\nextends "); //NOI18N
+                    appendType(eu, sb, supercls, false, false);
+                }
             }
         }
+
         sb.append("</tt></p>"); //NOI18N
         return sb;
     }
@@ -1149,12 +1169,13 @@ public class ElementJavadoc {
     }
 
     private int createLink(StringBuilder sb, Element e, String text) {
-        if (e != null && e.asType().getKind() != TypeKind.ERROR) {
+        final TypeMirror asType = e != null ? e.asType() : null;
+        if (e != null && asType != null && asType.getKind() != TypeKind.ERROR) {
             String link = "*" + linkCounter++; //NOI18N
             ElementHandle<Element> eh = null;
             try {
                 eh = ElementHandle.create(e);
-            } catch (IllegalArgumentException iae) {
+            } catch (Exception ex) {
                 // can't convert to element handler (incomplete element)
             }
             if (eh != null) {

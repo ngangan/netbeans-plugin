@@ -101,7 +101,7 @@ public class CallStackTreeModel implements TreeModel {
                 thread = (JavaFXThread) parent;
             }
             if (thread == null) {
-                return new String[] {"No current thread"}; // TODO make localizable!!!
+                return new String[] {"No current thread"}; // TODO make localizable!!! // NOI18N
             }
             
             // 2) get StackFrames for this Thread
@@ -110,9 +110,9 @@ public class CallStackTreeModel implements TreeModel {
                 return sfs;
             } catch (AbsentInformationException aiex) {
                 if (aiex.getCause() instanceof IncompatibleThreadStateException) {
-                    return new String[] {"Thread is running"}; // TODO make localizable!!!
+                    return new String[] {"Thread is running"}; // TODO make localizable!!! // NOI18N
                 } else {
-                    return new String[] {"No call stack information available."}; // TODO make localizable!!!
+                    return new String[] {"No call stack information available."}; // TODO make localizable!!! // NOI18N
                 }
             }
         } else
@@ -242,7 +242,7 @@ public class CallStackTreeModel implements TreeModel {
                 // cancel old task
                 task.cancel ();
                 if (verbose)
-                    System.out.println("CSTM cancel old task " + task);
+                    System.out.println("CSTM cancel old task " + task); // NOI18N
                 task = null;
             }
         }

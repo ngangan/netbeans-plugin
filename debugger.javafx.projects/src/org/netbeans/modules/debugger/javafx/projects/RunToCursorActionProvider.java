@@ -168,7 +168,7 @@ public class RunToCursorActionProvider extends ActionsProviderSupport {
     
     private boolean shouldBeEnabled () {
         if (editor.getCurrentLineNumber () < 0) return false;
-        if (!editor.getCurrentURL ().endsWith (".fx")) return false;
+        if (!editor.getCurrentURL ().endsWith (".fx")) return false;	//NOI18N
         
         // check if current project supports this action
         Project p = MainProjectManager.getDefault ().getMainProject ();

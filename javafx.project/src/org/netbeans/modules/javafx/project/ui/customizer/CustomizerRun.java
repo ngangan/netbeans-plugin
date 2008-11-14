@@ -149,7 +149,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
                         v = null;
                     }
                     if (v != null && v.equals(""))
-                        v = " ";
+                        v = " "; // NOI18N
                     configs.get(config).put(prop, v);
                     updateFont();
                 }
@@ -161,7 +161,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
                         config = null;
                     }
                     String def = configs.get(null).get(prop);
-                    label.setFont(config != null && !Utilities.compareObjects(v != null ? v : "", def != null ? def : "") ? boldfont : basefont);
+                    label.setFont(config != null && !Utilities.compareObjects(v != null ? v : "", def != null ? def : "") ? boldfont : basefont); // NOI18N
                 }
             });
         }
@@ -219,9 +219,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 0);
         configPanel.add(configLabel, gridBagConstraints);
-        configLabel.getAccessibleContext().setAccessibleDescription("Configuration profile");
+        configLabel.getAccessibleContext().setAccessibleDescription("Configuration profile"); // NOI18N
 
-        configCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<default>" }));
+        configCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<default>" })); // NOI18N
         configCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 configComboActionPerformed(evt);
@@ -244,7 +244,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 0);
         configPanel.add(configNew, gridBagConstraints);
-        configNew.getAccessibleContext().setAccessibleDescription("Button for creating new profile");
+        configNew.getAccessibleContext().setAccessibleDescription("Button for creating new profile"); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(configDel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.configDelete")); // NOI18N
         configDel.addActionListener(new java.awt.event.ActionListener() {
@@ -256,7 +256,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 0);
         configPanel.add(configDel, gridBagConstraints);
-        configDel.getAccessibleContext().setAccessibleDescription("Deletes current configuration profile");
+        configDel.getAccessibleContext().setAccessibleDescription("Deletes current configuration profile"); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -362,7 +362,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton4, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:");
+        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -606,7 +606,7 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
                 label = null;
             } else if (config.length() > 0) {
                 Map<String, String> m = configs.get(config);
-                label = m != null ? m.get("$label") : null;
+                label = m != null ? m.get("$label") : null; // NOI18N
                 if (label == null) {
                     label = config;
                 }

@@ -124,27 +124,27 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
         }        
         if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE) {
             if ( !isValidPackageName( gui.getTargetName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" );
+                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" ); // NOI18N
                 return false;
             }
         }
         else if (type == NewJavaFXFileWizardIterator.TYPE_PKG_INFO) {
             assert "package-info".equals( gui.getTargetName() );        //NOI18N
             if ( !isValidPackageName( gui.getPackageName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" );
+                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" ); // NOI18N
                 return false;
             }
         }
         else {
             if (!isValidFileName(gui.getTargetName())) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidFilename" );
+                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidFilename" ); // NOI18N
                 return false;
             } else if ( !isValidTypeIdentifier( gui.getTargetName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidClass" );
+                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidClass" ); // NOI18N
                 return false;
             }
             else if ( !isValidPackageName( gui.getPackageName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" );
+                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" ); // NOI18N
                 return false;
             }            
         }
@@ -167,11 +167,11 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
         
         if (type != NewJavaFXFileWizardIterator.TYPE_PACKAGE && returnValue && gui.getPackageName().length() == 0 && specVersion != null && JDK_14.compareTo(specVersion)<=0) { 
             if(isValidPackageRequired){
-                setErrorMessage( "ERR_JavaFXTargetChooser_CantUseDefaultPackage" );
+                setErrorMessage( "ERR_JavaFXTargetChooser_CantUseDefaultPackage" ); // NOI18N
                 return false;
             }
             //Only warning, display it only if everything else is OK.
-            setErrorMessage( "ERR_JavaFXTargetChooser_DefaultPackage" );            
+            setErrorMessage( "ERR_JavaFXTargetChooser_DefaultPackage" ); // NOI18N
         }
         String templateSrcLev = (String) template.getAttribute("javac.source"); // NOI18N
         //Only warning, display it only if everything else id OK.
@@ -321,7 +321,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
         if (str.length() > 0 && str.charAt(0) == '.') {
             return false;
         }
-        StringTokenizer tukac = new StringTokenizer(str, ".");
+        StringTokenizer tukac = new StringTokenizer(str, "."); // NOI18N
         while (tukac.hasMoreTokens()) {
             String token = tukac.nextToken();
             if ("".equals(token))

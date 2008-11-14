@@ -223,7 +223,7 @@ public class BreakpointsActionsProvider implements NodeActionsProviderFilter {
         int i = className.indexOf ('$');
         if (i > 0) className = className.substring (0, i);
         String sourceName = className.replace 
-            ('.', '/') + ".fx";
+            ('.', '/') + ".fx";	//NOI18N
         return sourceName;
     }
     

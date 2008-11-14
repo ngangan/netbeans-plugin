@@ -206,7 +206,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
     try {
       tok = jj_consume_token(LT);
     if (!jdk1_5) {
-      {if (true) throw new ParseException("Generic reference types are only available in JDK 1.5 or later generics" );}
+      {if (true) throw new ParseException("Generic reference types are only available in JDK 1.5 or later generics" );} // NOI18N
     }
       ActualTypeArgument();
       label_1:
@@ -545,7 +545,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
     try {
       tok = jj_consume_token(LT);
     if (!jdk1_5) {
-      {if (true) throw new ParseException("Generic type arguments are only available in JDK 1.5 or later generics" );}
+      {if (true) throw new ParseException("Generic type arguments are only available in JDK 1.5 or later generics" );} // NOI18N
     }
       ActualTypeArgument();
       label_5:
@@ -835,7 +835,7 @@ class JavaFXParser/*@bgen(jjtree)*/implements JavaFXParserTreeConstants, JavaFXP
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+    throw new Error("Missing return statement in function"); // NOI18N
   }
 
   final public void AssignmentOperator() throws ParseException {

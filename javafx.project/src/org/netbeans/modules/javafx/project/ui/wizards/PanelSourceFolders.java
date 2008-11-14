@@ -193,7 +193,7 @@ public class PanelSourceFolders extends SettingsPanel implements PropertyChangeL
             return;
         }
         for (File kid : kids) {
-            if (kid.isFile() && kid.getName().endsWith(".class")) {
+            if (kid.isFile() && kid.getName().endsWith(".class")) { // NOI18N
                 files.add(kid);
             } else if (kid.isDirectory()) {
                 findClassFiles(kid, files);

@@ -68,16 +68,16 @@ public class ReturnVariableImpl extends AbstractObjectVariable implements Return
         super (
             debugger,
             returnValue,
-            parentID + ".return " + methodName + "=" + getStringValue(returnValue) // To have good equals()
+            parentID + ".return " + methodName + "=" + getStringValue(returnValue) // To have good equals()	//NOI18N
         );
         this.methodName = methodName;
     }
     
     private static String getStringValue(Value v) {
-        if (v == null) return "null";
-        if (v instanceof VoidValue) return "void";
+        if (v == null) return "null";	//NOI18N
+        if (v instanceof VoidValue) return "void";	//NOI18N
         if (v instanceof PrimitiveValue) return v.toString ();
-        else return "#" + ((ObjectReference) v).uniqueID ();
+        else return "#" + ((ObjectReference) v).uniqueID ();	//NOI18N
     }
     
     public String methodName() {
@@ -88,12 +88,12 @@ public class ReturnVariableImpl extends AbstractObjectVariable implements Return
         return new ReturnVariableImpl(
                 getDebugger(),
                 getJDIValue(),
-                getID().substring(0, getID().length() - ".return".length()),
+                getID().substring(0, getID().length() - ".return".length()),	//NOI18N
                 methodName);
     }
     
     public String toString () {
-        return "ReturnVariable " + getValue();
+        return "ReturnVariable " + getValue();	//NOI18N
     }
 
 }

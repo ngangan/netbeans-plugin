@@ -181,7 +181,7 @@ public final class SourceNodeFactory implements NodeFactory {
         public PackageViewFilterNode(SourceGroup sourceGroup, Project project) {
             super(PackageView.createPackageView(sourceGroup));
             this.project = project;
-            this.nodeName = "Sources";
+            this.nodeName = "Sources"; // NOI18N
         }
         
         

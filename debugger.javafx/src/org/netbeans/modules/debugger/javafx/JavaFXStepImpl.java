@@ -144,9 +144,9 @@ public class JavaFXStepImpl extends JavaFXStep implements Executor {
             int size = getSize();
             boolean stepAdded = false;
             logger.log(Level.FINE, "Step "+((size == JavaFXStep.STEP_OPERATION) ? "operation" : "line")
-                       +" "+((getDepth() == JavaFXStep.STEP_INTO) ? "into" :
-                           ((getDepth() == JavaFXStep.STEP_OVER) ? "over" : "out"))
-                       +" in thread "+tr.getName());
+                       +" "+((getDepth() == JavaFXStep.STEP_INTO) ? "into" : // NOI18N
+                           ((getDepth() == JavaFXStep.STEP_OVER) ? "over" : "out")) // NOI18N
+                       +" in thread "+tr.getName()); // NOI18N
             if (size == JavaFXStep.STEP_OPERATION) {
                 stepAdded = addOperationStep(trImpl, false, sourcePath,
                                              setStoppedStateNoContinue);

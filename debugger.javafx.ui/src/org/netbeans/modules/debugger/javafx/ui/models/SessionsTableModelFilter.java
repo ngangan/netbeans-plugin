@@ -128,7 +128,7 @@ PropertyChangeListener {
     private String getSessionState (Session s) {
         DebuggerEngine e = s.getCurrentEngine ();
         if (e == null)
-            return loc ("MSG_Session_State_Starting");
+            return loc ("MSG_Session_State_Starting");	//NOI18N
         JavaFXDebugger d = e.lookupFirst(null, JavaFXDebugger.class);
         synchronized (this) {
             if (!addedAsListener) {
@@ -137,13 +137,13 @@ PropertyChangeListener {
         }
         switch (d.getState ()) {
             case JavaFXDebugger.STATE_DISCONNECTED:
-                return loc ("MSG_Session_State_Disconnected");
+                return loc ("MSG_Session_State_Disconnected");	//NOI18N
             case JavaFXDebugger.STATE_RUNNING:
-                return loc ("MSG_Session_State_Running");
+                return loc ("MSG_Session_State_Running");	//NOI18N
             case JavaFXDebugger.STATE_STARTING:
-                return loc ("MSG_Session_State_Starting");
+                return loc ("MSG_Session_State_Starting");	//NOI18N
             case JavaFXDebugger.STATE_STOPPED:
-                return loc ("MSG_Session_State_Stopped");
+                return loc ("MSG_Session_State_Stopped");	//NOI18N
         }
         return null;
     }

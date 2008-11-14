@@ -120,57 +120,57 @@ public class JavaFXUtils {
         System.out.println ("  Break request: " + l.size ()); // NOI18N
         int i, k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.classPrepareRequests ();
         System.out.println ("  Class prepare request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.accessWatchpointRequests ();
         System.out.println ("  Access watch request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.classUnloadRequests ();
         System.out.println ("  Class unload request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.exceptionRequests ();
         System.out.println ("  Exception request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.methodEntryRequests ();
         System.out.println ("  Method entry request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.methodExitRequests ();
         System.out.println ("  Method exit request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.modificationWatchpointRequests ();
         System.out.println ("  Modif watch request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.stepRequests ();
         System.out.println ("  Step request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.threadDeathRequests ();
         System.out.println ("  Thread death entry request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         l = requestManager.threadStartRequests ();
         System.out.println ("  Thread start request: " + l.size ()); // NOI18N
         k = l.size ();
         for (i = 0; i < k; i++)
-            System.out.println ("    " + l.get (i));
+            System.out.println ("    " + l.get (i)); // NOI18N
         System.out.println ("  ============================================"); // NOI18N
         
     }

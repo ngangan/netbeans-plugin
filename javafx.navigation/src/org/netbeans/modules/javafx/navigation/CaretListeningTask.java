@@ -218,7 +218,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                     ElementHandle<Element> eh1 = null;
                     try {
                         eh1 = ElementHandle.create(element);
-                    } catch (IllegalArgumentException iae) {
+                    } catch (Exception ex) {
                         // can't convert to element handler (incomplete element)
                     }
                     if (eh1 == null) {
@@ -460,9 +460,6 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             try {
                 eh[0]  = ElementHandle.create(e);
             } catch (Exception ex) {
-                System.out.println("* element = " + e);
-                System.out.println("* element kind = " + e.getKind());
-                ex.printStackTrace();
                 // can't convert to element handler (incomplete element)
             }
             if (eh[0] == null) {

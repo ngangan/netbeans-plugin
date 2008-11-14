@@ -287,7 +287,7 @@ public class ThreadsTreeModel implements TreeModel {
                     // cancel old task
                     task.cancel ();
                     if (verbose)
-                        System.out.println("TTM cancel old task " + task);
+                        System.out.println("TTM cancel old task " + task); // NOI18N
                     task = null;
                 }
             }
@@ -295,10 +295,10 @@ public class ThreadsTreeModel implements TreeModel {
         
         private RequestProcessor.Task createTask() {
             RequestProcessor.Task task =
-                new RequestProcessor("Threads Refresh", 1).create(
+                new RequestProcessor("Threads Refresh", 1).create( // NOI18N
                                 new RefreshTree());
             if (verbose)
-                System.out.println("TTM  create task " + task);
+                System.out.println("TTM  create task " + task); // NOI18N
             return task;
         }
         
@@ -343,7 +343,7 @@ public class ThreadsTreeModel implements TreeModel {
                 ThreadsTreeModel tm = getModel ();
                 if (tm == null) return;
                 if (verbose)
-                    System.out.println("TTM do R task " + task);
+                    System.out.println("TTM do R task " + task); // NOI18N
                 List nodes;
                 synchronized (Listener.this) {
                     nodes = new ArrayList(nodesToRefresh);

@@ -114,7 +114,7 @@ PropertyChangeListener {
         String title = contextProvider.lookupFirst(null, String.class);
         if (title == null)
             title = NbBundle.getBundle (IOManager.class).getString 
-                ("CTL_DebuggerConsole_Title");
+                ("CTL_DebuggerConsole_Title");	//NOI18N
         ioManager = new IOManager (title);
         managers.add (ioManager);
         
@@ -155,7 +155,7 @@ PropertyChangeListener {
                 AttachingDICookie c = (AttachingDICookie) cookie;
                 if (c.getHostName () != null) {
                     print (
-                        "CTL_Attaching_socket",
+                        "CTL_Attaching_socket",	//NOI18N
 //                        where,
                         new String[] {
                             c.getHostName (),
@@ -165,25 +165,25 @@ PropertyChangeListener {
                     );
                 } else if (c.getSharedMemoryName() != null) {
                     print (
-                        "CTL_Attaching_shmem",
+                        "CTL_Attaching_shmem",	//NOI18N
 //                        where,
                         new String[] {
                             c.getSharedMemoryName ()
                         },
                         null
                     );
-                } else if (c.getArgs().get("pid") != null) {
+                } else if (c.getArgs().get("pid") != null) {	//NOI18N
                     print (
-                        "CTL_Attaching_pid",
+                        "CTL_Attaching_pid",	//NOI18N
 //                        where,
                         new String[] {
-                            c.getArgs().get("pid").toString()
+                            c.getArgs().get("pid").toString()	//NOI18N
                         },
                         null
                     );
                 } else {
                     print (
-                        "CTL_Attaching",
+                        "CTL_Attaching",	//NOI18N
                         null,
                         null
                     );
@@ -193,7 +193,7 @@ PropertyChangeListener {
                 ListeningDICookie c = (ListeningDICookie) cookie;
                 if (c.getSharedMemoryName () != null)
                     print (
-                        "CTL_Listening_shmem",
+                        "CTL_Listening_shmem",	//NOI18N
 //                        where,
                         new String[] {
                             c.getSharedMemoryName ()
@@ -202,7 +202,7 @@ PropertyChangeListener {
                     );
                 else
                     print (
-                        "CTL_Listening_socket",
+                        "CTL_Listening_socket",	//NOI18N
 //                        where,
                         new String[] {
                             String.valueOf(c.getPortNumber ())
@@ -213,7 +213,7 @@ PropertyChangeListener {
             if (cookie instanceof LaunchingDICookie) {
                 LaunchingDICookie c = (LaunchingDICookie) cookie;
                     print (
-                        "CTL_Launching",
+                        "CTL_Launching",	//NOI18N
 //                        where,
                         new String[] {
                             c.getCommandLine ()
@@ -224,7 +224,7 @@ PropertyChangeListener {
         } else
         if (debuggerState == JavaFXDebugger.STATE_RUNNING) {
             print (
-                "CTL_Debugger_running",
+                "CTL_Debugger_running",	//NOI18N
 //                where,
                 new String[] {
                 },
@@ -243,7 +243,7 @@ PropertyChangeListener {
                 e = ex.getTargetException ();
             }
             if (e == null)
-                print ("CTL_Debugger_finished", null, null);
+                print ("CTL_Debugger_finished", null, null);	//NOI18N
             else {
                 String message = e.getMessage ();
                 if (e instanceof ConnectException)
@@ -270,7 +270,7 @@ PropertyChangeListener {
             //DebuggerEngine engine = debugger.getEngine ();
             //S ystem.out.println("State Stopped " + debugger.getLastAction ());
             if (t == null) {
-                print ("CTL_Debugger_stopped", null, null);
+                print ("CTL_Debugger_stopped", null, null);	//NOI18N
                 return;
             }
             Session session = null;
@@ -311,7 +311,7 @@ PropertyChangeListener {
                 if (op != null) {
                     boolean done = op == lastOperation;
                     if (!done) {
-                        print("CTL_Thread_stopped_before_op",
+                        print("CTL_Thread_stopped_before_op",	//NOI18N
                             new String[] {
                                 threadName,
                                 sourceName,
@@ -322,7 +322,7 @@ PropertyChangeListener {
                             line
                         );
                     } else {
-                        print("CTL_Thread_stopped_after_op",
+                        print("CTL_Thread_stopped_after_op",	//NOI18N
                             new String[] {
                                 threadName,
                                 sourceName,
@@ -335,7 +335,7 @@ PropertyChangeListener {
                     }
                 } else if (lineNumber > 0)
                     print (
-                        "CTL_Thread_stopped",
+                        "CTL_Thread_stopped",	//NOI18N
                       //  IOManager.DEBUGGER_OUT + IOManager.STATUS_OUT,
                         new String[] {
                             threadName,
@@ -347,7 +347,7 @@ PropertyChangeListener {
                     );
                 else if (sourceName.length() > 0 && methodName.length() > 0)
                     print (
-                        "CTL_Thread_stopped_no_line",
+                        "CTL_Thread_stopped_no_line",	//NOI18N
                     //    IOManager.DEBUGGER_OUT + IOManager.STATUS_OUT,
                         new String[] {
                             threadName,
@@ -358,14 +358,14 @@ PropertyChangeListener {
                     );
                 else
                     print (
-                        "CTL_Thread_stopped_no_line_no_source",
+                        "CTL_Thread_stopped_no_line_no_source",	//NOI18N
                         new String[] { threadName },
                         line
                     );
             } catch (AbsentInformationException ex) {
                 if (lineNumber > 0)
                     print (
-                        "CTL_Thread_stopped_no_info",
+                        "CTL_Thread_stopped_no_info",	//NOI18N
                      //   IOManager.DEBUGGER_OUT + IOManager.STATUS_OUT,
                         new String[] {
                             threadName,
@@ -377,7 +377,7 @@ PropertyChangeListener {
                     );
                 else
                     print (
-                        "CTL_Thread_stopped_no_info_no_line",
+                        "CTL_Thread_stopped_no_info_no_line",	//NOI18N
                         //IOManager.DEBUGGER_OUT + IOManager.STATUS_OUT,
                         new String[] {
                             threadName,
@@ -394,16 +394,16 @@ PropertyChangeListener {
         if (!success) return;
         //print ("CTL_Debugger_running", where, null, null);
         if (action == ActionsManager.ACTION_CONTINUE)
-            print ("CTL_Continue", null, null);
+            print ("CTL_Continue", null, null);	//NOI18N
         else
         if (action == ActionsManager.ACTION_STEP_INTO)
-            print ("CTL_Step_Into", null, null);
+            print ("CTL_Step_Into", null, null);	//NOI18N
         else
         if (action == ActionsManager.ACTION_STEP_OUT)
-            print ("CTL_Step_Out", null, null);
+            print ("CTL_Step_Out", null, null);	//NOI18N
         else
         if (action == ActionsManager.ACTION_STEP_OVER)
-            print ("CTL_Step_Over", null, null);
+            print ("CTL_Step_Over", null, null);	//NOI18N
     }
 
     IOManager getIOManager() {

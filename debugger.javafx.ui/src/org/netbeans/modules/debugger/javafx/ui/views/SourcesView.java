@@ -83,7 +83,7 @@ public class SourcesView extends TopComponent implements org.openide.util.HelpCt
         if (viewModelListener != null)
             throw new InternalError ();
         viewModelListener = new ViewModelListener (
-            "SourcesView",
+            "SourcesView",	//NOI18N
             tree
         );
     }

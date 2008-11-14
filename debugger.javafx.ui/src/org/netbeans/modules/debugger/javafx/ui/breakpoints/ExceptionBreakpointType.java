@@ -60,7 +60,7 @@ public class ExceptionBreakpointType extends BreakpointType {
     public String getCategoryDisplayName() {
         return NbBundle.getMessage (
             ExceptionBreakpointType.class,
-            "CTL_Java_breakpoint_events_cathegory_name"
+            "CTL_Java_breakpoint_events_cathegory_name"	//NOI18N
         );
     }
     
@@ -71,7 +71,7 @@ public class ExceptionBreakpointType extends BreakpointType {
     public String getTypeDisplayName () {
         return NbBundle.getMessage (
             ExceptionBreakpointType.class,
-            "CTL_Exception_event_name_type_name"
+            "CTL_Exception_event_name_type_name"	//NOI18N
         );
     }
     

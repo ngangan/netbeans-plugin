@@ -90,7 +90,7 @@ public class FieldBreakpointPanel extends JPanel implements Controller, org.open
         );
         mb.setPrintText (
             NbBundle.getBundle (FieldBreakpointPanel.class).getString 
-                ("CTL_Field_Breakpoint_Print_Text")
+                ("CTL_Field_Breakpoint_Print_Text")	//NOI18N
         );
         return mb;
     }
@@ -130,10 +130,10 @@ public class FieldBreakpointPanel extends JPanel implements Controller, org.open
         conditionsPanel.setCondition(b.getCondition());
         conditionsPanel.setHitCountFilteringStyle(b.getHitCountFilteringStyle());
         conditionsPanel.setHitCount(b.getHitCountFilter());
-        cPanel.add(conditionsPanel, "Center");
+        cPanel.add(conditionsPanel, "Center");	//NOI18N
         
         actionsPanel = new ActionsPanel (b);
-        pActions.add (actionsPanel, "Center");
+        pActions.add (actionsPanel, "Center");	//NOI18N
         // <RAVE>
         // The help IDs for the AddBreakpointPanel panels have to be different from the
         // values returned by getHelpCtx() because they provide different help

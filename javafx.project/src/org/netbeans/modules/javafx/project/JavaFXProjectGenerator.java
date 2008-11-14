@@ -76,7 +76,7 @@ import org.w3c.dom.NodeList;
  */
 public class JavaFXProjectGenerator {
     
-    static final String MINIMUM_ANT_VERSION = "1.6.5";
+    static final String MINIMUM_ANT_VERSION = "1.6.5"; // NOI18N
     
     private JavaFXProjectGenerator() {}
 
@@ -123,7 +123,7 @@ public class JavaFXProjectGenerator {
                     public Void run() throws Exception {
                         Element data = h[0].getPrimaryConfigurationData(true);
                         Document doc = data.getOwnerDocument();
-                        NodeList nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");
+                        NodeList nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots"); // NOI18N
                         assert nl.getLength() == 1;
                         Element sourceRoots = (Element) nl.item(0);
                         nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"test-roots");  //NOI18N
@@ -251,7 +251,7 @@ public class JavaFXProjectGenerator {
         }
         
         ep.setProperty("javac.compilerargs", ""); // NOI18N
-        ep.setComment("javac.compilerargs", new String[] {
+        ep.setComment("javac.compilerargs", new String[] { // NOI18N
             "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_javac.compilerargs"), // NOI18N
         }, false);
         SpecificationVersion sourceLevel = getDefaultSourceLevel();
@@ -267,7 +267,7 @@ public class JavaFXProjectGenerator {
         ep.setProperty("platform.active", "default_fx_platform"); // NOI18N
 
         ep.setProperty("run.jvmargs", ""); // NOI18N
-        ep.setComment("run.jvmargs", new String[] {
+        ep.setComment("run.jvmargs", new String[] { // NOI18N
             "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs"), // NOI18N
             "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs_2"), // NOI18N
             "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs_3"), // NOI18N
@@ -343,9 +343,9 @@ public class JavaFXProjectGenerator {
         else {
             JavaPlatform defaultPlatform = JavaPlatformManager.getDefault().getDefaultPlatform();
             SpecificationVersion v = defaultPlatform.getSpecification().getVersion();
-            if (v.equals(new SpecificationVersion("1.6")) || v.equals(new SpecificationVersion("1.7"))) {
+            if (v.equals(new SpecificationVersion("1.6")) || v.equals(new SpecificationVersion("1.7"))) { // NOI18N
                 // #89131: these levels are not actually distinct from 1.5.
-                return new SpecificationVersion("1.5");
+                return new SpecificationVersion("1.5"); // NOI18N
             } else {
                 return v;
             }

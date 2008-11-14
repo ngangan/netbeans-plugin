@@ -151,7 +151,7 @@ public final class LaunchingDICookie extends AbstractDICookie {
             "\\bin\\java -Xdebug -Xnoagent -Xrunjdwp:transport=" + 	//NOI18N
             getTransportName () + 
             ",address=name,suspend=" + 	//NOI18N
-            (suspend ? "y" : "n") +
+            (suspend ? "y" : "n") + // NOI18N
             " -classpath \"" + 	//NOI18N
             classPath + 
             "\" " +	//NOI18N

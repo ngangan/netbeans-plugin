@@ -459,7 +459,7 @@ public abstract class JavaFXDebugger {
      * @throws {@link java.lang.UnsupportedOperationException} If not overridden
      */
     public JavaFXStep createJavaFXStep(int size, int depth) {
-        throw new UnsupportedOperationException("This method must be overridden."); 
+        throw new UnsupportedOperationException("This method must be overridden."); // NOI18N
     } 
     
     /**
@@ -499,7 +499,7 @@ public abstract class JavaFXDebugger {
      *         each respective element in the <code>classTypes</code> list.
      */
     public long[] getInstanceCounts(List<JavaFXClassType> classTypes) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Not supported.");
+        throw new UnsupportedOperationException("Not supported."); // NOI18N
     }
 
 }

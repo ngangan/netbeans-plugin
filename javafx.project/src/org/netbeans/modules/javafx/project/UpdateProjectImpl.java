@@ -68,7 +68,7 @@ public class UpdateProjectImpl implements UpdateImplementation {
 
     private static final boolean TRANSPARENT_UPDATE = Boolean.getBoolean("javafxproject.transparentUpdate");
     private static final String BUILD_NUMBER = System.getProperty("netbeans.buildnumber"); // NOI18N
-    private static final String MINIMUM_ANT_VERSION_ELEMENT = "minimum-ant-version";
+    private static final String MINIMUM_ANT_VERSION_ELEMENT = "minimum-ant-version"; // NOI18N
 
     private final Project project;
     private final AntProjectHelper helper;

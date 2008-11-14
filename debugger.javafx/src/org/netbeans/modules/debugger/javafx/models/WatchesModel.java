@@ -240,7 +240,7 @@ public class WatchesModel implements TreeModel {
     LocalsTreeModel getLocalsTreeModel () {
         if (localsTreeModel == null)
             localsTreeModel = (LocalsTreeModel) lookupProvider.
-                lookupFirst ("LocalsView", TreeModel.class);
+                lookupFirst ("LocalsView", TreeModel.class);	//NOI18N
         return localsTreeModel;
     }
 
@@ -265,7 +265,7 @@ public class WatchesModel implements TreeModel {
         }
         
         private JavaFXWatchEvaluating(WatchesModel model, Watch w, JavaFXDebuggerImpl debugger, int cloneNumber) {
-            super(debugger, null, (cloneNumber > 0) ? w + "_clone" + cloneNumber : "" + w);
+            super(debugger, null, (cloneNumber > 0) ? w + "_clone" + cloneNumber : "" + w);	//NOI18N
             this.model = model;
             this.w = w;
             this.debugger = debugger;
@@ -436,7 +436,7 @@ public class WatchesModel implements TreeModel {
             if (evaluatedWatch != null) {
                 evaluatedWatch.setValue(value);
             } else {
-                throw new InvalidExpressionException("Can not set value while evaluating.");
+                throw new InvalidExpressionException("Can not set value while evaluating."); // NOI18N
             }
         }
         
@@ -553,12 +553,12 @@ public class WatchesModel implements TreeModel {
                 task = RequestProcessor.getDefault ().create (new Runnable () {
                     public void run () {
                         if (verbose)
-                            System.out.println("WM do task " + task);
+                            System.out.println("WM do task " + task); // NOI18N
                         m.fireTreeChanged ();
                     }
                 });
                 if (verbose)
-                    System.out.println("WM  create task " + task);
+                    System.out.println("WM  create task " + task); // NOI18N
             }
             task.schedule(100);
         }
@@ -582,7 +582,7 @@ public class WatchesModel implements TreeModel {
                 // cancel old task
                 task.cancel ();
                 if (verbose)
-                    System.out.println("WM cancel old task " + task);
+                    System.out.println("WM cancel old task " + task); // NOI18N
                 task = null;
             }
         }

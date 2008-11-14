@@ -72,12 +72,12 @@ public class FilteredKeymap implements Keymap {
         }
         
         this.keyMap = component.getKeymap();
-        component.addPropertyChangeListener("keymap", new PropertyChangeListener() {
+        component.addPropertyChangeListener("keymap", new PropertyChangeListener() {	//NOI18N
             public void propertyChange(PropertyChangeEvent evt) {
                 if (!(evt.getNewValue() instanceof FilteredKeymap)) {
                     // We have to do that lazily, because the property change
                     // is fired *before* the keymap is actually changed!
-                    component.removePropertyChangeListener("keymap", this);
+                    component.removePropertyChangeListener("keymap", this);	//NOI18N
                     if (EventQueue.isDispatchThread()) {
                         EventQueue.invokeLater(new KeymapUpdater());
                     } else {
