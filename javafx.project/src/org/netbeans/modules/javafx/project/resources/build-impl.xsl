@@ -260,6 +260,7 @@ is divided into following sections:
         <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}" failonerror="true">
+                <arg value="${{run.jvmargs}}"/>
                 <arg value="-Xdescriptor:${{jad.file}}"/>
             </exec>
         </target>
@@ -318,6 +319,7 @@ is divided into following sections:
         <target name="-debug-midp-debuggee" if="midp.execution.trigger">
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
+                <arg value="${{run.jvmargs}}"/>
                 <arg value="-Xdescriptor:${{jad.file}}"/>
                 <arg value="-Xdebug"/>
                 <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
