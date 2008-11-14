@@ -127,6 +127,8 @@ class ClassIndexManager {
                             ElementHandle eh = ElementHandle.create(elem);
                             String sig = eh.getSignatures()[0];
                             int lastDot = sig.lastIndexOf('.');
+                            int lastDollar = sig.lastIndexOf('$');
+                            if (lastDollar > lastDot) lastDot = lastDollar;
                             String prefix = (lastDot >= 0) ? sig.substring(0, lastDot+1) : "";
                             String name = (lastDot >= 0) ? sig.substring(lastDot+1) : sig;
                             types.add(new ClassIndex.TypeHolder(prefix, name));
