@@ -34,13 +34,7 @@ public class FXDComposerModel {
             m_fxzArchiveException = e;
         }
     }
-            
-    void reload() throws FileNotFoundException, IOException {
-        if ( m_fxzArchive != null) {
-            m_fxzArchive.reload();
-        }
-    }
-    
+                
     public FXZArchive getFXDContainer() {
         return m_fxzArchive;
     }

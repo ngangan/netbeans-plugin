@@ -52,14 +52,6 @@ public final class FXDComposerController {
     public synchronized void close() {
     }
     
-    public void reload() {
-        try {
-            m_dObj.getDataModel().reload();
-            refresh();
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        } 
-    }
     public ActionController getActionController() {
         return m_actionController;
     }
