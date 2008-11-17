@@ -43,6 +43,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.lang.ref.SoftReference;
 import java.text.Collator;
 import java.util.*;
@@ -55,7 +57,7 @@ import java.util.logging.Logger;
  * @todo documentation
  * @todo Use RequestProcessor if possible.
  */
-final class ImportResolverImpl extends Thread implements ImportResolver {
+final class ImportResolverImpl extends Thread implements ImportResolver, FocusListener {
     private ClassIndex index;
     //    private CompilationInfo ci;
     private SoftReference<JTextComponent> component;
@@ -65,6 +67,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
     private Queue<Element> queue = new ConcurrentLinkedQueue<Element>();
     private static Logger log = Logger.getLogger(ImportResolverImpl.class.getName());
     private static final TypesComparator TYPES_COMPARATOR = new TypesComparator();
+    private boolean interupt = false;
 
     /**
      * Allocates a new <code>Thread</code> object. This constructor has
@@ -81,6 +84,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
         this.index = index;
 //        this.ci = ci;
         this.component = new SoftReference<JTextComponent>(component);
+        component.addFocusListener(this);
     }
 
     public static ImportResolver create(ClassIndex index, /*CompilationInfo ci,*/ JTextComponent component) {
@@ -134,8 +138,11 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
     public void run() {
         super.run();
         Element element;
-        while ((element = queue.poll()) != null) {
+        while ((element = queue.poll()) != null && !interupt) {
             resolveImpl(model, element);
+        }
+        if (interupt) {
+            log.info("Fix imports has been interupted because focus has been lost.");
         }
         if (log.isLoggable(Level.INFO)) {
             log.log(Level.INFO, "Resolving finished.");
@@ -152,7 +159,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
             }
         };
         SwingUtilities.invokeLater(runnable);
-
+        component.get().removeFocusListener(this);
     }
 
     private void publish(final Document doc) {
@@ -230,8 +237,12 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
         if (selection != null) {
             model.append(new ImportsModel.ModelEntry(selection.getElement()));
         }
-//        fil.hide();
-        fil.finish();
+        runnable = new Runnable() {
+            public void run() {
+                fil.finish();
+            }
+        };
+        SwingUtilities.invokeLater(runnable);
     }
 
     private List<FixItem> convert(Set<ElementHandle<TypeElement>> types) {
@@ -270,6 +281,21 @@ final class ImportResolverImpl extends Thread implements ImportResolver {
         Name simpleName = e.getSimpleName();
         if (simpleName == null) return null;
         return simpleName.toString();
+    }
+
+    /**
+     * Invoked when a component gains the keyboard focus.
+     */
+    public void focusGained(FocusEvent e) {
+    }
+
+    /**
+     * Invoked when a component loses the keyboard focus.
+     */
+    public void focusLost(FocusEvent e) {
+        log.info("Loosing focus in prospect of " + e.getOppositeComponent());
+        component.get().removeFocusListener(this);
+        interupt = true;
     }
 
     private static class MyListSelectionListener implements ListSelectionListener {
