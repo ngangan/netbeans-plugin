@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
+import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 
 final class BootClassPathImplementation implements ClassPathImplementation, PropertyChangeListener {
@@ -70,7 +71,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
     private String activePlatformName;
     //active platform is valid (not broken reference)
     private boolean isActivePlatformValid;
-    private List<PathResourceImplementation> resourcesCache;
+    private volatile List<PathResourceImplementation> resourcesCache;
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     public BootClassPathImplementation(PropertyEvaluator evaluator) {
@@ -79,8 +80,10 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
         evaluator.addPropertyChangeListener(WeakListeners.propertyChange(this, evaluator));
     }
 
-    public synchronized List<PathResourceImplementation> getResources() {
-        if (this.resourcesCache == null) {
+    public List<PathResourceImplementation> getResources() {
+        //using local copy of reference instead of synchronized section to prevent deadlocks
+        List<PathResourceImplementation> rc = this.resourcesCache;
+        if (rc == null) {
             JavaFXPlatform jp = findActivePlatform ();
             if (jp != null) {
                 //TODO: May also listen on CP, but from Platform it should be fixed.
@@ -88,13 +91,13 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
                 for (ClassPath.Entry entry : jp.getBootstrapLibraries(this.evaluator.getProperty(JAVAFX_PROFILE)).entries()) {
                     result.add(ClassPathSupport.createResource(entry.getURL()));
                 }
-                resourcesCache = Collections.unmodifiableList (result);
+                rc = Collections.unmodifiableList (result);
+            } else {
+                rc = Collections.emptyList();
             }
-            else {
-                resourcesCache = Collections.emptyList();
-            }
+            resourcesCache = rc;
         }
-        return this.resourcesCache;
+        return rc;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -141,10 +144,12 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
      * Resets the cache and firesPropertyChange
      */
     private void resetCache () {
-        synchronized (this) {
-            resourcesCache = null;
-        }
-        support.firePropertyChange(PROP_RESOURCES, null, null);
+        resourcesCache = null;
+        RequestProcessor.getDefault().post(new Runnable() {
+            public void run() {
+                support.firePropertyChange(PROP_RESOURCES, null, null);
+            }
+        });
     }
     
 }
