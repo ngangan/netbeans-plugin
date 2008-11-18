@@ -201,6 +201,19 @@
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
+        <folder name="Gradients">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="position" intvalue="650"/>
+            <file name="LinearGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LinearGradient.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="RadialGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadialGradient.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Stop.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stop.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
         <folder name="Animation">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="700"/>            
