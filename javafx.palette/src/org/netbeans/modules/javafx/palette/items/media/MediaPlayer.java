@@ -53,7 +53,7 @@ import org.openide.util.NbBundle;
 public class MediaPlayer implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        String code = NbBundle.getMessage( Media.class, "TEMPLATE_MediaPlayer" ); // NOI18N
+        String code = NbBundle.getMessage( MediaPlayer.class, "TEMPLATE_MediaPlayer" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
