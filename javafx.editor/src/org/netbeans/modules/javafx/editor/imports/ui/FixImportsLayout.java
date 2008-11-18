@@ -42,6 +42,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /**
  * Copied from Code Completion and shortened.
@@ -82,7 +83,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
     FixImportsLayout() {
         fixPopup = new FixPopup<T>();
         fixPopup.setLayout(this);
-        fixPopup.setPreferDisplayAboveCaret(false);
+        fixPopup.setPreferDisplayAboveCaret(false);        
 //        visiblePopups = new Stack<PopupWindow<T>>();
     }
 
@@ -131,6 +132,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
         if (fixPopup.isVisible()) {
             fixPopup.hide();
             fixPopup.completionScrollPane = null;
+            unregister();
             return true;
         } else { // not visible
             return false;
@@ -154,6 +156,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
 
     public void processKeyEvent(KeyEvent evt) {
         if (fixPopup.isVisible()) {
+            log.info("KeyEvent to process on visible popup: " + evt.getKeyChar());
             if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 canceled = true;
                 hideAll();
@@ -161,6 +164,9 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
                 fixPopup.processKeyEvent(evt);
             }
             evt.consume();
+        } else {
+            log.info("KeyEvent to process on invisible popup: " + evt.getKeyChar() + ". Unregistering...");
+            unregister();
         }
     }
 
@@ -210,10 +216,12 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
     public void focusGained(FocusEvent e) {
     }
 
+    private static Logger log = Logger.getLogger(FixImportsLayout.class.getName());
     /**
      * Invoked when a component loses the keyboard focus.
      */
     public void focusLost(FocusEvent e) {
+        log.info("Focus has been lost in prospect of " + e.getOppositeComponent());
         canceled = true;
         if (fixPopup != null && fixPopup.getSelectedCompletionItem() != null) {
             fixPopup.getSelectedCompletionItem()
@@ -373,6 +381,17 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
             return COMPLETION_ANCHOR_HORIZONTAL_SHIFT;
         }
 
+        /**
+         * Return true if this popup should be focusable (there is a focusable
+         * component in it). The popupFactory.getPopup() will use non-null parent
+         * editor pane in such case.
+         *
+         * @return always false.
+         */
+        @Override
+        protected boolean isFocusable() {
+            return getFocusListeningComponent() != null;
+        }
     }
 
 }

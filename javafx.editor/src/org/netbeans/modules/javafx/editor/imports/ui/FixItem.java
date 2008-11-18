@@ -106,16 +106,12 @@ public class FixItem implements CompletionItem {
         int keyCode = evt.getKeyCode();
         log.info("KeyEvent: " + evt.getKeyCode() + " consumed: " + evt.isConsumed());
         switch (keyCode) {
+            case KeyEvent.VK_ESCAPE:
             case KeyEvent.VK_ENTER: {
-                defaultAction(null);
-                evt.consume();
-                break;
+                    defaultAction(null);
+                    evt.consume();
+                    break;
             }
-            case KeyEvent.VK_ESCAPE: {                
-                defaultAction(null);
-                evt.consume();
-                break;
-            }            
         }
     }
 

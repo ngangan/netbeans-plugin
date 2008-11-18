@@ -31,7 +31,11 @@ import javax.swing.text.EditorKit;
 import org.netbeans.core.spi.multiview.CloseOperationHandler;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.editor.BaseDocument;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.Task;
+import org.openide.util.UserQuestionException;
 import org.openide.windows.TopComponent;
 
 /**
@@ -69,6 +73,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
 
     @Override
     protected Task reloadDocument() {
+        final FXZDataObject fxzDO = (FXZDataObject) getDataObject();
+        fxzDO.getDataModel().getFXDContainer().setDirty();
         final Task reloadTask = super.reloadDocument();
         Thread th = new Thread() {
             @Override
@@ -76,9 +82,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
                 reloadTask.waitFinished();
                 SwingUtilities.invokeLater( new Runnable() {
                     public void run() {
-                        FXZDataObject dObj = (FXZDataObject) getDataObject();
-                        dObj.getDataModel().getFXDContainer().incrementChangeTicker(false);
-                        dObj.getController().reload();
+                        fxzDO.getDataModel().getFXDContainer().incrementChangeTicker(false);
+                        fxzDO.getController().refresh();
                     }                    
                 });
             }
@@ -104,7 +109,20 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         FXZDataObject dObj = (FXZDataObject) getDataObject();
         dObj.addSaveCookie(new SaveCookie() {
             public void save() throws IOException {
-                saveDocument();
+                try {
+                    saveDocument();
+                } catch( UserQuestionException e) {
+                    NotifyDescriptor nd = new NotifyDescriptor.Confirmation(
+                            e.getLocalizedMessage(), NotifyDescriptor.YES_NO_OPTION
+                        );
+                    nd.setOptions(new Object[] { NotifyDescriptor.YES_OPTION, NotifyDescriptor.NO_OPTION });
+
+                    Object res = DialogDisplayer.getDefault().notify(nd);
+
+                    if (NotifyDescriptor.OK_OPTION.equals(res)) {
+                        e.confirmed();
+                    } 
+                }
                 ((FXZDataObject) getDataObject()).getDataModel().getFXDContainer().setIsSaved();
             }
         });

@@ -153,7 +153,7 @@
             <class-path-extension>
                 <runtime-relative-path>ext/fxd/lib/javafxgui.jar</runtime-relative-path>
                 <binary-origin>external/javafx-fxd-netbeans-support/javafxgui.jar</binary-origin>
-            </class-path-extension>            
+            </class-path-extension>
         </data>
     </configuration>
 </project>

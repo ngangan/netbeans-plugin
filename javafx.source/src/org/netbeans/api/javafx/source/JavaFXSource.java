@@ -276,7 +276,9 @@ public final class JavaFXSource {
             } catch (RuntimeException analyzerError) {
                 LOGGER.log(Level.FINE, "Error in analyzer", analyzerError); // NOI18N
                 return cc.phase;
-            } catch (AssertionError assErr) {
+            } catch (ThreadDeath td) {
+                throw td;
+            } catch (Throwable assErr) {
                 LOGGER.log(Level.FINE, "Error in analyzer", assErr); // NOI18N
                 return cc.phase;
             }
