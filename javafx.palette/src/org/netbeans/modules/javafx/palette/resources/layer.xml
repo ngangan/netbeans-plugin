@@ -156,6 +156,9 @@
             <file name="Translate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Translate.xml">
                 <attr name="position" intvalue="300"/>
             </file>
+            <file name="Shear.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Shear.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
         </folder>
         
         <folder name="Colors">
