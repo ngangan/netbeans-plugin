@@ -229,6 +229,21 @@
             <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
                 <attr name="position" intvalue="400"/>
             </file>
+            <file name="Discrete.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Discrete.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Linear.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Linear.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="EaseIn.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseIn.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="EaseOut.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseOut.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="EaseBoth.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseBoth.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
         </folder>
         <folder name="Media">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
