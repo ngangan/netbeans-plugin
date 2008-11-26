@@ -142,7 +142,38 @@
                 <attr name="position" intvalue="900"/>
             </file>
         </folder>
-        
+        <folder name="Paths">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="450"/>
+            
+            <file name="Path.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Path.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="MoveTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MoveTo.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="LineTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LineTo.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="ArcTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ArcTo.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="CubicCurveTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CubicCurveTo.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="QuadCurveTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/QuadCurveTo.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="HLineTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/HLineTo.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="VLineTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/VLineTo.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="ClosePath.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ClosePath.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+        </folder>
         <folder name="Transformations">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="500"/>
@@ -155,6 +186,9 @@
             </file>
             <file name="Translate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Translate.xml">
                 <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Shear.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Shear.xml">
+                <attr name="position" intvalue="400"/>
             </file>
         </folder>
         
@@ -201,6 +235,19 @@
                 <attr name="position" intvalue="1300"/>
             </file>
         </folder>
+        <folder name="Gradients">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="position" intvalue="650"/>
+            <file name="LinearGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LinearGradient.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="RadialGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadialGradient.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Stop.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stop.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
         <folder name="Animation">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="700"/>            
@@ -215,6 +262,21 @@
             </file>
             <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
                 <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Discrete.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Discrete.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Linear.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Linear.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="EaseIn.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseIn.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="EaseOut.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseOut.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="EaseBoth.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseBoth.xml">
+                <attr name="position" intvalue="900"/>
             </file>
         </folder>
         <folder name="Media">

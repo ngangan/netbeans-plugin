@@ -37,12 +37,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.media;
+package org.netbeans.modules.javafx.palette.items.timeline;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
+import org.netbeans.api.javafx.source.Imports;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -50,18 +50,16 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class MediaView implements ActiveEditorDrop {
+public class Linear implements ActiveEditorDrop {
 
-    public boolean handleTransfer( JTextComponent targetComponent ) {
-        String code = NbBundle.getMessage( MediaView.class, "TEMPLATE_MediaView" ); // NOI18N
+    public boolean handleTransfer(JTextComponent targetComponent) {
+        String code = NbBundle.getMessage( Linear.class, "TEMPLATE_Linear" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        // Import
-        Imports.addImport( targetComponent, "javafx.scene.media.Media" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.media.MediaPlayer" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.media.MediaView" ); // NOI18N
+        // Imports
+        Imports.addImport( targetComponent, "javafx.animation.Interpolator" );
 
         return true;
     }

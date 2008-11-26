@@ -37,7 +37,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.media;
+package org.netbeans.modules.javafx.palette.items.paths;
 
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.Imports;
@@ -50,18 +50,16 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class MediaView implements ActiveEditorDrop {
+public class Path implements ActiveEditorDrop {
 
-    public boolean handleTransfer( JTextComponent targetComponent ) {
-        String code = NbBundle.getMessage( MediaView.class, "TEMPLATE_MediaView" ); // NOI18N
+    public boolean handleTransfer(JTextComponent targetComponent) {
+        String code = NbBundle.getMessage( Path.class, "TEMPLATE_Path" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
         // Import
-        Imports.addImport( targetComponent, "javafx.scene.media.Media" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.media.MediaPlayer" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.media.MediaView" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.shape.Path" ); // NOI18N
 
         return true;
     }
