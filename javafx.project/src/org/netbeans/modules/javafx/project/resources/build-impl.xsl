@@ -135,6 +135,13 @@ is divided into following sections:
             <condition property="codebase.arg" value="-appCodebase ${{codebase.url}}" else="">
                 <isset property="codebase.url"/>
             </condition>
+            <property file="${{user.properties.file}}/../config/preferences/org/apache/tools/ant/module.properties" prefix="ant.module"/>
+            <condition property="verbose.arg" value="-v" else="">
+                <or>
+                    <equals arg1="${{ant.module.verbosity}}" arg2="3"/>
+                    <equals arg1="${{ant.module.verbosity}}" arg2="4"/>
+                </or>
+            </condition>
             <condition property="draggable.arg" value="-draggable" else="">
                 <istrue value="${{applet.draggable}}"/>
             </condition>
@@ -230,7 +237,7 @@ is divided into following sections:
                 <arg line="${{codebase.arg}}"/>
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
-                <arg value="-v"/>
+                <arg value="${{verbose.arg}}"/>
                 <arg value="${{draggable.arg}}"/>
                 <arg value="${{pack200.arg}}"/>
                 <arg value="${{sign.arg}}"/>
