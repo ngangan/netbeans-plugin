@@ -235,6 +235,8 @@ is divided into following sections:
                 <arg value="-appclass"/>
                 <arg value="${{main.class}}"/>
                 <arg line="${{codebase.arg}}"/>
+                <arg value="-encoding"/>
+                <arg value="${{source.encoding}}"/>
                 <arg value="-p"/>
                 <arg value="${{javafx.profile}}"/>
                 <arg value="${{verbose.arg}}"/>
