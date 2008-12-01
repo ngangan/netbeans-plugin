@@ -41,35 +41,9 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.ReturnTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.ThrowTree;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.*;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.*;
-import javax.lang.model.util.ElementFilter;
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -85,6 +59,26 @@ import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.xml.XMLUtil;
+
+import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.ExecutableType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -1199,7 +1193,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
                     public void run(final CompilationController controller) throws IOException {
                         if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                            if (LOGGABLE) log ("Cannot show code completion due to compiler exception - should be already logged.");
+                            if (LOGGABLE) log (java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged."));
                             return;
                         }
                         final TypeElement eleme = (type != null) ? (TypeElement)type.asElement() : elem;

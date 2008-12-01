@@ -46,12 +46,14 @@ import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXFunctionValue;
 import com.sun.tools.javafx.tree.JFXType;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.CATCH_KEYWORD;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.FINALLY_KEYWORD;
+
+import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
  *

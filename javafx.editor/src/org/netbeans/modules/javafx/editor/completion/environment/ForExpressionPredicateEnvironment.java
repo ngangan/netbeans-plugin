@@ -40,14 +40,14 @@
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.tools.javafx.tree.JFXForExpression;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * seq[x | condition]
@@ -106,12 +106,12 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
         }
         if (LOGGABLE) log("  afterPipe: " + afterPipe);
         if (afterPipe) {
-            if (LOGGABLE) log("  NOT IMPLEMENTED: boolean condition ");
+            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_"));
             return;
         }
         if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier);
         if (afterIdentifier) {
-            if (LOGGABLE) log("  NOT IMPLEMENTED: suggest ending the variable name and | after");
+            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after"));
             return;
         } 
     }

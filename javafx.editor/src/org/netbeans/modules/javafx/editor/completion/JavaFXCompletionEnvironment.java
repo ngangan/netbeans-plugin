@@ -40,23 +40,8 @@
  */
 package org.netbeans.modules.javafx.editor.completion;
 
-import com.sun.javafx.api.tree.BlockExpressionTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.ForExpressionInClauseTree;
-import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.FunctionValueTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.InstanceOfTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.javafx.api.tree.OnReplaceTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javac.code.Scope;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
@@ -65,56 +50,33 @@ import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
-import static javax.lang.model.element.Modifier.*;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ExecutableType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import javax.tools.Diagnostic;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex.NameKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+
+import javax.lang.model.element.*;
+import static javax.lang.model.element.Modifier.*;
+import javax.lang.model.type.*;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -156,7 +118,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * This method should be overriden in subclasses
      */
     protected void inside(T t) throws IOException {
-        if (LOGGABLE) log("NOT IMPLEMENTED " + t.getJavaFXKind() + " inside " + t);
+        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED_") + t.getJavaFXKind() + " inside " + t);
     }
 
     public int getOffset() {
@@ -236,7 +198,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 return;
             }
         }
-        if (LOGGABLE) log("NOT IMPLEMENTED: insideExpression " + exPath.getLeaf());
+        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED:_insideExpression_") + exPath.getLeaf());
 
     }
 
@@ -599,7 +561,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) {
-        if (LOGGABLE) log("NOT IMPLEMENTED: getSubtypesOf " + baseType);
+        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED:_getSubtypesOf_") + baseType);
         return Collections.emptyList();
     }
 

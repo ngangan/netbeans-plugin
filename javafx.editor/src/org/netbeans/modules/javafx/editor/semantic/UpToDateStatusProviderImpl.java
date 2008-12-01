@@ -39,18 +39,19 @@
 
 package org.netbeans.modules.javafx.editor.semantic;
 
+import org.netbeans.spi.editor.errorstripe.UpToDateStatus;
+import org.netbeans.spi.editor.errorstripe.UpToDateStatusProvider;
+
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+import javax.tools.Diagnostic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
-import javax.tools.Diagnostic;
-import org.netbeans.spi.editor.errorstripe.UpToDateStatus;
-import org.netbeans.spi.editor.errorstripe.UpToDateStatusProvider;
 /**
  *
  * @author David Strupl

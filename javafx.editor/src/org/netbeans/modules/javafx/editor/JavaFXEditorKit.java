@@ -44,7 +44,11 @@ import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.print.PrintManager;
-import org.netbeans.editor.*;
+import org.netbeans.editor.BaseAction;
+import org.netbeans.editor.BaseDocument;
+import org.netbeans.editor.BaseKit;
+import org.netbeans.editor.LocaleSupport;
+import org.netbeans.modules.editor.NbEditorKit;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
@@ -53,6 +57,7 @@ import org.netbeans.modules.javafx.preview.SerializableImage;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
+import org.openide.util.WeakListeners;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -64,8 +69,6 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
 import java.util.logging.Logger;
-import org.netbeans.modules.editor.NbEditorKit;
-import org.openide.util.WeakListeners;
 
 /**
  * @author answer
@@ -153,7 +156,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             b.setAction(this);
             b.setEnabled(Bridge.isStarted());
             b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
-            b.setText("");
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString(""));
             return b;
         }
 
@@ -250,7 +253,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             ResetButton b = new ResetButton();
             b.setAction(this);
             b.putClientProperty("resetPreviewMark", Boolean.TRUE);              // NOI18N
-            b.setText("");
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString(""));
             b.setEnabled(false);
             return b;
         }
@@ -310,7 +313,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             JButton b = new JButton(this);
             b.setAction(this);
             b.putClientProperty("printPreviewMark", Boolean.TRUE);                  //NOI18N
-            b.setText("");
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString(""));
             b.setEnabled(false);
             return b;
         }

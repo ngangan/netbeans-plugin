@@ -41,11 +41,12 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+
+import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.type.TypeMirror;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
  *

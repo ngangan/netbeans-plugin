@@ -40,9 +40,10 @@
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.ImportTree;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
  *

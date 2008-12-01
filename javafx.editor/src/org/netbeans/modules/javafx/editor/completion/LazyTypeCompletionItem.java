@@ -42,20 +42,6 @@
 package org.netbeans.modules.javafx.editor.completion;
 
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javafx.api.JavafxcScope;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.util.EnumSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.Elements;
-import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -63,6 +49,16 @@ import org.netbeans.api.javafx.source.Task;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.LazyCompletionItem;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
+
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -118,7 +114,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                                 e = handle.resolve(controller);
                             } catch (Exception ex) {
                                 if (LOGGABLE) {
-                                    logger.log(Level.FINE, "Cannot resolve " + handle + " name: " + handle.getQualifiedName(), ex);
+                                    logger.log(Level.FINE, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex);
                                 }
                             }
                             if (e != null) {
