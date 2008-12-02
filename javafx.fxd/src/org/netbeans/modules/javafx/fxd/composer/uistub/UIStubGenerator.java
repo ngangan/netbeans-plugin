@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.StringTokenizer;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
@@ -36,7 +37,10 @@ import org.openide.util.NbBundle;
  * @author Pavel Benes
  */
 public final class UIStubGenerator {
-    private static final String UI_STUB_EXTENSION = "UI.fx";  //NOI18N
+    private static final String JAVAFX_EXTENSION = ".fx";    //NOI18N
+    private static final String UI_STUB_EXTENSION = "UI" + JAVAFX_EXTENSION;  //NOI18N
+    private static final String PACKAGE_SEPARATOR = ".";      //NOI18N
+    static final String PACKAGE_NOT_SET = "<enter-your-package-here>";   //NOI18N
 
     private static final class AttributeDescription implements NamedElement {
         private String m_type;
@@ -107,13 +111,35 @@ public final class UIStubGenerator {
                 dlg.setVisible(true);
 
                 if (dd.getValue() == DialogDescriptor.OK_OPTION) {
-                    stubFile = new File( panel.getStubLocation());
+                    String stubLoc = panel.getStubLocation();
+                    if ( !isValidStubName(stubLoc)) {
+                        NotifyDescriptor d = new NotifyDescriptor.Message(
+                            NbBundle.getMessage(UIStubGenerator.class, "MSG_INVALID_UI_STUB_FILENAME", stubLoc),  //NOI18N 
+                            NotifyDescriptor.ERROR_MESSAGE);
+                        DialogDisplayer.getDefault().notify(d);
+                        return;
+                    }
+
+                    String packageName = panel.getPackagePath();
+                    if ( !isValidPackagePath(packageName)) {
+                        NotifyDescriptor d = new NotifyDescriptor.Message(
+                            NbBundle.getMessage(UIStubGenerator.class, "MSG_INVALID_UI_STUB_PACKAGE_NAME", packageName),  //NOI18N
+                            NotifyDescriptor.ERROR_MESSAGE);
+                        DialogDisplayer.getDefault().notify(d);
+                        return;
+                    }
+
+                    stubFile = new File(stubLoc);
                     if ( stubFile.isDirectory()) {
-                        assert false;
+                        NotifyDescriptor d = new NotifyDescriptor.Message(
+                            NbBundle.getMessage(UIStubGenerator.class, "MSG_UI_STUB_FILENAME_IS_DIR", stubLoc),  //NOI18N
+                            NotifyDescriptor.ERROR_MESSAGE);
+                        DialogDisplayer.getDefault().notify(d);
+                        return;
                     } else {
                         if ( stubFile.exists()) {
-                            String msgFormat = NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_MSG");   //NOI18N 
-                            NotifyDescriptor d = new NotifyDescriptor.Confirmation( String.format(msgFormat, stubFile.getAbsoluteFile()),
+                            NotifyDescriptor d = new NotifyDescriptor.Confirmation( 
+                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_MSG", stubFile.getAbsoluteFile()),  //NOI18N
                                 NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_TITLE"), //NOI18N 
                                 NotifyDescriptor.YES_NO_OPTION,   
                                 NotifyDescriptor.WARNING_MESSAGE);
@@ -122,17 +148,18 @@ public final class UIStubGenerator {
                             }
                         }
                     }
-                    implGenerate( fo.getNameExt(), panel.getStubLocation(), panel.getPackagePath());                    
+
+                    implGenerate( fo.getNameExt(), stubLoc, packageName);                    
                 }
             } catch( Exception e) {
+                e.printStackTrace();
                 //SceneManager.error("Animation export failed", e);
             }
         } else {
             throw new IllegalArgumentException( );
         }        
     }
-     
-    
+
     private void implGenerate( final String archiveName, final String stubLocation, final String packagePath) {
         Thread th = new Thread() {
             @Override
@@ -252,9 +279,7 @@ public final class UIStubGenerator {
 
         writer.close();
     }
-            
-    static final String PACKAGE_NOT_SET = "<enter-your-package-here>";   //NOI18N
-    
+                
     static String getPackagePath(final File file) {
         StringBuilder pName = new StringBuilder();
 
@@ -292,5 +317,50 @@ public final class UIStubGenerator {
                 }
             }
         });
-    }    
+    }
+
+    private static boolean isValidStubName( final String stubFileName) {
+        if ( stubFileName != null && stubFileName.length() > JAVAFX_EXTENSION.length()) {
+            File file = new File(stubFileName);
+            String name = file.getName();
+            if ( !name.endsWith(JAVAFX_EXTENSION)) {
+                return false;
+            }
+            if ( isJavaIdentifier( name.substring(0, name.length() - JAVAFX_EXTENSION.length()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private static boolean isValidPackagePath( final String packagePath) {
+        if ( packagePath != null && packagePath.length() > 0) {
+            if ( PACKAGE_NOT_SET.endsWith(packagePath)) {
+                return true;
+            }
+            if ( !packagePath.startsWith(PACKAGE_SEPARATOR) && !packagePath.endsWith(PACKAGE_SEPARATOR)) {
+                StringTokenizer st = new StringTokenizer(packagePath, PACKAGE_SEPARATOR);
+                if ( st.countTokens() > 0) {
+                    while( st.hasMoreTokens()) {
+                        if ( !isJavaIdentifier( st.nextToken())) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isJavaIdentifier(final String  str) {
+          int n = str.length();
+          if (n==0) return false;
+          if (!Character.isJavaIdentifierStart(str.charAt(0)))
+              return false;
+          for (int i = 1; i < n; i++)
+              if (!Character.isJavaIdentifierPart(str.charAt(i)))
+                  return false;
+          return true;
+    }
 }
