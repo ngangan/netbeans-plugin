@@ -119,6 +119,9 @@ public final class FXSourceUtils {
             type = types.elementType(type);
         }
         switch (type.tag) {
+            case TypeTags.BOOLEAN:
+                return "Boolean" + suffix; // NOI18N
+
             case TypeTags.DOUBLE:
                 return "Number" + suffix; // NOI18N
 
