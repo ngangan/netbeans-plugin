@@ -248,6 +248,53 @@
                 <attr name="position" intvalue="300"/>
             </file>
         </folder>
+        <folder name="Effects">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="position" intvalue="670"/>
+            
+            <file name="Blend.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Blend.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Bloom.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Bloom.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="ColorAdjust.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ColorAdjust.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="DropShadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DropShadow.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Flood.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Flood.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="GaussianBlur.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/GaussianBlur.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Glow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Glow.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="InnerShadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/InnerShadow.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Lighting.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Lighting.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="MotionBlur.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MotionBlur.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="PerspectiveTransform.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PerspectiveTransform.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Reflection.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Reflection.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="SepiaTone.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SepiaTone.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Shadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Shadow.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+        </folder>
         <folder name="Animation">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
             <attr name="position" intvalue="700"/>            
