@@ -50,7 +50,7 @@ import javax.swing.ImageIcon;
  * @author Pavel Benes
  */
 public abstract class AbstractFXDToggleAction extends AbstractFXDAction {
-    private static final long serialVersionUID  = 5862679852552354L;
+    private static final long serialVersionUID  = 2L;
     private static final String RES_NAME_SUFFIX = "1_"; //NOI18N
 
     public static final String  SELECTION_STATE = "selected"; //NOI18N

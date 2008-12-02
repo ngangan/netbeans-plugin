@@ -33,7 +33,6 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.editor.BaseDocument;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.Task;
 import org.openide.util.UserQuestionException;
 import org.openide.windows.TopComponent;
@@ -42,18 +41,14 @@ import org.openide.windows.TopComponent;
  *
  * @author Pavel Benes
  */
-public final class FXZEditorSupport extends DataEditorSupport implements Serializable, OpenCookie, EditorCookie, EditorCookie.Observable, EditCookie {
-    private static final long serialVersionUID = 1L;    
-        
-    //TODO Hack - I should not be holding this reference
-    protected CloneableTopComponent m_mvtc  = null;
+public final class FXZEditorSupport extends DataEditorSupport implements OpenCookie, EditorCookie, EditorCookie.Observable, EditCookie {
     
     public FXZEditorSupport( FXZDataObject dObj) {
         super(dObj, new FXDEnv(dObj));
     }
             
     public void updateDisplayName() {
-        final TopComponent tc = m_mvtc;
+        final TopComponent tc = getFXZDataObject().getMVTC();
         if (tc == null) {
             return;
         }
@@ -73,7 +68,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
 
     @Override
     protected Task reloadDocument() {
-        final FXZDataObject fxzDO = (FXZDataObject) getDataObject();
+        final FXZDataObject fxzDO = getFXZDataObject();
         fxzDO.getDataModel().getFXDContainer().setDirty();
         final Task reloadTask = super.reloadDocument();
         Thread th = new Thread() {
@@ -152,21 +147,13 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         
     @Override
     protected CloneableEditorSupport.Pane createPane() {
+        FXZDataObject           fxzDO   = getFXZDataObject();
         MultiViewDescription [] views   = getViewDescriptions();
-        int                     defView = ((FXZDataObject) getDataObject()).getDefaultView();
-        m_mvtc = MultiViewFactory.createCloneableMultiView(views, views[ defView],
-                new CloseHandler(this));
-        return (CloneableEditorSupport.Pane)m_mvtc;
+        int                     defView = fxzDO.getDefaultView();
+        return  (CloneableEditorSupport.Pane) MultiViewFactory.createCloneableMultiView(views, views[ defView],
+                new CloseHandler(fxzDO));
     }
-    
-    CloneableTopComponent getMVTC() {
-        return m_mvtc;
-    }
-    
-    void resetMVTC() {
-        m_mvtc = null;
-    }
-        
+                
     @Override
     public String messageHtmlName() {
         return super.messageHtmlName();
@@ -178,10 +165,11 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
     }
     
     protected MultiViewDescription [] getViewDescriptions() {
+        FXZDataObject fxzDO = getFXZDataObject();
         return new MultiViewDescription[] {
-            new PreviewViewDescription(this),        
-            new SourceViewDescription(this),
-            new ArchiveViewDescription(this)
+            new PreviewViewDescription( fxzDO),        
+            new SourceViewDescription( fxzDO),
+            new ArchiveViewDescription( fxzDO)
         };
     }
         
@@ -190,9 +178,13 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
         throws IOException, BadLocationException {
         ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer().save( (BaseDocument) doc, kit, stream);
     }
-    
+
+    protected final FXZDataObject getFXZDataObject() {
+        return (FXZDataObject) getDataObject();
+    }
+
     static final class FXDEnv extends DataEditorSupport.Env {
-        private static final long  serialVersionUID = 1L;
+        private static final long  serialVersionUID = 2L;
         
         public FXDEnv( FXZDataObject obj) {
             super(obj);
@@ -221,19 +213,23 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
     }
     
     private static class CloseHandler implements CloseOperationHandler, Serializable {
-        private static final long serialVersionUID =1L;
+        private static final long serialVersionUID = 2L;
 
-        private FXZEditorSupport sup;
+        private FXZDataObject m_dObj;
 
         private CloseHandler() {
+            System.err.println("Serialized?");
         }
 
-        public CloseHandler(FXZEditorSupport formDO) {
-            sup = formDO;
+        public CloseHandler(final FXZDataObject dObj) {
+            if (dObj == null) {
+                throw new IllegalArgumentException( "Null DataObject is not allowed!"); //NOI18N
+            }
+            m_dObj = dObj;
         }
 
         public boolean resolveCloseOperation(CloseOperationState[] elements) {
-            boolean status = sup.canClose();
+            boolean status = m_dObj.getEditorSupport().canClose();
             //hack or the only possible fix?
             //we need to call support.canClose() here to get the status of the
             //fxd editor. Once user chooses discard option the editor is not saved,
@@ -245,7 +241,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements Seriali
             //so the next call to canClose() doesn't do anything (it tests the
             //editor for modified state first).
             if(status) {
-                sup.notifyUnmodified();
+                m_dObj.getEditorSupport().notifyUnmodified();
             }   
             return status;        
         }

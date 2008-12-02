@@ -50,7 +50,7 @@ import javax.swing.Action;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElementOutline;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
+import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
 
 /**
  *
@@ -184,7 +184,7 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
                 FXDElement topElem = elems.get(0);
                 
                 if (me.getClickCount() > 1) {
-                    FXDSourceEditor.selectElement(m_dObj, topElem.getStartOffset(), true);
+                    SourceTopComponent.selectElement(m_dObj, topElem.getStartOffset(), true);
                 } 
                 
                 return select( new FXDElement[] { topElem}, true);

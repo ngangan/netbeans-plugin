@@ -13,7 +13,7 @@ import org.openide.util.NbBundle;
 
 public final class FXDDataLoader extends UniFileLoader {
     public static final String REQUIRED_MIME = "text/x-fxd";   //NOI18N
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     public FXDDataLoader() {
         super("org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataObject");  //NOI18N

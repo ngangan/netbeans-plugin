@@ -10,7 +10,7 @@ import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataNode;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -20,17 +20,17 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public final class SourceViewDescription implements MultiViewDescription, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
         
-    private final FXZEditorSupport m_support;
+    private final FXZDataObject m_dObj;
 
-    public SourceViewDescription(FXZEditorSupport ed) {
-        m_support = ed;
+    public SourceViewDescription(FXZDataObject dObj) {
+        m_dObj = dObj;
     }
 
     public MultiViewElement createElement() {
         assert EventQueue.isDispatchThread();
-        return new FXDSourceEditor(m_support);
+        return new SourceElement(m_dObj);
     }
 
     public java.awt.Image getIcon() {

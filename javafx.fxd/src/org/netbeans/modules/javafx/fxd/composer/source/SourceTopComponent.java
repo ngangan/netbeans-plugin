@@ -9,10 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
-import org.netbeans.core.spi.multiview.CloseOperationState;
-import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.netbeans.editor.EditorUI;
 import org.netbeans.editor.StatusBar;
 import org.netbeans.editor.Utilities;
@@ -37,22 +34,16 @@ import org.openide.windows.TopComponent;
  *
  * @author Pavel Benes
  */
-public class FXDSourceEditor extends CloneableEditor implements MultiViewElement, Runnable {
+public final class SourceTopComponent extends CloneableEditor implements Runnable  {
     public static final String CELL_ERROR = "error";
     
-    private JComponent m_toolbar = null;
-    private static MultiViewElementCallback m_callback;
+    private transient JComponent m_toolbar = null;
     
-    public FXDSourceEditor( FXZEditorSupport ed) {
-        super(ed);
+    public SourceTopComponent( FXZDataObject dObj) {
+        super( dObj.getEditorSupport());
     }
 
-    public JComponent getVisualRepresentation() {
-        //System.err.println("Asking for visual");
-        return this;        
-    }
-
-    public JComponent getToolbarRepresentation() {
+    public synchronized JComponent getToolbar() {
         if (m_toolbar == null) {
             final JEditorPane editorPane = getEditorPane();
             if (editorPane!= null) {
@@ -68,19 +59,14 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
         }
         return m_toolbar;
     }
-    
-    public void setMultiViewCallback(MultiViewElementCallback callback) {
-        m_callback = callback;
-        updateName();
-    }
-       
+           
     @Override
     public void updateName() {
         Mutex.EVENT.readAccess(this);
     }
 
     public void run() {
-        MultiViewElementCallback c = m_callback;
+        MultiViewElementCallback c = getDataObject().getMultiViewElementCallback();
         if ( c == null) {
             return;
         }
@@ -122,6 +108,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
     @Override
     public void componentClosed() {
         super.componentClosed();
+        getDataObject().reset();
     }
 
     @Override
@@ -166,13 +153,6 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
     public void componentDeactivated() {
         super.componentDeactivated();
     }
-
-    public CloseOperationState canCloseElement() {
-        return MultiViewFactory.createUnsafeCloseState(
-            "ID_FXZ_CLOSING", // NOI18N
-            MultiViewFactory.NOOP_CLOSE_ACTION,
-            MultiViewFactory.NOOP_CLOSE_ACTION);
-    }
     
     public static void selectElement( final FXDZDataObject dDoj, int startOffset, final boolean requestFocus) {
         if ( startOffset != -1) {
@@ -194,6 +174,7 @@ public class FXDSourceEditor extends CloneableEditor implements MultiViewElement
                         ed.openDocument();
                         JEditorPane [] opened = ed.getOpenedPanes();
                         if ( opened != null && opened.length > 0) {
+
                             final JEditorPane  pane = opened[0];
                             //m_callback.requestVisible();
                             if (position >= 0) {

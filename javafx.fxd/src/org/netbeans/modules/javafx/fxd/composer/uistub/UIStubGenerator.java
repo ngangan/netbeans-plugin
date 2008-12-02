@@ -175,7 +175,7 @@ public final class UIStubGenerator {
                                 uiStubFO.refresh();
                                 try {
                                     DataObject uiStubDO = DataObject.find(uiStubFO);
-                                    OpenCookie cookie = (OpenCookie) uiStubDO.getCookie( OpenCookie.class);
+                                    OpenCookie cookie = uiStubDO.getCookie( OpenCookie.class);
                                     cookie.open();
                                 } catch( Exception e) {
                                     e.printStackTrace();

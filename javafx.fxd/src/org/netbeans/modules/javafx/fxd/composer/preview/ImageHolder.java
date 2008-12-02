@@ -172,7 +172,7 @@ final class ImageHolder extends JPanel {
     };
     
     private final class LabelLayout extends FlowLayout {
-        private static final long serialVersionUID = 842591224720135361L;
+        private static final long serialVersionUID = 2L;
 
         @Override
         public void layoutContainer(Container parent) {

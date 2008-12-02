@@ -43,6 +43,7 @@ import java.io.IOException;
 import org.netbeans.core.api.multiview.MultiViewHandler;
 import org.netbeans.core.api.multiview.MultiViewPerspective;
 import org.netbeans.core.api.multiview.MultiViews;
+import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
@@ -63,9 +64,8 @@ import org.openide.windows.TopComponent;
  *
  * @author Pavel Benes
  */
-
 public final class FXZDataObject extends FXDZDataObject implements Lookup.Provider {     
-    private static final long  serialVersionUID = 1L;
+    private static final long  serialVersionUID = 2L;
     
     public static final String FXZ_EXT = "fxz";  //NOI18N
 
@@ -73,12 +73,14 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public static final int    TEXT_VIEW_INDEX    = 1;
     public static final int    ARCHIVE_VIEW_INDEX = 2;
     
-    InstanceContent                                  m_ic;
-    private transient volatile Lookup                m_lookup;
-    private transient          FXZEditorSupport      m_edSup = null;
-    private transient          FXDComposerModel      m_model = null;
-    private transient          FXDComposerController m_controller = null;
-    private transient          int                   m_defaultViewIndex;
+    InstanceContent                                     m_ic;
+    private transient volatile Lookup                   m_lookup;
+    private transient          FXZEditorSupport         m_edSup = null;
+    private transient          FXDComposerModel         m_model = null;
+    private transient          FXDComposerController    m_controller = null;
+    private transient          MultiViewElementCallback m_callback = null;
+    private transient          int                      m_defaultViewIndex;
+
             
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
@@ -103,7 +105,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         getController().init();
     }
     
-    private synchronized FXZEditorSupport getEditorSupport() {
+    public synchronized FXZEditorSupport getEditorSupport() {
         if(m_edSup == null) {
             m_edSup = new FXZEditorSupport(this);
         }
@@ -115,14 +117,12 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
 
         m_defaultViewIndex = VISUAL_VIEW_INDEX;
-        if ( m_edSup != null) {
-            m_edSup.resetMVTC();
-        }
         m_model = null;
         if ( m_controller != null) {
             m_controller.close();
             m_controller = null;
         }
+        m_callback = null;
     }
 
     public void setDefaultView( int viewIndex) {
@@ -132,9 +132,18 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public int getDefaultView() {
         return m_defaultViewIndex;
     }
+        
+    public void setMultiviewElementCallback( MultiViewElementCallback callback) {
+        m_callback = callback;
+    }
+    
+    public MultiViewElementCallback getMultiViewElementCallback() {
+        return m_callback;
+    }
     
     public void selectView( int index) {
         MultiViewHandler handler = MultiViews.findMultiViewHandler( getMVTC());
+
         if (handler != null) {
             MultiViewPerspective perspective =  handler.getPerspectives()[index];        
             handler.requestActive(perspective);
@@ -170,8 +179,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     }
     
     public TopComponent getMVTC() {
-        //TODO Check if the view callback is not a better option
-        return m_edSup.getMVTC();
+        return m_callback == null? null:m_callback.getTopComponent();
     }
     
     @Override

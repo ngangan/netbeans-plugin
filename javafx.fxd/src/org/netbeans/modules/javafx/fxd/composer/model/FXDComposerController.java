@@ -16,13 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import javax.swing.SwingUtilities;
-import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ComposerAction;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.netbeans.modules.javafx.fxd.composer.navigator.FXDNavigatorContent;
 import org.netbeans.modules.javafx.fxd.composer.preview.PreviewElement;
+import org.netbeans.modules.javafx.fxd.composer.preview.PreviewTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 /**
@@ -30,12 +29,12 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
  * @author Pavel Benes
  */
 public final class FXDComposerController {
-    private final FXZDataObject     m_dObj;
-    private final ActionController  m_actionController;
-    private final List<String>      m_busyStates   = new ArrayList<String>(4);
-    private       boolean           m_busyCursorOn = false;
-    private       PreviewElement    m_previewTopComponent = null; 
-    private volatile short          m_screenChangeTicker = 0;
+    private final FXZDataObject       m_dObj;
+    private final ActionController    m_actionController;
+    private final List<String>        m_busyStates   = new ArrayList<String>(4);
+    private       boolean             m_busyCursorOn = false;
+    private       PreviewTopComponent m_previewTopComponent = null; 
+    private volatile short            m_screenChangeTicker = 0;
     
     //private       JSGPanel         m_sgPanel      = null;
     //private       StatusBar        m_statusBar = null;   
@@ -95,11 +94,11 @@ public final class FXDComposerController {
         }
     }   
     
-    public PreviewElement getPreviewComponent() {
+    public PreviewTopComponent getPreviewComponent() {
         return m_previewTopComponent;        
     }
     
-    public void setPreviewComponent( final PreviewElement previewTopComponent) {
+    public void setPreviewComponent( final PreviewTopComponent previewTopComponent) {
         assert previewTopComponent != null;
         m_previewTopComponent = previewTopComponent;
     }

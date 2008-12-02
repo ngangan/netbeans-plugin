@@ -54,7 +54,7 @@ public final class FXZDataLoader extends UniFileLoader {
     
     public static final String REQUIRED_MIME = "multipart/x-fxz"; //NOI18N
     
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     
     public FXZDataLoader() {
         super("org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject"); //NOI18N

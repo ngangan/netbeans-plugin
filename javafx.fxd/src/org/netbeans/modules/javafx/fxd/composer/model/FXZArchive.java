@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -30,10 +29,8 @@ import org.openide.util.NbBundle;
 import com.sun.javafx.tools.fxd.FXDNode;
 import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
-import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataLoader;
 import org.openide.util.Exceptions;
 
 /**
@@ -42,6 +39,8 @@ import org.openide.util.Exceptions;
  */
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
     private final    FXZDataObject            m_dObj;
+    // controls the access to the FXDFileModel object
+    private final    Object                   m_lock = new Object();
     private          List<FXZArchiveEntry>    m_entries;
     private          FXDFileModel             m_fileModel = null;
     private final    List<TableModelListener> m_tableListeners;
@@ -283,16 +282,18 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     public boolean areEntriesChanged() {
         return m_entryChanged;
     }
-            
-    public synchronized FXDFileModel getFileModel() {
-        if ( m_fileModel == null) {
-            try {
-                m_fileModel = new FXDFileModel(this);
-            } catch( Exception e) {
-                Exceptions.printStackTrace(e);
+
+    public FXDFileModel getFileModel() {
+        synchronized( m_lock) {
+            if ( m_fileModel == null) {
+                try {
+                    m_fileModel = new FXDFileModel(this);
+                } catch( Exception e) {
+                    Exceptions.printStackTrace(e);
+                }
             }
+            return m_fileModel;
         }
-        return m_fileModel;
     }
     
     public synchronized long getSize() {

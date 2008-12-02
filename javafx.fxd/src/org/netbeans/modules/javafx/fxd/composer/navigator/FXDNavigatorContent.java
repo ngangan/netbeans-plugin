@@ -80,7 +80,7 @@ import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelListener;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
+import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
@@ -145,7 +145,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
         }
         
         if ( d != null) {
-            EditorCookie ec = (EditorCookie)d.getCookie(EditorCookie.class);
+            EditorCookie ec = d.getCookie(EditorCookie.class);
             if(ec == null) {
     //            ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL, "The DataObject " + d.getName() + "(class=" + d.getClass().getName() + ") has no EditorCookie!?");
                 System.err.println("The DataObject " + d.getName() + "(class=" + d.getClass().getName() + ") has no EditorCookie!?");  //NOI18N
@@ -183,7 +183,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
      * support releases a strong reference to NbEditorDocument. */
     private void closeDocument(FXDZDataObject dobj) {
         if(dobj != null) {
-            EditorCookie ec = (EditorCookie)peerDO.getCookie(EditorCookie.class);
+            EditorCookie ec = peerDO.getCookie(EditorCookie.class);
             if(ec != null) {
                 JEditorPane panes[] = ec.getOpenedPanes();
                 //call EC.close() if there isn't any pane and the editor was opened
@@ -257,7 +257,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                                             //if(DEBUG) System.out.println("[xml navigator] panel created");
                                             
                                             //start to listen to the document property changes - we need to get know when the document is being closed
-                                            EditorCookie.Observable eco = (EditorCookie.Observable)documentDO.getCookie(EditorCookie.Observable.class);
+                                            EditorCookie.Observable eco = documentDO.getCookie(EditorCookie.Observable.class);
                                             if(eco != null) {
                                                 eco.addPropertyChangeListener(FXDNavigatorContent.this);
                                             } else {
@@ -373,7 +373,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                         TreePath         selPath = tree.getPathForLocation(e.getX(), e.getY());
                         FXDNavigatorNode tna     = (FXDNavigatorNode)selPath.getLastPathComponent();                       
                         DocumentElement  de      = tna.getDocumentElement();
-                        FXDSourceEditor.selectElement(m_doj, de.getStartOffset(), true);
+                        SourceTopComponent.selectElement(m_doj, de.getStartOffset(), true);
                     }
                 }
             };
@@ -556,7 +556,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                     
                     
                     //remove the property change listener from the DataObject's EditorSupport
-                    EditorCookie ec = (EditorCookie)dobj.getCookie(EditorCookie.class);
+                    EditorCookie ec = dobj.getCookie(EditorCookie.class);
                     if(ec != null)
                         ((EditorCookie.Observable)ec).removePropertyChangeListener(this);
                     

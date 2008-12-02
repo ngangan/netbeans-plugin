@@ -198,7 +198,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     final class ZoomToFitAction extends AbstractFXDAction {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         ZoomToFitAction() {
             super("zoom_fit"); //NOI18N
@@ -218,7 +218,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     final class ZoomInAction extends AbstractFXDAction {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         ZoomInAction() {
             super("zoom_in"); //NOI18N
@@ -231,7 +231,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
 
     final class ZoomOutAction extends AbstractFXDAction {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2L;
 
         ZoomOutAction() {
             super("zoom_out"); //NOI18N

@@ -242,7 +242,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                         EditorUI eui = Utilities.getEditorUI(panes[0]);
                         StatusBar sb = eui == null ? null : eui.getStatusBar();
                         if (sb != null) {
-                            sb.setText(FXDSourceEditor.CELL_ERROR, msg);
+                            sb.setText(SourceTopComponent.CELL_ERROR, msg);
                         }
                     }
                 }
@@ -263,7 +263,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             trans.removeDocumentElement(de, true);
         } else {
             for (int i = de.getElementCount()-1; i >= 0; i--) {
-                reportDeletedElements(trans, (DocumentElement) de.getElement(i));
+                reportDeletedElements(trans, de.getElement(i));
             }
         }
     }

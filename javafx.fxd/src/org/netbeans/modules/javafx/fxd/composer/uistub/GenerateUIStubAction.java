@@ -31,7 +31,7 @@ public class GenerateUIStubAction extends CookieAction {
     }
 
     protected void performAction(Node[] activatedNodes) {
-        FXZDataObject doj = (FXZDataObject) activatedNodes[0].getLookup().lookup(FXZDataObject.class);
+        FXZDataObject doj = activatedNodes[0].getLookup().lookup(FXZDataObject.class);
         if (doj != null) {
             UIStubGenerator generator = new UIStubGenerator(doj);
             generator.generate();

@@ -10,7 +10,7 @@ import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataNode;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -20,17 +20,17 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public class ArchiveViewDescription implements MultiViewDescription, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
         
-    private final FXZEditorSupport m_support;
+    private final FXZDataObject m_dObj;
 
-    public ArchiveViewDescription(FXZEditorSupport ed) {
-        m_support = ed;
+    public ArchiveViewDescription(FXZDataObject dObj) {
+        m_dObj = dObj;
     }
 
     public synchronized MultiViewElement createElement() {
         assert EventQueue.isDispatchThread();
-        return new ArchiveElement(m_support);
+        return new ArchiveElement(m_dObj);
     }
 
     public java.awt.Image getIcon() {

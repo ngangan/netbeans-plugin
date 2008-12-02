@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDSourceEditor;
+import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.cookies.CloseCookie;
@@ -66,13 +66,13 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
                 FileObject fxzFO = FileUtil.toFileObject( fs.getJarFile());
                 FXZDataObject dObj = (FXZDataObject) DataObject.find(fxzFO);
                 dObj.setDefaultView( FXZDataObject.TEXT_VIEW_INDEX);
-                FXDSourceEditor.selectPosition( dObj, -1, true);
+                SourceTopComponent.selectPosition( dObj, -1, true);
             } catch( Exception e) {
                 //TODO report
                 e.printStackTrace();
             }
         }
-        FXDSourceEditor.addErrorStatusBarCell(getDataObject());
+        SourceTopComponent.addErrorStatusBarCell(getDataObject());
     }
     
     @Override
@@ -133,7 +133,7 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
 
     public void updateSelection(FXDZDataObject doj, DocumentElement de, boolean doubleClick) {
         if ( de != null) {
-            FXDSourceEditor.selectElement(doj, de.getStartOffset(), doubleClick);
+            SourceTopComponent.selectElement(doj, de.getStartOffset(), doubleClick);
         }
     }
     
@@ -142,7 +142,7 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
      */
     
     private static class Environment extends DataEditorSupport.Env {
-        private static final long serialVersionUID = 5451434321155443431L;
+        private static final long serialVersionUID = 2L;
         
         private MultiDataObject.Entry entry;
         
@@ -169,7 +169,7 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
          */
         @Override
         public CloneableOpenSupport findCloneableOpenSupport() {
-            return (FXDEditorSupport)getDataObject().getCookie(FXDEditorSupport.class);
+            return getDataObject().getCookie(FXDEditorSupport.class);
         }
     } // End of nested Environment class.
 }

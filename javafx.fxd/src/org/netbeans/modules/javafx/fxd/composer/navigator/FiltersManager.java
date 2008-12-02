@@ -66,7 +66,7 @@ import javax.swing.event.ChangeEvent;
  * @author Pavel Benes
  */
 final class FiltersManager implements Serializable {
-    private static final long  serialVersionUID = 123471457562776148L;
+    private static final long  serialVersionUID = 2L;
     
     private FiltersComponent comp;
     

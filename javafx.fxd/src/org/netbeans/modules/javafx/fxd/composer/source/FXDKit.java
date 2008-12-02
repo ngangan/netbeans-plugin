@@ -17,7 +17,7 @@ import org.netbeans.modules.editor.NbEditorKit;
 public class FXDKit extends NbEditorKit implements org.openide.util.HelpCtx.Provider {
 
     /** Serial Version UID */
-    private static final long serialVersionUID =1L;
+    private static final long serialVersionUID =2L;
     
     /** Default FXD Mime Type. */
     public static final String MIME_TYPE = "text/x-fxd"; // NOI18N
