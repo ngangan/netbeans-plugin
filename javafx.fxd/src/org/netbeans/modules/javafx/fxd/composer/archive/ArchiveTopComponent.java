@@ -11,14 +11,15 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
 import org.openide.util.Mutex;
 import org.openide.util.RequestProcessor;
+import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
 
 /**
@@ -28,7 +29,8 @@ import org.openide.windows.TopComponent;
 final class ArchiveTopComponent extends TopComponent implements Runnable {
     protected transient final FXZDataObject  m_dObj;
     protected transient       ArchivePanel   m_panel;
-    private   transient       ArchiveToolbar m_toolbar;
+    protected transient       ArchiveToolbar m_toolbar;
+    protected transient       Lookup         m_lookup;
     
     public ArchiveTopComponent( final FXZDataObject dObj) {
         m_dObj = dObj;   
@@ -49,7 +51,19 @@ final class ArchiveTopComponent extends TopComponent implements Runnable {
         }
         return m_toolbar;
     }
-    
+
+    @Override
+    public synchronized Lookup getLookup() {
+        if ( m_lookup == null) {
+            m_lookup = new ProxyLookup(new org.openide.util.Lookup[] {
+                m_dObj.getLookup(),
+                m_dObj.getNodeDelegate().getLookup()
+            });
+        }
+
+        return m_lookup;
+    }
+
     @Override
     public Action[] getActions() {
         return new Action[0];
@@ -98,21 +112,7 @@ final class ArchiveTopComponent extends TopComponent implements Runnable {
     }    
     
     public void run() {
-        MultiViewElementCallback c = m_dObj.getMultiViewElementCallback();
-        if ( c == null) {
-            return;
-        }
-        TopComponent tc = c.getTopComponent();
-        if ( tc == null) {
-            return;            
-        }
-        
-        FXZEditorSupport edSup = m_dObj.getEditorSupport();
-        String name = edSup.messageName();
-        tc.setName(name);
-        tc.setDisplayName(name);
-        name = edSup.messageHtmlName();
-        tc.setHtmlDisplayName( name);
+        m_dObj.updateTCName();
     }    
     
     private final FocusListener m_focusListener = new FocusAdapter() { 

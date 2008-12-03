@@ -39,6 +39,8 @@
 
 package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import org.netbeans.core.api.multiview.MultiViewHandler;
 import org.netbeans.core.api.multiview.MultiViewPerspective;
@@ -49,7 +51,9 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
+import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
+import org.openide.loaders.SaveAsCapable;
 import org.openide.nodes.Node;
 import org.openide.nodes.CookieSet;
 import org.openide.nodes.Node.Cookie;
@@ -81,9 +85,15 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     private transient          MultiViewElementCallback m_callback = null;
     private transient          int                      m_defaultViewIndex;
 
-            
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
+
+        getCookieSet().assign( SaveAsCapable.class, new SaveAsCapable() {
+            public void saveAs(FileObject folder, String fileName) throws IOException {
+                getEditorSupport().saveAs( folder, fileName);
+            }
+        });
+
         getCookieSet().add(FXZEditorSupport.class, new CookieSet.Factory() {
             public <T extends Cookie> T createCookie(Class<T> klass) {
                 return klass.cast(getEditorSupport());
@@ -94,8 +104,28 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
         m_defaultViewIndex = VISUAL_VIEW_INDEX;
 //        SceneManager.log(Level.INFO, "SVGDataObject created for " + pf.getPath()); //NOI18N
+
+        addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (DataObject.PROP_NAME.equals(evt.getPropertyName())) {
+                    updateTCName();
+                }
+            }
+        });
     }
-            
+
+    public void updateTCName() {
+        TopComponent tc = getMVTC();
+        if ( tc != null) {
+            FXZEditorSupport edSupp = getEditorSupport();
+            String name = edSupp.messageName();
+            tc.setName(name);
+            tc.setDisplayName(name);
+            name = edSupp.messageHtmlName();
+            tc.setHtmlDisplayName( name);
+        }
+    }
+
     public void notifyEditorSupportModified () {
         getEditorSupport().notifyModified ();
     }    
@@ -136,11 +166,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public void setMultiviewElementCallback( MultiViewElementCallback callback) {
         m_callback = callback;
     }
-    
-    public MultiViewElementCallback getMultiViewElementCallback() {
-        return m_callback;
-    }
-    
+        
     public void selectView( int index) {
         MultiViewHandler handler = MultiViews.findMultiViewHandler( getMVTC());
 

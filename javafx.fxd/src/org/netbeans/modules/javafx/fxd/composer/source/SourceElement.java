@@ -19,7 +19,7 @@ import org.openide.util.Lookup;
  *
  * @author Pavel Benes
  */
-public final class SourceElement implements MultiViewElement, Serializable {
+final class SourceElement implements MultiViewElement, Serializable {
     private static final long serialVersionUID = 2L;
     
     private final     FXZDataObject      m_dObj;

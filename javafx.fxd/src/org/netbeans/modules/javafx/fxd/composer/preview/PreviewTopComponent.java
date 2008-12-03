@@ -13,7 +13,6 @@ import java.awt.event.FocusListener;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.openide.awt.UndoRedo;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
@@ -27,7 +26,6 @@ import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.filesystems.FileObject;
-import org.openide.nodes.FilterNode;
 import org.openide.util.Mutex;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.Lookups;
@@ -90,7 +88,8 @@ public final class PreviewTopComponent extends TopComponent implements Runnable 
     public JSGPanel getJSGPane() {
         return m_imgPanel.getJSGPanel();
     }
-        
+
+    /*
     private Lookup createLookup() {
         return Lookups.fixed( new Object[] {            
             new FilterNode(m_dObj.getNodeDelegate(), null, new ProxyLookup(new Lookup[] {
@@ -100,6 +99,14 @@ public final class PreviewTopComponent extends TopComponent implements Runnable 
             })),
             //ActionMap map = getActionMap(),            
             new FXDPreviewCookie()
+        });
+    }
+ */
+   private Lookup createLookup() {
+        return new ProxyLookup(new org.openide.util.Lookup[] {
+            m_dObj.getLookup(),
+            m_dObj.getNodeDelegate().getLookup(),
+            Lookups.singleton( new FXDPreviewCookie())
         });
     }
 
@@ -148,20 +155,7 @@ public final class PreviewTopComponent extends TopComponent implements Runnable 
     }
     
     public void run() {
-        MultiViewElementCallback c = m_dObj.getMultiViewElementCallback();
-        if ( c == null) {
-            return;
-        }
-        TopComponent tc = c.getTopComponent();
-        if ( tc == null) {
-            return;            
-        }
-        FXZEditorSupport edSupp = m_dObj.getEditorSupport();
-        String name = edSupp.messageName();
-        tc.setName(name);
-        tc.setDisplayName(name);
-        name = edSupp.messageHtmlName();
-        tc.setHtmlDisplayName( name);
+        m_dObj.updateTCName();
     }
    
     private final class FXDPreviewCookie implements SelectionCookie {

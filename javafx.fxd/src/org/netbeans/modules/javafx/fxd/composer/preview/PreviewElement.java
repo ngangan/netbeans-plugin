@@ -2,7 +2,6 @@
  *  Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
-
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import java.io.Serializable;
@@ -19,13 +18,13 @@ import org.openide.util.Lookup;
  *
  * @author Pavel Benes
  */
-public final class PreviewElement implements MultiViewElement, Serializable {
+final class PreviewElement implements MultiViewElement, Serializable {
     private static final long serialVersionUID = 2L;
 
     private final     FXZDataObject       m_dObj;
     private transient PreviewTopComponent m_previewTC = null;
     
-    public PreviewElement( FXZDataObject dObj) {
+    PreviewElement( FXZDataObject dObj) {
         m_dObj = dObj;
     }
     

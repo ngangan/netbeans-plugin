@@ -35,7 +35,7 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public final class SourceTopComponent extends CloneableEditor implements Runnable  {
-    public static final String CELL_ERROR = "error";
+    public static final String CELL_ERROR = "error"; // NOI18N
     
     private transient JComponent m_toolbar = null;
     
@@ -66,18 +66,7 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
     }
 
     public void run() {
-        MultiViewElementCallback c = getDataObject().getMultiViewElementCallback();
-        if ( c == null) {
-            return;
-        }
-        TopComponent tc = c.getTopComponent();
-        if ( tc == null) {
-            return;            
-        }
-        super.updateName();
-        tc.setName( this.getName());
-        tc.setDisplayName( this.getDisplayName());
-        tc.setHtmlDisplayName( this.getHtmlDisplayName());
+        getDataObject().updateTCName();
     }
 
     protected FXZDataObject getDataObject() {

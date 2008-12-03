@@ -36,7 +36,6 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
 import java.awt.Image;
@@ -63,7 +62,7 @@ public final class FXZDataNode extends DataNode {
     public FXZDataNode(DataObject obj) {
         this(obj, new DummyChildren());
     }
-    
+
     private FXZDataNode(DataObject obj, DummyChildren c) {
         super(obj, c);
         c.attachFXDNode(this);
