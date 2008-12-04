@@ -41,14 +41,14 @@
 
 package org.netbeans.lib.javafx.lexer;
 
-import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.JCDiagnostic;
+import com.sun.tools.javac.util.Log;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

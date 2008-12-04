@@ -40,31 +40,8 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.WhileLoopTree;
-import java.awt.Color;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.element.Element;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.Document;
-import javax.swing.text.StyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -76,6 +53,19 @@ import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+
+import javax.lang.model.element.Element;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.Document;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

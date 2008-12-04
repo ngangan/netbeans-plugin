@@ -40,32 +40,17 @@
  */
 package org.netbeans.modules.javafx.editor.semantic;
 
-import com.sun.javafx.api.tree.CatchTree;
-import com.sun.javafx.api.tree.ConditionalExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.ReturnTree;
-import com.sun.javafx.api.tree.ThrowTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TryTree;
-import com.sun.javafx.api.tree.UnitTree;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import com.sun.javafx.api.tree.*;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
+import java.util.*;
 
 /**
  *

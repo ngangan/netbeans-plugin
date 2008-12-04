@@ -8,28 +8,6 @@ import com.sun.tools.javac.code.TypeTags;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
@@ -40,6 +18,15 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
+
+import javax.lang.model.element.*;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
+import java.util.*;
 
 /**
  * 
@@ -565,7 +552,7 @@ public final class FXSourceUtils {
 
     public static boolean isJavaFXClass(final Element element, final CompilationInfo compilationInfo) {
         if (element == null || compilationInfo == null) {
-            throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.isJavaFXClass");
+            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/api/javafx/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isJavaFXClass"));
         }
         return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
     }

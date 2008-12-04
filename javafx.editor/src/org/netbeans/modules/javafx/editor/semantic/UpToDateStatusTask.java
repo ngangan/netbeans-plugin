@@ -39,17 +39,6 @@
 
 package org.netbeans.modules.javafx.editor.semantic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.StyledDocument;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -62,6 +51,18 @@ import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
 import org.openide.text.NbDocument;
+
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author David Strupl
@@ -131,7 +132,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                     continue;
                 } catch (BadLocationException ex) {
                     if (LOGGABLE) {
-                        LOGGER.log(Level.INFO, "Problem with error underlining", ex);
+                        LOGGER.log(Level.INFO, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex);
                     }
                 }
             } 

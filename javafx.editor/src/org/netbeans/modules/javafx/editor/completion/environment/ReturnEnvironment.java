@@ -44,11 +44,12 @@ import com.sun.javafx.api.tree.ReturnTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXType;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+
+import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.type.TypeMirror;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
  *

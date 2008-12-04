@@ -40,12 +40,13 @@
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.ThrowTree;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
  *

@@ -40,17 +40,17 @@
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.InstanceOfTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXTypeCast;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+
+import javax.lang.model.type.TypeMirror;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

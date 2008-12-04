@@ -39,16 +39,13 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.*;
 import com.sun.tools.javafx.api.JavafxcScope;
-import java.io.IOException;
-import java.util.EnumSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
@@ -56,12 +53,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

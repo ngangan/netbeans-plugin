@@ -379,7 +379,7 @@ class BracketCompletion {
     private static int tokenBalance(BaseDocument doc, boolean handleSpecialBracesToken, TokenId... pairs) {
         if (pairs == null || pairs.length == 0) return 0;
         if (pairs.length % 2 != 0)
-            throw new IllegalArgumentException("The odd number of elements should not be paired!");
+            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!"));
 
         final List<TokenId> ids = Arrays.asList(pairs);
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);

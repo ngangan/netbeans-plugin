@@ -53,7 +53,7 @@ public final class ImportsModel {
 
 
     ImportsModel(CompilationInfo ci) {
-        if (ci == null) throw new IllegalArgumentException("Compilation info cannot be null.");
+        if (ci == null) throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Compilation_info_cannot_be_null."));
         List<? extends ImportTree> trees = ci.getCompilationUnit().getImports();
         if (!trees.isEmpty()) {
             int start = Integer.MAX_VALUE;

@@ -32,7 +32,6 @@ import org.netbeans.modules.editor.indent.spi.Context;
 
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -133,7 +132,7 @@ class DocumentLinesIterator implements LineIterator<Element> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException("Read only interator!");
+        throw new UnsupportedOperationException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Read_only_interator"));
     }
 
 }

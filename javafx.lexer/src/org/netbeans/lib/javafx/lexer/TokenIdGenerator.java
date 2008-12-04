@@ -30,11 +30,14 @@ package org.netbeans.lib.javafx.lexer;
 
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)

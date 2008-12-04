@@ -168,7 +168,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             GuardedDocument gd = (GuardedDocument) doc;
             gd.runAtomic(runnable);
         } else {
-            log.warning("Running in non atomic fashion.");
+            log.warning(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Running_in_non_atomic_fashion."));
             doc.render(runnable);
         }
     }

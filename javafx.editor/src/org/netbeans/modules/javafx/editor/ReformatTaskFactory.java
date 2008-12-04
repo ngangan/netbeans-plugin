@@ -28,12 +28,12 @@
 
 package org.netbeans.modules.javafx.editor;
 
-import org.netbeans.modules.editor.indent.spi.ReformatTask;
 import org.netbeans.modules.editor.indent.spi.Context;
+import org.netbeans.modules.editor.indent.spi.ReformatTask;
 import org.netbeans.modules.javafx.editor.format.JFXIndentTask;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
@@ -48,7 +48,7 @@ public class ReformatTaskFactory implements ReformatTask.Factory{
      * @return reformatting task or null if the factory cannot handle the given context.
      */
     public ReformatTask createTask(Context context) {
-        if (log.isLoggable(Level.FINE)) log.fine("Creating reformat factory");
+        if (log.isLoggable(Level.FINE)) log.fine(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory"));
         return new JFXIndentTask(context);
     }
 }
