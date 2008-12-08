@@ -85,6 +85,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private TokenSequence<TokenId> ts;
     private static final String STRING_ZERO_LENGTH = "";
     private boolean disableContinuosIndent;
+    private boolean isOrphanObjectLiterar;
 
 
     Visitor(CompilationInfo info, Context ctx, int startOffset) {
@@ -322,7 +323,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (isFirstOnLine(offset)) {
                 hasComment(node, adjustments);
                 indentLine(offset, adjustments);
-            } else {
+            } else if (!isOrphanObjectLiterar){
                 adjustments.offer(Adjustment.add(createPosition(offset), NEW_LINE_STRING));
                 adjustments.offer(Adjustment.indent(createPosition(offset + 1), indentOffset));
             }
@@ -383,7 +384,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             hasComment(node, adjustments);
             int start = getStartPos(node);
             boolean firstOnLine = isFirstOnLine(start);
-            if (firstOnLine) {
+            if (firstOnLine) {                
                 indentOffset += getCi();
                 indentLine(start, adjustments);
             }
@@ -901,7 +902,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentReturn(node, adjustments);
             }
             incIndent();
+            isOrphanObjectLiterar = node.getLiteralParts() == null || node.getLiteralParts().size() == 1;
             super.visitInstantiate(node, adjustments);
+            isOrphanObjectLiterar = false;
             decIndent();
             if (isMultiline(node) && !endsOnSameLine(tree, node)) {
                 indentEndLine(node, adjustments);
@@ -932,6 +935,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof SequenceInsertTree
                 || tree instanceof SequenceDeleteTree
                 || tree instanceof FunctionInvocationTree
+                || tree instanceof OnReplaceTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
@@ -1051,8 +1055,22 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private boolean isSynthetic(JFXTree node) {
-        JFXTree tree = (JFXTree) getCurrentPath().getLeaf();
-        return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC || getStartPos(tree) == getEndPos(tree);
+//        JFXTree tree = (JFXTree) getCurrentPath().getLeaf();
+        if (node instanceof BlockExpressionTree) {
+            JavaFXTreePath pp = getCurrentPath().getParentPath();
+            if (pp != null && pp instanceof FunctionValueTree) {
+                pp = pp.getParentPath();
+                JFXTree tree = (JFXTree) pp.getLeaf();
+                if (tree instanceof FunctionDefinitionTree) {
+                    return synthetic(tree);
+                }
+            }
+        }
+        return synthetic(node);
+    }
+
+    private boolean synthetic(JFXTree node) {
+        return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC || getStartPos(node) == getEndPos(node);
     }
 
     private Tree firstImport;
@@ -1421,7 +1439,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 }
             } else {
                 int endPos = getEndPos(node);
-                indentLine(start, adjustments);
+                if (isFirstOnLine(endPos)) {
+                    indentLine(start, adjustments);
+                }
                 incIndent();
                 super.visitBlockExpression(node, adjustments);
                 decIndent();
