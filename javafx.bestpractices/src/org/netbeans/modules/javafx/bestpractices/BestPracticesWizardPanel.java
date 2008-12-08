@@ -72,7 +72,7 @@ public class BestPracticesWizardPanel implements WizardDescriptor.Panel, WizardD
     public Component getComponent() {
         if( component == null ) {
             component = new BestPracticesVisualPanel( this );
-            component.setName( NbBundle.getMessage( BestPracticesWizardPanel.class, "LBL_CreateProjectStep" ));
+            component.setName( NbBundle.getMessage( BestPracticesWizardPanel.class, "LBL_CreateProjectStep" )); // NOI18N
         }
         return component;
     }
@@ -113,7 +113,7 @@ public class BestPracticesWizardPanel implements WizardDescriptor.Panel, WizardD
 
     public void readSettings(Object settings) {
         if (wizardDescriptor == null){
-            ((WizardDescriptor)settings).putProperty("name", null);
+            ((WizardDescriptor) settings).putProperty(BestPracticesWizardIterator.PROJECT_NAME, null);
         }
         wizardDescriptor = (WizardDescriptor) settings;
         component.load( wizardDescriptor );

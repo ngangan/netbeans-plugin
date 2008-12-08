@@ -47,14 +47,15 @@ import javax.swing.text.Document;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author  Michal Skvor
  */
 public class BestPracticesVisualPanel extends javax.swing.JPanel implements DocumentListener {
+    public static final String PROP_PROJECT_NAME = "projectName"; // NOI18N
 
-    public static final String PROP_PROJECT_NAME = "projectName";
     private BestPracticesWizardPanel panel;
     
     /** Creates new form BestPracticesVisualPanel */
@@ -152,10 +153,11 @@ public class BestPracticesVisualPanel extends javax.swing.JPanel implements Docu
 
 private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String command = evt.getActionCommand();
-        if( "BROWSE".equals( command )) {
+        String browseActionCommand = NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.browseButton.actionCommand"); // NOI18N
+        if( browseActionCommand.equals( command )) {
             JFileChooser chooser = new JFileChooser();
             FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-            chooser.setDialogTitle("Select Project Location");
+            chooser.setDialogTitle(NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.fileChooserTitle.text")); // NOI18N
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
             if (path.length() > 0) {
@@ -173,7 +175,7 @@ private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_browseButtonActionPerformed
 
     void load( WizardDescriptor settings ) {
-        File projectLocation = (File) settings.getProperty("projdir");
+        File projectLocation = (File) settings.getProperty(BestPracticesWizardIterator.PROJECT_DIR);
         if (projectLocation == null || projectLocation.getParentFile() == null || !projectLocation.getParentFile().isDirectory()) {
             projectLocation = ProjectChooser.getProjectsFolder();
         } else {
@@ -181,7 +183,7 @@ private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         }
         this.projectLocationTextField.setText( projectLocation.getAbsolutePath());
 
-        String projectName = (String) settings.getProperty("name");
+        String projectName = (String) settings.getProperty(BestPracticesWizardIterator.PROJECT_NAME);
         if( projectName == null ) {
             projectName = panel.getFile().getName();
         }
@@ -193,25 +195,24 @@ private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         String name = projectNameTextField.getText().trim();
         String folder = projectFolderTextField.getText().trim();
 
-        d.putProperty("projdir", new File(folder));
-        d.putProperty("name", name);
+        d.putProperty(BestPracticesWizardIterator.PROJECT_DIR, new File(folder));
+        d.putProperty(BestPracticesWizardIterator.PROJECT_NAME, name);
     }
         
     boolean isValid( WizardDescriptor wizardDescriptor ) {
         if( projectNameTextField.getText().length() == 0 ) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                    "Project Name is not a valid folder name.");
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                    NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.WizardPanel.errorMessage.ivalidProjectName")); // NOI18N
             return false; // Display name not specified
         }
-        if( projectNameTextField.getText().contains( "<" ) || projectNameTextField.getText().contains( ">" )) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                    "Project Name is not a valid folder name.");
+        if( projectNameTextField.getText().contains( "<" ) || projectNameTextField.getText().contains( ">" )) { // NOI18N
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                    NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.WizardPanel.errorMessage.ivalidProjectName")); // NOI18N
             return false;
         }
         File f = FileUtil.normalizeFile( new File( projectLocationTextField.getText()).getAbsoluteFile());
         if( !f.isDirectory()) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", message );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.WizardPanel.errorMessage.ivalidProjectFolder")); // NOI18N
             return false;
         }
         final File destFolder = FileUtil.normalizeFile(new File( projectFolderTextField.getText()).getAbsoluteFile());
@@ -221,23 +222,22 @@ private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             projLoc = projLoc.getParentFile();
         }
         if( projLoc == null || !projLoc.canWrite()) {
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", "Project Folder cannot be created." );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.WizardPanel.errorMessage.projectFolderCantbeCreated")); // NOI18N
             return false;
         }
 
         if( FileUtil.toFileObject( projLoc ) == null ) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", message );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.WizardPanel.errorMessage.ivalidProjectFolder")); // NOI18N
             return false;
         }
 
         File[] kids = destFolder.listFiles();
         if( destFolder.exists() && kids != null && kids.length > 0 ) {
             // Folder exists and is not empty
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", "Project Folder already exists and is not empty." );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", NbBundle.getMessage(BestPracticesVisualPanel.class, "BestPracticesVisualPanel.WizardPanel.errorMessage.projectFolderExists")); // NOI18N
             return false;
         }
-        wizardDescriptor.putProperty( "WizardPanel_errorMessage", "" );
+        wizardDescriptor.putProperty( "WizardPanel_errorMessage", "" ); // NOI18N
         
         return true;
     }    

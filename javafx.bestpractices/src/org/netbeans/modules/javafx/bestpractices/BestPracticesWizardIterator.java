@@ -40,11 +40,8 @@
 package org.netbeans.modules.javafx.bestpractices;
 
 import java.awt.Component;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -59,11 +56,9 @@ import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.openide.WizardDescriptor;
 import org.openide.WizardDescriptor.Panel;
-import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.Repository;
-import org.openide.filesystems.URLMapper;
 import org.openide.util.NbBundle;
 
 /**
@@ -71,6 +66,9 @@ import org.openide.util.NbBundle;
  * @author Michal Skvor
  */
 public class BestPracticesWizardIterator implements WizardDescriptor.InstantiatingIterator {
+
+    public static final String PROJECT_DIR = "projdir"; // NOI18N
+    public static final String PROJECT_NAME = "name"; // NOI18N
 
     private WizardDescriptor wizard;
     
@@ -92,19 +90,19 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
     }
     
     private String[] createSteps() {
-        return new String[]{ NbBundle.getMessage( BestPracticesWizardIterator.class, "LBL_CreateProjectStep" )};
+        return new String[]{ NbBundle.getMessage( BestPracticesWizardIterator.class, "LBL_CreateProjectStep" )}; // NOI18N
     }
         
     public Set instantiate() throws IOException {
         Set<FileObject> resultSet = new LinkedHashSet<FileObject>();
-        File dirF = FileUtil.normalizeFile((File) wizard.getProperty( "projdir" ));
+        File dirF = FileUtil.normalizeFile((File) wizard.getProperty(PROJECT_DIR));
        
-        FileObject mainFile = Repository.getDefault().getDefaultFileSystem().findResource((String) file.getAttribute( "file" ));
-        String path = mainFile.getPath().substring( "demos/".length());
-        AntProjectHelper helper = JavaFXProjectGenerator.createProject( dirF, (String)wizard.getProperty( "name" ), null, null );
+        FileObject mainFile = Repository.getDefault().getDefaultFileSystem().findResource((String) file.getAttribute( "file" )); // NOI18N
+        String path = mainFile.getPath().substring( "demos/".length()); // NOI18N
+        AntProjectHelper helper = JavaFXProjectGenerator.createProject( dirF, (String)wizard.getProperty(PROJECT_NAME), null, null );
         EditableProperties props = helper.getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );
         
-        String srcdir = props.getProperty( "src.dir" );
+        String srcdir = props.getProperty( "src.dir" ); // NOI18N
         FileObject dir = FileUtil.toFileObject( dirF );
         
         FileObject srcDir = dir.getFileObject( srcdir );
@@ -116,19 +114,19 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
             for( FileObject c : fo.getChildren()) {
                 FileUtil.copyFile( c, destDirFO, c.getName());
                 // If file has mainclass attribute - set it as main 
-                if( c.getAttribute( "mainclass" ) != null ) {
+                if( c.getAttribute( "mainclass" ) != null ) { // NOI18N
                     String fileName = c.getPath().substring( mainFile.getPath().length() + 1 ).replace( "/", "." );
                     fileName = fileName.substring( 0, fileName.length() - 3 );
                             
-                    props.setProperty( "main.class", fileName );
+                    props.setProperty( "main.class", fileName ); // NOI18N
                     helper.putProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH, props );        
                 }
             }
         }     
         
         // Create manifest
-        FileObject manifestFO = srcDir.getParent().createData( "manifest", "mf" );
-        props.setProperty( "manifest.file", "manifest.mf" );
+        FileObject manifestFO = srcDir.getParent().createData( "manifest", "mf" ); // NOI18N
+        props.setProperty( "manifest.file", "manifest.mf" ); // NOI18N
         helper.putProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH, props );
         
         // Traverse created directory
@@ -168,9 +166,9 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
                 // assume Swing components
                 JComponent jc = (JComponent) c;
                 // Step #.
-                jc.putClientProperty( "WizardPanel_contentSelectedIndex", new Integer( i ));
+                jc.putClientProperty( "WizardPanel_contentSelectedIndex", new Integer( i )); // NOI18N
                 // Step name (actually the whole list for reference).
-                jc.putClientProperty( "WizardPanel_contentData", steps );
+                jc.putClientProperty( "WizardPanel_contentData", steps ); // NOI18N
             }
         }
     }
@@ -184,7 +182,8 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
     }
 
     public String name() {
-        return MessageFormat.format( "{0} of {1}", new Object[]{ new Integer( index + 1 ), new Integer( panels.length )});
+        String str = "{0} " + NbBundle.getMessage( BestPracticesWizardIterator.class, "LBL_Iterator_Number_Delimiter") + " {1}"; // NOI18N
+        return MessageFormat.format( str, new Object[]{ new Integer( index + 1 ), new Integer( panels.length )});
     }
 
     public boolean hasNext() {
