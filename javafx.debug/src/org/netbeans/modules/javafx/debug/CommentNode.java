@@ -56,7 +56,7 @@ public class CommentNode extends AbstractNode implements OffsetProvider {
     public CommentNode(Comment comment) {
         super(Children.LEAF);
         this.comment = comment;
-        setDisplayName(NbBundle.getMessage(CommentNode.class, "NM_Comment"));
+        setDisplayName(NbBundle.getMessage(CommentNode.class, "NM_Comment")); // NOI18N
     }
 
     public int getStart() {

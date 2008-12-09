@@ -86,9 +86,9 @@ final class HTMLJavadocParser {
                 if (urlStr.indexOf(PACKAGE_SUMMARY) > 0) {
                     // package description
                     offsets = isJavaFXDoc ? new int[] {0, is.available()} : parsePackage(reader, parser, charset != null);
-                } else if (urlStr.indexOf('#') > 0) {
+                } else if (urlStr.indexOf('#') > 0) { // NOI18N
                     // member javadoc info
-                    String memberName = urlStr.substring(urlStr.indexOf('#') + 1);
+                    String memberName = urlStr.substring(urlStr.indexOf('#') + 1); // NOI18N
                     if (memberName.length() > 0) {
                         offsets = parseMember(reader, memberName, parser, charset != null, isJavaFXDoc);
                     }
@@ -363,12 +363,12 @@ final class HTMLJavadocParser {
                     }
                 } else if (t == HTML.Tag.B && a != null) {
                     final Object classAttr = a.getAttribute(HTML.Attribute.CLASS);
-                    if ("name".equals(classAttr)) {
+                    if ("name".equals(classAttr)) { // NOI18N
                         insideNameBlock = true;
                     }
                 } else if (t == HTML.Tag.DIV && a != null) {
                     final Object classAttr = a.getAttribute(HTML.Attribute.CLASS);
-                    if ("long-desc".equals(classAttr) && insideFieldBlock) {
+                    if ("long-desc".equals(classAttr) && insideFieldBlock) { // NOI18N
                         offset[0] = pos;
                         insideFieldBlock = false;
                     }
@@ -378,9 +378,10 @@ final class HTMLJavadocParser {
             @Override
             public void handleText(char[] data, int pos) {
                 String dataStr = new String(data);
-                if (dataStr.indexOf("&nbsp;") != -1 && offset[0] != -1 && offset[1] == -1) {
+                if (dataStr.indexOf("&nbsp;") != -1 && offset[0] != -1 && offset[1] == -1) { // NOI18N
                     offset[1] = pos;
-                } else if (offset[0] == -1 && name.indexOf("(") == -1 && dataStr.indexOf(name) != -1 && insideNameBlock) { // fields: name attr is not been parsed for some magic reason
+                } else if (offset[0] == -1 && name.indexOf("(") == -1 && dataStr.indexOf(name) != -1 && insideNameBlock) { // NOI18N
+                    // fields: name attr is not been parsed for some magic reason
                     insideFieldBlock = true;
                     insideNameBlock = false;
                 }

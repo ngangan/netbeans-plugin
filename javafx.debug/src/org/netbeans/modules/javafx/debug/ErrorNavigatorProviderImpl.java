@@ -67,11 +67,11 @@ public class ErrorNavigatorProviderImpl implements NavigatorPanel {
     }
     
     public String getDisplayName() {
-        return NbBundle.getMessage(ErrorNavigatorProviderImpl.class, "NM_Errors");
+        return NbBundle.getMessage(ErrorNavigatorProviderImpl.class, "NM_Errors"); // NOI18N
     }
     
     public String getDisplayHint() {
-        return NbBundle.getMessage(ErrorNavigatorProviderImpl.class, "SD_Errors");
+        return NbBundle.getMessage(ErrorNavigatorProviderImpl.class, "SD_Errors"); // NOI18N
     }
     
     public JComponent getComponent() {

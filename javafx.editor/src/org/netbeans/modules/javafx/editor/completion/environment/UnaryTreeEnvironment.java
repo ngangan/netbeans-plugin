@@ -59,7 +59,7 @@ public class UnaryTreeEnvironment extends JavaFXCompletionEnvironment<UnaryTree>
 
     @Override
     protected void inside(UnaryTree t) throws IOException {
-        if (LOGGABLE) log("inside UnaryTree " + t);
+        if (LOGGABLE) log("inside UnaryTree " + t); // NOI18N
         UnaryTree ui = (UnaryTree) getPath().getLeaf();
         localResult(getSmartType(ui));
         addValueKeywords();
@@ -72,10 +72,10 @@ public class UnaryTreeEnvironment extends JavaFXCompletionEnvironment<UnaryTree>
     }
 
     private TypeMirror getSmartType(UnaryTree ut) {
-        TypeElement te = controller.getElements().getTypeElement("java.lang.Integer");
-        if (LOGGABLE) log("   int == " + te);
+        TypeElement te = controller.getElements().getTypeElement("java.lang.Integer"); // NOI18N
+        if (LOGGABLE) log("   int == " + te); // NOI18N
         TypeMirror type = te.asType();
-        if (LOGGABLE) log("   getSmartType returning " + type);
+        if (LOGGABLE) log("   getSmartType returning " + type); // NOI18N
         return type;
     }
 }

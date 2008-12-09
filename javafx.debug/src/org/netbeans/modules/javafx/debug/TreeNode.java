@@ -87,8 +87,8 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         String res = t.getJavaFXKind().toString();
 
         SourcePositions pos = info.getTrees().getSourcePositions();
-        res = res + '[' + pos.getStartPosition(tp.getCompilationUnit(), t) + ',' + 
-                pos.getEndPosition(tp.getCompilationUnit(), t) + "]:" + s.toString();
+        res = res + '[' + pos.getStartPosition(tp.getCompilationUnit(), t) + ',' +  // NOI18N
+                pos.getEndPosition(tp.getCompilationUnit(), t) + "]:" + s.toString(); // NOI18N
         return res;
     }
 
@@ -840,11 +840,11 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
                 if (el != null) {
                     below.add(new ElementNode(info, el, Collections.EMPTY_LIST));
                 } else {
-                    below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element")));
+                    below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element"))); // NOI18N
                 }
             } catch (Exception e) {
                 Logger.getLogger(TreeNode.class.getName()).log(Level.WARNING, treeToString(info, tp), e);
-                below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element")));
+                below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element"))); // NOI18N
             }
         }
 
@@ -854,7 +854,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
             if (tm != null) {
                 below.add(new TypeNode(tm));
             } else {
-                below.add(new NotFoundTypeNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Type")));
+                below.add(new NotFoundTypeNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Type"))); // NOI18N
             }
         }
         

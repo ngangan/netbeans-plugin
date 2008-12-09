@@ -82,7 +82,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     private static final String FX_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
     private static final String CLASS_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
 
-    private static final String NEEDS_COMPILE_BADGE_URL = "org/netbeans/modules/javafx/dataloader/resources/needs-compile.png";
+    private static final String NEEDS_COMPILE_BADGE_URL = "org/netbeans/modules/javafx/dataloader/resources/needs-compile.png"; // NOI18N
     private static final Image NEEDS_COMPILE;
     
     private Status status;
@@ -92,7 +92,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
 
     static{
         URL needsCompileIconURL = JavaFXDataNode.class.getClassLoader().getResource(NEEDS_COMPILE_BADGE_URL);
-        String needsCompileTP = "<img src=\"" + needsCompileIconURL + "\">&nbsp;" + getMessage(JavaFXDataNode.class, "TP_NeedsCompileBadge");
+        String needsCompileTP = "<img src=\"" + needsCompileIconURL + "\">&nbsp;" + getMessage(JavaFXDataNode.class, "TP_NeedsCompileBadge"); // NOI18N
         NEEDS_COMPILE = assignToolTipToImage(loadImage(NEEDS_COMPILE_BADGE_URL), needsCompileTP); // NOI18N
     }
 
@@ -102,7 +102,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     public JavaFXDataNode (final DataObject jdo, boolean isJavaFXSource) {
         super (jdo, Children.LEAF);
         setIconBaseWithExtension(isJavaFXSource ? FX_ICON_BASE : CLASS_ICON_BASE);
-        Logger.getLogger("TIMER").log(Level.FINE, "JavaFXNode", new Object[] {jdo.getPrimaryFile(), this});
+        Logger.getLogger("TIMER").log(Level.FINE, "JavaFXNode", new Object[] {jdo.getPrimaryFile(), this}); // NOI18N
         
         if (isJavaFXSource) {
             this.isCompiled = new AtomicBoolean(true);                                        
@@ -113,7 +113,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
             jdo.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (DataObject.PROP_PRIMARY_FILE.equals(evt.getPropertyName())) {
-                        Logger.getLogger("TIMER").log(Level.FINE, "JavaFXDataNode", new Object[]{jdo.getPrimaryFile(), this});
+                        Logger.getLogger("TIMER").log(Level.FINE, "JavaFXDataNode", new Object[]{jdo.getPrimaryFile(), this}); // NOI18N
                         WORKER.post(new Runnable() {
                             public void run() {
                                 synchronized (JavaFXDataNode.this) {
@@ -136,7 +136,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
 
     @Override
     public HelpCtx getHelpCtx() {
-        return new HelpCtx("javafx_editing_source");
+        return new HelpCtx("javafx_editing_source"); // NOI18N
     }
 
 
@@ -180,18 +180,18 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         // Add classpath-related properties.
         Sheet.Set ps = new Sheet.Set();
         ps.setName("classpaths"); // NOI18N
-        ps.setDisplayName(NbBundle.getMessage(JavaFXDataNode.class, "LBL_JavaFXDataNode_sheet_classpaths"));
-        ps.setShortDescription(NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_sheet_classpaths"));
+        ps.setDisplayName(NbBundle.getMessage(JavaFXDataNode.class, "LBL_JavaFXDataNode_sheet_classpaths")); // NOI18N
+        ps.setShortDescription(NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_sheet_classpaths")); // NOI18N
         ps.put(new Node.Property[] {
             new ClasspathProperty(ClassPath.COMPILE,
-                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_compile_classpath"),
-                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_compile_classpath")),
+                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_compile_classpath"), // NOI18N
+                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_compile_classpath")), // NOI18N
                     new ClasspathProperty(ClassPath.EXECUTE,
-                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_execute_classpath"),
-                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_execute_classpath")),
+                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_execute_classpath"), // NOI18N
+                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_execute_classpath")), // NOI18N
                     new ClasspathProperty(ClassPath.BOOT,
-                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_boot_classpath"),
-                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_boot_classpath")),
+                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_boot_classpath"), // NOI18N
+                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_boot_classpath")), // NOI18N
         });
         sheet.put(ps);
         return sheet;
@@ -201,8 +201,8 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         Node.Property p = new PropertySupport.ReadWrite<String> (
                 DataObject.PROP_NAME,
                 String.class,
-                NbBundle.getMessage (DataObject.class, "PROP_name"),
-                NbBundle.getMessage (DataObject.class, "HINT_name")
+                NbBundle.getMessage (DataObject.class, "PROP_name"), // NOI18N
+                NbBundle.getMessage (DataObject.class, "HINT_name") // NOI18N
                 ) {
             public String getValue () {
                 return JavaFXDataNode.this.getName();
@@ -269,7 +269,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
                 }
                 return sb.toString();
             } else {
-                return NbBundle.getMessage(JavaFXDataNode.class, "LBL_JavaFXDataNode_classpath_unknown");
+                return NbBundle.getMessage(JavaFXDataNode.class, "LBL_JavaFXDataNode_classpath_unknown"); // NOI18N
             }
         }
     }
@@ -298,7 +298,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         return i;
     }
     
-    private static final RequestProcessor WORKER = new RequestProcessor("JavaFX Node Badge Processor", 1);
+    private static final RequestProcessor WORKER = new RequestProcessor("JavaFX Node Badge Processor", 1); // NOI18N
     
     private static class BuildStatusTask implements Runnable {
         private JavaFXDataNode node;

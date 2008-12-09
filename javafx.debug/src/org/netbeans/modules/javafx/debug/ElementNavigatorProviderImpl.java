@@ -85,11 +85,11 @@ public class ElementNavigatorProviderImpl implements NavigatorPanel {
     }
     
     public String getDisplayName() {
-        return NbBundle.getMessage(ElementNavigatorProviderImpl.class, "NM_Elements");
+        return NbBundle.getMessage(ElementNavigatorProviderImpl.class, "NM_Elements"); // NOI18N
     }
     
     public String getDisplayHint() {
-        return NbBundle.getMessage(ElementNavigatorProviderImpl.class, "SD_Elements");
+        return NbBundle.getMessage(ElementNavigatorProviderImpl.class, "SD_Elements"); // NOI18N
     }
     
     public JComponent getComponent() {

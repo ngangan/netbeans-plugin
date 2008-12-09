@@ -43,7 +43,7 @@ public class HighlightsLayerFactoryImpl implements HighlightsLayerFactory {
     static {
         boolean value = false;
         
-        if (Boolean.getBoolean("org.netbeans.modules.java.debug.enable")) {
+        if (Boolean.getBoolean("org.netbeans.modules.java.debug.enable")) { // NOI18N
             value = true;
         } else {
             assert value = true;
@@ -71,15 +71,15 @@ public class HighlightsLayerFactoryImpl implements HighlightsLayerFactory {
     }
     
     private static Object createImpl(FileObject f) {
-        if ("TreeNavigatorProviderImpl".equals(f.getName())) {
+        if ("TreeNavigatorProviderImpl".equals(f.getName())) { // NOI18N
             return new TreeNavigatorProviderImpl();
         }
         
-        if ("ElementNavigatorProviderImpl".equals(f.getName())) {
+        if ("ElementNavigatorProviderImpl".equals(f.getName())) { // NOI18N
             return new ElementNavigatorProviderImpl();
         }
         
-        if ("ErrorNavigatorProviderImpl".equals(f.getName())) {
+        if ("ErrorNavigatorProviderImpl".equals(f.getName())) { // NOI18N
             return new ErrorNavigatorProviderImpl();
         }
         

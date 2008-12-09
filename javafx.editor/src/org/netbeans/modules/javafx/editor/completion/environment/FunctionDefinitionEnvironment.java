@@ -66,17 +66,17 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
 
     @Override
     protected void inside(JFXFunctionDefinition t) throws IOException {
-        if (LOGGABLE) log("inside JFXFunctionDefinition " + t);
+        if (LOGGABLE) log("inside JFXFunctionDefinition " + t); // NOI18N
         JFXFunctionDefinition def = t;
         int startPos = (int) sourcePositions.getStartPosition(root, def);
         JFXType retType = def.getJFXReturnType();
-        if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType);
+        if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
         String headerText = controller.getText().substring(startPos, offset > startPos ? offset : startPos);
-        if (LOGGABLE) log("  headerText(1) == " + headerText);
-        int parStart = headerText.indexOf('(');
-        if (LOGGABLE) log("  parStart: " + parStart);
+        if (LOGGABLE) log("  headerText(1) == " + headerText); // NOI18N
+        int parStart = headerText.indexOf('('); // NOI18N
+        if (LOGGABLE) log("  parStart: " + parStart); // NOI18N
         if (parStart >= 0) {
-            int parEnd = headerText.indexOf(')', parStart);
+            int parEnd = headerText.indexOf(')', parStart); // NOI18N
             if (parEnd > parStart) {
                 headerText = headerText.substring(parEnd + 1).trim();
             } else {
@@ -89,21 +89,21 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
 //                }
                 headerText = headerText.substring(parStart).trim();
             }
-            if (LOGGABLE) log("  headerText(2) ==" + headerText);
+            if (LOGGABLE) log("  headerText(2) ==" + headerText); // NOI18N
             if (":".equals(headerText)) {
                 addLocalAndImportedTypes(null, null, null, false, null);
                 addBasicTypes();
                 return;
             }
         } else if (retType != null && headerText.trim().length() == 0) {
-            if (LOGGABLE) log("  insideExpression for retType:");
+            if (LOGGABLE) log("  insideExpression for retType:"); // NOI18N
             insideExpression(new JavaFXTreePath(path, retType));
             return;
         }
         int bodyPos = (int) sourcePositions.getStartPosition(root, def.getBodyExpression());
-        if (LOGGABLE) log("  bodyPos: " + bodyPos);
+        if (LOGGABLE) log("  bodyPos: " + bodyPos); // NOI18N
         if ((bodyPos >=0) && (offset > bodyPos)) {
-            if (LOGGABLE) log(" we are inside body of the function:");
+            if (LOGGABLE) log(" we are inside body of the function:"); // NOI18N
             insideFunctionBlock(def.getBodyExpression().getStatements());
         } 
     }

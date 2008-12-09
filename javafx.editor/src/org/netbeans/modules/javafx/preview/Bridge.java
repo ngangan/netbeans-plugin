@@ -166,7 +166,7 @@ public class Bridge extends ModuleInstall {
         }
         
         String classs = "org/netbeans/modules/javafx/preview/Main";             //NOI18N
-        String path = "";
+        String path = ""; // NOI18N
         try {
             path = URLDecoder.decode(Bridge.class.getClassLoader().getResource(classs + ".class").getPath(), new InputStreamReader(new ByteArrayInputStream(new byte[0])).getEncoding());                                   //NOI18N
         } catch (UnsupportedEncodingException uex) {

@@ -150,11 +150,11 @@ public final class Comment {
     
     public String toString() {
         StringBuilder sb = new StringBuilder(style.toString());
-        sb.append(" pos=");
+        sb.append(" pos="); // NOI18N
         sb.append(pos);
-        sb.append(" endPos=");
+        sb.append(" endPos="); // NOI18N
         sb.append(endPos);
-        sb.append(" indent=");
+        sb.append(" indent="); // NOI18N
         sb.append(indent);
         sb.append(' ');
         sb.append(text);

@@ -105,8 +105,8 @@ class InnerJList extends JList {
                 }
             }
         });
-        getAccessibleContext().setAccessibleName(LocaleSupport.getString("ACSN_CompletionView"));
-        getAccessibleContext().setAccessibleDescription(LocaleSupport.getString("ACSD_CompletionView"));
+        getAccessibleContext().setAccessibleName(LocaleSupport.getString("ACSN_CompletionView")); // NOI18N
+        getAccessibleContext().setAccessibleDescription(LocaleSupport.getString("ACSD_CompletionView")); // NOI18N
     }
 
     public @Override void paint(Graphics g) {

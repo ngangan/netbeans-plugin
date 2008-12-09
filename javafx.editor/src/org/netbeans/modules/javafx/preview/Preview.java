@@ -353,8 +353,8 @@ public class Preview {
             @Override
             public void run() {
                 try {
-                    Class acc = this.getClass().getClassLoader().loadClass(SAST);   // NOI18N
-                    ac = acc.getDeclaredMethod(CNAC).invoke(null);                  // NOI18N
+                    Class acc = this.getClass().getClassLoader().loadClass(SAST);
+                    ac = acc.getDeclaredMethod(CNAC).invoke(null);
                     eq = Toolkit.getDefaultToolkit().getSystemEventQueue();
                 } catch (Exception ex) {
                     Exceptions.printStackTrace(ex);

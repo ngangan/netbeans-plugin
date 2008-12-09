@@ -86,9 +86,10 @@ class BracketCompletion {
             return;
         }
 
-        if (((ch == ')' || ch == '(') && !posWithinString(doc, caret.getDot())) //parenthesis completion works only outside of string. 
-                || ((ch == ']' || ch == '[') && !posWithinString(doc, caret.getDot())) 
-                || ch == '{' || ch == '}') {
+        //parenthesis completion works only outside of string.
+        if (((ch == ')' || ch == '(') && !posWithinString(doc, caret.getDot())) // NOI18N
+                || ((ch == ']' || ch == '[') && !posWithinString(doc, caret.getDot()))  // NOI18N
+                || ch == '{' || ch == '}') { // NOI18N
             TokenSequence<JFXTokenId> seq = getTokenSequence(doc, dotPos);
             JFXTokenId tidAtDot = seq.moveNext() ? seq.token().id() : null;
             if (tidAtDot == null) return;
@@ -96,8 +97,8 @@ class BracketCompletion {
             if (tidAtDot == JFXTokenId.RBRACKET
                     || tidAtDot == JFXTokenId.RPAREN
 //                    || tidAtDot == JFXTokenId.RBRACE
-                    || (tidAtDot == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL && nextIs(doc, caret.getDot(), '}'))
-                    || (tidAtDot == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && ch == '}')) {
+                    || (tidAtDot == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL && nextIs(doc, caret.getDot(), '}')) // NOI18N
+                    || (tidAtDot == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && ch == '}')) { // NOI18N
                 skipClosingBracket(doc, caret, tidAtDot, ch);
 //                skipClosingBracket(doc, caret, (ch == ')') ? JFXTokenId.RPAREN : JFXTokenId.RBRACKET);
             } else if (tidAtDot == JFXTokenId.LBRACKET
@@ -108,7 +109,7 @@ class BracketCompletion {
                     || tidAtDot == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL) {
                 completeOpeningBracket(doc, dotPos, caret, ch);
             }
-        } else if (ch == ';') {
+        } else if (ch == ';') { // NOI18N
             moveSemicolon(doc, dotPos, caret);
         }
     }
@@ -141,7 +142,7 @@ class BracketCompletion {
     private static void moveSemicolon(BaseDocument doc, int dotPos, Caret caret) throws BadLocationException {
         int eolPos = Utilities.getRowEnd(doc, dotPos);
 
-        System.err.println("move semicolon:");
+        System.err.println("move semicolon:"); // NOI18N
 
         TokenSequence<?> seq = getTokenSequence(doc, dotPos);
 
@@ -149,7 +150,7 @@ class BracketCompletion {
         while (seq.moveNext()) {
             if (seq.offset() >= eolPos) break;
             TokenId tid = seq.token().id();
-            System.err.println("  token: " + tid);
+            System.err.println("  token: " + tid); // NOI18N
             if (tid == JFXTokenId.RPAREN) {
                 lastParenPos = seq.offset();
             } else if (tid == JFXTokenId.WS) {
@@ -184,20 +185,20 @@ class BracketCompletion {
      */
     static void charBackspaced(BaseDocument doc, int dotPos, char ch) throws BadLocationException {
         if (completionSettingEnabled()) {
-            if (ch == '(' || ch == '[' || ch == '{') {
+            if (ch == '(' || ch == '[' || ch == '{') { // NOI18N
                 TokenId tidAtDot = tokenAt(doc, dotPos);
                 if ((tidAtDot == JFXTokenId.RBRACKET && tokenBalance(doc, JFXTokenId.LBRACKET, JFXTokenId.RBRACKET) != 0) ||
                         (tidAtDot == JFXTokenId.RPAREN && tokenBalance(doc, JFXTokenId.LPAREN, JFXTokenId.RPAREN) != 0)) {
                     doc.remove(dotPos, 1);
                 }
-            } else if (ch == '\"') {
+            } else if (ch == '\"') { // NOI18N
                 char match[] = doc.getChars(dotPos, 1);
-                if (match != null && match[0] == '\"') {
+                if (match != null && match[0] == '\"') { // NOI18N
                     doc.remove(dotPos, 1);
                 }
-            } else if (ch == '\'') {
+            } else if (ch == '\'') { // NOI18N
                 char match[] = doc.getChars(dotPos, 1);
-                if (match != null && match[0] == '\'') {
+                if (match != null && match[0] == '\'') { // NOI18N
                     doc.remove(dotPos, 1);
                 }
             }
@@ -379,7 +380,7 @@ class BracketCompletion {
     private static int tokenBalance(BaseDocument doc, boolean handleSpecialBracesToken, TokenId... pairs) {
         if (pairs == null || pairs.length == 0) return 0;
         if (pairs.length % 2 != 0)
-            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!"));
+            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
 
         final List<TokenId> ids = Arrays.asList(pairs);
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
@@ -415,9 +416,9 @@ class BracketCompletion {
         final CharSequence cs = token.text();
         for (int i = 0; i < cs.length(); i++) {
             final char c = cs.charAt(i);
-            if (c == '{') {
+            if (c == '{') { // NOI18N
                 balance++;
-            } else if (c == '}') {
+            } else if (c == '}') { // NOI18N
                 balance--;
             }
         }
@@ -478,7 +479,7 @@ class BracketCompletion {
         // Check whether character follows the bracket is the same bracket
         if (token != null && token.id() == bracketId
                 // we are escaping right bracket inserted into RL_SL because it is correct statement.
-                && !(bracketId == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}')                
+                && !(bracketId == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
                 ) {
             JFXTokenId leftBracketIntId = JavaFXBracesMatcher.getOposite(bracketId, false);
 
@@ -632,7 +633,7 @@ class BracketCompletion {
                                                Caret caret,
                                                char bracket) throws BadLocationException {
         if (isCompletablePosition(doc, dotPos + 1)) {
-            String matchinBracket = "" + matching(bracket);
+            String matchinBracket = "" + matching(bracket); // NOI18N
             doc.insertString(dotPos + 1, matchinBracket, null);
             caret.setDot(dotPos + 1);
         }
@@ -641,7 +642,7 @@ class BracketCompletion {
     private static boolean isEscapeSequence(BaseDocument doc, int dotPos) throws BadLocationException {
         if (dotPos <= 0) return false;
         char previousChar = doc.getChars(dotPos - 1, 1)[0];
-        return previousChar == '\\';
+        return previousChar == '\\'; // NOI18N
     }
 
     /**
@@ -746,16 +747,16 @@ class BracketCompletion {
         else {
             // test that we are in front of ) , " or '
             char chr = doc.getChars(dotPos, 1)[0];
-            return (chr == ')' ||
-                    chr == ',' ||
-                    chr == '\"' ||
-                    chr == '\'' ||
-                    chr == ' ' ||
-                    chr == ']' ||
-                    chr == '}' ||
-                    chr == '\n' ||
-                    chr == '\t' ||
-                    chr == ';');
+            return (chr == ')' || // NOI18N
+                    chr == ',' || // NOI18N
+                    chr == '\"' || // NOI18N
+                    chr == '\'' || // NOI18N
+                    chr == ' ' || // NOI18N
+                    chr == ']' || // NOI18N
+                    chr == '}' || // NOI18N
+                    chr == '\n' || // NOI18N
+                    chr == '\t' || // NOI18N
+                    chr == ';'); // NOI18N
         }
 //        return true;
     }
@@ -775,11 +776,11 @@ class BracketCompletion {
                 return false;
             }
             char chr = doc.getChars(firstNonWhiteFwd, 1)[0];
-            return (chr == ')' ||
-                    chr == ',' ||
-                    chr == '+' ||
-                    chr == '}' ||
-                    chr == ';');
+            return (chr == ')' || // NOI18N
+                    chr == ',' || // NOI18N
+                    chr == '+' || // NOI18N
+                    chr == '}' || // NOI18N
+                    chr == ';'); // NOI18N
         }
     }
 
@@ -802,18 +803,18 @@ class BracketCompletion {
      */
     /*private*/ static char matching(char bracket) {
         switch (bracket) {
-            case '(':
-                return ')';
-            case '[':
-                return ']';
-            case '\"':
+            case '(': // NOI18N
+                return ')'; // NOI18N
+            case '[': // NOI18N
+                return ']'; // NOI18N
+            case '\"': // NOI18N
                 return '\"'; // NOI18N
-            case '\'':
-                return '\'';
-            case '{':
-                return '}';
+            case '\'': // NOI18N
+                return '\''; // NOI18N
+            case '{': // NOI18N
+                return '}'; // NOI18N
             default:
-                return ' ';
+                return ' '; // NOI18N
         }
     }
 
@@ -827,7 +828,7 @@ class BracketCompletion {
      * @return true if matched.
      */
     static boolean posWithinString(BaseDocument doc, int dotPos) {
-        return posWithinQuotes(doc, dotPos, '\"', JFXTokenId.STRING_LITERAL, JFXTokenId.DoubleQuoteBody);
+        return posWithinQuotes(doc, dotPos, '\"', JFXTokenId.STRING_LITERAL, JFXTokenId.DoubleQuoteBody); // NOI18N
     }
 
     /**
@@ -857,7 +858,7 @@ class BracketCompletion {
             JFXTokenId tid = ts.moveNext() ? ts.token().id() : null;
             if (insideString(tid)) {
                 char[] ch = doc.getChars(dotPos - 1, 1);
-                return dotPos - ts.offset() == 1 || (ch[0] != '\"' && ch[0] != '\'');
+                return dotPos - ts.offset() == 1 || (ch[0] != '\"' && ch[0] != '\''); // NOI18N
             }
             return false;
         } catch (BadLocationException ex) {

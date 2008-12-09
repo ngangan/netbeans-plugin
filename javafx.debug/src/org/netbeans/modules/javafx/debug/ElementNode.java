@@ -60,7 +60,7 @@ public class ElementNode extends AbstractNode implements OffsetProvider {
         
     public static Node getTree(CompilationInfo info, Element element) {
         if (element == null) {
-            System.err.println("null CU element");
+            System.err.println("null CU element"); // NOI18N
             return null;
         }
         

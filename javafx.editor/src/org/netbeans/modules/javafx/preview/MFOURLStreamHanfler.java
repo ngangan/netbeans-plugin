@@ -84,7 +84,7 @@ public class MFOURLStreamHanfler extends URLStreamHandler {
             return classLoader.getResourceAsStream(normalizePath(url.getPath()));
         }
         private String normalizePath(String path) {
-            return path.replace("//", "/");
+            return path.replace("//", "/"); // NOI18N
         }
     }
 }

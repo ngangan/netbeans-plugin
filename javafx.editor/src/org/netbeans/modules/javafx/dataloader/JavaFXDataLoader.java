@@ -86,7 +86,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     }
     
     protected @Override String defaultDisplayName() {
-        return NbBundle.getMessage(JavaFXDataLoader.class, "PROP_JavaLoader_Name");
+        return NbBundle.getMessage(JavaFXDataLoader.class, "PROP_JavaLoader_Name"); // NOI18N
     }
     
     /** Create the <code>JavaDataObject</code>.
@@ -151,7 +151,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     protected MultiDataObject.Entry createSecondaryEntry (MultiDataObject obj, FileObject secondaryFile) {
         //The JavaDataObject itself has no secondary entries, but its subclasses have.
         //So we have to keep it as MultiFileLoader
-        ErrorManager.getDefault().log ("Subclass of JavaFXDataLoader ("+this.getClass().getName()
+        ErrorManager.getDefault().log ("Subclass of JavaFXDataLoader ("+this.getClass().getName() // NOI18N
                 +") has secondary entries but does not override createSecondaryEntries (MultidataObject, FileObject) method."); // NOI18N
         return new FileEntry.Numb(obj, secondaryFile);
     }   
@@ -168,7 +168,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     */
     static Map<String, String> createStringsMap() {
         Map<String, String> map = new HashMap<String, String>();
-        map.put("USER", System.getProperty("user.name"));
+        map.put("USER", System.getProperty("user.name")); // NOI18N
         Date d = new Date();
         map.put("DATE", DateFormat.getDateInstance(DateFormat.LONG).format(d)); // NOI18N
         map.put("TIME", DateFormat.getTimeInstance(DateFormat.SHORT).format(d)); // NOI18N
@@ -203,7 +203,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
 
         protected void modifyMap(Map<String, String> map, FileObject target, String n, String e) {
             ClassPath cp = ClassPath.getClassPath(target, ClassPath.SOURCE);
-            String resourcePath = "";
+            String resourcePath = ""; // NOI18N
             if (cp != null) {
                 resourcePath = cp.getResourceName(target);
             } else {
@@ -213,14 +213,14 @@ public class JavaFXDataLoader extends MultiFileLoader {
             // Yes, this is package sans filename (target is a folder).
             map.put("PACKAGE", resourcePath.replace('/', '.')); // NOI18N
             map.put("PACKAGE_SLASHES", resourcePath); // NOI18N
-	    // Fully-qualified name:
-	    if (target.isRoot ()) {
-		map.put ("PACKAGE_AND_NAME", n); // NOI18N
-		map.put ("PACKAGE_AND_NAME_SLASHES", n); // NOI18N
-	    } else {
-		map.put ("PACKAGE_AND_NAME", resourcePath.replace('/', '.') + '.' + n); // NOI18N
-		map.put ("PACKAGE_AND_NAME_SLASHES", resourcePath + '/' + n); // NOI18N
-	    }
+            // Fully-qualified name:
+            if (target.isRoot ()) {
+                map.put ("PACKAGE_AND_NAME", n); // NOI18N
+                map.put ("PACKAGE_AND_NAME_SLASHES", n); // NOI18N
+            } else {
+                map.put ("PACKAGE_AND_NAME", resourcePath.replace('/', '.') + '.' + n); // NOI18N
+                map.put ("PACKAGE_AND_NAME_SLASHES", resourcePath + '/' + n); // NOI18N
+            }
             map.put("QUOTES","\""); // NOI18N
             
             for (CreateFromTemplateAttributesProvider provider
@@ -246,8 +246,9 @@ public class JavaFXDataLoader extends MultiFileLoader {
         
         @Override
         public FileObject rename(String name) throws IOException {
-            if (!PACKAGE_INFO.equals(name) && !Utilities.isJavaIdentifier(name)) // NOI18N
-                throw new IOException(NbBundle.getMessage(JavaFXDataObject.class, "FMT_Not_Valid_FileName", name));
+            if (!PACKAGE_INFO.equals(name) && !Utilities.isJavaIdentifier(name)) {
+                throw new IOException(NbBundle.getMessage(JavaFXDataObject.class, "FMT_Not_Valid_FileName", name)); // NOI18N
+            }
             
             FileObject fo = super.rename(name);
             return fo;
@@ -261,8 +262,8 @@ public class JavaFXDataLoader extends MultiFileLoader {
             final ClassPath cpOrig = ClassPath.getClassPath(origFile,ClassPath.SOURCE);
             final ClassPath cpNew = ClassPath.getClassPath(fo, ClassPath.SOURCE);
             if (cpOrig != null && cpNew != null) {                
-                final String pkgNameOrig = cpOrig.getResourceName(origFile.getParent(), '.', false);
-                final String pkgNameNew = cpNew.getResourceName(f,'.',false); 
+                final String pkgNameOrig = cpOrig.getResourceName(origFile.getParent(), '.', false); // NOI18N
+                final String pkgNameNew = cpNew.getResourceName(f, '.', false); // NOI18N
                 final String newName = fo.getName();
                 if (!pkgNameNew.equals(pkgNameOrig) || !newName.equals(origName)) {
                     JavaFXDataObject.renameFO(fo, pkgNameNew, newName, origName);
@@ -284,7 +285,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
                 // special case: name is null (unspecified or from one-parameter createFromTemplate)
                 name = FileUtil.findFreeFileName(f, f.getName(), "fx"); // NOI18N
             } else if (!PACKAGE_INFO.equals(name) && !Utilities.isJavaIdentifier(name)) {
-                throw new IOException(NbBundle.getMessage(JavaFXDataObject.class, "FMT_Not_Valid_FileName", name));
+                throw new IOException(NbBundle.getMessage(JavaFXDataObject.class, "FMT_Not_Valid_FileName", name)); // NOI18N
             }
             
             this.initializeIndentEngine();
@@ -293,7 +294,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
             ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
             String pkgName;
             if (cp != null) {
-                pkgName = cp.getResourceName(f, '.', false);
+                pkgName = cp.getResourceName(f, '.', false); // NOI18N
             } else {
                 pkgName = "";   //NOI18N
             }

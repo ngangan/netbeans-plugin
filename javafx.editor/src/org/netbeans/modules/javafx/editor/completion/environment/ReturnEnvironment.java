@@ -62,7 +62,7 @@ public class ReturnEnvironment extends JavaFXCompletionEnvironment<ReturnTree> {
 
     @Override
     protected void inside(ReturnTree t) throws IOException {
-        if (LOGGABLE) log("inside ReturnTree " + t);
+        if (LOGGABLE) log("inside ReturnTree " + t); // NOI18N
         localResult(getSmartType(t));
         addValueKeywords();
     }
@@ -77,16 +77,16 @@ public class ReturnEnvironment extends JavaFXCompletionEnvironment<ReturnTree> {
         JFXType r = null;
         for (JavaFXTreePath tp = path; tp != null; tp = tp.getParentPath()) {
             Tree t = tp.getLeaf();
-            if (LOGGABLE) log("  tree kind: " + t.getJavaFXKind());
+            if (LOGGABLE) log("  tree kind: " + t.getJavaFXKind()); // NOI18N
             if (t instanceof JFXFunctionDefinition) {
                 JFXFunctionDefinition fDefTree = (JFXFunctionDefinition)t;
                 r = fDefTree.getJFXReturnType();
-                if (LOGGABLE) log("   return type == " + r);
+                if (LOGGABLE) log("   return type == " + r); // NOI18N
             }
         }
         final JavaFXTreePath treePath = new JavaFXTreePath(path, r == null ? ui.getExpression() : r);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-        if (LOGGABLE) log("getSmartType path == " + treePath.getLeaf() + "  type == " + type);
+        if (LOGGABLE) log("getSmartType path == " + treePath.getLeaf() + "  type == " + type); // NOI18N
         return type;
     }
 }

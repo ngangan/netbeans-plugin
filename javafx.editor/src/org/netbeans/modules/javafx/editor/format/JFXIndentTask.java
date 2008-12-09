@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
  */
 public class JFXIndentTask implements IndentTask, ReformatTask {
     private static Logger log = Logger.getLogger(JFXIndentTask.class.getName());
-    private static final Pattern KEEP_LEVEL_PTRN = Pattern.compile("\\s*(}|\\)|\\])\\s*(;|,)?\\s*");
+    private static final Pattern KEEP_LEVEL_PTRN = Pattern.compile("\\s*(}|\\)|\\])\\s*(;|,)?\\s*"); // NOI18N
 
     private final Context context;
     private TokenSequence<JFXTokenId> ts = null;
@@ -102,21 +102,21 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         if (context == null) {
             return;
         }
-        if (log.isLoggable(Level.FINE)) log.fine("Reindent...");
+        if (log.isLoggable(Level.FINE)) log.fine("Reindent..."); // NOI18N
 
         final List<Context.Region> regions = context.indentRegions();
         if (!regions.isEmpty()) {
             for (Context.Region region : regions) {
                 if (log.isLoggable(Level.FINE))
-                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
+                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]"); // NOI18N
                 indentRegion(region);
             }
         } else {
             if (log.isLoggable(Level.FINE))
-                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]");
+                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]"); // NOI18N
             indentLine(context.startOffset());
         }
-        if (log.isLoggable(Level.FINE)) log.fine("... done!");
+        if (log.isLoggable(Level.FINE)) log.fine("... done!"); // NOI18N
 
     }
 
@@ -280,10 +280,10 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                     final long s = System.currentTimeMillis();
                     final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
                     if (log.isLoggable(Level.INFO))
-                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
+                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms"); // NOI18N
                     if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
                         if (log.isLoggable(Level.INFO))
-                            log.info("The " + phase + " phase has been reached ... OK!");
+                            log.info("The " + phase + " phase has been reached ... OK!"); // NOI18N
                         final int offset = context.startOffset();
                         final TreeUtilities tu = controller.getTreeUtilities();
                         JavaFXTreePath path;
@@ -402,18 +402,18 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         }
 
         private void dumpStack() {
-            Exception e = new Exception("-------  StackTrace ---------- ");
+            Exception e = new Exception("-------  StackTrace ---------- "); // NOI18N
             StackTraceElement[] ste = e.getStackTrace();
             System.err.println(e.getMessage());
             for (int i = 0; i < Math.min(10, ste.length); i++) {
-                System.err.println("\t" + ste[i]);
+                System.err.println("\t" + ste[i]); // NOI18N
             }
         }
     }
 
     private void applyAdjustments(Queue<Adjustment> adjustments) throws BadLocationException {
         if (adjustments == null || adjustments.isEmpty()) return;
-        log.info("Applying " + adjustments.size() + " adjustments into source code.");
+        log.info("Applying " + adjustments.size() + " adjustments into source code."); // NOI18N
         while (!adjustments.isEmpty()) {
             final Adjustment adjustment = adjustments.poll();
             adjustment.apply(context);

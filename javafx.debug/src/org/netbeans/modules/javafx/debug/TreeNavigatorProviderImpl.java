@@ -109,11 +109,11 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
     }
     
     public String getDisplayName() {
-        return NbBundle.getMessage(TreeNavigatorProviderImpl.class, "NM_Trees");
+        return NbBundle.getMessage(TreeNavigatorProviderImpl.class, "NM_Trees"); // NOI18N
     }
     
     public String getDisplayHint() {
-        return NbBundle.getMessage(TreeNavigatorProviderImpl.class, "SD_Trees");
+        return NbBundle.getMessage(TreeNavigatorProviderImpl.class, "SD_Trees"); // NOI18N
     }
     
     public JComponent getComponent() {
