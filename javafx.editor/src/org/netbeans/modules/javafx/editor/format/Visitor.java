@@ -133,6 +133,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 hasComment(node, adjustments);
                 indentLine(start, adjustments);
             }
+            verifyVarSpaces(node, adjustments);
             if (isMultiline(node) && node.getOnReplaceTree() == null) {
                 li.moveTo(start);
                 if (li.hasNext()) {
@@ -354,6 +355,42 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private void verifyOLPTSpaces(ObjectLiteralPartTree node, Queue<Adjustment> adjustments) throws BadLocationException {
         TokenSequence<JFXTokenId> ts = ts(node);
         // INDETIFIER WS* COLON WS+ ANY
+        verifySpacesAroundColon(adjustments, ts);
+    }
+
+    @SuppressWarnings({"MethodWithMultipleLoops"})
+    private void verifyVarSpaces(VariableTree node, Queue<Adjustment> adjustments) throws BadLocationException {
+        TokenSequence<JFXTokenId> ts = ts(node);
+        while (ts.moveNext()) {
+            JFXTokenId id = ts.token().id();
+            switch (id) {
+                case WS:
+                case PUBLIC:
+                case PUBLIC_INIT:
+                case PUBLIC_READ:
+                case PUBLIC_READABLE:
+                case PRIVATE:
+                case STATIC:
+                case PROTECTED:
+                case DEF:
+                case VAR:
+                case NON_WRITABLE:
+                case OVERRIDE:
+                case READABLE:
+                case REPLACE:
+                    continue;
+                case IDENTIFIER:
+                    ts.movePrevious();
+                    verifySpacesAroundColon(adjustments, ts);
+                    return;
+                default: return;
+
+            }
+        }
+    }
+
+    private void verifySpacesAroundColon(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
+        // INDETIFIER WS* COLON WS+ ANY
         if (ts.moveNext()) {
             if (ts.token().id() == JFXTokenId.IDENTIFIER) {
                 int start = ts.offset() + ts.token().length();
@@ -364,9 +401,11 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 // verifying spaces beyond COLON
                 start = ts.offset() + ts.offsetToken().length();
                 while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
-                }
+                }                
                 if (ts.offset() - start > 1) {
                     adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                } else if (ts.offset() == start) {
+                    adjustments.offer(Adjustment.add(createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
                 }
             }
         }
