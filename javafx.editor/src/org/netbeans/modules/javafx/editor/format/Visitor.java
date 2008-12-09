@@ -61,6 +61,7 @@ import javax.swing.text.Element;
 import javax.swing.text.Position;
 import java.util.List;
 import java.util.Queue;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -86,6 +87,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private static final String STRING_ZERO_LENGTH = "";
     private boolean disableContinuosIndent;
     private boolean isOrphanObjectLiterar;
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle");
 
 
     Visitor(CompilationInfo info, Context ctx, int startOffset) {
@@ -112,7 +114,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitInitDefinition(node, adjustments);
         return adjustments;
@@ -140,7 +142,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitVariable(node, adjustments);
         return adjustments;
@@ -200,7 +202,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitIdentifier(node, adjustments);
         return adjustments;
@@ -264,7 +266,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                             adjustments.offer(Adjustment.add(createPosition(operatorOffset), ONE_SPACE));
                         }
                         if (!ts.moveNext())
-                            throw new BadLocationException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Concurent_modification_has_occured_on_document."), ts.offset());
+                            throw new BadLocationException(BUNDLE.getString("Concurent_modification_has_occured_on_document."), ts.offset());
                         if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
                             adjustments.offer(Adjustment.add(createPosition(ts.offset()), ONE_SPACE));
                         }
@@ -274,7 +276,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitBinary(node, adjustments);
         return adjustments;
@@ -343,7 +345,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
 
         return adjustments;
@@ -394,7 +396,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -413,7 +415,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -472,7 +474,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -502,7 +504,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         } finally {
             disableContinuosIndent = false;
         }
@@ -515,7 +517,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             indentSimpleStructure(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitInterpolateValue(node, adjustments);
         return adjustments;
@@ -545,7 +547,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -572,7 +574,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -612,7 +614,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentLine(getEndPos(node), adjustments);
             } catch (BadLocationException e) {
                 if (log.isLoggable(Level.SEVERE))
-                    log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                    log.severe(BUNDLE.getString("Reformat_failed._") + e);
             }
         }
         return adjustments;
@@ -640,7 +642,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             holdInvocationChain = (starter != node);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -672,7 +674,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitFunctionDefinition(node, adjustments);
         return adjustments;
@@ -883,7 +885,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitAssignment(node, adjustments);
         return adjustments;
@@ -912,7 +914,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -971,7 +973,21 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private int getStartPos(Tree node) {
-        return (int) sp().getStartPosition(cu(), node);
+        int start = (int) sp().getStartPosition(cu(), node);
+        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
+        ts.move(start);
+        while (ts.movePrevious()) {
+            JFXTokenId id = ts.token().id();
+            switch (id) {
+                case WS:
+                    continue;
+                case LPAREN:
+                    return ts.offset();                    
+                default:
+                    return start;
+            }
+        }
+        return start;
         /*int modifiersStart = getModifiersStart(node);
         return Math.min(nodeStart, modifiersStart);*/
     }
@@ -1049,7 +1065,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getClassDeclBracePlacement(), cs.spaceBeforeClassDeclLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -1102,7 +1118,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitImport(importTree, adjustments);
         return adjustments;
@@ -1156,7 +1172,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitCompoundAssignment(node, adjustments);
         return adjustments;
@@ -1168,7 +1184,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(returnTree, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitReturn(returnTree, adjustments);
         return adjustments;
@@ -1205,7 +1221,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -1221,7 +1237,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -1267,7 +1283,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitWhileLoop(node, adjustments);
         return adjustments;
@@ -1291,7 +1307,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitForExpression(node, adjustments);
         return adjustments;
@@ -1307,7 +1323,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node.getFalseExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
 //        super.visitIf(node, adjustments);
         super.visitConditionalExpression(node, adjustments);
@@ -1325,7 +1341,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeTryLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitTry(node, adjustments);
         return adjustments;
@@ -1359,7 +1375,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         super.visitCatch(node, adjustments);
         return adjustments;
@@ -1452,7 +1468,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
+                log.severe(BUNDLE.getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
