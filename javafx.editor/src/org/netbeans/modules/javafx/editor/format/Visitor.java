@@ -390,22 +390,23 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void verifySpacesAroundColon(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
-        // INDETIFIER WS* COLON WS+ ANY
+        // INDETIFIER (WS* COLON|QE) WS+ ANY
         if (ts.moveNext()) {
             if (ts.token().id() == JFXTokenId.IDENTIFIER) {
                 int start = ts.offset() + ts.token().length();
-                moveTo(ts, JFXTokenId.COLON);
-                if (ts.offset() != start) {
-                    adjustments.offer(Adjustment.delete(createPosition(start), createPosition(ts.offset())));
-                }
-                // verifying spaces beyond COLON
-                start = ts.offset() + ts.offsetToken().length();
-                while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
-                }                
-                if (ts.offset() - start > 1) {
-                    adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
-                } else if (ts.offset() == start) {
-                    adjustments.offer(Adjustment.add(createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                if (moveTo(ts, JFXTokenId.COLON) != null) {
+                    if (ts.offset() != start) {
+                        adjustments.offer(Adjustment.delete(createPosition(start), createPosition(ts.offset())));
+                    }
+                    // verifying spaces beyond COLON
+                    start = ts.offset() + ts.offsetToken().length();
+                    while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
+                    }
+                    if (ts.offset() - start > 1) {
+                        adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                    } else if (ts.offset() == start) {
+                        adjustments.offer(Adjustment.add(createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                    }
                 }
             }
         }
@@ -1356,7 +1357,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 //    public Queue<Adjustment> visitIf(IfTree node, Queue<Adjustment> adjustments) {
     public Queue<Adjustment> visitConditionalExpression(ConditionalExpressionTree node, Queue<Adjustment> adjustments) {
         try {
-            processStandaloneNode(node, adjustments);
+            if (!isPreceededByElse(node)) {
+                processStandaloneNode(node, adjustments);
+            }
             verifyBraces(node.getTrueExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeIfLeftBrace());
             verifySpaceBefore(node.getFalseExpression(), adjustments, cs.spaceBeforeElse());
             verifyBraces(node.getFalseExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace());
@@ -1367,6 +1370,23 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 //        super.visitIf(node, adjustments);
         super.visitConditionalExpression(node, adjustments);
         return adjustments;
+    }
+
+    private boolean isPreceededByElse(ConditionalExpressionTree node) {
+        TokenSequence<? extends TokenId> ts = ts();
+        ts.move(getStartPos(node));
+        while (ts.movePrevious()) {
+            JFXTokenId id = (JFXTokenId) ts.token().id();
+            switch (id) {
+                case WS:
+                    continue;
+                case ELSE:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return false;
     }
 
     private Position toPos(int index) throws BadLocationException {
