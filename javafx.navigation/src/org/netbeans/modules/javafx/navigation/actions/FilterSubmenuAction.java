@@ -56,7 +56,7 @@ import org.openide.util.actions.Presenter;
  */
 public final class FilterSubmenuAction extends AbstractAction implements Presenter.Popup {
 
-    private static final String PROP_FILTER_NAME = "nbFilterName";
+    private static final String PROP_FILTER_NAME = "nbFilterName"; // NOI18N
     /** access to filter manager */
     private FiltersManager filters;
 

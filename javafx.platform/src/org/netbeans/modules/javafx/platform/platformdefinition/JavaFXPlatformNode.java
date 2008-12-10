@@ -56,7 +56,7 @@ class JavaFXPlatformNode extends AbstractNode {
     public JavaFXPlatformNode (JavaFXPlatformImpl platform, DataObject definition) {
         super (Children.LEAF, Lookups.fixed(new Object[] {platform, definition}));
         this.platform = platform;
-        super.setIconBaseWithExtension("org/netbeans/modules/javafx/platform/resources/platform.gif");
+        super.setIconBaseWithExtension("org/netbeans/modules/javafx/platform/resources/platform.gif"); // NOI18N
     }
 
     public String getDisplayName () {
@@ -65,7 +65,7 @@ class JavaFXPlatformNode extends AbstractNode {
 
     public String getHtmlDisplayName() {
         if (isBroken()) {
-            return "<font color=\"#A40000\">"+this.platform.getDisplayName()+"</font>";
+            return "<font color=\"#A40000\">"+this.platform.getDisplayName()+"</font>"; // NOI18N
         }
         else {
             return null;
@@ -87,7 +87,7 @@ class JavaFXPlatformNode extends AbstractNode {
     public synchronized String getShortDescription() {
         if (this.toolTip == null) {
             this.toolTip = MessageFormat.format (
-            NbBundle.getMessage(JavaFXPlatformNode.class,"TXT_JavaFXPlatformToolTip"),
+            NbBundle.getMessage(JavaFXPlatformNode.class,"TXT_JavaFXPlatformToolTip"), // NOI18N
             new Object[] {
                 this.platform.getSpecification().getVersion()
             });

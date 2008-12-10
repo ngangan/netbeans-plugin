@@ -163,7 +163,7 @@ public final class FiltersManager {
             }
             
             if (result == null) {
-                throw new IllegalArgumentException("Filter " + filterName + " not found.");
+                throw new IllegalArgumentException("Filter " + filterName + " not found."); // NOI18N
             }
             return result.booleanValue();
         }
@@ -174,7 +174,7 @@ public final class FiltersManager {
             
             int index = filterIndexForName(filterName);
             if (index < 0) {
-                throw new IllegalArgumentException("Filter " + filterName + " not found.");
+                throw new IllegalArgumentException("Filter " + filterName + " not found."); // NOI18N
             }
             // update both swing control and states map
             toggles.get(index).setSelected(value);

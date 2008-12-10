@@ -58,7 +58,7 @@ public class Scene implements ActiveEditorDrop {
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
-        Imports.addImport( targetComponent, "javafx.scene.Scene" );
+        Imports.addImport( targetComponent, "javafx.scene.Scene" ); // NOI18N
                 
         return true;
     }

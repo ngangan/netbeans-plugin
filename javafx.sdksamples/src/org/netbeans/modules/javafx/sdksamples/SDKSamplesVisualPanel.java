@@ -60,7 +60,7 @@ import org.openide.filesystems.FileUtil;
  */
 public class SDKSamplesVisualPanel extends javax.swing.JPanel implements DocumentListener {
 
-    public static final String PROP_PROJECT_NAME = "projectName";
+    public static final String PROP_PROJECT_NAME = "projectName"; // NOI18N
     private SDKSamplesWizardPanel panel;
 
     /** Creates new form SDKSamplesVisualPanel */
@@ -72,20 +72,20 @@ public class SDKSamplesVisualPanel extends javax.swing.JPanel implements Documen
     }
 
     boolean isValid( WizardDescriptor wizardDescriptor ) {
+        String message = org.openide.util.NbBundle.getBundle(SDKSamplesVisualPanel.class).getString("Project_Folder_is_not_a_valid_path");
         if( projectNameTextField.getText().length() == 0 ) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                    "Project Name is not a valid folder name.");
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                    org.openide.util.NbBundle.getBundle(SDKSamplesVisualPanel.class).getString("Project_Name_is_not_a_valid_folder_name"));
             return false; // Display name not specified
         }
-        if( projectNameTextField.getText().contains( "<" ) || projectNameTextField.getText().contains( ">" )) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                    "Project Name is not a valid folder name.");
+        if( projectNameTextField.getText().contains( "<" ) || projectNameTextField.getText().contains( ">" )) { // NOI18N
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                    org.openide.util.NbBundle.getBundle(SDKSamplesVisualPanel.class).getString("Project_Name_is_not_a_valid_folder_name"));
             return false;
         }
         File f = FileUtil.normalizeFile( new File( projectLocationTextField.getText()).getAbsoluteFile());
         if( !f.isDirectory()) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", message );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", message ); // NOI18N
             return false;
         }
         final File destFolder = FileUtil.normalizeFile(new File( projectFolderTextField.getText()).getAbsoluteFile());
@@ -95,29 +95,30 @@ public class SDKSamplesVisualPanel extends javax.swing.JPanel implements Documen
             projLoc = projLoc.getParentFile();
         }
         if( projLoc == null || !projLoc.canWrite()) {
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", "Project Folder cannot be created." );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", // NOI18N
+                    org.openide.util.NbBundle.getBundle(SDKSamplesVisualPanel.class).getString("Project_Folder_cannot_be_created") );
             return false;
         }
 
         if( FileUtil.toFileObject( projLoc ) == null ) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", message );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", message ); // NOI18N
             return false;
         }
 
         File[] kids = destFolder.listFiles();
         if( destFolder.exists() && kids != null && kids.length > 0 ) {
             // Folder exists and is not empty
-            wizardDescriptor.putProperty( "WizardPanel_errorMessage", "Project Folder already exists and is not empty." );
+            wizardDescriptor.putProperty( "WizardPanel_errorMessage", // NOI18N
+                    org.openide.util.NbBundle.getBundle(SDKSamplesVisualPanel.class).getString("Project_Folder_already_exists_and_is_not_empty") );
             return false;
         }
-        wizardDescriptor.putProperty( "WizardPanel_errorMessage", "" );
+        wizardDescriptor.putProperty( "WizardPanel_errorMessage", "" ); // NOI18N
 
         return true;
     }
 
     void load( WizardDescriptor settings ) {
-        File projectLocation = (File) settings.getProperty("projdir");
+        File projectLocation = (File) settings.getProperty("projdir"); // NOI18N
         if (projectLocation == null || projectLocation.getParentFile() == null || !projectLocation.getParentFile().isDirectory()) {
             projectLocation = ProjectChooser.getProjectsFolder();
         } else {
@@ -125,7 +126,7 @@ public class SDKSamplesVisualPanel extends javax.swing.JPanel implements Documen
         }
         this.projectLocationTextField.setText( projectLocation.getAbsolutePath());
 
-        String projectName = (String) settings.getProperty("name");
+        String projectName = (String) settings.getProperty("name"); // NOI18N
         if( projectName == null ) {
             projectName = panel.getFile().getName();
         }
@@ -137,8 +138,8 @@ public class SDKSamplesVisualPanel extends javax.swing.JPanel implements Documen
         String name = projectNameTextField.getText().trim();
         String folder = projectFolderTextField.getText().trim();
 
-        d.putProperty("projdir", new File(folder));
-        d.putProperty("name", name);
+        d.putProperty("projdir", new File(folder)); // NOI18N
+        d.putProperty("name", name); // NOI18N
     }
 
     /** This method is called from within the constructor to
@@ -221,10 +222,10 @@ public class SDKSamplesVisualPanel extends javax.swing.JPanel implements Documen
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String command = evt.getActionCommand();
-        if( "BROWSE".equals( command )) {
+        if( "BROWSE".equals( command )) { // NOI18N
             JFileChooser chooser = new JFileChooser();
             FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-            chooser.setDialogTitle("Select Project Location");
+            chooser.setDialogTitle(org.openide.util.NbBundle.getBundle(SDKSamplesVisualPanel.class).getString("Select_Project_Location"));
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
             if (path.length() > 0) {

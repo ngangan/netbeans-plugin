@@ -59,7 +59,7 @@ public class EaseOut implements ActiveEditorDrop {
         template.insert( targetComponent );
 
         // Imports
-        Imports.addImport( targetComponent, "javafx.animation.Interpolator" );
+        Imports.addImport( targetComponent, "javafx.animation.Interpolator" ); // NOI18N
 
         return true;
     }

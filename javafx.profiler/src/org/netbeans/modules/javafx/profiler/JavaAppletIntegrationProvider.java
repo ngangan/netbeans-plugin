@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.profiler;
 
 import org.netbeans.lib.profiler.common.AttachSettings;
@@ -48,7 +47,6 @@ import org.netbeans.modules.profiler.attach.providers.AbstractIntegrationProvide
 import org.netbeans.modules.profiler.attach.providers.IntegrationCategorizer;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.wizard.steps.NullWizardStep;
-
 
 /**
  *
@@ -80,11 +78,10 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
     private static final String MANUAL_DYNAMIC_STEP2_WINDOWS_MESSAGE = messages.getString("JavaAppletIntegrationProvider_ManualDynamicStep2WindowsMessage"); // NOI18N
     private static final String MANUAL_DYNAMIC_STEP2_UNIXES_MESSAGE = messages.getString("JavaAppletIntegrationProvider_ManualDynamicStep2UnixesMessage"); // NOI18N
     private static final String MANUAL_DYNAMIC_STEP3_MESSAGE = messages.getString("JavaAppletIntegrationProvider_ManualDynamicStep3Message"); // NOI18N
-    private static final String APPLET_TITLE = messages.getString("JavaAppletIntegrationProvider_Title");
+    private static final String APPLET_TITLE = messages.getString("JavaAppletIntegrationProvider_Title"); // NOI18N
     private static final String DYNAMIC_WARNING_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_DynamicWarningMessage"); // NOI18N  
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
-
     /**
      * Creates a new instance of JavaAppletIntegrationProvider
      */
@@ -93,7 +90,6 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public IntegrationProvider.IntegrationHints getAfterInstallationHints(AttachSettings attachSettings, boolean automation) {
         return null;
     }
@@ -142,7 +138,7 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
     }
 
     private IntegrationProvider.IntegrationHints getManualLocalDirectIntegrationStepsInstructions(String targetOS,
-                                                                                                  AttachSettings attachSettings) {
+            AttachSettings attachSettings) {
         IntegrationProvider.IntegrationHints hints = new IntegrationProvider.IntegrationHints();
 
         // Windows & Opera & remote attach warning
@@ -156,24 +152,20 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
         // Step 2
         if (IntegrationUtils.isWindowsPlatform(targetOS)) {
             hints.addStep(MessageFormat.format(MANUAL_DIRECT_STEP2_WINDOWS_MESSAGE,
-                                               new Object[] {
-                                                   IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
-                                                                                                                 getTargetJava(),
-                                                                                                                 attachSettings
-                                                                                                                                                                     .isRemote(),
-                                                                                                                 attachSettings
-                                                                                                                                                                       .getPort())
-                                               }));
+                    new Object[]{
+                        IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
+                        getTargetJava(),
+                        attachSettings.isRemote(),
+                        attachSettings.getPort())
+                    }));
         } else {
             hints.addStep(MessageFormat.format(MANUAL_DIRECT_STEP2_UNIXES_MESSAGE,
-                                               new Object[] {
-                                                   IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
-                                                                                                                 getTargetJava(),
-                                                                                                                 attachSettings
-                                                                                                                                                                               .isRemote(),
-                                                                                                                 attachSettings
-                                                                                                                                                                                 .getPort())
-                                               }));
+                    new Object[]{
+                        IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
+                        getTargetJava(),
+                        attachSettings.isRemote(),
+                        attachSettings.getPort())
+                    }));
         }
 
         // Step 3
@@ -192,7 +184,7 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
     }
 
     private IntegrationProvider.IntegrationHints getManualLocalDynamicIntegrationStepsInstructions(String targetOS,
-                                                                                                   AttachSettings attachSettings) {
+            AttachSettings attachSettings) {
         IntegrationProvider.IntegrationHints hints = new IntegrationProvider.IntegrationHints();
 
         // Step 1
@@ -201,10 +193,10 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
         // Step 2
         if (IntegrationUtils.isWindowsPlatform(targetOS)) {
             hints.addStep(MessageFormat.format(MANUAL_DYNAMIC_STEP2_WINDOWS_MESSAGE,
-                                               new Object[] { IntegrationUtils.getJavaPlatformName(getTargetJava()) }));
+                    new Object[]{IntegrationUtils.getJavaPlatformName(getTargetJava())}));
         } else {
             hints.addStep(MessageFormat.format(MANUAL_DYNAMIC_STEP2_UNIXES_MESSAGE,
-                                               new Object[] { IntegrationUtils.getJavaPlatformName(getTargetJava()) }));
+                    new Object[]{IntegrationUtils.getJavaPlatformName(getTargetJava())}));
         }
 
         // Step 3
@@ -215,19 +207,19 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
 
         // Put here a warning that the IDE must be run under JDK6/7
         hints.addWarning(MessageFormat.format(DYNAMIC_WARNING_MESSAGE,
-                                              new Object[] {
-                                                  IntegrationUtils.getJavaPlatformName(getTargetJava()),
-                                                  IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
-                                                                                                   attachSettings.isRemote(),
-                                                                                                   attachSettings.getPort())
-                                              }));
+                new Object[]{
+                    IntegrationUtils.getJavaPlatformName(getTargetJava()),
+                    IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
+                    attachSettings.isRemote(),
+                    attachSettings.getPort())
+                }));
 
         return hints;
     }
 
     // </editor-fold>
     private IntegrationProvider.IntegrationHints getManualRemoteIntegrationStepsInstructions(String targetOS,
-                                                                                             AttachSettings attachSettings) {
+            AttachSettings attachSettings) {
         IntegrationProvider.IntegrationHints hints = new IntegrationProvider.IntegrationHints();
 
         // Windows & Opera & remote attach warning
@@ -247,24 +239,20 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
         // Step 4
         if (IntegrationUtils.isWindowsPlatform(targetOS)) {
             hints.addStep(MessageFormat.format(MANUAL_REMOTE_STEP4_WINDOWS_MESSAGE,
-                                               new Object[] {
-                                                   IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
-                                                                                                                 getTargetJava(),
-                                                                                                                 attachSettings
-                                                                                                                                                                                                                                                                .isRemote(),
-                                                                                                                 attachSettings
-                                                                                                                                                                                                                                                                  .getPort())
-                                               }));
+                    new Object[]{
+                        IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
+                        getTargetJava(),
+                        attachSettings.isRemote(),
+                        attachSettings.getPort())
+                    }));
         } else {
             hints.addStep(MessageFormat.format(MANUAL_REMOTE_STEP4_UNIXES_MESSAGE,
-                                               new Object[] {
-                                                   IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
-                                                                                                                 getTargetJava(),
-                                                                                                                 attachSettings
-                                                                                                                                                                                                                                                                          .isRemote(),
-                                                                                                                 attachSettings
-                                                                                                                                                                                                                                                                            .getPort())
-                                               }));
+                    new Object[]{
+                        IntegrationUtils.getProfilerAgentCommandLineArgsWithoutQuotes(targetOS,
+                        getTargetJava(),
+                        attachSettings.isRemote(),
+                        attachSettings.getPort())
+                    }));
         }
 
         // Step 5

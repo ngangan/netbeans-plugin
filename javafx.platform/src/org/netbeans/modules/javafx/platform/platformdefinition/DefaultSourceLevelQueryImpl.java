@@ -64,9 +64,9 @@ public class DefaultSourceLevelQueryImpl implements SourceLevelQueryImplementati
             JavaPlatform jp = JavaPlatformManager.getDefault().getDefaultPlatform();
             assert jp != null : "JavaPlatformManager.getDefaultPlatform returned null";     //NOI18N
             String s = jp.getSpecification().getVersion().toString();
-            if (s.equals("1.6") || s.equals("1.7")) {
+            if (s.equals("1.6") || s.equals("1.7")) { // NOI18N
                 // #89131: these levels are not actually distinct from 1.5.
-                return "1.5";
+                return "1.5"; // NOI18N
             } else {
                 return s;
             }

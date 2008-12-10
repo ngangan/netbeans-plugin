@@ -73,7 +73,7 @@ public class FileObjectPropertyEditor extends PropertyEditorSupport {
             return result.toString ();
         } catch (Exception e) {
             e.printStackTrace();
-            return "";
+            return ""; // NOI18N
         }
     }
 

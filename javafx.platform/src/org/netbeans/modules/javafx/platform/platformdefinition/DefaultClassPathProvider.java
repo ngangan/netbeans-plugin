@@ -230,7 +230,7 @@ public class DefaultClassPathProvider implements ClassPathProvider {
         }
         else {
             List<String> elements = new ArrayList<String> ();
-            for (StringTokenizer tk = new StringTokenizer(pkg,"."); tk.hasMoreTokens();) {
+            for (StringTokenizer tk = new StringTokenizer(pkg,"."); tk.hasMoreTokens();) { // NOI18N
                 elements.add(tk.nextToken());
             }
             FileObject tmp = fo;
@@ -387,8 +387,8 @@ public class DefaultClassPathProvider implements ClassPathProvider {
         private boolean inString = false;
         private boolean backslashLast = false;
         private boolean separatorLast = false;
-        static private final char separators[] = {'.'}; // dot is enough here...
-        static private final char whitespaces[] = {' ', '\t', '\r', '\n'};
+        static private final char separators[] = {'.'}; // dot is enough here... // NOI18N
+        static private final char whitespaces[] = {' ', '\t', '\r', '\n'}; // NOI18N
         
         public SourceReader(InputStream in) {
             super(in);
@@ -416,37 +416,37 @@ public class DefaultClassPathProvider implements ClassPathProvider {
                     c = onechar[0];
                 }
                 
-                if (c == '/' && !inString) { // a comment could start here
+                if (c == '/' && !inString) { // a comment could start here // NOI18N
                     preRead = super.read(onechar, 0, 1);
                     if (preRead == 1) {
                         preRead = onechar[0];
                     }
-                    if (preRead != '*' && preRead != '/') { // it's not a comment
+                    if (preRead != '*' && preRead != '/') { // it's not a comment // NOI18N
                         data[pos++] = (char) c;
                         numRead++;
                         if (preRead == -1) {   // end of stream reached
                             return numRead;
                         }
                     } else { // we have run into the comment - skip it
-                        if (preRead == '*') { // comment started with /*
+                        if (preRead == '*') { // comment started with /* // NOI18N
                             preRead = -1;
                             do {
-                                c = moveToChar('*');
+                                c = moveToChar('*'); // NOI18N
                                 if (c == 0) {
                                     c = super.read(onechar, 0, 1);
                                     if (c == 1) {
                                         c = onechar[0];
                                     }
-                                    if (c == '*') {
+                                    if (c == '*') { // NOI18N
                                         preRead = c;
                                     }
                                 }
-                            } while (c != '/' && c != -1);
+                            } while (c != '/' && c != -1); // NOI18N
                         } else { // comment started with //
                             preRead = -1;
-                            c = moveToChar('\n');
+                            c = moveToChar('\n'); // NOI18N
                             if (c == 0) {
-                                preRead = '\n';
+                                preRead = '\n'; // NOI18N
                             }
                         }
                         if (c == -1) {   // end of stream reached
@@ -477,21 +477,21 @@ public class DefaultClassPathProvider implements ClassPathProvider {
                             }
                         }
                         
-                        if (c == '\"' || c == '\'') {
+                        if (c == '\"' || c == '\'') { // NOI18N
                             inString = true;
                             separatorLast = false;
                         } else {
                             separatorLast = isSeparator(c);
                         }
                     } else { // we are just in a string
-                        if (c == '\"' || c == '\'') {
+                        if (c == '\"' || c == '\'') { // NOI18N
                             if (!backslashLast) {
                                 inString = false;
                             } else {
                                 backslashLast = false;
                             }
                         } else {
-                            backslashLast = (c == '\\');
+                            backslashLast = (c == '\\'); // NOI18N
                         }
                     }
 

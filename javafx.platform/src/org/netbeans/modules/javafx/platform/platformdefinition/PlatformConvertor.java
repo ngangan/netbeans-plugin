@@ -155,7 +155,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                                 InputStream in = null;
                                 OutputStream out = null;
                                 try {
-                                    in = PlatformUiSupport.class.getResourceAsStream("resources/templates/defaultPlatform.xml");
+                                    in = PlatformUiSupport.class.getResourceAsStream("resources/templates/defaultPlatform.xml"); // NOI18N
                                     out = fo.getParent().createData(fo.getName(), fo.getExt()).getOutputStream();
                                     FileUtil.copy(in, out);
                                 } finally {
@@ -337,7 +337,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 }
                 sbootcp.append(normalizePath(root, jdkHome, homePropName));
             }
-            props.setProperty(bootClassPathPropName,sbootcp.toString());   //NOI18N
+            props.setProperty(bootClassPathPropName,sbootcp.toString());
             props.setProperty(compilerType, MODERN);
             for (int i = 0; i < IMPORTANT_TOOLS.length; i++) {
                 String name = IMPORTANT_TOOLS[i];
@@ -355,7 +355,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         if (platform instanceof JavaFXPlatform){
             URL fxFolder = ((JavaFXPlatform)platform).getJavaFXFolder();
             if (fxFolder != null){
-                props.setProperty(fxHomePropName,new File(URI.create(fxFolder.toExternalForm())).getAbsolutePath());   //NOI18N
+                props.setProperty(fxHomePropName,new File(URI.create(fxFolder.toExternalForm())).getAbsolutePath());
             }
         }
     }
@@ -373,8 +373,8 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         if (relativePath == null) {
             return false;
         }
-        StringTokenizer tk = new StringTokenizer(relativePath, "/");
-        return (tk.countTokens()== 2 && "bin".equals(tk.nextToken()));
+        StringTokenizer tk = new StringTokenizer(relativePath, "/"); // NOI18N
+        return (tk.countTokens()== 2 && "bin".equals(tk.nextToken())); // NOI18N
     }
 
 
@@ -448,8 +448,8 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 lck = holder.getPrimaryEntry().takeLock();
             } else {
                 FileObject folder = f.getPrimaryFile();
-                String fn = FileUtil.findFreeFileName(folder, name, "xml");
-                data = folder.createData(fn, "xml");
+                String fn = FileUtil.findFreeFileName(folder, name, "xml"); // NOI18N
+                data = folder.createData(fn, "xml"); // NOI18N
                 lck = data.lock();
             }
             try {
@@ -571,7 +571,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         throws org.xml.sax.SAXException {
             if (ELEMENT_PLATFORM.equals(qName)) {
                 name = attrs.getValue(ATTR_PLATFORM_NAME);
-                isDefault = "yes".equals(attrs.getValue(ATTR_PLATFORM_DEFAULT));
+                isDefault = "yes".equals(attrs.getValue(ATTR_PLATFORM_DEFAULT)); // NOI18N
             } else if (ELEMENT_PROPERTIES.equals(qName)) {
                 if (properties == null)
                     properties = new HashMap<String,String>(17);
@@ -582,10 +582,10 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 propertyMap = sysProperties;
             } else if (ELEMENT_PROPERTY.equals(qName)) {
                 if (propertyMap == null)
-                    throw new SAXException("property w/o properties or sysproperties");
+                    throw new SAXException("property w/o properties or sysproperties"); // NOI18N
                 String name = attrs.getValue(ATTR_PROPERTY_NAME);
-                if (name == null || "".equals(name))
-                    throw new SAXException("missing name");
+                if (name == null || "".equals(name)) // NOI18N
+                    throw new SAXException("missing name"); // NOI18N
                 String val = attrs.getValue(ATTR_PROPERTY_VALUE);
                 propertyMap.put(name, val);
             }

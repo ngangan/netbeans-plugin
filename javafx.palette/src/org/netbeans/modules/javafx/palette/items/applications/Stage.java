@@ -59,8 +59,8 @@ public class Stage implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Imports.addImport( targetComponent, "javafx.stage.Stage" );
-        Imports.addImport( targetComponent, "javafx.scene.Scene" );
+        Imports.addImport( targetComponent, "javafx.stage.Stage" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.Scene" ); // NOI18N
         
         return true;
     }

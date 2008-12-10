@@ -53,14 +53,14 @@ import org.openide.util.NbBundle;
 public class Circle implements ActiveEditorDrop {
     
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Circle" );
+        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Circle" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Imports
-        Imports.addImport( targetComponent, "javafx.scene.shape.Circle" );
-        Imports.addImport( targetComponent, "javafx.scene.paint.Color" );
+        Imports.addImport( targetComponent, "javafx.scene.shape.Circle" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
         return true;
     }    
 }

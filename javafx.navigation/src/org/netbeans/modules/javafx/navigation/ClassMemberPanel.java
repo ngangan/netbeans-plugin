@@ -70,7 +70,7 @@ public class ClassMemberPanel implements NavigatorPanel {
             instance.setLookup(context, getClassMemberPanelUI());
             getClassMemberPanelUI().showWaitNode();
         } else {
-            System.err.println("Can't instantiate ClassMemberNavigatorJavaFXSourceFactory ! No navigator will be available.");
+            System.err.println("Can't instantiate ClassMemberNavigatorJavaFXSourceFactory ! No navigator will be available."); // NOI18N
         }
     }
 
@@ -85,11 +85,11 @@ public class ClassMemberPanel implements NavigatorPanel {
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(ClassMemberPanel.class,"LBL_members");
+        return NbBundle.getMessage(ClassMemberPanel.class,"LBL_members"); // NOI18N
     }
 
     public String getDisplayHint() {
-        return NbBundle.getMessage(ClassMemberPanel.class,"HINT_members");
+        return NbBundle.getMessage(ClassMemberPanel.class,"HINT_members"); // NOI18N
     }
 
     public JComponent getComponent() {

@@ -66,7 +66,7 @@ import org.openide.util.Exceptions;
  */
 public final class SpaceMagicUtils {
 
-    public static final String MAGIC_FUNCTION = "javafx$run$";
+    public static final String MAGIC_FUNCTION = "javafx$run$"; // NOI18N
 
     private SpaceMagicUtils() {
     }

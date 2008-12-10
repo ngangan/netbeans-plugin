@@ -64,7 +64,7 @@ public class FlickrFlockrApplicationWizardPanel implements WizardDescriptor.Pane
     public Component getComponent() {
         if( component == null ) {
             component = new FlickrFlockrApplicationPanelVisual( this );
-            component.setName( NbBundle.getMessage( FlickrFlockrApplicationWizardPanel.class, "LBL_CreateProjectStep" ));
+            component.setName( NbBundle.getMessage( FlickrFlockrApplicationWizardPanel.class, "LBL_CreateProjectStep" )); // NOI18N
         }
         return component;
     }
@@ -75,7 +75,7 @@ public class FlickrFlockrApplicationWizardPanel implements WizardDescriptor.Pane
 
     public void readSettings( Object settings ) {
         if( wizardDescriptor == null ){
-            ((WizardDescriptor)settings).putProperty( "name", null );
+            ((WizardDescriptor)settings).putProperty( "name", null ); // NOI18N
         }
         wizardDescriptor = (WizardDescriptor) settings;
         component.read( wizardDescriptor );

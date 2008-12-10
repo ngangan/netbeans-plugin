@@ -84,17 +84,17 @@ public class WeatherFXApplicationWizardIterator implements WizardDescriptor.Inst
     }
 
     private String[] createSteps() {
-        return new String[]{NbBundle.getMessage(WeatherFXApplicationWizardIterator.class, "LBL_CreateProjectStep")};
+        return new String[]{NbBundle.getMessage(WeatherFXApplicationWizardIterator.class, "LBL_CreateProjectStep")}; // NOI18N
     }
 
     public Set instantiate() throws IOException {
         /*<FileObject>*/ Set<FileObject> resultSet = new LinkedHashSet<FileObject>();
-        File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
+        File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir")); // NOI18N
         dirF.mkdirs();
 
         FileObject template = Templates.getTemplate(wiz);
         FileObject dir = FileUtil.toFileObject(dirF);
-        unZipFile(template.getInputStream(), dir, (String) wiz.getProperty("name"));
+        unZipFile(template.getInputStream(), dir, (String) wiz.getProperty("name")); // NOI18N
 
         // Always open top dir as a project:
         resultSet.add(dir);
@@ -133,22 +133,22 @@ public class WeatherFXApplicationWizardIterator implements WizardDescriptor.Inst
                 // assume Swing components
                 JComponent jc = (JComponent) c;
                 // Step #.
-                jc.putClientProperty("WizardPanel_contentSelectedIndex", new Integer(i));
+                jc.putClientProperty("WizardPanel_contentSelectedIndex", new Integer(i)); // NOI18N
                 // Step name (actually the whole list for reference).
-                jc.putClientProperty("WizardPanel_contentData", steps);
+                jc.putClientProperty("WizardPanel_contentData", steps); // NOI18N
             }
         }
     }
 
     public void uninitialize(WizardDescriptor wiz) {
-        this.wiz.putProperty("projdir", null);
-        this.wiz.putProperty("name", null);
+        this.wiz.putProperty("projdir", null); // NOI18N
+        this.wiz.putProperty("name", null); // NOI18N
         this.wiz = null;
         panels = null;
     }
 
     public String name() {
-        return MessageFormat.format("{0} of {1}", new Object[]{new Integer(index + 1), new Integer(panels.length)});
+        return MessageFormat.format("{0} of {1}", new Object[]{new Integer(index + 1), new Integer(panels.length)}); // NOI18N
     }
 
     public boolean hasNext() {
@@ -191,7 +191,7 @@ public class WeatherFXApplicationWizardIterator implements WizardDescriptor.Inst
             while ((entry = str.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
                     FileUtil.createFolder(projectRoot, entry.getName());
-                } else if (entry.getName().toLowerCase().endsWith(".png")){
+                } else if (entry.getName().toLowerCase().endsWith(".png")){ // NOI18N
                     FileObject fo = FileUtil.createData(projectRoot, entry.getName());
                     FileLock lock = fo.lock();
                     try {
@@ -208,14 +208,14 @@ public class WeatherFXApplicationWizardIterator implements WizardDescriptor.Inst
                     FileObject fo = FileUtil.createData(projectRoot, entry.getName());
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     FileUtil.copy(str, baos);
-                    String content = baos.toString("UTF-8").
-//                            replaceAll("\n|\r|\r\n", System.getProperty("line.separator")).
-                            replaceAll("@NAME@", name);
+                    String content = baos.toString("UTF-8"). // NOI18N
+//                            replaceAll("\n|\r|\r\n", System.getProperty("line.separator")). // NOI18N
+                            replaceAll("@NAME@", name); // NOI18N
                     FileLock lock = fo.lock();
                     try {
                         OutputStream out = fo.getOutputStream(lock);
                         try {
-                            FileUtil.copy(new ByteArrayInputStream(content.getBytes("UTF-8")), out);
+                            FileUtil.copy(new ByteArrayInputStream(content.getBytes("UTF-8")), out); // NOI18N
                         } finally {
                             out.close();
                         }

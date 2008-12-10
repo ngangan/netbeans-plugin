@@ -88,8 +88,8 @@ public class Util {
             }
             else if (!f.exists()) {
                 String surl = url.toExternalForm();
-                if (!surl.endsWith("/")) {
-                    url = new URL (surl+"/");
+                if (!surl.endsWith("/")) { // NOI18N
+                    url = new URL (surl+"/"); // NOI18N
                 }
             }
             else if (f.isFile()) {
@@ -120,11 +120,11 @@ public class Util {
         StringBuffer normalizedName = new StringBuffer ();
         for (int i=0; i< displayName.length(); i++) {
             char c = displayName.charAt(i);
-            if (Character.isJavaIdentifierPart(c) || c =='-' || c =='.') {
+            if (Character.isJavaIdentifierPart(c) || c =='-' || c =='.') { // NOI18N
                 normalizedName.append(c);
             }
             else {
-                normalizedName.append('_');
+                normalizedName.append('_'); // NOI18N
             }
         }
         return normalizedName.toString();
@@ -138,7 +138,7 @@ public class Util {
     public static SpecificationVersion getSpecificationVersion(JavaPlatform plat) {
          String version = plat.getSystemProperties().get("java.specification.version");   // NOI18N
          if (version == null) {
-             version = "1.1";
+             version = "1.1"; // NOI18N
          }
          return makeSpec(version);
     }
@@ -190,7 +190,7 @@ public class Util {
                         //May happen, eg. broken link, it is safe to ignore it
                         //since it is an extension directory, but log it.
                         ErrorManager.getDefault().log (ErrorManager.WARNING,
-                            MessageFormat.format (NbBundle.getMessage(Util.class,"MSG_BrokenExtension"),
+                            MessageFormat.format (NbBundle.getMessage(Util.class,"MSG_BrokenExtension"), // NOI18N
                             new Object[] {f,extFolder}));
                         continue;
                     }
@@ -200,7 +200,7 @@ public class Util {
                     }
                     FileObject fo = FileUtil.toFileObject(f);
                     if (fo == null) {
-                        Logger.getLogger(Util.class.getName()).warning("Cannot create FileObject for file: "+f.getAbsolutePath()+" exists: " + f.exists());
+                        Logger.getLogger(Util.class.getName()).warning("Cannot create FileObject for file: "+f.getAbsolutePath()+" exists: " + f.exists()); // NOI18N
                         continue;
                     }
                     if (!FileUtil.isArchiveFile(fo)) {

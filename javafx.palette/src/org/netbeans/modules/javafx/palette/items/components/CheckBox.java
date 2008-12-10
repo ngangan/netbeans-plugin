@@ -53,7 +53,7 @@ import org.openide.util.NbBundle;
 public class CheckBox implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( CheckBox.class, "TEMPLATE_CheckBox" );
+        String code = NbBundle.getMessage( CheckBox.class, "TEMPLATE_CheckBox" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );

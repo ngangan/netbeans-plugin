@@ -62,26 +62,26 @@ public final class JavaFXMembersAndHierarchyOptions {
         return NbPreferences.forModule(JavaFXMembersAndHierarchyOptions.class);
     }
     
-    private static final String PROP_caseSensitive = "caseSensitive";
-    private static final String PROP_showInherited = "showInherited";
-    private static final String PROP_showSuperTypeHierarchy = "showSuperTypeHierarchy";
-    private static final String PROP_showSubTypeHierarchy = "showSubTypeHierarchy";
-    private static final String PROP_showInner = "showInner";
-    private static final String PROP_showFQN = "showFQN";
-    private static final String PROP_showConstructors = "showConstructors";
-    private static final String PROP_showMethods = "showMethods";
-    private static final String PROP_showFields = "showFields";
-    private static final String PROP_showEnumConstants = "showEnumConstants";
-    private static final String PROP_showProtected = "showProtected";
-    private static final String PROP_showPackage = "showPackage";
-    private static final String PROP_showPrivate = "showPrivate";
-    private static final String PROP_showStatic = "showStatic";
-    private static final String PROP_lastBoundsX = "lastBoundsX";
-    private static final String PROP_lastBoundsY = "lastBoundsY";
-    private static final String PROP_lastBoundsWidth = "lastBoundsWidth";
-    private static final String PROP_lastBoundsHeight = "lastBoundsHeight";
-    private static final String PROP_membersDividerLocation = "membersDividerLocation";
-    private static final String PROP_hierarchyDividerLocation = "hierarchyDividerLocation";
+    private static final String PROP_caseSensitive = "caseSensitive"; // NOI18N
+    private static final String PROP_showInherited = "showInherited"; // NOI18N
+    private static final String PROP_showSuperTypeHierarchy = "showSuperTypeHierarchy"; // NOI18N
+    private static final String PROP_showSubTypeHierarchy = "showSubTypeHierarchy"; // NOI18N
+    private static final String PROP_showInner = "showInner"; // NOI18N
+    private static final String PROP_showFQN = "showFQN"; // NOI18N
+    private static final String PROP_showConstructors = "showConstructors"; // NOI18N
+    private static final String PROP_showMethods = "showMethods"; // NOI18N
+    private static final String PROP_showFields = "showFields"; // NOI18N
+    private static final String PROP_showEnumConstants = "showEnumConstants"; // NOI18N
+    private static final String PROP_showProtected = "showProtected"; // NOI18N
+    private static final String PROP_showPackage = "showPackage"; // NOI18N
+    private static final String PROP_showPrivate = "showPrivate"; // NOI18N
+    private static final String PROP_showStatic = "showStatic"; // NOI18N
+    private static final String PROP_lastBoundsX = "lastBoundsX"; // NOI18N
+    private static final String PROP_lastBoundsY = "lastBoundsY"; // NOI18N
+    private static final String PROP_lastBoundsWidth = "lastBoundsWidth"; // NOI18N
+    private static final String PROP_lastBoundsHeight = "lastBoundsHeight"; // NOI18N
+    private static final String PROP_membersDividerLocation = "membersDividerLocation"; // NOI18N
+    private static final String PROP_hierarchyDividerLocation = "hierarchyDividerLocation"; // NOI18N
     
     /**
      */

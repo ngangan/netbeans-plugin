@@ -53,14 +53,14 @@ import org.openide.util.NbBundle;
 public class Text implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Text" );
+        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Text" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Imports
-        Imports.addImport( targetComponent, "javafx.scene.text.Text" );
-        Imports.addImport( targetComponent, "javafx.scene.text.Font" );
+        Imports.addImport( targetComponent, "javafx.scene.text.Text" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.text.Font" ); // NOI18N
 //        Util.addImport( targetComponent, "javafx.scene.FontStyle" );
         
         return true;

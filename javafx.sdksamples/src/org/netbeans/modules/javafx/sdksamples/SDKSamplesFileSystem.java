@@ -72,13 +72,13 @@ public class SDKSamplesFileSystem extends MultiFileSystem {
                     }
                 } catch( SAXException e ) {
                     Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
-                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" )); // NOI18N
                 } catch( MalformedURLException e ) {
                     Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
-                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" )); // NOI18N
                 } catch( IOException e ) {
                     Logger.getLogger( SDKSamplesFileSystem.class.getName()).warning(
-                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" ));
+                            NbBundle.getMessage( SDKSamplesFileSystem.class, "WARN_Cannot_find_demo_layer" )); // NOI18N
                 }
             }
         });
@@ -86,70 +86,70 @@ public class SDKSamplesFileSystem extends MultiFileSystem {
 
     private URL createLayer() throws IOException {
         FileObject root = Repository.getDefault().getDefaultFileSystem().getRoot();
-        FileObject folder = FileUtil.createFolder(root, "javafx/samples" );
-        FileObject xml = FileUtil.createData( folder, "sdksamples.xml" );
+        FileObject folder = FileUtil.createFolder(root, "javafx/samples" ); // NOI18N
+        FileObject xml = FileUtil.createData( folder, "sdksamples.xml" ); // NOI18N
 
         // Get all files in samples
-        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0/samples",
-                "org.netbeans.modules.javafx", false );
+        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0/samples", // NOI18N
+                "org.netbeans.modules.javafx", false ); // NOI18N
         if( fxPath == null ) return null;
-        String descriptionsXml = "", samplesXml = "";
+        String descriptionsXml = "", samplesXml = ""; // NOI18N
         FileObject sdkRoot = FileUtil.toFileObject( fxPath );
         if( sdkRoot == null ) return null;
         for( FileObject sample : sdkRoot.getChildren()) {
             // Skip non folder
             if( !sample.isFolder()) continue;
             String sampleName = sample.getName();
-            FileObject zip = sample.getFileObject( sampleName + ".zip" );
+            FileObject zip = sample.getFileObject( sampleName + ".zip" ); // NOI18N
             // Skip directories without zip
             if( zip == null ) continue;
             // Descriptions
-            FileObject descriptionFO = sample.getFileObject( "description.html" );
+            FileObject descriptionFO = sample.getFileObject( "description.html" ); // NOI18N
 
             if( descriptionFO != null ) {
-                descriptionsXml += "<folder name=\"" + sampleName + "\">";
-                descriptionsXml += "<file name=\"description.html\" url=\"" + descriptionFO.getURL().toString() + "\"/>";
+                descriptionsXml += "<folder name=\"" + sampleName + "\">"; // NOI18N
+                descriptionsXml += "<file name=\"description.html\" url=\"" + descriptionFO.getURL().toString() + "\"/>"; // NOI18N
                 descriptionsXml += "</folder>";
             }
 
             // file definition
-            samplesXml += "<file name=\"" + spaceName( sampleName ) + "\" url=\"" + zip.getURL().toString() + "\">";
-                samplesXml += "<attr name=\"SystemFileSystem.icon\" urlvalue=\"nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png\"/>";
-                samplesXml += "<attr name=\"SystemFileSystem.localizingBundle\" stringvalue=\"org.netbeans.modules.javafx.sdksamples.Bundle\"/>";
-                samplesXml += "<attr name=\"instantiatingIterator\" methodvalue=\"org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator.createIterator\"/>";
+            samplesXml += "<file name=\"" + spaceName( sampleName ) + "\" url=\"" + zip.getURL().toString() + "\">"; // NOI18N
+                samplesXml += "<attr name=\"SystemFileSystem.icon\" urlvalue=\"nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png\"/>"; // NOI18N
+                samplesXml += "<attr name=\"SystemFileSystem.localizingBundle\" stringvalue=\"org.netbeans.modules.javafx.sdksamples.Bundle\"/>"; // NOI18N
+                samplesXml += "<attr name=\"instantiatingIterator\" methodvalue=\"org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator.createIterator\"/>"; // NOI18N
                 if( descriptionFO != null ) {
-                    samplesXml += "<attr name=\"instantiatingWizardURL\" urlvalue=\"nbfs:/SystemFileSystem/SDKSamples/" + sampleName + "/description.html\"/>";
+                    samplesXml += "<attr name=\"instantiatingWizardURL\" urlvalue=\"nbfs:/SystemFileSystem/SDKSamples/" + sampleName + "/description.html\"/>"; // NOI18N
                 }
-                samplesXml += "<attr name=\"template\" boolvalue=\"true\"/>";
-            samplesXml += "</file>";
+                samplesXml += "<attr name=\"template\" boolvalue=\"true\"/>"; // NOI18N
+            samplesXml += "</file>"; // NOI18N
         }
 
         FileLock lock = xml.lock();
         PrintStream os = new PrintStream( xml.getOutputStream( lock ));
-        os.println( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
-        os.println( "<filesystem>" );
-            os.println( "<folder name=\"SDKSamples\">" );
+        os.println( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ); // NOI18N
+        os.println( "<filesystem>" ); // NOI18N
+            os.println( "<folder name=\"SDKSamples\">" ); // NOI18N
                 os.println( descriptionsXml );
-            os.println( "</folder>" );
-            os.println( "<folder name=\"Templates\">" );
-                os.println( "<folder name=\"Project\">" );
-                    os.println( "<folder name=\"Samples\">" );
-                        os.println( "<folder name=\"JavaFX\">" );
+            os.println( "</folder>" ); // NOI18N
+            os.println( "<folder name=\"Templates\">" ); // NOI18N
+                os.println( "<folder name=\"Project\">" ); // NOI18N
+                    os.println( "<folder name=\"Samples\">" ); // NOI18N
+                        os.println( "<folder name=\"JavaFX\">" ); // NOI18N
                             os.println( samplesXml );
-                        os.println( "</folder>" );
-                    os.println( "</folder>" );
-                os.println( "</folder>" );
-            os.println( "</folder>" );
-        os.println( "</filesystem>" );
+                        os.println( "</folder>" ); // NOI18N
+                    os.println( "</folder>" ); // NOI18N
+                os.println( "</folder>" ); // NOI18N
+            os.println( "</folder>" ); // NOI18N
+        os.println( "</filesystem>" ); // NOI18N
         os.close();
 
         return xml.getURL();
     }
 
     private String spaceName( String name ) {
-        String newName = "";
+        String newName = ""; // NOI18N
         for( char c : name.toCharArray()) {
-            if( Character.isUpperCase( c )) newName += " ";
+            if( Character.isUpperCase( c )) newName += " "; // NOI18N
             newName += c;
         }
         return newName.trim();

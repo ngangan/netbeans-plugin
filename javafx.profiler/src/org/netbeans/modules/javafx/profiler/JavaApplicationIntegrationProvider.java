@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.profiler;
 
 import org.netbeans.lib.profiler.common.AttachSettings;
@@ -48,7 +47,6 @@ import org.netbeans.modules.profiler.attach.providers.AbstractIntegrationProvide
 import org.netbeans.modules.profiler.attach.providers.IntegrationCategorizer;
 import org.netbeans.modules.profiler.attach.spi.IntegrationProvider;
 import org.netbeans.modules.profiler.attach.wizard.steps.NullWizardStep;
-
 
 /**
  *
@@ -69,7 +67,7 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
     private static final String MANUAL_DYNAMIC_STEP1_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_ManualDynamicStep1Message"); // NOI18N
     private static final String MANUAL_DYNAMIC_STEP2_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_ManualDynamicStep2Message"); // NOI18N  
     private static final String DYNAMIC_WARNING_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_DynamicWarningMessage"); // NOI18N  
-    private static final String APPLICATION_TITLE = messages.getString("JavaApplicationIntegrationProvider_Title");
+    private static final String APPLICATION_TITLE = messages.getString("JavaApplicationIntegrationProvider_Title"); // NOI18N
 
     //~ Constructors -------------------------------------------------------------------------------------------------------------
 
@@ -79,7 +77,6 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
     }
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     public IntegrationProvider.IntegrationHints getAfterInstallationHints(AttachSettings attachSettings, boolean automation) {
         return null;
     }
@@ -128,17 +125,17 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
     }
 
     private IntegrationProvider.IntegrationHints getManualLocalDirectIntegrationStepsInstructions(String targetOS,
-                                                                                                  AttachSettings attachSettings) {
+            AttachSettings attachSettings) {
         IntegrationProvider.IntegrationHints hints = new IntegrationProvider.IntegrationHints();
 
         // Step 1
         hints.addStep(MessageFormat.format(MANUAL_DIRECT_STEP1_MESSAGE,
-                                           new Object[] {
-                                               IntegrationUtils.getJavaPlatformName(getTargetJava()),
-                                               IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
-                                                                                                attachSettings.isRemote(),
-                                                                                                attachSettings.getPort())
-                                           }));
+                new Object[]{
+                    IntegrationUtils.getJavaPlatformName(getTargetJava()),
+                    IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
+                    attachSettings.isRemote(),
+                    attachSettings.getPort())
+                }));
 
         // Step 2
         hints.addStep(MANUAL_DIRECT_STEP2_MESSAGE);
@@ -155,12 +152,12 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
     }
 
     private IntegrationProvider.IntegrationHints getManualLocalDynamicIntegrationStepsInstructions(String targetOS,
-                                                                                                   AttachSettings attachSettings) {
+            AttachSettings attachSettings) {
         IntegrationProvider.IntegrationHints hints = new IntegrationProvider.IntegrationHints();
 
         // Step 1
         hints.addStep(MessageFormat.format(MANUAL_DYNAMIC_STEP1_MESSAGE,
-                                           new Object[] { IntegrationUtils.getJavaPlatformName(getTargetJava()) }));
+                new Object[]{IntegrationUtils.getJavaPlatformName(getTargetJava())}));
         // Step 2
         hints.addStep(MANUAL_DYNAMIC_STEP2_MESSAGE);
 
@@ -174,19 +171,19 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
 
         // Put here a warning that the IDE must be run under JDK6/7
         hints.addWarning(MessageFormat.format(DYNAMIC_WARNING_MESSAGE,
-                                              new Object[] {
-                                                  IntegrationUtils.getJavaPlatformName(getTargetJava()),
-                                                  IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
-                                                                                                   attachSettings.isRemote(),
-                                                                                                   attachSettings.getPort())
-                                              }));
+                new Object[]{
+                    IntegrationUtils.getJavaPlatformName(getTargetJava()),
+                    IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
+                    attachSettings.isRemote(),
+                    attachSettings.getPort())
+                }));
 
         return hints;
     }
 
     // </editor-fold>
     private IntegrationProvider.IntegrationHints getManualRemoteIntegrationStepsInstructions(String targetOS,
-                                                                                             AttachSettings attachSettings) {
+            AttachSettings attachSettings) {
         IntegrationProvider.IntegrationHints hints = new IntegrationProvider.IntegrationHints();
         //        StringBuffer text = new StringBuffer();
 
@@ -198,13 +195,13 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
 
         // Step 3
         hints.addStep(MessageFormat.format(MANUAL_REMOTE_STEP3_MESSAGE,
-                                           new Object[] {
-                                               IntegrationUtils.getJavaPlatformName(getTargetJava()),
-                                               IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
-                                                                                                attachSettings.isRemote(),
-                                                                                                attachSettings.getPort()),
-                                               REMOTE_ABSOLUTE_PATH_HINT
-                                           }));
+                new Object[]{
+                    IntegrationUtils.getJavaPlatformName(getTargetJava()),
+                    IntegrationUtils.getProfilerAgentCommandLineArgs(targetOS, getTargetJava(),
+                    attachSettings.isRemote(),
+                    attachSettings.getPort()),
+                    REMOTE_ABSOLUTE_PATH_HINT
+                }));
 
         // Step 4
         hints.addStep(MANUAL_REMOTE_STEP4_MESSAGE);
@@ -216,7 +213,7 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
 
         // Note about export vs. setenv on UNIXes
         hints.addHint(MessageFormat.format(MANUAL_REMOTE_HINT_MESSAGE,
-                                           new Object[] { IntegrationUtils.getRemoteProfileCommandString(targetOS) }));
+                new Object[]{IntegrationUtils.getRemoteProfileCommandString(targetOS)}));
 
         // Note about decreasing CPU profiling overhead
         hints.addHint(REDUCE_OVERHEAD_MSG);

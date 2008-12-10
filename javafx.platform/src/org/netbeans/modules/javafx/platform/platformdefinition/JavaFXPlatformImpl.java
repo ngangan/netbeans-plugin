@@ -207,25 +207,25 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             ClassPath cp = (bootstrap == null ? null : bootstrap.get());
             if (cp != null)
                 return cp;
-            cp = Util.createClassPath(getBootstrapLibraries("desktop").toString() + File.pathSeparator + getBootstrapLibraries("mobile").toString());
+            cp = Util.createClassPath(getBootstrapLibraries("desktop").toString() + File.pathSeparator + getBootstrapLibraries("mobile").toString()); // NOI18N
             bootstrap = new SoftReference<ClassPath>(cp);
             return cp;
         }
     }
     
     public ClassPath getBootstrapLibraries(String profile) {
-        profile = profile == null ? "desktop_" : (profile.toLowerCase()+'_');
+        profile = profile == null ? "desktop_" : (profile.toLowerCase()+'_'); // NOI18N
         synchronized (this) {
             Reference<ClassPath> ref = bootstrapMap.get(profile);
             ClassPath cp = ref == null ? null : ref.get();
             if (cp != null)
                 return cp;
-            String pathSpec = getProperties().get(profile + "compile_bootclasspath");
+            String pathSpec = getProperties().get(profile + "compile_bootclasspath"); // NOI18N
             if (pathSpec == null || pathSpec.length() == 0) {
-                String prep = getProperties().get(profile + "compile_bootclasspath_prepend");
-                prep = prep == null || prep.length() == 0 ? "" :  (prep + File.pathSeparator);
-                String app = getProperties().get(profile + "compile_bootclasspath_append");
-                app = app == null || app.length() == 0 ? "" :  (File.pathSeparator + app);
+                String prep = getProperties().get(profile + "compile_bootclasspath_prepend"); // NOI18N
+                prep = prep == null || prep.length() == 0 ? "" :  (prep + File.pathSeparator); // NOI18N
+                String app = getProperties().get(profile + "compile_bootclasspath_append"); // NOI18N
+                app = app == null || app.length() == 0 ? "" :  (File.pathSeparator + app); // NOI18N
                 pathSpec = prep + getSystemProperties().get(SYSPROP_BOOT_CLASSPATH) + app;
             }
 
@@ -235,11 +235,11 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
 
             //temporary bootclasspath includes all runtime implementation Jars
             //this should be moved to a different classpath type in the future to stay hidden for users
-            String ecp = getProperties().get(profile + "execute_classpath");
-            ecp = ecp == null || ecp.length() == 0 ? "" :  (File.pathSeparator + ecp);
+            String ecp = getProperties().get(profile + "execute_classpath"); // NOI18N
+            ecp = ecp == null || ecp.length() == 0 ? "" :  (File.pathSeparator + ecp); // NOI18N
             pathSpec = pathSpec + ecp;
 
-            cp = Util.createClassPath (pathSpec.replace(';', File.pathSeparatorChar));
+            cp = Util.createClassPath (pathSpec.replace(';', File.pathSeparatorChar)); // NOI18N
             bootstrapMap.put(profile, new SoftReference(cp));
             return cp;
         }
@@ -323,8 +323,8 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         List<URL> safeCopy = Collections.unmodifiableList (new ArrayList<URL> (c));
         for (Iterator<URL> it = safeCopy.iterator(); it.hasNext();) {
             URL url = it.next ();
-            if (!"jar".equals (url.getProtocol()) && FileUtil.isArchiveFile(url)) {
-                throw new IllegalArgumentException ("JavadocFolder must be a folder.");
+            if (!"jar".equals (url.getProtocol()) && FileUtil.isArchiveFile(url)) { // NOI18N
+                throw new IllegalArgumentException ("JavadocFolder must be a folder."); // NOI18N
             }
         }
         this.javadoc = safeCopy;
@@ -353,15 +353,15 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
     
     protected static void loadProfileProperties(File fxFolder, Map properties) {
         FileInputStream in = null;        
-        for (File f : new File(fxFolder, "profiles").listFiles()) if (f.isFile() && f.getName().endsWith(".properties")) try {
-            String profile = f.getName().substring(0, f.getName().length() - 11).toLowerCase() + '_';
+        for (File f : new File(fxFolder, "profiles").listFiles()) if (f.isFile() && f.getName().endsWith(".properties")) try { // NOI18N
+            String profile = f.getName().substring(0, f.getName().length() - 11).toLowerCase() + '_'; // NOI18N
             in = new FileInputStream(f);
             Properties p = new Properties();
             p.load(in);
             for (Entry e : p.entrySet()) {
                 String val = e.getValue().toString();
-                if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1);
-                properties.put(profile + e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath()));
+                if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1); // NOI18N
+                properties.put(profile + e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath())); // NOI18N
             }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
@@ -445,9 +445,9 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         //problems with NetBeans 4.0. So use the modified "src.zip" shipped 
         //with the OpenVMS NetBeans 4.0 kit.
         if (Utilities.getOperatingSystem() == Utilities.OS_VMS) {
-            String srcHome = System.getProperty("netbeans.openvms.j2seplatform.default.srcdir");
+            String srcHome = System.getProperty("netbeans.openvms.j2seplatform.default.srcdir"); // NOI18N
             if (srcHome != null) {
-                File f = new File(srcHome, "src.zip");
+                File f = new File(srcHome, "src.zip"); // NOI18N
                 if (sources != null && f.exists() && f.canRead()) try {
                     sources.add(FileUtil.getArchiveRoot(f.toURI().toURL()));
                 } catch (MalformedURLException e) {
@@ -463,7 +463,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
                 javadoc.add(docsApi.toURI().toURL());
             if (sources != null) 
                 for (File f : root.listFiles()) 
-                    if ((f.getName().endsWith("src.zip") || f.getName().endsWith("src.jar")) && f.isFile() && f.canRead()) {
+                    if ((f.getName().endsWith("src.zip") || f.getName().endsWith("src.jar")) && f.isFile() && f.canRead()) { // NOI18N
                         URL url = FileUtil.getArchiveRoot(f.toURI().toURL());
 
                          //Test for src folder in the src.zip on Mac

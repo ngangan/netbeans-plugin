@@ -68,7 +68,7 @@ public class SDKSamplesWizardPanel implements WizardDescriptor.Panel, WizardDesc
     public Component getComponent() {
         if( component == null ) {
             component = new SDKSamplesVisualPanel( this );
-            component.setName( NbBundle.getMessage( SDKSamplesWizardPanel.class, "LBL_CreateProjectStep" ));
+            component.setName( NbBundle.getMessage( SDKSamplesWizardPanel.class, "LBL_CreateProjectStep" )); // NOI18N
         }
         return component;
     }
@@ -113,7 +113,7 @@ public class SDKSamplesWizardPanel implements WizardDescriptor.Panel, WizardDesc
 
     public void readSettings(Object settings) {
         if (wizardDescriptor == null){
-            ((WizardDescriptor)settings).putProperty("name", null);
+            ((WizardDescriptor)settings).putProperty("name", null); // NOI18N
         }
         wizardDescriptor = (WizardDescriptor) settings;
         component.load( wizardDescriptor );

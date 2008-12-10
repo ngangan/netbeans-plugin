@@ -53,13 +53,13 @@ import org.openide.util.NbBundle;
 public class Shear implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Scale.class, "TEMPLATE_Shear" );
+        String code = NbBundle.getMessage( Scale.class, "TEMPLATE_Shear" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
 
         // Import
-        Imports.addImport( targetComponent, "javafx.scene.transform.Shear" );
+        Imports.addImport( targetComponent, "javafx.scene.transform.Shear" ); // NOI18N
 
         return true;
     }

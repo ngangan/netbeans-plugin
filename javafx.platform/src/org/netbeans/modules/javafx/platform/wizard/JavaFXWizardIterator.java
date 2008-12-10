@@ -118,7 +118,7 @@ public class JavaFXWizardIterator implements WizardDescriptor.InstantiatingItera
             FileObject platformsFolder = Repository.getDefault().getDefaultFileSystem().findResource(
                     "Services/Platforms/org-netbeans-api-java-Platform"); //NOI18N
             if (platformsFolder.getFileObject(systemName, "xml") != null) {   //NOI18N
-                String msg = NbBundle.getMessage(JavaFXWizardIterator.class, "ERROR_InvalidName");
+                String msg = NbBundle.getMessage(JavaFXWizardIterator.class, "ERROR_InvalidName"); // NOI18N
                 throw (IllegalStateException) ErrorManager.getDefault().annotate(
                         new IllegalStateException(msg), ErrorManager.USER, null, msg, null, null);
             }
@@ -129,7 +129,7 @@ public class JavaFXWizardIterator implements WizardDescriptor.InstantiatingItera
     }
 
     public String name() {
-        return NbBundle.getMessage(JavaFXWizardIterator.class, "TITLE_PlatformName");
+        return NbBundle.getMessage(JavaFXWizardIterator.class, "TITLE_PlatformName"); // NOI18N
     }
 
     public void nextPanel() {

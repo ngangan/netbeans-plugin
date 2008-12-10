@@ -59,7 +59,7 @@ public class KeyFrame implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         // Imports
-        Imports.addImport( targetComponent, "javafx.animation.KeyFrame" );
+        Imports.addImport( targetComponent, "javafx.animation.KeyFrame" ); // NOI18N
         
         return true;
     }

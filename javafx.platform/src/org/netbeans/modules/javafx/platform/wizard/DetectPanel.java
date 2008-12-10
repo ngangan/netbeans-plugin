@@ -53,7 +53,6 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.modules.javafx.platform.PlatformUiSupport;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
 import org.openide.util.HelpCtx;
@@ -87,11 +86,11 @@ public class DetectPanel extends javax.swing.JPanel {
     public DetectPanel() {
         initComponents();
         postInitComponents ();
-        putClientProperty("WizardPanel_contentData",
+        putClientProperty("WizardPanel_contentData", // NOI18N
             new String[] {
-                NbBundle.getMessage(DetectPanel.class,"TITLE_PlatformName"),
+                NbBundle.getMessage(DetectPanel.class,"TITLE_PlatformName"), // NOI18N
         });
-        this.setName (NbBundle.getMessage(DetectPanel.class,"TITLE_PlatformName"));
+        this.setName (NbBundle.getMessage(DetectPanel.class,"TITLE_PlatformName")); // NOI18N
     }
 
     public void addNotify() {
@@ -207,7 +206,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                     // L&F (e.g. GTK) did not specify any icon.
                     original = EMPTY;
                 }
-                if ((new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) && new File(f, "lib/shared/javafxc.jar").isFile() && new File(f, "lib/shared/javafxrt.jar").isFile()) {
+                if ((new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) && new File(f, "lib/shared/javafxc.jar").isFile() && new File(f, "lib/shared/javafxrt.jar").isFile()) { // NOI18N
                     if ( original.equals( lastOriginal ) ) {
                         return lastMerged;
                     }
@@ -223,7 +222,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         File f = new File (fxFolder.getText());
         chooser.setSelectedFile(f);
-        chooser.setDialogTitle (NbBundle.getMessage(DetectPanel.class, "TITLE_SelectFX"));
+        chooser.setDialogTitle (NbBundle.getMessage(DetectPanel.class, "TITLE_SelectFX")); // NOI18N
         if (chooser.showOpenDialog (this) == JFileChooser.APPROVE_OPTION) {
             fxFolder.setText(chooser.getSelectedFile().getAbsolutePath());
         }
@@ -304,11 +303,11 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             this.wiz = settings;
             String name;
             int i = 1;
-            while (!checkName(name = NbBundle.getMessage(DetectPanel.class, "TXT_DefaultPlaformName", String.valueOf(i)))) i++;
+            while (!checkName(name = NbBundle.getMessage(DetectPanel.class, "TXT_DefaultPlaformName", String.valueOf(i)))) i++; // NOI18N
             component.jdkName.setText(name);
-            File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
+            File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
             if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
-                fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
+                fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
             if (fxPath != null && fxPath.isFile()) component.fxFolder.setText(fxPath.getParentFile().getParentFile().getParent());
             File f = component.getPlatformFolder();
             checkValid();
@@ -366,7 +365,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 //                 return;
 //            }
             File f = component.getFxFolder();
-            if (!(new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) || !new File(f, "lib/shared/javafxc.jar").isFile() || !new File(f, "lib/shared/javafxrt.jar").isFile()) {
+            if (!(new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) || !new File(f, "lib/shared/javafxc.jar").isFile() || !new File(f, "lib/shared/javafxrt.jar").isFile()) { // NOI18N
                 setErrorMessage("ERROR_WrongFxLocation"); //NOI18N
                  return;
             }

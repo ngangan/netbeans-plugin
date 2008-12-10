@@ -66,7 +66,7 @@ public class GraphicsDemosWizardPanel implements WizardDescriptor.Panel, WizardD
     public Component getComponent() {
         if (component == null) {
             component = new GraphicsDemosPanelVisual(this);
-            component.setName(NbBundle.getMessage(GraphicsDemosWizardPanel.class, "LBL_CreateProjectStep"));
+            component.setName(NbBundle.getMessage(GraphicsDemosWizardPanel.class, "LBL_CreateProjectStep")); // NOI18N
         }
         return component;
     }

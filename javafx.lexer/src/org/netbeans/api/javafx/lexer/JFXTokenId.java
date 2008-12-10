@@ -105,94 +105,94 @@ public enum JFXTokenId implements TokenId {
 	EXCLUSIVE("keyword", 21),//NOI18N
 	LT("operator", 90),//NOI18N
 	BOUND("keyword", 13),//NOI18N
-	LINE_COMMENT("comment", 134),
-	EQEQ("operator", 87),
-	QUOTE_LBRACE_STRING_LITERAL("string", 113),
-	FLOATING_POINT_LITERAL("number", 127),
-	CATCH("keyword-directive", 15),
-	STATIC("keyword", 61),
-	SEMI("separator", 84),
-	ELSE("keyword-directive", 20),
-	INDEXOF("keyword", 31),
-	FORMAT_STRING_LITERAL("format", 118),
-	LTEQ("operator", 92),
-	FIRST("keyword", 25),
-	BREAK("keyword-directive", 14),
-	NULL("keyword-literal", 44),
-	QUES("operator", 106),
-	COLON("operator", 105),
-	DOTDOT("operator", 81),
-	IDENTIFIER("identifier", 130),
-	NextIsPercent("string", 112),
-	INSERT("keyword", 34),
-	TRUE("keyword-literal", 68),
-	DOC_COMMENT("comment", 133),
-	POUND("operator", 78),
-	POSTINIT("keyword", 49),
-	THROW("keyword-directive", 66),
-	WHERE("keyword", 73),
-	PUBLIC("keyword", 53),
-	LTGT("operator", 91),
-	PERCENT("operator", 98),
-	TYPEOF("keyword", 71),
-	LAST("keyword", 38),
-	LBRACKET("separator", 76),
-	MOD("keyword", 40),
-	INIT("keyword", 33),
-	OCTAL_LITERAL("number", 123),
-	HEX_LITERAL("number", 124),
-	OR("keyword", 46),
-	LBRACE("separator", 114),
-	AFTER("keyword", 5),
-	RBRACE("separator", 117),
-	PROTECTED("keyword", 51),
-	INVERSE("keyword", 37),
-	SUBEQ("operator", 100),
-	INSTANCEOF("keyword", 35),
-	TRANSLATION_KEY("i18n-artifact", 120),
-	LPAREN("separator", 77),
-	DoubleQuoteBody("string", 109),
-	SLASHEQ("operator", 102),
-	FROM("keyword", 27),
-	PERCENTEQ("operator", 103),
-	DELETE("keyword", 19),
-	Exponent("number", 126),
-	SLASH("operator", 97),
-	WHILE("keyword-directive", 74),
-	STAREQ("operator", 101),
-	READABLE("keyword", 56),
-	PLUSEQ("operator", 99),
-	PUBLIC_INIT("keyword", 52),
-	REPLACE("keyword", 57),
-	GT("operator", 89),
-	COMMENT("comment", 132),
-	OVERRIDE("keyword", 47),
-	GTEQ("operator", 93),
-	THIS("keyword", 65),
-	WITH("keyword", 75),
-	IN("keyword", 32),
-	REVERSE("keyword", 59),
-	INVALIDC("keyword", 136),
-	JavaIDDigit("identifier", 129),
-	VAR("keyword", 72),
-	CLASS("keyword", 16),
-	TWEEN("keyword", 70),
-	RETURN("keyword-directive", 58),
-	IF("keyword-directive", 29),
-	SUCHTHAT("operator", 107),
-	FOR("keyword-directive", 26),
-	LAST_TOKEN("future-literal", 135),
-	NON_WRITABLE("keyword", 42),
-	BEFORE("keyword", 11),
-	STAR("operator", 96),
-	ATTRIBUTE("keyword", 10),
-	SUB("operator", 95),
-	BIND("keyword", 12),
-	Digits("number", 125),
-	NOT("keyword", 43),
-	TRY("keyword-directive", 69),
-	RBRACE_QUOTE_STRING_LITERAL("string", 115),    
-    UNKNOWN("error", 200);
+	LINE_COMMENT("comment", 134), // NOI18N
+	EQEQ("operator", 87), // NOI18N
+	QUOTE_LBRACE_STRING_LITERAL("string", 113), // NOI18N
+	FLOATING_POINT_LITERAL("number", 127), // NOI18N
+	CATCH("keyword-directive", 15), // NOI18N
+	STATIC("keyword", 61), // NOI18N
+	SEMI("separator", 84), // NOI18N
+	ELSE("keyword-directive", 20), // NOI18N
+	INDEXOF("keyword", 31), // NOI18N
+	FORMAT_STRING_LITERAL("format", 118), // NOI18N
+	LTEQ("operator", 92), // NOI18N
+	FIRST("keyword", 25), // NOI18N
+	BREAK("keyword-directive", 14), // NOI18N
+	NULL("keyword-literal", 44), // NOI18N
+	QUES("operator", 106), // NOI18N
+	COLON("operator", 105), // NOI18N
+	DOTDOT("operator", 81), // NOI18N
+	IDENTIFIER("identifier", 130), // NOI18N
+	NextIsPercent("string", 112), // NOI18N
+	INSERT("keyword", 34), // NOI18N
+	TRUE("keyword-literal", 68), // NOI18N
+	DOC_COMMENT("comment", 133), // NOI18N
+	POUND("operator", 78), // NOI18N
+	POSTINIT("keyword", 49), // NOI18N
+	THROW("keyword-directive", 66), // NOI18N
+	WHERE("keyword", 73), // NOI18N
+	PUBLIC("keyword", 53), // NOI18N
+	LTGT("operator", 91), // NOI18N
+	PERCENT("operator", 98), // NOI18N
+	TYPEOF("keyword", 71), // NOI18N
+	LAST("keyword", 38), // NOI18N
+	LBRACKET("separator", 76), // NOI18N
+	MOD("keyword", 40), // NOI18N
+	INIT("keyword", 33), // NOI18N
+	OCTAL_LITERAL("number", 123), // NOI18N
+	HEX_LITERAL("number", 124), // NOI18N
+	OR("keyword", 46), // NOI18N
+	LBRACE("separator", 114), // NOI18N
+	AFTER("keyword", 5), // NOI18N
+	RBRACE("separator", 117), // NOI18N
+	PROTECTED("keyword", 51), // NOI18N
+	INVERSE("keyword", 37), // NOI18N
+	SUBEQ("operator", 100), // NOI18N
+	INSTANCEOF("keyword", 35), // NOI18N
+	TRANSLATION_KEY("i18n-artifact", 120), // NOI18N
+	LPAREN("separator", 77), // NOI18N
+	DoubleQuoteBody("string", 109), // NOI18N
+	SLASHEQ("operator", 102), // NOI18N
+	FROM("keyword", 27), // NOI18N
+	PERCENTEQ("operator", 103), // NOI18N
+	DELETE("keyword", 19), // NOI18N
+	Exponent("number", 126), // NOI18N
+	SLASH("operator", 97), // NOI18N
+	WHILE("keyword-directive", 74), // NOI18N
+	STAREQ("operator", 101), // NOI18N
+	READABLE("keyword", 56), // NOI18N
+	PLUSEQ("operator", 99), // NOI18N
+	PUBLIC_INIT("keyword", 52), // NOI18N
+	REPLACE("keyword", 57), // NOI18N
+	GT("operator", 89), // NOI18N
+	COMMENT("comment", 132), // NOI18N
+	OVERRIDE("keyword", 47), // NOI18N
+	GTEQ("operator", 93), // NOI18N
+	THIS("keyword", 65), // NOI18N
+	WITH("keyword", 75), // NOI18N
+	IN("keyword", 32), // NOI18N
+	REVERSE("keyword", 59), // NOI18N
+	INVALIDC("keyword", 136), // NOI18N
+	JavaIDDigit("identifier", 129), // NOI18N
+	VAR("keyword", 72), // NOI18N
+	CLASS("keyword", 16), // NOI18N
+	TWEEN("keyword", 70), // NOI18N
+	RETURN("keyword-directive", 58), // NOI18N
+	IF("keyword-directive", 29), // NOI18N
+	SUCHTHAT("operator", 107), // NOI18N
+	FOR("keyword-directive", 26), // NOI18N
+	LAST_TOKEN("future-literal", 135), // NOI18N
+	NON_WRITABLE("keyword", 42), // NOI18N
+	BEFORE("keyword", 11), // NOI18N
+	STAR("operator", 96), // NOI18N
+	ATTRIBUTE("keyword", 10), // NOI18N
+	SUB("operator", 95), // NOI18N
+	BIND("keyword", 12), // NOI18N
+	Digits("number", 125), // NOI18N
+	NOT("keyword", 43), // NOI18N
+	TRY("keyword-directive", 69), // NOI18N
+	RBRACE_QUOTE_STRING_LITERAL("string", 115), // NOI18N
+    UNKNOWN("error", 200); // NOI18N
 
     /*v3.g lexer
     EXPR_LIST("error", 120),
@@ -362,7 +362,7 @@ public enum JFXTokenId implements TokenId {
 	RBRACE_QUOTE_STRING_LITERAL("string", 147),
     UNKNOWN("error", 200);                      */
 
-    public static final String UNIVERSAL_CATEGORY = "future-literal";
+    public static final String UNIVERSAL_CATEGORY = "future-literal"; // NOI18N
     private final String primaryCategory;
     private final int tokenType;
     private static JFXTokenId[] typeToId;
@@ -436,7 +436,7 @@ public enum JFXTokenId implements TokenId {
             try {
                 return new JFXLexer(info);
             } catch (IOException e) {
-                if (log.isLoggable(Level.SEVERE)) log.severe("Cannot create lexer.\n" + e);
+                if (log.isLoggable(Level.SEVERE)) log.severe("Cannot create lexer.\n" + e); // NOI18N
                 throw new IllegalStateException(e);
             }
         }

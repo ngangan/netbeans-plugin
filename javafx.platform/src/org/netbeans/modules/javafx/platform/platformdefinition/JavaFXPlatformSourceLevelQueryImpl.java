@@ -59,7 +59,7 @@ public class JavaFXPlatformSourceLevelQueryImpl implements SourceLevelQueryImple
         } catch (Exception e) {}
         JavaPlatform[] platforms = JavaPlatformManager.getDefault().getInstalledPlatforms ();
         for (int i=0; i< platforms.length; i++) {
-            if (JavaFXPlatformImpl.PLATFORM_JAVAFX.equalsIgnoreCase(platforms[i].getSpecification().getName()) && platforms[i].getSourceFolders().contains(javaFile)) {   //NOI18N
+            if (JavaFXPlatformImpl.PLATFORM_JAVAFX.equalsIgnoreCase(platforms[i].getSpecification().getName()) && platforms[i].getSourceFolders().contains(javaFile)) {
                 return platforms[i].getSpecification().getVersion().toString();
             }
         }        

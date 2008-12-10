@@ -80,7 +80,7 @@ public abstract class SortActionSupport extends AbstractAction implements Presen
     }
 
     protected abstract void updateMenuItem();
-    public static final String SELECTED = "selected";
+    public static final String SELECTED = "selected"; // NOI18N
 
     /** Enables sorting by names when selected
      */

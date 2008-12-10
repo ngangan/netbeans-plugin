@@ -143,14 +143,14 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
      */
     public void run() {
         try {
-            FileObject java = findTool("java");
+            FileObject java = findTool("java"); // NOI18N
             if (java == null)
                 return;
             File javaFile = FileUtil.toFile (java);
             if (javaFile == null)
                 return;
             String javapath = javaFile.getAbsolutePath();
-            String filePath = File.createTempFile("nb-platformdetect", "properties").getAbsolutePath();
+            String filePath = File.createTempFile("nb-platformdetect", "properties").getAbsolutePath(); // NOI18N
             final String probePath = getSDKProperties(javapath, filePath);
             File f = new File(filePath);
             Properties p = new Properties();
@@ -230,7 +230,7 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
             command[0] = javaPath;
             command[1] = "-classpath";    //NOI18N
             command[2] = InstalledFileLocator.getDefault().locate("modules/ext/org-netbeans-modules-javafx-platform-probe.jar", "org.netbeans.modules.javafx.platform", false).getAbsolutePath(); // NOI18N
-            command[3] = "org.netbeans.modules.javafx.platform.wizard.SDKProbe";
+            command[3] = "org.netbeans.modules.javafx.platform.wizard.SDKProbe"; // NOI18N
             command[4] = path;
             final Process process = runtime.exec(command);
             // PENDING -- this may be better done by using ExecEngine, since

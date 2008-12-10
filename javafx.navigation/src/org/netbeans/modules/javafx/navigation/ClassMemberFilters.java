@@ -35,10 +35,10 @@ public final class ClassMemberFilters {
     private ClassMemberPanelUI ui;
     
     /** constants for defined filters */
-    private static final String SHOW_NON_PUBLIC = "show_non_public";
-    private static final String SHOW_STATIC = "show_static";
-    private static final String SHOW_FIELDS = "show_fields";
-    private static final String SHOW_INHERITED = "show_inherited";
+    private static final String SHOW_NON_PUBLIC = "show_non_public"; // NOI18N
+    private static final String SHOW_STATIC = "show_static"; // NOI18N
+    private static final String SHOW_FIELDS = "show_fields"; // NOI18N
+    private static final String SHOW_INHERITED = "show_inherited"; // NOI18N
     
 //    private static final String SORT_ALPHA = "sort_alpha";
 //    private static final String SORT_POSITION = "sort_position";

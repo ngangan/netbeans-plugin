@@ -63,14 +63,14 @@ public class JavaFXPlatformImplBeanInfo extends SimpleBeanInfo {
                 new PropertyDescriptor (JavaFXPlatformImpl.PROP_SOURCE_FOLDER, JavaFXPlatformImpl.class),
                 new PropertyDescriptor (JavaFXPlatformImpl.PROP_JAVADOC_FOLDER, JavaFXPlatformImpl.class),
             };
-            descs[0].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_Name"));
+            descs[0].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_Name")); // NOI18N
             descs[0].setBound(true);
-            descs[1].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_AntName"));
+            descs[1].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_AntName")); // NOI18N
             descs[1].setWriteMethod(null);
-            descs[2].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_SourcesFolder"));
+            descs[2].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_SourcesFolder")); // NOI18N
             descs[2].setPropertyEditorClass(FileObjectPropertyEditor.class);
             descs[2].setBound(true);
-            descs[3].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_JavaDocFolder"));
+            descs[3].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_JavaDocFolder")); // NOI18N
             descs[3].setPropertyEditorClass(FileObjectPropertyEditor.class);
             descs[3].setBound(true);
             return descs;

@@ -66,7 +66,7 @@ public class WeatherFXApplicationWizardPanel implements WizardDescriptor.Panel, 
     public Component getComponent() {
         if (component == null) {
             component = new WeatherFXApplicationPanelVisual(this);
-            component.setName(NbBundle.getMessage(WeatherFXApplicationWizardPanel.class, "LBL_CreateProjectStep"));
+            component.setName(NbBundle.getMessage(WeatherFXApplicationWizardPanel.class, "LBL_CreateProjectStep")); // NOI18N
         }
         return component;
     }
@@ -106,7 +106,7 @@ public class WeatherFXApplicationWizardPanel implements WizardDescriptor.Panel, 
 
     public void readSettings(Object settings) {
         if (wizardDescriptor == null){
-            ((WizardDescriptor)settings).putProperty("name", null);
+            ((WizardDescriptor)settings).putProperty("name", null); // NOI18N
         }
         wizardDescriptor = (WizardDescriptor) settings;
         component.read(wizardDescriptor);

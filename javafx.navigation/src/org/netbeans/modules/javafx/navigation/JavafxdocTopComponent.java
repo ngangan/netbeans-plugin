@@ -61,15 +61,15 @@ public class JavafxdocTopComponent extends TopComponent {
     
     private static JavafxdocTopComponent instance;
     /** path to the icon used by the component and its open action */
-    public static final String ICON_PATH = "org/netbeans/modules/javafx/navigation/resources/javadoc_action.png";
+    public static final String ICON_PATH = "org/netbeans/modules/javafx/navigation/resources/javadoc_action.png"; // NOI18N
     
-    private static final String PREFERRED_ID = "JavafxdocTopComponent";
+    private static final String PREFERRED_ID = "JavafxdocTopComponent"; // NOI18N
     
     private DocumentationScrollPane documentationPane;
     
     private JavafxdocTopComponent() {
-        setName(NbBundle.getMessage(JavafxdocTopComponent.class, "CTL_JavafxdocTopComponent"));
-        setToolTipText(NbBundle.getMessage(JavafxdocTopComponent.class, "HINT_JavafxdocTopComponent"));
+        setName(NbBundle.getMessage(JavafxdocTopComponent.class, "CTL_JavafxdocTopComponent")); // NOI18N
+        setToolTipText(NbBundle.getMessage(JavafxdocTopComponent.class, "HINT_JavafxdocTopComponent")); // NOI18N
         setIcon(Utilities.loadImage(ICON_PATH, true));
         
         documentationPane = new DocumentationScrollPane( false );
@@ -109,15 +109,15 @@ public class JavafxdocTopComponent extends TopComponent {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
             LOGGER.log(Level.WARNING, 
-                       "Cannot find MyWindow component. It will not be located properly in the window system.");
+                       "Cannot find MyWindow component. It will not be located properly in the window system."); // NOI18N
             return getDefault();
         }
         if (win instanceof JavafxdocTopComponent) {
             return (JavafxdocTopComponent)win;
         }
         LOGGER.log(Level./* Shut up! Logged dozens of times in every session. */FINE,
-                "There seem to be multiple components with the '" + PREFERRED_ID +
-                "' ID. That is a potential source of errors and unexpected behavior.");
+                "There seem to be multiple components with the '" + PREFERRED_ID + // NOI18N
+                "' ID. That is a potential source of errors and unexpected behavior."); // NOI18N
         return getDefault();
     }
    

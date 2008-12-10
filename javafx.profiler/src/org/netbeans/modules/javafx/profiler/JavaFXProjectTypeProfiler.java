@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.profiler;
 
 import org.netbeans.api.java.platform.JavaPlatform;
@@ -48,10 +47,7 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.SessionSettings;
-import org.netbeans.lib.profiler.marker.CompositeMarker;
 import org.netbeans.lib.profiler.marker.Marker;
-import org.netbeans.lib.profiler.marker.MethodMarker;
-import org.netbeans.lib.profiler.marker.PackageMarker;
 import org.netbeans.modules.profiler.AbstractProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.AppletSupport;
@@ -90,7 +86,6 @@ import java.util.Properties;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
-import org.netbeans.lib.profiler.marker.Mark;
 
 /**
  * @author Tomas Hurka
@@ -105,13 +100,11 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         private Properties props;
 
         //~ Constructors ---------------------------------------------------------------------------------------------------------
-
         private MyPropertyProvider(Properties props) {
             this.props = props;
         }
 
         //~ Methods --------------------------------------------------------------------------------------------------------------
-
         public Map /*<String,String>*/ getProperties() {
             return props;
         }
@@ -128,30 +121,30 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
     // -----
     // I18N String constants
     private static final String MODIFY_BUILDSCRIPT_CAPTION = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                                 "JavaFXProjectTypeProfiler_ModifyBuildScriptCaption"); // NOI18N
+            "JavaFXProjectTypeProfiler_ModifyBuildScriptCaption"); // NOI18N
     private static final String MODIFY_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                             "JavaFXProjectTypeProfiler_ModifyBuildScriptMsg"); // NOI18N
+            "JavaFXProjectTypeProfiler_ModifyBuildScriptMsg"); // NOI18N
     private static final String REGENERATE_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                                 "JavaFXProjectTypeProfiler_RegenerateBuildScriptMsg"); // NOI18N
+            "JavaFXProjectTypeProfiler_RegenerateBuildScriptMsg"); // NOI18N
     private static final String CANNOT_FIND_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                                  "JavaFXProjectTypeProfiler_CannotFindBuildScriptMsg"); // NOI18N
+            "JavaFXProjectTypeProfiler_CannotFindBuildScriptMsg"); // NOI18N
     private static final String CANNOT_BACKUP_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                                    "JavaFXProjectTypeProfiler_CannotBackupBuildScriptMsg"); // NOI18N
+            "JavaFXProjectTypeProfiler_CannotBackupBuildScriptMsg"); // NOI18N
     private static final String MODIFY_BUILDSCRIPT_MANUALLY_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                                      "JavaFXProjectTypeProfiler_ModifyBuildScriptManuallyMsg"); // NOI18N
+            "JavaFXProjectTypeProfiler_ModifyBuildScriptManuallyMsg"); // NOI18N
     private static final String PROJECT_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                       "JavaFXProjectTypeProfiler_ProjectCategory"); // NOI18N
+            "JavaFXProjectTypeProfiler_ProjectCategory"); // NOI18N
     private static final String LISTENERS_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                         "JavaFXProjectTypeProfiler_ListenersCategory"); // NOI18N
+            "JavaFXProjectTypeProfiler_ListenersCategory"); // NOI18N
     private static final String PAINTERS_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                        "JavaFXProjectTypeProfiler_PaintersCategory"); // NOI18N
+            "JavaFXProjectTypeProfiler_PaintersCategory"); // NOI18N
     private static final String IO_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                  "JavaFXProjectTypeProfiler_IoCategory"); // NOI18N
+            "JavaFXProjectTypeProfiler_IoCategory"); // NOI18N
     private static final String FILES_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                     "JavaFXProjectTypeProfiler_FilesCategory"); // NOI18N
+            "JavaFXProjectTypeProfiler_FilesCategory"); // NOI18N
     private static final String SOCKETS_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-                                                                       "JavaFXProjectTypeProfiler_SocketsCategory"); // NOI18N
-                                                                                                                   // -----
+            "JavaFXProjectTypeProfiler_SocketsCategory"); // NOI18N
+    // -----
     public static final ErrorManager err = ErrorManager.getDefault().getInstance("org.netbeans.modules.javafx.profiler"); // NOI18N
     private static final String JavaFX_PROJECT_NAMESPACE_40 = "http://www.netbeans.org/ns/javafx-project/1"; // NOI18N
     private static final String JavaFX_PROJECT_NAMESPACE_41 = "http://www.netbeans.org/ns/javafx-project/2"; // NOI18N
@@ -164,36 +157,35 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
     private static final String JAVA_MIME_TYPE = "text/x-java"; // NOI18N    
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-
     private Marker marker;
     private String mainClassSetManually = null; // used for case when the main class is not set in project and user is prompted for it
 
     //~ Methods ------------------------------------------------------------------------------------------------------------------
-
     @Override
     public boolean isFileObjectSupported(final Project project, final FileObject fo) {
-        if (!"java".equals(fo.getExt()) && !"class".equals(fo.getExt()) &&       // NOI18N
-            !"fx".equals(fo.getExt())) {                                         // NOI18N
+        if (!"java".equals(fo.getExt()) && !"class".equals(fo.getExt()) && // NOI18N
+                !"fx".equals(fo.getExt())) {                                         // NOI18N
             return false; // NOI18N
         }
-        
-        if (JAVA_MIME_TYPE.equals(fo.getMIMEType()))
+
+        if (JAVA_MIME_TYPE.equals(fo.getMIMEType())) {
             return SourceUtils.isRunnable(fo);
-            
+        }
+
         // TBD: need to determine if the selected fx class is executable
         // currently returns true for any fx file
         return JAVAFX_MIME_TYPE.equals(fo.getMIMEType());
     }
 
     public String getProfilerTargetName(final Project project, final FileObject buildScript, final int type,
-                                        final FileObject profiledClassFile) {
+            final FileObject profiledClassFile) {
         switch (type) {
             case TARGET_PROFILE:
                 return "profile"; // NOI18N
             case TARGET_PROFILE_SINGLE:
 
-                if (SourceUtils.isApplet(profiledClassFile) || 
-                    JavaFXSourceUtils.isJavaFXApplet(profiledClassFile)) {
+                if (SourceUtils.isApplet(profiledClassFile) ||
+                        JavaFXSourceUtils.isJavaFXApplet(profiledClassFile)) {
                     return "profile-applet"; // NOI18N
                 } else {
                     return "profile-single"; // NOI18N
@@ -209,7 +201,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     // --- ProjectTypeProfiler implementation ------------------------------------------------------------------------------
     public boolean isProfilingSupported(final Project project) {
-        
+
         final AuxiliaryConfiguration aux = (AuxiliaryConfiguration) project.getLookup().lookup(AuxiliaryConfiguration.class);
 
         if (aux == null) {
@@ -243,7 +235,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         JavaPlatformManager jpm = JavaPlatformManager.getDefault();
 
         if (platformName.equals("default_platform")) {  // NOI18N
-            return jpm.getDefaultPlatform(); // NOI18N
+            return jpm.getDefaultPlatform();
         }
 
         JavaPlatform[] platforms = jpm.getPlatforms(null, new Specification("javafx", null)); // NOI18N
@@ -267,7 +259,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
             if ((profiledClass == null) || "".equals(profiledClass)) { // NOI18N
                 mainClassSetManually = ProjectUtilities.selectMainClass(project, null, ProjectUtilities.getProjectName(project),
-                                                                        -1);
+                        -1);
                 if (mainClassSetManually == null) {
                     return false;
                 }
@@ -285,14 +277,14 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         }
 
         String projectName = ProjectUtils.getInformation(project).getDisplayName();
-        String caption = MessageFormat.format(MODIFY_BUILDSCRIPT_CAPTION, new Object[] { projectName });
-        String message = MessageFormat.format(MODIFY_BUILDSCRIPT_MSG, new Object[] { projectName, "build-before-profiler.xml" }); // NOI18N
+        String caption = MessageFormat.format(MODIFY_BUILDSCRIPT_CAPTION, new Object[]{projectName});
+        String message = MessageFormat.format(MODIFY_BUILDSCRIPT_MSG, new Object[]{projectName, "build-before-profiler.xml"}); // NOI18N
 
         if (ProfilerDialogs.notify(new NotifyDescriptor(message, caption, NotifyDescriptor.OK_CANCEL_OPTION,
-                                                            NotifyDescriptor.INFORMATION_MESSAGE,
-                                                            new Object[] {
-                                                                NotifyDescriptor.OK_OPTION, NotifyDescriptor.CANCEL_OPTION
-                                                            }, NotifyDescriptor.OK_OPTION)) != NotifyDescriptor.OK_OPTION) {
+                NotifyDescriptor.INFORMATION_MESSAGE,
+                new Object[]{
+                    NotifyDescriptor.OK_OPTION, NotifyDescriptor.CANCEL_OPTION
+                }, NotifyDescriptor.OK_OPTION)) != NotifyDescriptor.OK_OPTION) {
             return false; // cancelled by the user
         }
 
@@ -301,23 +293,23 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         // 2. the profiler version has been changed (see above)
         // 3. the stylesheet changed (usually should be caught by 2.)
         final GeneratedFilesHelper gfh = new GeneratedFilesHelper(project.getProjectDirectory());
-        int flags = gfh.getBuildScriptState("nbproject/profiler-build-impl.xml",                                     // NOI18N
-                                            JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
+        int flags = gfh.getBuildScriptState("nbproject/profiler-build-impl.xml", // NOI18N
+                JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
 
         if (((flags & GeneratedFilesHelper.FLAG_MISSING) != 0) || ((flags & GeneratedFilesHelper.FLAG_OLD_STYLESHEET) != 0)) {
             try {
                 if ((flags & GeneratedFilesHelper.FLAG_MODIFIED) != 0) {
                     if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(MessageFormat.format(REGENERATE_BUILDSCRIPT_MSG,
-                                                                                                          new Object[] {
-                                                                                                              "profiler-build-impl.xml"  // NOI18N
-                                                                                                          }),
-                                                                                     NotifyDescriptor.OK_CANCEL_OPTION)) != NotifyDescriptor.OK_OPTION) {
+                            new Object[]{
+                                "profiler-build-impl.xml" // NOI18N
+                            }),
+                            NotifyDescriptor.OK_CANCEL_OPTION)) != NotifyDescriptor.OK_OPTION) {
                         return false;
                     }
                 }
 
-                gfh.generateBuildScriptFromStylesheet("nbproject/profiler-build-impl.xml",  // NOI18N
-                                                      JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
+                gfh.generateBuildScriptFromStylesheet("nbproject/profiler-build-impl.xml", // NOI18N
+                        JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
             } catch (IOException e1) {
                 err.notify(ErrorManager.WARNING, e1);
 
@@ -326,11 +318,11 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         }
 
         // store info about profiler with project's auxiliary configuration
-        final Element profilerFragment = XMLUtil.createDocument("ignore", null, null, null)   // NOI18N
-                                                .createElementNS(ProjectUtilities.PROFILER_NAME_SPACE, "data"); // NOI18N
+        final Element profilerFragment = XMLUtil.createDocument("ignore", null, null, null) // NOI18N
+                .createElementNS(ProjectUtilities.PROFILER_NAME_SPACE, "data"); // NOI18N
         profilerFragment.setAttribute(PROFILE_VERSION_ATTRIBUTE, VERSION_NUMBER);
         ((AuxiliaryConfiguration) project.getLookup().lookup(AuxiliaryConfiguration.class)).putConfigurationFragment(profilerFragment,
-                                                                                                                     false);
+                false);
 
         try {
             ProjectManager.getDefault().saveProject(project);
@@ -345,16 +337,16 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
         if (buildScript == null) {
             ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(CANNOT_FIND_BUILDSCRIPT_MSG,
-                                                                                     new Object[] { "build.xml" }), // NOI18N
-                                                                NotifyDescriptor.ERROR_MESSAGE));
+                    new Object[]{"build.xml"}), // NOI18N
+                    NotifyDescriptor.ERROR_MESSAGE));
 
             return false;
         }
 
         if (!ProjectUtilities.backupBuildScript(project)) {
             if (ProfilerDialogs.notify(new NotifyDescriptor.Confirmation(CANNOT_BACKUP_BUILDSCRIPT_MSG,
-                                                                             NotifyDescriptor.OK_CANCEL_OPTION,
-                                                                             NotifyDescriptor.WARNING_MESSAGE)) != NotifyDescriptor.OK_OPTION) {
+                    NotifyDescriptor.OK_CANCEL_OPTION,
+                    NotifyDescriptor.WARNING_MESSAGE)) != NotifyDescriptor.OK_OPTION) {
                 return false; // cancelled by the user
             }
         }
@@ -365,11 +357,11 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         if (importIndex == -1) {
             // notify the user that the build script cannot be modified, and he should perform the change himself
             ProfilerDialogs.notify(new NotifyDescriptor.Message(MessageFormat.format(MODIFY_BUILDSCRIPT_MANUALLY_MSG,
-                                                                                     new Object[] {
-                                                                                         "build.xml",                                           // NOI18N
-                                                                                         "<import file=\"nbproject/profiler-build-impl.xml\"/>" // NOI18N
-                                                                                     }),
-                                                                NotifyDescriptor.WARNING_MESSAGE));
+                    new Object[]{
+                        "build.xml", // NOI18N
+                        "<import file=\"nbproject/profiler-build-impl.xml\"/>" // NOI18N
+                    }),
+                    NotifyDescriptor.WARNING_MESSAGE));
 
             return false;
         }
@@ -378,9 +370,9 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         int idx = importIndex - 1;
 
         while (idx >= 0) {
-            if (buildScript.charAt(idx) == ' ') {
+            if (buildScript.charAt(idx) == ' ') { // NOI18N
                 indent = " " + indent; // NOI18N
-            } else if (buildScript.charAt(idx) == '\t') {
+            } else if (buildScript.charAt(idx) == '\t') { // NOI18N
                 indent = "\t" + indent; // NOI18N
             } else {
                 break;
@@ -427,7 +419,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     @Override
     public void configurePropertiesForProfiling(final Properties props, final Project project, final FileObject profiledClassFile) {
-        PropertyEvaluator projectProps = getProjectProperties(project);        
+        PropertyEvaluator projectProps = getProjectProperties(project);
         if (profiledClassFile == null) {
             if (mainClassSetManually != null) {
                 props.put("main.class", mainClassSetManually); // NOI18N
@@ -437,29 +429,29 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             // In case the class to profile is explicitely selected (profile-single)
             // 1. specify profiled class name
             if (SourceUtils.isApplet(profiledClassFile) ||
-                JavaFXSourceUtils.isJavaFXApplet(profiledClassFile)) {
+                    JavaFXSourceUtils.isJavaFXApplet(profiledClassFile)) {
                 String jvmargs = props.getProperty("run.jvmargs"); // NOI18N
 
-                URL url = null;                
+                URL url = null;
 
                 // do this only when security policy is not set manually
                 if ((jvmargs == null) || !(jvmargs.indexOf("java.security.policy") > 0)) { //NOI18N
-                    
+
                     String buildDirProp = projectProps.getProperty("build.dir"); //NOI18N
-                                                                                 // TODO [M9] what if buildDirProp is null?
+                    // TODO [M9] what if buildDirProp is null?
 
                     FileObject buildFolder = ProjectUtilities.getOrCreateBuildFolder(project, buildDirProp);
 
                     AppletSupport.generateSecurityPolicy(project.getProjectDirectory(), buildFolder);
 
                     if ((jvmargs == null) || (jvmargs.length() == 0)) {
-                        props.setProperty("run.jvmargs",  // NOI18N
-                                          "-Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath() + File.separator  // NOI18N
-                                          + "applet.policy"); //NOI18N
+                        props.setProperty("run.jvmargs", // NOI18N
+                                "-Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath() + File.separator // NOI18N
+                                + "applet.policy"); //NOI18N
                     } else {
-                        props.setProperty("run.jvmargs",                       // NOI18N
-                                          jvmargs + " -Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath()  // NOI18N
-                                          + File.separator + "applet.policy"); //NOI18N
+                        props.setProperty("run.jvmargs", // NOI18N
+                                jvmargs + " -Djava.security.policy=" + FileUtil.toFile(buildFolder).getPath() // NOI18N
+                                + File.separator + "applet.policy"); //NOI18N
                     }
                 }
 
@@ -479,22 +471,21 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 if (null != profiledClass) {
                     props.setProperty("profile.class", profiledClass); //NOI18N
                     final String clazz = FileUtil.getRelativePath(ProjectUtilities.getRootOf(ProjectUtilities.getSourceRoots(project),
-                                                                                     profiledClassFile), profiledClassFile);
+                            profiledClassFile), profiledClassFile);
                     props.setProperty("javac.includes", clazz); //NOI18N
                 } else {
                     if (project instanceof JavaFXProject) {
-                        JavaFXProject projectJFX = (JavaFXProject)project;
-                        String clazz = FileUtil.getRelativePath(JavaFXProjectUtilities.getRoot(projectJFX.getFOSourceRoots(),profiledClassFile), profiledClassFile);
+                        JavaFXProject projectJFX = (JavaFXProject) project;
+                        String clazz = FileUtil.getRelativePath(JavaFXProjectUtilities.getRoot(projectJFX.getFOSourceRoots(), profiledClassFile), profiledClassFile);
                         props.setProperty("javac.includes", clazz); // NOI18N
                         clazz = clazz.substring(0, clazz.length() - 3);
-                        clazz = clazz.replace('/','.');
+                        clazz = clazz.replace('/', '.'); // NOI18N
                         props.setProperty("profile.class", clazz); //NOI18N
-                    }                    
+                    }
                 }
             }
         }
     }
-    
 
     @Override
     public void setupProjectSessionSettings(final Project project, final SessionSettings ss) {
@@ -547,94 +538,95 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         final FileObject configPropsDir = project.getProjectDirectory().getFileObject("nbproject/configs"); // NOI18N
 
         ProjectManager.mutex().readAccess(new Runnable() {
-                public void run() {
-                    // the order is 1. private, 2. project, 3. user to reflect how Ant handles property definitions (immutable, once set property value cannot be changed)
-                    if (privatePropsFile != null) {
+
+            public void run() {
+                // the order is 1. private, 2. project, 3. user to reflect how Ant handles property definitions (immutable, once set property value cannot be changed)
+                if (privatePropsFile != null) {
+                    try {
+                        final InputStream is = privatePropsFile.getInputStream();
+
                         try {
-                            final InputStream is = privatePropsFile.getInputStream();
-
-                            try {
-                                privateProps.load(is);
-                            } finally {
-                                is.close();
-                            }
-                        } catch (IOException e) {
-                            err.notify(ErrorManager.INFORMATIONAL, e);
+                            privateProps.load(is);
+                        } finally {
+                            is.close();
                         }
-                    }
-
-                    if (projectPropsFile != null) {
-                        try {
-                            final InputStream is = projectPropsFile.getInputStream();
-
-                            try {
-                                projectProps.load(is);
-                            } finally {
-                                is.close();
-                            }
-                        } catch (IOException e) {
-                            err.notify(ErrorManager.INFORMATIONAL, e);
-                        }
-                    }
-
-                    if (userPropsFile != null) {
-                        try {
-                            final InputStream is = new BufferedInputStream(new FileInputStream(userPropsFile));
-
-                            try {
-                                userPropsProps.load(is);
-                            } finally {
-                                is.close();
-                            }
-                        } catch (IOException e) {
-                            err.notify(ErrorManager.INFORMATIONAL, e);
-                        }
-                    }
-
-                    if ((configPropsDir != null) && (configPropsFile != null)) {
-                        try {
-                            InputStream is = configPropsFile.getInputStream();
-                            Properties activeConfigProps = new Properties();
-
-                            try {
-                                activeConfigProps.load(is);
-
-                                String activeConfig = activeConfigProps.getProperty("config"); // NOI18N
-
-                                if ((activeConfig != null) && (activeConfig.length() > 0)) {
-                                    FileObject configSpecPropFile = configPropsDir.getFileObject(activeConfig + ".properties"); // NOI18N
-
-                                    if (configSpecPropFile != null) {
-                                        is = configSpecPropFile.getInputStream();
-                                        configProps.load(is);
-                                    }
-                                }
-                            } finally {
-                                is.close();
-                            }
-                        } catch (IOException e) {
-                            err.notify(ErrorManager.INFORMATIONAL, e);
-                        }
+                    } catch (IOException e) {
+                        err.notify(ErrorManager.INFORMATIONAL, e);
                     }
                 }
-            });
+
+                if (projectPropsFile != null) {
+                    try {
+                        final InputStream is = projectPropsFile.getInputStream();
+
+                        try {
+                            projectProps.load(is);
+                        } finally {
+                            is.close();
+                        }
+                    } catch (IOException e) {
+                        err.notify(ErrorManager.INFORMATIONAL, e);
+                    }
+                }
+
+                if (userPropsFile != null) {
+                    try {
+                        final InputStream is = new BufferedInputStream(new FileInputStream(userPropsFile));
+
+                        try {
+                            userPropsProps.load(is);
+                        } finally {
+                            is.close();
+                        }
+                    } catch (IOException e) {
+                        err.notify(ErrorManager.INFORMATIONAL, e);
+                    }
+                }
+
+                if ((configPropsDir != null) && (configPropsFile != null)) {
+                    try {
+                        InputStream is = configPropsFile.getInputStream();
+                        Properties activeConfigProps = new Properties();
+
+                        try {
+                            activeConfigProps.load(is);
+
+                            String activeConfig = activeConfigProps.getProperty("config"); // NOI18N
+
+                            if ((activeConfig != null) && (activeConfig.length() > 0)) {
+                                FileObject configSpecPropFile = configPropsDir.getFileObject(activeConfig + ".properties"); // NOI18N
+
+                                if (configSpecPropFile != null) {
+                                    is = configSpecPropFile.getInputStream();
+                                    configProps.load(is);
+                                }
+                            }
+                        } finally {
+                            is.close();
+                        }
+                    } catch (IOException e) {
+                        err.notify(ErrorManager.INFORMATIONAL, e);
+                    }
+                }
+            }
+        });
 
         PropertyEvaluator pe = PropertyUtils.sequentialPropertyEvaluator(null,
-                                                                         new PropertyProvider[] {
-                                                                             new MyPropertyProvider(configProps),
-                                                                             new MyPropertyProvider(privateProps),
-                                                                             new MyPropertyProvider(userPropsProps),
-                                                                             new MyPropertyProvider(projectProps)
-                                                                         });
+                new PropertyProvider[]{
+                    new MyPropertyProvider(configProps),
+                    new MyPropertyProvider(privateProps),
+                    new MyPropertyProvider(userPropsProps),
+                    new MyPropertyProvider(projectProps)
+                });
 
         return pe;
     }
-    
+
     @Override
     public org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection[] getDefaultRootMethods(Project project,
-                                                                                                    FileObject profiledClassFile,
-                                                                                                    boolean profileUnderlyingFramework,
-                                                                                                    String[][] projectPackagesDescr) {
+            FileObject profiledClassFile,
+            boolean profileUnderlyingFramework,
+            String[][] projectPackagesDescr) {
         if (profileUnderlyingFramework) {
             // No root method should be specified, first executed method will be treated as root method
             return new ClientUtils.SourceCodeSelection[0];
@@ -646,14 +638,14 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             } else {
                 // Profile Single, provide correct root methods
                 String profiledClass = JavaFXProjectUtilities.getToplevelClassName(project, profiledClassFile);
-                return new ClientUtils.SourceCodeSelection[] { new ClientUtils.SourceCodeSelection(profiledClass, "<all>", "") }; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
+                return new ClientUtils.SourceCodeSelection[]{new ClientUtils.SourceCodeSelection(profiledClass, "<all>", "")}; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
             }
         }
-    }    
-    
+    }
+
     @Override
     public SimpleFilter computePredefinedInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
-                                                               String[][] projectPackagesDescr) {
+            String[][] projectPackagesDescr) {
         return JavaFXProjectUtilities.computeProjectOnlyInstrumentationFilter(project, predefinedInstrFilter, projectPackagesDescr);
-    }    
+    }
 }

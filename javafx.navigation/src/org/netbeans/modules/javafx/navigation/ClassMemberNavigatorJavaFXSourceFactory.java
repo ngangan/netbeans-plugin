@@ -74,7 +74,7 @@ public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaSour
 
     public ClassMemberNavigatorJavaFXSourceFactory() {
 //        super(Phase.ELEMENTS_RESOLVED, Priority.LOW, "text/x-java", "application/x-class-file");
-        super(Phase.ANALYZED, Priority.LOW, "text/x-fx");
+        super(Phase.ANALYZED, Priority.LOW, "text/x-fx"); // NOI18N
     }
 
     @Override

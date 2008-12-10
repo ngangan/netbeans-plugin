@@ -49,7 +49,7 @@ import org.netbeans.spi.palette.PaletteFactory;
  */
 public class JavaFXPaletteFactory {
     
-    public static final String JAVAFX_PALETTE_FOLDER = "JavaFXPalette";
+    public static final String JAVAFX_PALETTE_FOLDER = "JavaFXPalette"; // NOI18N
     
     static private PaletteController palette = null;
 

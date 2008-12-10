@@ -103,7 +103,7 @@ public class JavaFXPaletteActions extends PaletteActions {
             }
             JTextComponent target = Utilities.getFocusedComponent();
             if( target == null ) {
-                String msg = NbBundle.getMessage( JavaFXPaletteActions.class, "MSG_ErrorNoFocusedDocument" );
+                String msg = NbBundle.getMessage( JavaFXPaletteActions.class, "MSG_ErrorNoFocusedDocument" ); // NOI18N
                 DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE));
                 return;
             }

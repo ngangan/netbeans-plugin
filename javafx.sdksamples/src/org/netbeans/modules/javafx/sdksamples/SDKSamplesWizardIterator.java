@@ -89,18 +89,18 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
     }
 
     private String[] createSteps() {
-        return new String[]{ NbBundle.getMessage( SDKSamplesWizardIterator.class, "LBL_CreateProjectStep" )};
+        return new String[]{ NbBundle.getMessage( SDKSamplesWizardIterator.class, "LBL_CreateProjectStep" )}; // NOI18N
     }
 
     public Set instantiate() throws IOException {
         Set<FileObject> resultSet = new LinkedHashSet<FileObject>();
 
-        File dirF = FileUtil.normalizeFile((File) wizard.getProperty( "projdir" ));
+        File dirF = FileUtil.normalizeFile((File) wizard.getProperty( "projdir" )); // NOI18N
         dirF.mkdirs();
 
         FileObject template = Templates.getTemplate( wizard );
         FileObject dir = FileUtil.toFileObject( dirF );
-        unZipFile( template.getInputStream(), dir, (String) wizard.getProperty( "name" ), file.getName());
+        unZipFile( template.getInputStream(), dir, (String) wizard.getProperty( "name" ), file.getName()); // NOI18N
 
         resultSet.add(dir);
         // Look for nested projects to open as well:
@@ -138,9 +138,9 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
                 // assume Swing components
                 JComponent jc = (JComponent) c;
                 // Step #.
-                jc.putClientProperty( "WizardPanel_contentSelectedIndex", new Integer( i ));
+                jc.putClientProperty( "WizardPanel_contentSelectedIndex", new Integer( i )); // NOI18N
                 // Step name (actually the whole list for reference).
-                jc.putClientProperty( "WizardPanel_contentData", steps );
+                jc.putClientProperty( "WizardPanel_contentData", steps ); // NOI18N
             }
         }
     }
@@ -150,7 +150,7 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
     }
 
     public String name() {
-        return MessageFormat.format( "{0} of {1}", new Object[]{ new Integer(index + 1), new Integer( panels.length )});
+        return MessageFormat.format( "{0} of {1}", new Object[]{ new Integer(index + 1), new Integer( panels.length )}); // NOI18N
     }
 
     public boolean hasNext() {
@@ -206,14 +206,14 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
                     FileObject fo = FileUtil.createData(projectRoot, entry.getName().substring( rootFileName.length()));
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     FileUtil.copy(str, baos);
-                    String content = baos.toString( "UTF-8" ).
+                    String content = baos.toString( "UTF-8" ). // NOI18N
 //                            replaceAll("\n|\r|\r\n", System.getProperty("line.separator")).
-                            replaceAll( "@NAME@", name );
+                            replaceAll( "@NAME@", name ); // NOI18N
                     FileLock lock = fo.lock();
                     try {
                         OutputStream out = fo.getOutputStream( lock );
                         try {
-                            FileUtil.copy( new ByteArrayInputStream( content.getBytes( "UTF-8" )), out );
+                            FileUtil.copy( new ByteArrayInputStream( content.getBytes( "UTF-8" )), out ); // NOI18N
                         } finally {
                             out.close();
                         }
@@ -241,12 +241,12 @@ public class SDKSamplesWizardIterator implements WizardDescriptor.InstantiatingI
     }
 
     private static final String textFileExtensions[] = new String[] {
-        "xml", "html", "htm", "txt", "mf", "properties", "fx", "java"
+        "xml", "html", "htm", "txt", "mf", "properties", "fx", "java" // NOI18N
     };
 
     private static boolean isText( String filename ) {
         for( String ext : textFileExtensions ) {
-            if( filename.toLowerCase().endsWith( "." + ext )) return true;
+            if( filename.toLowerCase().endsWith( "." + ext )) return true; // NOI18N
         }
         return false;
     }

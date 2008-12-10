@@ -75,7 +75,7 @@ public class JavaFXPaletteUtilities {
             try {
                 int cursor_offset = s.indexOf(CARET);
                 if (cursor_offset != -1) {
-                    s = s.replace( CARET, "" );
+                    s = s.replace( CARET, "" ); // NOI18N
                 }
                 int start = insert( s, target, d );
                 if (cursor_offset != -1) {

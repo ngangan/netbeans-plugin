@@ -68,14 +68,14 @@ public class JavaFXPaletteCustomizerAction extends CallableSystemAction {
         try {
             JavaFXPaletteFactory.getPalette().showCustomizer();
         } catch( IOException ioe ) {
-            Logger.getLogger( "global" ).log( Level.WARNING, null, ioe );
+            Logger.getLogger( "global" ).log( Level.WARNING, null, ioe ); // NOI18N
         }
     }
 
     @Override
     public String getName() {
         if( name == null ) {
-            name = NbBundle.getMessage( JavaFXPaletteCustomizerAction.class, "ACT_OpenJavaFXCustomizer" );
+            name = NbBundle.getMessage( JavaFXPaletteCustomizerAction.class, "ACT_OpenJavaFXCustomizer" ); // NOI18N
         }
         return name;
     }

@@ -54,7 +54,7 @@ import org.openide.filesystems.FileUtil;
 
 public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentListener {
 
-    public static final String PROP_PROJECT_NAME = "projectName";
+    public static final String PROP_PROJECT_NAME = "projectName"; // NOI18N
     private WeatherFXApplicationWizardPanel panel;
 
     public WeatherFXApplicationPanelVisual(WeatherFXApplicationWizardPanel panel) {
@@ -86,12 +86,12 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         createdFolderTextField = new javax.swing.JTextField();
 
         projectNameLabel.setLabelFor(projectNameTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, "Project &Name:");
+        org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Name")); // NOI18N
 
         projectLocationLabel.setLabelFor(projectLocationTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(projectLocationLabel, "Project &Location:");
+        org.openide.awt.Mnemonics.setLocalizedText(projectLocationLabel, org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Location")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(browseButton, "Br&owse...");
+        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Browse_Button_label")); // NOI18N
         browseButton.setActionCommand("BROWSE");
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -100,7 +100,7 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         });
 
         createdFolderLabel.setLabelFor(createdFolderTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(createdFolderLabel, "Project &Folder:");
+        org.openide.awt.Mnemonics.setLocalizedText(createdFolderLabel, org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder")); // NOI18N
 
         createdFolderTextField.setEditable(false);
 
@@ -145,15 +145,15 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         projectNameLabel.getAccessibleContext().setAccessibleDescription("Name of new project");
         projectLocationLabel.getAccessibleContext().setAccessibleDescription("Location of the project's root folder");
         browseButton.getAccessibleContext().setAccessibleDescription("Click the Browse button to open the project location chooser.");
-        createdFolderLabel.getAccessibleContext().setAccessibleDescription("Location of the project");
+        createdFolderLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Location_of_the_project")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String command = evt.getActionCommand();
-        if ("BROWSE".equals(command)) {
+        if ("BROWSE".equals(command)) { // NOI18N
             JFileChooser chooser = new JFileChooser();
             FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-            chooser.setDialogTitle("Select Project Location");
+            chooser.setDialogTitle(org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Select_Project_Location"));
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
             if (path.length() > 0) {
@@ -189,16 +189,15 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
     }
 
     boolean valid(WizardDescriptor wizardDescriptor) {
-
+        String message = org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_is_not_a_valid_path");
         if (projectNameTextField.getText().length() == 0) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                    "Project Name is not a valid folder name.");
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                    org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Name_is_not_a_valid_folder_name"));
             return false; // Display name not specified
         }
         File f = FileUtil.normalizeFile(new File(projectLocationTextField.getText()).getAbsoluteFile());
         if (!f.isDirectory()) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", message);
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", message); // NOI18N
             return false;
         }
         final File destFolder = FileUtil.normalizeFile(new File(createdFolderTextField.getText()).getAbsoluteFile());
@@ -208,25 +207,24 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
             projLoc = projLoc.getParentFile();
         }
         if (projLoc == null || !projLoc.canWrite()) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                                    "Project Folder cannot be created.");
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                                    org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_cannot_be_created"));
             return false;
         }
 
         if (FileUtil.toFileObject(projLoc) == null) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", message);
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", message); // NOI18N
             return false;
         }
 
         File[] kids = destFolder.listFiles();
         if (destFolder.exists() && kids != null && kids.length > 0) {
             // Folder exists and is not empty
-            wizardDescriptor.putProperty("WizardPanel_errorMessage",
-                                     "Project Folder already exists and is not empty.");
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
+                                     org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_already_exists_and_is_not_empty"));
             return false;
         }
-        wizardDescriptor.putProperty("WizardPanel_errorMessage", "");
+        wizardDescriptor.putProperty("WizardPanel_errorMessage", ""); // NOI18N
         return true;
     }
 
@@ -234,12 +232,12 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         String name = projectNameTextField.getText().trim();
         String folder = createdFolderTextField.getText().trim();
 
-        d.putProperty("projdir", new File(folder));
-        d.putProperty("name", name);
+        d.putProperty("projdir", new File(folder)); // NOI18N
+        d.putProperty("name", name); // NOI18N
     }
 
     void read(WizardDescriptor settings) {
-        File projectLocation = (File) settings.getProperty("projdir");
+        File projectLocation = (File) settings.getProperty("projdir"); // NOI18N
         if (projectLocation == null || projectLocation.getParentFile() == null || !projectLocation.getParentFile().isDirectory()) {
             projectLocation = ProjectChooser.getProjectsFolder();
         } else {
@@ -247,9 +245,9 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         }
         this.projectLocationTextField.setText(projectLocation.getAbsolutePath());
 
-        String projectName = (String) settings.getProperty("name");
+        String projectName = (String) settings.getProperty("name"); // NOI18N
         if(projectName == null) {
-            projectName = "WeatherFXApplication";
+            projectName = "WeatherFXApplication"; // NOI18N
         }
         this.projectNameTextField.setText(projectName);
         this.projectNameTextField.selectAll();

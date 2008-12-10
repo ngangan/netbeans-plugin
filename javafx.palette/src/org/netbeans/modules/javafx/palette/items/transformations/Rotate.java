@@ -53,13 +53,13 @@ import org.openide.util.NbBundle;
 public class Rotate implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Rotate.class, "TEMPLATE_Rotate" );
+        String code = NbBundle.getMessage( Rotate.class, "TEMPLATE_Rotate" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Import
-        Imports.addImport( targetComponent, "javafx.scene.transform.Rotate" );
+        Imports.addImport( targetComponent, "javafx.scene.transform.Rotate" ); // NOI18N
         
         return true;
     }    

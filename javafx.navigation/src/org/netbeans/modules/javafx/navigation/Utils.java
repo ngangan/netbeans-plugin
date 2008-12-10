@@ -104,7 +104,7 @@ class Utils {
                 stringBuilder.append(toString(modifiers));
                 if (modifiers.size() > 0) {
                     if (stringBuilder.length() > 0) {
-                        stringBuilder.append(" ");
+                        stringBuilder.append(" "); // NOI18N
                     }
                 }
             }
@@ -140,7 +140,7 @@ class Utils {
                 stringBuilder.append(toString(modifiers));
                 if (modifiers.size() > 0) {
                     if (stringBuilder.length() > 0) {
-                        stringBuilder.append(" ");
+                        stringBuilder.append(" "); // NOI18N
                     }
                 }
             }
@@ -148,10 +148,10 @@ class Utils {
             ExecutableElement constructorElement = (ExecutableElement) element;
             stringBuilder.append(constructorElement.getEnclosingElement()
                                                    .getSimpleName().toString());
-            stringBuilder.append("(");
+            stringBuilder.append("("); // NOI18N
             formatVariableElements(constructorElement.getParameters(),
                 constructorElement.isVarArgs(), stringBuilder, FQNs);
-            stringBuilder.append(")");
+            stringBuilder.append(")"); // NOI18N
 
             List<? extends TypeMirror> thrownTypesMirrors = constructorElement.getThrownTypes();
             if (!thrownTypesMirrors.isEmpty()) {
@@ -171,14 +171,14 @@ class Utils {
                 
                 if (modifiers.size() > 0) {
                     if (stringBuilder.length() > 0) {
-                        stringBuilder.append(" ");
+                        stringBuilder.append(" "); // NOI18N
                     }
                 }
 
                 if ((typeParameters != null) && (typeParameters.size() > 0)) {
                     formatTypeParameters(typeParameters, stringBuilder, FQNs);
                     if (stringBuilder.length() > 0) {
-                        stringBuilder.append(" ");
+                        stringBuilder.append(" "); // NOI18N
                     }
                 }
 
@@ -186,14 +186,14 @@ class Utils {
             }
 
             if (stringBuilder.length() > 0) {
-                    stringBuilder.append(" ");
+                    stringBuilder.append(" "); // NOI18N
             }
 
             stringBuilder.append(methodElement.getSimpleName().toString());
-            stringBuilder.append("(");
+            stringBuilder.append("("); // NOI18N
             formatVariableElements(methodElement.getParameters(),
                 methodElement.isVarArgs(), stringBuilder, FQNs);
-            stringBuilder.append(")");
+            stringBuilder.append(")"); // NOI18N
 
             List<? extends TypeMirror> thrownTypesMirrorsByMethod = methodElement.getThrownTypes();
             if (!thrownTypesMirrorsByMethod.isEmpty()) {
@@ -208,32 +208,32 @@ class Utils {
                     if (annotationValueValue != null) {
                         stringBuilder.append(" default "); // NOI18N
                         if (annotationValueValue instanceof String) {
-                            stringBuilder.append("\"");
+                            stringBuilder.append("\""); // NOI18N
                         } else if (annotationValueValue instanceof Character) {
-                            stringBuilder.append("\'");
+                            stringBuilder.append("\'"); // NOI18N
                         } 
                         stringBuilder.append(String.valueOf(annotationValueValue));
                         if (annotationValueValue instanceof String) {
-                            stringBuilder.append("\"");
+                            stringBuilder.append("\""); // NOI18N
                         } else if (annotationValueValue instanceof Character) {
-                            stringBuilder.append("\'");
+                            stringBuilder.append("\'"); // NOI18N
                         }                    
                     }
                 }
             } else {
-                stringBuilder.append(":");
+                stringBuilder.append(":"); // NOI18N
 
                 formatTypeMirror(returnTypeMirror, stringBuilder, FQNs);
 
                 if ((typeParameters != null) && (typeParameters.size() > 0)) {
-                    stringBuilder.append(":");
+                    stringBuilder.append(":"); // NOI18N
                     formatTypeParameters(typeParameters, stringBuilder, FQNs);
                 }
 
                 if (JavaFXMembersAndHierarchyOptions.isShowInherited()) {
-                    stringBuilder.append(" [");
+                    stringBuilder.append(" ["); // NOI18N
                     stringBuilder.append(getClassName(element.getEnclosingElement().toString(), FQNs));
-                    stringBuilder.append("]");
+                    stringBuilder.append("]"); // NOI18N
                 }
             }
 
@@ -273,14 +273,14 @@ class Utils {
                 stringBuilder.append(toString(modifiers));
 
                 if (stringBuilder.length() > 0) {
-                    stringBuilder.append(" ");
+                    stringBuilder.append(" "); // NOI18N
                 }
 
                 formatTypeMirror(fieldElement.asType(), stringBuilder, FQNs);
             }
 
             if (stringBuilder.length() > 0) {
-                stringBuilder.append(" ");
+                stringBuilder.append(" "); // NOI18N
             }
 
             stringBuilder.append(fieldElement.getSimpleName().toString());
@@ -288,28 +288,28 @@ class Utils {
             if (forSignature) {
                 Object fieldValue = fieldElement.getConstantValue();
                 if (fieldValue != null) {
-                    stringBuilder.append(" = ");
+                    stringBuilder.append(" = "); // NOI18N
                     if (fieldValue instanceof String) {
-                        stringBuilder.append("\"");
+                        stringBuilder.append("\""); // NOI18N
                     } else if (fieldValue instanceof Character) {
-                        stringBuilder.append("\'");
+                        stringBuilder.append("\'"); // NOI18N
                     } 
                     stringBuilder.append(String.valueOf(fieldValue));
                     if (fieldValue instanceof String) {
-                        stringBuilder.append("\"");
+                        stringBuilder.append("\""); // NOI18N
                     } else if (fieldValue instanceof Character) {
-                        stringBuilder.append("\'");
+                        stringBuilder.append("\'"); // NOI18N
                     }                    
                 }
             } else {
-                stringBuilder.append(":");
+                stringBuilder.append(":"); // NOI18N
 
                 formatTypeMirror(fieldElement.asType(), stringBuilder, FQNs);
 
                 if (JavaFXMembersAndHierarchyOptions.isShowInherited()) {
-                    stringBuilder.append(" [");
+                    stringBuilder.append(" ["); // NOI18N
                     stringBuilder.append(getClassName(element.getEnclosingElement().toString(), FQNs));
-                    stringBuilder.append("]");
+                    stringBuilder.append("]"); // NOI18N
                 }
             }
             
@@ -319,9 +319,9 @@ class Utils {
             stringBuilder.append(element.toString());
 
             if (JavaFXMembersAndHierarchyOptions.isShowInherited()) {
-                stringBuilder.append(" [");
+                stringBuilder.append(" ["); // NOI18N
                 stringBuilder.append(getClassName(element.getEnclosingElement().toString(), FQNs));
-                stringBuilder.append("]");
+                stringBuilder.append("]"); // NOI18N
             }
 
             break;
@@ -368,7 +368,7 @@ class Utils {
 
         case WILDCARD:
             WildcardType wildcardType = (WildcardType)typeMirror;
-            stringBuilder.append("?");
+            stringBuilder.append("?"); // NOI18N
             if ( wildcardType.getExtendsBound() != null ) {
                 stringBuilder.append(" extends "); // NOI18N
                 formatTypeMirror(wildcardType.getExtendsBound(), stringBuilder, FQNs);
@@ -393,9 +393,9 @@ class Utils {
             }
             List<? extends TypeMirror> typeArgs = declaredType.getTypeArguments();
             if ( !typeArgs.isEmpty() ) {
-                stringBuilder.append("<");
+                stringBuilder.append("<"); // NOI18N
                 formatTypeMirrors(typeArgs, stringBuilder, FQNs);
-                stringBuilder.append(">");
+                stringBuilder.append(">"); // NOI18N
             }
 
             break;
@@ -412,7 +412,7 @@ class Utils {
             formatTypeMirror(typeMirror, stringBuilder, FQNs);
 
             for (int i = 0; i < dims; i++) {
-                stringBuilder.append("[]");
+                stringBuilder.append("[]"); // NOI18N
             }
 
             break;
@@ -428,20 +428,20 @@ class Utils {
 
         boolean first = true;        
         if (typeParameters.size() > 0) {
-            stringBuilder.append("<");
+            stringBuilder.append("<"); // NOI18N
             first = true;
 
             for (TypeParameterElement typeParameterElement : typeParameters) {
                 if (first) {
                     first = false;
                 } else {
-                    stringBuilder.append(", ");
+                    stringBuilder.append(", "); // NOI18N
                 }
 
                 format(typeParameterElement, stringBuilder, false, FQNs);
             }
 
-            stringBuilder.append(">");
+            stringBuilder.append(">"); // NOI18N
         }
     }
 
@@ -458,14 +458,14 @@ class Utils {
             if (first) {
                 first = false;
             } else {
-                stringBuilder.append(", ");
+                stringBuilder.append(", "); // NOI18N
             }
 
            format(variableElement, stringBuilder, false, FQNs);
         }
 
         if (varArgs) {
-            stringBuilder.append("...");
+            stringBuilder.append("..."); // NOI18N
         }
     }
 
@@ -481,7 +481,7 @@ class Utils {
             if (first) {
                 first = false;
             } else {
-                stringBuilder.append(", ");
+                stringBuilder.append(", "); // NOI18N
             }
 
             formatTypeMirror(typeMirror, stringBuilder, FQNs);
@@ -634,14 +634,14 @@ class Utils {
     
     static String getClassName(String className, boolean FQNs) {
         // Handle generic type names i.e. strip off parameters
-        int firstLessThan = className.indexOf('<');
+        int firstLessThan = className.indexOf('<'); // NOI18N
 
         if (firstLessThan != -1) {
             className = className.substring(0, firstLessThan);
         }
 
         if (!FQNs) {
-            int lastDot = className.lastIndexOf('.');
+            int lastDot = className.lastIndexOf('.'); // NOI18N
 
             if (lastDot != -1) {
                 className = className.substring(lastDot + 1);
@@ -653,13 +653,13 @@ class Utils {
 
     static String getClassNameSansPackage(String className) {
         // Handle generic type names i.e. strip off parameters
-        int firstLessThan = className.indexOf('<');
+        int firstLessThan = className.indexOf('<'); // NOI18N
 
         if (firstLessThan != -1) {
             className = className.substring(0, firstLessThan);
         }
 
-        int lastDot = className.lastIndexOf('.');
+        int lastDot = className.lastIndexOf('.'); // NOI18N
 
         if (lastDot != -1) {
             className = className.substring(lastDot + 1);

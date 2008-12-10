@@ -48,13 +48,9 @@ import java.net.MalformedURLException;
 import org.openide.util.Exceptions;
 
 import org.openide.util.NbBundle;
-import org.openide.util.Utilities;
 import org.openide.filesystems.FileUtil;
 import org.netbeans.api.java.platform.*;
 import org.netbeans.api.java.classpath.*;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
-import org.openide.filesystems.URLMapper;
 import org.openide.modules.InstalledFileLocator;
 
 /**
@@ -70,7 +66,7 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
 
     private ClassPath standardLibs;
     
-    @SuppressWarnings("unchecked")  //Properties cast to Map<String,String>
+    @SuppressWarnings("unchecked")  //Properties cast to Map<String,String> // NOI18N
     static JavaPlatform create(Map<String,String> properties, List<URL> sources, List<URL> javadoc) {
         // XXX java.home??
         File javaHome = FileUtil.normalizeFile(new File(System.getProperty("jdk.home")));       //NOI18N
@@ -81,9 +77,9 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
-        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
+        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
         if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
-            fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false);
+            fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
         if (fxPath != null && fxPath.isFile()) try {
             fxPath = fxPath.getParentFile().getParentFile().getParentFile();
             fxFolder = fxPath.toURI().toURL();
@@ -114,7 +110,7 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
     public String getDisplayName () {
         String displayName = super.getDisplayName();
         if (displayName == null) {
-            displayName = NbBundle.getMessage(DefaultPlatformImpl.class,"TXT_DefaultPlatform", getSpecification().getVersion().toString());
+            displayName = NbBundle.getMessage(DefaultPlatformImpl.class,"TXT_DefaultPlatform", getSpecification().getVersion().toString()); // NOI18N
             this.internalSetDisplayName (displayName);
         }
         return displayName;

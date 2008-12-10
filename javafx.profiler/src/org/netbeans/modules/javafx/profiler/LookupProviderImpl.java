@@ -37,7 +37,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.profiler;
 
 import org.netbeans.api.project.Project;
@@ -50,7 +49,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-
 /**
  *
  * @author Jiri Sedlacek
@@ -60,26 +58,26 @@ public class LookupProviderImpl implements LookupProvider {
 
     public DataFilesProviderImplementation getDataFilesProviderImplementation(final Project project) {
         return new DataFilesProviderImplementation() {
-                public List<FileObject> getMetadataFiles() {
-                    List<FileObject> metadataFilesList = new LinkedList();
-                    FileObject buildBackupFile = (project == null) ? null
-                                                                   : project.getProjectDirectory()
-                                                                            .getFileObject("build-before-profiler.xml"); // NOI18N
 
-                    if ((buildBackupFile != null) && buildBackupFile.isValid()) {
-                        metadataFilesList.add(buildBackupFile);
-                    }
+            public List<FileObject> getMetadataFiles() {
+                List<FileObject> metadataFilesList = new LinkedList();
+                FileObject buildBackupFile = (project == null) ? null
+                        : project.getProjectDirectory().getFileObject("build-before-profiler.xml"); // NOI18N
 
-                    return metadataFilesList;
+                if ((buildBackupFile != null) && buildBackupFile.isValid()) {
+                    metadataFilesList.add(buildBackupFile);
                 }
 
-                public List<FileObject> getDataFiles() {
-                    return Collections.EMPTY_LIST;
-                }
-            };
+                return metadataFilesList;
+            }
+
+            public List<FileObject> getDataFiles() {
+                return Collections.EMPTY_LIST;
+            }
+        };
     }
 
     public Lookup createAdditionalLookup(Lookup baseContext) {
-        return Lookups.fixed(new Object[] { getDataFilesProviderImplementation(baseContext.lookup(Project.class)) });
+        return Lookups.fixed(new Object[]{getDataFilesProviderImplementation(baseContext.lookup(Project.class))});
     }
 }

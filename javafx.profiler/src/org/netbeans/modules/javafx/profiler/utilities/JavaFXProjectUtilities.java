@@ -308,7 +308,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         } else if (isJavaFXFile(profiledClassFile)) {
             JavaFXProject projectJFX = (JavaFXProject)project;
             String clazz = FileUtil.getRelativePath(getRoot(projectJFX.getFOSourceRoots(),profiledClassFile), profiledClassFile);
-            return (clazz.substring(0, clazz.length() - 3)).replace('/','.');           
+            return (clazz.substring(0, clazz.length() - 3)).replace('/','.'); // NOI18N
         }
         return ""; //NOI18N // won't be here: other file types are not supported
     }   
@@ -407,10 +407,10 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
             return null;
         }
         
-        if (className.indexOf('$') != -1) {
+        if (className.indexOf('$') != -1) { // NOI18N
             try {
-                new Integer(className.substring(className.indexOf('$') + 1, className.indexOf('$') + 2));
-                className = className.substring(0, className.indexOf('$')); // digit. Assume hidden anonymous inner class                
+                new Integer(className.substring(className.indexOf('$') + 1, className.indexOf('$') + 2)); // NOI18N
+                className = className.substring(0, className.indexOf('$')); // digit. Assume hidden anonymous inner class      // NOI18N
             } catch (NumberFormatException e) {
             }
         }
@@ -512,7 +512,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 (owner.kind == Kinds.TYP && owner.type.tag == TypeTags.TYPEVAR)) 
             return name.toString();
 
-        char sep = owner.kind == Kinds.TYP ? '$' : '.';
+        char sep = owner.kind == Kinds.TYP ? '$' : '.'; // NOI18N
         name = ((Symbol)element).getSimpleName();
         
         Name prefix = owner.flatName();

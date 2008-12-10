@@ -53,7 +53,7 @@ import org.openide.util.NbBundle;
 public class ToggleButton implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( ToggleButton.class, "TEMPLATE_ToggleButton" );
+        String code = NbBundle.getMessage( ToggleButton.class, "TEMPLATE_ToggleButton" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );

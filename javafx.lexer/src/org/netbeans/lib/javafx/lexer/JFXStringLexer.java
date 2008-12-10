@@ -70,7 +70,7 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
         while (true) {
             int ch = input.read();
             if (log.isLoggable(Level.FINE))
-                log.fine("Reading character: " + (ch == EOF ? "<EOF>" : Character.toString((char) ch)));
+                log.fine("Reading character: " + (ch == EOF ? "<EOF>" : Character.toString((char) ch))); // NOI18N
             switch (ch) {
                 case EOF:
                     if (input.readLength() > 0)
@@ -104,8 +104,8 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
                         case '\\': //NOI18N
                             return token(JFXStringTokenId.BACKSLASH);
                         case 'u': //NOI18N
-                            while ('u' == (ch = input.read())) {
-                            }//NOI18N
+                            while ('u' == (ch = input.read())) { // NOI18N
+                            }
 
                             for (int i = 0; ; i++) {
                                 ch = Character.toLowerCase(ch);
@@ -122,28 +122,28 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
                                 ch = input.read();
                             }
 
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3': //NOI18N
+                        case '0': // NOI18N
+                        case '1': // NOI18N
+                        case '2': // NOI18N
+                        case '3': // NOI18N
                             switch (input.read()) {
-                                case '0':
-                                case '1':
-                                case '2':
-                                case '3': //NOI18N
-                                case '4':
-                                case '5':
-                                case '6':
+                                case '0': // NOI18N
+                                case '1': // NOI18N
+                                case '2': // NOI18N
+                                case '3': // NOI18N
+                                case '4': // NOI18N
+                                case '5': // NOI18N
+                                case '6': // NOI18N
                                 case '7': //NOI18N
                                     switch (input.read()) {
-                                        case '0':
-                                        case '1':
-                                        case '2':
-                                        case '3': //NOI18N
-                                        case '4':
-                                        case '5':
-                                        case '6':
-                                        case '7': //NOI18N
+                                        case '0': // NOI18N
+                                        case '1': // NOI18N
+                                        case '2': // NOI18N
+                                        case '3': // NOI18N
+                                        case '4': // NOI18N
+                                        case '5': // NOI18N
+                                        case '6': // NOI18N
+                                        case '7': // NOI18N
                                             return token(JFXStringTokenId.OCTAL_ESCAPE);
                                     }
                                     input.backup(1);
@@ -154,7 +154,7 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
                     }
                     input.backup(1);
                     return token(JFXStringTokenId.ESCAPE_SEQUENCE_INVALID);
-                case '{':
+                case '{': // NOI18N
                     if (input.readLength() > 1 || forceStringLiteralOnly) {// already read some text
                         input.backup(1);
                         return tokenFactory.createToken(JFXStringTokenId.TEXT, input.readLength());
@@ -162,7 +162,7 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
                     rl_slStartPossible = false;
                     return tokenFactory.createToken(JFXStringTokenId.CODE_OPENING_BRACE, input.readLength());
 
-                case '}':
+                case '}': // NOI18N
                     if (input.readLength() > 1 || forceStringLiteralOnly || rl_slStartPossible) {
                         return tokenFactory.createToken(JFXStringTokenId.TEXT, input.readLength());
                     } else {

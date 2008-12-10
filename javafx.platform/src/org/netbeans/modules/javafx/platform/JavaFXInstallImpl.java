@@ -67,6 +67,6 @@ class JavaFXPlatformInstall extends CustomPlatformInstall {
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(JavaFXPlatformInstall.class,"TXT_JavaFXPlatform");
+        return NbBundle.getMessage(JavaFXPlatformInstall.class, "TXT_JavaFXPlatform"); // NOI18N
     }
 }

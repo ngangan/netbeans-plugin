@@ -53,7 +53,7 @@ import org.openide.util.NbBundle;
 public class ComboBox implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( ComboBox.class, "TEMPLATE_ComboBox" );
+        String code = NbBundle.getMessage( ComboBox.class, "TEMPLATE_ComboBox" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );

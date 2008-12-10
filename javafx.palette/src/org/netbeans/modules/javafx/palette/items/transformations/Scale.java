@@ -53,13 +53,13 @@ import org.openide.util.NbBundle;
 public class Scale implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Scale.class, "TEMPLATE_Scale" );
+        String code = NbBundle.getMessage( Scale.class, "TEMPLATE_Scale" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Import
-        Imports.addImport( targetComponent, "javafx.scene.transform.Scale" );
+        Imports.addImport( targetComponent, "javafx.scene.transform.Scale" ); // NOI18N
         
         return true;
     }    

@@ -254,7 +254,7 @@ public final class PlatformUiSupport {
         }
 
         public SourceLevelKey(final SpecificationVersion sourceLevel, final boolean broken) {
-            assert sourceLevel != null : "Source level cannot be null";
+            assert sourceLevel != null : "Source level cannot be null"; // NOI18N
             this.sourceLevel = sourceLevel;
             this.broken = broken;
         }
@@ -268,7 +268,7 @@ public final class PlatformUiSupport {
         }
 
         public int compareTo(final Object other) {
-            assert other instanceof SourceLevelKey : "Illegal argument of SourceLevelKey.compareTo()";
+            assert other instanceof SourceLevelKey : "Illegal argument of SourceLevelKey.compareTo()"; // NOI18N
             SourceLevelKey otherKey = (SourceLevelKey) other;
             return this.sourceLevel.compareTo(otherKey.sourceLevel);
         }
@@ -299,7 +299,7 @@ public final class PlatformUiSupport {
             if (JDK_1_5.compareTo(sourceLevel) <= 0) {
                 tmp = tmp.replaceFirst("^1\\.([5-9]|\\d\\d+)$", "$1"); //NOI18N
             }
-            return NbBundle.getMessage(PlatformUiSupport.class, "LBL_JDK", tmp);
+            return NbBundle.getMessage(PlatformUiSupport.class, "LBL_JDK", tmp); // NOI18N
         }
     }
 
@@ -352,7 +352,7 @@ public final class PlatformUiSupport {
 
         private synchronized PlatformKey[] getPlatformNames() {
             if (platformNamesCache == null) {
-                JavaPlatform[] platforms = pm.getPlatforms(null, new Specification(type, null)); //NOI18N
+                JavaPlatform[] platforms = pm.getPlatforms(null, new Specification(type, null));
                 Set<PlatformKey> orderedNames = new TreeSet<PlatformKey>();
                 boolean activeFound = false;
                 for (JavaPlatform platform : platforms) {
@@ -405,12 +405,12 @@ public final class PlatformUiSupport {
             if (value == null) {
                 name = ""; //NOI18N
             } else {
-                assert value instanceof PlatformKey : "Wrong model";
+                assert value instanceof PlatformKey : "Wrong model"; // NOI18N
                 PlatformKey key = (PlatformKey) value;
                 if (key.isBroken()) {
                     name = "<html><font color=\"#A40000\">" //NOI18N
                             + NbBundle.getMessage(
-                                    PlatformUiSupport.class, "TXT_BrokenPlatformFmt", key.getDisplayName());
+                                    PlatformUiSupport.class, "TXT_BrokenPlatformFmt", key.getDisplayName()); // NOI18N
                 } else {
                     name = key.getDisplayName();
                 }
@@ -443,7 +443,7 @@ public final class PlatformUiSupport {
                     originalSourceLevel = new SpecificationVersion(initialSourceLevel);
                 } catch (NumberFormatException nfe) {
                     // if the javac.source has invalid value, do not preselect and log it.
-                    LOGGER.warning("Invalid javac.source: " + initialSourceLevel);
+                    LOGGER.warning("Invalid javac.source: " + initialSourceLevel); // NOI18N
                 }
             }
             if (initialTargetLevel != null && initialTargetLevel.length() > 0) {
@@ -454,7 +454,7 @@ public final class PlatformUiSupport {
                     }
                 } catch (NumberFormatException nfe) {
                     // if the javac.target has invalid value, do not preselect and log it
-                    LOGGER.warning("Invalid javac.target: "+initialTargetLevel);
+                    LOGGER.warning("Invalid javac.target: "+initialTargetLevel); // NOI18N
                 }
             }
             selectedSourceLevel = originalSourceLevel;
@@ -577,15 +577,15 @@ public final class PlatformUiSupport {
 
         private boolean shouldChangePlatform(SpecificationVersion selectedSourceLevel,
                 SpecificationVersion platformSourceLevel) {
-            JButton changeOption = new JButton(NbBundle.getMessage(PlatformUiSupport.class, "CTL_ChangePlatform"));
+            JButton changeOption = new JButton(NbBundle.getMessage(PlatformUiSupport.class, "CTL_ChangePlatform")); // NOI18N
             changeOption.getAccessibleContext().setAccessibleDescription(
-                    NbBundle.getMessage(PlatformUiSupport.class, "AD_ChangePlatform"));
+                    NbBundle.getMessage(PlatformUiSupport.class, "AD_ChangePlatform")); // NOI18N
             String message = MessageFormat.format(
-                    NbBundle.getMessage(PlatformUiSupport.class, "TXT_ChangePlatform"),
+                    NbBundle.getMessage(PlatformUiSupport.class, "TXT_ChangePlatform"), // NOI18N
                     new Object[] {selectedSourceLevel.toString(), platformSourceLevel.toString()});
             return DialogDisplayer.getDefault().notify(new NotifyDescriptor(
                     message,
-                    NbBundle.getMessage(PlatformUiSupport.class, "TXT_ChangePlatformTitle"),
+                    NbBundle.getMessage(PlatformUiSupport.class, "TXT_ChangePlatformTitle"), // NOI18N
                     NotifyDescriptor.DEFAULT_OPTION,
                     NotifyDescriptor.WARNING_MESSAGE,
                     new Object[] {
@@ -615,7 +615,7 @@ public final class PlatformUiSupport {
                 if (key.isBroken()) {
                     message = "<html><font color=\"#A40000\">" //NOI18N
                             + NbBundle.getMessage(
-                                    PlatformUiSupport.class, "TXT_InvalidSourceLevel", key.getDisplayName());
+                                    PlatformUiSupport.class, "TXT_InvalidSourceLevel", key.getDisplayName()); // NOI18N
                 } else {
                     message = key.getDisplayName();
                 }

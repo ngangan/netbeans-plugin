@@ -225,9 +225,9 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         // TODO this is temporary for debug
         } catch (NullPointerException npe) {
             npe.printStackTrace();
-            System.err.println("* e = " + e);
-            System.err.println("* e.getKind() = " + e.getKind());
-            System.err.println("* e.asType() = " + e.asType());
+            System.err.println("* e = " + e); // NOI18N
+            System.err.println("* e.getKind() = " + e.getKind()); // NOI18N
+            System.err.println("* e.asType() = " + e.asType()); // NOI18N
         }
         if (members != null) {
             for (Element m : members) {
@@ -301,7 +301,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             d.subs = new HashSet<Description>();
             d.htmlHeader = FXSourceUtils.typeElementToString(javafxTypes, (TypeElement) e, isDeprecated, d.isInherited);
         } else if (e instanceof ExecutableElement) {
-            if (!spaceMagic && name.contains("$")) {
+            if (!spaceMagic && name.contains("$")) { // NOI18N
                 return null;
             }
             d.htmlHeader = FXSourceUtils.executableElementToString(javafxTypes, (ExecutableElement) e, isDeprecated, d.isInherited);

@@ -59,9 +59,9 @@ public class CustomNode implements ActiveEditorDrop {
         template.insert( targetComponent );
         
         //
-        Imports.addImport( targetComponent, "javafx.scene.CustomNode" );
-        Imports.addImport( targetComponent, "javafx.scene.Group" );
-        Imports.addImport( targetComponent, "javafx.scene.Node" );
+        Imports.addImport( targetComponent, "javafx.scene.CustomNode" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.Group" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.Node" ); // NOI18N
         
         return true;
     }

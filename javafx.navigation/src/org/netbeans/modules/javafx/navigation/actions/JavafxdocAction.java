@@ -56,7 +56,7 @@ import org.openide.windows.TopComponent;
 public class JavafxdocAction extends AbstractAction {
 
     public JavafxdocAction() {
-        super(NbBundle.getMessage(JavafxdocAction.class, "CTL_JavafxdocAction"));
+        super(NbBundle.getMessage(JavafxdocAction.class, "CTL_JavafxdocAction")); // NOI18N
         putValue(SMALL_ICON, new ImageIcon(Utilities.loadImage(JavafxdocTopComponent.ICON_PATH, true)));
     }
 
