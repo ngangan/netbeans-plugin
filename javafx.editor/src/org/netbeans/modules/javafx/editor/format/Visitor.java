@@ -196,7 +196,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitIdentifier(IdentifierTree node, Queue<Adjustment> adjustments) {
         try {
-            if (isWidow(node)) {
+//            if (isWidow(node)) {
+            if (isFirstOnLine(getStartPos(node))
+                    && getCurrentPath().getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.INSTANTIATE_OBJECT_LITERAL) {
                 final int position = getStartPos(node);
                 indentLine(position, adjustments);
                 hasComment(node, adjustments);
@@ -549,6 +551,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             disableContinuosIndent = false;
         }
         return adjustments;
+    }
+
+
+    @Override
+    public Queue<Adjustment> visitMemberSelect(MemberSelectTree node, Queue<Adjustment> adjustments) {
+        return super.visitMemberSelect(node, adjustments);
     }
 
     @Override
