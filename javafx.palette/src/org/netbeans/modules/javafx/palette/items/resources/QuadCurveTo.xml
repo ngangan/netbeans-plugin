@@ -45,8 +45,8 @@ made subject to such option by the copyright holder.
 <editor_palette_item version="1.0">
     <class name="org.netbeans.modules.javafx.palette.items.paths.QuadCurveTo" />
 
-    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/quadcurveto_16.png" />
-    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/quadcurveto_32.png" />
+    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/quad_curve_to_16.png" />
+    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/quad_curve_to_32.png" />
     <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
                display-name-key="NAME_javafx-QuadCurveTo"
                tooltip-key="HINT_javafx-QuadCurveTo" />
