@@ -114,7 +114,7 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
     }
 
     private static final Config DEFAULT = new Config(null,
-            NbBundle.getMessage(JavaFXConfigurationProvider.class, "JavaFXConfigurationProvider.default.label"));
+            NbBundle.getMessage(JavaFXConfigurationProvider.class, "JavaFXConfigurationProvider.default.label")); // NOI18N
 
     private final JavaFXProject p;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -132,20 +132,20 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
             update(fe);
         }
         private void update(FileEvent ev) {
-            LOGGER.log(Level.FINEST, "Received {0}", ev);
+            LOGGER.log(Level.FINEST, "Received {0}", ev); // NOI18N
             Set<String> oldConfigs = configs != null ? configs.keySet() : Collections.<String>emptySet();
             configDir = p.getProjectDirectory().getFileObject("nbproject/configs"); // NOI18N
             if (configDir != null) {
                 configDir.removeFileChangeListener(fclWeak);
                 configDir.addFileChangeListener(fclWeak);
-                LOGGER.log(Level.FINEST, "(Re-)added listener to {0}", configDir);
+                LOGGER.log(Level.FINEST, "(Re-)added listener to {0}", configDir); // NOI18N
             } else {
-                LOGGER.log(Level.FINEST, "No nbproject/configs exists");
+                LOGGER.log(Level.FINEST, "No nbproject/configs exists"); // NOI18N
             }
             calculateConfigs();
             Set<String> newConfigs = configs.keySet();
             if (!oldConfigs.equals(newConfigs)) {
-                LOGGER.log(Level.FINER, "Firing " + ProjectConfigurationProvider.PROP_CONFIGURATIONS + ": {0} -> {1}", new Object[] {oldConfigs, newConfigs});
+                LOGGER.log(Level.FINER, "Firing " + ProjectConfigurationProvider.PROP_CONFIGURATIONS + ": {0} -> {1}", new Object[] {oldConfigs, newConfigs}); // NOI18N
                 pcs.firePropertyChange(ProjectConfigurationProvider.PROP_CONFIGURATIONS, null, null);
                 // XXX also fire PROP_ACTIVE_CONFIGURATION?
             }
@@ -162,17 +162,17 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
         nbp = p.getProjectDirectory().getFileObject("nbproject"); // NOI18N
         if (nbp != null) {
             nbp.addFileChangeListener(fclWeak);
-            LOGGER.log(Level.FINEST, "Added listener to {0}", nbp);
+            LOGGER.log(Level.FINEST, "Added listener to {0}", nbp); // NOI18N
             configDir = nbp.getFileObject("configs"); // NOI18N
             if (configDir != null) {
                 configDir.addFileChangeListener(fclWeak);
-                LOGGER.log(Level.FINEST, "Added listener to {0}", configDir);
+                LOGGER.log(Level.FINEST, "Added listener to {0}", configDir); // NOI18N
             }
         }
         p.evaluator().addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (PROP_CONFIG.equals(evt.getPropertyName())) {
-                    LOGGER.log(Level.FINER, "Refiring " + PROP_CONFIG + " -> " + ProjectConfigurationProvider.PROP_CONFIGURATION_ACTIVE);
+                    LOGGER.log(Level.FINER, "Refiring " + PROP_CONFIG + " -> " + ProjectConfigurationProvider.PROP_CONFIGURATION_ACTIVE); // NOI18N
                     pcs.firePropertyChange(ProjectConfigurationProvider.PROP_CONFIGURATION_ACTIVE, null, null);
                 }
             }
@@ -202,7 +202,7 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
                 }
             }
         }
-        LOGGER.log(Level.FINEST, "Calculated configurations: {0}", configs);
+        LOGGER.log(Level.FINEST, "Calculated configurations: {0}", configs); // NOI18N
     }
 
     public Collection<Config> getConfigurations() {
@@ -211,9 +211,9 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
             if (configDir != null) {
                 configDir.removeFileChangeListener(fclWeak);
                 configDir.addFileChangeListener(fclWeak);
-                LOGGER.log(Level.FINEST, "(Re-)added listener to {0}", configDir);
+                LOGGER.log(Level.FINEST, "(Re-)added listener to {0}", configDir); // NOI18N
             } else {
-                LOGGER.log(Level.FINEST, "No nbproject/configs exists");
+                LOGGER.log(Level.FINEST, "No nbproject/configs exists"); // NOI18N
             }
         }
         calculateConfigs();

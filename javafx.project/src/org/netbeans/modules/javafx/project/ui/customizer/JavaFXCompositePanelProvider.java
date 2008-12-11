@@ -67,11 +67,11 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
     static final String LIBRARIES = "Libraries"; // NOI18N
     
     private static final String BUILD = "Build"; // NOI18N
-//    private static final String BUILD_TESTS = "BuildTests";
+//    private static final String BUILD_TESTS = "BuildTests"; // NOI18N
     private static final String JAR = "Jar"; // NOI18N
     private static final String JAVADOC = "Javadoc"; // NOI18N
     public static final String RUN = "Run"; // NOI18N
-//    private static final String RUN_TESTS = "RunTests";
+//    private static final String RUN_TESTS = "RunTests"; // NOI18N
     private static final String APPLICATION = "Application"; // NOI18N
     
     private static final String WEBSTART = "WebStart"; // NOI18N
@@ -91,7 +91,7 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
         if (SOURCES.equals(name)) {
             toReturn = ProjectCustomizer.Category.create(
                     SOURCES,
-                    bundle.getString("LBL_Config_Sources"),
+                    bundle.getString("LBL_Config_Sources"), // NOI18N
                     null,
                     (ProjectCustomizer.Category[])null);
         } else if (LIBRARIES.equals(name)) {
@@ -145,7 +145,7 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
             toReturn = ProjectCustomizer.Category.create(APPLET,
                     bundle.getString("LBL_Config_Applet"), null, (ProjectCustomizer.Category[])null); //NOI18N
         }
-        assert toReturn != null : "No category for name:" + name;
+        assert toReturn != null : "No category for name:" + name; // NOI18N
         return toReturn;
     }
 
@@ -156,7 +156,7 @@ public class JavaFXCompositePanelProvider implements ProjectCustomizer.Composite
             return new CustomizerSources(uiProps);
         } else if (LIBRARIES.equals(nm)) {
             CustomizerProviderImpl.SubCategoryProvider prov = (CustomizerProviderImpl.SubCategoryProvider)context.lookup(CustomizerProviderImpl.SubCategoryProvider.class);
-            assert prov != null : "Assuming CustomizerProviderImpl.SubCategoryProvider in customizer context";
+            assert prov != null : "Assuming CustomizerProviderImpl.SubCategoryProvider in customizer context"; // NOI18N
             return new CustomizerLibraries(uiProps, prov);
         } else if (BUILD.equals(nm)) {
             return new CustomizerCompile(uiProps);

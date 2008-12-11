@@ -72,7 +72,7 @@ public class FoldersListSettings {
     }
     
     public String displayName() {
-        return NbBundle.getMessage(FoldersListSettings.class, "TXT_JavaFXProjectFolderList");
+        return NbBundle.getMessage(FoldersListSettings.class, "TXT_JavaFXProjectFolderList"); // NOI18N
     }
 
     public int getNewProjectCount () {
@@ -100,21 +100,21 @@ public class FoldersListSettings {
     }
 
     public File getLastUsedClassPathFolder () {
-        return new File (getPreferences().get(LAST_USED_CP_FOLDER, System.getProperty("user.home")));
+        return new File (getPreferences().get(LAST_USED_CP_FOLDER, System.getProperty("user.home"))); // NOI18N
     }
 
     public void setLastUsedClassPathFolder (File folder) {
-        assert folder != null : "ClassPath root can not be null";
+        assert folder != null : "ClassPath root can not be null"; // NOI18N
         String path = folder.getAbsolutePath();
         getPreferences().put(LAST_USED_CP_FOLDER, path);
     }
 
     public File getLastUsedArtifactFolder () {
-        return new File (getPreferences().get(LAST_USED_ARTIFACT_FOLDER, System.getProperty("user.home")));
+        return new File (getPreferences().get(LAST_USED_ARTIFACT_FOLDER, System.getProperty("user.home"))); // NOI18N
     }
 
     public void setLastUsedArtifactFolder (File folder) {
-        assert folder != null : "Folder can not be null";
+        assert folder != null : "Folder can not be null"; // NOI18N
         String path = folder.getAbsolutePath();
         getPreferences().put(LAST_USED_ARTIFACT_FOLDER, path);
     }   

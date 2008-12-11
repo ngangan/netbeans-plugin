@@ -382,7 +382,7 @@ final class LibrariesNode extends AbstractNode {
                                     }
                                 }
                                 displayName = MessageFormat.format (
-                                    NbBundle.getMessage (LibrariesNode.class,"TXT_LibraryPartFormat"),
+                                    NbBundle.getMessage (LibrariesNode.class,"TXT_LibraryPartFormat"), // NOI18N
                                     new Object[] {lib.getDisplayName(), displayName});
                                 SourceGroup sg = new LibrariesSourceGroup (root, displayName, libIcon, libIcon);
                                 result.add (new Key(sg,currentClassPath, propName));
@@ -558,7 +558,7 @@ final class LibrariesNode extends AbstractNode {
         private final String classPathId;
 
         public AddProjectAction (Project project, String classPathId) {
-            super( NbBundle.getMessage( LibrariesNode.class, "LBL_AddProject_Action" ) );
+            super( NbBundle.getMessage( LibrariesNode.class, "LBL_AddProject_Action" ) ); // NOI18N
             this.project = project;
             this.classPathId = classPathId;
         }
@@ -595,20 +595,20 @@ final class LibrariesNode extends AbstractNode {
         private final String classPathId;
 
         public AddLibraryAction (Project project, String classPathId) {
-            super( NbBundle.getMessage( LibrariesNode.class, "LBL_AddLibrary_Action" ) );
+            super( NbBundle.getMessage( LibrariesNode.class, "LBL_AddLibrary_Action" ) ); // NOI18N
             this.project = project;
             this.classPathId = classPathId;
         }
 
         public void actionPerformed(ActionEvent e) {
             Object[] options = new Object[] {
-                new JButton (NbBundle.getMessage (LibrariesNode.class,"LBL_AddLibrary")),
+                new JButton (NbBundle.getMessage (LibrariesNode.class,"LBL_AddLibrary")), // NOI18N
                 DialogDescriptor.CANCEL_OPTION
             };
             ((JButton)options[0]).setEnabled(false);
-            ((JButton)options[0]).getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (LibrariesNode.class,"AD_AddLibrary"));
+            ((JButton)options[0]).getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (LibrariesNode.class,"AD_AddLibrary")); // NOI18N
             LibrariesChooser panel = new LibrariesChooser ((JButton)options[0], Collections.EMPTY_SET);
-            DialogDescriptor desc = new DialogDescriptor(panel,NbBundle.getMessage( LibrariesNode.class, "LBL_CustomizeCompile_Classpath_AddLibrary" ),
+            DialogDescriptor desc = new DialogDescriptor(panel,NbBundle.getMessage( LibrariesNode.class, "LBL_CustomizeCompile_Classpath_AddLibrary" ), // NOI18N
                     true, options, options[0], DialogDescriptor.DEFAULT_ALIGN,null,null);
             Dialog dlg = DialogDisplayer.getDefault().createDialog(desc);
             dlg.setVisible(true);
@@ -642,7 +642,7 @@ final class LibrariesNode extends AbstractNode {
         private final String classPathId;
 
         public AddFolderAction (Project project, String classPathId) {
-            super( NbBundle.getMessage( LibrariesNode.class, "LBL_AddFolder_Action" ) );
+            super( NbBundle.getMessage( LibrariesNode.class, "LBL_AddFolder_Action" ) ); // NOI18N
             this.project = project;
             this.classPathId = classPathId;
         }

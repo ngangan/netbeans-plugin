@@ -52,8 +52,8 @@ public final class ResourceMarker {
     }
     
     public static String getRosource( String resourName ) {
-        return ResourceMarker.class.getPackage().getName().replace( '.', '/') 
-                + '/' +resourName;
+        return ResourceMarker.class.getPackage().getName().replace( '.', '/') // NOI18N
+                + '/' +resourName; // NOI18N
     }
     
     public static final String PROJECT_ICO = "fx.png"; // NOI18N

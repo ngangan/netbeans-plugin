@@ -39,7 +39,6 @@
 
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.JavafxcTask;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.javac.util.Context;
@@ -191,7 +190,7 @@ public class CompilationInfoImpl {
         }
         
         public void report(Diagnostic<? extends JavaFileObject> message) {            
-            LOGGER.fine("Error at [" + message.getLineNumber() + ":" + message.getColumnNumber() + "]/" + message.getEndPosition() + " - " + message.getMessage(null));
+            LOGGER.fine("Error at [" + message.getLineNumber() + ":" + message.getColumnNumber() + "]/" + message.getEndPosition() + " - " + message.getMessage(null)); // NOI18N
             errors.put((int)message.getPosition(),message);
         }
     }

@@ -96,7 +96,7 @@ public class NewJavaFXFileWizardIterator implements WizardDescriptor.Instantiati
         Project project = Templates.getProject( wizardDescriptor );
         Sources sources = ProjectUtils.getSources(project);
         SourceGroup[] groups = sources.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        assert groups != null : "Cannot return null from Sources.getSourceGroups: " + sources;
+        assert groups != null : "Cannot return null from Sources.getSourceGroups: " + sources; // NOI18N
         if (groups.length == 0) {
             groups = sources.getSourceGroups( Sources.TYPE_GENERIC ); 
             return new WizardDescriptor.Panel[] {            

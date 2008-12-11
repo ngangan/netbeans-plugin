@@ -84,9 +84,9 @@ public class FileObjects {
     public static final Comparator<JavaFileObject> SIMPLE_NAME_FILEOBJECT_COMPARATOR = new SimpleNameFileObjectComparator();
   */  
     
-    public static final String JAVAFX  = "fx"; //JavaFXDataLoader.FX_EXTENSION;
-    public static final String JAVA  = "java";
-    public static final String CLASS = "class"; //ClassDataLoader.CLASS_EXTENSION;
+    public static final String JAVAFX  = "fx"; //JavaFXDataLoader.FX_EXTENSION; // NOI18N
+    public static final String JAVA  = "java"; // NOI18N
+    public static final String CLASS = "class"; //ClassDataLoader.CLASS_EXTENSION; // NOI18N
     public static final String JAR   = "jar";  //NOI18N
     public static final String FILE  = "file"; //NOI18N
     public static final String ZIP   = "zip";  //NOI18N
@@ -188,7 +188,7 @@ public class FileObjects {
     }
         
     public static String stripExtension( String fileName ) {        
-        int dot = fileName.lastIndexOf(".");
+        int dot = fileName.lastIndexOf("."); // NOI18N
         return (dot == -1 ? fileName : fileName.substring(0, dot));
     }    
     
@@ -220,10 +220,10 @@ public class FileObjects {
         try {
             final URL url = fo.toUri().toURL();
             String path = url.getPath();
-            int index1 = path.lastIndexOf('/');
+            int index1 = path.lastIndexOf('/'); // NOI18N
             int len;
             if (noExt) {
-               final int index2 = path.lastIndexOf('.');
+               final int index2 = path.lastIndexOf('.'); // NOI18N
                if (index2>index1) {
                    len = index2;
                }
@@ -296,7 +296,7 @@ public class FileObjects {
     public static String getSimpleName( JavaFileObject fo ) {
         
         String name = getName(fo,true);
-        int i = name.lastIndexOf( '$' );
+        int i = name.lastIndexOf( '$' ); // NOI18N
         if ( i == -1 ) {
             return name;
         }
@@ -309,7 +309,7 @@ public class FileObjects {
         
         String name = getBaseName( fileName );
         
-        int i = name.lastIndexOf( '$' );
+        int i = name.lastIndexOf( '$' ); // NOI18N
         if ( i == -1 ) {
             return name;
         }
@@ -320,7 +320,7 @@ public class FileObjects {
     }
     
     public static String convertPackage2Folder( String packageName ) {
-        return packageName.replace( '.', '/' );
+        return packageName.replace( '.', '/' ); // NOI18N
     }    
     
     
@@ -329,22 +329,22 @@ public class FileObjects {
     }
     
     public static String convertFolder2Package( String packageName, char folderSeparator ) {
-        return packageName.replace( folderSeparator, '.' );
+        return packageName.replace( folderSeparator, '.' ); // NOI18N
     }
     
     
     public static String getRelativePath (final String packageName, final String relativeName) {
         StringBuilder relativePath = new StringBuilder ();
-        relativePath.append(packageName.replace('.','/'));
+        relativePath.append(packageName.replace('.','/')); // NOI18N
         relativePath.append(relativeName);
         return relativePath.toString();
     }
     
     public static String[] getParentRelativePathAndName (final String className) {
-        if (className.charAt(className.length()-1) == '.') {
+        if (className.charAt(className.length()-1) == '.') { // NOI18N
             return null;
         }
-        final int index = className.lastIndexOf('.');
+        final int index = className.lastIndexOf('.'); // NOI18N
         if (index<0) {
             return new String[] {
                 "",     //NOI18N
@@ -449,7 +449,7 @@ public class FileObjects {
         }
         
         public String getName () {
-            return this.nameWithoutExt + '.' + ext;
+            return this.nameWithoutExt + '.' + ext; // NOI18N
         }
         
         public String getExt () {
@@ -457,7 +457,7 @@ public class FileObjects {
         }        
         
         private static String[] getNameExtPair (String name) {
-            int index = name.lastIndexOf ('.');            
+            int index = name.lastIndexOf ('.'); // NOI18N
             String namenx;
             String ext;
             if (index <= 0) {
@@ -504,7 +504,7 @@ public class FileObjects {
         }
         
         public InvalidFileException (final FileObject fo) {
-            super (NbBundle.getMessage(FileObjects.class,"FMT_InvalidFile",FileUtil.getFileDisplayName(fo)));
+            super (NbBundle.getMessage(FileObjects.class,"FMT_InvalidFile",FileUtil.getFileDisplayName(fo))); // NOI18N
         }
     }
     
@@ -512,7 +512,7 @@ public class FileObjects {
     public static String getRelativePath (final File root, final File fo) {
         final String rootPath = root.getAbsolutePath();
         final String foPath = fo.getAbsolutePath();
-        assert foPath.startsWith(rootPath) : String.format("getRelativePath(%s, %s)", rootPath, foPath);
+        assert foPath.startsWith(rootPath) : String.format("getRelativePath(%s, %s)", rootPath, foPath); // NOI18N
         int index = rootPath.length();
         if (rootPath.charAt(index-1)!=File.separatorChar) {
             index++;
@@ -722,7 +722,7 @@ public class FileObjects {
                         element = element.replace("+", "%20");               //NOI18N
                         sb.append(element);
                         if (i< elements.length - 1) {
-                            sb.append('/');
+                            sb.append('/'); // NOI18N
                         }
                     }
                     return new URI("jar:"+zdirURI.toString()+"!/"+sb.toString());    //NOI18N
@@ -802,7 +802,7 @@ public class FileObjects {
                 }
 
                 public int read() throws IOException {
-                    throw new java.lang.UnsupportedOperationException("Not supported yet.");
+                    throw new java.lang.UnsupportedOperationException("Not supported yet."); // NOI18N
                 }
 
                 public int read(byte b[], int off, int len) throws IOException {
@@ -825,7 +825,7 @@ public class FileObjects {
             };
             // long time = System.currentTimeMillis();
             ZipFile zf = new ZipFile (archiveFile);
-            // System.out.println("ZF OPEN " + archiveFile.getPath() + " took: " + (System.currentTimeMillis() - time )+ "ms." );
+            // System.out.println("ZF OPEN " + archiveFile.getPath() + " took: " + (System.currentTimeMillis() - time )+ "ms." ); // NOI18N
             return new BufferedInputStream (new ZipInputStream (zf));
 	}
         

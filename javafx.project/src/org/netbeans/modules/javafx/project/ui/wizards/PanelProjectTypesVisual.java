@@ -102,7 +102,7 @@ public class PanelProjectTypesVisual extends SettingsPanel {
             ((FolderList)sourcePanel).setLastUsedDir(currentDirectory);
         }
         
-        switch ((NewJavaFXProjectWizardIterator.WizardType)wd.getProperty("projectType")) {
+        switch ((NewJavaFXProjectWizardIterator.WizardType)wd.getProperty("projectType")) { // NOI18N
         case APP:
             jRadioButton1.setSelected(true);
             break;
@@ -270,7 +270,7 @@ private void projectTypeChanged(java.awt.event.ActionEvent evt) {//GEN-FIRST:eve
     private void browseProjectLocation(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseProjectLocation
         JFileChooser chooser = new JFileChooser();
         FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-        chooser.setDialogTitle(NbBundle.getMessage(PanelSourceFolders.class,"LBL_NWP1_SelectProjectLocation"));
+        chooser.setDialogTitle(NbBundle.getMessage(PanelSourceFolders.class,"LBL_NWP1_SelectProjectLocation")); // NOI18N
         chooser.setFileSelectionMode (JFileChooser.DIRECTORIES_ONLY);
         String path = this.projectLocation.getText();
         if (path.length() > 0) {

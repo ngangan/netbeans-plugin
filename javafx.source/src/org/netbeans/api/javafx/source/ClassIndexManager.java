@@ -63,7 +63,7 @@ import org.openide.util.RequestProcessor;
 class ClassIndexManager {
     private static final Map<URL, ClassIndex.Impl> instances = new HashMap<URL, ClassIndex.Impl> ();
     private static boolean invalid;
-    private static RequestProcessor PROCESSOR = new RequestProcessor("JavaFX class index manager");
+    private static RequestProcessor PROCESSOR = new RequestProcessor("JavaFX class index manager"); // NOI18N
 
     public static synchronized ClassIndex.Impl getUsagesQuery (final URL root) {
         assert root != null;
@@ -101,13 +101,13 @@ class ClassIndexManager {
 
         Set<ClassIndex.TypeHolder> types = new HashSet<ClassIndex.TypeHolder>();
         Set<String> packages = new HashSet<String>();
-        collect(rootFO, types, packages, "");
+        collect(rootFO, types, packages, ""); // NOI18N
         target.setTypes(types);
     }
 
     private static void collect(FileObject dir, final Set<ClassIndex.TypeHolder> types, Set<String> packages, String prefix) {
         for (FileObject act : dir.getChildren()) {
-            if (act.isData() && act.hasExt("fx")) {
+            if (act.isData() && act.hasExt("fx")) { // NOI18N
                 try {
                     JavaFXSource.forFileObject(act).runUserActionTask(new CancellableTask<CompilationController>() {
 
@@ -129,7 +129,7 @@ class ClassIndexManager {
                             int lastDot = sig.lastIndexOf('.');
                             int lastDollar = sig.lastIndexOf('$');
                             if (lastDollar > lastDot) lastDot = lastDollar;
-                            String prefix = (lastDot >= 0) ? sig.substring(0, lastDot+1) : "";
+                            String prefix = (lastDot >= 0) ? sig.substring(0, lastDot+1) : ""; // NOI18N
                             String name = (lastDot >= 0) ? sig.substring(lastDot+1) : sig;
                             types.add(new ClassIndex.TypeHolder(prefix, name));
 
@@ -152,7 +152,7 @@ class ClassIndexManager {
             } else if (act.isFolder()) {
                 String pkgName = prefix + act.getName();
                 packages.add(pkgName);
-                collect(act, types, packages, pkgName + ".");
+                collect(act, types, packages, pkgName + "."); // NOI18N
             }
         }
     }

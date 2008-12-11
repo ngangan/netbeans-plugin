@@ -55,13 +55,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.classpath.ClassPath.Entry;
 import org.netbeans.api.queries.FileEncodingQuery;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -111,7 +108,7 @@ public abstract class Archive {
      */
     private static Archive create( URL root) {
         String protocol = root.getProtocol();
-        if ("file".equals(protocol)) {
+        if ("file".equals(protocol)) { // NOI18N
             File f = new File (URI.create(root.toExternalForm()));
             if (f.isDirectory()) {
                 return new FolderArchive (f);
@@ -119,10 +116,10 @@ public abstract class Archive {
                 return null;
             }
         }
-        if ("jar".equals(protocol)) {
+        if ("jar".equals(protocol)) { // NOI18N
             URL inner = FileUtil.getArchiveFile(root);
             protocol = inner.getProtocol();
-            if ("file".equals(protocol)) {
+            if ("file".equals(protocol)) { // NOI18N
                 File f = new File (URI.create(inner.toExternalForm()));
                 if (f.isFile()) {
                     return new CachingArchive(f);
@@ -262,9 +259,9 @@ public abstract class Archive {
             byte[] name = new byte[len];
             System.arraycopy(names, off, name, 0, len);
             try {
-                return new String(name, "UTF-8");
+                return new String(name, "UTF-8"); // NOI18N
             } catch (UnsupportedEncodingException e) {
-                throw new InternalError("No UTF-8");
+                throw new InternalError("No UTF-8"); // NOI18N
             }
         }
     
@@ -335,8 +332,8 @@ public abstract class Archive {
                 for ( Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements(); ) {
                     ZipEntry entry = e.nextElement();
                     String name = entry.getName();
-                    int i = name.lastIndexOf('/');
-                    String dirname = i == -1 ? "" : name.substring(0, i /* +1 */);
+                    int i = name.lastIndexOf('/'); // NOI18N
+                    String dirname = i == -1 ? "" : name.substring(0, i /* +1 */); // NOI18N
                     String basename = name.substring(i+1);
                     if (basename.length() == 0) {
                         basename = null;
@@ -393,13 +390,13 @@ public abstract class Archive {
                 }
 
                 try {
-                    byte[] bytes = name.getBytes("UTF-8");
+                    byte[] bytes = name.getBytes("UTF-8"); // NOI18N
                     indices[idx++] = outer.putName(bytes);
                     indices[idx++] = bytes.length;
                     indices[idx++] = (int)(mtime & 0xFFFFFFFF);
                     indices[idx++] = (int)(mtime >> 32);
                 } catch (UnsupportedEncodingException e) {
-                    throw new InternalError("No UTF-8");
+                    throw new InternalError("No UTF-8"); // NOI18N
                 }
             }
 

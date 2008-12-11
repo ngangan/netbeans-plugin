@@ -99,7 +99,7 @@ final class RemoveClassPathRootAction extends NodeAction {
     }
 
     public String getName() {
-        return NbBundle.getMessage (RemoveClassPathRootAction.class,"CTL_RemoveProject");
+        return NbBundle.getMessage (RemoveClassPathRootAction.class,"CTL_RemoveProject"); // NOI18N
     }
 
     public HelpCtx getHelpCtx() {

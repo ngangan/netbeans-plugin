@@ -48,7 +48,6 @@ import com.sun.tools.javac.parser.DocCommentScanner;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
-//import com.sun.tools.javafxdoc.JavafxdocClassReader;
 import com.sun.tools.javafxdoc.JavafxdocEnter;
 import com.sun.tools.javafxdoc.Messager;
 import java.io.IOException;
@@ -77,7 +76,6 @@ import javax.tools.JavaFileObject;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.openide.cookies.EditorCookie;
@@ -210,11 +208,11 @@ public final class JavaFXSource {
         if (LOGGER.isLoggable(Level.FINEST)) {
             try {
                 String sourceTxt = jfo.getCharContent(true).toString();
-                LOGGER.finest("\n======================================================\n");
+                LOGGER.finest("\n======================================================\n"); // NOI18N
                 LOGGER.finest(sourceTxt);
-                LOGGER.finest("\n------------------------------------------------------\n");
+                LOGGER.finest("\n------------------------------------------------------\n"); // NOI18N
             } catch (IOException ex) {
-                LOGGER.log(Level.FINEST, "Cannot get file content.", ex);
+                LOGGER.log(Level.FINEST, "Cannot get file content.", ex); // NOI18N
             }
         }
 
@@ -242,7 +240,7 @@ public final class JavaFXSource {
                 //runnig after the phace completion task may still use it.
                 return cc.phase;
             }
-            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to parse " + file.getNameExt());
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to parse " + file.getNameExt()); // NOI18N
             long start = System.currentTimeMillis();
             Iterable<? extends UnitTree> trees = null;
             try {
@@ -260,16 +258,16 @@ public final class JavaFXSource {
             cc.setPhase(Phase.PARSED);
 
             long end = System.currentTimeMillis();
-            Logger.getLogger("TIMER").log(Level.FINE, "Compilation Unit", new Object[] {file, unit}); // log the instance
-            Logger.getLogger("TIMER").log(Level.FINE, "Parsed", new Object[] {file, end-start});
-            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished parsing " + file.getNameExt());
+            Logger.getLogger("TIMER").log(Level.FINE, "Compilation Unit", new Object[] {file, unit}); // log the instance // NOI18N
+            Logger.getLogger("TIMER").log(Level.FINE, "Parsed", new Object[] {file, end-start}); // NOI18N
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished parsing " + file.getNameExt()); // NOI18N
         }
 
         if (cc.phase == Phase.PARSED && !phase.lessThan(Phase.ANALYZED)) {
             if (cancellable && CompilationJob.currentRequest.isCanceled()) {
                 return Phase.MODIFIED;
             }
-            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to analyze " + file.getNameExt());
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Starting to analyze " + file.getNameExt()); // NOI18N
             long start = System.currentTimeMillis();
             try {
                 cc.getJavafxcTask().analyze();
@@ -308,8 +306,8 @@ public final class JavaFXSource {
             FXErrorAnnotator.getAnnotator().updateInError(urls);
 
             long end = System.currentTimeMillis();
-            Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
-            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished to analyze " + file.getNameExt());
+            Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start}); // NOI18N
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine("Finished to analyze " + file.getNameExt()); // NOI18N
         }
         
         if (cc.phase == Phase.ANALYZED && !phase.lessThan(Phase.UP_TO_DATE)) {
@@ -332,7 +330,7 @@ public final class JavaFXSource {
                 cc.setClassBytes(bytes);
                 cc.setPhase(Phase.CODE_GENERATED);
                 long end = System.currentTimeMillis();
-                Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start});
+                Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {file, end-start}); // NOI18N
             } else {
                 cc.setClassBytes(null);
                 cc.setPhase(Phase.CODE_GENERATED);
@@ -357,7 +355,7 @@ public final class JavaFXSource {
         for (Iterator<? extends FileObject> it = this.files.iterator(); it.hasNext();) {
             FileObject file = it.next();
             try {
-                Logger.getLogger("TIMER").log(Level.FINE, "JavaFXSource",
+                Logger.getLogger("TIMER").log(Level.FINE, "JavaFXSource", // NOI18N
                     new Object[] {file, this});
                 if (!multipleSources) {
                     file.addFileChangeListener(FileUtil.weakFileChangeListener(this.fileChangeListener,file));
@@ -376,7 +374,7 @@ public final class JavaFXSource {
         }
         this.cpInfo.addChangeListener(WeakListeners.change(listener, this.cpInfo));
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Created JavaFXSource for " + files);
+            LOGGER.fine("Created JavaFXSource for " + files); // NOI18N
         }
     }
     
@@ -400,8 +398,8 @@ public final class JavaFXSource {
 
         try {
             if (   fileObject.getFileSystem().isDefault()
-                && fileObject.getAttribute("javax.script.ScriptEngine") != null
-                && fileObject.getAttribute("template") == Boolean.TRUE) {
+                && fileObject.getAttribute("javax.script.ScriptEngine") != null // NOI18N
+                && fileObject.getAttribute("template") == Boolean.TRUE) { // NOI18N
                 return null;
             }
             DataObject od = DataObject.find(fileObject);
@@ -419,7 +417,7 @@ public final class JavaFXSource {
         JavaFXSource source = ref != null ? ref.get() : null;
         if (source == null) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("Not found in cache: " + fileObject);
+                LOGGER.fine("Not found in cache: " + fileObject); // NOI18N
             }
 
             if (!"text/x-fx".equals(FileUtil.getMIMEType(fileObject)) && !"fx".equals(fileObject.getExt())) {  //NOI18N
@@ -428,7 +426,7 @@ public final class JavaFXSource {
             source = create(ClasspathInfo.create(fileObject), Collections.singletonList(fileObject));
             file2Source.put(fileObject, new WeakReference<JavaFXSource>(source));
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("Put into the cache: " + fileObject);
+                LOGGER.fine("Put into the cache: " + fileObject); // NOI18N
             }
         }
         return source;

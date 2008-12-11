@@ -92,7 +92,7 @@ public class SourceFileManager implements JavaFileManager {
                                 if (FileObjects.JAVAFX.equalsIgnoreCase(ext) || FileObjects.JAVA.equalsIgnoreCase(ext)) {
                                     kind = JavaFileObject.Kind.SOURCE;
                                 }
-                                else if (FileObjects.CLASS.equalsIgnoreCase(ext) || "sig".equalsIgnoreCase(ext)) {
+                                else if (FileObjects.CLASS.equalsIgnoreCase(ext) || "sig".equalsIgnoreCase(ext)) { // NOI18N
                                     kind = JavaFileObject.Kind.CLASS;
                                 }
                                 else if (FileObjects.HTML.equalsIgnoreCase(ext)) {
@@ -136,9 +136,9 @@ public class SourceFileManager implements JavaFileManager {
             
             if (root != null) {
                 String relativePath = FileUtil.getRelativePath(root,fo);
-                int index = relativePath.lastIndexOf('.');
+                int index = relativePath.lastIndexOf('.'); // NOI18N
                 assert index > 0;                    
-                final String result = relativePath.substring(0,index).replace('/','.');                    
+                final String result = relativePath.substring(0,index).replace('/','.');  // NOI18N
                 return result;
             }
         } catch (MalformedURLException e) {

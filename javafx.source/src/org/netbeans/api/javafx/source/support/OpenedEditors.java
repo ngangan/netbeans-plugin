@@ -204,23 +204,23 @@ class OpenedEditors implements PropertyChangeListener {
      * @throws NullPointerException if <code>files == null</code> or <code>type == null</code>
      */
     public static List<FileObject> filterSupportedMIMETypes(Collection<FileObject> files, String... mimeTypes) throws NullPointerException {
-        Parameters.notNull("files", files);
+        Parameters.notNull("files", files); // NOI18N
         
         boolean            allowJavaExtension = false;
         
         if (mimeTypes == null) {
-            mimeTypes = new String[] {"text/x-fx"};
+            mimeTypes = new String[] {"text/x-fx"}; // NOI18N
             allowJavaExtension = true;
         }
         
         List<String>       mimeTypesList = Arrays.asList(mimeTypes);
-        boolean            allowAll  = mimeTypesList.contains("*");
+        boolean            allowAll  = mimeTypesList.contains("*"); // NOI18N
         List<FileObject>   result    = new LinkedList<FileObject>();
         
-        Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "mimeTypesList={0}", mimeTypesList);
+        Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "mimeTypesList={0}", mimeTypesList); // NOI18N
         
         for (FileObject f : files) {
-            Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "analyzing={0}", f);
+            Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "analyzing={0}", f); // NOI18N
             
             if (JavaFXSource.forFileObject(f) == null)
                 continue;
@@ -230,14 +230,14 @@ class OpenedEditors implements PropertyChangeListener {
                 continue;
             }
             
-            if (allowJavaExtension && "java".equals(f.getExt())) {
+            if (allowJavaExtension && "java".equals(f.getExt())) { // NOI18N
                 result.add(f);
                 continue;
             }
             
             String fileMimeType = FileUtil.getMIMEType(f);
             
-            Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "fileMimeType={0}", fileMimeType);
+            Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "fileMimeType={0}", fileMimeType); // NOI18N
             
             if (mimeTypesList.contains(fileMimeType)) {
                 result.add(f);
@@ -266,7 +266,7 @@ class OpenedEditors implements PropertyChangeListener {
             }
         }
         
-        Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINE, "filter({0}, {1})={2}", new Object[] {files, mimeTypesList, result});
+        Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINE, "filter({0}, {1})={2}", new Object[] {files, mimeTypesList, result}); // NOI18N
         
         return result;
     }

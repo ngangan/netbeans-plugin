@@ -102,7 +102,7 @@ public final class TreeUtilities {
      */
     public boolean isSynthetic(JavaFXTreePath path) {
         if (path == null) {
-            if (LOGGABLE) log("isSynthetic invoked with null argument");
+            if (LOGGABLE) log("isSynthetic invoked with null argument"); // NOI18N
             return false;
         }
         final Tree leaf = path.getLeaf();
@@ -111,7 +111,7 @@ public final class TreeUtilities {
             SynthType type = fxLeaf.getGenType();
             return SynthType.SYNTHETIC.equals(type);
         }
-        if (LOGGABLE) log("isSynthetic returning false because the leaf is not JFXTree.");
+        if (LOGGABLE) log("isSynthetic returning false because the leaf is not JFXTree."); // NOI18N
         return false;
     }
     
@@ -227,7 +227,7 @@ public final class TreeUtilities {
                             if (!isSynthetic(getCurrentPath())) {
                                 // here we might have a problem
                                 if (LOGGABLE) {
-                                    logger.finest("SCAN: Cannot determine start and end for: " + treeToString(info, tree));
+                                    logger.finest("SCAN: Cannot determine start and end for: " + treeToString(info, tree)); // NOI18N
                                 }
                             }
                         }
@@ -244,18 +244,18 @@ public final class TreeUtilities {
         }
         
         if (path.getLeaf() == path.getCompilationUnit()) {
-            log("pathFor returning compilation unit for position: " + pos);
+            log("pathFor returning compilation unit for position: " + pos); // NOI18N
             return path;
         }
         int start = (int)sourcePositions.getStartPosition(info.getCompilationUnit(), path.getLeaf());
         int end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), path.getLeaf());
         while (start == -1 || pos < start || pos > end) {
             if (LOGGABLE) {
-                logger.finer("pathFor moving to parent: " + treeToString(info, path.getLeaf()));
+                logger.finer("pathFor moving to parent: " + treeToString(info, path.getLeaf())); // NOI18N
             }
             path = path.getParentPath();
             if (LOGGABLE) {
-                logger.finer("pathFor moved to parent: " + treeToString(info, path.getLeaf()));
+                logger.finer("pathFor moved to parent: " + treeToString(info, path.getLeaf())); // NOI18N
             }
             if (path.getLeaf() == path.getCompilationUnit()) {
                 break;
@@ -264,7 +264,7 @@ public final class TreeUtilities {
             end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), path.getLeaf());
         }
         if (LOGGABLE) {
-            log("pathFor(pos: " + pos + ") returning: " + treeToString(info, path.getLeaf()));
+            log("pathFor(pos: " + pos + ") returning: " + treeToString(info, path.getLeaf())); // NOI18N
         }
         return path;
     }
@@ -284,7 +284,7 @@ public final class TreeUtilities {
                 scope = info.getTrees().getScope(p);
             } catch (Exception ex) {
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.log(Level.FINEST, "  getScope failed on " + p, ex);
+                    logger.log(Level.FINEST, "  getScope failed on " + p, ex); // NOI18N
                 }
                 p = p.getParentPath();
             }
@@ -304,11 +304,11 @@ public final class TreeUtilities {
         int start = (int)sourcePositions.getStartPosition(info.getCompilationUnit(), tree);
         int end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), tree);
         if ((start == -1) || (end == -1)) {
-            throw new RuntimeException("RE Cannot determine start and end for: " + treeToString(info, tree));
+            throw new RuntimeException("RE Cannot determine start and end for: " + treeToString(info, tree)); // NOI18N
         }
         TokenSequence<JFXTokenId> t = ((TokenHierarchy<?>)info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         if (t == null) {
-            throw new RuntimeException("RE SDid not get a token sequence.");
+            throw new RuntimeException("RE SDid not get a token sequence."); // NOI18N
         }
         return t.subSequence(start, end);
     }
@@ -319,19 +319,19 @@ public final class TreeUtilities {
         try {
             new JavafxPretty(s, false).printExpr((JFXTree)t);
         } catch (Exception e) {
-            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e);
+            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e); // NOI18N
         }
         k = t.getJavaFXKind();
         String res = k.toString();
         SourcePositions pos = info.getTrees().getSourcePositions();
-        res = res + '[' + pos.getStartPosition(info.getCompilationUnit(), t) + ',' + 
-                pos.getEndPosition(info.getCompilationUnit(), t) + "]:" + s.toString();
+        res = res + '[' + pos.getStartPosition(info.getCompilationUnit(), t) + ',' +  // NOI18N
+                pos.getEndPosition(info.getCompilationUnit(), t) + "]:" + s.toString(); // NOI18N
         return res;
     }
 
     public ExpressionTree getBreakContinueTarget(JavaFXTreePath breakOrContinue) throws IllegalArgumentException {
         if (info.getPhase().lessThan(Phase.ANALYZED))
-            throw new IllegalArgumentException("Not in correct Phase. Required: Phase.RESOLVED, got: Phase." + info.getPhase().toString());
+            throw new IllegalArgumentException("Not in correct Phase. Required: Phase.RESOLVED, got: Phase." + info.getPhase().toString()); // NOI18N
         
         Tree leaf = breakOrContinue.getLeaf();
         
@@ -349,7 +349,7 @@ public final class TreeUtilities {
                     return target;
                 
             default:
-                throw new IllegalArgumentException("Unsupported kind: " + leaf.getJavaFXKind());
+                throw new IllegalArgumentException("Unsupported kind: " + leaf.getJavaFXKind()); // NOI18N
         }
     }
 
@@ -361,70 +361,70 @@ public final class TreeUtilities {
      *         successfull
      */
     public ExpressionTree parseExpression(String expr, int pos) {
-        if (LOGGABLE) log("parseExpression pos= " + pos + " : " + expr);
+        if (LOGGABLE) log("parseExpression pos= " + pos + " : " + expr); // NOI18N
         try {
             Document d = info.getJavaFXSource().getDocument();
             String start = d.getText(0, pos);
-            if (LOGGABLE) log("  start = " + start);
+            if (LOGGABLE) log("  start = " + start); // NOI18N
             String end = d.getText(pos, d.getLength()-pos);
-            if (LOGGABLE) log("  end = " + end);
+            if (LOGGABLE) log("  end = " + end); // NOI18N
             FileSystem fs = FileUtil.createMemoryFileSystem();
-            final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx");
+            final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx"); // NOI18N
             Writer w = new OutputStreamWriter(fo.getOutputStream());
             w.write(start);
-            w.write("\n" + expr+"\n");
+            w.write("\n" + expr+"\n"); // NOI18N
             w.write(end);
             w.close();
-            if (LOGGABLE) log("  source written to " + fo);
+            if (LOGGABLE) log("  source written to " + fo); // NOI18N
             ClasspathInfo cp = ClasspathInfo.create(info.getFileObject());
             JavaFXSource s = JavaFXSource.create(cp, Collections.singleton(fo));
-            if (LOGGABLE) log("  jfxsource obtained " + s);
+            if (LOGGABLE) log("  jfxsource obtained " + s); // NOI18N
             CompilationInfoImpl ci = new CompilationInfoImpl(s);
             s.moveToPhase(Phase.ANALYZED, ci, false);
             CompilationController cc = new CompilationController(ci);
             JavaFXTreePath p = cc.getTreeUtilities().pathFor(pos+2);
             if (p == null) {
-                if (LOGGABLE) log("  path for returned null");
+                if (LOGGABLE) log("  path for returned null"); // NOI18N
                 return null;
             }
             SourcePositions sp = cc.getTrees().getSourcePositions();
-            if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p = " + p.getLeaf());
+            if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p = " + p.getLeaf()); // NOI18N
             // first loop will try to find our expression
             while ((p != null) && (! (p.getLeaf() instanceof ExpressionTree))) {
-                if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (2) = " + p.getLeaf());
+                if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (2) = " + p.getLeaf()); // NOI18N
                 p = p.getParentPath();
             }
             if (p == null) {
-                if (LOGGABLE) log("  ExpressionTree not found! Returning null");
+                if (LOGGABLE) log("  ExpressionTree not found! Returning null"); // NOI18N
                 return null;
             }
             // the second while loop will try to find as big expression as possible
             JavaFXTreePath pp = p.getParentPath();
             if (LOGGABLE && pp != null) {
-                log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf());
-                log("   start == " + sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf()));
-                log("   end == " + sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf()));
-                log("   pos == " + pos);
-                log("   pos+length == " + (pos+expr.length()));
-                log("   (pp.getLeaf() instanceof ExpressionTree)" + (pp.getLeaf() instanceof ExpressionTree));
+                log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf()); // NOI18N
+                log("   start == " + sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf())); // NOI18N
+                log("   end == " + sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf())); // NOI18N
+                log("   pos == " + pos); // NOI18N
+                log("   pos+length == " + (pos+expr.length())); // NOI18N
+                log("   (pp.getLeaf() instanceof ExpressionTree)" + (pp.getLeaf() instanceof ExpressionTree)); // NOI18N
             }
             while ((pp != null) && ((pp.getLeaf() instanceof ExpressionTree)) &&
                     (sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf())>=pos) &&
                     (sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf())<=(pos+expr.length()))) {
-                if (LOGGABLE) log(pp.getLeaf().getClass().getName() + "   p (3) = " + pp.getLeaf());
+                if (LOGGABLE) log(pp.getLeaf().getClass().getName() + "   p (3) = " + pp.getLeaf()); // NOI18N
                 p = pp;
                 pp = pp.getParentPath();
                 if (LOGGABLE) {
-                    log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf());
-                    log("   start == " + sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf()));
-                    log("   end == " + sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf()));
-                    log("   (pp.getLeaf() instanceof ExpressionTree)" + (pp.getLeaf() instanceof ExpressionTree));
+                    log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf()); // NOI18N
+                    log("   start == " + sp.getStartPosition(cc.getCompilationUnit(),pp.getLeaf())); // NOI18N
+                    log("   end == " + sp.getEndPosition(cc.getCompilationUnit(),pp.getLeaf())); // NOI18N
+                    log("   (pp.getLeaf() instanceof ExpressionTree)" + (pp.getLeaf() instanceof ExpressionTree)); // NOI18N
                 }
             }
-            if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (4) = " + p.getLeaf());
+            if (LOGGABLE) log(p.getLeaf().getClass().getName() + "   p (4) = " + p.getLeaf()); // NOI18N
             return (ExpressionTree)p.getLeaf();
         } catch (Exception x) {
-            logger.log(Level.FINE, "Exception during parseExpression", x);
+            logger.log(Level.FINE, "Exception during parseExpression", x); // NOI18N
         }
         return null;
     }
@@ -439,21 +439,21 @@ public final class TreeUtilities {
     public boolean isAccessible(Scope 
             scope, Element member, TypeMirror type) {
         if (LOGGABLE) {
-            log("isAccessible scope == " + scope);
-            log("   member == " + member);
-            log("   type == " + type);
+            log("isAccessible scope == " + scope); // NOI18N
+            log("   member == " + member); // NOI18N
+            log("   type == " + type); // NOI18N
         }
         if (scope instanceof JavafxcScope && member instanceof Symbol && type instanceof Type) {
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
-            if (LOGGABLE) log("     resolve == " + resolve);
+            if (LOGGABLE) log("     resolve == " + resolve); // NOI18N
             Object env = ((JavafxcScope) scope).getEnv();
             JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-            if (LOGGABLE) log("     fxEnv == " + fxEnv);
+            if (LOGGABLE) log("     fxEnv == " + fxEnv); // NOI18N
             boolean res = resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);
-            if (LOGGABLE) log("     returning " + res);
+            if (LOGGABLE) log("     returning " + res); // NOI18N
             return res;
         } else {
-            if (LOGGABLE) log("     returning FALSE from the else branch");
+            if (LOGGABLE) log("     returning FALSE from the else branch"); // NOI18N
             return false;
         }
     }
@@ -468,20 +468,20 @@ public final class TreeUtilities {
     public boolean isAccessible(Scope
             scope, Element type) {
         if (LOGGABLE) {
-            log("isAccessible scope == " + scope);
-            log("   type == " + type);
+            log("isAccessible scope == " + scope); // NOI18N
+            log("   type == " + type); // NOI18N
         }
         if (scope instanceof JavafxcScope &&  type instanceof Symbol.TypeSymbol) {
             JavafxResolve resolve = JavafxResolve.instance(info.impl.getContext());
-            if (LOGGABLE) log("     resolve == " + resolve);
+            if (LOGGABLE) log("     resolve == " + resolve); // NOI18N
             Object env = ((JavafxcScope) scope).getEnv();
             JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-            if (LOGGABLE) log("     fxEnv == " + fxEnv);
+            if (LOGGABLE) log("     fxEnv == " + fxEnv); // NOI18N
             boolean res = resolve.isAccessible(fxEnv, (Symbol.TypeSymbol) type);
-            if (LOGGABLE) log("     returning " + res);
+            if (LOGGABLE) log("     returning " + res); // NOI18N
             return res;
         } else {
-            if (LOGGABLE) log("     returning FALSE from the else branch");
+            if (LOGGABLE) log("     returning FALSE from the else branch"); // NOI18N
             return false;
         }
     }

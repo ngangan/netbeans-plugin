@@ -183,7 +183,7 @@ public class BuildArtifactMapperImpl {
             File f = FileUtil.archiveOrDirForURL(u);
             
             if (f != null && result != null) {
-                Logger.getLogger(BuildArtifactMapperImpl.class.getName()).log(Level.WARNING, "More than one binary directory for root: {0}", source.toExternalForm());
+                Logger.getLogger(BuildArtifactMapperImpl.class.getName()).log(Level.WARNING, "More than one binary directory for root: {0}", source.toExternalForm()); // NOI18N
                 return null;
             }
             
@@ -405,10 +405,10 @@ public class BuildArtifactMapperImpl {
         File f;
         if (RELATIVE_SLASH_SEPARATED_PATH.matcher(filename).matches()) {
             // Shortcut - simple relative path. Potentially faster.
-            f = new File(basedir, filename.replace('/', File.separatorChar));
+            f = new File(basedir, filename.replace('/', File.separatorChar)); // NOI18N
         } else {
             // All other cases.
-            String machinePath = filename.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            String machinePath = filename.replace('/', File.separatorChar).replace('\\', File.separatorChar); // NOI18N
             f = new File(machinePath);
             if (!f.isAbsolute()) {
                 f = new File(basedir, machinePath);
@@ -450,9 +450,9 @@ public class BuildArtifactMapperImpl {
             b.append("../"); // NOI18N
         }
         URI u = base.toURI().relativize(file.toURI());
-        assert !u.isAbsolute() : u + " from " + basedir + " and " + file + " with common root " + base;
+        assert !u.isAbsolute() : u + " from " + basedir + " and " + file + " with common root " + base; // NOI18N
         b.append(u.getPath());
-        if (b.charAt(b.length() - 1) == '/') {
+        if (b.charAt(b.length() - 1) == '/') { // NOI18N
             // file is an existing directory and file.toURI ends in /
             // we do not want the trailing slash
             b.setLength(b.length() - 1);

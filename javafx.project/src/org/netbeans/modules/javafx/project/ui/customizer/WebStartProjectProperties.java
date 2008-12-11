@@ -198,7 +198,7 @@ public class WebStartProjectProperties {
         Document doc = new PlainDocument();
         String valueURL = evaluator.getProperty(JNLP_CBASE_USER);
         String valueType = evaluator.getProperty(JNLP_CBASE_TYPE);
-        String docString = "";
+        String docString = ""; // NOI18N
         if (CB_TYPE_LOCAL.equals(valueType)) {
             docString = getProjectDistDir();
         } else if (CB_TYPE_USER.equals(valueType)) {
@@ -231,7 +231,7 @@ public class WebStartProjectProperties {
     }
 
     public String getProjectDistDir() {
-        File distDir = new File(FileUtil.toFile(javafxProject.getProjectDirectory()), evaluator.getProperty("dist.dir"));
+        File distDir = new File(FileUtil.toFile(javafxProject.getProjectDirectory()), evaluator.getProperty("dist.dir")); // NOI18N
         return distDir.toURI().toString();
     }
 
@@ -391,8 +391,8 @@ public class WebStartProjectProperties {
 
     public class CodebaseComboBoxModel extends DefaultComboBoxModel {
 
-        String localLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_CB_Combo_Local");
-        String userLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_CB_Combo_User");
+        String localLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_CB_Combo_Local"); // NOI18N
+        String userLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_CB_Combo_User"); // NOI18N
         Object[] visItems = new Object[]{localLabel, userLabel};
         String[] cbItems = new String[]{CB_TYPE_LOCAL, CB_TYPE_USER};
 

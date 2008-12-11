@@ -41,7 +41,6 @@ package org.netbeans.api.javafx.source;
 
 import com.sun.tools.javafx.api.JavafxcTool;
 import java.net.URL;
-import java.nio.charset.Charset;
 import javax.swing.event.ChangeListener;
 import javax.tools.JavaFileManager;
 import org.netbeans.api.java.classpath.ClassPath;

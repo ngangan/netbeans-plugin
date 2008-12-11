@@ -120,10 +120,10 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         else {
             String platformId = pp.getPlatformId ();
             if (platformId == null) {
-                name = NbBundle.getMessage(PlatformNode.class,"TXT_BrokenPlatform");
+                name = NbBundle.getMessage(PlatformNode.class,"TXT_BrokenPlatform"); // NOI18N
             }
             else {
-                name = MessageFormat.format(NbBundle.getMessage(PlatformNode.class,"FMT_BrokenPlatform"), new Object[] {platformId});
+                name = MessageFormat.format(NbBundle.getMessage(PlatformNode.class,"FMT_BrokenPlatform"), new Object[] {platformId}); // NOI18N
             }
         }
         return name;
@@ -281,7 +281,7 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         }
         
         public void propertyChange(PropertyChangeEvent evt) {
-            if (platformPropName.equals (evt.getPropertyName()) || "javafx.profile".equals(evt.getPropertyName())) {
+            if (platformPropName.equals (evt.getPropertyName()) || "javafx.profile".equals(evt.getPropertyName())) { // NOI18N
                 platformCache = null;                
                 this.changeSupport.fireChange ();
             }

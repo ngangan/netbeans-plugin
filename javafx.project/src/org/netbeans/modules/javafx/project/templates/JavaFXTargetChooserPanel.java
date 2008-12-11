@@ -50,7 +50,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.SourceGroup;
@@ -114,7 +113,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
             }
         }
 
-        return new HelpCtx("javafx_proj_quickref");
+        return new HelpCtx("javafx_proj_quickref"); // NOI18N
     }
 
     public boolean isValid() {              
@@ -318,13 +317,13 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
     // Nice copy of useful methods (Taken from JavaModule)
     
     static boolean isValidPackageName(String str) {
-        if (str.length() > 0 && str.charAt(0) == '.') {
+        if (str.length() > 0 && str.charAt(0) == '.') { // NOI18N
             return false;
         }
         StringTokenizer tukac = new StringTokenizer(str, "."); // NOI18N
         while (tukac.hasMoreTokens()) {
             String token = tukac.nextToken();
-            if ("".equals(token))
+            if ("".equals(token)) // NOI18N
                 return false;
             if (!Utilities.isJavaIdentifier(token))
                 return false;

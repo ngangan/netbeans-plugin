@@ -157,7 +157,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
         for (int v = 4; v < 10; v++) {
             if (aux.getConfigurationFragment("data", "http://www.netbeans.org/ns/javafx-project/" + v, true) != null) { // NOI18N
                 throw Exceptions.attachLocalizedMessage(new IOException("too new"), // NOI18N
-                        NbBundle.getMessage(JavaFXProject.class, "JavaFXProject.too_new", FileUtil.getFileDisplayName(helper.getProjectDirectory())));
+                        NbBundle.getMessage(JavaFXProject.class, "JavaFXProject.too_new", FileUtil.getFileDisplayName(helper.getProjectDirectory()))); // NOI18N
             }
         }
         refHelper = new ReferenceHelper(helper, aux, eval);
@@ -453,11 +453,11 @@ public final class JavaFXProject implements Project, AntProjectListener {
                 //Refresh build-impl.xml only for j2seproject/2
                 genFilesHelper.refreshBuildScript(
                     GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
-                    JavaFXProject.class.getResource("resources/build-impl.xsl"),
+                    JavaFXProject.class.getResource("resources/build-impl.xsl"), // NOI18N
                     false);
                 genFilesHelper.refreshBuildScript(
                     JavaFXProjectUtil.getBuildXmlName(JavaFXProject.this),
-                    JavaFXProject.class.getResource("resources/build.xsl"),
+                    JavaFXProject.class.getResource("resources/build.xsl"), // NOI18N
                     false);
             }
         }    
@@ -483,11 +483,11 @@ public final class JavaFXProject implements Project, AntProjectListener {
                     //Refresh build-impl.xml only for j2seproject/2
                     genFilesHelper.refreshBuildScript(
                         GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
-                        JavaFXProject.class.getResource("resources/build-impl.xsl"),
+                        JavaFXProject.class.getResource("resources/build-impl.xsl"), // NOI18N
                         true);
                     genFilesHelper.refreshBuildScript(
                         JavaFXProjectUtil.getBuildXmlName(JavaFXProject.this),
-                        JavaFXProject.class.getResource("resources/build.xsl"),
+                        JavaFXProject.class.getResource("resources/build.xsl"), // NOI18N
                         true);
                 }                
             } catch (IOException e) {
@@ -561,7 +561,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
                                 } catch (IOException e) {
                                     //#91398 provide a better error message in case of read-only location of project.
                                     if (!JavaFXProject.this.getProjectDirectory().canWrite()) {
-                                        NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(JavaFXProject.class, "ERR_ProjectReadOnly",
+                                        NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(JavaFXProject.class, "ERR_ProjectReadOnly", // NOI18N
                                                 JavaFXProject.this.getProjectDirectory().getName()));
                                         DialogDisplayer.getDefault().notify(nd);
                                     } else {

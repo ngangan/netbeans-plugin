@@ -97,13 +97,13 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
     
     private String[] createSteps() {
         return new String[] {
-            NbBundle.getMessage(NewJavaFXProjectWizardIterator.class,"LAB_ConfigureProject"),
+            NbBundle.getMessage(NewJavaFXProjectWizardIterator.class,"LAB_ConfigureProject"), // NOI18N
         };
     }
     
     
     public Set<?> instantiate() throws IOException {
-        assert false : "Cannot call this method if implements WizardDescriptor.ProgressInstantiatingIterator.";
+        assert false : "Cannot call this method if implements WizardDescriptor.ProgressInstantiatingIterator."; // NOI18N
         return null;
     }
         
@@ -116,9 +116,9 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
         }
         String name = (String)wiz.getProperty("name");        //NOI18N
         String mainClass = (String)wiz.getProperty("mainClass");        //NOI18N
-        handle.progress (NbBundle.getMessage (NewJavaFXProjectWizardIterator.class, "LBL_NewJavaFXProjectWizardIterator_WizardProgress_CreatingProject"), 1);
+        handle.progress (NbBundle.getMessage (NewJavaFXProjectWizardIterator.class, "LBL_NewJavaFXProjectWizardIterator_WizardProgress_CreatingProject"), 1); // NOI18N
         
-        type = (WizardType)wiz.getProperty("projectType");
+        type = (WizardType)wiz.getProperty("projectType"); // NOI18N
         
         switch (type) {
         case EXT:
@@ -181,7 +181,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                 break;
         }        
         resultSet.add (dir);
-        handle.progress (NbBundle.getMessage (NewJavaFXProjectWizardIterator.class, "LBL_NewJavaFXProjectWizardIterator_WizardProgress_PreparingToOpen"), 4);
+        handle.progress (NbBundle.getMessage (NewJavaFXProjectWizardIterator.class, "LBL_NewJavaFXProjectWizardIterator_WizardProgress_PreparingToOpen"), 4); // NOI18N
         dirF = (dirF != null) ? dirF.getParentFile() : null;
         if (dirF != null && dirF.exists()) {
             ProjectChooser.setProjectsFolder (dirF);    
@@ -240,7 +240,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
     }
     
     public String name() {
-        return NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LAB_IteratorName", index + 1, panels.length);
+        return NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LAB_IteratorName", index + 1, panels.length); // NOI18N
     }
     
     public boolean hasNext() {
@@ -285,7 +285,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                 builder.append(c);
             }            
         }
-        return builder.length() == 0 ? NbBundle.getMessage(NewJavaFXProjectWizardIterator.class,"TXT_DefaultPackageName") : builder.toString();
+        return builder.length() == 0 ? NbBundle.getMessage(NewJavaFXProjectWizardIterator.class,"TXT_DefaultPackageName") : builder.toString(); // NOI18N
     }
     
     /**

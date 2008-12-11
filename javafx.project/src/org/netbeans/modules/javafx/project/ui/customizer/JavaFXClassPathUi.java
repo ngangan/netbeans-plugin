@@ -125,9 +125,9 @@ public class JavaFXClassPathUi {
         // Contains well known paths in the JavaFXProject
         private static final Map WELL_KNOWN_PATHS_NAMES = new HashMap();
         static {
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.JAVAC_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_JavacClasspath_DisplayName" ) );
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.RUN_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_RunClasspath_DisplayName" ) );
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.BUILD_CLASSES_DIR, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_BuildClassesDir_DisplayName" ) );            
+            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.JAVAC_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_JavacClasspath_DisplayName" ) ); // NOI18N
+            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.RUN_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_RunClasspath_DisplayName" ) ); // NOI18N
+            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.BUILD_CLASSES_DIR, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_BuildClassesDir_DisplayName" ) ); // NOI18N
         };
                 
         public ClassPathListCellRenderer( PropertyEvaluator evaluator ) {
@@ -153,7 +153,7 @@ public class JavaFXClassPathUi {
                 
                 case ClassPathSupport.Item.TYPE_LIBRARY:
                     if ( item.isBroken() ) {
-                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_LIBRARY", getLibraryName( item ) );
+                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_LIBRARY", getLibraryName( item ) ); // NOI18N
                     }
                     else { 
                         return item.getLibrary().getDisplayName();
@@ -163,20 +163,20 @@ public class JavaFXClassPathUi {
                     return name == null ? item.getReference() : name;
                 case ClassPathSupport.Item.TYPE_ARTIFACT:
                     if ( item.isBroken() ) {
-                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_PROJECT", getProjectName( item ) );
+                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_PROJECT", getProjectName( item ) ); // NOI18N
                     }
                     else {
                         Project p = item.getArtifact().getProject();
                         ProjectInformation pi = ProjectUtils.getInformation(p);
                         String projectName = pi.getDisplayName();
-                        return MessageFormat.format (NbBundle.getMessage(JavaFXClassPathUi.class,"MSG_ProjectArtifactFormat"), new Object[] {
+                        return MessageFormat.format (NbBundle.getMessage(JavaFXClassPathUi.class,"MSG_ProjectArtifactFormat"), new Object[] { // NOI18N
                             projectName,
                             item.getArtifactURI().toString()
                         });
                     }
                 case ClassPathSupport.Item.TYPE_JAR:
                     if ( item.isBroken() ) {
-                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_FILE", getFileRefName( item ) );
+                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_FILE", getFileRefName( item ) ); // NOI18N
                     }
                     else {
                         return item.getFile().getPath();
@@ -405,13 +405,13 @@ public class JavaFXClassPathUi {
                     }
                 }
                 Object[] options = new Object[] {
-                    new JButton (NbBundle.getMessage (JavaFXClassPathUi.class,"LBL_AddLibrary")),
+                    new JButton (NbBundle.getMessage (JavaFXClassPathUi.class,"LBL_AddLibrary")), // NOI18N
                     DialogDescriptor.CANCEL_OPTION
                 };
                 ((JButton)options[0]).setEnabled(false);
-                ((JButton)options[0]).getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (JavaFXClassPathUi.class,"AD_AddLibrary"));
+                ((JButton)options[0]).getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (JavaFXClassPathUi.class,"AD_AddLibrary")); // NOI18N
                 LibrariesChooser panel = new LibrariesChooser ((JButton)options[0], includedLibraries);
-                DialogDescriptor desc = new DialogDescriptor(panel,NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_CustomizeCompile_Classpath_AddLibrary" ),
+                DialogDescriptor desc = new DialogDescriptor(panel,NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_CustomizeCompile_Classpath_AddLibrary" ), // NOI18N
                     true, options, options[0], DialogDescriptor.DEFAULT_ALIGN,null,null);
                 Dialog dlg = DialogDisplayer.getDefault().createDialog(desc);
                 dlg.setVisible(true);

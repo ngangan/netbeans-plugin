@@ -141,8 +141,8 @@ public class JavaFXProjectUtil {
             if ("text/x-fx".equals(FileUtil.getMIMEType(fo)) && // NOI18N
                     "fx".equals(fo.getExt())) { // NOI18N
                 String shortPath = fo.getPath().substring(root.getPath().length());
-                shortPath = shortPath.replace(shortPath.charAt(0), '.').
-                        substring(1, shortPath.length() - "fx".length() - 1);; // NOI18N
+                shortPath = shortPath.replace(shortPath.charAt(0), '.'). // NOI18N
+                        substring(1, shortPath.length() - "fx".length() - 1); // NOI18N
                 storage.add(shortPath);
             }
         }

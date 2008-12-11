@@ -179,7 +179,7 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
         if ( "BROWSE".equals( command ) ) { // NOI18N                
             JFileChooser chooser = new JFileChooser ();
             FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-            chooser.setDialogTitle(NbBundle.getMessage(PanelSourceFolders.class,"LBL_NWP1_SelectProjectLocation"));
+            chooser.setDialogTitle(NbBundle.getMessage(PanelSourceFolders.class,"LBL_NWP1_SelectProjectLocation")); // NOI18N
             chooser.setFileSelectionMode (JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
             if (path.length() > 0) {
@@ -210,26 +210,26 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
             || projectNameTextField.getText().indexOf('\\') > 0         //NOI18N
             || projectNameTextField.getText().indexOf(':')  > 0) {      //NOI18N
             wizardDescriptor.putProperty( "WizardPanel_errorMessage", // NOI18N
-            NbBundle.getMessage(PanelProjectLocationVisual.class,"MSG_IllegalProjectName"));
+            NbBundle.getMessage(PanelProjectLocationVisual.class,"MSG_IllegalProjectName")); // NOI18N
             return false; // Display name not specified
         }
         File f = new File (projectLocationTextField.getText()).getAbsoluteFile();
         if (getCanonicalFile (f)==null) {
-            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_IllegalProjectLocation");
+            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_IllegalProjectLocation"); // NOI18N
             wizardDescriptor.putProperty("WizardPanel_errorMessage", message); // NOI18N
             return false;
         }
         // not allow to create project on unix root folder, see #82339
         File cfl = getCanonicalFile(new File(createdFolderTextField.getText()));
         if (Utilities.isUnix() && cfl != null && cfl.getParentFile().getParent() == null) {
-            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_ProjectInRootNotSupported");
+            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_ProjectInRootNotSupported"); // NOI18N
             wizardDescriptor.putProperty("WizardPanel_errorMessage", message); // NOI18N
             return false;
         }
         
         final File destFolder = new File( createdFolderTextField.getText() ).getAbsoluteFile();
         if (getCanonicalFile (destFolder) == null) {
-            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_IllegalProjectLocation");
+            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_IllegalProjectLocation"); // NOI18N
             wizardDescriptor.putProperty("WizardPanel_errorMessage", message); // NOI18N
             return false;
         }
@@ -240,12 +240,12 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
         }
         if (projLoc == null || !projLoc.canWrite()) {
             wizardDescriptor.putProperty( "WizardPanel_errorMessage", // NOI18N
-            NbBundle.getMessage(PanelProjectLocationVisual.class,"MSG_ProjectFolderReadOnly"));
+            NbBundle.getMessage(PanelProjectLocationVisual.class,"MSG_ProjectFolderReadOnly")); // NOI18N
             return false;
         }
         
         if (FileUtil.toFileObject(projLoc) == null) {
-            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_IllegalProjectLocation");
+            String message = NbBundle.getMessage (PanelProjectLocationVisual.class,"MSG_IllegalProjectLocation"); // NOI18N
             wizardDescriptor.putProperty("WizardPanel_errorMessage", message); // NOI18N
             return false;
         }
@@ -254,7 +254,7 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
         if ( destFolder.exists() && kids != null && kids.length > 0) {
             // Folder exists and is not empty
             wizardDescriptor.putProperty( "WizardPanel_errorMessage", // NOI18N
-            NbBundle.getMessage(PanelProjectLocationVisual.class,"MSG_ProjectFolderExists"));
+            NbBundle.getMessage(PanelProjectLocationVisual.class,"MSG_ProjectFolderExists")); // NOI18N
             return false;
         }                
         return true;
@@ -285,14 +285,14 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
             switch (type) {
                         case APP:
                 int baseCount = FoldersListSettings.getDefault().getNewApplicationCount() + 1;
-                String formatter = NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaApplication");
+                String formatter = NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaApplication"); // NOI18N
                 while ((projectName=validFreeProjectName(projectLocation, formatter, baseCount))==null)
                     baseCount++;                
                 settings.putProperty (NewJavaFXProjectWizardIterator.PROP_NAME_INDEX, new Integer(baseCount));
                 break;
             default:
                 baseCount = FoldersListSettings.getDefault().getNewLibraryCount() + 1;
-                formatter = NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaLibrary");
+                formatter = NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaLibrary"); // NOI18N
                 while ((projectName=validFreeProjectName(projectLocation, formatter, baseCount))==null)
                     baseCount++;                
                 settings.putProperty (NewJavaFXProjectWizardIterator.PROP_NAME_INDEX, new Integer(baseCount));

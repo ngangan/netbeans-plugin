@@ -155,7 +155,7 @@ public class CompiledSourceForBinaryQuery implements SourceForBinaryQueryImpleme
                     // generated/wsclient
                     File f =  new File (helper.resolveFile (buildDir),"generated/wsclient"); //NOI18N
                     URL url = f.toURI().toURL();
-                    if (!f.exists()) {  //NOI18N
+                    if (!f.exists()) {
                         assert !url.toExternalForm().endsWith("/");  //NOI18N
                         url = new URL (url.toExternalForm()+'/');   //NOI18N
                     }

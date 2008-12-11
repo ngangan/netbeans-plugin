@@ -56,7 +56,7 @@ public class MemoryFileManager implements JavaFileManager {
     
     List<SimpleJavaFileObject> buffers = new ArrayList<SimpleJavaFileObject>();
     public ClassLoader getClassLoader(Location location) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
@@ -124,14 +124,14 @@ public class MemoryFileManager implements JavaFileManager {
 	String binaryName;
         
 	public String getBinaryName() {
-	    return binaryName.equals("__FX_SCRIPT__.fx") ? "__FX_SCRIPT__" : binaryName;
+	    return binaryName.equals("__FX_SCRIPT__.fx") ? "__FX_SCRIPT__" : binaryName; // NOI18N
 	}
 
         StringInputBuffer(String name, String code) {
             super(toURI(name), Kind.SOURCE);
             this.code = code;
 	    binaryName = name;
-            isFXSourceFile = name.endsWith(".fx");
+            isFXSourceFile = name.endsWith(".fx"); // NOI18N
         }
         
         @Override
@@ -186,19 +186,19 @@ public class MemoryFileManager implements JavaFileManager {
     }
 
     public boolean isSameFile(javax.tools.FileObject a, javax.tools.FileObject b) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public boolean handleOption(String current, Iterator<String> remaining) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public boolean hasLocation(Location location) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public JavaFileObject getJavaFileForInput(Location location, String className, Kind kind) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location,
@@ -211,25 +211,25 @@ public class MemoryFileManager implements JavaFileManager {
     }
 
     public javax.tools.FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public javax.tools.FileObject getFileForOutput(Location location, String packageName, String relativeName, javax.tools.FileObject sibling) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public void flush() throws IOException {
     }
 
     public void close() throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
 
     public int isSupportedOption(String option) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
     
-    private final static String EXT = ".fx";
+    private final static String EXT = ".fx"; // NOI18N
     static URI toURI(String name) {
         File file = new File(name);
         if (file.exists()) {
@@ -237,12 +237,12 @@ public class MemoryFileManager implements JavaFileManager {
         } else {
             try {
                 final StringBuilder newUri = new StringBuilder();
-                newUri.append("mfm:///");
-                newUri.append(name.replace('.', '/'));
+                newUri.append("mfm:///"); // NOI18N
+                newUri.append(name.replace('.', '/')); // NOI18N
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {
-                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source");
+                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source"); // NOI18N
             }
         }
     }

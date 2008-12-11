@@ -282,10 +282,10 @@ public class AppletSupport {
             if (appletFile.getExt().equals("fx")) { // NOI18N
                 JavaFXProject project = (JavaFXProject) getProject(appletFile);
 
-                String distJAR = project.evaluator().getProperty("dist.jar");
-                distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
+                String distJAR = project.evaluator().getProperty("dist.jar"); // NOI18N
+                distJAR = distJAR.substring(distJAR.indexOf('/') + 1); // NOI18N
                 String libs = distJAR;
-                String[] list = {""};
+                String[] list = {""}; // NOI18N
                 try {
                     File fxFolder = new File(((JavaFXPlatform) JavaFXProjectUtil.getActivePlatform(activePlatform)).getJavaFXFolder().toURI());
                     list = fxFolder.list(new FilenameFilter() {
@@ -424,7 +424,7 @@ public class AppletSupport {
 
         writer.print("   <TITLE>"); // NOI18N
 
-        writer.print(bundle.getString("GEN_title"));
+        writer.print(bundle.getString("GEN_title")); // NOI18N
         writer.println("</TITLE>"); // NOI18N
 
         writer.println("</HEAD>"); // NOI18N
@@ -435,7 +435,7 @@ public class AppletSupport {
 
         writer.print("<H3><HR WIDTH=\"100%\">"); // NOI18N
 
-        writer.print(bundle.getString("GEN_header"));
+        writer.print(bundle.getString("GEN_header")); // NOI18N
         writer.println("<HR WIDTH=\"100%\"></H3>\n"); // NOI18N
 
         writer.println("<P>"); // NOI18N
@@ -502,23 +502,23 @@ public class AppletSupport {
 
         writer.print("   <TITLE>"); // NOI18N
 
-        writer.print(bundle.getString("GEN_title"));
+        writer.print(bundle.getString("GEN_title")); // NOI18N
         writer.println("</TITLE>"); // NOI18N
 
         writer.println("</HEAD>"); // NOI18N
 
         writer.println("<BODY>\n"); // NOI18N
 
-        writer.print(bundle.getString("GEN_warning"));
+        writer.print(bundle.getString("GEN_warning")); // NOI18N
 
         writer.print("<H3><HR WIDTH=\"100%\">"); // NOI18N
 
-        writer.print(bundle.getString("GEN_header"));
+        writer.print(bundle.getString("GEN_header")); // NOI18N
         writer.println("<HR WIDTH=\"100%\"></H3>\n"); // NOI18N
 
         writer.println("<P>"); // NOI18N
 
-        writer.println("<script src=\"http://java.com/js/deployJava.js\"></script><br>");
+        writer.println("<script src=\"http://java.com/js/deployJava.js\"></script><br>"); // NOI18N
         writer.println("<script>"); // NOI18N
         writer.println("    var attributes = {"); // NOI18N
         if (jnlpFileName != null) {
@@ -563,7 +563,7 @@ public class AppletSupport {
 
         writer.print("<HR WIDTH=\"100%\"><FONT SIZE=-1><I>"); // NOI18N
 
-        writer.print(bundle.getString("GEN_copy"));
+        writer.print(bundle.getString("GEN_copy")); // NOI18N
         writer.println("</I></FONT>"); // NOI18N
 
         writer.println("</BODY>"); // NOI18N
@@ -607,12 +607,12 @@ public class AppletSupport {
 
         writer.println("            <jar href=\"" + distJar + "\"/>"); // NOI18N
 
-        String mainJar = "";
+        String mainJar = ""; // NOI18N
         for (int i = 0; i < libs.length; i++) {
             if (libs[i].equals("javafxgui.jar")) { // NOI18N
                 mainJar = " main=\"true\""; // NOI18N
             } else {
-                mainJar = "";
+                mainJar = ""; // NOI18N
             }
             writer.println("            <jar href=\"lib/" + libs[i] + "\"" + mainJar + "/>"); // NOI18N
         }

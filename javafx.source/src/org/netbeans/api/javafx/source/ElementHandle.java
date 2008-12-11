@@ -368,7 +368,7 @@ public class ElementHandle<T extends Element> {
 
     private static void encodeType(final TypeMirror type, final StringBuilder sb) {
         if (type == null) {
-            sb.append('?');
+            sb.append('?'); // NOI18N
             return;
         }
         switch (type.getKind()) {
@@ -407,7 +407,7 @@ public class ElementHandle<T extends Element> {
             case DECLARED: {
                 sb.append('L');	    // NOI18N
                 TypeElement te = (TypeElement) ((DeclaredType) type).asElement();
-                encodeClassName(te, sb, '/');
+                encodeClassName(te, sb, '/'); // NOI18N
                 sb.append(';');	    // NOI18N
                 break;
             }
@@ -427,8 +427,8 @@ public class ElementHandle<T extends Element> {
             case ERROR: {                
                 TypeElement te = (TypeElement) ((ErrorType) type).asElement();
                 if (te != null) {
-                    sb.append('L');
-                    encodeClassName(te, sb,'/');
+                    sb.append('L'); // NOI18N
+                    encodeClassName(te, sb,'/'); // NOI18N
                     sb.append(';');	    // NOI18N
                     break;
                 } // else fall through
@@ -439,7 +439,7 @@ public class ElementHandle<T extends Element> {
     }
 
     private static void encodeClassName(TypeElement te, final StringBuilder sb, final char separator) {
-        sb.append(((Symbol.ClassSymbol) te).flatname.toString().replace('.', separator));
+        sb.append(((Symbol.ClassSymbol) te).flatname.toString().replace('.', separator)); // NOI18N
     }
 
     private static String[] createExecutableDescriptor(final ExecutableElement ee) {
@@ -499,7 +499,7 @@ public class ElementHandle<T extends Element> {
         else {
             final JavacElements elements = jt.getElements();                    
             // return (TypeElement) elements.getTypeElementByBinaryName(signature);
-            return (TypeElement) elements.getTypeElement(signature.replace('$', '.'));
+            return (TypeElement) elements.getTypeElement(signature.replace('$', '.')); // NOI18N
         }
     }
     
@@ -525,7 +525,7 @@ public class ElementHandle<T extends Element> {
     public org.netbeans.api.java.source.ElementHandle toJava() {
         try {
             // Load the right version of the ElementKind class and convert our instance to it
-            Class ekClass = org.netbeans.api.java.source.ElementHandle.class.getClassLoader().loadClass("javax.lang.model.element.ElementKind");
+            Class ekClass = org.netbeans.api.java.source.ElementHandle.class.getClassLoader().loadClass("javax.lang.model.element.ElementKind"); // NOI18N
             Object ekInstance = Enum.valueOf(ekClass, getKind().name());
 
             String[] sig = getSignatures();
@@ -542,12 +542,12 @@ public class ElementHandle<T extends Element> {
     
     public static ElementHandle fromJava(org.netbeans.api.java.source.ElementHandle eh) {
         try {
-            Method getKind = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getKind");
+            Method getKind = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getKind"); // NOI18N
             Object o = getKind.invoke(eh); //eh.getKind() - java's ElementKind type, can't reference directly
 
             ElementKind kind = Enum.valueOf(ElementKind.class, o.toString());
             
-            Method getSignature = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getSignature");
+            Method getSignature = org.netbeans.api.java.source.ElementHandle.class.getDeclaredMethod("getSignature"); // NOI18N
             getSignature.setAccessible(true);
             String[] signatures = (String[]) getSignature.invoke(eh);
             return new ElementHandle(kind, signatures);

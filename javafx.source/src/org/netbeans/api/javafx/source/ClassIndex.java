@@ -412,7 +412,7 @@ public class ClassIndex {
                     return Pattern.compile(name);
                     
                 case PREFIX:
-                    return Pattern.compile(name.concat(".*"));
+                    return Pattern.compile(name.concat(".*")); // NOI18N
                     
                 case CAMEL_CASE:
                     if (name.length() == 0) throw new IllegalArgumentException ();

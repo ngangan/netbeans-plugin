@@ -399,14 +399,14 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
     }//GEN-LAST:event_configDelActionPerformed
 
     private void configNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configNewActionPerformed
-        NotifyDescriptor.InputLine d = new NotifyDescriptor.InputLine(NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.input.prompt"), NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.input.title"));
+        NotifyDescriptor.InputLine d = new NotifyDescriptor.InputLine(NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.input.prompt"), NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.input.title")); // NOI18N
         if (DialogDisplayer.getDefault().notify(d) != NotifyDescriptor.OK_OPTION) {
             return;
         }
         String name = d.getInputText();
         String config = name.replaceAll("[^a-zA-Z0-9_.-]", "_"); // NOI18N
         if (configs.get(config) != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.input.duplicate", config), NotifyDescriptor.WARNING_MESSAGE));
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.input.duplicate", config), NotifyDescriptor.WARNING_MESSAGE)); // NOI18N
             return;
         }
         Map<String, String> m = new HashMap<String, String>();
@@ -474,7 +474,7 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     
     private void configChanged(String activeConfig) {
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-        model.addElement("");
+        model.addElement(""); // NOI18N
         SortedSet<String> alphaConfigs = new TreeSet<String>(new Comparator<String>() {
             Collator coll = Collator.getInstance();
 
@@ -498,7 +498,7 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
             model.addElement(c);
         }
         configCombo.setModel(model);
-        configCombo.setSelectedItem(activeConfig != null ? activeConfig : "");
+        configCombo.setSelectedItem(activeConfig != null ? activeConfig : ""); // NOI18N
         Map<String, String> m = configs.get(activeConfig);
         Map<String, String> def = configs.get(null);
         if (m != null) {
@@ -549,8 +549,8 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
         MainClassListener(SourceRoots sourceRoots, JTextField mainClassTextField) {
             this.sourceRoots = sourceRoots;
             this.mainClassTextField = mainClassTextField;
-            this.okButton = new JButton(NbBundle.getMessage(CustomizerRun.class, "LBL_ChooseMainClass_OK"));
-            this.okButton.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(CustomizerRun.class, "AD_ChooseMainClass_OK"));
+            this.okButton = new JButton(NbBundle.getMessage(CustomizerRun.class, "LBL_ChooseMainClass_OK")); // NOI18N
+            this.okButton.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(CustomizerRun.class, "AD_ChooseMainClass_OK")); // NOI18N
         }
 
         // Implementation of ActionListener ------------------------------------
@@ -573,7 +573,7 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
                 }
             });
             okButton.setEnabled(false);
-            DialogDescriptor desc = new DialogDescriptor(panel, NbBundle.getMessage(CustomizerRun.class, "LBL_ChooseMainClass_Title"), true, options, options[0], DialogDescriptor.BOTTOM_ALIGN, null, null);
+            DialogDescriptor desc = new DialogDescriptor(panel, NbBundle.getMessage(CustomizerRun.class, "LBL_ChooseMainClass_Title"), true, options, options[0], DialogDescriptor.BOTTOM_ALIGN, null, null); // NOI18N
             //desc.setMessageType (DialogDescriptor.INFORMATION_MESSAGE);
             //desc.setMessageType (DialogDescriptor.INFORMATION_MESSAGE);
             //desc.setMessageType (DialogDescriptor.INFORMATION_MESSAGE);
@@ -611,7 +611,7 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
                     label = config;
                 }
             } else {
-                label = NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.default");
+                label = NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.default"); // NOI18N
             }
             setText(label);
 

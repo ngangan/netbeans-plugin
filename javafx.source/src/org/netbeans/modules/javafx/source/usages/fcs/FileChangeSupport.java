@@ -80,7 +80,7 @@ public final class FileChangeSupport {
      * it is quietly removed.
      */
     public void addListener(FileChangeSupportListener listener, File path) {
-        assert path.equals(FileUtil.normalizeFile(path)) : "Need to normalize " + path + " before passing to FCS!";
+        assert path.equals(FileUtil.normalizeFile(path)) : "Need to normalize " + path + " before passing to FCS!"; // NOI18N
         synchronized (holders) {
             Map<File,Holder> f2H = holders.get(listener);
             if (f2H == null) {
@@ -98,7 +98,7 @@ public final class FileChangeSupport {
      * Remove a listener to changes in a given path.
      */
     public void removeListener(FileChangeSupportListener listener, File path) {
-        assert path.equals(FileUtil.normalizeFile(path)) : "Need to normalize " + path + " before passing to FCS!";
+        assert path.equals(FileUtil.normalizeFile(path)) : "Need to normalize " + path + " before passing to FCS!"; // NOI18N
         synchronized (holders) {
             Map<File,Holder> f2H = holders.get(listener);
             if (f2H == null) {

@@ -66,7 +66,7 @@ import org.w3c.dom.Text;
  */
 public class UpdateProjectImpl implements UpdateImplementation {
 
-    private static final boolean TRANSPARENT_UPDATE = Boolean.getBoolean("javafxproject.transparentUpdate");
+    private static final boolean TRANSPARENT_UPDATE = Boolean.getBoolean("javafxproject.transparentUpdate"); // NOI18N
     private static final String BUILD_NUMBER = System.getProperty("netbeans.buildnumber"); // NOI18N
     private static final String MINIMUM_ANT_VERSION_ELEMENT = "minimum-ant-version"; // NOI18N
 
@@ -101,8 +101,8 @@ public class UpdateProjectImpl implements UpdateImplementation {
             public Boolean run() {
                 synchronized (this) {
                     if (isCurrent == null) {
-                        if ((cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/1",true) != null) ||
-                        (cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/2",true) != null)) {
+                        if ((cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/1",true) != null) || // NOI18N
+                        (cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/2",true) != null)) { // NOI18N
                             isCurrent = Boolean.FALSE;
                         } else {
                             isCurrent = Boolean.TRUE;
@@ -240,11 +240,11 @@ public class UpdateProjectImpl implements UpdateImplementation {
     }
 
     private boolean showUpdateDialog() {
-        JButton updateOption = new JButton (NbBundle.getMessage(UpdateProjectImpl.class, "CTL_UpdateOption"));
-        updateOption.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(UpdateProjectImpl.class, "AD_UpdateOption"));
+        JButton updateOption = new JButton (NbBundle.getMessage(UpdateProjectImpl.class, "CTL_UpdateOption")); // NOI18N
+        updateOption.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(UpdateProjectImpl.class, "AD_UpdateOption")); // NOI18N
         return DialogDisplayer.getDefault().notify(
-            new NotifyDescriptor (NbBundle.getMessage(UpdateProjectImpl.class,"TXT_ProjectUpdate", BUILD_NUMBER),
-                NbBundle.getMessage(UpdateProjectImpl.class,"TXT_ProjectUpdateTitle"),
+            new NotifyDescriptor (NbBundle.getMessage(UpdateProjectImpl.class,"TXT_ProjectUpdate", BUILD_NUMBER), // NOI18N
+                NbBundle.getMessage(UpdateProjectImpl.class,"TXT_ProjectUpdateTitle"), // NOI18N
                 NotifyDescriptor.DEFAULT_OPTION,
                 NotifyDescriptor.WARNING_MESSAGE,
                 new Object[] {

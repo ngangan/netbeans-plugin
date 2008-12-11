@@ -49,8 +49,6 @@ import javax.swing.filechooser.FileFilter;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-import org.netbeans.modules.javafx.project.ui.customizer.WebStartProjectProperties.CodebaseComboBoxModel;
-
 /**
  *
  * @author  Milan Kubec
@@ -131,7 +129,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
                 return true;
             }
             String name = f.getName();
-            int index = name.lastIndexOf('.');
+            int index = name.lastIndexOf('.'); // NOI18N
             if (index > 0 && index < name.length() - 1) {
                 String ext = name.substring(index+1).toLowerCase();
                 if ("gif".equals(ext) || "png".equals(ext) || "jpg".equals(ext)) { // NOI18N
@@ -142,7 +140,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         }
         
         public String getDescription() {
-            return NbBundle.getMessage(CustomizerWebStart.class, "MSG_IconFileFilter_Description");
+            return NbBundle.getMessage(CustomizerWebStart.class, "MSG_IconFileFilter_Description"); // NOI18N
         }
         
     }

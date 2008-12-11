@@ -47,7 +47,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Set;
@@ -69,14 +68,11 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.ui.FoldersListSettings;
 import org.openide.DialogDisplayer;
 import org.openide.DialogDescriptor;
-import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.util.HelpCtx;
 
 /** Handles adding, removing, reordering of source roots.
  *
@@ -131,8 +127,8 @@ public final class JavaFXSourceRootsUi {
         
         DefaultTableModel model = (DefaultTableModel)rootsList.getModel();
         String[] columnNames = new String[2];
-        columnNames[0]  = NbBundle.getMessage( JavaFXSourceRootsUi.class,"CTL_PackageFolders");
-        columnNames[1]  = NbBundle.getMessage( JavaFXSourceRootsUi.class,"CTL_PackageLabels");
+        columnNames[0]  = NbBundle.getMessage( JavaFXSourceRootsUi.class,"CTL_PackageFolders"); // NOI18N
+        columnNames[1]  = NbBundle.getMessage( JavaFXSourceRootsUi.class,"CTL_PackageLabels"); // NOI18N
         model.setColumnIdentifiers(columnNames);
         rootsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         
@@ -144,19 +140,19 @@ public final class JavaFXSourceRootsUi {
      * @param roots the set of illegal source/test roots
      */
     public static void showIllegalRootsDialog (Set/*<File>*/ roots) {
-        JButton closeOption = new JButton (NbBundle.getMessage(JavaFXSourceRootsUi.class,"CTL_JavaFXSourceRootsUi_Close"));
-        closeOption.getAccessibleContext ().setAccessibleDescription (NbBundle.getMessage(JavaFXSourceRootsUi.class,"AD_JavaFXSourceRootsUi_Close"));        
+        JButton closeOption = new JButton (NbBundle.getMessage(JavaFXSourceRootsUi.class,"CTL_JavaFXSourceRootsUi_Close")); // NOI18N
+        closeOption.getAccessibleContext ().setAccessibleDescription (NbBundle.getMessage(JavaFXSourceRootsUi.class,"AD_JavaFXSourceRootsUi_Close")); // NOI18N
         JPanel warning = new WarningDlg (roots);                
-        String message = NbBundle.getMessage(JavaFXSourceRootsUi.class,"MSG_InvalidRoot");
+        String message = NbBundle.getMessage(JavaFXSourceRootsUi.class,"MSG_InvalidRoot"); // NOI18N
         JOptionPane optionPane = new JOptionPane (new Object[] {message, warning},
             JOptionPane.WARNING_MESSAGE,
             0, 
             null, 
             new Object[0], 
             null);
-        optionPane.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXSourceRootsUi.class,"AD_InvalidRootDlg"));
+        optionPane.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXSourceRootsUi.class,"AD_InvalidRootDlg")); // NOI18N
         DialogDescriptor dd = new DialogDescriptor (optionPane,
-            NbBundle.getMessage(JavaFXSourceRootsUi.class,"TITLE_InvalidRoot"),
+            NbBundle.getMessage(JavaFXSourceRootsUi.class,"TITLE_InvalidRoot"), // NOI18N
             true,
             new Object[] {
                 closeOption,
@@ -523,8 +519,8 @@ out:        for( int i = 0; i < files.length; i++ ) {
         private void initGui (Set invalidRoots) {
             setLayout( new GridBagLayout ());                        
             JLabel label = new JLabel ();
-            label.setText (NbBundle.getMessage(JavaFXSourceRootsUi.class,"LBL_InvalidRoot"));
-            label.setDisplayedMnemonic(NbBundle.getMessage(JavaFXSourceRootsUi.class,"MNE_InvalidRoot").charAt(0));            
+            label.setText (NbBundle.getMessage(JavaFXSourceRootsUi.class,"LBL_InvalidRoot")); // NOI18N
+            label.setDisplayedMnemonic(NbBundle.getMessage(JavaFXSourceRootsUi.class,"MNE_InvalidRoot").charAt(0)); // NOI18N
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = GridBagConstraints.RELATIVE;
             c.gridy = GridBagConstraints.RELATIVE;
@@ -549,9 +545,9 @@ out:        for( int i = 0; i < files.length; i++ ) {
             ((GridBagLayout)this.getLayout()).setConstraints(p,c);
             this.add (p);
             label.setLabelFor(roots);
-            roots.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXSourceRootsUi.class,"AD_InvalidRoot"));
+            roots.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXSourceRootsUi.class,"AD_InvalidRoot")); // NOI18N
             JLabel label2 = new JLabel ();
-            label2.setText (NbBundle.getMessage(JavaFXSourceRootsUi.class,"MSG_InvalidRoot2"));
+            label2.setText (NbBundle.getMessage(JavaFXSourceRootsUi.class,"MSG_InvalidRoot2")); // NOI18N
             c = new GridBagConstraints();
             c.gridx = GridBagConstraints.RELATIVE;
             c.gridy = GridBagConstraints.RELATIVE;
@@ -580,7 +576,7 @@ out:        for( int i = 0; i < files.length; i++ ) {
                     if (p!=null) {
                         ProjectInformation pi = ProjectUtils.getInformation(p);
                         String projectName = pi.getDisplayName();
-                        message = MessageFormat.format (NbBundle.getMessage(JavaFXSourceRootsUi.class,"TXT_RootOwnedByProject"), new Object[] {
+                        message = MessageFormat.format (NbBundle.getMessage(JavaFXSourceRootsUi.class,"TXT_RootOwnedByProject"), new Object[] { // NOI18N
                             message,
                             projectName});
                     }

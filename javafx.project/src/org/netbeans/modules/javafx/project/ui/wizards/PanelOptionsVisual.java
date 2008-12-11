@@ -110,10 +110,10 @@ public class PanelOptionsVisual extends SettingsPanel implements ActionListener,
         if (PanelProjectLocationVisual.PROP_PROJECT_NAME.equals(event.getPropertyName())) {
             String newProjectName = NewJavaFXProjectWizardIterator.getPackageName((String) event.getNewValue());
             if (!Utilities.isJavaIdentifier(newProjectName)) {
-                newProjectName = NbBundle.getMessage (PanelOptionsVisual.class, "TXT_PackageNameSuffix", newProjectName); 
+                newProjectName = NbBundle.getMessage (PanelOptionsVisual.class, "TXT_PackageNameSuffix", newProjectName);  // NOI18N
             }
             this.mainClassTextField.setText (MessageFormat.format(
-                NbBundle.getMessage (PanelOptionsVisual.class,"TXT_ClassName"), new Object[] {newProjectName}
+                NbBundle.getMessage (PanelOptionsVisual.class,"TXT_ClassName"), new Object[] {newProjectName} // NOI18N
             ));
         }
     }

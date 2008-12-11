@@ -216,7 +216,7 @@ public final class SourceNodeFactory implements NodeFactory {
         }
         
         public PreselectPropertiesAction(Project project, String nodeName, String panelName) {
-            super(NbBundle.getMessage(JavaFXLogicalViewProvider.class, "LBL_Properties_Action"));
+            super(NbBundle.getMessage(JavaFXLogicalViewProvider.class, "LBL_Properties_Action")); // NOI18N
             this.project = project;
             this.nodeName = nodeName;
             this.panelName = panelName;

@@ -43,9 +43,6 @@ package org.netbeans.modules.javafx.project.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
@@ -133,7 +130,7 @@ public final class LibrariesNodeFactory implements NodeFactory {
             if (key == LIBRARIES) {
                 //Libraries Node
                 return  
-                    new LibrariesNode(NbBundle.getMessage(JavaFXLogicalViewProvider.class,"CTL_LibrariesNode"),
+                    new LibrariesNode(NbBundle.getMessage(JavaFXLogicalViewProvider.class,"CTL_LibrariesNode"), // NOI18N
                         project, evaluator, helper, resolver, JavaFXProjectProperties.RUN_CLASSPATH,
                         new String[] {JavaFXProjectProperties.BUILD_CLASSES_DIR},
                         "platform.active", // NOI18N

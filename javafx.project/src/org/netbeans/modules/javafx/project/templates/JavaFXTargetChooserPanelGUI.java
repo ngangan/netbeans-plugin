@@ -199,7 +199,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
                         if (preselectedFolder != null) {
                             int index = 0;                            
                             while (true) {
-                                FileObject _tmp = preselectedFolder.getFileObject(activeName, template.getExt());    //NOI18N
+                                FileObject _tmp = preselectedFolder.getFileObject(activeName, template.getExt());
                                 if (_tmp == null) {
                                     break;
                                 }
@@ -559,7 +559,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         }        
         else {
             // Find the right item.            
-            String name = relPath.replace('/', '.');
+            String name = relPath.replace('/', '.'); // NOI18N
             /*
             int max = model.getSize();
             for (int i = 0; i < max; i++) {

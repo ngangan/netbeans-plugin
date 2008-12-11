@@ -54,11 +54,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.UIManager;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import org.netbeans.api.queries.FileEncodingQuery;
-import org.netbeans.spi.java.project.support.ui.IncludeExcludeVisualizer;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
@@ -150,7 +146,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
             }
             if (!notified && encName!=null && !encName.equals(originalEncoding)) {
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
-                        NbBundle.getMessage(CustomizerSources.class,"MSG_EncodingWarning"), NotifyDescriptor.WARNING_MESSAGE));
+                        NbBundle.getMessage(CustomizerSources.class,"MSG_EncodingWarning"), NotifyDescriptor.WARNING_MESSAGE)); // NOI18N
                 notified=true;
             }
             this.uiProperties.putAdditionalProperty(JavaFXProjectProperties.SOURCE_ENCODING, encName);
@@ -190,7 +186,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
                     addElement(defEnc);
                 } catch (IllegalCharsetNameException e) {
                     //The source.encoding property is completely broken
-                    Logger.getLogger(this.getClass().getName()).info("IllegalCharsetName: " + originalEncoding);
+                    Logger.getLogger(this.getClass().getName()).info("IllegalCharsetName: " + originalEncoding); // NOI18N
                 }
             }
             if (defEnc == null) {

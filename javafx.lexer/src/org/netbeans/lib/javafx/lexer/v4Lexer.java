@@ -10,6 +10,7 @@ import org.antlr.runtime.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
 public class v4Lexer extends AbstractGeneratedLexerV4 {
     public static final int LAZY=39;
     public static final int COMMA=85;
@@ -171,7 +172,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
     // delegates
     // delegators
 
-    public v4Lexer() {;} 
+    public v4Lexer() {} 
     public v4Lexer(CharStream input) {
         this(input, new RecognizerSharedState());
     }

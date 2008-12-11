@@ -105,7 +105,7 @@ final class ShowJavadocAction extends NodeAction {
     }
 
     public final String getName() {
-        return NbBundle.getMessage(ShowJavadocAction.class,"CTL_ShowJavadoc");
+        return NbBundle.getMessage(ShowJavadocAction.class,"CTL_ShowJavadoc"); // NOI18N
     }
 
     public final HelpCtx getHelpCtx() {

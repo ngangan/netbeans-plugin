@@ -40,13 +40,11 @@
  */
 package org.netbeans.api.javafx.source.support;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.event.ChangeEvent;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
 import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;

@@ -107,7 +107,7 @@ public class EditorRegistryListener implements CaretListener, PropertyChangeList
 
     public void propertyChange(final PropertyChangeEvent evt) {
         String propName = evt.getPropertyName();
-        if ("completion-active".equals(propName)) {
+        if ("completion-active".equals(propName)) { // NOI18N
             JavaFXSource js = null;
             final Document doc = lastEditor.getDocument();
             if (doc != null) {

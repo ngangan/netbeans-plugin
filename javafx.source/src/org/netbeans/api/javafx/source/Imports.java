@@ -64,8 +64,8 @@ public class Imports {
         }
         if( doc == null ) return;
         
-        Pattern packagePattern = Pattern.compile( "package [a-zA-Z0-9_.]+;" );
-        Pattern importPattern = Pattern.compile( "import [a-zA-Z0-9_.*]+;" );
+        Pattern packagePattern = Pattern.compile( "package [a-zA-Z0-9_.]+;" ); // NOI18N
+        Pattern importPattern = Pattern.compile( "import [a-zA-Z0-9_.*]+;" ); // NOI18N
         
         List<Import> imports = new ArrayList<Import>();
         int position = 0;
@@ -79,8 +79,8 @@ public class Imports {
                     c = (char) in.read();
                     position++;
                     if( c == 65535 ) { line = null; break; }
-                    if( c == '\n' || c == '\r' ) { line = line == null ? "" : line ; break; }
-                    if( line == null ) line = "" + c;
+                    if( c == '\n' || c == '\r' ) { line = line == null ? "" : line ; break; } // NOI18N
+                    if( line == null ) line = "" + c; // NOI18N
                     else line += c;
                 }
                 if( line == null ) continue;
@@ -106,7 +106,7 @@ public class Imports {
             throw new IllegalStateException( e );
         }
         
-        final String pkgImport = im.substring( 0, im.lastIndexOf( '.' )) + ".*";
+        final String pkgImport = im.substring( 0, im.lastIndexOf( '.' )) + ".*"; // NOI18N
         // Check whether the import is in there
         boolean found = false;
         Import lastImport = null;
@@ -114,7 +114,7 @@ public class Imports {
             if( lastImport == null ) lastImport = i; 
             else if( lastImport.end < i.end ) lastImport = i;
 
-            if(( "import " + im + ";" ).equals( i.value ) || ( "import " + pkgImport + ";" ).equals( i.value )) {
+            if(( "import " + im + ";" ).equals( i.value ) || ( "import " + pkgImport + ";" ).equals( i.value )) { // NOI18N
                 found = true;
                 break;
             }
@@ -122,7 +122,7 @@ public class Imports {
         if( !found ) {
             if( lastImport == null ) {
                 try {
-                    targetComponent.getDocument().insertString( 0, "import " + im + ";\r\n", null );
+                    targetComponent.getDocument().insertString( 0, "import " + im + ";\r\n", null ); // NOI18N
                 } catch( BadLocationException e ) {
                     throw new IllegalStateException( e );
                 }
@@ -130,14 +130,14 @@ public class Imports {
                 if( lastImport.pkg ) {
                     try {
                         targetComponent.getDocument().
-                                insertString((int) lastImport.end, "\r\nimport " + im + ";\r\n", null );
+                                insertString((int) lastImport.end, "\r\nimport " + im + ";\r\n", null ); // NOI18N
                     } catch( BadLocationException e ) {
                         throw new IllegalStateException( e );
                     }
                 } else {
                     try {
                         targetComponent.getDocument().
-                                insertString((int) lastImport.end, "import " + im + ";\r\n", null );
+                                insertString((int) lastImport.end, "import " + im + ";\r\n", null ); // NOI18N
                     } catch( BadLocationException e ) {
                         throw new IllegalStateException( e );
                     }

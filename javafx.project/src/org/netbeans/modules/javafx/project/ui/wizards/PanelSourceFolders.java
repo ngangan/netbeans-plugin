@@ -78,10 +78,10 @@ public class PanelSourceFolders extends SettingsPanel implements PropertyChangeL
     public PanelSourceFolders (Panel panel) {
         this.firer = panel;
         initComponents();
-        this.setName(NbBundle.getMessage(PanelConfigureProjectVisual.class,"LAB_ConfigureSourceRoots"));
+        this.setName(NbBundle.getMessage(PanelConfigureProjectVisual.class,"LAB_ConfigureSourceRoots")); // NOI18N
         this.putClientProperty ("NewProjectWizard_Title", NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaExtSourcesProjectLocation")); // NOI18N
-        this.getAccessibleContext().setAccessibleName(NbBundle.getMessage(PanelSourceFolders.class,"AN_PanelSourceFolders"));
-        this.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(PanelSourceFolders.class,"AD_PanelSourceFolders"));
+        this.getAccessibleContext().setAccessibleName(NbBundle.getMessage(PanelSourceFolders.class,"AN_PanelSourceFolders")); // NOI18N
+        this.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(PanelSourceFolders.class,"AD_PanelSourceFolders")); // NOI18N
         this.sourcePanel.addPropertyChangeListener (this);
         this.testsPanel.addPropertyChangeListener(this);
         ((FolderList)this.sourcePanel).setRelatedFolderList((FolderList)this.testsPanel);
@@ -159,22 +159,22 @@ public class PanelSourceFolders extends SettingsPanel implements PropertyChangeL
         String ploc = projectLocation.getAbsolutePath ();        
         for (int i=0; i<sources.length;i++) {
             if (!sources[i].isDirectory() || !sources[i].canRead()) {
-                return MessageFormat.format(NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalSources"),
+                return MessageFormat.format(NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalSources"), // NOI18N
                         new Object[] {sources[i].getAbsolutePath()});
             }
             String sloc = sources[i].getAbsolutePath ();
             if (ploc.equals (sloc) || ploc.startsWith (sloc + File.separatorChar)) {
-                return NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalProjectFolder");
+                return NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalProjectFolder"); // NOI18N
             }
         }
         for (int i=0; i<tests.length; i++) {
             if (!tests[i].isDirectory() || !tests[i].canRead()) {
-                return MessageFormat.format(NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalTests"),
+                return MessageFormat.format(NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalTests"), // NOI18N
                         new Object[] {sources[i].getAbsolutePath()});
             }
             String tloc = tests[i].getAbsolutePath();
             if (ploc.equals(tloc) || ploc.startsWith(tloc + File.separatorChar)) {
-                return NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalProjectFolder");
+                return NbBundle.getMessage(PanelSourceFolders.class,"MSG_IllegalProjectFolder"); // NOI18N
             }            
         }
         return null;
@@ -210,9 +210,9 @@ public class PanelSourceFolders extends SettingsPanel implements PropertyChangeL
             JButton KEEP_OPTION = new JButton (NbBundle.getMessage (PanelSourceFolders.class, "TXT_KeepOption")); // NOI18N
             JButton CANCEL_OPTION = new JButton (NbBundle.getMessage (PanelSourceFolders.class, "TXT_CancelOption")); // NOI18N
             KEEP_OPTION.setMnemonic(NbBundle.getMessage (PanelSourceFolders.class, "MNE_KeepOption").charAt(0));
-            DELETE_OPTION.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (PanelSourceFolders.class, "AD_DeleteOption"));
-            KEEP_OPTION.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (PanelSourceFolders.class, "AD_KeepOption"));
-            CANCEL_OPTION.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (PanelSourceFolders.class, "AD_CancelOption"));
+            DELETE_OPTION.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (PanelSourceFolders.class, "AD_DeleteOption")); // NOI18N
+            KEEP_OPTION.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (PanelSourceFolders.class, "AD_KeepOption")); // NOI18N
+            CANCEL_OPTION.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (PanelSourceFolders.class, "AD_CancelOption")); // NOI18N
             NotifyDescriptor desc = new NotifyDescriptor (
                     NbBundle.getMessage (PanelSourceFolders.class, "MSG_FoundClassFiles"), // NOI18N
                     NbBundle.getMessage (PanelSourceFolders.class, "MSG_FoundClassFiles_Title"), // NOI18N

@@ -147,11 +147,11 @@ public class JavaFXSourceUtils {
 
     public static List<URL> getAdditionalCP() {
         LibraryManager lm = LibraryManager.getDefault();
-        Library l = lm.getLibrary("JavaFXUserLib");
+        Library l = lm.getLibrary("JavaFXUserLib"); // NOI18N
         if (l == null) {
             return Collections.emptyList();
         }
-        return l.getContent("classpath");
+        return l.getContent("classpath"); // NOI18N
     }
 
     public static TypeElement getEnclosingTypeElement(Element element) throws IllegalArgumentException {
@@ -177,9 +177,9 @@ public class JavaFXSourceUtils {
 
             while (param != null) {
                 sb.append(param.getKind());
-                sb.append(':');
+                sb.append(':'); // NOI18N
                 sb.append(param.toString());
-                sb.append('/');
+                sb.append('/'); // NOI18N
                 param = param.getEnclosingElement();
             }
 

@@ -379,7 +379,7 @@ public class JavaFXProjectProperties {
         
         // CustomizerApplication
         APPLICATION_TITLE_DOC = projectGroup.createStringDocument(evaluator, APPLICATION_TITLE);
-        String title = evaluator.getProperty("application.title");
+        String title = evaluator.getProperty("application.title"); // NOI18N
         if (title == null) {
             try {
                 APPLICATION_TITLE_DOC.insertString(0, ProjectUtils.getInformation(project).getName(), null);
@@ -388,10 +388,10 @@ public class JavaFXProjectProperties {
             }
         }
         APPLICATION_VENDOR_DOC = projectGroup.createStringDocument(evaluator, APPLICATION_VENDOR);
-        String vendor = evaluator.getProperty("application.vendor");
+        String vendor = evaluator.getProperty("application.vendor"); // NOI18N
         if (vendor == null) {
             try {
-                APPLICATION_VENDOR_DOC.insertString(0, System.getProperty("user.name", "User Name"), null);
+                APPLICATION_VENDOR_DOC.insertString(0, System.getProperty("user.name", "User Name"), null); // NOI18N
             } catch (BadLocationException ex) {
                 // just do not set anything
             }
@@ -415,7 +415,7 @@ public class JavaFXProjectProperties {
         heightModel = AppletSupport.createSpinnerModel(evaluator, APPLET_HEIGHT);
         // CustomizerRun
         RUN_CONFIGS = readRunConfigs();
-        activeConfig = evaluator.getProperty("config");
+        activeConfig = evaluator.getProperty("config"); // NOI18N
                 
     }
     
@@ -427,8 +427,8 @@ public class JavaFXProjectProperties {
                 public Boolean run() throws IOException {
                     if ((genFileHelper.getBuildScriptState(GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
                         JavaFXProject.class.getResource("resources/build-impl.xsl")) //NOI18N
-                        & GeneratedFilesHelper.FLAG_MODIFIED) == GeneratedFilesHelper.FLAG_MODIFIED) {  //NOI18N
-                        if (showModifiedMessage (NbBundle.getMessage(JavaFXProjectProperties.class,"TXT_ModifiedTitle"))) {
+                        & GeneratedFilesHelper.FLAG_MODIFIED) == GeneratedFilesHelper.FLAG_MODIFIED) {
+                        if (showModifiedMessage (NbBundle.getMessage(JavaFXProjectProperties.class,"TXT_ModifiedTitle"))) { // NOI18N
                             //Delete user modified build-impl.xml
                             FileObject fo = projectDir.getFileObject(GeneratedFilesHelper.BUILD_IMPL_XML_PATH);
                             if (fo != null) {
@@ -615,7 +615,7 @@ public class JavaFXProjectProperties {
                             projectConfigurationNamespace, "explicit-platform"); //NOI18N
                     NodeList sourceRootNodes = root.getElementsByTagNameNS(
                             projectConfigurationNamespace, "source-roots"); //NOI18N
-                    assert sourceRootNodes.getLength() == 1 : "Broken project.xml file";
+                    assert sourceRootNodes.getLength() == 1 : "Broken project.xml file"; // NOI18N
 
                     root.insertBefore(explicitPlatform, sourceRootNodes.item(0));
                     changed = true;
@@ -624,7 +624,7 @@ public class JavaFXProjectProperties {
                     explicitPlatform = (Element) explicitPlatformNodes.item(0);
                     break;
                 default:
-                    throw new AssertionError("Broken project.xml file");
+                    throw new AssertionError("Broken project.xml file"); // NOI18N
             }
             String explicitSourceAttrValue = explicitPlatform.getAttribute("explicit-source-supported"); //NOI18N
             if (jdk13.compareTo(platform.getSpecification().getVersion()) >= 0
@@ -755,10 +755,10 @@ public class JavaFXProjectProperties {
     }
     
     private static boolean showModifiedMessage (String title) {
-        String message = NbBundle.getMessage(JavaFXProjectProperties.class,"TXT_Regenerate");
-        JButton regenerateButton = new JButton (NbBundle.getMessage(JavaFXProjectProperties.class,"CTL_RegenerateButton"));
+        String message = NbBundle.getMessage(JavaFXProjectProperties.class,"TXT_Regenerate"); // NOI18N
+        JButton regenerateButton = new JButton (NbBundle.getMessage(JavaFXProjectProperties.class,"CTL_RegenerateButton")); // NOI18N
         regenerateButton.setDefaultCapable(true);
-        regenerateButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXProjectProperties.class,"AD_RegenerateButton"));
+        regenerateButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXProjectProperties.class,"AD_RegenerateButton")); // NOI18N
         NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.WARNING_MESSAGE);
         d.setTitle(title);
         d.setOptionType(NotifyDescriptor.OK_CANCEL_OPTION);
@@ -772,7 +772,7 @@ public class JavaFXProjectProperties {
         if ( kind == BOOLEAN_KIND_ED ) {
             return value ? "on" : "off"; // NOI18N
         }
-        else if ( kind == BOOLEAN_KIND_YN ) { // NOI18N
+        else if ( kind == BOOLEAN_KIND_YN ) {
             return value ? "yes" : "no"; // NOI18N
         }
         else {

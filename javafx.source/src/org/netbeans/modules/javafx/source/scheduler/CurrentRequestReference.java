@@ -245,7 +245,7 @@ public final class CurrentRequestReference {
 
         public Thread newThread(Runnable r) {
             assert this.t == null;
-            this.t = new Thread(r, "JavaFX Source Worker Thread");
+            this.t = new Thread(r, "JavaFX Source Worker Thread"); // NOI18N
             //NOI18N
             return this.t;
         }

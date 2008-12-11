@@ -222,7 +222,7 @@ public class AntArtifactChooser extends JPanel implements PropertyChangeListener
         JFileChooser chooser = ProjectChooser.projectChooser();
         chooser.setDialogTitle( NbBundle.getMessage( AntArtifactChooser.class, "LBL_AACH_Title" ) ); // NOI18N
         chooser.setApproveButtonText( NbBundle.getMessage( AntArtifactChooser.class, "LBL_AACH_SelectProject" ) ); // NOI18N
-        chooser.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage (AntArtifactChooser.class,"AD_AACH_SelectProject"));
+        chooser.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage (AntArtifactChooser.class,"AD_AACH_SelectProject")); // NOI18N
         AntArtifactChooser accessory = new AntArtifactChooser( artifactTypes, chooser );
         chooser.setAccessory( accessory );
         chooser.setPreferredSize( new Dimension( 650, 380 ) );
@@ -242,14 +242,14 @@ public class AntArtifactChooser extends JPanel implements PropertyChangeListener
             
             if ( selectedProject.getProjectDirectory().equals( master.getProjectDirectory() ) ) {
                 DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message( 
-                    NbBundle.getMessage( AntArtifactChooser.class, "MSG_AACH_RefToItself" ),
+                    NbBundle.getMessage( AntArtifactChooser.class, "MSG_AACH_RefToItself" ), // NOI18N
                     NotifyDescriptor.INFORMATION_MESSAGE ) );
                 return null;
             }
             
             if ( ProjectUtils.hasSubprojectCycles( master, selectedProject ) ) {
                 DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message( 
-                    NbBundle.getMessage( AntArtifactChooser.class, "MSG_AACH_Cycles" ),
+                    NbBundle.getMessage( AntArtifactChooser.class, "MSG_AACH_Cycles" ), // NOI18N
                     NotifyDescriptor.INFORMATION_MESSAGE ) );
                 return null;
             }

@@ -243,7 +243,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         return result;
     }
     
-    private static Image brokenProjectBadge = Utilities.loadImage("org/netbeans/modules/javafx/project/ui/resources/brokenProjectBadge.gif", true);
+    private static Image brokenProjectBadge = Utilities.loadImage("org/netbeans/modules/javafx/project/ui/resources/brokenProjectBadge.gif", true); // NOI18N
     
     /** Filter node containin additional features for the J2SE physical
      */
@@ -255,7 +255,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         public JavaFXLogicalViewRootNode() {
             super(NodeFactorySupport.createCompositeChildren(project, "Projects/org-netbeans-modules-javafx-project/Nodes"), // NOI18N
                   Lookups.singleton(project));
-            setIconBaseWithExtension("org/netbeans/modules/javafx/project/ui/resources/fx.png");
+            setIconBaseWithExtension("org/netbeans/modules/javafx/project/ui/resources/fx.png"); // NOI18N
             super.setName( ProjectUtils.getInformation( project ).getDisplayName() );
             if (hasBrokenLinks()) {
                 broken = true;
@@ -301,7 +301,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         }
         
         public HelpCtx getHelpCtx() {
-            return new HelpCtx("javafx_proj_about");
+            return new HelpCtx("javafx_proj_about"); // NOI18N
         }
         
         // Private methods -------------------------------------------------
@@ -398,7 +398,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
             private PropertyChangeListener weakPCL;
             
             public BrokenLinksAction() {
-                putValue(Action.NAME, NbBundle.getMessage(JavaFXLogicalViewProvider.class, "LBL_Fix_Broken_Links_Action"));
+                putValue(Action.NAME, NbBundle.getMessage(JavaFXLogicalViewProvider.class, "LBL_Fix_Broken_Links_Action")); // NOI18N
                 setEnabled(broken);
                 evaluator.addPropertyChangeListener(this);
                 // When evaluator fires changes that platform properties were

@@ -71,7 +71,7 @@ final class PanelConfigureProject implements WizardDescriptor.Panel, WizardDescr
     }
     
     public HelpCtx getHelp() {
-        return new HelpCtx(PanelConfigureProject.class.getName() + '_' + type);
+        return new HelpCtx(PanelConfigureProject.class.getName() + '_' + type); // NOI18N
     }
     
     public boolean isValid() {

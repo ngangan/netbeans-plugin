@@ -142,7 +142,7 @@ public class JavaFXSources implements Sources, PropertyChangeListener, ChangeLis
             String includes = "${" + JavaFXProjectProperties.INCLUDES + "}"; // NOI18N
             String excludes = "${" + JavaFXProjectProperties.EXCLUDES + "}"; // NOI18N
             sourcesHelper.addPrincipalSourceRoot(loc, includes, excludes, displayName, null, null); // NOI18N
-            sourcesHelper.addTypedSourceRoot(loc, includes, excludes, JavaProjectConstants.SOURCES_TYPE_JAVA, displayName, null, null); // NOI18N
+            sourcesHelper.addTypedSourceRoot(loc, includes, excludes, JavaProjectConstants.SOURCES_TYPE_JAVA, displayName, null, null);
         }
     }
 

@@ -69,7 +69,7 @@ import org.openide.util.RequestProcessor;
 public abstract class SelectionAwareJavaSourceTaskFactory extends JavaFXSourceTaskFactory {
     
     private static final int DEFAULT_RESCHEDULE_TIMEOUT = 300;
-    private static final RequestProcessor WORKER = new RequestProcessor("SelectionAwareJavaSourceTaskFactory worker");
+    private static final RequestProcessor WORKER = new RequestProcessor("SelectionAwareJavaSourceTaskFactory worker"); // NOI18N
     
     private int timeout;
     private String[] supportedMimeTypes;
@@ -117,7 +117,7 @@ public abstract class SelectionAwareJavaSourceTaskFactory extends JavaFXSourceTa
      */
     public synchronized static int[] getLastSelection(FileObject file) {
         if (file == null) {
-            throw new NullPointerException("Cannot pass null file!");
+            throw new NullPointerException("Cannot pass null file!"); // NOI18N
         }
         
         Integer startPosition = file2SelectionStartPosition.get(file);

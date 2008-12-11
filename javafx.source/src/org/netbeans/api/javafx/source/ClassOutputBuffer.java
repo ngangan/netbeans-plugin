@@ -77,7 +77,7 @@ public class ClassOutputBuffer extends SimpleJavaFileObject {
         return bytes;
     }
             
-    private final static String EXT = ".fx";
+    private final static String EXT = ".fx"; // NOI18N
     static URI toURI(String name) {
         File file = new File(name);
         if (file.exists()) {
@@ -85,12 +85,12 @@ public class ClassOutputBuffer extends SimpleJavaFileObject {
         } else {
             try {
                 final StringBuilder newUri = new StringBuilder();
-                newUri.append("mfm:///");
-                newUri.append(name.replace('.', '/'));
+                newUri.append("mfm:///"); // NOI18N
+                newUri.append(name.replace('.', '/')); // NOI18N
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {
-                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source");
+                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source"); // NOI18N
             }
         }
     }

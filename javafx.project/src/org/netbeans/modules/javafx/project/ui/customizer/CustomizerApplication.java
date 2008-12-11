@@ -161,7 +161,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
                 return true;
             }
             String name = f.getName();
-            int index = name.lastIndexOf('.');
+            int index = name.lastIndexOf('.'); // NOI18N
             if (index > 0 && index < name.length() - 1) {
                 String ext = name.substring(index+1).toLowerCase();
                 if ("gif".equals(ext) || "png".equals(ext) || "jpg".equals(ext)) { // NOI18N

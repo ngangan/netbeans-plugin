@@ -50,8 +50,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
@@ -80,7 +78,7 @@ public class CachingFileManager implements JavaFileManager, PropertyChangeListen
     public Iterable<JavaFileObject> list( Location l, String packageName, Set<JavaFileObject.Kind> kinds, boolean recursive ) {
      
         if (recursive) {
-            throw new UnsupportedOperationException ("Recursive listing is not supported in archives");
+            throw new UnsupportedOperationException ("Recursive listing is not supported in archives"); // NOI18N
         }
         
         String folderName = FileObjects.convertPackage2Folder( packageName );

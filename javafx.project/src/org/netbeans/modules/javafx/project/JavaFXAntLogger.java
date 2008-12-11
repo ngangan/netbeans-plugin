@@ -179,7 +179,7 @@ public final class JavaFXAntLogger extends AntLogger {
             // We have a stack trace.
             String pkg = m.group(1);
             String filename = m.group(2);
-            String resource = pkg.replace('.', '/') + filename;
+            String resource = pkg.replace('.', '/') + filename; // NOI18N
             int lineNumber = Integer.parseInt(m.group(3));
             // Check to see if the class is listed in our per-task sourcepath.
             // XXX could also look for -Xbootclasspath etc., but probably less important
@@ -307,7 +307,7 @@ public final class JavaFXAntLogger extends AntLogger {
     private void hyperlink(String line, AntSession session, AntEvent event, FileObject source, int messageLevel, int sessionLevel, SessionData data, int lineNumber) {
         if (messageLevel <= sessionLevel) {
             try {
-                session.println(line, true, session.createStandardHyperlink(source.getURL(), "", lineNumber, -1, -1, -1));
+                session.println(line, true, session.createStandardHyperlink(source.getURL(), "", lineNumber, -1, -1, -1)); // NOI18N
                 event.consume();
             } catch (FileStateInvalidException e) {
                 assert false : e;

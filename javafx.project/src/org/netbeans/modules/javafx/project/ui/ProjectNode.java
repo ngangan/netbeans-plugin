@@ -110,11 +110,11 @@ class ProjectNode extends AbstractNode {
     public String getDisplayName () {        
         ProjectInformation info = getProjectInformation();        
         if (info != null) {
-            return MessageFormat.format(NbBundle.getMessage(ProjectNode.class,"TXT_ProjectArtifactFormat"),
+            return MessageFormat.format(NbBundle.getMessage(ProjectNode.class,"TXT_ProjectArtifactFormat"), // NOI18N
                     new Object[] {info.getDisplayName(), artifactLocation.toString()});
         }
         else {
-            return NbBundle.getMessage (ProjectNode.class,"TXT_UnknownProjectName");
+            return NbBundle.getMessage (ProjectNode.class,"TXT_UnknownProjectName"); // NOI18N
         }
     }
 
@@ -209,7 +209,7 @@ class ProjectNode extends AbstractNode {
                 info = ProjectUtils.getInformation(p);
             }
             ShowJavadocAction.showJavaDoc (pageURL, info == null ?
-                NbBundle.getMessage (ProjectNode.class,"TXT_UnknownProjectName") : info.getDisplayName());
+                NbBundle.getMessage (ProjectNode.class,"TXT_UnknownProjectName") : info.getDisplayName()); // NOI18N
         }
         
         private Set findJavadoc() {            
@@ -254,7 +254,7 @@ class ProjectNode extends AbstractNode {
         }
 
         public String getName() {
-            return NbBundle.getMessage (ProjectNode.class,"CTL_OpenProject");
+            return NbBundle.getMessage (ProjectNode.class,"CTL_OpenProject"); // NOI18N
         }
 
         public HelpCtx getHelpCtx() {

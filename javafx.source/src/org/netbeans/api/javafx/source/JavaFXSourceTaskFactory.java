@@ -53,7 +53,6 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
 import org.openide.filesystems.FileObject;
 import org.openide.ErrorManager;
-import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
 /**

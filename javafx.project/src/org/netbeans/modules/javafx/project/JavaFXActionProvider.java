@@ -296,7 +296,7 @@ class JavaFXActionProvider implements ActionProvider {
             public void run () {
                 Properties p = new Properties();
                 String[] targetNames;
-                if (Utilities.isWindows() && "desktop".equalsIgnoreCase(project.evaluator().getProperty("javafx.profile"))) {
+                if (Utilities.isWindows() && "desktop".equalsIgnoreCase(project.evaluator().getProperty("javafx.profile"))) { // NOI18N
                     String codeBaseURL = getCodebaseURL();
                     if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
                 }
@@ -448,7 +448,7 @@ class JavaFXActionProvider implements ActionProvider {
                 }
             }
             if (clazz == null) return null;
-            p.setProperty(JavaFXProjectProperties.MAIN_CLASS, clazz.substring(0, clazz.length()-3).replace('/','.'));
+            p.setProperty(JavaFXProjectProperties.MAIN_CLASS, clazz.substring(0, clazz.length() - 3).replace('/', '.')); // NOI18N
         }
         JavaFXConfigurationProvider.Config c = context.lookup(JavaFXConfigurationProvider.Config.class);
         if (c != null) {
@@ -457,7 +457,7 @@ class JavaFXActionProvider implements ActionProvider {
                 config = c.name;
             } else {
                 // Invalid but overrides any valid setting in config.properties.
-                config = "";
+                config = ""; // NOI18N
             }
             p.setProperty(JavaFXConfigurationProvider.PROP_CONFIG, config);
         }
@@ -535,18 +535,18 @@ class JavaFXActionProvider implements ActionProvider {
     private boolean showMainClassWarning(String mainClass, String projectName, EditableProperties ep, MainClassStatus messageType) {
         boolean canceled;
         final JButton okButton = new JButton (NbBundle.getMessage (MainClassWarning.class, "LBL_MainClassWarning_ChooseMainClass_OK")); // NOI18N
-        okButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (MainClassWarning.class, "AD_MainClassWarning_ChooseMainClass_OK"));
+        okButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (MainClassWarning.class, "AD_MainClassWarning_ChooseMainClass_OK")); // NOI18N
 
         // main class goes wrong => warning
         String message;
         switch (messageType) {
             case UNSET:
-                message = MessageFormat.format (NbBundle.getMessage(MainClassWarning.class,"LBL_MainClassNotFound"), new Object[] {
+                message = MessageFormat.format (NbBundle.getMessage(MainClassWarning.class,"LBL_MainClassNotFound"), new Object[] { // NOI18N
                     projectName
                 });
                 break;
             case SET_BUT_INVALID:
-                message = MessageFormat.format (NbBundle.getMessage(MainClassWarning.class,"LBL_MainClassWrong"), new Object[] {
+                message = MessageFormat.format (NbBundle.getMessage(MainClassWarning.class,"LBL_MainClassWrong"), new Object[] { // NOI18N
                     mainClass,
                     projectName
                 });
@@ -583,7 +583,7 @@ class JavaFXActionProvider implements ActionProvider {
         } else {
             mainClass = panel.getSelectedMainClass ();
             canceled = false;
-            ep.put(JavaFXProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass);
+            ep.put(JavaFXProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass); // NOI18N
         }
         dlg.dispose();
 
@@ -591,15 +591,15 @@ class JavaFXActionProvider implements ActionProvider {
     }
 
     private void showPlatformWarning () {
-        final JButton closeOption = new JButton (NbBundle.getMessage(JavaFXActionProvider.class, "CTL_BrokenPlatform_Close"));
-        closeOption.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(JavaFXActionProvider.class, "AD_BrokenPlatform_Close"));
+        final JButton closeOption = new JButton (NbBundle.getMessage(JavaFXActionProvider.class, "CTL_BrokenPlatform_Close")); // NOI18N
+        closeOption.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(JavaFXActionProvider.class, "AD_BrokenPlatform_Close")); // NOI18N
         final ProjectInformation pi = project.getLookup().lookup(ProjectInformation.class);
         final String projectDisplayName = pi == null ?
-            NbBundle.getMessage (JavaFXActionProvider.class,"TEXT_BrokenPlatform_UnknownProjectName")
+            NbBundle.getMessage (JavaFXActionProvider.class,"TEXT_BrokenPlatform_UnknownProjectName") // NOI18N
             : pi.getDisplayName();
         final DialogDescriptor dd = new DialogDescriptor(
-            NbBundle.getMessage(JavaFXActionProvider.class, "TEXT_BrokenPlatform", projectDisplayName),
-            NbBundle.getMessage(JavaFXActionProvider.class, "MSG_BrokenPlatform_Title"),
+            NbBundle.getMessage(JavaFXActionProvider.class, "TEXT_BrokenPlatform", projectDisplayName), // NOI18N
+            NbBundle.getMessage(JavaFXActionProvider.class, "MSG_BrokenPlatform_Title"), // NOI18N
             true,
             new Object[] {closeOption},
             closeOption,

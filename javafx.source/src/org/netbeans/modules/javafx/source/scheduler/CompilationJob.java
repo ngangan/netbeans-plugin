@@ -200,7 +200,7 @@ public class CompilationJob implements Runnable {
                                                     r.task.run(clientCi);
                                                     final long endTime = System.currentTimeMillis();
                                                     if (LOGGER.isLoggable(Level.FINEST)) {
-                                                        LOGGER.finest(String.format("executed task: %s in %d ms.", r.task.getClass().toString(), endTime - startTime));
+                                                        LOGGER.finest(String.format("executed task: %s in %d ms.", r.task.getClass().toString(), endTime - startTime)); // NOI18N
                                                     }
                                                 } catch (Exception re) {
                                                     Exceptions.printStackTrace(re);
