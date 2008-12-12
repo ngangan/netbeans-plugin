@@ -33,8 +33,10 @@ import com.sun.tools.javafx.tree.JFXTree;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 import java.util.Collection;
+import java.util.TreeSet;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -43,14 +45,25 @@ import java.util.Collection;
 class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collection<Element>> {
     private final CompilationInfo info;
     protected UnitTree cu;
+    private final Collection<Name> variableNames = new TreeSet<Name>();
 
     IdentifierVisitor(CompilationInfo info) {
         this.info = info;
         cu = this.info.getCompilationUnit();
     }
 
+
+    @Override
+    public Collection<Element> visitVariable(VariableTree node, Collection<Element> elements) {
+        variableNames.add(node.getName());
+        return super.visitVariable(node, elements);
+    }
+
     @Override
     public Collection<Element> visitIdentifier(IdentifierTree node, Collection<Element> elements) {
+        if (variableNames.contains(node.getName())) {
+            return elements;
+        }
         Element element = toElement(node);
         if (element != null) {
             if ((element.asType().getKind() == TypeKind.PACKAGE)) {

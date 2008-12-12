@@ -212,12 +212,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
 
-    private boolean isWidow(Tree node) throws BadLocationException {
-        final int endPos = getEndPos(node);
-        int start = getStartPos(node);
-
-        return isWidow(endPos, start);
-    }
+//    private boolean isWidow(Tree node) throws BadLocationException {
+//        final int endPos = getEndPos(node);
+//        int start = getStartPos(node);
+//
+//        return isWidow(endPos, start);
+//    }
 
     private boolean isWidow(int endPos, int start) throws BadLocationException {
         boolean probablyWidow = false;
