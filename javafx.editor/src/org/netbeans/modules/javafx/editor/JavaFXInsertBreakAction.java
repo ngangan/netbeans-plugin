@@ -76,36 +76,6 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
     }
 
     protected Object beforeBreak(JTextComponent target, BaseDocument doc, Caret caret) {
-/*
-        int dotPos = caret.getDot();
-        if (BracketCompletion.posWithinString(doc, dotPos)) {
-            try {
-                doc.insertString(dotPos, "\" + \"", null); //NOI18N
-                dotPos += 3;
-                caret.setDot(dotPos);
-                return dotPos;
-            } catch (BadLocationException ex) {
-            }
-        } else {
-            try {
-                if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
-                    boolean insert[] = {true};
-                    int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
-                    if (insert[0]) {
-                        doc.insertString(end, "}", null); // NOI18N                        
-                        doc.getFormatter().indentNewLine(doc, end);
-                    }
-                    caret.setDot(dotPos);
-                    return Boolean.TRUE;
-                }
-            } catch (BadLocationException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-
-        return javadocBlockCompletion(target, doc, dotPos);
-*/
-
         int dotPos = caret.getDot();
         try {
             if (BracketCompletion.posWithinString(doc, dotPos)) {
@@ -125,17 +95,7 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
                     StringBuilder sb = createAdditiveString(doc, lineIndent, "}");
                     doc.insertString(dotPos, sb.toString(), null);
                     return dotPos + 1 + innerLineIndent;
-                } /*else if (doc.getText(dotPos - 1, 1).contains("[") && !doc.getText(dotPos, 1).contains("]")) {
-                    int innerLineIndent = lineIndent + IndentUtils.indentLevelSize(doc);
-                    StringBuilder sb = createAdditiveString(doc, lineIndent, "]");
-                    doc.insertString(dotPos, sb.toString(), null);
-                    return dotPos + 1 + innerLineIndent;
-                } else if (doc.getText(dotPos - 1, 1).contains("(") && !doc.getText(dotPos, 1).contains(")")) {
-                    int innerLineIndent = lineIndent + IndentUtils.indentLevelSize(doc);
-                    StringBuilder sb = createAdditiveString(doc, lineIndent, ")");
-                    doc.insertString(dotPos, sb.toString(), null);
-                    return dotPos + 1 + innerLineIndent;
-                }*/
+                } 
             }
         } catch (BadLocationException e) {
             e.printStackTrace();
