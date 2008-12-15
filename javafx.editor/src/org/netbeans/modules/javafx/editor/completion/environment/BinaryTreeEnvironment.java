@@ -59,7 +59,7 @@ public class BinaryTreeEnvironment extends JavaFXCompletionEnvironment<BinaryTre
 
     @Override
     protected void inside(BinaryTree t) throws IOException {
-        if (LOGGABLE) log("inside BinaryTree " + t); // NOI18N
+        if (LOGGABLE) log("inside BinaryTree " + t);
         BinaryTree bi = (BinaryTree) getPath().getLeaf();
         int pos = (int) sourcePositions.getEndPosition(root, bi.getRightOperand());
         if (pos != Diagnostic.NOPOS && pos < offset) {

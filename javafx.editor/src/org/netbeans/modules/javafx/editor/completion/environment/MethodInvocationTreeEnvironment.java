@@ -60,7 +60,7 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
     
     @Override
     protected void inside(FunctionInvocationTree t) throws IOException {
-        if (LOGGABLE) log("inside MethodInvocationTree " + t); // NOI18N
+        if (LOGGABLE) log("inside MethodInvocationTree " + t);
         FunctionInvocationTree mi = t;
         TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(mi, offset);
         if (ts == null || (ts.token().id() != JFXTokenId.LPAREN && ts.token().id() != JFXTokenId.COMMA)) {

@@ -483,14 +483,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             }
         }
-        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset +  // NOI18N
+        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + 
                 " offset: " + offset + " prefix " + prefix); // NOI18N
         JavaFXTreePath path = pathFor(controller, offset);
-        if (LOGGABLE) log("   pathFor returned " + path.getLeaf()); // NOI18N
+        if (LOGGABLE) log("   pathFor returned " + path.getLeaf());
         JavaFXTreePath pathOfBrother = pathFor(controller, offset > 0 ? offset - 1 : offset);
         Tree t = path.getLeaf();
         Tree brother = pathOfBrother.getLeaf();
-        if (LOGGABLE) log("   borther == " + brother); // NOI18N
+        if (LOGGABLE) log("   borther == " + brother);
         if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
             if ((brother.getJavaFXKind() == JavaFXKind.OBJECT_LITERAL_PART) ||
                 (brother.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) ||
@@ -502,7 +502,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 path = pathOfBrother.getParentPath();
             }
             t = path.getLeaf();
-            if (LOGGABLE) log("   brother gave us " + t); // NOI18N
+            if (LOGGABLE) log("   brother gave us " + t);
         } else {
             SourcePositions pos = controller.getTrees().getSourcePositions();
             UnitTree unit = controller.getCompilationUnit();
@@ -516,7 +516,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 path = path.getParentPath();
                 if (path != null) {
                     t = path.getLeaf();
-                    if (LOGGABLE) log("    updating t == " + t); // NOI18N
+                    if (LOGGABLE) log("    updating t == " + t);
                 } else {
                     t = null;
                 }
@@ -524,7 +524,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 s = s1 < s ? s1 : s;
                 long e1 = pos.getEndPosition(unit, t);
                 e = e1 > e ? e1 : e;
-                if (LOGGABLE) log("   s ==" + s + " s1 ==" + s1 + "   e ==" + e + "   e1 == " + e1); // NOI18N
+                if (LOGGABLE) log("   s ==" + s + " s1 ==" + s1 + "   e ==" + e + "   e1 == " + e1);
                 if ((t != null) &&
                         (t.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) &&
                         s1 == e1) {
@@ -551,13 +551,13 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
      * @return
      */
     private boolean isBrokenAtTheEnd(CompilationController controller, Tree t, int offset) {
-        if (LOGGABLE) log("isBrokenAtTheEnd " + t + " class == " + t.getClass()); // NOI18N
+        if (LOGGABLE) log("isBrokenAtTheEnd " + t + " class == " + t.getClass());
         if (t instanceof JFXErroneousType || t instanceof JFXErroneous) {
             SourcePositions pos = controller.getTrees().getSourcePositions();
             UnitTree unit = controller.getCompilationUnit();
             long s = pos.getStartPosition(unit, t);
             long e = pos.getEndPosition(unit, t);
-            if (LOGGABLE) log("   (1) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
+            if (LOGGABLE) log("   (1) s == " + s + "  e == " + e + "  offset == " + offset);
             return e == offset;
         }
         if ((t instanceof JFXObjectLiteralPart) || (t instanceof JFXVar)) {
@@ -566,7 +566,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 UnitTree unit = controller.getCompilationUnit();
                 long s = pos.getStartPosition(unit, t);
                 long e = pos.getEndPosition(unit, t);
-                if (LOGGABLE) log("   (2) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
+                if (LOGGABLE) log("   (2) s == " + s + "  e == " + e + "  offset == " + offset);
                 return e == offset;
             }
         }
@@ -576,7 +576,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 UnitTree unit = controller.getCompilationUnit();
                 long s = pos.getStartPosition(unit, t);
                 long e = pos.getEndPosition(unit, t);
-                if (LOGGABLE) log("   (3) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
+                if (LOGGABLE) log("   (3) s == " + s + "  e == " + e + "  offset == " + offset);
                 return e == offset;
             }
         }
@@ -842,7 +842,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                             if (!info.getTreeUtilities().isSynthetic(getCurrentPath())) {
                                 // here we might have a problem
                                 if (LOGGABLE) {
-                                    logger.finest("SCAN: Cannot determine start and end for: " + treeToString(info, tree)); // NOI18N
+                                    logger.finest("SCAN: Cannot determine start and end for: " + treeToString(info, tree));
                                 }
                             }
                         }
@@ -859,18 +859,18 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         }
 
         if (path.getLeaf() == path.getCompilationUnit()) {
-            log("pathFor returning compilation unit for position: " + pos); // NOI18N
+            log("pathFor returning compilation unit for position: " + pos);
             return path;
         }
         int start = (int)sourcePositions.getStartPosition(info.getCompilationUnit(), path.getLeaf());
         int end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), path.getLeaf());
         while (start == -1 || pos < start || pos > end) {
             if (LOGGABLE) {
-                logger.finer("pathFor moving to parent: " + treeToString(info, path.getLeaf())); // NOI18N
+                logger.finer("pathFor moving to parent: " + treeToString(info, path.getLeaf()));
             }
             path = path.getParentPath();
             if (LOGGABLE) {
-                logger.finer("pathFor moved to parent: " + treeToString(info, path.getLeaf())); // NOI18N
+                logger.finer("pathFor moved to parent: " + treeToString(info, path.getLeaf()));
             }
             if (path.getLeaf() == path.getCompilationUnit()) {
                 break;
@@ -879,7 +879,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             end   = (int)sourcePositions.getEndPosition(info.getCompilationUnit(), path.getLeaf());
         }
         if (LOGGABLE) {
-            log("pathFor(pos: " + pos + ") returning: " + treeToString(info, path.getLeaf())); // NOI18N
+            log("pathFor(pos: " + pos + ") returning: " + treeToString(info, path.getLeaf()));
         }
         return path;
     }
@@ -889,13 +889,13 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         try {
             new JavafxPretty(s, false).printExpr((JFXTree)t);
         } catch (Exception e) {
-            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e); // NOI18N
+            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e);
         }
         k = t.getJavaFXKind();
         String res = k.toString();
         SourcePositions pos = info.getTrees().getSourcePositions();
-        res = res + '[' + pos.getStartPosition(info.getCompilationUnit(), t) + ',' + // NOI18N
-                pos.getEndPosition(info.getCompilationUnit(), t) + "]:" + s.toString(); // NOI18N
+        res = res + '[' + pos.getStartPosition(info.getCompilationUnit(), t) + ',' +
+                pos.getEndPosition(info.getCompilationUnit(), t) + "]:" + s.toString();
         return res;
     }
             

@@ -94,7 +94,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         Document doc = info.getJavaFXSource().getDocument();
 
         if (doc == null) {
-            Logger.getLogger(MarkOccurrencesHighlighter.class.getName()).log(Level.FINE, "SemanticHighlighter: Cannot get document!"); // NOI18N
+            Logger.getLogger(MarkOccurrencesHighlighter.class.getName()).log(Level.FINE, "SemanticHighlighter: Cannot get document!");
             return;
         }
 
@@ -176,7 +176,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         }
 
         getHighlightsBag(doc).setHighlights(obag);
-        OccurrencesMarkProvider.get(doc).setOccurrences(OccurrencesMarkProvider.createMarks(doc, bag, ES_COLOR, NbBundle.getMessage(MarkOccurrencesHighlighter.class, "LBL_ES_TOOLTIP"))); // NOI18N
+        OccurrencesMarkProvider.get(doc).setOccurrences(OccurrencesMarkProvider.createMarks(doc, bag, ES_COLOR, NbBundle.getMessage(MarkOccurrencesHighlighter.class, "LBL_ES_TOOLTIP")));
     }
 
     private boolean isIn(UnitTree cu, SourcePositions sp, Tree tree, int position) {

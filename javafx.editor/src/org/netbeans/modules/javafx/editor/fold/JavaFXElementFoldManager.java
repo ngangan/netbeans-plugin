@@ -160,12 +160,12 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         if (!logger.isLoggable(Level.FINER)) {
             return;
         }
-        logger.finer("decl = " + tree); // NOI18N
-        logger.finer("startOffset = " + start); // NOI18N
-        logger.finer("endOffset = " + end); // NOI18N
+        logger.finer("decl = " + tree);
+        logger.finer("startOffset = " + start);
+        logger.finer("endOffset = " + end);
         
         if (start == (-1) || end == (-1)) {
-            logger.finer("ERROR: the positions are outside document."); // NOI18N
+            logger.finer("ERROR: the positions are outside document.");
         }
 
     }
@@ -213,7 +213,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             final JavaFXElementFoldVisitor v = manager.new JavaFXElementFoldVisitor(info, cu, info.getTrees().getSourcePositions());
             
             scan(v, cu, null);
-            if (LOGGABLE) log("No of folds after scan: " + v.folds.size()); // NOI18N
+            if (LOGGABLE) log("No of folds after scan: " + v.folds.size());
             if (v.folds.size() == 0) {
                 // this is a hack to somehow fool the effects of #133144
                 // this should be removed when the error recovery is implemented
@@ -231,13 +231,13 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 return ;
             }
             
-            if (LOGGABLE) log("will commit folds: " + v.folds.size()); // NOI18N
+            if (LOGGABLE) log("will commit folds: " + v.folds.size());
             
             SwingUtilities.invokeLater(manager.new CommitFolds(v.folds));
             
             long endTime = System.currentTimeMillis();
             
-            Logger.getLogger("TIMER").log(Level.FINE, "Folds - 1", // NOI18N
+            Logger.getLogger("TIMER").log(Level.FINE, "Folds - 1",
                     new Object[] {info, endTime - startTime});
         }
         
@@ -330,7 +330,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             
             long endTime = System.currentTimeMillis();
             
-            Logger.getLogger("TIMER").log(Level.FINE, "Folds - 2", // NOI18N
+            Logger.getLogger("TIMER").log(Level.FINE, "Folds - 2",
                     new Object[] {file, endTime - startTime});
         }
     }
@@ -356,7 +356,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         private void addCommentsFolds() {
             TokenHierarchy<?> th = info.getTokenHierarchy();
             if (th == null) {
-                if (LOGGABLE) log("addCommentsFolds returning because of null token hierarchy."); // NOI18N
+                if (LOGGABLE) log("addCommentsFolds returning because of null token hierarchy.");
                 return;
             }
             TokenSequence<JFXTokenId>  ts = th.tokenSequence(JFXTokenId.language());
@@ -367,22 +367,22 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     if (token.id() == JFXTokenId.DOC_COMMENT) {
                         Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
-                        if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset); // NOI18N
+                        if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset);
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
                     }
                     if (token.id() == JFXTokenId.COMMENT) {
                         Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
-                        if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]"); // NOI18N
+                        if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]");
                         if (firstNormalFold) {
-                            if (LOGGABLE) log("foldInitialCommentsPreset == " + foldInitialCommentsPreset + " on " + token.text()); // NOI18N
+                            if (LOGGABLE) log("foldInitialCommentsPreset == " + foldInitialCommentsPreset + " on " + token.text());
                         }
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), INITIAL_COMMENT_FOLD_TEMPLATE, firstNormalFold ? foldInitialCommentsPreset : false));
                         firstNormalFold = false;
                     }
                 } catch (BadLocationException ble) {
                     if (LOGGABLE) {
-                        logger.log(Level.FINE, "addDocComments continuing", ble); // NOI18N
+                        logger.log(Level.FINE, "addDocComments continuing", ble);
                     }
                 }
             }
@@ -401,8 +401,8 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     if (start != (-1) && end != (-1) &&
                             !info.getTreeUtilities().isSynthetic(pa)) {
                         
-                        if (LOGGABLE) log("handleTree adding fold [" + start + ":" + end + "]"); // NOI18N
-                        if (LOGGABLE) log("  for tree: " + node); // NOI18N
+                        if (LOGGABLE) log("handleTree adding fold [" + start + ":" + end + "]");
+                        if (LOGGABLE) log("  for tree: " + node);
                         folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldCodeBlocksPreset));
                     } else {
                         // debug:
@@ -427,7 +427,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 int end   = (int)sp.getEndPosition(cu, node);
 
                 if (start != (-1) && end != (-1)) {
-                    if (LOGGABLE) log("visitInstantiate adding fold [" + start + ":" + end + "] for tree: " + node); // NOI18N
+                    if (LOGGABLE) log("visitInstantiate adding fold [" + start + ":" + end + "] for tree: " + node);
                     folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldInnerClassesPreset));
                 } else {
                     dumpPositions(node, start, end);
@@ -459,7 +459,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 JavaFXTreePath pa = JavaFXTreePath.getPath(cu, node);
                 if (start != (-1) && end != (-1) &&
                         !info.getTreeUtilities().isSynthetic(pa)) {
-                    if (LOGGABLE) log("visitClassDeclaration adding fold [" + start + ":" + end + "] for tree: " + node); // NOI18N
+                    if (LOGGABLE) log("visitClassDeclaration adding fold [" + start + ":" + end + "] for tree: " + node);
                     folds.add(new FoldInfo(doc, start, end, CODE_BLOCK_FOLD_TEMPLATE, foldInnerClassesPreset));
                 } else {
                     dumpPositions(node, start, end);
@@ -531,7 +531,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     importsStart += 7/*"import ".length()*/;
                     
                     if (importsStart < importsEnd) {
-                        if (LOGGABLE) log("visitCompilationUnit adding fold [" + importsStart + ":" + importsEnd + "]"); // NOI18N
+                        if (LOGGABLE) log("visitCompilationUnit adding fold [" + importsStart + ":" + importsEnd + "]");
                         folds.add(new FoldInfo(doc, importsStart , importsEnd, IMPORTS_FOLD_TEMPLATE, collapsed));
                     }
                 } catch (BadLocationException e) {
@@ -640,7 +640,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
     }
 
     private static int findBodyEndImpl(Tree cltree, UnitTree cu, SourcePositions positions, Document doc) {
-        if (LOGGABLE) log("findBodyEndImpl for " + cltree); // NOI18N
+        if (LOGGABLE) log("findBodyEndImpl for " + cltree);
         int end   = (int)positions.getEndPosition(cu, cltree);
         if (end <= 0) {
             return -1;
@@ -650,19 +650,19 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         }
         try {
             String text = doc.getText(end-1, doc.getLength() - end + 1);
-            if (LOGGABLE) log("      text == " + text); // NOI18N
+            if (LOGGABLE) log("      text == " + text);
             int index = text.indexOf('}');
-            if (LOGGABLE) log("      index == " + index); // NOI18N
+            if (LOGGABLE) log("      index == " + index);
             if (index == -1) {
-                if (LOGGABLE) log("findBodyEndImpl returning original end (index==-1)" + end); // NOI18N
+                if (LOGGABLE) log("findBodyEndImpl returning original end (index==-1)" + end);
                 return end;
             }
             int ind2 = text.indexOf('{');
             if (ind2 != -1 && ind2 < index) {
-                if (LOGGABLE) log("findBodyEndImpl returning original end " + end + " ind2 == " + ind2); // NOI18N
+                if (LOGGABLE) log("findBodyEndImpl returning original end " + end + " ind2 == " + ind2);
                 return end;
             }
-            if (LOGGABLE) log("findBodyEndImpl returning " + (end + index) + " instead of " + end); // NOI18N
+            if (LOGGABLE) log("findBodyEndImpl returning " + (end + index) + " instead of " + end);
             return end + index;
         } catch (BadLocationException e) {
             Exceptions.printStackTrace(e);

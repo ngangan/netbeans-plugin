@@ -54,7 +54,7 @@ import org.openide.filesystems.FileObject;
 public class MarkOccurrencesHighlighterFactory extends CaretAwareJavaSourceTaskFactory {
 
     public MarkOccurrencesHighlighterFactory() {
-        super(Phase.ANALYZED, Priority.LOW, "*"); // NOI18N
+        super(Phase.ANALYZED, Priority.LOW, "*");
     }
 
     public CancellableTask<CompilationInfo> createTask(FileObject file) {

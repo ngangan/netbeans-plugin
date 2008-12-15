@@ -48,7 +48,7 @@ public class IndentTaskFactory implements IndentTask.Factory{
      * @return reformatting task or null if the factory cannot handle the given context.
      */
     public IndentTask createTask(Context context) {
-        if (log.isLoggable(Level.FINE)) log.fine("Creating reformat factory"); // NOI18N
+        if (log.isLoggable(Level.FINE)) log.fine("Creating reformat factory");
         return new JFXIndentTask(context);
     }
 }

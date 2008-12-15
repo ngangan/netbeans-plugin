@@ -62,16 +62,16 @@ class Publisher implements Runnable {
             Position end = doc.createPosition(dr.end);
             int length = dr.end - dr.start;
             if (log.isLoggable(Level.INFO)) {
-                log.info(doc.getText(dr.start, length) + "\n"); // NOI18N
-                log.info("Publishing following entries:"); // NOI18N
+                log.info(doc.getText(dr.start, length) + "\n");
+                log.info("Publishing following entries:");
             }
             doc.remove(dr.start, length);
             int offset = dr.start;
             boolean first = true;
             for (ImportsModel.ModelEntry entry : model.getEntries()) {
                 if (entry.isUsed()) {
-                    log.info("\t" + entry.toImportStatement()); // NOI18N
-                    String text = (first ? "" : "\n") + entry.toImportStatement(); // NOI18N
+                    log.info("\t" + entry.toImportStatement());
+                    String text = (first ? "" : "\n") + entry.toImportStatement();
                     first = false;
                     doc.insertString(offset, text, null);
                     offset += text.length();

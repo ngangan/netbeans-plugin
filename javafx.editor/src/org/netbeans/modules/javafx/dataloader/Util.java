@@ -326,7 +326,7 @@ public final class Util extends Object {
             }
             
             // counting line's length
-            if (x == (int)'\n') { // NOI18N
+            if (x == (int)'\n') {
                 if (lineCounter == lines.length - 1) {
                     int[] newLines = new int[lineCounter + lineCounter];
                     System.arraycopy(lines, 0, newLines, 0, lines.length);

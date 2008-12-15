@@ -57,7 +57,7 @@ public class WhileLoopTreeEnvironment extends JavaFXCompletionEnvironment<WhileL
 
     @Override
     protected void inside(WhileLoopTree t) throws IOException {
-        if (LOGGABLE) log("inside WhileLoopTree " + t); // NOI18N
+        if (LOGGABLE) log("inside WhileLoopTree " + t);
         WhileLoopTree wlt = t;
         if (getSourcePositions().getEndPosition(root, wlt.getCondition()) <= getOffset()) {
             localResult(null);

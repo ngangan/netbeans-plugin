@@ -570,14 +570,14 @@ public class ElementJavadoc {
             if (pkg != null) {
                 sb.append("<font size='+0'><b>"); //NOI18N
                 createLink(sb, eu.elementFor(pkg), makeNameLineBreakable(pkg.name()));
-                sb.append("</b></font>"); //NOI18N
+                sb.append("</b></font>"); //NOI18N)
             }
         }
         return sb;
     }
 
     private static String makeNameLineBreakable(String name) {
-        return name.replace(".", /* ZERO WIDTH SPACE */ ".&#x200B;"); // NOI18N
+        return name.replace(".", /* ZERO WIDTH SPACE */ ".&#x200B;");
     }
 
     private CharSequence getMethodHeader(ElementUtilities eu, ExecutableMemberDoc mdoc) {
@@ -704,7 +704,7 @@ public class ElementJavadoc {
                 sb.append("&gt;"); //NOI18N
             }
         }
-        sb.append("</b>"); // NOI18N
+        sb.append("</b>"); //NOi18N
 
         if (isJavaClass) {
             if (!cdoc.isAnnotationType()) {
@@ -1069,7 +1069,7 @@ public class ElementJavadoc {
                     VariableElement param = it.next();
                     appendType(sb, param.asType(), ee.isVarArgs() && !it.hasNext());
                     if (it.hasNext()) {
-                        sb.append(", "); // NOI18N
+                        sb.append(", ");
                     }
                 }
                 sb.append(')'); //NOI18N

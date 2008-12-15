@@ -63,9 +63,9 @@ public class SequenceEmptyEnvironment extends JavaFXCompletionEnvironment<JFXSeq
 
     @Override
     protected void inside(JFXSequenceEmpty t) throws IOException {
-        if (LOGGABLE) log("inside JFXSequenceEmpty " + t + "  offset == " + offset); // NOI18N
+        if (LOGGABLE) log("inside JFXSequenceEmpty " + t + "  offset == " + offset);
         TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-        if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
+        if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
         localResult(getSmartType(t));
         addValueKeywords();
     }
@@ -73,13 +73,13 @@ public class SequenceEmptyEnvironment extends JavaFXCompletionEnvironment<JFXSeq
     private TypeMirror getSmartType(JFXSequenceEmpty t) throws IOException {
         final JavaFXTreePath treePath = new JavaFXTreePath(path, t);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(1) == " + type); // NOI18N
+        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(1) == " + type);
         // handle sequences as their element type
         JavafxTypes types = controller.getJavafxTypes();
         if (types.isSequence((Type) type)) {
             type = types.elementType((Type) type);
         } 
-        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(2) == " + type); // NOI18N
+        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(2) == " + type);
         return type;
     }
 

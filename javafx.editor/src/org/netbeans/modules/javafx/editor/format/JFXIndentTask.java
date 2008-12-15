@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
  */
 public class JFXIndentTask implements IndentTask, ReformatTask {
     private static Logger log = Logger.getLogger(JFXIndentTask.class.getName());
-    private static final Pattern KEEP_LEVEL_PTRN = Pattern.compile("\\s*(}|\\)|\\])\\s*(;|,)?\\s*"); // NOI18N
+    private static final Pattern KEEP_LEVEL_PTRN = Pattern.compile("\\s*(}|\\)|\\])\\s*(;|,)?\\s*");
 
     private final Context context;
     private TokenSequence<JFXTokenId> ts = null;
@@ -102,21 +102,22 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         if (context == null) {
             return;
         }
-        if (log.isLoggable(Level.FINE)) log.fine("Reindent..."); // NOI18N
-
-        final List<Context.Region> regions = context.indentRegions();
-        if (!regions.isEmpty()) {
-            for (Context.Region region : regions) {
-                if (log.isLoggable(Level.FINE))
-                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]"); // NOI18N
-                indentRegion(region);
-            }
-        } else {
-            if (log.isLoggable(Level.FINE))
-                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]"); // NOI18N
-            indentLine(context.startOffset());
-        }
-        if (log.isLoggable(Level.FINE)) log.fine("... done!"); // NOI18N
+//        if (log.isLoggable(Level.FINE)) log.fine("Reindent...");
+//
+//        final List<Context.Region> regions = context.indentRegions();
+//        if (!regions.isEmpty()) {
+//            for (Context.Region region : regions) {
+//                if (log.isLoggable(Level.FINE))
+//                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
+//                indentRegion(region);
+//            }
+//        } else {
+//            if (log.isLoggable(Level.FINE))
+//                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]");
+//            indentLine(context.startOffset());
+//        }
+//        if (log.isLoggable(Level.FINE)) log.fine("... done!");
+        reformat();
 
     }
 
@@ -280,10 +281,10 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                     final long s = System.currentTimeMillis();
                     final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
                     if (log.isLoggable(Level.INFO))
-                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms"); // NOI18N
+                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
                     if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
                         if (log.isLoggable(Level.INFO))
-                            log.info("The " + phase + " phase has been reached ... OK!"); // NOI18N
+                            log.info("The " + phase + " phase has been reached ... OK!");
                         final int offset = context.startOffset();
                         final TreeUtilities tu = controller.getTreeUtilities();
                         JavaFXTreePath path;
@@ -402,18 +403,18 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         }
 
         private void dumpStack() {
-            Exception e = new Exception("-------  StackTrace ---------- "); // NOI18N
+            Exception e = new Exception("-------  StackTrace ---------- ");
             StackTraceElement[] ste = e.getStackTrace();
             System.err.println(e.getMessage());
             for (int i = 0; i < Math.min(10, ste.length); i++) {
-                System.err.println("\t" + ste[i]); // NOI18N
+                System.err.println("\t" + ste[i]);
             }
         }
     }
 
     private void applyAdjustments(Queue<Adjustment> adjustments) throws BadLocationException {
         if (adjustments == null || adjustments.isEmpty()) return;
-        log.info("Applying " + adjustments.size() + " adjustments into source code."); // NOI18N
+        log.info("Applying " + adjustments.size() + " adjustments into source code.");
         while (!adjustments.isEmpty()) {
             final Adjustment adjustment = adjustments.poll();
             adjustment.apply(context);

@@ -92,7 +92,7 @@ class UpToDateStatusProviderImpl extends UpToDateStatusProvider {
             return result;
         }
         
-        if (LOGGABLE) log("Creating new UpToDateStatusProviderImpl for " + document); // NOI18N
+        if (LOGGABLE) log("Creating new UpToDateStatusProviderImpl for " + document);
         UpToDateStatusProviderImpl res = new UpToDateStatusProviderImpl(document);
         
         return res;
@@ -111,7 +111,7 @@ class UpToDateStatusProviderImpl extends UpToDateStatusProvider {
 
     void refresh(List<Diagnostic> diag, UpToDateStatus s) {
         status = s;
-        if (LOGGABLE) log("UpToDateStatusProviderImpl changing status to: " + s); // NOI18N
+        if (LOGGABLE) log("UpToDateStatusProviderImpl changing status to: " + s);
         firePropertyChange(PROP_UP_TO_DATE, null, null);
     }
     

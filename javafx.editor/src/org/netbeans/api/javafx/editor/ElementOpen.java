@@ -42,6 +42,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import org.netbeans.modules.javafx.editor.*;
+import java.lang.reflect.Constructor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -90,7 +91,7 @@ public final class ElementOpen {
                 if (el == null) {
                     return;
                 }
-                System.err.println("real=" + el); // NOI18N
+                System.err.println("real=" + el);
 
                 JavaFXTreePath elpath = controller.getPath(el);
                 Tree tree = elpath != null ? elpath.getLeaf() : null;

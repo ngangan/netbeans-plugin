@@ -64,21 +64,21 @@ public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
 
     @Override
     protected void inside(CatchTree t) throws IOException {
-        if (LOGGABLE) log("inside CatchTree " + t + "  offset == " + offset); // NOI18N
+        if (LOGGABLE) log("inside CatchTree " + t + "  offset == " + offset);
         VariableTree var = t.getParameter();
         Tree type = var.getType();
         int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
-        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos); // NOI18N
+        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos);
         if (offset <= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
+            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
             if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType());
             }
             return;
         }
         // TODO:
-        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
+        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?"));
     }
 
     /**
@@ -88,10 +88,10 @@ public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
     private TypeMirror getSmartType() {
         // TODO: find what exceptions are being thrown in the corresponding try
         //       for now just make "smart" all throwables
-        TypeElement te = controller.getElements().getTypeElement("java.lang.Throwable"); // NOI18N
-        if (LOGGABLE) log("   throwable == " + te); // NOI18N
+        TypeElement te = controller.getElements().getTypeElement("java.lang.Throwable");
+        if (LOGGABLE) log("   throwable == " + te);
         TypeMirror type = te.asType();
-        if (LOGGABLE) log("   getSmartType returning " + type); // NOI18N
+        if (LOGGABLE) log("   getSmartType returning " + type);
         return type;
     }
 

@@ -117,12 +117,12 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
                         public void run(CompilationController cc) throws Exception {
                             final JavaFXSource.Phase phase = cc.toPhase(JavaFXSource.Phase.ANALYZED);
                             if (phase.lessThan(JavaFXSource.Phase.ANALYZED)) {
-                                logger.warning("We did not reach required phase. Leaving without fix"); // NOI18N
+                                logger.warning("We did not reach required phase. Leaving without fix");
                                 return;
                             }
                             final FileObject source = getFileObject(document);
                             if (source == null) {
-                                throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
+                                throw new IllegalArgumentException("There is no associated fileobject for document.");
                             }
                             ClassIndex index = ClasspathInfo.create(source).getClassIndex();
                             Set<Element> elements = new TreeSet<Element>(InternalSetComparator.create());
@@ -134,7 +134,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
 
                     }, false);
                 } catch (IOException e) {
-                    throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e); // NOI18N
+                    throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e);
                 } finally {
                     target.getCaret().setDot(caret);
                 }
@@ -142,7 +142,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
         };
     }
 
-    public static final String fixImportsAction = "fix-imports"; // NOI18N
+    public static final String fixImportsAction = "fix-imports";
 
     /**
      * The target method that performs the real action functionality.

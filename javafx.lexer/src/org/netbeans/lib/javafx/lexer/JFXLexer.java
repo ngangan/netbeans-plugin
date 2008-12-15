@@ -70,7 +70,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
 
     public JFXLexer(LexerRestartInfo<JFXTokenId> info) throws IOException {
         super();
-        if (log.isLoggable(Level.FINE)) log.fine("Creating new lexer"); // NOI18N
+        if (log.isLoggable(Level.FINE)) log.fine("Creating new lexer");
         this.lexer = new v4Lexer();
         this.info = info;
     }
@@ -99,13 +99,13 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
 
     public Token<JFXTokenId> nextToken() {
         if (lexer == null) {
-            throw new IllegalStateException("Internal implementation of lexer is null. You need to create new instance first!"); // NOI18N
+            throw new IllegalStateException("Internal implementation of lexer is null. You need to create new instance first!");
         }
 
         if (info != null) {
             configureLexer(info);
             info = null;
-            if (log.isLoggable(Level.FINE)) log.fine("Reseting lexer"); // NOI18N
+            if (log.isLoggable(Level.FINE)) log.fine("Reseting lexer");
         }
         st = System.currentTimeMillis();
         final org.antlr.runtime.Token token = lexer.nextToken();
@@ -113,7 +113,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             final int rl = lexerInput.readLength();
             if (rl > 0) {
                 if (log.isLoggable(Level.WARNING))
-                    log.warning("There are still " + rl + " characters unparsed.");    // NOI18N
+                    log.warning("There are still " + rl + " characters unparsed.");                
                 return tokenFactory.createToken(JFXTokenId.UNKNOWN, rl);
             } else {
                 return null;
@@ -121,7 +121,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
         }
         String text = token.getText();
         JFXTokenId id = getId(token);
-        if (JFXTokenId.COMMENT == id && text.startsWith("/**")) { // NOI18N
+        if (JFXTokenId.COMMENT == id && text.startsWith("/**")) {
             id = JFXTokenId.DOC_COMMENT;
         }
         assert id != null;
@@ -136,7 +136,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
     public Object state() {
         final Lexer.BraceQuoteTracker bqt = lexer.getBraceQuoteTracker();
         if (log.isLoggable(Level.FINEST) && bqt != null) {
-            log.finest("StateOut: " + bqt.toString()); // NOI18N
+            log.finest("StateOut: " + bqt.toString());
         }
         if (bqt == null) {
             return null;
@@ -147,7 +147,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
     public void release() {
         long tt = System.currentTimeMillis() - st;
         if (log.isLoggable(Level.FINE))
-            log.fine("Releasing lexer @line: " + lexer.getLine() + " total time: " + tt + "ms"); // NOI18N
+            log.fine("Releasing lexer @line: " + lexer.getLine() + " total time: " + tt + "ms");
         lexer = null;
     }
 

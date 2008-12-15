@@ -36,6 +36,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
+
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
@@ -54,41 +55,31 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
  * @author David Strupl
  */
 public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneous> {
-
+    
     private static final Logger logger = Logger.getLogger(ErroneousEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
     protected void inside(JFXErroneous t) {
-        if (LOGGABLE) {
-            log("inside JFXErroneous " + t); // NOI18N
-        }
+        if (LOGGABLE) log("inside JFXErroneous " + t);
         SourcePositions pos = controller.getTrees().getSourcePositions();
         long s = pos.getStartPosition(root, t);
         long e = pos.getEndPosition(root, t);
-        if (LOGGABLE) {
-            log("   s = " + s + "  e == " + e); // NOI18N
-        }
+        if (LOGGABLE) log("   s = " + s + "  e == " + e);
         JavaFXTreePath p = JavaFXTreePath.getPath(root, t);
-
+        
         if (t.getErrorTrees().isEmpty()) {
             fakeIt();
             return;
         }
 
         for (Tree tt : t.getErrorTrees()) {
-            if (LOGGABLE) {
-                log("    tt == " + tt); // NOI18N
-            }
-            if (LOGGABLE) {
-                log("    tt.getClass() == " + tt.getClass()); // NOI18N
-            }
+            if (LOGGABLE) log("    tt == " + tt);
+            if (LOGGABLE) log("    tt.getClass() == " + tt.getClass());
             long st = pos.getStartPosition(root, tt);
             long et = pos.getEndPosition(root, tt);
-            if (LOGGABLE) {
-                log("   st = " + st + "  et == " + et); // NOI18N
-            }
-            if (et == offset - 1) {
+            if (LOGGABLE) log("   st = " + st + "  et == " + et);
+            if (et == offset-1) {
                 fakeIt();
             }
         }
@@ -98,18 +89,12 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
         try {
             Document d = controller.getJavaFXSource().getDocument();
             String start = d.getText(0, offset);
-            if (LOGGABLE) {
-                log("  start = " + start); // NOI18N
-            }
-            String end = d.getText(offset, d.getLength() - offset);
-            if (LOGGABLE) {
-                log("  end = " + end); // NOI18N
-            }
-            useFakeSource(start + "x" + end, offset); // NOI18N
+            if (LOGGABLE) log("  start = " + start);
+            String end = d.getText(offset, d.getLength()-offset);
+            if (LOGGABLE) log("  end = " + end);
+            useFakeSource(start+"x"+end, offset);
         } catch (BadLocationException ble) {
-            if (LOGGABLE) {
-                logger.log(Level.FINER, "ble", ble); // NOI18N
-            }
+            if (LOGGABLE) logger.log(Level.FINER, "ble", ble);
         }
     }
 

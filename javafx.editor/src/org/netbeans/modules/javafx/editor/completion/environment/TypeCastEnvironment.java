@@ -63,14 +63,14 @@ public class TypeCastEnvironment extends JavaFXCompletionEnvironment<JFXTypeCast
 
     @Override
     protected void inside(JFXTypeCast t) {
-        if (LOGGABLE) log("inside JFXTypeCast " + t); // NOI18N
+        if (LOGGABLE) log("inside JFXTypeCast " + t);
         ExpressionTree exp = t.getExpression();
         Tree type = t.getType();
         int typePos = (int)sourcePositions.getStartPosition(root, t.getType());
-        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos + "  offset == " + offset); // NOI18N
+        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos + "  offset == " + offset);
         if (offset >= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
+            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id()));
             if ((last != null) && (last.token().id() == JFXTokenId.AS)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
                 addBasicTypes();
@@ -85,7 +85,7 @@ public class TypeCastEnvironment extends JavaFXCompletionEnvironment<JFXTypeCast
     private TypeMirror getSmartType(Tree t) {
         final JavaFXTreePath treePath = new JavaFXTreePath(path, t);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
-        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type); // NOI18N
+        if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type);
         return type;
     }
     

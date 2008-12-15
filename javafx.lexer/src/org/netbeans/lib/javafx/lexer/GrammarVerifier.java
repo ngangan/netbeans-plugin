@@ -57,10 +57,10 @@ public class GrammarVerifier {
             HashMap<String, Integer> map = new HashMap<String, Integer>();
             String line;
             while ((line = r.readLine()) != null) {
-                if (line.startsWith("\'")) continue; // NOI18N
-                String[] elements = line.split("="); // NOI18N
+                if (line.startsWith("\'")) continue;
+                String[] elements = line.split("=");
                 if (elements.length < 2) {
-                    System.err.println("Zero elements: '" + line + "'"); // NOI18N
+                    System.err.println("Zero elements: '" + line + "'");
                     continue;
                 }
                 map.put(elements[0].trim(), Integer.parseInt(elements[1].trim()));
@@ -71,17 +71,17 @@ public class GrammarVerifier {
                 if (map.containsKey(id.name())) {
                     final Integer integer = map.get(id.name());
                     if (id.getTokenType() != integer) {
-                        System.err.println("The token " + id + " has not correct id."); // NOI18N
+                        System.err.println("The token " + id + " has not correct id.");
                         System.exit(-100);
                     }
                     map.remove(id.name());
                 } else if (id != JFXTokenId.UNKNOWN) {
-                    System.err.println("The token " + id + " has not been found."); // NOI18N
+                    System.err.println("The token " + id + " has not been found.");
                     System.exit(-100);
                 } 
             }
             if (!map.isEmpty()) {
-                System.err.printf("There are tokens missing in %s enum. \n", JFXTokenId.class.getName()); // NOI18N
+                System.err.printf("There are tokens missing in %s enum. \n", JFXTokenId.class.getName());
                 System.exit(-100);
             }
         } catch (FileNotFoundException e) {

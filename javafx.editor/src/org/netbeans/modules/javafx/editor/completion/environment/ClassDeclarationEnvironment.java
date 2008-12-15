@@ -63,11 +63,11 @@ public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFX
 
     @Override
     protected void inside(JFXClassDeclaration cldecl) throws IOException {
-        if (LOGGABLE) log("inside JFXClassDeclaration " + cldecl); // NOI18N
-        if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
+        if (LOGGABLE) log("inside JFXClassDeclaration " + cldecl);
+        if (LOGGABLE) log("  prefix: " + prefix);
         int start = (int)sourcePositions.getStartPosition(root, cldecl);
-        if (LOGGABLE) log("  offset: " + offset); // NOI18N
-        if (LOGGABLE) log("  start: " + start); // NOI18N
+        if (LOGGABLE) log("  offset: " + offset);
+        if (LOGGABLE) log("  start: " + start);
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterLBrace = false;
@@ -92,15 +92,15 @@ public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFX
                     // TODO:
             }
         }
-        if (LOGGABLE) log("  afterLBrace: " + afterLBrace); // NOI18N
+        if (LOGGABLE) log("  afterLBrace: " + afterLBrace);
         if (afterLBrace) {
             addKeywordsForClassBody();
         } else {
             if (afterExtends) {
-                if (LOGGABLE) log("  afterExtends: " + afterExtends); // NOI18N
+                if (LOGGABLE) log("  afterExtends: " + afterExtends);
                 addLocalAndImportedTypes(EnumSet.of(CLASS), null, null, false, null);
             } else {
-                addKeyword(EXTENDS_KEYWORD, " ", false); // NOI18N
+                addKeyword(EXTENDS_KEYWORD, " ", false);
             }
         }
     }

@@ -25,6 +25,7 @@
 
 package org.netbeans.modules.javafx.preview;
 
+import com.sun.tools.javac.util.BaseFileObject;
 import com.sun.tools.javac.util.JavacFileManager;
 import com.sun.tools.javafx.util.JavafxFileManager;
 import java.io.*;
@@ -338,7 +339,7 @@ public final class MemoryFileManager extends ForwardingJavaFileManager<JavacFile
             try {
                 final StringBuilder newUri = new StringBuilder();
                 newUri.append("mfm:///");                                                                       //NOI18N
-                newUri.append(name.replace('.', '/')); // NOI18N
+                newUri.append(name.replace('.', '/'));
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {

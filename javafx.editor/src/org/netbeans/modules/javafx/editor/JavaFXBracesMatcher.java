@@ -62,12 +62,12 @@ import java.util.List;
  * @author Vita Stejskal
  */
 public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFactory {
-    private static final char[] PAIRS = new char[]{'(', ')', // NOI18N
-            '[', ']', // NOI18N
-            '{', '}', // NOI18N
-            '{', '}', // NOI18N
-            '{', '}' // NOI18N
-    };
+    private static final char[] PAIRS = new char[]{'(', ')',
+            '[', ']',
+            '{', '}',
+            '{', '}',
+            '{', '}'
+    }; //NOI18N
     private static final JFXTokenId[] PAIR_TOKEN_IDS = new JFXTokenId[]{
             JFXTokenId.LPAREN, JFXTokenId.RPAREN,
             JFXTokenId.LBRACKET, JFXTokenId.RBRACKET,

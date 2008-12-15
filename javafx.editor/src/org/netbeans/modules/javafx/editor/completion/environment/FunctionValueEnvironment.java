@@ -66,12 +66,12 @@ public class FunctionValueEnvironment extends JavaFXCompletionEnvironment<JFXFun
 
     @Override
     protected void inside(JFXFunctionValue val) throws IOException {
-        if (LOGGABLE) log("inside JFXFunctionValue " + val); // NOI18N
+        if (LOGGABLE) log("inside JFXFunctionValue " + val);
         int startPos = (int) sourcePositions.getStartPosition(root, val);
         JFXType retType = val.getJFXReturnType();
-        if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
+        if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType);
         if ((offset < startPos) || (startPos == 0)) {
-            if (LOGGABLE) log("  before block: return types"); // NOI18N
+            if (LOGGABLE) log("  before block: return types");
             addLocalAndImportedTypes(null, null, null, false, null);
             addBasicTypes();
             return;

@@ -60,13 +60,13 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
 
     @Override
     protected void inside(AssignmentTree as) throws IOException {
-        if (LOGGABLE) log("inside AssignmentTree " + as); // NOI18N
+        if (LOGGABLE) log("inside AssignmentTree " + as);
         int asTextStart = (int) sourcePositions.getEndPosition(root, as.getVariable());
         if (asTextStart != Diagnostic.NOPOS) {
             Tree expr = as.getExpression();
             if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
                 String asText = getController().getText().substring(asTextStart, offset);
-                int eqPos = asText.indexOf('='); // NOI18N
+                int eqPos = asText.indexOf('=');
                 if (eqPos > -1) {
                     localResult(getSmartType(as));
                     addValueKeywords();

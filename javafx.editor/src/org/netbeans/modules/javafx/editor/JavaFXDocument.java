@@ -144,7 +144,7 @@ public class JavaFXDocument extends NbEditorDocument {
         try{
             return (getText(0, getLength()));
         }catch(BadLocationException e){
-            return ""; // NOI18N
+            return "";
         }
     }
     

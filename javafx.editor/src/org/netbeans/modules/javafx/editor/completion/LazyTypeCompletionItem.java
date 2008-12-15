@@ -114,7 +114,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                                 e = handle.resolve(controller);
                             } catch (Exception ex) {
                                 if (LOGGABLE) {
-                                    logger.log(Level.FINE, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex); // NOI18N
+                                    logger.log(Level.FINE, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex);
                                 }
                             }
                             if (e != null) {

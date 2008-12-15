@@ -73,11 +73,11 @@ import java.util.logging.Logger;
  */
 public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
-    private static final String ID_METHOD = "method"; // NOI18N
-    private static final String ID_METHOD_INVOCATION = "methodInvocation"; // NOI18N
-    private static final String ID_FIELD = "field"; // NOI18N
-    private static final String ID_IDENTIFIER = "identifier"; // NOI18N
-    private static final String ID_CLASS = "class"; // NOI18N
+    private static final String ID_METHOD = "method";
+    private static final String ID_METHOD_INVOCATION = "methodInvocation";
+    private static final String ID_FIELD = "field";
+    private static final String ID_IDENTIFIER = "identifier";
+    private static final String ID_CLASS = "class";
 
     private static final AttributeSet FIELD_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0));
     private static final AttributeSet FIELD_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0), StyleConstants.Italic, Boolean.TRUE);
@@ -152,15 +152,15 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 bag.addHighlight(start, end, getAttributeSet(result));
             } else {
                 if (LOGGABLE) {
-                    log("* Incorrect positions for highlighting: " + start + ", " + end); // NOI18N
+                    log("* Incorrect positions for highlighting: " + start + ", " + end);
                 }
             }
 
             // highlighting for variables from cache
             if (ID_FIELD.equals(result.identifier)) {
                 for (Result id : identifiers) {
-                    final String idText = id.token.text() == null ? "" : id.token.text().toString(); // NOI18N
-                    final String resText = result.token.text() == null ? "" : result.token.text().toString(); // NOI18N
+                    final String idText = id.token.text() == null ? "" : id.token.text().toString();
+                    final String resText = result.token.text() == null ? "" : result.token.text().toString();
                     if (idText.equals(resText)) {
                         bag.addHighlight((int) id.start, (int) id.end, getAttributeSet(result));
                     }
@@ -453,7 +453,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
         @Override
         public String toString() {
-            return "[" + start + ", " + end + ", " + identifier + "]"; // NOI18N
+            return "[" + start + ", " + end + ", " + identifier + "]";
         }
     }
 }

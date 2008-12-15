@@ -97,7 +97,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
 
     public synchronized void resolve(ImportsModel model, Collection<Element> elements) {
         if (this.model != null && this.model != model) {
-            throw new IllegalStateException("Illegal model. Create new instance of resolver first."); // NOI18N
+            throw new IllegalStateException("Illegal model. Create new instance of resolver first.");
         } else if (this.model == null) {
             this.model = model;
         }
@@ -108,7 +108,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
     private void ensureStart() {
         if (!this.isAlive()) {
             if (log.isLoggable(Level.INFO)) {
-                log.log(Level.INFO, "Starting resolving thread."); // NOI18N
+                log.log(Level.INFO, "Starting resolving thread.");
             }
             start();
         }
@@ -142,11 +142,11 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             resolveImpl(model, element);
         }
         if (interupt) {
-            log.info("Fix imports has been interupted because focus has been lost."); // NOI18N
+            log.info("Fix imports has been interupted because focus has been lost.");
         }
         if (log.isLoggable(Level.INFO)) {
-            log.log(Level.INFO, "Resolving finished."); // NOI18N
-            log.log(Level.INFO, "Publishing entries..."); // NOI18N
+            log.log(Level.INFO, "Resolving finished.");
+            log.log(Level.INFO, "Publishing entries...");
         }
         Runnable runnable = new Runnable() {
             public void run() {
@@ -154,7 +154,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
                 publish(comp.getDocument());
                 comp.requestFocusInWindow();
                 if (log.isLoggable(Level.INFO)) {
-                    log.log(Level.INFO, "Fix Imports done."); // NOI18N
+                    log.log(Level.INFO, "Fix Imports done.");
                 }
             }
         };
@@ -168,7 +168,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             GuardedDocument gd = (GuardedDocument) doc;
             gd.runAtomic(runnable);
         } else {
-            log.warning(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Running_in_non_atomic_fashion.")); // NOI18N
+            log.warning(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Running_in_non_atomic_fashion."));
             doc.render(runnable);
         }
     }
@@ -183,7 +183,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             return;
         }
         if (log.isLoggable(Level.INFO)) {
-            log.log(Level.INFO, "Resolving element. " + e.getSimpleName()); // NOI18N
+            log.log(Level.INFO, "Resolving element. " + e.getSimpleName());
         }
         String name = toSimpleName(e);
         if (name == null) return;
@@ -195,13 +195,13 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             askUser(model, e, types);
         }
         if (log.isLoggable(Level.INFO)) {
-            log.log(Level.INFO, "Element resolved"); // NOI18N
+            log.log(Level.INFO, "Element resolved");
         }
 
     }
 
     private String getHeaderText(Element e) {
-        return NbBundle.getMessage(ImportsModel.class, "FI_IMPORT_UI_HEADER", e.getSimpleName().toString()); // NOI18N
+        return NbBundle.getMessage(ImportsModel.class, "FI_IMPORT_UI_HEADER", e.getSimpleName().toString());
     }
 
     private void askUser(final ImportsModel model, final Element e, final Set<ElementHandle<TypeElement>> types) {
@@ -211,7 +211,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
         Runnable runnable = new Runnable() {
             public void run() {
                 if (log.isLoggable(Level.INFO)) {
-                    log.log(Level.INFO, "Showing dialog..."); // NOI18N
+                    log.log(Level.INFO, "Showing dialog...");
                 }
                 fil.show(convert(types), getHeaderText(e), comp.getCaretPosition(), new MyListSelectionListener(), null, null, -1);
             }
@@ -226,7 +226,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             try {
                 LOCK.wait();
                 if (log.isLoggable(Level.INFO)) {
-                    log.log(Level.INFO, "... closing dialog."); // NOI18N
+                    log.log(Level.INFO, "... closing dialog.");
                 }
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
@@ -293,7 +293,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
      * Invoked when a component loses the keyboard focus.
      */
     public void focusLost(FocusEvent e) {
-        log.info("Loosing focus in prospect of " + e.getOppositeComponent()); // NOI18N
+        log.info("Loosing focus in prospect of " + e.getOppositeComponent());
         component.get().removeFocusListener(this);
         interupt = true;
     }

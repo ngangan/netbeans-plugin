@@ -70,7 +70,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
     @SuppressWarnings("fallthrough")
     @Override
     protected void inside(MemberSelectTree fa) throws IOException {
-        if (LOGGABLE) log("inside MemberSelectTree " + fa); // NOI18N
+        if (LOGGABLE) log("inside MemberSelectTree " + fa);
         int expEndPos = (int)sourcePositions.getEndPosition(root, fa.getExpression());
         boolean afterDot = false;
         JFXTokenId lastNonWhitespaceTokenId = null;
@@ -82,7 +82,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             }
             switch (ts.token().id()) {
                 case DECIMAL_LITERAL:
-                    if (ts.offset() != expEndPos || ts.token().text().charAt(0) != '.') // NOI18N
+                    if (ts.offset() != expEndPos || ts.token().text().charAt(0) != '.')
                         break;
                 case DOT:
                     afterDot = true;
@@ -101,22 +101,22 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                 insideExpression(new JavaFXTreePath(path, fa.getExpression()));
             }
             addPackages("");
-            if (LOGGABLE) log("  returning as afterDot==false"); // NOI18N
+            if (LOGGABLE) log("  returning as afterDot==false");
             return;
         }
 
         if (lastNonWhitespaceTokenId != JFXTokenId.STAR) {
             JavaFXTreePath parentPath = path.getParentPath();
             Tree parent = parentPath != null ? parentPath.getLeaf() : null;
-            if (LOGGABLE) log("  parent == " + parent); // NOI18N
+            if (LOGGABLE) log("  parent == " + parent);
             ExpressionTree exp = fa.getExpression();
-            if (LOGGABLE) log("   exp == " + exp); // NOI18N
+            if (LOGGABLE) log("   exp == " + exp);
             JavaFXTreePath expPath = new JavaFXTreePath(path, exp);
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
             Element el = controller.getTrees().getElement(expPath);
-            if (LOGGABLE) log("   type == " + type); // NOI18N
+            if (LOGGABLE) log("   type == " + type);
             if (type != null) {
-                if (LOGGABLE) log("   type.getKind() == " + type.getKind()); // NOI18N
+                if (LOGGABLE) log("   type.getKind() == " + type.getKind());
                 switch (type.getKind()) {
                     case TYPEVAR:
                         while(type != null && type.getKind() == TypeKind.TYPEVAR)
@@ -140,12 +140,12 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         addMembers(type, true, true, null,sc, true, !isStatic);
                         break;
                     default:
-                        if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
+                        if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():""));
                         if (type.getKind() == TypeKind.ERROR && el != null && el.getKind().isClass()) {
-                            if (LOGGABLE) log("   will try to find package named " + (((TypeElement)el).getQualifiedName())); // NOI18N
+                            if (LOGGABLE) log("   will try to find package named " + (((TypeElement)el).getQualifiedName()));
                             el = controller.getElements().getPackageElement(((TypeElement)el).getQualifiedName());
                         }
-                        if (LOGGABLE) log("   el(3) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
+                        if (LOGGABLE) log("   el(3) == " + el + "  el.getKind() == " + (el != null? el.getKind():""));
                         if (el != null && el instanceof PackageElement) {                                
                             addPackageContent((PackageElement)el, null, null, false);
                         } else {

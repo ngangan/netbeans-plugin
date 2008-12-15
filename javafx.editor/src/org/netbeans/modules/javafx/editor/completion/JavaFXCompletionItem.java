@@ -94,13 +94,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     public static final String STRIKE_END = "</s>"; //NOI18N
     public static final String BOLD = "<b>"; //NOI18N
     public static final String BOLD_END = "</b>"; //NOI18N
-    public static final String SEQUENCE_PREFIX = "com.sun.javafx.runtime.sequence.Sequence<? extends "; // NOI18N
+    public static final String SEQUENCE_PREFIX = "com.sun.javafx.runtime.sequence.Sequence<? extends ";
 
     public int substitutionOffset;
     public String textToAdd;
     
     protected static int SMART_TYPE = 1000;
-    private static final String GENERATE_TEXT = NbBundle.getMessage(JavaFXCompletionItem.class, "generate_Lbl"); // NOI18N
+    private static final String GENERATE_TEXT = NbBundle.getMessage(JavaFXCompletionItem.class, "generate_Lbl");
 
     public static final JavaFXCompletionItem createKeywordItem(String kwd, String postfix, int substitutionOffset, boolean smartType) {
         return new KeywordItem(kwd, 0, postfix, substitutionOffset, smartType);
@@ -124,7 +124,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             case METHOD:
                 return new MethodItem(elem, type, substitutionOffset, isInherited, isDeprecated, inImport, smartType);
             default:
-                throw new IllegalArgumentException("kind=" + elem.getKind()); // NOI18N
+                throw new IllegalArgumentException("kind=" + elem.getKind());
         }
     }
     
@@ -161,10 +161,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     public void processKeyEvent(KeyEvent evt) {
         if (evt.getID() == KeyEvent.KEY_TYPED) {
             switch (evt.getKeyChar()) {
-                case ':': // NOI18N
-                case ';': // NOI18N
-                case ',': // NOI18N
-                case '(': // NOI18N
+                case ':':
+                case ';':
+                case ',':
+                case '(':
                     Completion.get().hideDocumentation();
                     Completion.get().hideCompletion();
                     JTextComponent component = (JTextComponent)evt.getSource();
@@ -172,7 +172,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     substituteText(component, substitutionOffset, caretOffset - substitutionOffset, Character.toString(evt.getKeyChar()));
                     evt.consume();
                     break;
-                case '.': // NOI18N
+                case '.':
                     Completion.get().hideDocumentation();
                     component = (JTextComponent)evt.getSource();
                     caretOffset = component.getSelectionEnd();
@@ -180,7 +180,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     evt.consume();
                     caretOffset = component.getSelectionEnd();
                     try {
-                        if (caretOffset > 0 && !".".equals(component.getDocument().getText(caretOffset - 1, 1))) { // NOI18N
+                        if (caretOffset > 0 && !".".equals(component.getDocument().getText(caretOffset - 1, 1))) {
                             Completion.get().hideCompletion();
                             break;
                         }
@@ -248,7 +248,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
             char ch;
             int i = 0;
-            while(i < toAdd.length() && (ch = toAdd.charAt(i)) <= ' ' ) { // NOI18N
+            while(i < toAdd.length() && (ch = toAdd.charAt(i)) <= ' ' ) {
                 text.append(ch);
                 i++;
             }
@@ -308,7 +308,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     doc.remove(offset, length);
                     doc.insertString(position.getOffset(), text.toString(), null);
                     if (semiPosition != null)
-                        doc.insertString(semiPosition.getOffset(), ";", null); // NOI18N
+                        doc.insertString(semiPosition.getOffset(), ";", null);
                 } catch (BadLocationException e) {
                     // Can't update
                 }
@@ -317,12 +317,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     }
 
     private static boolean isAutoImported(String toImport) {
-        return "java.lang.Integer".equals(toImport) || // NOI18N
-               "java.lang.Boolean".equals(toImport) || // NOI18N
-               "java.lang.Number".equals(toImport) || // NOI18N
-               "java.lang.String".equals(toImport) || // NOI18N
-               (    toImport.startsWith("javafx.lang.") && // NOI18N
-                    !"javafx.lang.Builtins".equals(toImport) // NOI18N
+        return "java.lang.Integer".equals(toImport) ||
+               "java.lang.Boolean".equals(toImport) ||
+               "java.lang.Number".equals(toImport) ||
+               "java.lang.String".equals(toImport) ||
+               (    toImport.startsWith("javafx.lang.") &&
+                    !"javafx.lang.Builtins".equals(toImport)
                );
     }
             
@@ -498,7 +498,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private PackageItem(String pkgFQN, int substitutionOffset, boolean isDeprecated) {
             super(substitutionOffset);
             this.isDeprecated = isDeprecated;
-            int idx = pkgFQN.lastIndexOf('.'); // NOI18N
+            int idx = pkgFQN.lastIndexOf('.');
             this.simpleName = idx < 0 ? pkgFQN : pkgFQN.substring(idx + 1);
             this.sortText = this.simpleName + "#" + pkgFQN; //NOI18N
         }
@@ -744,17 +744,17 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         public CharSequence getSortText() {
             if (sortText == null) {
                 StringBuilder sortParams = new StringBuilder();
-                sortParams.append('('); // NOI18N
+                sortParams.append('(');
                 int cnt = 0;
                 for(Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                     ParamDesc param = it.next();
                     sortParams.append(param.typeName);
                     if (it.hasNext()) {
-                        sortParams.append(','); // NOI18N
+                        sortParams.append(',');
                     }
                     cnt++;
                 }
-                sortParams.append(')'); // NOI18N
+                sortParams.append(')');
                 sortText = simpleName + "#" + ((cnt < 10 ? "0" : "") + cnt) + "#" + sortParams.toString(); //NOI18N
             }
             return sortText;
@@ -779,11 +779,11 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 if (!isInherited)
                     lText.append(BOLD_END);
                 lText.append(COLOR_END);
-                lText.append('('); // NOI18N
+                lText.append('(');
                 for (Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                     ParamDesc paramDesc = it.next();
                     lText.append(paramDesc.name);
-                    lText.append(" : "); // NOI18N
+                    lText.append(" : ");
                     lText.append(PARAMETER_NAME_COLOR);
                     lText.append(escape(paramDesc.typeName));
                     lText.append(COLOR_END);
@@ -986,22 +986,22 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             StringBuilder sb = new StringBuilder();
             for (Modifier mod : modifiers) {
                 sb.append(mod.toString());
-                sb.append(' '); // NOI18N
+                sb.append(' ');
             }
             sb.append(typeName);
-            sb.append(' '); // NOI18N
+            sb.append(' ');
             sb.append(simpleName);
-            sb.append('('); // NOI18N
+            sb.append('(');
             for (Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                 ParamDesc paramDesc = it.next();
                 sb.append(paramDesc.name);
-                sb.append(" : "); // NOI18N
+                sb.append(" : ");
                 sb.append(paramDesc.typeName);
                 if (it.hasNext()) {
                     sb.append(", "); //NOI18N
                 }
             }
-            sb.append(')'); // NOI18N
+            sb.append(')');
             return sb.toString();
         }   
     }    
@@ -1034,8 +1034,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.simpleName = name;
             this.typeName = name;
             this.sortText = this.simpleName;
-            if (name.contains(".")) { // NOI18N
-                int index = name.lastIndexOf('.'); // NOI18N
+            if (name.contains(".")) {
+                int index = name.lastIndexOf('.');
                 this.simpleName = name.substring(index);
                 this.enclName = name.substring(0, index);
             }
@@ -1193,7 +1193,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
                     public void run(final CompilationController controller) throws IOException {
                         if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                            if (LOGGABLE) log (java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged.")); // NOI18N
+                            if (LOGGABLE) log (java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged."));
                             return;
                         }
                         final TypeElement eleme = (type != null) ? (TypeElement)type.asElement() : elem;
@@ -1255,7 +1255,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                         if (eleme != null) {
                                             cs = eleme.getSimpleName();
                                             if (eleme.getEnclosingElement().getKind() == ElementKind.CLASS) {
-                                                cs = eleme.getEnclosingElement().getSimpleName() + "." + eleme.getSimpleName(); // NOI18N
+                                                cs = eleme.getEnclosingElement().getSimpleName() + "." + eleme.getSimpleName();
                                             }
                                         }
                                         if (!insideNew)
@@ -1379,17 +1379,17 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         public CharSequence getSortText() {
             if (sortText == null) {
                 StringBuilder sortParams = new StringBuilder();
-                sortParams.append('('); // NOI18N
+                sortParams.append('(');
                 int cnt = 0;
                 for(Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                     ParamDesc param = it.next();
                     sortParams.append(param.typeName);
                     if (it.hasNext()) {
-                        sortParams.append(','); // NOI18N
+                        sortParams.append(',');
                     }
                     cnt++;
                 }
-                sortParams.append(')'); // NOI18N
+                sortParams.append(')');
                 sortText = "#" + ((cnt < 10 ? "0" : "") + cnt) + "#" + sortParams.toString(); //NOI18N
             }
             return sortText;
@@ -1409,20 +1409,20 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 lText.append(simpleName);
                 if (isDeprecated)
                     lText.append(STRIKE_END);
-                lText.append('('); // NOI18N
+                lText.append('(');
                 for (int i = 0; i < params.size(); i++) {
                     ParamDesc paramDesc = params.get(i);
                     if (i == activeParamsIndex)
                         lText.append(COLOR_END).append(ACTIVE_PARAMETER_COLOR).append(BOLD);
                     lText.append(paramDesc.name);
-                    lText.append(" : "); // NOI18N
+                    lText.append(" : ");
                     lText.append(escape(paramDesc.typeName));
                     if (i < params.size() - 1)
                         lText.append(", "); //NOI18N
                     else
                         lText.append(BOLD_END).append(COLOR_END).append(PARAMETERS_COLOR);
                 }
-                lText.append(')'); // NOI18N
+                lText.append(')');
                 lText.append(COLOR_END);
                 return lText.toString();
             }
@@ -1530,13 +1530,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append(typeName);
-            sb.append(' '); // NOI18N
+            sb.append(' ');
             sb.append(simpleName);
-            sb.append('('); // NOI18N
+            sb.append('(');
             for (Iterator<ParamDesc> it = params.iterator(); it.hasNext();) {
                 ParamDesc paramDesc = it.next();
                 sb.append(paramDesc.name);
-                sb.append(" : "); // NOI18N
+                sb.append(" : ");
                 sb.append(paramDesc.typeName);
                 if (it.hasNext()) {
                     sb.append(", "); //NOI18N
@@ -1567,25 +1567,25 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             try {
                 if (s.startsWith(SEQUENCE_PREFIX)) {
                     s = s.substring(SEQUENCE_PREFIX.length());
-                    s = s.substring(0, s.length()-1) + "[]"; // NOI18N
+                    s = s.substring(0, s.length()-1) + "[]";
                 }
-                if (s.startsWith("java.lang")) { // NOI18N
-                    s = s.substring("java.lang.".length()); // NOI18N
+                if (s.startsWith("java.lang")) {
+                    s = s.substring("java.lang.".length());
                 }
-                if (s.startsWith("int")) { // NOI18N
-                    s = "Integer" + s.substring(3); // NOI18N
+                if (s.startsWith("int")) {
+                    s = "Integer" + s.substring(3);
                 }
-                if (s.startsWith("double") || s.startsWith("Double")) { // NOI18N
-                    s = "Number" + s.substring("double".length()); // NOI18N
+                if (s.startsWith("double") || s.startsWith("Double")) {
+                    s = "Number" + s.substring("double".length());
                 }
-                if (s.startsWith("long")) { // NOI18N
-                    s = "Integer" + s.substring(4); // NOI18N
+                if (s.startsWith("long")) {
+                    s = "Integer" + s.substring(4);
                 }
-                if (s.startsWith("boolean")) { // NOI18N
-                    s = "B" + s.substring(1); // NOI18N
+                if (s.startsWith("boolean")) {
+                    s = "B" + s.substring(1);
                 }
-                if (s.startsWith("void")) { // NOI18N
-                    s = "V" + s.substring(1); // NOI18N
+                if (s.startsWith("void")) {
+                    s = "V" + s.substring(1);
                 }
                 return XMLUtil.toAttributeValue(s);
             } catch (Exception ex) {}

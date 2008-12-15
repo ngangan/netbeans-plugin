@@ -279,8 +279,8 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
         Element el = info.getTrees().getElement(new JavaFXTreePath(getCurrentPath(), tree.getMethodSelect()));
         
         if (el == null) {
-            System.err.println("Warning: decl == null"); // NOI18N
-            System.err.println("tree=" + tree); // NOI18N
+            System.err.println("Warning: decl == null");
+            System.err.println("tree=" + tree);
         }
         
         if (el != null && el.getKind() == ElementKind.METHOD) {

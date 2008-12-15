@@ -59,7 +59,7 @@ public class ThrowEnvironment extends JavaFXCompletionEnvironment<ThrowTree> {
 
     @Override
     protected void inside(ThrowTree tt) throws IOException {
-        if (LOGGABLE) log("inside ThrowTree " + tt); // NOI18N
+        if (LOGGABLE) log("inside ThrowTree " + tt);
         localResult(getSmartType(tt));
         addValueKeywords();
     }
@@ -71,10 +71,10 @@ public class ThrowEnvironment extends JavaFXCompletionEnvironment<ThrowTree> {
     }
 
     private TypeMirror getSmartType(ThrowTree tt) {
-        TypeElement te = controller.getElements().getTypeElement("java.lang.Throwable"); // NOI18N
-        if (LOGGABLE) log("   throwable == " + te); // NOI18N
+        TypeElement te = controller.getElements().getTypeElement("java.lang.Throwable");
+        if (LOGGABLE) log("   throwable == " + te);
         TypeMirror type = te.asType();
-        if (LOGGABLE) log("   getSmartType returning " + type); // NOI18N
+        if (LOGGABLE) log("   getSmartType returning " + type);
         return type;
     }
 }

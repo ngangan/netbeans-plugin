@@ -60,11 +60,11 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
 
     @Override
     protected void inside(JFXForExpression foe) throws IOException {
-        if (LOGGABLE) log("inside ForExpressionPredicateEnvironment " + foe); // NOI18N
-        if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
+        if (LOGGABLE) log("inside ForExpressionPredicateEnvironment " + foe);
+        if (LOGGABLE) log("  prefix: " + prefix);
         int start = (int)sourcePositions.getStartPosition(root, foe);
-        if (LOGGABLE) log("  offset: " + offset); // NOI18N
-        if (LOGGABLE) log("  start: " + start); // NOI18N
+        if (LOGGABLE) log("  offset: " + offset);
+        if (LOGGABLE) log("  start: " + start);
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
@@ -80,7 +80,7 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
                     break;
                 case LBRACKET:
                     if (afterLBracket) {
-                        if (LOGGABLE) log("  second L bracket --> bad luck "); // NOI18N
+                        if (LOGGABLE) log("  second L bracket --> bad luck ");
                         return;
                     } else {
                         afterLBracket = true;
@@ -95,23 +95,23 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
                     afterIdentifier = true;
                     break;
                 default:
-                    if (LOGGABLE) log("  default: " + ts.token().id()); // NOI18N
+                    if (LOGGABLE) log("  default: " + ts.token().id());
                     if (afterPipe) {
                         break WHILE;
                     } else {
-                        if (LOGGABLE) log("   there is too much, return nothing"); // NOI18N
+                        if (LOGGABLE) log("   there is too much, return nothing");
                         return;
                     }
             }
         }
-        if (LOGGABLE) log("  afterPipe: " + afterPipe); // NOI18N
+        if (LOGGABLE) log("  afterPipe: " + afterPipe);
         if (afterPipe) {
-            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_")); // NOI18N
+            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_"));
             return;
         }
-        if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier); // NOI18N
+        if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier);
         if (afterIdentifier) {
-            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after")); // NOI18N
+            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after"));
             return;
         } 
     }

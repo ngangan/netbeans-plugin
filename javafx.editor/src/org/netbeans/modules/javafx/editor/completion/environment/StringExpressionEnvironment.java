@@ -57,7 +57,7 @@ public class StringExpressionEnvironment extends JavaFXCompletionEnvironment<JFX
 
     @Override
     protected void inside(JFXStringExpression bl) throws IOException {
-        if (LOGGABLE) log("inside JFXStringExpression " + bl); // NOI18N
+        if (LOGGABLE) log("inside JFXStringExpression " + bl);
         localResult(null);
         addKeywordsForStatement();
     }

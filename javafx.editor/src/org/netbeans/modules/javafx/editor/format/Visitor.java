@@ -61,7 +61,6 @@ import javax.swing.text.Element;
 import javax.swing.text.Position;
 import java.util.List;
 import java.util.Queue;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -78,16 +77,14 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private final Context ctx;
     private int indentOffset = 0;
     private final CodeStyle cs;
-    private static final String NEW_LINE_STRING = "\n"; // NOI18N
-    //    private static final String NEW_LINE_STRING = System.getProperty("line.separator", "\n"); // NOI18N
+    private static final String NEW_LINE_STRING = "\n";
+    //    private static final String NEW_LINE_STRING = System.getProperty("line.separator", "\n");
     protected final DocumentLinesIterator li;
-    private static final String STRING_EMPTY_LENGTH_ONE = " "; // NOI18N
+    private static final String STRING_EMPTY_LENGTH_ONE = " ";
     protected static final String ONE_SPACE = STRING_EMPTY_LENGTH_ONE;
     private TokenSequence<TokenId> ts;
-    private static final String STRING_ZERO_LENGTH = ""; // NOI18N
+    private static final String STRING_ZERO_LENGTH = "";
     private boolean disableContinuosIndent;
-    private boolean isOrphanObjectLiterar;
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle"); // NOI18N
 
 
     Visitor(CompilationInfo info, Context ctx, int startOffset) {
@@ -114,7 +111,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitInitDefinition(node, adjustments);
         return adjustments;
@@ -133,7 +130,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 hasComment(node, adjustments);
                 indentLine(start, adjustments);
             }
-            verifyVarSpaces(node, adjustments);
             if (isMultiline(node) && node.getOnReplaceTree() == null) {
                 li.moveTo(start);
                 if (li.hasNext()) {
@@ -143,7 +139,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitVariable(node, adjustments);
         return adjustments;
@@ -203,7 +199,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitIdentifier(node, adjustments);
         return adjustments;
@@ -260,14 +256,14 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             final TokenSequence<JFXTokenId> ts = ts(node);
             ts.move(offset);
             while (ts.moveNext() && ts.offset() <= end) {
-                if ("operator".equals(ts.token().id().primaryCategory())) { // NOI18N
+                if ("operator".equals(ts.token().id().primaryCategory())) {
                     if (cs.spaceAroundBinaryOps()) {
                         int operatorOffset = ts.offset();
                         if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
                             adjustments.offer(Adjustment.add(createPosition(operatorOffset), ONE_SPACE));
                         }
                         if (!ts.moveNext())
-                            throw new BadLocationException(BUNDLE.getString("Concurent_modification_has_occured_on_document."), ts.offset()); // NOI18N
+                            throw new BadLocationException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Concurent_modification_has_occured_on_document."), ts.offset());
                         if (ts.moveNext() && ts.token().id() != JFXTokenId.WS) {
                             adjustments.offer(Adjustment.add(createPosition(ts.offset()), ONE_SPACE));
                         }
@@ -277,7 +273,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitBinary(node, adjustments);
         return adjustments;
@@ -291,7 +287,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         while (ts.movePrevious()) {
             switch (ts.token().id()) {
                 case WS:
-                    if ("\n".equals(ts.token().text())) { // NOI18N
+                    if ("\n".equals(ts.token().text())) {
                         terminate = true;
                         break;
                     }
@@ -326,7 +322,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (isFirstOnLine(offset)) {
                 hasComment(node, adjustments);
                 indentLine(offset, adjustments);
-            } else if (!isOrphanObjectLiterar){
+            } else {
                 adjustments.offer(Adjustment.add(createPosition(offset), NEW_LINE_STRING));
                 adjustments.offer(Adjustment.indent(createPosition(offset + 1), indentOffset));
             }
@@ -346,7 +342,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
 
         return adjustments;
@@ -354,42 +350,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private void verifyOLPTSpaces(ObjectLiteralPartTree node, Queue<Adjustment> adjustments) throws BadLocationException {
         TokenSequence<JFXTokenId> ts = ts(node);
-        // INDETIFIER WS* COLON WS+ ANY
-        verifySpacesAroundColon(adjustments, ts);
-    }
-
-    @SuppressWarnings({"MethodWithMultipleLoops"})
-    private void verifyVarSpaces(VariableTree node, Queue<Adjustment> adjustments) throws BadLocationException {
-        TokenSequence<JFXTokenId> ts = ts(node);
-        while (ts.moveNext()) {
-            JFXTokenId id = ts.token().id();
-            switch (id) {
-                case WS:
-                case PUBLIC:
-                case PUBLIC_INIT:
-                case PUBLIC_READ:
-                case PUBLIC_READABLE:
-                case PRIVATE:
-                case STATIC:
-                case PROTECTED:
-                case DEF:
-                case VAR:
-                case NON_WRITABLE:
-                case OVERRIDE:
-                case READABLE:
-                case REPLACE:
-                    continue;
-                case IDENTIFIER:
-                    ts.movePrevious();
-                    verifySpacesAroundColon(adjustments, ts);
-                    return;
-                default: return;
-
-            }
-        }
-    }
-
-    private void verifySpacesAroundColon(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
         // INDETIFIER WS* COLON WS+ ANY
         if (ts.moveNext()) {
             if (ts.token().id() == JFXTokenId.IDENTIFIER) {
@@ -401,11 +361,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 // verifying spaces beyond COLON
                 start = ts.offset() + ts.offsetToken().length();
                 while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
-                }                
+                }
                 if (ts.offset() - start > 1) {
                     adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
-                } else if (ts.offset() == start) {
-                    adjustments.offer(Adjustment.add(createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
                 }
             }
         }
@@ -425,7 +383,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             hasComment(node, adjustments);
             int start = getStartPos(node);
             boolean firstOnLine = isFirstOnLine(start);
-            if (firstOnLine) {                
+            if (firstOnLine) {
                 indentOffset += getCi();
                 indentLine(start, adjustments);
             }
@@ -435,7 +393,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -454,7 +412,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -513,7 +471,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -543,7 +501,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         } finally {
             disableContinuosIndent = false;
         }
@@ -556,7 +514,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             indentSimpleStructure(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitInterpolateValue(node, adjustments);
         return adjustments;
@@ -586,7 +544,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -613,7 +571,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -653,7 +611,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentLine(getEndPos(node), adjustments);
             } catch (BadLocationException e) {
                 if (log.isLoggable(Level.SEVERE))
-                    log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                    log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
             }
         }
         return adjustments;
@@ -681,7 +639,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             holdInvocationChain = (starter != node);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -713,7 +671,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitFunctionDefinition(node, adjustments);
         return adjustments;
@@ -869,7 +827,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             switch (id) {
                 case WS: {
                     final CharSequence cs = ts.token().text();
-                    if (cs != null && "\n".equals(cs.toString())) { // NOI18N
+                    if (cs != null && "\n".equals(cs.toString())) {
                         indentEndLine(node, adjustments);
                         return;
                     }
@@ -924,7 +882,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitAssignment(node, adjustments);
         return adjustments;
@@ -943,9 +901,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentReturn(node, adjustments);
             }
             incIndent();
-            isOrphanObjectLiterar = node.getLiteralParts() == null || node.getLiteralParts().size() == 1;
             super.visitInstantiate(node, adjustments);
-            isOrphanObjectLiterar = false;
             decIndent();
             if (isMultiline(node) && !endsOnSameLine(tree, node)) {
                 indentEndLine(node, adjustments);
@@ -953,7 +909,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -976,7 +932,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 || tree instanceof SequenceInsertTree
                 || tree instanceof SequenceDeleteTree
                 || tree instanceof FunctionInvocationTree
-                || tree instanceof OnReplaceTree
                 || tree instanceof ForExpressionInClauseTree;
     }
 
@@ -995,7 +950,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 }
                 case WS: {
                     final CharSequence cs = ts.token().text();
-                    if (cs != null && "\n".equals(cs.toString()) && shouldIndent) { // NOI18N
+                    if (cs != null && "\n".equals(cs.toString()) && shouldIndent) {
                         indentLine(endPos, adjustments);
                         return;
                     }
@@ -1012,21 +967,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private int getStartPos(Tree node) {
-        int start = (int) sp().getStartPosition(cu(), node);
-        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
-        ts.move(start);
-        while (ts.movePrevious()) {
-            JFXTokenId id = ts.token().id();
-            switch (id) {
-                case WS:
-                    continue;
-                case LPAREN:
-                    return ts.offset();                    
-                default:
-                    return start;
-            }
-        }
-        return start;
+        return (int) sp().getStartPosition(cu(), node);
         /*int modifiersStart = getModifiersStart(node);
         return Math.min(nodeStart, modifiersStart);*/
     }
@@ -1104,28 +1045,14 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getClassDeclBracePlacement(), cs.spaceBeforeClassDeclLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
 
     private boolean isSynthetic(JFXTree node) {
-//        JFXTree tree = (JFXTree) getCurrentPath().getLeaf();
-        if (node instanceof BlockExpressionTree) {
-            JavaFXTreePath pp = getCurrentPath().getParentPath();
-            if (pp != null && pp instanceof FunctionValueTree) {
-                pp = pp.getParentPath();
-                JFXTree tree = (JFXTree) pp.getLeaf();
-                if (tree instanceof FunctionDefinitionTree) {
-                    return synthetic(tree);
-                }
-            }
-        }
-        return synthetic(node);
-    }
-
-    private boolean synthetic(JFXTree node) {
-        return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC || getStartPos(node) == getEndPos(node);
+        JFXTree tree = (JFXTree) getCurrentPath().getLeaf();
+        return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC || getStartPos(tree) == getEndPos(tree);
     }
 
     private Tree firstImport;
@@ -1133,7 +1060,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitImport(ImportTree importTree, Queue<Adjustment> adjustments) {
-        if (log.isLoggable(Level.FINE)) log.fine("Visiting import" + importTree); // NOI18N
+        if (log.isLoggable(Level.FINE)) log.fine("Visiting import" + importTree);
         try {
             final int ls = ctx.lineStartOffset(getStartPos(importTree));
             processStandaloneNode(importTree, adjustments);
@@ -1157,7 +1084,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitImport(importTree, adjustments);
         return adjustments;
@@ -1211,7 +1138,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitCompoundAssignment(node, adjustments);
         return adjustments;
@@ -1223,7 +1150,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(returnTree, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitReturn(returnTree, adjustments);
         return adjustments;
@@ -1260,7 +1187,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -1276,7 +1203,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -1322,7 +1249,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitWhileLoop(node, adjustments);
         return adjustments;
@@ -1346,7 +1273,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitForExpression(node, adjustments);
         return adjustments;
@@ -1362,7 +1289,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node.getFalseExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
 //        super.visitIf(node, adjustments);
         super.visitConditionalExpression(node, adjustments);
@@ -1380,7 +1307,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeTryLeftBrace());
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitTry(node, adjustments);
         return adjustments;
@@ -1414,7 +1341,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         super.visitCatch(node, adjustments);
         return adjustments;
@@ -1494,9 +1421,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 }
             } else {
                 int endPos = getEndPos(node);
-                if (isFirstOnLine(endPos)) {
-                    indentLine(start, adjustments);
-                }
+                indentLine(start, adjustments);
                 incIndent();
                 super.visitBlockExpression(node, adjustments);
                 decIndent();
@@ -1507,7 +1432,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString("Reformat_failed._") + e); // NOI18N
+                log.severe(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Reformat_failed._") + e);
         }
         return adjustments;
     }
@@ -1593,7 +1518,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
 
-    private static final Pattern EMPTY_LINE_PTRN = Pattern.compile("\\s+"); // NOI18N
+    private static final Pattern EMPTY_LINE_PTRN = Pattern.compile("\\s+");
 
     private boolean isEmpty(String text) {
         return text == null || text.length() == 0 || EMPTY_LINE_PTRN.matcher(text).matches();

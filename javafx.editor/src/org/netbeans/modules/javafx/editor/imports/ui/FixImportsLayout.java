@@ -156,7 +156,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
 
     public void processKeyEvent(KeyEvent evt) {
         if (fixPopup.isVisible()) {
-            log.info("KeyEvent to process on visible popup: " + evt.getKeyChar()); // NOI18N
+            log.info("KeyEvent to process on visible popup: " + evt.getKeyChar());
             if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 canceled = true;
                 hideAll();
@@ -165,7 +165,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
             }
             evt.consume();
         } else {
-            log.info("KeyEvent to process on invisible popup: " + evt.getKeyChar() + ". Unregistering..."); // NOI18N
+            log.info("KeyEvent to process on invisible popup: " + evt.getKeyChar() + ". Unregistering...");
             unregister();
         }
     }
@@ -221,7 +221,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
      * Invoked when a component loses the keyboard focus.
      */
     public void focusLost(FocusEvent e) {
-        log.info("Focus has been lost in prospect of " + e.getOppositeComponent()); // NOI18N
+        log.info("Focus has been lost in prospect of " + e.getOppositeComponent());
         canceled = true;
         if (fixPopup != null && fixPopup.getSelectedCompletionItem() != null) {
             fixPopup.getSelectedCompletionItem()
