@@ -70,12 +70,12 @@ nb.cluster.javafx=\\
        contrib/javafx.fxd,\\
        contrib/javafx.sdksamples
 
-javafx-sdk.win.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/bundles/javafx_sdk-1_0-windows-i586.zip
-javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/artifact/jfx/build/macosx-universal/release/bundles/javafx_sdk-1_0-macosx-universal.zip
-javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/artifact/jfx/build/linux-i586/release/bundles/javafx_sdk-1_0-linux-i586.zip
-javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/artifact/jfx/build/solaris-sparc/release/bundles/javafx_sdk-1_0-solaris-sparc.zip
-jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxc.jar
-jfxdoc.jar.url=${SDK_URL}/label=windows-i586/artifact/jfx/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxdoc.jar
+javafx-sdk.win.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/bundles/javafx_sdk-1_0_1-windows-i586.zip
+javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/lastSuccessfulBuild/artifact/build/macosx-universal/release/bundles/javafx_sdk-1_0_1-macosx-universal.zip
+javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/lastSuccessfulBuild/artifact/build/linux-i586/release/bundles/javafx_sdk-1_0_1-linux-i586.zip	
+javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/build/solaris-sparc/release/bundles/javafx_sdk-1_0_1-solaris-sparc.zip	
+jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxc.jar
+jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
 javafx-fxd-netbeans-support.zip.url=${PRODUCTION_SUITE_URL}/label=macosx-universal2/artifact/installer/macosx/build/javafx-fxd-netbeans-support-1.0-macosx-universal.zip
 EOF
@@ -83,7 +83,7 @@ EOF
 # Get Netbeans binary
 ########################## 
 rm -rf nbms/* netbeans nbproject/private
-unzip -o /net/smetiste.czech.sun.com/space/builds/netbeans/6.5/fcs/zip/netbeans-*-*[0-9].zip
+unzip -o /net/smetiste.czech.sun.com/space/builds/netbeans/6.5/fixes/latest/zip/netbeans-*-*[0-9].zip
 
 ant init  build-one-cluster -Done.cluster.name=nb.cluster.javafx -Dnb.cluster.javafx-hasNoDependencies=true -Dverify.checkout=false -Dscan.binaries=true
 
