@@ -117,7 +117,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             indentLine(context.startOffset());
         }
         if (log.isLoggable(Level.FINE)) log.fine("... done!");
-
+//        reformat();
     }
 
     private void indentLine(int offset) throws BadLocationException {

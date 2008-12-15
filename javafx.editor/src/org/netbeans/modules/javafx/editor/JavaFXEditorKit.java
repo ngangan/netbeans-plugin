@@ -117,7 +117,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new JavaFXGoToDeclarationAction(),
                 new JavaFXGoToSourceAction(),
                 JavaFXImports.getInstance(),
-                new JavaInsertBreakAction()
+                new JavaFXInsertBreakAction()
         };
         return TextAction.augmentList(superActions, javafxActions);
     }
@@ -234,6 +234,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         private final class ResetButton extends JButton implements ChangeListener {
             private boolean state;
+
             public ResetButton() {
                 super();
                 Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
@@ -385,6 +386,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
     }
 
+
     public static class JavaInsertBreakAction extends InsertBreakAction {
 
         static final long serialVersionUID = -1506173310438326380L;
@@ -426,8 +428,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
                 doc.insertString(end, "}", null);                               // NOI18N
                 indent.reindent(end);
-                caret.setDot(dotPos);
-                return Boolean.TRUE;
+                caret.setDot(end);
+                return end + 1;
             } else {
                 final String epsylon = doc.getText(dotPos - 1, 2);
                 final char c = epsylon.charAt(0);
@@ -436,7 +438,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                         doc.insertString(dotPos + 1, "\n", null);               // NOI18N
                         indent.reindent(dotPos);
                         caret.setDot(dotPos);
-                        return Boolean.TRUE;
+                        return dotPos + 1;
                     }
                 } else if (c == '*') {                                          //NOI18N
                     return processStartOfComment(doc, caret, indent);
@@ -464,17 +466,18 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 if (cookie instanceof Integer) {
                     int newDot = (Integer) cookie;
                     // integer
-                    int nowDotPos = caret.getDot();
+//                    int nowDotPos = caret.getDot();
                     try {
+                        caret.setDot(newDot);
                         Indent.get(doc).reindent(newDot);
                     } catch (BadLocationException ex) {
-                        log.severe("Excetion throw during InsertBreakAction. " + ex);   // NOI18N
+                        log.severe("Exception thrown during InsertBreakAction. " + ex);   // NOI18N
                     }
-                    if (newDot > nowDotPos + 1) {
+                    /*if (newDot > nowDotPos + 1) {
                         caret.setDot(newDot);
                     } else {
                         caret.setDot(nowDotPos + 1);
-                    }
+                    }*/
                 }
             }
         }
