@@ -260,7 +260,7 @@ public class Utilities {
             return findTokenWithText(info, name, start, end);
         }
         
-        throw new IllegalArgumentException("Only MethodDecl, VariableDecl and ClassDecl are accepted by this method.");
+        throw new IllegalArgumentException("Only MethodDecl, VariableDecl and ClassDecl are accepted by this method."); // NOI18N
     }
 
     public static int[] findIdentifierSpan( final JavaFXTreePath decl, final CompilationInfo info, final Document doc) {
@@ -300,10 +300,10 @@ public class Utilities {
         
         if (start > doc.getLength() || end > doc.getLength()) {
             if (DEBUG) {
-                System.err.println("Log: position outside document: ");
-                System.err.println("decl = " + cltree);
-                System.err.println("startOffset = " + start);
-                System.err.println("endOffset = " + end);
+                System.err.println("Log: position outside document: "); // NOI18N
+                System.err.println("decl = " + cltree); // NOI18N
+                System.err.println("startOffset = " + start); // NOI18N
+                System.err.println("endOffset = " + end); // NOI18N
                 Thread.dumpStack();
             }
             
@@ -331,7 +331,7 @@ public class Utilities {
     public static int findBodyStart(final Tree cltree, final UnitTree cu, final SourcePositions positions, final Document doc) {
         JavaFXKind kind = cltree.getJavaFXKind();
         if (kind != JavaFXKind.CLASS_DECLARATION && kind != JavaFXKind.FUNCTION_DEFINITION)
-            throw new IllegalArgumentException("Unsupported kind: "+ kind);
+            throw new IllegalArgumentException("Unsupported kind: "+ kind); // NOI18N
         final int[] result = new int[1];
         
         doc.render(new Runnable() {
@@ -353,10 +353,10 @@ public class Utilities {
         
         if (start > doc.getLength() || end > doc.getLength()) {
             if (DEBUG) {
-                System.err.println("Log: position outside document: ");
-                System.err.println("decl = " + tree);
-                System.err.println("startOffset = " + start);
-                System.err.println("endOffset = " + end);
+                System.err.println("Log: position outside document: "); // NOI18N
+                System.err.println("decl = " + tree); // NOI18N
+                System.err.println("startOffset = " + start); // NOI18N
+                System.err.println("endOffset = " + end); // NOI18N
                 Thread.dumpStack();
             }
             
@@ -440,12 +440,12 @@ public class Utilities {
     static { // TODO - FX keywords
         keywords = new HashSet<String>();
         
-        keywords.add("true");
-        keywords.add("false");
-        keywords.add("null");
-        keywords.add("this");
-        keywords.add("super");
-        keywords.add("class");
+        keywords.add("true"); // NOI18N
+        keywords.add("false"); // NOI18N
+        keywords.add("null"); // NOI18N
+        keywords.add("this"); // NOI18N
+        keywords.add("super"); // NOI18N
+        keywords.add("class"); // NOI18N
     }
     
     public static boolean isKeyword(Tree tree) {

@@ -76,10 +76,10 @@ abstract class Adjustment {
 
 
         public String toString() {
-            return "AddAdjustment[" +
-                    "pos=" + pos +
-                    ", adjustment='" + adjustment + '\'' +
-                    ']';
+            return "AddAdjustment[" + // NOI18N
+                    "pos=" + pos + // NOI18N
+                    ", adjustment='" + adjustment + '\'' + // NOI18N
+                    ']'; // NOI18N
         }
     }
 
@@ -103,11 +103,11 @@ abstract class Adjustment {
 
 
         public String toString() {
-            return "ReplaceAdjustment[" +
-                    "start=" + start +
-                    ", end=" + end +
-                    ", replaceWith='" + replaceWith + '\'' +
-                    ']';
+            return "ReplaceAdjustment[" + // NOI18N
+                    "start=" + start + // NOI18N
+                    ", end=" + end + // NOI18N
+                    ", replaceWith='" + replaceWith + '\'' + // NOI18N
+                    ']'; // NOI18N
         }
     }
 
@@ -126,10 +126,10 @@ abstract class Adjustment {
 
 
         public String toString() {
-            return "IndentAdjustment[" +
-                    "pos=" + pos +
-                    ", numberOfSpaces=" + numberOfSpaces +
-                    ']';
+            return "IndentAdjustment[" + // NOI18N
+                    "pos=" + pos + // NOI18N
+                    ", numberOfSpaces=" + numberOfSpaces + // NOI18N
+                    ']'; // NOI18N
         }
     }
 

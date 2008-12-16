@@ -53,7 +53,7 @@ public final class ImportsModel {
 
 
     ImportsModel(CompilationInfo ci) {
-        if (ci == null) throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Compilation_info_cannot_be_null."));
+        if (ci == null) throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Compilation_info_cannot_be_null.")); // NOI18N
         List<? extends ImportTree> trees = ci.getCompilationUnit().getImports();
         if (!trees.isEmpty()) {
             int start = Integer.MAX_VALUE;
@@ -139,10 +139,10 @@ public final class ImportsModel {
         }
 
         private void verifyType() {
-            stared = type.endsWith(".*");
-            dStared = type.endsWith(".**");
+            stared = type.endsWith(".*"); // NOI18N
+            dStared = type.endsWith(".**"); // NOI18N
             if (stared || dStared) {
-                int index = type.indexOf(".*");
+                int index = type.indexOf(".*"); // NOI18N
                 type = type.substring(0, index);
             }
         }
@@ -158,19 +158,19 @@ public final class ImportsModel {
             if (dStared) {
                 return type.startsWith(this.type);
             } else if (stared) {
-                int dotIndex = type.lastIndexOf('.');
+                int dotIndex = type.lastIndexOf('.'); // NOI18N
                 return dotIndex > -1 && this.type.equals(type.substring(0, dotIndex));
             }
             return this.type.equals(type) || canBeThisType(type);
         }
 
-        private boolean canBeThisType(String type) {
+        private boolean canBeThisType(String type) { // NOI18N
             int index = this.type.lastIndexOf('.');
             return index > 0 && this.type.substring(index).equals(type);
         }
 
         String toImportStatement() {
-            return "import " + type + (stared ? ".*" : "") + (dStared ? ".**" : "") + ";";
+            return "import " + type + (stared ? ".*" : "") + (dStared ? ".**" : "") + ";"; // NOI18N
         }
 
         void setUsage() {
@@ -210,9 +210,9 @@ public final class ImportsModel {
 
 
         public String toString() {
-            return "ModelEntry[" +
-                    "type='" + type + '\'' +
-                    ']';
+            return "ModelEntry[" + // NOI18N
+                    "type='" + type + '\'' + // NOI18N
+                    ']'; // NOI18N
         }
     }
 

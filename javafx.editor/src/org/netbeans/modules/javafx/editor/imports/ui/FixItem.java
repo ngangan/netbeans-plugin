@@ -46,10 +46,10 @@ import java.util.logging.Logger;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  */
 public class FixItem implements CompletionItem {
-    private static final String EMPTY_STRING = "";
-    private static final String ITEM_ICON = "org/netbeans/modules/editor/resources/completion/class_16.png";
-    private static final String ITEM_COLOR = "<font color=#560000>";
-    private static final String ITEM_END = "</font>";
+    private static final String EMPTY_STRING = ""; // NOI18N
+    private static final String ITEM_ICON = "org/netbeans/modules/editor/resources/completion/class_16.png"; // NOI18N
+    private static final String ITEM_COLOR = "<font color=#560000>"; // NOI18N
+    private static final String ITEM_END = "</font>"; // NOI18N
     public static final ImageIcon icon;
     private static Logger log = Logger.getLogger(FixItem.class.getName());
 
@@ -74,7 +74,7 @@ public class FixItem implements CompletionItem {
         this.element = element;
         this.LOCK = lock;        
         elementHTMLForm = ITEM_COLOR + element + ITEM_END;
-        sortPriority = element.startsWith("javafx.") ? JAVAFX : NORMAL;
+        sortPriority = element.startsWith("javafx.") ? JAVAFX : NORMAL; // NOI18N
     }
 
     /**
@@ -104,7 +104,7 @@ public class FixItem implements CompletionItem {
      */
     public void processKeyEvent(KeyEvent evt) {
         int keyCode = evt.getKeyCode();
-        log.info("KeyEvent: " + evt.getKeyCode() + " consumed: " + evt.isConsumed());
+        log.info("KeyEvent: " + evt.getKeyCode() + " consumed: " + evt.isConsumed()); // NOI18N
         switch (keyCode) {
             case KeyEvent.VK_ESCAPE:
             case KeyEvent.VK_ENTER: {

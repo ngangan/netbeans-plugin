@@ -90,11 +90,11 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private void process(CompilationInfo info) {
-        if (LOGGABLE) log("process: " + info.getJavaFXSource().getFileObject());
+        if (LOGGABLE) log("process: " + info.getJavaFXSource().getFileObject()); // NOI18N
         
         Document doc = info.getJavaFXSource().getDocument();
         if (doc == null) {
-            if (LOGGABLE) log("  no document for: " + info.getJavaFXSource());
+            if (LOGGABLE) log("  no document for: " + info.getJavaFXSource()); // NOI18N
             return;
         }
 
@@ -103,23 +103,23 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         ArrayList<ErrorDescription> c = new ArrayList<ErrorDescription>();
 
         for (Diagnostic d : diag) {
-            if (LOGGABLE) log("    diagnostics: " + d);
+            if (LOGGABLE) log("    diagnostics: " + d); // NOI18N
             if (d.getSource() instanceof JavaFileObject) {
                 JavaFileObject jfo = (JavaFileObject)d.getSource();
                 if (! jfo.getName().equals(info.getJavaFXSource().getFileObject().getNameExt())) {
-                    if (LOGGABLE) log("    in different file: " + jfo.getName() + " vs.: " + info.getJavaFXSource().getFileObject().getNameExt());
+                    if (LOGGABLE) log("    in different file: " + jfo.getName() + " vs.: " + info.getJavaFXSource().getFileObject().getNameExt()); // NOI18N
                     continue;
                 }
             } else {
-                if (LOGGABLE) log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null"));
+                if (LOGGABLE) log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null")); // NOI18N
             }
             long start = d.getStartPosition();
             long end = d.getEndPosition();
             if (start != Diagnostic.NOPOS && end != Diagnostic.NOPOS) {
-                if (LOGGABLE) log("    start == " + start + "  end == " + end);
+                if (LOGGABLE) log("    start == " + start + "  end == " + end); // NOI18N
                 if (start == end) {
                     end = skipWhiteSpace(info, (int)start);
-                    if (LOGGABLE) log("  after skip  start == " + start + "  end == " + end);
+                    if (LOGGABLE) log("  after skip  start == " + start + "  end == " + end); // NOI18N
                 }
                 try {
                     c.add(ErrorDescriptionFactory.createErrorDescription(
@@ -132,23 +132,23 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                     continue;
                 } catch (BadLocationException ex) {
                     if (LOGGABLE) {
-                        LOGGER.log(Level.INFO, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex);
+                        LOGGER.log(Level.INFO, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex); // NOI18N
                     }
                 }
             } 
             // let's use the line number
             int lastLine = NbDocument.findLineNumber((StyledDocument)doc, doc.getEndPosition().getOffset());
             long linu = d.getLineNumber();
-            if (LOGGABLE) log("    lastLine == " + lastLine + " linu == " + linu);
+            if (LOGGABLE) log("    lastLine == " + lastLine + " linu == " + linu); // NOI18N
             if ( (linu>0) && (linu-1 <= lastLine)) {
                 c.add(ErrorDescriptionFactory.createErrorDescription(
                     Severity.ERROR, d.getMessage(Locale.getDefault()),
                     doc,(int)linu));
             } else {
-                if (LOGGABLE) log("   NOT USED (wrong bounds): " + d);
+                if (LOGGABLE) log("   NOT USED (wrong bounds): " + d); // NOI18N
             }
         }
-        HintsController.setErrors(doc, "semantic-highlighter", c);
+        HintsController.setErrors(doc, "semantic-highlighter", c); // NOI18N
 
         UpToDateStatusProviderImpl p = UpToDateStatusProviderImpl.forDocument(doc);
         p.refresh(diag, UpToDateStatus.UP_TO_DATE_OK);
@@ -165,15 +165,15 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             }
         }
         if (!nonWSFound) {
-            if (LOGGABLE) log("NOT skipping the WS because we are at the very end");
+            if (LOGGABLE) log("NOT skipping the WS because we are at the very end"); // NOI18N
             return start;
         }
         int res = ts.offset();
         if (res > start && res < info.getJavaFXSource().getDocument().getLength()) {
-            if (LOGGABLE) log("skipping the whitespace start == " + start + "  res == " + res);
+            if (LOGGABLE) log("skipping the whitespace start == " + start + "  res == " + res); // NOI18N
             return res;
         } else {
-            if (LOGGABLE) log("NOT skipping the whitespace start == " + start + "  res == " + res);
+            if (LOGGABLE) log("NOT skipping the whitespace start == " + start + "  res == " + res); // NOI18N
             return start;
         }
     }

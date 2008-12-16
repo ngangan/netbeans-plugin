@@ -132,7 +132,7 @@ class DocumentLinesIterator implements LineIterator<Element> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Read_only_interator"));
+        throw new UnsupportedOperationException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Read_only_interator")); // NOI18N
     }
 
 }
