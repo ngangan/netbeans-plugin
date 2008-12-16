@@ -61,11 +61,11 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
 
     @Override
     protected void inside(JFXErroneous t) {
-        if (LOGGABLE) log("inside JFXErroneous " + t);
+        if (LOGGABLE) log("inside JFXErroneous " + t); // NOI18N
         SourcePositions pos = controller.getTrees().getSourcePositions();
         long s = pos.getStartPosition(root, t);
         long e = pos.getEndPosition(root, t);
-        if (LOGGABLE) log("   s = " + s + "  e == " + e);
+        if (LOGGABLE) log("   s = " + s + "  e == " + e); // NOI18N
         JavaFXTreePath p = JavaFXTreePath.getPath(root, t);
         
         if (t.getErrorTrees().isEmpty()) {
@@ -74,11 +74,11 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
         }
 
         for (Tree tt : t.getErrorTrees()) {
-            if (LOGGABLE) log("    tt == " + tt);
-            if (LOGGABLE) log("    tt.getClass() == " + tt.getClass());
+            if (LOGGABLE) log("    tt == " + tt); // NOI18N
+            if (LOGGABLE) log("    tt.getClass() == " + tt.getClass()); // NOI18N
             long st = pos.getStartPosition(root, tt);
             long et = pos.getEndPosition(root, tt);
-            if (LOGGABLE) log("   st = " + st + "  et == " + et);
+            if (LOGGABLE) log("   st = " + st + "  et == " + et); // NOI18N
             if (et == offset-1) {
                 fakeIt();
             }
@@ -89,12 +89,12 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
         try {
             Document d = controller.getJavaFXSource().getDocument();
             String start = d.getText(0, offset);
-            if (LOGGABLE) log("  start = " + start);
+            if (LOGGABLE) log("  start = " + start); // NOI18N
             String end = d.getText(offset, d.getLength()-offset);
-            if (LOGGABLE) log("  end = " + end);
-            useFakeSource(start+"x"+end, offset);
+            if (LOGGABLE) log("  end = " + end); // NOI18N
+            useFakeSource(start+"x"+end, offset); // NOI18N
         } catch (BadLocationException ble) {
-            if (LOGGABLE) logger.log(Level.FINER, "ble", ble);
+            if (LOGGABLE) logger.log(Level.FINER, "ble", ble); // NOI18N
         }
     }
 

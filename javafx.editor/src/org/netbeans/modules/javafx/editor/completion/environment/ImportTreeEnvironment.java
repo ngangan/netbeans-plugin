@@ -56,9 +56,9 @@ public class ImportTreeEnvironment extends JavaFXCompletionEnvironment<ImportTre
 
     @Override
     protected void inside(ImportTree t) {
-        if (LOGGABLE) log("inside ImportTree " + t + "\n  offset == " + offset);
+        if (LOGGABLE) log("inside ImportTree " + t + "\n  offset == " + offset); // NOI18N
         long idStart = sourcePositions.getStartPosition(root, t.getQualifiedIdentifier());
-        if (LOGGABLE) log("  idStart == " + idStart);
+        if (LOGGABLE) log("  idStart == " + idStart); // NOI18N
         addPackages(prefix);
     }
 

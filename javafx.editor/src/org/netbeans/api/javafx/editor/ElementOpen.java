@@ -91,7 +91,7 @@ public final class ElementOpen {
                 if (el == null) {
                     return;
                 }
-                System.err.println("real=" + el);
+                System.err.println("real=" + el); // NOI18N
 
                 JavaFXTreePath elpath = controller.getPath(el);
                 Tree tree = elpath != null ? elpath.getLeaf() : null;

@@ -62,11 +62,11 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
 
     @Override
     protected void inside(JFXForExpression foe) throws IOException {
-        if (LOGGABLE) log("inside JFXForExpression " + foe);
-        if (LOGGABLE) log("  prefix: " + prefix);
+        if (LOGGABLE) log("inside JFXForExpression " + foe); // NOI18N
+        if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, foe);
-        if (LOGGABLE) log("  offset: " + offset);
-        if (LOGGABLE) log("  start: " + start);
+        if (LOGGABLE) log("  offset: " + offset); // NOI18N
+        if (LOGGABLE) log("  start: " + start); // NOI18N
         TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
@@ -82,7 +82,7 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
                     break;
                 case LPAREN:
                     if (afterLParen) {
-                        if (LOGGABLE) log("   too many parens");
+                        if (LOGGABLE) log("   too many parens"); // NOI18N
                         return;
                     }
                     afterLParen = true;
@@ -96,20 +96,20 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
                     afterIdentifier = true;
                     break;
                 default:
-                    if (LOGGABLE) log("  default: " + ts.token().id());
+                    if (LOGGABLE) log("  default: " + ts.token().id()); // NOI18N
                     // there is too much, return nothing
                     return;
             }
         }
-        if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier);
+        if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier); // NOI18N
         if (afterIdentifier) {
-            addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false));
+            addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false)); // NOI18N
             return;
         } 
         if (afterLParen) {
             if (prefix != null && prefix.length() > 0) {
                 // ok the user has already typed something
-                if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after"));
+                if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
             } else {
                 if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
             }

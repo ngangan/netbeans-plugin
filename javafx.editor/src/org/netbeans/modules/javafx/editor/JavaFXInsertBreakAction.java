@@ -64,8 +64,8 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
             // XXX temporary solution until the editor will provide a SPI to plug. See issue #115739
             // This must run outside the document lock
             if (isJavadocTouched) {
-                Lookup.Result<TextAction> res = MimeLookup.getLookup(MimePath.parse("text/x-javadoc")).lookupResult(TextAction.class);
-                ActionEvent newevt = new ActionEvent(target, ActionEvent.ACTION_PERFORMED, "fix-javadoc");
+                Lookup.Result<TextAction> res = MimeLookup.getLookup(MimePath.parse("text/x-javadoc")).lookupResult(TextAction.class); // NOI18N
+                ActionEvent newevt = new ActionEvent(target, ActionEvent.ACTION_PERFORMED, "fix-javadoc"); // NOI18N
                 for (TextAction action : res.allInstances()) {
                     action.actionPerformed(newevt);
                 }
@@ -92,7 +92,7 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
                 int lineIndent = IndentUtils.lineIndent(doc, start);
                 if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
                     int innerLineIndent = lineIndent + IndentUtils.indentLevelSize(doc);
-                    StringBuilder sb = createAdditiveString(doc, lineIndent, "}");
+                    StringBuilder sb = createAdditiveString(doc, lineIndent, "}"); // NOI18N
                     doc.insertString(dotPos, sb.toString(), null);
                     return dotPos + 1 + innerLineIndent;
                 } 
@@ -104,9 +104,9 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
     }
 
     private StringBuilder createAdditiveString(BaseDocument doc, int baseIndent, String closingString) {
-        StringBuilder sb = new StringBuilder("\n");
+        StringBuilder sb = new StringBuilder("\n"); // NOI18N
         sb.append(IndentUtils.createIndentString(doc, baseIndent + IndentUtils.indentLevelSize(doc)));
-        sb.append("\n");
+        sb.append("\n"); // NOI18N
         sb.append(IndentUtils.createIndentString(doc, baseIndent)).append(closingString);
         return sb;
     }
@@ -154,13 +154,13 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
     private static boolean isOpenJavadoc(CharSequence content, int pos) {
         for (int i = pos; i >= 0; i--) {
             char c = content.charAt(i);
-            if (c == '*' && i - 2 >= 0 && content.charAt(i - 1) == '*' && content.charAt(i - 2) == '/') {
+            if (c == '*' && i - 2 >= 0 && content.charAt(i - 1) == '*' && content.charAt(i - 2) == '/') { // NOI18N
                 // matched /**
                 return true;
-            } else if (c == '\n') {
+            } else if (c == '\n') { // NOI18N
                 // no javadoc, matched start of line
                 return false;
-            } else if (c == '/' && i - 1 >= 0 && content.charAt(i - 1) == '*') {
+            } else if (c == '/' && i - 1 >= 0 && content.charAt(i - 1) == '*') { // NOI18N
                 // matched javadoc enclosing tag
                 return false;
             }
@@ -174,7 +174,7 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
         int quotation = 0;
         for (int i = pos; i < length; i++) {
             char c = txt.charAt(i);
-            if (c == '*' && i < length - 1 && txt.charAt(i + 1) == '/') {
+            if (c == '*' && i < length - 1 && txt.charAt(i + 1) == '/') { // NOI18N
                 if (quotation == 0 || i < length - 2) {
                     return true;
                 }
@@ -182,9 +182,9 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
                 boolean isClosed = true;
                 for (int j = i + 2; j < length; j++) {
                     char cc = txt.charAt(j);
-                    if (cc == '\n') {
+                    if (cc == '\n') { // NOI18N
                         break;
-                    } else if (cc == '"' && j < length - 1 && txt.charAt(j + 1) != '\'') {
+                    } else if (cc == '"' && j < length - 1 && txt.charAt(j + 1) != '\'') { // NOI18N
                         isClosed = false;
                         break;
                     }
@@ -193,12 +193,12 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
                 if (isClosed) {
                     return true;
                 }
-            } else if (c == '/' && i < length - 1 && txt.charAt(i + 1) == '*') {
+            } else if (c == '/' && i < length - 1 && txt.charAt(i + 1) == '*') { // NOI18N
                 // start of another comment block
                 return false;
-            } else if (c == '\n') {
+            } else if (c == '\n') { // NOI18N
                 quotation = 0;
-            } else if (c == '"' && i < length - 1 && txt.charAt(i + 1) != '\'') {
+            } else if (c == '"' && i < length - 1 && txt.charAt(i + 1) != '\'') { // NOI18N
                 quotation = ++quotation % 2;
             }
         }

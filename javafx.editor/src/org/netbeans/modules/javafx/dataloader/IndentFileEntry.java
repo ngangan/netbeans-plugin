@@ -95,7 +95,7 @@ public abstract class IndentFileEntry extends FileEntry.Format {
     
     /* package private */ final void initializeIndentEngine() {
         StyledDocument doc = createDocument(createEditorKit(getFile().getMIMEType()));
-        IndentEngine engine = IndentEngine.find(doc); // NOI18N
+        IndentEngine engine = IndentEngine.find(doc);
         setIndentEngine(engine);
     }
 
@@ -214,7 +214,7 @@ public abstract class IndentFileEntry extends FileEntry.Format {
         } catch (Exception ex) {
 	    ErrorManager.getDefault().annotate(
 		ex, ErrorManager.WARNING, "Indentation engine error",  // NOI18N
-                    Util.getString("EXMSG_IndentationEngineError"), ex, null);
+                    Util.getString("EXMSG_IndentationEngineError"), ex, null); // NOI18N
             ErrorManager.getDefault().notify(ex);
             return text;
         }

@@ -70,7 +70,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
 
     @Override
     protected void inside(UnitTree ut) throws IOException {
-        if (LOGGABLE) log("inside CompilationUnitTree " + ut);
+        if (LOGGABLE) log("inside CompilationUnitTree " + ut); // NOI18N
         Tree pkg = root.getPackageName();
         boolean hasPublicDecls = hasPublicDeclarations(ut);
         if (pkg == null || offset <= sourcePositions.getStartPosition(root, root)) {
@@ -88,7 +88,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
                 addKeywordsForCU(ut);
                 if (!hasPublicDecls) {
                     addKeywordsForStatement();
-                    addPackages("");
+                    addPackages(""); // NOI18N
                     addLocalAndImportedTypes(null, null, null, false, null);
                     addLocalMembersAndVars(null);
                     addLocalAndImportedFunctions();
@@ -98,55 +98,55 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
     }
 
     private boolean hasPublicDeclarations(UnitTree ut) {
-        if (LOGGABLE) log("hasPublicDeclarations");
+        if (LOGGABLE) log("hasPublicDeclarations"); // NOI18N
         for (Tree tr : ut.getTypeDecls()) {
             if (tr.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
                 JFXClassDeclaration cl = (JFXClassDeclaration)tr;
-                if (LOGGABLE) log("   cl " + cl);
+                if (LOGGABLE) log("   cl " + cl); // NOI18N
                 JavaFXTreePath tp = JavaFXTreePath.getPath(root, cl);
                 if (controller.getTreeUtilities().isSynthetic(tp)) {
-                    if (LOGGABLE) log("       isSynthetic ");
+                    if (LOGGABLE) log("       isSynthetic "); // NOI18N
                     for (Tree t : cl.getClassMembers()) {
-                        if (LOGGABLE) log("   t == " + t);
+                        if (LOGGABLE) log("   t == " + t); // NOI18N
                         if (t instanceof JFXFunctionDefinition) {
                             JFXFunctionDefinition fd = (JFXFunctionDefinition)t;
-                            if (LOGGABLE) log("   fd == " + fd);
+                            if (LOGGABLE) log("   fd == " + fd); // NOI18N
                             JavaFXTreePath fp = JavaFXTreePath.getPath(root, fd);
                             if (controller.getTreeUtilities().isSynthetic(fp)) {
-                                if (LOGGABLE) log("  ignoring " + fd + " because it is syntetic");
+                                if (LOGGABLE) log("  ignoring " + fd + " because it is syntetic"); // NOI18N
                                 continue;
                             }
                             if (fd.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
-                                if (LOGGABLE) log("   returning true because of " + fd);
+                                if (LOGGABLE) log("   returning true because of " + fd); // NOI18N
                                 return true;
                             }
                         }
                         if (t instanceof JFXVar) {
                             JFXVar v = (JFXVar)t;
-                            if (LOGGABLE) log("   v == " + v);
+                            if (LOGGABLE) log("   v == " + v); // NOI18N
                             if (v.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
-                                if (LOGGABLE) log("   returning true because of " + v);
+                                if (LOGGABLE) log("   returning true because of " + v); // NOI18N
                                 return true;
                             }
                         }
                         if (t instanceof JFXClassDeclaration) {
                             JFXClassDeclaration inner = (JFXClassDeclaration)t;
-                            if (LOGGABLE) log("   inner == " + inner);
+                            if (LOGGABLE) log("   inner == " + inner); // NOI18N
                             if (inner.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
-                                if (LOGGABLE) log("   returning true because of " + inner);
+                                if (LOGGABLE) log("   returning true because of " + inner); // NOI18N
                                 return true;
                             }
                         }
                     }
                 } else {
                     if (cl.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
-                        if (LOGGABLE) log("   returning true because the class is public");
+                        if (LOGGABLE) log("   returning true because the class is public"); // NOI18N
                         return true;
                     }
                 }
             }
         }
-        if (LOGGABLE) log("hasPublicDeclarations returning false at the very end");
+        if (LOGGABLE) log("hasPublicDeclarations returning false at the very end"); // NOI18N
         return false;
     }
 

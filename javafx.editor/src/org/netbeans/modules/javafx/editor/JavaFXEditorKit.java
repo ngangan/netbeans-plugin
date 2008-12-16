@@ -156,7 +156,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             b.setAction(this);
             b.setEnabled(Bridge.isStarted());
             b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString(""));
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
             return b;
         }
 
@@ -254,7 +254,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             ResetButton b = new ResetButton();
             b.setAction(this);
             b.putClientProperty("resetPreviewMark", Boolean.TRUE);              // NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString(""));
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
             b.setEnabled(false);
             return b;
         }
@@ -314,7 +314,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             JButton b = new JButton(this);
             b.setAction(this);
             b.putClientProperty("printPreviewMark", Boolean.TRUE);                  //NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString(""));
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
             b.setEnabled(false);
             return b;
         }

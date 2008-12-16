@@ -92,7 +92,7 @@ public final class FXSourceUtils {
 
     private static String typeToString(JavafxTypes types, Type type) {
         if (type == null) {
-            return "<null>";
+            return "<null>"; // NOI18N
         }
 
         String suffix = ""; // NOI18N

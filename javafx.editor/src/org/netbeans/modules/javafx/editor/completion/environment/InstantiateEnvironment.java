@@ -63,28 +63,28 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
     protected void inside(JFXInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
         int end = (int) sourcePositions.getEndPosition(root, it);
-        if (LOGGABLE) log("inside InstantiateEnvironment " + it + 
-                " pos == " + pos +
-                " end == " + end +
-                "  offset == " + offset + "  prefix == " + prefix + "\n");
+        if (LOGGABLE) log("inside InstantiateEnvironment " + it +  // NOI18N
+                " pos == " + pos + // NOI18N
+                " end == " + end + // NOI18N
+                "  offset == " + offset + "  prefix == " + prefix + "\n"); // NOI18N
         if (pos < 0) {
-            if (LOGGABLE) log("  returing nothing because pos < 0");
+            if (LOGGABLE) log("  returing nothing because pos < 0"); // NOI18N
             return;
         }
         String s = it.getIdentifier().toString();
-        if (LOGGABLE) log("  s == " + s);
+        if (LOGGABLE) log("  s == " + s); // NOI18N
         TypeElement te = findTypeElement(s);
-        if (LOGGABLE) log("  te == " + te);
+        if (LOGGABLE) log("  te == " + te); // NOI18N
         if (te == null) {
             return;
         }
         TypeMirror tm = te.asType();
-        if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind()));
+        if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "" : tm.getKind())); // NOI18N
         if (tm == null) {
             return;
         }
-        if (LOGGABLE) log(" TODO: missing check whether we are not after the closing bracket!"); 
-        addMembers(tm, false, true, ":",controller.getTreeUtilities().getScope(path),true, true);
+        if (LOGGABLE) log(" TODO: missing check whether we are not after the closing bracket!");  // NOI18N
+        addMembers(tm, false, true, ":",controller.getTreeUtilities().getScope(path),true, true); // NOI18N
     }
 
     public TypeMirror getSmartType(JFXInstanciate it) throws IOException {

@@ -67,7 +67,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
     private static final Logger logger = Logger.getLogger(JavaFXCompletionProvider.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
     
-    private static final boolean autoMode = Boolean.getBoolean("org.netbeans.modules.editor.java.completionAutoMode");
+    private static final boolean autoMode = Boolean.getBoolean("org.netbeans.modules.editor.java.completionAutoMode"); // NOI18N
     private static final String ERROR = "<error>"; //NOI18N
     
     public int getAutoQueryTypes(JTextComponent component, String typedText) {
@@ -118,7 +118,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
             }
             switch (ts.token().id()) {
                 case FLOATING_POINT_LITERAL:
-                    if (ts.token().text().charAt(0) == '.') {
+                    if (ts.token().text().charAt(0) == '.') { // NOI18N
                         break;
                     }
                 case DOC_COMMENT:
@@ -144,13 +144,13 @@ public class JavaFXCompletionProvider implements CompletionProvider {
                 if (ts.language() == JFXTokenId.language())
                     return (TokenSequence<JFXTokenId>)ts;
                 if (!ts.moveNext() && !ts.movePrevious()) {
-                    if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset);
+                    if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset); // NOI18N
                     return null;
                 }
                 ts = ts.embedded();
             }
         }
-        if (LOGGABLE) log("getJavaFXTokenSequence returning null (2) for offset " + offset);
+        if (LOGGABLE) log("getJavaFXTokenSequence returning null (2) for offset " + offset); // NOI18N
         return null;
     }
     
