@@ -90,7 +90,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
                 headerText = headerText.substring(parStart).trim();
             }
             if (LOGGABLE) log("  headerText(2) ==" + headerText); // NOI18N
-            if (":".equals(headerText)) {
+            if (":".equals(headerText)) { // NOI18N
                 addLocalAndImportedTypes(null, null, null, false, null);
                 addBasicTypes();
                 return;

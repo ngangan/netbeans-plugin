@@ -132,7 +132,7 @@ final class DocumentElementWrapper {
         
         @Override
         public Object getAttrValue(String name) {  //NOI18N
-            if ("cache".equals(name)) {
+            if ("cache".equals(name)) { // NOI18N
                 return Boolean.TRUE;
             } else {
                 return super.getAttrValue(name);

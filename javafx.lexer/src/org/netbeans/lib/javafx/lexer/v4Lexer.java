@@ -10,6 +10,10 @@ import org.antlr.runtime.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ * NOI18N for whole class
+*/
 public class v4Lexer extends AbstractGeneratedLexerV4 {
     public static final int LAZY=39;
     public static final int COMMA=85;

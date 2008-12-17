@@ -44,7 +44,7 @@ import java.util.Map;
  * @todo documentation
  */
 public class TokenIdGenerator {
-    public static final String FORMAT = "\t{0}(\"{1}\", {2}),";
+    public static final String FORMAT = "\t{0}(\"{1}\", {2}),"; // NOI18N
 
 
     public static void main(String[] args) {
@@ -52,10 +52,10 @@ public class TokenIdGenerator {
             System.exit(-2);
         }
 
-        String tokens = get("-tokens", args);
+        String tokens = get("-tokens", args); // NOI18N
         File tokenF = new File(tokens);
         if (tokens == null || !tokenF.exists()) {
-            System.out.println("Use -tokens to specify token input file.");
+            System.out.println("Use -tokens to specify token input file."); // NOI18N
             System.exit(-1);
         }
 

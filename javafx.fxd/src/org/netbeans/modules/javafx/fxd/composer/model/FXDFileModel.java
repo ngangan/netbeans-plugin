@@ -171,7 +171,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     public static BaseDocument getDocument( final FXZDataObject dObj) throws IOException {
         EditorCookie ec = dObj.getCookie(EditorCookie.class);
         if(ec == null) {
-            throw new IllegalArgumentException("The DataObject " + dObj.getName() + "(class=" + dObj.getClass().getName() + ") has no EditorCookie!?");
+            throw new IllegalArgumentException("The DataObject " + dObj.getName() + "(class=" + dObj.getClass().getName() + ") has no EditorCookie!?"); // NOI18N
         } else {
             return (BaseDocument)ec.openDocument();
         }

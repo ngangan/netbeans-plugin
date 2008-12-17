@@ -221,14 +221,14 @@ final class FXDNavigatorNode implements TreeNode, DocumentElementListener {
                 }
             }
             String name = getDocumentElement().getName();
-            if ( "root".equals(name)) {
-                name = "FXD";
+            if ( "root".equals(name)) { // NOI18N
+                name = "FXD"; // NOI18N
             }
             String id = (String) getDocumentElement().getAttributes().getAttribute("id"); //NOI18N
             
             if (id != null /*&& !id.startsWith(JSONObject.INJECTED_ID_PREFIX)*/) {
                 int    len = id.length();
-                if ( id.charAt(0) == '"' && len >=2 && id.charAt(len-1) == '"') {
+                if ( id.charAt(0) == '"' && len >=2 && id.charAt(len-1) == '"') { // NOI18N
                     //strip the enclosing parentheses
                     for (int i = 1; i < len - 1; i++) {
                         text.append( id.charAt(i));

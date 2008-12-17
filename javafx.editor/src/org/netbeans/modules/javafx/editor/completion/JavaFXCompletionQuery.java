@@ -483,7 +483,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 }
             }
         }
-        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset + 
+        if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset +  // NOI18N
                 " offset: " + offset + " prefix " + prefix); // NOI18N
         JavaFXTreePath path = pathFor(controller, offset);
         if (LOGGABLE) log("   pathFor returned " + path.getLeaf()); // NOI18N

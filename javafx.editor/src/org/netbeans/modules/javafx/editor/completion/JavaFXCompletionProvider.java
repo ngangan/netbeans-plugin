@@ -71,7 +71,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
     private static final String ERROR = "<error>"; //NOI18N
     
     public int getAutoQueryTypes(JTextComponent component, String typedText) {
-        if (".".equals(typedText) || (autoMode && JavaFXCompletionQuery.isJavaIdentifierPart(typedText))) {
+        if (".".equals(typedText) || (autoMode && JavaFXCompletionQuery.isJavaIdentifierPart(typedText))) { // NOI18N
             if (isJavaFXContext(component, component.getSelectionStart() - 1))
                 return COMPLETION_QUERY_TYPE;
         }

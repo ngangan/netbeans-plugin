@@ -296,7 +296,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
-                if (s.contains("$")) {
+                if (s.contains("$")) { // NOI18N
                     continue;
                 }
 
@@ -428,7 +428,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (VariableTree var : fvt.getParameters()) {
                     if (LOGGABLE) log("  var: " + var + "\n"); // NOI18N
                     String s = var.getName().toString();
-                    if (s.contains("$")) {
+                    if (s.contains("$")) { // NOI18N
                         continue;
                     }
                     if (LOGGABLE) log("    adding(3) " + s + " with prefix " + prefix); // NOI18N
@@ -1257,7 +1257,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             for (Element local : scope.getLocalElements()) {
                 if (LOGGABLE) log("    local == " + local); // NOI18N
                 String name = local.getSimpleName().toString();
-                if (name.contains("$")) {
+                if (name.contains("$")) { // NOI18N
                     continue;
                 }
                 if (local.getKind() == ElementKind.METHOD) {

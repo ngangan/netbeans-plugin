@@ -48,7 +48,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.net.URL;
 import java.net.URI;
 import java.net.MalformedURLException;
@@ -129,8 +128,8 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                     break;
                 case JAVADOC:
                     key = "TXT_JDKJavadoc";         //NOI18N
-                    mneKey = "MNE_JDKJavadoc";      //NOI8N
-                    ad = "AD_JDKJavadoc";      //NOI8N
+                    mneKey = "MNE_JDKJavadoc"; // NOI18N
+                    ad = "AD_JDKJavadoc"; // NOI18N
                     break;
                 default:
                     assert false : "Illegal type of panel";     //NOI18N

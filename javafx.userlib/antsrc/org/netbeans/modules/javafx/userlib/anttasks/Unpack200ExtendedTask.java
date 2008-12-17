@@ -76,7 +76,7 @@ public class Unpack200ExtendedTask extends Unpack200Task{
             if (!dir.exists()) {
                 continue;
             }
-            log("Processing FileSet: " + fs, Project.MSG_VERBOSE);
+            log("Processing FileSet: " + fs, Project.MSG_VERBOSE); // NOI18N
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             File basedir = ds.getBasedir();
             String[] files = ds.getIncludedFiles();
@@ -85,14 +85,14 @@ public class Unpack200ExtendedTask extends Unpack200Task{
                 files2pack.add(fl);
             }
         }
-        log("Files to be upacked: "  + files2pack.toString(), Project.MSG_VERBOSE);
+        log("Files to be upacked: "  + files2pack.toString(), Project.MSG_VERBOSE); // NOI18N
 
         if (files2pack.size()>0) {
             for(Iterator<File> iter = files2pack.iterator();iter.hasNext();) {
                 File f = iter.next();
-                log("Unpacking file: " + f, Project.MSG_VERBOSE);
+                log("Unpacking file: " + f, Project.MSG_VERBOSE); // NOI18N
                 source = f;
-                dest = new File(f.getName()+".jar");
+                dest = new File(f.getName() + ".jar"); // NOI18N
                 super.extract();
             }
         }

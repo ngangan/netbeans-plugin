@@ -67,7 +67,7 @@ public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<Insta
         ExpressionTree exp = t.getExpression();
         Tree type = t.getType();
         int typePos = (int)sourcePositions.getStartPosition(root, t.getType()); // NOI18N
-        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos + "  offset == " + offset);
+        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos + "  offset == " + offset); // NOI18N
         if (offset >= typePos) {
             TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N

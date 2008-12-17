@@ -43,8 +43,8 @@ import org.openide.util.NbBundle;
         JLabel cell;
         cell = cells[CELL_POSITION] = new Cell(POS_MAX_STRINGS);
         cell.setHorizontalAlignment(SwingConstants.CENTER);
-        cell.setToolTipText("SVG coordinates");
-        setText(CELL_POSITION, "[-,-]");
+        cell.setToolTipText("SVG coordinates"); // NOI18N
+        setText(CELL_POSITION, "[-,-]"); // NOI18N
         cell = cells[CELL_MODE] = new Cell( new String[] { LOCKED, UNLOCKED });
         cell.setHorizontalAlignment(SwingConstants.CENTER);
         cells[CELL_MAIN] = new Cell(null);

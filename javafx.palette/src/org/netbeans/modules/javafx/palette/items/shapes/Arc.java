@@ -53,15 +53,15 @@ import org.openide.util.NbBundle;
 public class Arc implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Arc" );
+        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Arc" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Imports
-        Imports.addImport( targetComponent, "javafx.scene.shape.Arc" );
-        Imports.addImport( targetComponent, "javafx.scene.shape.ArcType" );
-        Imports.addImport( targetComponent, "javafx.scene.paint.Color" );
+        Imports.addImport( targetComponent, "javafx.scene.shape.Arc" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.shape.ArcType" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
         return true;
     }
 }

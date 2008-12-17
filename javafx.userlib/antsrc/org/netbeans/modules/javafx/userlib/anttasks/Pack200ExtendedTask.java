@@ -89,8 +89,8 @@ public class Pack200ExtendedTask extends Pack200Task {
             if (!dir.exists()) {
                 continue;
             }
-            System.out.println("Processing FileSet: " + fs);
-            log("Processing FileSet: " + fs, Project.MSG_VERBOSE);
+            System.out.println("Processing FileSet: " + fs); // NOI18N
+            log("Processing FileSet: " + fs, Project.MSG_VERBOSE); // NOI18N
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             File basedir = ds.getBasedir();
             String[] files = ds.getIncludedFiles();
@@ -100,18 +100,18 @@ public class Pack200ExtendedTask extends Pack200Task {
             }
         }
         //System.out.println("Files to be packed: "  + files2pack.toString());
-        log("Files to be packed: "  + files2pack.toString(), Project.MSG_VERBOSE);
+        log("Files to be packed: "  + files2pack.toString(), Project.MSG_VERBOSE); // NOI18N
         
         if (files2pack.size()>0) {
             for(Iterator<File> iter = files2pack.iterator();iter.hasNext();) {
                 File f = iter.next();
-                //System.out.println("Packing file: " + f);
-                log("Packing file: " + f, Project.MSG_VERBOSE);
+                //System.out.println("Packing file: " + f); // NOI18N
+                log("Packing file: " + f, Project.MSG_VERBOSE); // NOI18N
                 source = f;
                 if (doRepack) {
                     zipFile = f;
                 } else {
-                    zipFile = new File(f.toString()+".pack.gz");
+                    zipFile = new File(f.toString()+".pack.gz"); // NOI18N
                 }
                 super.pack();
             }

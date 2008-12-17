@@ -330,7 +330,7 @@ class Utils {
         case LOCAL_VARIABLE:
             VariableElement variableElement = (VariableElement) element;
             formatTypeMirror(variableElement.asType(), stringBuilder, FQNs);
-            stringBuilder.append(" ");
+            stringBuilder.append(" "); // NOI18N
             stringBuilder.append(element.getSimpleName().toString());
 
             break;

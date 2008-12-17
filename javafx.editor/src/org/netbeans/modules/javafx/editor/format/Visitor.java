@@ -1518,7 +1518,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
 
-    private static final Pattern EMPTY_LINE_PTRN = Pattern.compile("\\s+");
+    private static final Pattern EMPTY_LINE_PTRN = Pattern.compile("\\s+"); // NOI18N
 
     private boolean isEmpty(String text) {
         return text == null || text.length() == 0 || EMPTY_LINE_PTRN.matcher(text).matches();

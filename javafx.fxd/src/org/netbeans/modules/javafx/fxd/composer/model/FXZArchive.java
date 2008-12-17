@@ -261,7 +261,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                     m_zip.close();
                 }
             } catch( IOException e) {
-                throw new RuntimeException( "Entry reload failed.", e);
+                throw new RuntimeException( "Entry reload failed.", e); // NOI18N
             }
             SwingUtilities.invokeLater( new Runnable() {
                 public void run() {

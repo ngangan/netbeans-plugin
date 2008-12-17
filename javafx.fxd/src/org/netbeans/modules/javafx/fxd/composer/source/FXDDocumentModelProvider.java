@@ -83,7 +83,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         }
     }
     
-    public static final String PROP_PARSE_ERROR = "parse-error";
+    public static final String PROP_PARSE_ERROR = "parse-error"; // NOI18N
     
     /*
     private static FXDNode s_root = null;    
@@ -171,8 +171,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 
             }, nodesStartPos);
             
-            final StringBuilder statMsg = new StringBuilder(" ");
-            showStatusText(dObj, " Parsing text...");
+            final StringBuilder statMsg = new StringBuilder(" "); // NOI18N
+            showStatusText(dObj, " Parsing text..."); // NOI18N
             
             try {
                 fxdParser.parseObject();
@@ -197,17 +197,17 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 //recognized by the FXD parser
                 try {
                     int end;
-                    if ( (end=msg.lastIndexOf(']')) != -1) {
+                    if ( (end=msg.lastIndexOf(']')) != -1) { // NOI18N
                         int start;
                         if ( (start=msg.lastIndexOf('[', end)) != -1) {
-                            StringTokenizer st = new StringTokenizer( msg.substring(start+1, end), ",");
+                            StringTokenizer st = new StringTokenizer( msg.substring(start+1, end), ","); // NOI18N
                             if ( st.countTokens() == 2) {
                                 int [] startCoords = FXDParser.index2coords(textParser.subsequence(0, textParser.getSize()), nodesStartPos);
                                 int [] coords = new int[2];
                                 for (int i = 0; i < coords.length; i++) {
                                     coords[i] = Integer.parseInt(st.nextToken().trim());
                                 }
-                                msg = String.format( "%s[%d,%d]%s", 
+                                msg = String.format( "%s[%d,%d]%s", // NOI18N
                                         msg.substring(0, start),
                                         coords[0] + startCoords[0] - 1,
                                         coords[1] - 1,
@@ -222,7 +222,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 doc.putProperty( PROP_PARSE_ERROR, statMsg.toString());
                 cleanModel(trans, model);
                 try {
-                    trans.addDocumentElement("Invalid FXD syntax", FXDFileModel.FXD_ERROR, NO_ATTRS, nodesStartPos, textSize);
+                    trans.addDocumentElement("Invalid FXD syntax", FXDFileModel.FXD_ERROR, NO_ATTRS, nodesStartPos, textSize); // NOI18N
                 } catch (BadLocationException ex1) {
                     Exceptions.printStackTrace(ex1);
                 }

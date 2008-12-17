@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.userlib.anttasks;
 
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.*;
 import org.apache.tools.ant.taskdefs.*;
 import java.util.*;
@@ -70,11 +69,11 @@ public class Unpack200Task extends Unpack {
 
     // Needed by the super class
     protected String getDefaultExtension() {
-	return ".jar";
+	return ".jar"; // NOI18N
     }
 
     public void setVerbose(String value) {
-	propMap.put(Pack200Task.COM_PREFIX + "verbose",value);
+	propMap.put(Pack200Task.COM_PREFIX + "verbose", value); // NOI18N
     }
 
     private FileType getMagic(File in) throws IOException {
@@ -93,9 +92,9 @@ public class Unpack200Task extends Unpack {
     }
 	
     protected void extract() {
-	System.out.println("Unpacking with Unpack200");
-	System.out.println("Source File :" + source);
-	System.out.println("Dest.  File :" + dest);
+	System.out.println("Unpacking with Unpack200"); // NOI18N
+	System.out.println("Source File :" + source); // NOI18N
+	System.out.println("Dest.  File :" + dest); // NOI18N
 
 	try { 
 	    FileInputStream fis = new FileInputStream(source);
@@ -113,7 +112,7 @@ public class Unpack200Task extends Unpack {
   	    jout.close();
 
 	} catch (IOException ioe) {
-	    throw new BuildException("Error in unpack200");	
+	    throw new BuildException("Error in unpack200"); // NOI18N
         }
 
     }

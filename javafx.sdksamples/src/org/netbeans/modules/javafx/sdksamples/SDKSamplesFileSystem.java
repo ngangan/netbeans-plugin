@@ -109,7 +109,7 @@ public class SDKSamplesFileSystem extends MultiFileSystem {
             if( descriptionFO != null ) {
                 descriptionsXml += "<folder name=\"" + sampleName + "\">"; // NOI18N
                 descriptionsXml += "<file name=\"description.html\" url=\"" + descriptionFO.getURL().toString() + "\"/>"; // NOI18N
-                descriptionsXml += "</folder>";
+                descriptionsXml += "</folder>"; // NOI18N
             }
 
             // file definition

@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  * @author Rastislav Komara (<a href="mailto:rastislav .komara@sun.com">RKo</a>)
  */
 public abstract class Lexer extends org.antlr.runtime.Lexer {
-    public final BraceQuoteTracker NULL_BQT = new BraceQuoteTracker(null, '\'', false);
+    public final BraceQuoteTracker NULL_BQT = new BraceQuoteTracker(null, '\'', false); // NOI18N
     private BraceQuoteTracker quoteStack = NULL_BQT;
     /**
      * The log to be used for error diagnostics.
@@ -144,7 +144,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
      */
     @Override
     public void recover(RecognitionException re) {
-        logger.severe(getErrorMessage(re, getTokenNames()) + " Trying to recover from error. " + re.getClass().getSimpleName());
+        logger.severe(getErrorMessage(re, getTokenNames()) + " Trying to recover from error. " + re.getClass().getSimpleName()); // NOI18N
         final BitSet bitSet = computeErrorRecoverySet();
         consumeUntil(input, bitSet);
         input.consume(); // consuming last character.
@@ -154,8 +154,8 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
     public void reportError(RecognitionException e) {
         if (e instanceof FailedPredicateException) {
             if (logger.isLoggable(Level.WARNING))
-                logger.warning(e.getClass().getSimpleName() + " found unexpected type "
-                        + Integer.toString(e.getUnexpectedType()) + " trying to recover from buggy source code.");
+                logger.warning(e.getClass().getSimpleName() + " found unexpected type " // NOI18N
+                        + Integer.toString(e.getUnexpectedType()) + " trying to recover from buggy source code."); // NOI18N
             // we just skip this character. Maybe the next one will be OK. Preventing endless loop.
             input.consume();            
         } else {
@@ -312,12 +312,12 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
          * {@inheritDoc}
          */
         public String toString() {
-            return "BQT[" +
-                    "depth=" + braceDepth +
-                    ", quote=" + Integer.toString(quote) +
-                    ", pif=" + percentIsFormat +
-                    ", next=" + next +
-                    ']';
+            return "BQT[" + // NOI18N
+                    "depth=" + braceDepth + // NOI18N
+                    ", quote=" + Integer.toString(quote) + // NOI18N
+                    ", pif=" + percentIsFormat + // NOI18N
+                    ", next=" + next + // NOI18N
+                    ']'; // NOI18N
         }
 
 
@@ -421,7 +421,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
          */
         @Override
         public void error(int pos, String key, Object... args) {
-           logger.fine("Lexer error: " + key + " @" + pos + "\tCaused by: " + Arrays.asList(args));
+           logger.fine("Lexer error: " + key + " @" + pos + "\tCaused by: " + Arrays.asList(args)); // NOI18N
         }
     }
 }

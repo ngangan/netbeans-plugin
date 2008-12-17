@@ -96,8 +96,8 @@ public class UnsignJarTask extends Task {
             if (!dir.exists()) {
                 continue;
             }
-            System.out.println("Processing FileSet: " + fs);
-            log("Processing FileSet: " + fs, Project.MSG_VERBOSE);
+            System.out.println("Processing FileSet: " + fs); // NOI18N
+            log("Processing FileSet: " + fs, Project.MSG_VERBOSE); // NOI18N
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             File basedir = ds.getBasedir();
             String[] files = ds.getIncludedFiles();
@@ -107,7 +107,7 @@ public class UnsignJarTask extends Task {
             }
         }
         //System.out.println("Files to be packed: "  + files2pack.toString());
-        log("Files to be packed: " + files2unsign.toString(), Project.MSG_VERBOSE);
+        log("Files to be packed: " + files2unsign.toString(), Project.MSG_VERBOSE); // NOI18N
 
         //Unsign list of JARs
         if (files2unsign.size() > 0) {
@@ -115,11 +115,11 @@ public class UnsignJarTask extends Task {
             //Unjar files in loop
             for (Iterator<File> iter = files2unsign.iterator(); iter.hasNext();) {
                 File f = iter.next();
-                System.out.println("Unsign File: " + f);
-                log("Unsign file: " + f, Project.MSG_VERBOSE);
+                System.out.println("Unsign File: " + f); // NOI18N
+                log("Unsign file: " + f, Project.MSG_VERBOSE); // NOI18N
                 try {
                     //TODO Remove hardcode
-                    dest = new File(getProject().getBaseDir().getAbsolutePath()+File.separator+"dist"+File.separator+"tmp");
+                    dest = new File(getProject().getBaseDir().getAbsolutePath()+File.separator+"dist"+File.separator+"tmp"); // NOI18N
                     dest.mkdir();
                     unJar(new JarFile(f));
                     String fileName = f.getAbsolutePath();
@@ -128,7 +128,7 @@ public class UnsignJarTask extends Task {
                     dest.delete();
                 } catch (IOException ex) {
                     Logger.getLogger(UnsignJarTask.class.getName()).log(Level.SEVERE, null, ex);
-                    throw new BuildException("Not a valid Jar file:" + ex.getMessage());
+                    throw new BuildException("Not a valid Jar file:" + ex.getMessage()); // NOI18N
                 }
             }//for
 
@@ -147,18 +147,18 @@ public class UnsignJarTask extends Task {
         while (e.hasMoreElements()) {
             entry = (JarEntry) e.nextElement();
             //Filter for signature files
-            if ((entry.getName().indexOf(".SF") != -1) ||
-                    (entry.getName().indexOf(".DSA") != -1) ||
-                    (entry.getName().indexOf(".RSA") != -1)) {
+            if ((entry.getName().indexOf(".SF") != -1) || // NOI18N
+                    (entry.getName().indexOf(".DSA") != -1) || // NOI18N
+                    (entry.getName().indexOf(".RSA") != -1)) { // NOI18N
             } else {
                 files2jar.add(entry.getName());
                 if (entry.isDirectory()) {
                     new File(this.dest.getAbsolutePath() + File.separator + entry.getName()).mkdir();
                 } else {
                     //Some jars has META-INF dir entry below its content
-                    if ((entry.getName().indexOf("META-INF")!=-1)&&
-                            !new File(dest.getAbsolutePath()+File.separator+"META-INF").exists()) {
-                        new File(dest.getAbsolutePath()+File.separator+"META-INF").mkdir();
+                    if ((entry.getName().indexOf("META-INF")!=-1)&& // NOI18N
+                            !new File(dest.getAbsolutePath()+File.separator+"META-INF").exists()) { // NOI18N
+                        new File(dest.getAbsolutePath()+File.separator+"META-INF").mkdir(); // NOI18N
                     }
                     is = new BufferedInputStream(jarFile.getInputStream(entry));
                     int count;

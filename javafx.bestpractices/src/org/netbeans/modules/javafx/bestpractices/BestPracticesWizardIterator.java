@@ -115,7 +115,7 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
                 FileUtil.copyFile( c, destDirFO, c.getName());
                 // If file has mainclass attribute - set it as main 
                 if( c.getAttribute( "mainclass" ) != null ) { // NOI18N
-                    String fileName = c.getPath().substring( mainFile.getPath().length() + 1 ).replace( "/", "." );
+                    String fileName = c.getPath().substring( mainFile.getPath().length() + 1 ).replace( "/", "." ); // NOI18N
                     fileName = fileName.substring( 0, fileName.length() - 3 );
                             
                     props.setProperty( "main.class", fileName ); // NOI18N

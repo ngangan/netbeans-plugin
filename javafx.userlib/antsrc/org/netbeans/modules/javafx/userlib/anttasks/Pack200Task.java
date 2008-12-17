@@ -59,8 +59,8 @@ import java.util.jar.Pack200.*;
  */
 public class Pack200Task extends Pack {
 
-    private   static final String ERRMSG_ZF="zipfile attribute must end";
-    protected static final String COM_PREFIX="com.sun.java.util.jar.pack.";
+    private   static final String ERRMSG_ZF="zipfile attribute must end"; // NOI18N
+    protected static final String COM_PREFIX="com.sun.java.util.jar.pack."; // NOI18N
 
     private boolean doRepack = false;
     private boolean doGZIP = false;
@@ -80,25 +80,25 @@ public class Pack200Task extends Pack {
     private void validate() throws BuildException {
 	if (p200ConfigFile != null && 
 		(!p200ConfigFile.exists() || p200ConfigFile.isDirectory())) {
-            throw new BuildException("Pack200 property file attribute must "
-				+ "exist and not represent a directory!", 
+            throw new BuildException("Pack200 property file attribute must " // NOI18N
+				+ "exist and not represent a directory!",  // NOI18N
 				getLocation()); 
 	}
 	if (doGZIP) { 
-	   if (!zipFile.toString().toLowerCase().endsWith(".gz")) {
-		throw new BuildException(ERRMSG_ZF + " with .gz extension", 
+	   if (!zipFile.toString().toLowerCase().endsWith(".gz")) { // NOI18N
+		throw new BuildException(ERRMSG_ZF + " with .gz extension",  // NOI18N
 				getLocation()); 
 	   }
 	} else if (doRepack) {
-	   if (!zipFile.toString().toLowerCase().endsWith(".jar")) {
-		throw new BuildException(ERRMSG_ZF + " with .jar extension", 
+	   if (!zipFile.toString().toLowerCase().endsWith(".jar")) { // NOI18N
+		throw new BuildException(ERRMSG_ZF + " with .jar extension",  // NOI18N
 				getLocation()); 
 	   }
 	} else {
-	   if (!zipFile.toString().toLowerCase().endsWith(".pack") && 
-			!zipFile.toString().toLowerCase().endsWith(".pac")) {
+	   if (!zipFile.toString().toLowerCase().endsWith(".pack") &&  // NOI18N
+			!zipFile.toString().toLowerCase().endsWith(".pac")) { // NOI18N
 	       throw new BuildException(ERRMSG_ZF + 
-					"with .pack or .pac extension", 
+					"with .pack or .pac extension",  // NOI18N
 					getLocation()); 
 	   }
 	}
@@ -123,7 +123,7 @@ public class Pack200Task extends Pack {
      * Sets whether the java debug attributes should be stripped
      */
     public void setStripDebug(String value) {
-	propMap.put(COM_PREFIX+"strip.debug",value);
+	propMap.put(COM_PREFIX+"strip.debug",value); // NOI18N
     } 
     
     /**
@@ -179,19 +179,19 @@ public class Pack200Task extends Pack {
      * Set the verbosity level.
      */
     public void setVerbose(String value) {
-	propMap.put(COM_PREFIX + "verbose",value);
+	propMap.put(COM_PREFIX + "verbose",value); // NOI18N
     }
 
     protected void pack() {
 	String statusStr = doRepack 
-	    ? "Repack with Pack200" 
-	    : "Packing with Pack200";
+	    ? "Repack with Pack200"  // NOI18N
+	    : "Packing with Pack200"; // NOI18N
 
 	System.out.println(statusStr);
-	System.out.println("Source File :" + source);
-	System.out.println("Dest.  File :" + zipFile);
+	System.out.println("Source File :" + source); // NOI18N
+	System.out.println("Dest.  File :" + zipFile); // NOI18N
 	if (p200ConfigFile != null)
-           System.out.println("Config file :" + p200ConfigFile);
+           System.out.println("Config file :" + p200ConfigFile); // NOI18N
 
 	this.validate();
 
@@ -214,7 +214,7 @@ public class Pack200Task extends Pack {
 
 	    if (doRepack) {
 		doGZIP = false;
-		packFile = new File(zipFile.toString() + ".tmp");
+		packFile = new File(zipFile.toString() + ".tmp"); // NOI18N
 	    }
 
 	    JarFile jarFile = new JarFile(source);
@@ -257,7 +257,7 @@ public class Pack200Task extends Pack {
 
 	} catch (IOException ioe) {
 	    ioe.printStackTrace();
-	    throw new BuildException("Error in pack200");	
+	    throw new BuildException("Error in pack200"); // NOI18N
         } finally {
 	    if (doRepack) packFile.delete();
 	}

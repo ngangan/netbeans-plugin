@@ -174,7 +174,7 @@ public final class UIStubGenerator {
                             String id = (String) attrs.getAttribute("id"); //NOI18N 
                             int    len;
                             if ( id != null && (len=id.length()) > 0) {
-                                if ( len > 2 && id.charAt(0) == '"' && id.charAt(len-1) == '"') {
+                                if ( len > 2 && id.charAt(0) == '"' && id.charAt(len-1) == '"') { // NOI18N
                                     m_attrs.add( new AttributeDescription(elemName, id.substring(1, len-1)));
                                 } else {
                                     System.err.println("Invalid node id: " + id);  //NOI18N 
@@ -190,7 +190,7 @@ public final class UIStubGenerator {
 
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            String msgFormat = NbBundle.getMessage(UIStubGenerator.class, "MSG_STUB_CREATED");   //NOI18N 
+                            String msgFormat = NbBundle.getMessage(UIStubGenerator.class, "MSG_STUB_CREATED"); //NOI18N
                             
                             NotifyDescriptor d = new NotifyDescriptor.Confirmation( 
                                     String.format(msgFormat, stubLocation),

@@ -153,7 +153,7 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         if ("BROWSE".equals(command)) { // NOI18N
             JFileChooser chooser = new JFileChooser();
             FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
-            chooser.setDialogTitle(org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Select_Project_Location"));
+            chooser.setDialogTitle(org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Select_Project_Location")); // NOI18N
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
             if (path.length() > 0) {
@@ -189,10 +189,10 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
     }
 
     boolean valid(WizardDescriptor wizardDescriptor) {
-        String message = org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_is_not_a_valid_path");
+        String message = org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_is_not_a_valid_path"); // NOI18N
         if (projectNameTextField.getText().length() == 0) {
             wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
-                    org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Name_is_not_a_valid_folder_name"));
+                    org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Name_is_not_a_valid_folder_name")); // NOI18N
             return false; // Display name not specified
         }
         File f = FileUtil.normalizeFile(new File(projectLocationTextField.getText()).getAbsoluteFile());
@@ -208,7 +208,7 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         }
         if (projLoc == null || !projLoc.canWrite()) {
             wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
-                                    org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_cannot_be_created"));
+                                    org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_cannot_be_created")); // NOI18N
             return false;
         }
 
@@ -221,7 +221,7 @@ public class WeatherFXApplicationPanelVisual extends JPanel implements DocumentL
         if (destFolder.exists() && kids != null && kids.length > 0) {
             // Folder exists and is not empty
             wizardDescriptor.putProperty("WizardPanel_errorMessage", // NOI18N
-                                     org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_already_exists_and_is_not_empty"));
+                                     org.openide.util.NbBundle.getBundle(WeatherFXApplicationPanelVisual.class).getString("Project_Folder_already_exists_and_is_not_empty")); // NOI18N
             return false;
         }
         wizardDescriptor.putProperty("WizardPanel_errorMessage", ""); // NOI18N

@@ -140,7 +140,7 @@ public class ActionController implements ActionLookup {
     
     public final class GenerateUIStubAction extends AbstractFXDAction {
         GenerateUIStubAction() {
-            super("generate_stub", true);
+            super("generate_stub", true); // NOI18N
         }
         public void actionPerformed(ActionEvent e) {
             UIStubGenerator generator = new UIStubGenerator(m_dObj);

@@ -100,7 +100,7 @@ public class TextParser {
             }
 
             public CharSequence subSequence(int start, int end) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException("Not supported yet."); // NOI18N
             }
             
             @Override

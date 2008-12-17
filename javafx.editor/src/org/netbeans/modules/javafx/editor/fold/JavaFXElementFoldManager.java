@@ -528,7 +528,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                         collapsed = importsFold.isCollapsed();
                     }
                     
-                    importsStart += 7/*"import ".length()*/;
+                    importsStart += 7/*"import ".length()*/; // NOI18Nitor
                     
                     if (importsStart < importsEnd) {
                         if (LOGGABLE) log("visitCompilationUnit adding fold [" + importsStart + ":" + importsEnd + "]"); // NOI18N

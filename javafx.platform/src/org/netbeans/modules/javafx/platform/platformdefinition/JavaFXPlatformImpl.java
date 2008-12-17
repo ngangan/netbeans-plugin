@@ -229,7 +229,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
                 pathSpec = prep + getSystemProperties().get(SYSPROP_BOOT_CLASSPATH) + app;
             }
 
-            String ccp = getProperties().get(profile + "compile_classpath");
+            String ccp = getProperties().get(profile + "compile_classpath"); // NOI18N
             ccp = ccp == null || ccp.length() == 0 ? "" :  (File.pathSeparator + ccp);
             pathSpec = pathSpec + ccp;
 

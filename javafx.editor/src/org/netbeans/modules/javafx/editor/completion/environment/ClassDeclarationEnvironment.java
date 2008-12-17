@@ -100,7 +100,7 @@ public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFX
                 if (LOGGABLE) log("  afterExtends: " + afterExtends); // NOI18N
                 addLocalAndImportedTypes(EnumSet.of(CLASS), null, null, false, null);
             } else {
-                addKeyword(EXTENDS_KEYWORD, " ", false);
+                addKeyword(EXTENDS_KEYWORD, " ", false); // NOI18N
             }
         }
     }
