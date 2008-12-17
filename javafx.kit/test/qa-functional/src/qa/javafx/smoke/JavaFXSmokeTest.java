@@ -1,35 +1,27 @@
 package qa.javafx.smoke;
 
-import java.awt.Point;
 import qa.javafx.functional.library.Util;
 import java.io.File;
 import java.io.FileFilter;
 import javax.swing.JToggleButton;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.MainWindowOperator;
-import org.netbeans.jellytools.NewProjectWizardOperator;
-import org.netbeans.jellytools.OutputTabOperator;
-import org.netbeans.jellytools.PaletteOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.nodes.Node;
-import org.netbeans.jellytools.nodes.ProjectRootNode;
 import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
-import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.jemmy.operators.JToggleButtonOperator;
-import org.netbeans.junit.NbTestSuite;
 
 import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.MouseRobot;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
 
@@ -37,6 +29,7 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
+import qa.javafx.functional.library.operator.FXPaletteOperator;
 
 /**
  *
@@ -48,8 +41,8 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
         "testLoadModule",
         "testProjectCreation",
         "testMainFile",
-        "testPalette",
         "testProjectBuilding",
+        "testPalette",
         "testEditor",
         "testPreview",
     };
@@ -197,48 +190,57 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
 
     }
 
+    public void testProjectBuilding() {
+        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        project.build();
+
+
+        System.out.println("Project name: '" + project.getName()  +"'");
+        assertTrue("Project is not built!", project.getOutput().isCompiled());
+    }
 
     public void testPalette() {
         //System.out.println("Test Palette!");
+
+        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        EditorOperator editor = project.getMainEditor();
+        editor.setText("package helloworld;\n");
+
 
         TopComponentOperator main = new TopComponentOperator("Main.fx");
         JTextComponentOperator textComponent = new JTextComponentOperator(main);
 
 
-        PaletteOperator palette = new PaletteOperator();
+        FXPaletteOperator palette = new FXPaletteOperator();
 
         assertNotNull("Palette is not open!!!", palette);
 
-        palette.selectComponent("Frame");
+        palette.selectComponent("Stage");
         
         System.out.println("[palette] Drag and Drop");
+        palette.dragNDrop(textComponent);
+
+//        JListOperator list = palette.lstComponents();
+//        Point point = list.getClickPoint(0);
+//
+//        int x1 = point.x;
+//        int y1 = point.y;
+//
+//        int x2 = textComponent.getCenterXForClick();
+//        int y2 = textComponent.getCenterYForClick();
+//
+//        //System.out.println("[palette] Drag and Drop");
+//
+//        MouseRobot.dragNDrop(list, x1, y1, textComponent, x2, y2);
         
-        JListOperator list = palette.lstComponents();
-        Point point = list.getClickPoint(0);
-        
-        int x1 = point.x;
-        int y1 = point.y;
 
-        int x2 = textComponent.getCenterXForClick();
-        int y2 = textComponent.getCenterYForClick();
-
-        //System.out.println("[palette] Drag and Drop");
-        
-        MouseRobot.dragNDrop(list, x1, y1, textComponent, x2, y2);
-        
-
-        Util.sleep(1000);
-
-    }
-
-    public void testProjectBuilding() {
-        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        Util.sleep(8000);
         project.build();
-        
-        
-        System.out.println("Project name: '" + project.getName()  +"'");
         assertTrue("Project is not built!", project.getOutput().isCompiled());
+        
+
     }
+
     
     public void testEditor() {
 
