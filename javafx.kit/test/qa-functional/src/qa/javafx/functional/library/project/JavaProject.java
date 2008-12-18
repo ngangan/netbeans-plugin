@@ -241,6 +241,7 @@ public class JavaProject extends Project {
         }
 
         //Utils.waitScanningClassPath();
+        Util.waitScanFinished();
 
         return new JavaProject(name, type, location, mainClass);
 

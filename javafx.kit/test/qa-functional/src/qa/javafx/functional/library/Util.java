@@ -14,6 +14,7 @@ import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -200,9 +201,9 @@ public class Util {
     public static void showDetailedInformatin(String blank, Component comp) {
 
         if (FLAG_SHOW_DETAIL_INFORMATION) {
-            if (comp instanceof JButton) {
-                JButton button = (JButton) comp;
-                System.out.println(blank + "[button] { tooltip: " + button.getToolTipText() + " text:" + button.getText() + "}");
+            if (comp instanceof AbstractButton) {
+                AbstractButton button = (AbstractButton) comp;
+                System.out.println(blank + "[abstract button] { tooltip: " + button.getToolTipText() + " text:" + button.getText() + " action command: " + button.getActionCommand() +  "}");
             } else if (comp instanceof JTextComponent) {
                 JTextComponent textComponent = (JTextComponent) comp;
                 System.out.println(blank + "[text]");

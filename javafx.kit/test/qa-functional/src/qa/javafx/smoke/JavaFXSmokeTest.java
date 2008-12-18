@@ -30,6 +30,7 @@ import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
 import qa.javafx.functional.library.operator.FXPaletteOperator;
+import qa.javafx.functional.library.operator.FXPreviewOperator;
 
 /**
  *
@@ -258,7 +259,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     
 
     public void testPreview() {
-        System.setOut(getLog());
+        //System.setOut(getLog());
         Node umlNode = new Node(ProjectsTabOperator.invoke().tree(), PROJECT_NAME_HELLO_WORLD);
         TopComponentOperator main = new TopComponentOperator("Main.fx");
         JTextComponentOperator textComponent = new JTextComponentOperator(main);
@@ -266,11 +267,18 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
         String text = Util.getSampleText(sample);
         assertNotNull("Sample \"" + sample + "\" was not found", text);
         textComponent.setText(text);
-        //new JButtonOperator(main, "Enable Preview").push();
-        ContainerOperator cont = new ContainerOperator(main, new ClassNameComponentChooser("PreviewButton"));
-        //Util.showComponents(cont);
-        JToggleButtonOperator preview = new JToggleButtonOperator((JToggleButton) cont.getSource());
-        preview.push();
+
+        FXPreviewOperator preview = new FXPreviewOperator(main);
+        preview.enable();
+        Util.sleep(7000);
+
+//        //new JButtonOperator(main, "Enable Preview").push();
+//        ContainerOperator cont = new ContainerOperator(main, new ClassNameComponentChooser("PreviewButton"));
+//        //Util.showComponents(cont);
+//        JToggleButtonOperator preview = new JToggleButtonOperator((JToggleButton) cont.getSource());
+//        preview.push();
+
+        
     //Util.sleep(7000);
     //Util.
     //Util.showComponents(main);
