@@ -3,14 +3,12 @@ package qa.javafx.smoke;
 import qa.javafx.functional.library.Util;
 import java.io.File;
 import java.io.FileFilter;
-import javax.swing.JToggleButton;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jemmy.TimeoutExpiredException;
-import org.netbeans.jemmy.operators.ContainerOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
@@ -19,7 +17,6 @@ import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.netbeans.jemmy.operators.JToggleButtonOperator;
 
 import qa.javafx.functional.library.JavaFXTestCase;
 import qa.javafx.functional.library.project.EditorOperator;
@@ -29,6 +26,7 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
+import qa.javafx.functional.library.Constant;
 import qa.javafx.functional.library.operator.FXPaletteOperator;
 import qa.javafx.functional.library.operator.FXPreviewOperator;
 
@@ -46,6 +44,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
         "testPalette",
         "testEditor",
         "testPreview",
+        "testProfiler",
     };
 
 
@@ -292,12 +291,16 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     //Util.showComponents(main);
     }
     
-//     public void testProfiler() {
-//        JavaFXProject profiler  = JavaFXProject.createProject("SmokeProfiler");
-//        EditorOperator main = profiler.openMainFile();
-//        String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
-//        main.insert(code);
-//        Util.sleep(4000);
-//        
-//    }
+     public void testProfiler() {
+        JavaFXProject profiler  = JavaFXProject.createProject("SmokeProfiler");
+        EditorOperator main = profiler.openMainFile();
+        String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
+
+        main.setText(code);
+        profiler.profile();
+        //assertTrue("Prifiler project is not compiled!", profiler.getOutput().isCompiled());
+        Util.sleep(4000);
+
+        
+    }
 }

@@ -283,6 +283,8 @@ public class JavaProject extends Project {
         new JButtonOperator(profileOper, Constant.BUTTON_RUN).push();
         profileOper.waitClosed();
         //waitProgressDialog("Progress", 5000);
+        //Util.waitScanFinished();
+        Util.sleep(4000);
         new TopComponentOperator(Constant.TAB_PROFILER);
         new OutputTabOperator(getName()).waitText("Established local connection with the tool");
         Util.sleep(2000);
