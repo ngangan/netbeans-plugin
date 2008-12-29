@@ -15,9 +15,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import javax.swing.AbstractButton;
-import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
@@ -226,6 +226,18 @@ public class Util {
                         System.out.println(blank + "  [" + i + "," + j + "] " + tableModel.getValueAt(i, j));
                     }
                 }
+            } else if (comp instanceof JTree) {
+                JTree tree = (JTree) comp;
+
+//                TableModel tableModel = table.getModel();
+                System.out.println(blank + "[tree] " + tree);
+//
+//                for (int i = 0; i < tableModel.getRowCount(); i++) {
+//                    for (int j = 0; j < tableModel.getColumnCount(); j++) {
+//                        System.out.println(blank + "  [" + i + "," + j + "] " + tableModel.getValueAt(i, j));
+//                    }
+//                }
+
             }
         }
     }

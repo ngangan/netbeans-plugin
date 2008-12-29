@@ -324,6 +324,10 @@ public class JavaProject extends Project {
         rootNode.buildProject();
     }
 
+    public void run() {
+        rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_RUN);
+    }
+
     public void close() {
         rootNode.performPopupActionNoBlock("Close");
     }

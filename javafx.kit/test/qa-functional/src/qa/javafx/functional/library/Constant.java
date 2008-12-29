@@ -80,15 +80,23 @@ public interface Constant {
 
     // ================   Menu items  ========================
 
+    String POPUP_MENU_ITEM_RUN = "Run Project";
     String POPUP_MENU_ITEM_PROFILE = "Profile";
     String POPUP_MENU_ITEM_DEBUG = "Debug Project";
-    
+    String POPUP_MENU_ITEM_PROPERTIES = "Properties";
+
 
     // ================   Dialogs  ========================
 
     String DIALOG_TITLE_ENABLE_PROFILING = "Enable Profiling";
     String DIALOG_TITLE_DEBUG_PROJECT = "Debug Project";
+    String DIALOG_TITLE_PROPERTIES = "Project Properties";
     
+    // ============    Deployment  ===========================
+    String DEPLOYMENT_STANDARD = "Standard Execution";
+    String DEPLOYMENT_WEB_START = "Web Start Execution";
+    String DEPLOYMENT_BROWSER = "Run in Browser";
+    String DEPLOYMENT_MOBILE = "Run in Mobile Emulator";
     
     // ================   Tests  ========================
     // ============    Smoke  ===========================

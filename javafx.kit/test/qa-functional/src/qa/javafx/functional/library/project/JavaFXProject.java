@@ -40,6 +40,11 @@ package qa.javafx.functional.library.project;
 
 import org.netbeans.jellytools.actions.OpenAction;
 import org.netbeans.jellytools.nodes.Node;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JDialogOperator;
+import org.netbeans.jemmy.operators.JRadioButtonOperator;
+import org.netbeans.jemmy.operators.JTreeOperator;
+import qa.javafx.functional.library.Constant;
 
 /**
  *
@@ -47,16 +52,32 @@ import org.netbeans.jellytools.nodes.Node;
  */
 public class JavaFXProject extends JavaProject {
 
+
+    public DeploymentType deploymentType = DeploymentType.STANDARD;
+
     public JavaFXProject(String name) {
         super(name, ProjectType.JAVAFX_APPLICATION);
+    }
+
+    public JavaFXProject(String name, DeploymentType deploymentType) {
+        super(name, ProjectType.JAVAFX_APPLICATION);
+        this.deploymentType = deploymentType;
     }
 
     public JavaFXProject(JavaProject javaProject) {
         this(javaProject.getName());
     }
 
+    public JavaFXProject(JavaProject javaProject, DeploymentType deploymentType) {
+        this(javaProject.getName(), deploymentType);
+    }
+
     public static JavaFXProject createProject(String name) {
         return new JavaFXProject(JavaProject.createProject(name, ProjectType.JAVAFX_APPLICATION));
+    }
+    public static JavaFXProject createProject(String name, DeploymentType deploymentType) {
+        JavaProject project = JavaProject.createProject(name, ProjectType.JAVAFX_APPLICATION);
+        return new JavaFXProject(project, deploymentType);
     }
 
     public String getMainFile() {
@@ -76,5 +97,38 @@ public class JavaFXProject extends JavaProject {
     
     public EditorOperator getMainEditor() {
         return new EditorOperator(getMainFile());
+    }
+
+    public void deploy() throws Exception{
+        System.out.println("==== Deploy  ====");
+        System.out.println("Deployment type = " + deploymentType);
+        rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_PROPERTIES);
+        //JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_ENABLE_PROFILING, false, true);
+        JDialogOperator propertyDialog = new JDialogOperator(Constant.DIALOG_TITLE_PROPERTIES);
+
+
+        JTreeOperator categoryTree = new JTreeOperator(propertyDialog);
+
+        categoryTree.selectPath(categoryTree.findPath("Run"));
+
+        if(deploymentType == DeploymentType.MOBILE){
+
+            JRadioButtonOperator button = new JRadioButtonOperator(propertyDialog, Constant.DEPLOYMENT_MOBILE);
+            OperationSystem os = OperationSystem.getOS();
+            if(os == OperationSystem.WINDOWS){
+                button.push();
+            } else {
+                if (button.isEnabled()){
+                    throw new Exception("Mobile deployment is enabled on " + os);
+                }
+            }
+            //new JRadioButtonOperator(propertyDialog, Constant.DEPLOYMENT_MOBILE).push();
+        }
+
+        //Util.sleep(6000);
+        
+        new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
+        run();
+       
     }
 }
