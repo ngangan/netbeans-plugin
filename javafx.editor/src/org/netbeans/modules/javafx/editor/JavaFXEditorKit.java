@@ -117,7 +117,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new JavaFXGoToDeclarationAction(),
                 new JavaFXGoToSourceAction(),
                 JavaFXImports.getInstance(),
-                new JavaInsertBreakAction()
+                new JavaFXInsertBreakAction()
         };
         return TextAction.augmentList(superActions, javafxActions);
     }
