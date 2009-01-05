@@ -80,7 +80,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private final CodeStyle cs;
     private static final String NEW_LINE_STRING = "\n"; // NOI18N
     //    private static final String NEW_LINE_STRING = System.getProperty("line.separator", "\n"); // NOI18N
-    protected final DocumentLinesIterator li;           
+    protected final DocumentLinesIterator li;
     private static final String STRING_EMPTY_LENGTH_ONE = " "; // NOI18N
     protected static final String ONE_SPACE = STRING_EMPTY_LENGTH_ONE;
     private TokenSequence<TokenId> ts;
@@ -212,7 +212,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-
 //    private boolean isWidow(Tree node) throws BadLocationException {
 //        final int endPos = getEndPos(node);
 //        int start = getStartPos(node);
@@ -329,7 +328,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (isFirstOnLine(offset)) {
                 hasComment(node, adjustments);
                 indentLine(offset, adjustments);
-            } else if (!isOrphanObjectLiterar){
+            } else if (!isOrphanObjectLiterar) {
                 adjustments.offer(Adjustment.add(createPosition(offset), NEW_LINE_STRING));
                 adjustments.offer(Adjustment.indent(createPosition(offset + 1), indentOffset));
             }
@@ -361,7 +360,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         verifySpacesAroundColon(adjustments, ts);
     }
 
-    @SuppressWarnings({"MethodWithMultipleLoops"}) // NOI18N
+    @SuppressWarnings({"MethodWithMultipleLoops"})
+    // NOI18N
     private void verifyVarSpaces(VariableTree node, Queue<Adjustment> adjustments) throws BadLocationException {
         TokenSequence<JFXTokenId> ts = ts(node);
         while (ts.moveNext()) {
@@ -386,32 +386,65 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     ts.movePrevious();
                     verifySpacesAroundColon(adjustments, ts);
                     return;
-                default: return;
+                default:
+                    return;
 
             }
         }
     }
 
+    @SuppressWarnings({"MethodWithMultipleLoops", "OverlyNestedMethod", "OverlyComplexMethod", // NOI18N
+            "MethodWithMoreThanThreeNegations", "OverlyLongMethod" }) // NOI18N 
     private void verifySpacesAroundColon(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
-        // INDETIFIER (WS* COLON|QE) WS+ ANY
+        // INDETIFIER WS* (COLON|EQ) WS+ ANY
         if (ts.moveNext()) {
             if (ts.token().id() == JFXTokenId.IDENTIFIER) {
                 int start = ts.offset() + ts.token().length();
-                if (moveTo(ts, JFXTokenId.COLON) != null) {
-                    if (ts.offset() != start) {
-                        adjustments.offer(Adjustment.delete(createPosition(start), createPosition(ts.offset())));
-                    }
-                    // verifying spaces beyond COLON
-                    start = ts.offset() + ts.offsetToken().length();
-                    while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
-                    }
-                    if (ts.offset() - start > 1) {
-                        adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
-                    } else if (ts.offset() == start) {
-                        adjustments.offer(Adjustment.add(createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                boolean terminate = false;
+                while (!terminate && ts.moveNext()) {
+                    JFXTokenId id = ts.token().id();
+                    switch (id) {
+                        case WS:
+                            continue;
+                        case COLON: {
+                            if (ts.offset() != start) {
+                                adjustments.offer(Adjustment.delete(createPosition(start), createPosition(ts.offset())));
+                            }
+                            terminate = true;
+                            break;
+                        }
+                        case EQ: {
+//                            skipWS(ts);
+                            int length = ts.offset() - start;
+                            if (cs.spaceAroundAssignOps()) {
+                                if (length != 1) {
+                                    adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), ONE_SPACE));
+                                }
+                            } else if (length != 0) {
+                                adjustments.offer(Adjustment.delete(createPosition(start), createPosition(ts.offset())));
+                            }
+                            terminate = true;
+                            break;
+                        }
+                        default: return;
                     }
                 }
+//                ts.movePrevious();
+                // verifying spaces beyond COLON
+                start = ts.offset() + ts.offsetToken().length();
+                skipWS(ts);
+                if (ts.offset() - start > 1) {
+                    adjustments.offer(Adjustment.replace(createPosition(start), createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                } else if (ts.offset() == start) {
+                    adjustments.offer(Adjustment.add(createPosition(ts.offset()), STRING_EMPTY_LENGTH_ONE));
+                }
+
             }
+        }
+    }
+
+    private void skipWS(TokenSequence<JFXTokenId> ts) {
+        while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
         }
     }
 
@@ -815,7 +848,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
-    @SuppressWarnings({"OverlyComplexMethod", "OverlyLongMethod"}) // NOI18N
+    @SuppressWarnings({"OverlyComplexMethod", "OverlyLongMethod"})
+    // NOI18N
     private void verifyBraces(Tree node, Queue<Adjustment> adjustments, BracePlacement bp, boolean spaceBeforeLeftBrace) throws BadLocationException {
         final TokenSequence<JFXTokenId> ts = tu.tokensFor(node);
         Token<JFXTokenId> obrace = moveTo(ts, JFXTokenId.LBRACE);
@@ -919,7 +953,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return info.getCompilationUnit();
     }
 
-    @SuppressWarnings({"unchecked"})   // NOI18N
+    @SuppressWarnings({"unchecked"})
+    // NOI18N
     private /*<T extends TokenId> */TokenSequence<? extends TokenId> ts() {
         if (ts != null && ts.isValid()) {
             return (TokenSequence) ts;
@@ -1453,7 +1488,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-    @SuppressWarnings({"MethodWithMultipleLoops"})   // NOI18N
+    @SuppressWarnings({"MethodWithMultipleLoops"})
+    // NOI18N
     private void verifyParens(Tree node, Queue<Adjustment> adjustments, boolean spaceBeforParen, boolean spaceWithin) throws BadLocationException {
         final TokenSequence<JFXTokenId> ts = ts(node);
         ts.move(getStartPos(node));
@@ -1552,9 +1588,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             while (ts.moveNext()) {
                 JFXTokenId id = ts.token().id();
                 switch (id) {
-                    case RBRACE: return ts.offset()+1;
-                    case WS: continue;
-                    default: return getEndPos(node);
+                    case RBRACE:
+                        return ts.offset() + 1;
+                    case WS:
+                        continue;
+                    default:
+                        return getEndPos(node);
                 }
             }
         }
@@ -1567,9 +1606,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             while (ts.moveNext()) {
                 JFXTokenId id = ts.token().id();
                 switch (id) {
-                    case RBRACE: return true;
-                    case WS: continue;
-                    default: return false;
+                    case RBRACE:
+                        return true;
+                    case WS:
+                        continue;
+                    default:
+                        return false;
                 }
             }
         }
