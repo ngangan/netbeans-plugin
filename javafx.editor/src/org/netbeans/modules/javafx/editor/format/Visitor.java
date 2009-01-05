@@ -414,7 +414,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                             break;
                         }
                         case EQ: {
-//                            skipWS(ts);
                             int length = ts.offset() - start;
                             if (cs.spaceAroundAssignOps()) {
                                 if (length != 1) {
@@ -429,7 +428,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                         default: return;
                     }
                 }
-//                ts.movePrevious();
                 // verifying spaces beyond COLON
                 start = ts.offset() + ts.offsetToken().length();
                 skipWS(ts);
@@ -571,7 +569,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             if (!trees.isEmpty()) {
                 tree = trees.get(trees.size() - 1);
             }
-            boolean format = tree != null && !endsOnSameLine(tree, node);
+            boolean format = tree != null/* && !endsOnSameLine(tree, node)*/;
             if (isMultiline(node) && format) {
                 indentLine(getEndPos(node), adjustments);
             }
