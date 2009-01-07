@@ -322,6 +322,15 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
     public static class JavaDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
 
+        /**
+         * Check whether there was any important character typed
+         * so that the line should be possibly reformatted.
+         */
+        @Override
+        protected void checkIndent(JTextComponent target, String typedText) {
+            super.checkIndent(target, typedText);
+        }
+
         @Override
         protected void insertString(BaseDocument doc, int dotPos,
                                     Caret caret, String str,

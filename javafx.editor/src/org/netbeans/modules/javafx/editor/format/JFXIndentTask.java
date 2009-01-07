@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.format;
 
+import com.sun.javafx.api.tree.FunctionValueTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -99,25 +100,25 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reindent() throws BadLocationException {
-        if (context == null) {
-            return;
-        }
-        if (log.isLoggable(Level.FINE)) log.fine("Reindent...");
-
-        final List<Context.Region> regions = context.indentRegions();
-        if (!regions.isEmpty()) {
-            for (Context.Region region : regions) {
-                if (log.isLoggable(Level.FINE))
-                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
-                indentRegion(region);
-            }
-        } else {
-            if (log.isLoggable(Level.FINE))
-                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]");
-            indentLine(context.startOffset());
-        }
-        if (log.isLoggable(Level.FINE)) log.fine("... done!");
-//        reformat();
+//        if (context == null) {
+//            return;
+//        }
+//        if (log.isLoggable(Level.FINE)) log.fine("Reindent...");
+//
+//        final List<Context.Region> regions = context.indentRegions();
+//        if (!regions.isEmpty()) {
+//            for (Context.Region region : regions) {
+//                if (log.isLoggable(Level.FINE))
+//                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
+//                indentRegion(region);
+//            }
+//        } else {
+//            if (log.isLoggable(Level.FINE))
+//                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]");
+//            indentLine(context.startOffset());
+//        }
+//        if (log.isLoggable(Level.FINE)) log.fine("... done!");
+        reformat();
     }
 
     private void indentLine(int offset) throws BadLocationException {
@@ -210,10 +211,10 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             int nlo = adjustOffsetToNewLine(lso, lso); //start offset of next line
             if (KEEP_LEVEL_PTRN.matcher(document.getText(lso, nlo - lso)).matches()) {
                 // if current line is "closing" line move it -1 level.
-                level -= getIndentStepLevel();
+//                level -= getIndentStepLevel();
             } else if (KEEP_LEVEL_PTRN.matcher(document.getText(ls, lso - ls)).matches()) {
                 // if previous line is "closing" line move this +1 level.
-                level += getIndentStepLevel();
+//                level += getIndentStepLevel();
             } else {
                 final String previousLineText = document.getText(ls, lso - ls);
                 if (previousLineText.trim().endsWith(":")
@@ -273,9 +274,50 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reformat() throws BadLocationException {
+//        final JavaFXSource s = JavaFXSource.forDocument(context.document());
+//        try {
+//            s.runUserActionTask(new Task<CompilationController>() {
+//                public void run(CompilationController controller) throws Exception {
+//                    final long s = System.currentTimeMillis();
+//                    final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
+//                    if (log.isLoggable(Level.INFO))
+//                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
+//                    if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
+//                        if (log.isLoggable(Level.INFO))
+//                            log.info("The " + phase + " phase has been reached ... OK!");
+//                        final int offset = context.startOffset();
+//                        final TreeUtilities tu = controller.getTreeUtilities();
+//                        JavaFXTreePath path;
+//                        if (offset > 0) {
+//                            path = tu.pathFor(offset);
+//                        } else {
+//                            path = tu.pathFor(offset);
+//                            while (path.getParentPath() != null) {
+//                                path = path.getParentPath();
+//                            }
+//                        }
+//                        final int position = (int) controller.getTrees().getSourcePositions()
+//                                .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
+//                        int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
+//                        Visitor visitor = new Visitor(controller, context, dot);
+////                        final Queue<Adjustment> adjustments = new MaskedQueue();
+//                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
+//                        visitor.scan(path, adjustments);
+//                        applyAdjustments(adjustments);
+//                    }
+//                }
+//            }, true);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+        reformat(context.indentRegions());
+    }
+
+    public void reformat(final List<Context.Region> regions) throws BadLocationException {
         final JavaFXSource s = JavaFXSource.forDocument(context.document());
         try {
             s.runUserActionTask(new Task<CompilationController>() {
+                @SuppressWarnings({"MethodWithMultipleLoops"}) // NOI18N
                 public void run(CompilationController controller) throws Exception {
                     final long s = System.currentTimeMillis();
                     final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
@@ -284,24 +326,32 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                     if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
                         if (log.isLoggable(Level.INFO))
                             log.info("The " + phase + " phase has been reached ... OK!");
-                        final int offset = context.startOffset();
-                        final TreeUtilities tu = controller.getTreeUtilities();
-                        JavaFXTreePath path;
-                        if (offset > 0) {
-                            path = tu.pathFor(offset);
-                        } else {
-                            path = tu.pathFor(offset);
-                            while (path.getParentPath() != null) {
-                                path = path.getParentPath();
-                            }
-                        }
-                        final int position = (int) controller.getTrees().getSourcePositions()
-                                .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
-                        int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
-                        Visitor visitor = new Visitor(controller, context, dot);
-//                        final Queue<Adjustment> adjustments = new MaskedQueue();
+
+
                         final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
-                        visitor.scan(path, adjustments);
+                        for (Context.Region region : regions) {
+                            if (log.isLoggable(Level.INFO))
+                                log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
+                            final int offset = region.getStartOffset();
+                            final TreeUtilities tu = controller.getTreeUtilities();
+                            JavaFXTreePath path;
+                            if (offset > 0) {
+                                path = tu.pathFor(offset);
+                                if (path.getLeaf() instanceof FunctionValueTree) {
+                                    path = path.getParentPath();
+                                }
+                            } else {
+                                path = tu.pathFor(offset);
+                                while (path.getParentPath() != null) {
+                                    path = path.getParentPath();
+                                }
+                            }                            
+                            final int position = (int) controller.getTrees().getSourcePositions()
+                                    .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
+                            int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
+                            Visitor visitor = new Visitor(controller, context, dot);
+                            visitor.scan(path, adjustments);
+                        }
                         applyAdjustments(adjustments);
                     }
                 }
@@ -309,10 +359,6 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        } else {
-//            reindent();
-//        }
-
     }
 
     private class MaskedQueue implements Queue<Adjustment> {

@@ -846,8 +846,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
-    @SuppressWarnings({"OverlyComplexMethod", "OverlyLongMethod"})
-    // NOI18N
+    @SuppressWarnings({"OverlyComplexMethod", "OverlyLongMethod"}) // NOI18N
     private void verifyBraces(Tree node, Queue<Adjustment> adjustments, BracePlacement bp, boolean spaceBeforeLeftBrace) throws BadLocationException {
         final TokenSequence<JFXTokenId> ts = tu.tokensFor(node);
         Token<JFXTokenId> obrace = moveTo(ts, JFXTokenId.LBRACE);
@@ -951,8 +950,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return info.getCompilationUnit();
     }
 
-    @SuppressWarnings({"unchecked"})
-    // NOI18N
+    @SuppressWarnings({"unchecked"}) // NOI18N
     private /*<T extends TokenId> */TokenSequence<? extends TokenId> ts() {
         if (ts != null && ts.isValid()) {
             return (TokenSequence) ts;
@@ -1056,6 +1054,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private int getStartPos(Tree node) {
         int start = (int) sp().getStartPosition(cu(), node);
+        //noinspection unchecked
         TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
         ts.move(start);
         while (ts.movePrevious()) {
@@ -1103,6 +1102,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return super.visitCompilationUnit(node, adjustments);
     }
 
+    @SuppressWarnings({"OverlyLongMethod"}) // NOI18N
     @Override
     public Queue<Adjustment> visitClassDeclaration(ClassDeclarationTree node, Queue<Adjustment> adjustments) {
         if (isSynthetic((JFXTree) node)) {
@@ -1378,6 +1378,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private void verifySpaceBefore(Queue<Adjustment> adjustments, boolean spaceBefore, int start) throws BadLocationException {
         if (!isFirstOnLine(start) && spaceBefore) {
+            //noinspection unchecked
             final TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
             ts.move(start);
             if (ts.movePrevious() && ts.token().id() != JFXTokenId.WS) {
