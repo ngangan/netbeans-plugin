@@ -42,6 +42,9 @@
 package org.netbeans.modules.javafx.platform.wizard;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -370,6 +373,18 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                  return;
             }
             this.wiz.putProperty("WizardPanel_errorMessage", ""); //NOI18N
+            String pv = "???";//NOI18N
+            f = new File(f, "timestamp");
+            if (f.isFile()) try {
+                FileInputStream in = new FileInputStream(f);
+                Properties ts = new Properties();
+                ts.load(in);
+                in.close();
+                pv = ts.getProperty("Product"); //NOI18N
+            } catch (IOException e) {
+                //ignore
+            }
+            if (!pv.startsWith("javafx-1.1")) this.wiz.putProperty("WizardPanel_errorMessage", NbBundle.getMessage(DetectPanel.class, "WARNING_WrongVersion", pv));    //NOI18N
             setValid(true);            
         }
     }    
