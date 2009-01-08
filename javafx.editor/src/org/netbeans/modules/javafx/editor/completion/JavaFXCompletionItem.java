@@ -320,6 +320,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return "java.lang.Integer".equals(toImport) || // NOI18N
                "java.lang.Boolean".equals(toImport) || // NOI18N
                "java.lang.Number".equals(toImport) || // NOI18N
+               "java.lang.Short".equals(toImport) || // NOI18N
+               "java.lang.Long".equals(toImport) || // NOI18N
+               "java.lang.Byte".equals(toImport) || // NOI18N
+               "java.lang.Float".equals(toImport) || // NOI18N
+               "java.lang.Double".equals(toImport) || // NOI18N
+               "java.lang.Character".equals(toImport) || // NOI18N
                "java.lang.String".equals(toImport) || // NOI18N
                (    toImport.startsWith("javafx.lang.") && // NOI18N
                     !"javafx.lang.Builtins".equals(toImport) // NOI18N
@@ -1575,14 +1581,26 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 if (s.startsWith("int")) { // NOI18N
                     s = "Integer" + s.substring(3); // NOI18N
                 }
-                if (s.startsWith("double") || s.startsWith("Double")) { // NOI18N
-                    s = "Number" + s.substring("double".length()); // NOI18N
+                if (s.startsWith("double")) { // NOI18N
+                    s = "D" + s.substring(1); // NOI18N
                 }
                 if (s.startsWith("long")) { // NOI18N
-                    s = "Integer" + s.substring(4); // NOI18N
+                    s = "L" + s.substring(1); // NOI18N
                 }
                 if (s.startsWith("boolean")) { // NOI18N
                     s = "B" + s.substring(1); // NOI18N
+                }
+                if (s.startsWith("char")) {
+                    s = "Character" + s.substring(4);
+                }
+                if (s.startsWith("float")) {
+                    s = "F" + s.substring(1);
+                }
+                if (s.startsWith("short")) {
+                    s = "S" + s.substring(1);
+                }
+                if (s.startsWith("byte")) {
+                    s = "B" + s.substring(1);
                 }
                 if (s.startsWith("void")) { // NOI18N
                     s = "V" + s.substring(1); // NOI18N
