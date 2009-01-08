@@ -1137,8 +1137,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("addBasicTypes "); // NOI18N
         addBasicType("Boolean", "boolean"); // NOI18N
         addBasicType("Integer", "int"); // NOI18N
-        addBasicType("Number", "double"); // NOI18N
+        addBasicType("Number", "float"); // NOI18N
         addBasicType("String", "String"); // NOI18N
+        // new ones in 1.1:
+        addBasicType("Long", "long"); // NOI18N
+        addBasicType("Short", "short"); // NOI18N
+        addBasicType("Byte", "byte"); // NOI18N
+        addBasicType("Float", "float"); // NOI18N
+        addBasicType("Double", "double"); // NOI18N
+        addBasicType("Character", "char"); // NOI18N
     }
 
     private void addBasicType(String name1, String name2) {
