@@ -255,7 +255,9 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
-            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true"/>
+            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true">
+                <arg line="${{application.args}}"/>
+            </java>
         </target>
         <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
