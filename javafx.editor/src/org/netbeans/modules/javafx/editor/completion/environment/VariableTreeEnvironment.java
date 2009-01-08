@@ -48,7 +48,7 @@ import com.sun.tools.javafx.tree.JFXErroneousType;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-
+import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.LAZY_KEYWORD;
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -82,9 +82,14 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         }
         TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
         if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id())); // NOI18N
-        if ((last != null) && (last.token().id() == JFXTokenId.EQ)) {
+        if ((last != null) && (last.token().id() == JFXTokenId.EQ ||
+                last.token().id() == JFXTokenId.BIND  ||
+                last.token().id() == JFXTokenId.LAZY)) {
             localResult(getSmartType(t));
             addValueKeywords();
+            if (last.token().id() == JFXTokenId.BIND) {
+                addKeyword(LAZY_KEYWORD, null, false);
+            }
         }
     }
 
