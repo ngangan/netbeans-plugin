@@ -90,7 +90,7 @@ public class SDKSamplesFileSystem extends MultiFileSystem {
         FileObject xml = FileUtil.createData( folder, "sdksamples.xml" ); // NOI18N
 
         // Get all files in samples
-        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk1.0/samples", // NOI18N
+        File fxPath = InstalledFileLocator.getDefault().locate( "javafx-sdk/samples", // NOI18N
                 "org.netbeans.modules.javafx", false ); // NOI18N
         if( fxPath == null ) return null;
         String descriptionsXml = "", samplesXml = ""; // NOI18N

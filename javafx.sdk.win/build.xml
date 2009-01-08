@@ -52,9 +52,13 @@ made subject to such option by the copyright holder.
 	<target name="init-release-external" depends="basic-init">
 		<taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="lib/FXSDKAntTask.jar"/>
 		<mkdir dir="external"/>
-		<get src="${javafx-sdk.win.url}" dest="${javafx-sdk.win.zip}" usetimestamp="true" verbose="true"/>
-		<SetReleaseExternal propertynameprefix="release.${javafx-sdk.win.zip}!/">
-			<zipfileset src="${javafx-sdk.win.zip}" excludes="**/lib/*.jar.pack.gz"/>
+		<get src="${javafx-sdk.win.url}" dest="external/javafx_sdk-windows.zip" usetimestamp="true" verbose="true"/>
+    <delete dir="external/javafx_sdk-windows" quiet="true"/>
+    <unzip src="external/javafx_sdk-windows.zip" dest="external/javafx_sdk-windows">
+        <regexpmapper from="^[^/]*/(.*)$" to="javafx-sdk/\1" handledirsep="yes"/>   
+    </unzip>
+		<SetReleaseExternal propertynameprefix="release.external/javafx_sdk-windows/">
+			<fileset dir="external/javafx_sdk-windows" excludes="**/lib/*.jar.pack.gz"/>
 		</SetReleaseExternal>
 	</target>
 
@@ -62,7 +66,7 @@ made subject to such option by the copyright holder.
 
     <target name="javafx-sdk">
 		<BuildLibDesc libfile="build/classes/org/netbeans/modules/javafx/sdk/win/FXUserLib.xml" headerfile="libhead.xml" tailfile="libtail.xml" itemprefix="        &lt;resource>jar:nbinst:///" itemsuffix="!/&lt;/resource>">
-			<zipfileset src="${javafx-sdk.win.zip}" includes="**/lib/*.jar"/>
+			<fileset dir="external/javafx_sdk-windows" includes="**/lib/*.jar"/>
 		</BuildLibDesc>
     </target>
 

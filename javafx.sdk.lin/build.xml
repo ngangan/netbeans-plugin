@@ -52,9 +52,13 @@ made subject to such option by the copyright holder.
 	<target name="init-release-external" depends="basic-init">
 		<taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="../javafx.sdk.win/lib/FXSDKAntTask.jar"/>
 		<mkdir dir="external"/>
-		<get src="${javafx-sdk.lin.url}" dest="${javafx-sdk.lin.zip}" usetimestamp="true" verbose="true"/>
-		<SetReleaseExternal propertynameprefix="release.${javafx-sdk.lin.zip}!/">
-			<zipfileset src="${javafx-sdk.lin.zip}"/>
+		<get src="${javafx-sdk.lin.url}" dest="external/javafx_sdk-linux.zip" usetimestamp="true" verbose="true"/>
+    <delete dir="external/javafx_sdk-linux" quiet="true"/>
+    <unzip src="external/javafx_sdk-linux.zip" dest="external/javafx_sdk-linux">
+        <regexpmapper from="^[^/]*/(.*)$" to="javafx-sdk/\1" handledirsep="yes"/>   
+    </unzip>
+		<SetReleaseExternal propertynameprefix="release.external/javafx_sdk-linux/">
+			<fileset dir="external/javafx_sdk-linux" excludes="**/lib/*.jar.pack.gz"/>
 		</SetReleaseExternal>
 	</target>
 
@@ -62,7 +66,7 @@ made subject to such option by the copyright holder.
 
     <target name="javafx-sdk">
 		<BuildLibDesc libfile="build/classes/org/netbeans/modules/javafx/sdk/lin/FXUserLib.xml" headerfile="libhead.xml" tailfile="libtail.xml" itemprefix="        &lt;resource>jar:nbinst:///" itemsuffix="!/&lt;/resource>">
-			<zipfileset src="${javafx-sdk.lin.zip}" includes="**/lib/*.jar"/>
+			<fileset dir="external/javafx_sdk-linux" includes="**/lib/*.jar"/>
 		</BuildLibDesc>
     </target>
 
