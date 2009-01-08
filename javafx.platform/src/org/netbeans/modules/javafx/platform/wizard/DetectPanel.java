@@ -42,6 +42,9 @@
 package org.netbeans.modules.javafx.platform.wizard;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -305,7 +308,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             int i = 1;
             while (!checkName(name = NbBundle.getMessage(DetectPanel.class, "TXT_DefaultPlaformName", String.valueOf(i)))) i++; // NOI18N
             component.jdkName.setText(name);
-            File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk1.0/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
+            File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
             if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
                 fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
             if (fxPath != null && fxPath.isFile()) component.fxFolder.setText(fxPath.getParentFile().getParentFile().getParent());
@@ -370,6 +373,18 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                  return;
             }
             this.wiz.putProperty("WizardPanel_errorMessage", ""); //NOI18N
+            String pv = "???";//NOI18N
+            f = new File(f, "timestamp");
+            if (f.isFile()) try {
+                FileInputStream in = new FileInputStream(f);
+                Properties ts = new Properties();
+                ts.load(in);
+                in.close();
+                pv = ts.getProperty("Product"); //NOI18N
+            } catch (IOException e) {
+                //ignore
+            }
+            if (!pv.startsWith("javafx-1.1")) this.wiz.putProperty("WizardPanel_errorMessage", NbBundle.getMessage(DetectPanel.class, "WARNING_WrongVersion", pv));    //NOI18N
             setValid(true);            
         }
     }    

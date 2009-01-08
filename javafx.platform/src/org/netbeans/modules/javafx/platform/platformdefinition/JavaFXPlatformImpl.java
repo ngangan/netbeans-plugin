@@ -352,8 +352,9 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
     }
     
     protected static void loadProfileProperties(File fxFolder, Map properties) {
-        FileInputStream in = null;        
-        for (File f : new File(fxFolder, "profiles").listFiles()) if (f.isFile() && f.getName().endsWith(".properties")) try { // NOI18N
+        FileInputStream in = null;     
+        File profilesDir = new File(fxFolder, "profiles"); //NOI18N
+        if (profilesDir.isDirectory()) for (File f : profilesDir.listFiles()) if (f.isFile() && f.getName().endsWith(".properties")) try { // NOI18N
             String profile = f.getName().substring(0, f.getName().length() - 11).toLowerCase() + '_'; // NOI18N
             in = new FileInputStream(f);
             Properties p = new Properties();

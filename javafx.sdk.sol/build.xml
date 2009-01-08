@@ -52,9 +52,13 @@ made subject to such option by the copyright holder.
 	<target name="init-release-external" depends="basic-init">
 		<taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="../javafx.sdk.win/lib/FXSDKAntTask.jar"/>
 		<mkdir dir="external"/>
-		<get src="${javafx-sdk.sol.url}" dest="${javafx-sdk.sol.zip}" usetimestamp="true" verbose="true"/>
-		<SetReleaseExternal propertynameprefix="release.${javafx-sdk.sol.zip}!/">
-			<zipfileset src="${javafx-sdk.sol.zip}"/>
+		<get src="${javafx-sdk.sol.url}" dest="external/javafx_sdk-solaris.zip" usetimestamp="true" verbose="true"/>
+    <delete dir="external/javafx_sdk-solaris" quiet="true"/>
+    <unzip src="external/javafx_sdk-solaris.zip" dest="external/javafx_sdk-solaris">
+        <regexpmapper from="^[^/]*/(.*)$" to="javafx-sdk/\1" handledirsep="yes"/>   
+    </unzip>
+		<SetReleaseExternal propertynameprefix="release.external/javafx_sdk-solaris/">
+			<fileset dir="external/javafx_sdk-solaris" excludes="**/lib/*.jar.pack.gz"/>
 		</SetReleaseExternal>
 	</target>
 
@@ -62,7 +66,7 @@ made subject to such option by the copyright holder.
 
     <target name="javafx-sdk">
 		<BuildLibDesc libfile="build/classes/org/netbeans/modules/javafx/sdk/sol/FXUserLib.xml" headerfile="libhead.xml" tailfile="libtail.xml" itemprefix="        &lt;resource>jar:nbinst:///" itemsuffix="!/&lt;/resource>">
-			<zipfileset src="${javafx-sdk.sol.zip}" includes="**/lib/*.jar"/>
+			<fileset dir="external/javafx_sdk-solaris" includes="**/lib/*.jar"/>
 		</BuildLibDesc>
     </target>
 
