@@ -36,16 +36,18 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.TreeSet;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
+ * @todo Make it cancelable.
  */
 class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collection<Element>> {
     private final CompilationInfo info;
     protected UnitTree cu;
-    private final Collection<Name> variableNames = new TreeSet<Name>();
+    private final Collection<Name> variableNames = new TreeSet<Name>(new InnerComparator());
 
     IdentifierVisitor(CompilationInfo info) {
         this.info = info;
@@ -97,5 +99,12 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         super.visitFunctionValue(node, elements);
         return elements;
 
+    }
+
+    private static class InnerComparator implements Comparator<Name> {
+
+        public int compare(Name o1, Name o2) {            
+            return o1 != null ? o2 != null ? (o1.contentEquals(o2) ? 0 : 1) : -1 : 1;
+        }
     }
 }

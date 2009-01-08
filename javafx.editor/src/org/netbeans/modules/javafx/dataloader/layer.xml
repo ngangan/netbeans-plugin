@@ -45,49 +45,51 @@ made subject to such option by the copyright holder.
     <folder name="Services">
         <folder name="MIMEResolver">
             <file name="JavaFXResolver.xml" url="JavaFXResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
                 <attr name="position" intvalue="115"/>
             </file>
         </folder>
     </folder>
-<!--
-    <folder name="Actions">
-        <folder name="FXProject">
-            <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance">
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.JavaFXProjectModule.runApplet"/>
+    <!--
+        <folder name="Actions">
+            <folder name="FXProject">
+                <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance">
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.JavaFXProjectModule.runApplet"/>
+                </file>
+            </folder>
+        </folder>
+
+        <folder name="Keymaps">
+            <folder name="Emacs">
+                <file name="DS-F11.shadow">
+                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
+                </file>
+             </folder>
+             <folder name="NetBeans55">
+                 <file name="DS-F11.shadow">
+                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
+                </file>
+             </folder>
+             <folder name="NetBeans">
+                 <file name="DS-F11.shadow">
+                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
+                </file>
+             </folder>
+        </folder>
+
+        <folder name="Shortcuts">
+            <file name="DS-F11.shadow">
+                <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
             </file>
         </folder>
-    </folder>
-
-    <folder name="Keymaps">
-        <folder name="Emacs">
-            <file name="DS-F11.shadow">
-                <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
-            </file>
-         </folder>
-         <folder name="NetBeans55">
-             <file name="DS-F11.shadow">
-                <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
-            </file>
-         </folder>
-         <folder name="NetBeans">
-             <file name="DS-F11.shadow">
-                <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
-            </file>
-         </folder>
-    </folder>
-
-    <folder name="Shortcuts">
-        <file name="DS-F11.shadow">
-            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
-        </file>
-    </folder>
--->    
+    -->
 
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fx">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
                 <file name="org-netbeans-modules-javafx-editor-semantic-HighlightsLayerFactoryImpl.instance"/>
                 <folder name="UpToDateStatusProvider">
                     <file name="org-netbeans-modules-javafx-editor-semantic-OccurrencesMarkProviderCreator.instance">
@@ -100,11 +102,13 @@ made subject to such option by the copyright holder.
 
                 <folder name="HyperlinkProviders">
                     <file name="JavaFXHyperlinkProvider.instance">
-                        <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.editor.JavaFXHyperlinkProvider"/>
-                        <attr name="instanceOf" stringvalue="org.netbeans.lib.editor.hyperlink.spi.HyperlinkProviderExt"/>
+                        <attr name="instanceClass"
+                              stringvalue="org.netbeans.modules.javafx.editor.JavaFXHyperlinkProvider"/>
+                        <attr name="instanceOf"
+                              stringvalue="org.netbeans.lib.editor.hyperlink.spi.HyperlinkProviderExt"/>
                     </file>
                 </folder>
-                
+
                 <folder name="Macros">
                     <folder name="Defaults">
                         <file name="org-netbeans-modules-javafx-editor-macros.xml" url="DefaultMacros.xml"/>
@@ -114,7 +118,8 @@ made subject to such option by the copyright holder.
                 <folder name="CodeTemplates">
                     <folder name="Defaults">
                         <file name="org-netbeans-modules-editor-javafx-codetemplates.xml" url="DefaultAbbrevs.xml">
-                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                            <attr name="SystemFileSystem.localizingBundle"
+                                  stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
                         </file>
                     </folder>
                 </folder>
@@ -123,30 +128,34 @@ made subject to such option by the copyright holder.
                         <attr name="position" intvalue="1500"/>
                     </file>
                 </folder>
-                
+
                 <folder name="FoldManager">
                     <file name="org-netbeans-editor-CustomFoldManager$Factory.instance"/>
                     <file name="org-netbeans-modules-javafx-editor-fold-JavaFXElementFoldManagerFactory.instance"/>
                 </folder>
-                
+
                 <folder name="Preferences">
                     <folder name="Defaults">
-                        <file name="org-netbeans-modules-javafx-editor-preferences.xml" url="DefaultPreferences.xml" />
+                        <file name="org-netbeans-modules-javafx-editor-preferences.xml" url="DefaultPreferences.xml"/>
                     </folder>
                 </folder>
 
                 <folder name="FontsColors">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml" url="resources/NetBeans-JavaFX-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                            <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml"
+                                  url="resources/NetBeans-JavaFX-fontsColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle"
+                                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
                             </file>
                         </folder>
                     </folder>
                     <folder name="CityLights">
                         <folder name="Defaults">
-                            <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml" url="resources/CityLights-JavaFX-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                            <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml"
+                                  url="resources/CityLights-JavaFX-fontsColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle"
+                                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
                             </file>
                         </folder>
                     </folder>
@@ -155,8 +164,10 @@ made subject to such option by the copyright holder.
                 <folder name="Keybindings">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="org-netbeans-modules-javafx-editor-keybindings.xml" url="DefaultKeyBindings.xml"/>
-                            <file name="org-netbeans-modules-javafx-editor-keybindings-mac.xml" url="DefaultKeyBindings-Mac.xml">
+                            <file name="org-netbeans-modules-javafx-editor-keybindings.xml"
+                                  url="DefaultKeyBindings.xml"/>
+                            <file name="org-netbeans-modules-javafx-editor-keybindings-mac.xml"
+                                  url="DefaultKeyBindings-Mac.xml">
                                 <attr name="nbeditor-settings-targetOS" stringvalue="OS_MAC"/>
                             </file>
                         </folder>
@@ -186,27 +197,27 @@ made subject to such option by the copyright holder.
                         </file>
                     </folder>
                 </folder>
-                
+
                 <folder name="CompletionProviders">
                     <file name="org-netbeans-modules-javafx-editor-completion-JavaFXCompletionProvider.instance"/>
-                <!--    <file name="org-netbeans-modules-java-editor-javadoc-JavadocCompletionProvider.instance"/> -->
+                    <!--    <file name="org-netbeans-modules-java-editor-javadoc-JavadocCompletionProvider.instance"/> -->
                 </folder>
-                
+
                 <folder name="UpToDateStatusProvider">
                     <file name="org-netbeans-modules-javafx-editor-semantic-UpToDateStatusProviderFactoryImpl.instance">
                     </file>
                 </folder>
-                
+
                 <file name="EditorKit.instance">
                     <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.editor.JavaFXEditorKit"/>
                 </file>
-               
+
                 <folder name="BracesMatchers">
                     <file name="org-netbeans-modules-javafx-editor-JavaFXBracesMatcher.instance">
                         <attr name="position" intvalue="130"/>
                     </file>
                 </folder>
-                
+
                 <folder name="Popup">
                     <file name="format">
                         <attr name="position" intvalue="1490"/>
@@ -218,17 +229,17 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1940"/>
                     </file>
-<!--                    
-                    <file name="RunFile.instance">
-                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.project.JavaProjectModule.run"/>
-                        <attr name="position" intvalue="1950"/>
-                    </file>
-                    
-                    <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
-                        <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
-                        <attr name="position" intvalue="1955"/>
-                    </file>
--->                    
+                    <!--
+                                        <file name="RunFile.instance">
+                                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.project.JavaProjectModule.run"/>
+                                            <attr name="position" intvalue="1950"/>
+                                        </file>
+
+                                        <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
+                                            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
+                                            <attr name="position" intvalue="1955"/>
+                                        </file>
+                    -->
                     <file name="SeparatorBeforeCut.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1960"/>
@@ -241,7 +252,7 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-    
+
     <folder name="OptionsDialog">
         <folder name="PreviewExamples">
             <folder name="text">
@@ -253,10 +264,11 @@ made subject to such option by the copyright holder.
     <folder name="Loaders">
         <folder name="text">
             <folder name="x-fx">
-                
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+
+                <attr name="SystemFileSystem.icon"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
                 <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
-                
+
                 <folder name="Actions">
                     <file name="OpenAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.OpenAction"/>
@@ -284,19 +296,21 @@ made subject to such option by the copyright holder.
                     </file>
                     <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance_hidden"/>
                     <file name="CompileFile.instance">
-                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.project.JavaProjectModule.compile"/>
+                        <attr name="instanceCreate"
+                              methodvalue="org.netbeans.modules.java.project.JavaProjectModule.compile"/>
                         <attr name="position" intvalue="620"/>
                     </file>
                     <file name="RunFile.instance">
-                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.project.JavaProjectModule.run"/>
+                        <attr name="instanceCreate"
+                              methodvalue="org.netbeans.modules.java.project.JavaProjectModule.run"/>
                         <attr name="position" intvalue="640"/>
                     </file>
-<!--
-                    <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
-                        <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
-                        <attr name="position" intvalue="680"/>
-                    </file>
--->                    
+                    <!--
+                                        <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
+                                            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
+                                            <attr name="position" intvalue="680"/>
+                                        </file>
+                    -->
                     <file name="Separator3.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="700"/>
@@ -329,12 +343,12 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1400"/>
                     </file>
-<!--                    
-                    <file name="ToolsAction.instance">
-                        <attr name="instanceClass" stringvalue="org.openide.actions.ToolsAction"/>
-                        <attr name="position" intvalue="1500"/>
-                    </file>
--->
+                    <!--
+                                        <file name="ToolsAction.instance">
+                                            <attr name="instanceClass" stringvalue="org.openide.actions.ToolsAction"/>
+                                            <attr name="position" intvalue="1500"/>
+                                        </file>
+                    -->
                     <file name="PropertiesAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.PropertiesAction"/>
                         <attr name="position" intvalue="1600"/>
@@ -343,42 +357,54 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-  
+
     <folder name="Templates">
         <folder name="JavaFX">
             <attr name="position" intvalue="910"/>
             <file name="JavaFXEmpty.fx" url="JavaFXEmpty.fx">
                 <attr name="position" intvalue="100"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXEmpty.html"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="templateWizardURL"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXEmpty.html"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateCategory" stringvalue="javafx, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
-                <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                <attr name="instantiatingIterator"
+                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                <attr name="SystemFileSystem.icon"
+                      urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
             <file name="JavaFXClass.fx" url="JavaFXClass.fx">
                 <attr name="position" intvalue="200"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXClass.html"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="templateWizardURL"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXClass.html"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateCategory" stringvalue="javafx, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
-                <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                <attr name="instantiatingIterator"
+                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                <attr name="SystemFileSystem.icon"
+                      urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
-            
+
             <file name="JavaFXStage.fx" url="JavaFXStage.fx">
                 <attr name="position" intvalue="300"/>
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXStage.html"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="templateWizardURL"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXStage.html"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateCategory" stringvalue="javafx, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
-                <attr name="instantiatingIterator" methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                <attr name="instantiatingIterator"
+                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                <attr name="SystemFileSystem.icon"
+                      urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
-            
+
         </folder>
     </folder>
 

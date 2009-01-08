@@ -68,6 +68,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
     private static Logger log = Logger.getLogger(ImportResolverImpl.class.getName());
     private static final TypesComparator TYPES_COMPARATOR = new TypesComparator();
     private boolean interupt = false;
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle");
 
     /**
      * Allocates a new <code>Thread</code> object. This constructor has
@@ -168,7 +169,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             GuardedDocument gd = (GuardedDocument) doc;
             gd.runAtomic(runnable);
         } else {
-            log.warning(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Running_in_non_atomic_fashion.")); // NOI18N
+            log.warning(BUNDLE.getString("Running_in_non_atomic_fashion.")); // NOI18N
             doc.render(runnable);
         }
     }

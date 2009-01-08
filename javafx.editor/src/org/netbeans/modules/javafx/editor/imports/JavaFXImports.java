@@ -177,7 +177,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
         }
     }
 
-    private static class InternalSetComparator implements Comparator<Element> {
+    static class InternalSetComparator implements Comparator<Element> {
         public static final Collator collator = Collator.getInstance();
         static SoftReference<InternalSetComparator> instance;
 
@@ -188,7 +188,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
             return collator.compare(o1.getSimpleName().toString(), o2.getSimpleName().toString());
         }
 
-        private static InternalSetComparator create() {
+        static InternalSetComparator create() {
             if (instance == null || instance.get() == null) {
                 instance = new SoftReference<InternalSetComparator>(new InternalSetComparator());
             }
