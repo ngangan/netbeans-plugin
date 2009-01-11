@@ -1,4 +1,3 @@
-_$UNUSED$_$ARGS$_
 Node
 equals
 getClass
@@ -37,5 +36,3 @@ javafx
 javax
 org
 packages
-sun
-sunw

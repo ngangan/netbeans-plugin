@@ -2,7 +2,6 @@ abstract
 def
 function
 init
-override
 package
 postinit
 protected
