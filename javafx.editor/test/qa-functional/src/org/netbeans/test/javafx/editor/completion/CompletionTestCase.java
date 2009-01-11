@@ -180,7 +180,6 @@ public class CompletionTestCase extends java.lang.Object {
         String tempStart, tempEnd;
         for (int i = 0; i < array.length; i++) {
             CompletionItem completionItem = array[i];
-            System.out.println(getStringFromCharSequence(completionItem.getSortText()));
 
             tempStart = getStringFromCharSequence(completionItem.getSortText());
             try {
@@ -188,9 +187,11 @@ public class CompletionTestCase extends java.lang.Object {
             } catch (StringIndexOutOfBoundsException e) {
                 tempEnd = tempStart; //swallow StringOutOfBounds when # is missing
             }
+            System.out.println(tempEnd);
             out.println(tempEnd);
         }
-    }
+         System.out.println("=====================================================");
+   }
     
     private String getStringFromCharSequence(CharSequence chs) {
         int length = chs.length();
@@ -239,7 +240,7 @@ public class CompletionTestCase extends java.lang.Object {
             final String testFileName, final int line, final int queryType) throws Exception {
         try {
             log.println("Completion test start.");
-            System.out.println("Completion test start.");
+            System.out.println("============  Completion test start:" + testCase.getName() + "=================");
             log.flush();
             
             FileObject testFileObject = getTestFile(dataDir, projectName, testFileName, log);
