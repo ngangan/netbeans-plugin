@@ -96,9 +96,9 @@ made subject to such option by the copyright holder.
           <!-- zipfileset prefix="${nb.cluster.javafx.dir}" src="javafx.sdk.sol/${javafx-sdk.sol.zip}"/ -->
         </zip>
 	
-	<copy file="javafx.sdk.win/${javafx-sdk.win.zip}" tofile="zips/javafx-sdk-win.zip"/>
-	<copy file="javafx.sdk.mac/${javafx-sdk.mac.zip}" tofile="zips/javafx-sdk-mac.zip"/>
-	<copy file="javafx.sdk.lin/${javafx-sdk.lin.zip}" tofile="zips/javafx-sdk-lin.zip"/>
-	<copy file="javafx.sdk.sol/${javafx-sdk.sol.zip}" tofile="zips/javafx-sdk-sol.zip"/>
+        <zip basedir="javafx.sdk.win/external/javafx_sdk-windows" destfile="zips/javafx-sdk-win.zip" update="false" duplicate="preserve"/>
+        <zip basedir="javafx.sdk.mac/external/javafx_sdk-macosx" destfile="zips/javafx-sdk-mac.zip" update="false" duplicate="preserve"/>
+        <zip basedir="javafx.sdk.lin/external/javafx_sdk-linux" destfile="zips/javafx-sdk-lin.zip" update="false" duplicate="preserve"/>
+        <zip basedir="javafx.sdk.sol/external/javafx_sdk-solaris" destfile="zips/javafx-sdk-sol.zip" update="false" duplicate="preserve"/>
     </target>
 </project>
