@@ -106,9 +106,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         
         configs = uiProperties.RUN_CONFIGS;
 
-        data = new JTextField[]{jTextFieldMainClass, jvmText};
-        dataLabels = new JLabel[]{jLabelMainClass, jvmLabel};
-        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.RUN_JVM_ARGS};
+        data = new JTextField[]{jTextFieldMainClass, jTextArguments, jvmText};
+        dataLabels = new JLabel[]{jLabelMainClass, jLabelArguments, jvmLabel};
+        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS};
         assert data.length == keys.length;
 
         configChanged(uiProperties.activeConfig);
@@ -193,6 +193,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         jLabelMainClass = new javax.swing.JLabel();
         jTextFieldMainClass = new javax.swing.JTextField();
         jButtonMainClass = new javax.swing.JButton();
+        jLabelArguments = new javax.swing.JLabel();
+        jTextArguments = new javax.swing.JTextField();
         extPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
@@ -219,9 +221,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 0);
         configPanel.add(configLabel, gridBagConstraints);
-        configLabel.getAccessibleContext().setAccessibleDescription("Configuration profile"); // NOI18N
+        configLabel.getAccessibleContext().setAccessibleDescription("Configuration profile");
 
-        configCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<default>" })); // NOI18N
+        configCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<default>" }));
         configCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 configComboActionPerformed(evt);
@@ -244,7 +246,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 0);
         configPanel.add(configNew, gridBagConstraints);
-        configNew.getAccessibleContext().setAccessibleDescription("Button for creating new profile"); // NOI18N
+        configNew.getAccessibleContext().setAccessibleDescription("Button for creating new profile");
 
         org.openide.awt.Mnemonics.setLocalizedText(configDel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRun.configDelete")); // NOI18N
         configDel.addActionListener(new java.awt.event.ActionListener() {
@@ -256,7 +258,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 0);
         configPanel.add(configDel, gridBagConstraints);
-        configDel.getAccessibleContext().setAccessibleDescription("Deletes current configuration profile"); // NOI18N
+        configDel.getAccessibleContext().setAccessibleDescription("Deletes current configuration profile");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -286,6 +288,17 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 5, 0);
         mainPanel.add(jButtonMainClass, gridBagConstraints);
         jButtonMainClass.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jButtonMainClass")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelArguments, "Arguments:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        mainPanel.add(jLabelArguments, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 5, 0);
+        mainPanel.add(jTextArguments, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -362,7 +375,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton4, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:"); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -526,11 +539,13 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     private javax.swing.JPanel extPanel;
     private javax.swing.JButton jButtonMainClass;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelArguments;
     private javax.swing.JLabel jLabelMainClass;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JTextField jTextArguments;
     private javax.swing.JTextField jTextFieldMainClass;
     private javax.swing.JLabel jvmLabel;
     private javax.swing.JTextField jvmText;

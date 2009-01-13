@@ -45,8 +45,8 @@ made subject to such option by the copyright holder.
 <editor_palette_item version="1.0">
     <class name="org.netbeans.modules.javafx.palette.items.paints.RadialGradient" />
 
-    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/radialgradient_16.png" />
-    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/radialgradient_32.png" />
+    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/radial_gradient_16.png" />
+    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/radial_gradient_32.png" />
     <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
                display-name-key="NAME_javafx-RadialGradient"
                tooltip-key="HINT_javafx-RadialGradient" />

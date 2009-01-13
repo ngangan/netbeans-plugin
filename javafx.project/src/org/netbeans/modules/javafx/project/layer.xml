@@ -133,4 +133,13 @@ made subject to such option by the copyright holder.
             
         </folder>
     </folder>
+
+    <folder name="WelcomePage">
+        <folder name="LearnMoreLinks">
+            <file name="javafx.url" url="nbresloc:/org/netbeans/modules/javafx/project/resources/javafx.url">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.project.resources.Bundle"/>
+                <attr name="position" intvalue="150"/>
+            </file>
+        </folder>
+    </folder>
 </filesystem>
