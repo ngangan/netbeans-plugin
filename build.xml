@@ -97,8 +97,29 @@ made subject to such option by the copyright holder.
         </zip>
 	
         <zip basedir="javafx.sdk.win/external/javafx_sdk-windows" destfile="zips/javafx-sdk-win.zip" update="false" duplicate="preserve"/>
-        <zip basedir="javafx.sdk.mac/external/javafx_sdk-macosx" destfile="zips/javafx-sdk-mac.zip" update="false" duplicate="preserve"/>
-        <zip basedir="javafx.sdk.lin/external/javafx_sdk-linux" destfile="zips/javafx-sdk-lin.zip" update="false" duplicate="preserve"/>
-        <zip basedir="javafx.sdk.sol/external/javafx_sdk-solaris" destfile="zips/javafx-sdk-sol.zip" update="false" duplicate="preserve"/>
+        <zip destfile="zips/javafx-sdk-mac.zip" update="false" duplicate="preserve">
+            <zipfileset dir="javafx.sdk.mac/external/javafx_sdk-macosx" filemode="755">
+                <include name="javafx-sdk/bin/*"/>
+            </zipfileset>
+            <zipfileset dir="javafx.sdk.mac/external/javafx_sdk-macosx">
+                <exclude name="javafx-sdk/bin/*"/>
+            </zipfileset>
+        </zip>
+        <zip destfile="zips/javafx-sdk-lin.zip" update="false" duplicate="preserve">
+            <zipfileset dir="javafx.sdk.lin/external/javafx_sdk-linux" filemode="755">
+                <include name="javafx-sdk/bin/*"/>
+            </zipfileset>
+            <zipfileset dir="javafx.sdk.lin/external/javafx_sdk-linux">
+                <exclude name="javafx-sdk/bin/*"/>
+            </zipfileset>
+        </zip>
+        <zip destfile="zips/javafx-sdk-sol.zip" update="false" duplicate="preserve">
+            <zipfileset dir="javafx.sdk.sol/external/javafx_sdk-solaris" filemode="755">
+                <include name="javafx-sdk/bin/*"/>
+            </zipfileset>
+            <zipfileset dir="javafx.sdk.sol/external/javafx_sdk-solaris">
+                <exclude name="javafx-sdk/bin/*"/>
+            </zipfileset>
+        </zip>
     </target>
 </project>
