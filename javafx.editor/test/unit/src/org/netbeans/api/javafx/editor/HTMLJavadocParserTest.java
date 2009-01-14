@@ -60,7 +60,7 @@ public class HTMLJavadocParserTest extends NbTestCase {
         File dd = getDataDir();
         URL url = new URL(dd.toURL(), "javafx.scene.Node.html#onMouseClicked");
         boolean isJavaFXDoc = true;
-        String expResult = "Defines a function to be called when a mouse button has been clicked (pressed and released)";
+        String expResult = "Defines a function to be called when a mouse button has been clicked";
         String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
@@ -69,7 +69,7 @@ public class HTMLJavadocParserTest extends NbTestCase {
         File dd = getDataDir();
         URL url = new URL(dd.toURL(), "javafx.scene.Node.html#onKeyTyped");
         boolean isJavaFXDoc = true;
-        String expResult = "Defines a function to be called when this <code>Node</code> has input focus and a key has been typed.</p>";
+        String expResult = "Defines a function to be called when this <code>Node</code> has input focus and";
         String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
@@ -78,7 +78,7 @@ public class HTMLJavadocParserTest extends NbTestCase {
         File dd = getDataDir();
         URL url = new URL(dd.toURL(), "javafx.scene.Node.html#cache");
         boolean isJavaFXDoc = true;
-        String expResult = "A performance hint to the system to indicate that this";
+        String expResult = "little benefit to caching Nodes as bitmaps when blurs and other effects";
         String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
@@ -87,7 +87,7 @@ public class HTMLJavadocParserTest extends NbTestCase {
         File dd = getDataDir();
         URL url = new URL(dd.toURL(), "javafx.scene.Node.html#boundsInLocal");
         boolean isJavaFXDoc = true;
-        String expResult = "space required for a non-zero stroke that may fall outside the shape's";
+        String expResult = "Note that boundsInLocal is automatically recomputed whenever the";
         String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
