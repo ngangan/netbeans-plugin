@@ -48,11 +48,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.DefaultComboBoxModel;
@@ -62,11 +64,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.UIResource;
+import javax.swing.text.JTextComponent;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.modules.java.api.common.SourceRoots;
@@ -76,15 +80,18 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.MouseUtils;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
+import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 
 public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
     private JavaFXProject project;
 
-    private JTextField[] data;
+    private JTextComponent[] data;
     private JLabel[] dataLabels;
     private String[] keys;
     private Map<String, Map<String, String>> configs;
@@ -106,9 +113,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         
         configs = uiProperties.RUN_CONFIGS;
 
-        data = new JTextField[]{jTextFieldMainClass, jTextArguments, jvmText};
-        dataLabels = new JLabel[]{jLabelMainClass, jLabelArguments, jvmLabel};
-        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS};
+        data = new JTextComponent[]{jTextFieldMainClass, jTextArguments, jvmText, (JTextComponent)deviceCombo.getEditor().getEditorComponent()};
+        dataLabels = new JLabel[]{jLabelMainClass, jLabelArguments, jvmLabel, deviceLabel};
+        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS, JavaFXProjectProperties.MOBILE_DEVICE};
         assert data.length == keys.length;
 
         configChanged(uiProperties.activeConfig);
@@ -117,7 +124,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         configCombo.setRenderer(new ConfigListCellRenderer());
 
         for (int i = 0; i < data.length; i++) {
-            final JTextField field = data[i];
+            final JTextComponent field = data[i];
             final String prop = keys[i];
             final JLabel label = dataLabels[i];
             field.getDocument().addDocumentListener(new DocumentListener() {
@@ -201,6 +208,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         jRadioButton2 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
+        deviceLabel = new javax.swing.JLabel();
+        deviceCombo = new javax.swing.JComboBox();
         jvmLabel = new javax.swing.JLabel();
         jvmText = new javax.swing.JTextField();
 
@@ -289,7 +298,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         mainPanel.add(jButtonMainClass, gridBagConstraints);
         jButtonMainClass.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jButtonMainClass")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelArguments, "Arguments:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelArguments, "&Arguments:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -327,7 +336,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
@@ -342,7 +351,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton2, gridBagConstraints);
@@ -356,7 +365,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton3, gridBagConstraints);
@@ -370,10 +379,38 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton4, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(deviceLabel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_MobileDevice")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 32, 0, 0);
+        extPanel.add(deviceLabel, gridBagConstraints);
+
+        deviceCombo.setEditable(true);
+        deviceCombo.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                deviceComboPopupMenuWillBecomeVisible(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 12, 0, 0);
+        extPanel.add(deviceCombo, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -385,6 +422,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
@@ -445,32 +483,79 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
     
     
-    
+private void enableDeviceCombo() {
+    boolean enabled = jRadioButton4.isEnabled() && jRadioButton4.isSelected();
+    deviceLabel.setEnabled(enabled);
+    deviceCombo.setEnabled(enabled);
+}
     
     
 private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
     m.put("javafx.profile", "desktop"); //NOI18N
     m.put("execution.target", "standard"); //NOI18N
+    enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton1ActionPerformed
 
 private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
     m.put("javafx.profile", "desktop"); //NOI18N
     m.put("execution.target", "jnlp"); //NOI18N
+    enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton2ActionPerformed
 
 private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
     m.put("javafx.profile", "desktop"); //NOI18N
     m.put("execution.target", "applet"); //NOI18N
+    enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton3ActionPerformed
 
 private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
     m.put("javafx.profile", "mobile"); //NOI18N
     m.put("execution.target", "midp"); //NOI18N
+    enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton4ActionPerformed
+
+    boolean firstPopup = true;
+
+private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_deviceComboPopupMenuWillBecomeVisible
+    if (firstPopup) {
+        firstPopup = false;
+        RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    PlatformUiSupport.PlatformKey pk = (PlatformUiSupport.PlatformKey)uiProperties.PLATFORM_MODEL.getSelectedItem();
+                    if (pk != null) {
+                        JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
+                        if (jp instanceof JavaFXPlatform) {
+                            FileObject fo = jp.findTool("javafxpackager"); //NOI18N
+                            if (fo != null) {
+                                File em = new File(FileUtil.toFile(fo).getParentFile().getParentFile(), "emulator/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                                if (em.isFile()) try {
+                                    Properties p = new Properties();
+                                    p.load(Runtime.getRuntime().exec(new String[] {em.getAbsolutePath(), "-Xquery"}).getInputStream()); //NOI18N
+                                    final String list = p.getProperty("device.list"); //NOI18N
+                                    if (list != null) SwingUtilities.invokeLater(new Runnable() {
+                                        public void run() {
+                                            for (String name : list.split(",")) 
+                                                deviceCombo.addItem(name.trim());
+                                            if (deviceCombo.isPopupVisible()) {
+                                                deviceCombo.hidePopup();
+                                                deviceCombo.showPopup();
+                                            }
+                                        }
+                                    });
+                                } catch (IOException e) {}
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        );
+    }
+}//GEN-LAST:event_deviceComboPopupMenuWillBecomeVisible
     
     public void configUpdated() {
         Map<String, String> m = configs.get(uiProperties.activeConfig);
@@ -479,6 +564,7 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
         else if (run.equals("jnlp")) jRadioButton2.setSelected(true); //NOI18N
         else if (run.equals("applet")) jRadioButton3.setSelected(true); //NOI18N
         else if (run.equals("midp")) jRadioButton4.setSelected(true); //NOI18N
+        enableDeviceCombo();
     }
 
     
@@ -536,6 +622,8 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     private javax.swing.JButton configNew;
     private javax.swing.JPanel configPanel;
     private javax.swing.JSeparator configSep;
+    private javax.swing.JComboBox deviceCombo;
+    private javax.swing.JLabel deviceLabel;
     private javax.swing.JPanel extPanel;
     private javax.swing.JButton jButtonMainClass;
     private javax.swing.JLabel jLabel1;
