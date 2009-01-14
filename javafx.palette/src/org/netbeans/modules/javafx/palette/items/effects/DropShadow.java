@@ -60,6 +60,7 @@ public class DropShadow implements ActiveEditorDrop {
 
         // Imports
         Imports.addImport( targetComponent, "javafx.scene.effect.DropShadow" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); //NOI18N
 
         return true;
     }
