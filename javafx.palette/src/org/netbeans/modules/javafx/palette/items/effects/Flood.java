@@ -60,6 +60,7 @@ public class Flood implements ActiveEditorDrop {
 
         // Imports
         Imports.addImport( targetComponent, "javafx.scene.effect.Flood" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); //NOI18N
 
         return true;
     }

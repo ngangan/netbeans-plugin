@@ -60,6 +60,7 @@ public class InnerShadow implements ActiveEditorDrop {
 
         // Imports
         Imports.addImport( targetComponent, "javafx.scene.effect.InnerShadow" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); //NOI18N
 
         return true;
     }

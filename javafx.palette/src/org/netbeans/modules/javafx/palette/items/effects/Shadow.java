@@ -60,6 +60,7 @@ public class Shadow implements ActiveEditorDrop {
 
         // Imports
         Imports.addImport( targetComponent, "javafx.scene.effect.Shadow" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); //NOI18N
 
         return true;
     }
