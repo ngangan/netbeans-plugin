@@ -296,6 +296,7 @@ final class HTMLJavadocParser {
      * in the raw html file */
     private static int[] parseMember(Reader reader, final String name, final HTMLEditorKit.Parser parser, boolean ignoreCharset, boolean isJavaFXDoc) throws IOException {
         final int offset[] = {-1, -1};
+        final int shortCommentOffset[] = { -1, -1 };
 
         class CallbackJava extends HTMLEditorKit.ParserCallback {
             final int INIT = 0;
@@ -350,6 +351,7 @@ final class HTMLJavadocParser {
         class CallbackJavaFX extends HTMLEditorKit.ParserCallback {
             private boolean insideFieldBlock = false;
             private boolean insideNameBlock = false;
+            private boolean insideShortComment = false;
 
             @Override
             public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
@@ -372,6 +374,27 @@ final class HTMLJavadocParser {
                         offset[0] = pos;
                         insideFieldBlock = false;
                     }
+                } else if (t == HTML.Tag.P && a != null) {
+                    final Object classAttr = a.getAttribute(HTML.Attribute.CLASS);
+                    if ("comment".equals(classAttr) && insideFieldBlock &&
+                            shortCommentOffset[0] == -1) {
+                        shortCommentOffset[0] = pos;
+                        insideShortComment = true;
+                    }
+                }
+            }
+            @Override
+            public void handleEndTag(HTML.Tag t, int pos) {
+                if (t == HTML.Tag.TR) {
+                    insideNameBlock = false;
+                    insideFieldBlock = false;
+                    if (offset[0] != -1 && offset[1] == -1) {
+                        offset[1] = pos;
+                    }
+                }
+                if (t == HTML.Tag.P && insideShortComment) {
+                    shortCommentOffset[1] = pos;
+                    insideShortComment = false;
                 }
             }
 
@@ -390,6 +413,9 @@ final class HTMLJavadocParser {
         HTMLEditorKit.ParserCallback callback = isJavaFXDoc ?  new CallbackJavaFX() :  new CallbackJava();
         parser.parse(reader, callback, ignoreCharset);
         callback = null;
+        if (offset[0] == -1 || offset[1] == -1) {
+            return shortCommentOffset;
+        }
         return offset;
     }
 

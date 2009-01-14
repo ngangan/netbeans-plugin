@@ -82,7 +82,7 @@ public class JavaFlyTokensTest extends NbTestCase {
         cb.rewind();
         String text = cb.toString();
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
-        TokenSequence<? extends TokenId> ts = hi.tokenSequence();
+        TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
         
         System.out.println("Flyweight tokens: " + LexerTestUtilities.flyweightTokenCount(ts)
                 + "\nTotal tokens: " + ts.tokenCount()
