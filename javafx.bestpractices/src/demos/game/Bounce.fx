@@ -101,6 +101,7 @@ var bouncer : Timeline = Timeline {
         }
 };
 
+// Sequence containing Bricks
 var bricks : Brick[];
 // Create bricks
 for( j in [0..5] ) {
@@ -111,6 +112,7 @@ for( j in [0..5] ) {
     }
 }
 
+// Visual Stage
 Stage {
     scene : Scene {
         content : bind [
@@ -118,6 +120,7 @@ Stage {
                 width : 201, height : 200
                 fill : Color.LIGHTGREY
 
+                // Handler for mouse movement
                 onMouseMoved : function( e : MouseEvent ): Void {
                     if( e.sceneX < paddle.width / 2 ) { paddle.x = paddle.width / 2; }
                     else if( e.sceneX > 200 - paddle.width / 2 ) { paddle.x = 200 - paddle.width / 2; }
@@ -127,6 +130,7 @@ Stage {
                         ball.y = paddle.y - ball.radius;
                     }
                 }
+                // Handler for mouse press
                 onMousePressed : function( e : MouseEvent ): Void {
                     if( state == STICK ) {
                         state = BOUNCING;
@@ -144,11 +148,14 @@ Stage {
     title: "Bounce"
 }
 
+// Visual representation of Paddle
 class Paddle extends CustomNode {
 
+    // Position of paddle
     public var x : Number = 85;
     public var y : Number = 180;
 
+    // Paddle dimensions
     public var width : Number = 30;
     public var height : Number = 10;
 
@@ -162,9 +169,13 @@ class Paddle extends CustomNode {
     }
 }
 
+// Visua representation of Brick
 class Brick extends CustomNode {
+    // Position of Brick
     public var x : Number;
     public var y : Number;
+
+    // Brick dimensions
     public var width : Number = 20;
     public var height : Number = 10;
 
@@ -178,11 +189,15 @@ class Brick extends CustomNode {
     }
 }
 
+// Visual representation of Ball
 class Ball extends CustomNode {
+    // Ball position
     public var x : Number = 100;
     public var y : Number = 100;
+    // Ball radius
     public var radius : Number = 5;
 
+    // Ball velocity vectors
     public var vx : Number = 1.0;
     public var vy : Number = -1.0;
 

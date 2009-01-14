@@ -53,6 +53,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color.BLACK
 
+                // On mouse move, update binded values of rectangle sizes
                 onMouseMoved : function( e : MouseEvent ): Void {
                     var l = -0.002 * ( e.sceneX - 100 ) / 2 + 0.06;
                     var r = 0.002 * ( e.sceneX - 100 ) / 2 + 0.06;
@@ -76,6 +77,7 @@ Stage {
                     }
                 }
             },
+            // Left rectangle
             Rectangle {
                 x : bind width / 4 - gx
                 y : bind width / 2 - gx
@@ -83,6 +85,7 @@ Stage {
                 height : bind gx * 2
                 fill : bind leftColor
             },
+            // Right rectangle
             Rectangle {
                 x : bind width / 1.33 - gy
                 y : bind width / 2 - gy

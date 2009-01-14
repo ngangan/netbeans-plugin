@@ -43,6 +43,7 @@ import javafx.animation.KeyFrame;
  * @author Michal Skvor
  */
 
+// Sequence of all visualized boxes
 var boxes : Box[] = [
     Box {
         xpos : 134, ypos : 0, thickness : 36, direction : 1.0, div : 64,
@@ -64,6 +65,7 @@ var boxes : Box[] = [
 
 var mx : Number = 40;
 
+// Timeline which updates periodically all boxes on the screen
 var timer : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -85,6 +87,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color.BLACK
 
+                // When mouse is moved, update speed coeficient
                 onMouseMoved : function( e : MouseEvent ): Void {
                     mx = e.x * 0.4 - 200 / 5.0;
                 }
@@ -101,15 +104,21 @@ Stage {
 
 timer.play();
 
+// Representation of box
 class Box extends CustomNode {
 
+    // Size of the box
     public var thickness : Number;
+    // Box position
     public var ypos : Number;
     public var xpos : Number;
     public var div : Number;
+    // Moving direction of box
     public var direction : Number;
+    // Color of box
     public var color : Color;
 
+    // Function when called updates box's position 
     public function update( mx : Number ): Void {
         xpos += direction * mx / div;
 

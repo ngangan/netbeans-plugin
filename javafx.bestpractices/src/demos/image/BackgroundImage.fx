@@ -45,6 +45,7 @@ import javafx.scene.transform.Translate;
  * @author Michal Skvor
  */
 
+// vertical position of moving line
 var y : Number;
 
 var timeline = Timeline {
@@ -63,14 +64,17 @@ var timeline = Timeline {
     ]
 };
 
+// Visual representation
 Stage {
     scene : Scene {
         content : [
+            // Shows image on the background
             ImageView {
                 image : Image { url : "{__DIR__}background.png" }
             },
+            // Paints two moving lines
             Group {
-                transforms : Translate { y : bind y }
+                transforms : Translate { y : bind y } // Bind position of lines to y
                 content : [
                     Line {
                         startX : 0, startY : 20, endX : 200, endY : 0
@@ -91,4 +95,5 @@ Stage {
     title : "Background Image"
 }
 
+// Start the line animation
 timeline.play();

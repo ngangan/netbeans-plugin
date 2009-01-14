@@ -44,20 +44,24 @@ import java.lang.System;
  */
 
 var distance = 0;
+// Sequence of painted circles
 var circles : Circle[];
 
 var width : Number = 100;
 var height : Number = 100;
 
+// Mouse position
 var mouseX : Number = 0;
 var mouseY : Number = 0;
 
 var max_distance : Number = dist( 0, 0, width, height );
 
+// Function which computes distance bwtween two points
 function dist( x1 : Number, y1 : Number, x2 : Number, y2 : Number ): Number {
     return Math.sqrt(( x1 - x2 ) * ( x1 - x2 ) + ( y1 - y2 ) * ( y1 - y2 ));
 }
 
+// Generate matrix of 10x10 circles to paint them on the screen
 for( x in [0..10] ) {
     for( y in [0..10] ) {
         var cx = x * 20 + 10;
@@ -65,6 +69,8 @@ for( x in [0..10] ) {
         insert Circle {
             centerX : cx
             centerY : cy
+            // Bind the size of current circle to distance between its coordinates
+            // and mouse position so when mouse is closer the circle is bigger
             radius : bind dist( mouseX, mouseY, cx, cy ) / max_distance * 20
             fill : Color.WHITE
         } into circles;
@@ -78,6 +84,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color.GRAY
 
+                // When mouse is moved update the coordinate variables
                 onMouseMoved : function( e : MouseEvent ): Void {
                     mouseX = e.sceneX;
                     mouseY = e.sceneY;

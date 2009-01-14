@@ -43,14 +43,17 @@ import javafx.scene.transform.Scale;
 var width : Number = 200;
 var height : Number = 200;
 
+// Background image
 var img = Image { url : "{__DIR__}background.png" };
 
 Stage {
     scene : Scene {
         content : [
+            // Background image
             ImageView {
                 image : img
             },
+            // Scaled image to one half of its size
             ImageView {
                 image : img
                 transforms : [

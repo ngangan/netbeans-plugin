@@ -42,9 +42,11 @@ import javafx.scene.input.MouseButton;
  * @author Michal Skvor
  */
 
+// Mouse position
 var mouseX : Number = 100;
 var mouseY : Number = 100;
 
+// Mouse buttons visual representation
 var buttons : Rectangle[] = [
     Rectangle { x : 5, y : 5, width : 10, height : 20, fill : Color.WHITE },
     Rectangle { x : 20, y : 5, width : 10, height : 20, fill : Color.WHITE },
@@ -58,6 +60,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color.BLACK
 
+                // On mouse button press update visual button state
                 onMousePressed: function( e : MouseEvent ): Void {
                     if( e.button == MouseButton.PRIMARY ) {
                         buttons[0].fill = Color.BLACK;
@@ -68,6 +71,7 @@ Stage {
                     }
                 }
 
+                // On mouse button release update visual button state
                 onMouseReleased: function( e : MouseEvent ): Void {
                     if( e.button == MouseButton.PRIMARY ) {
                         buttons[0].fill = Color.WHITE;
@@ -78,6 +82,7 @@ Stage {
                     }
                 }
 
+                // On mouse move update mouse position
                 onMouseMoved: function( e : MouseEvent ): Void {
                     mouseX = e.sceneX;
                     mouseY = e.sceneY;

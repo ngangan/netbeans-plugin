@@ -44,8 +44,10 @@ import java.lang.Math;
  */
 
 var a : Number = 0.0;
+// Size variable counted from changes angle variable
 var s : Number = bind Math.sin( a ) * 2;
 
+// Change a variable from 0 to 2*PI in 5 seconds
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames : [
@@ -69,6 +71,7 @@ Stage {
         fill : Color.GRAY
         content : [
             Rectangle {
+                // Bind size of rectangle to s variable
                 transforms : [
                     javafx.scene.transform.Translate { x : bind 100 - 40 * s / 2, y : bind 100 - 40 * s / 2 },
                     javafx.scene.transform.Scale { x : bind s, y : bind s }

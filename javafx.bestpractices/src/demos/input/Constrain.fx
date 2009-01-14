@@ -45,15 +45,20 @@ import java.lang.Math;
  * @author Michal Skvor
  */
 
+// Size of the eased object
 var esize : Number = 25;
+
+// Automatic position of mouse
 var mouseX : Number = 100;
 var mouseY : Number = 100;
 
 var mx : Number = 100;
 var my : Number = 100;
 
+// Easing speed
 var easing : Number = 0.05;
 
+// Easing updater. It updates position of cursor to mouse speed
 var timer : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -77,6 +82,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color.BLACK
 
+                // When mouse is moved, the new target position is updated
                 onMouseMoved : function( e : MouseEvent ): Void {
                     mouseX = e.sceneX;
                     if( mouseX < 100 - esize ) { mouseX = 100 - esize };
@@ -106,4 +112,5 @@ Stage {
     height : 232
 }
 
+// Start easing updater
 timer.play();

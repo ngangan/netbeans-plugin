@@ -73,9 +73,10 @@ Stage {
 
     width : 206                       // Width and height of the frame
     height : 230
-    title : "Gradient Sample"
+    title : "Gradient Sample"         // Stage title
 }
 
+// Visual class which represents rectangle filled with color gradient
 class GradientBox extends CustomNode {
     var x : Number;
     var y : Number;
@@ -105,8 +106,7 @@ class GradientBox extends CustomNode {
         };
     }
 
-    /** create() function which returns our visual representation of the
-     *  color wheel */
+    // create() function which returns our visual representation of gradient box
     override function create() : Node {
         return Group {
             content : Rectangle {

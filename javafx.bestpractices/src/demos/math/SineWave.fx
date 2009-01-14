@@ -43,13 +43,18 @@ import java.lang.Math;
  */
 
 var dots : Circle[];
+// Actual angle
 var theta : Number = 0.0;
+// Amplitude of wave
 var amplitude : Number = 75;
+// Distance between circles
 var xspacing : Number = 8;
 var period : Number = 500;
 var dx : Number = ( Math.PI * 2 / period ) * xspacing;
+// Time variable
 var time : Number = 0.0;
 
+// Periodically update time variable
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -61,11 +66,14 @@ var timeline : Timeline = Timeline {
     }
 };
 
+// Fill up dots sequence to create visual representation of sine wave
 var x = theta;
 for( i in [0..25] ) {
     var xx = x;
     insert Circle {
         centerX : i * 8
+        // y position of circle is binded to actual angle and shifted so
+        // when time is changes the circle is moved
         centerY : bind 100 + Math.sin( xx + time ) * amplitude
         radius : 8
         fill : Color.WHITE
@@ -86,4 +94,5 @@ Stage {
     height : 232
 }
 
+// Start sine wave animation
 timeline.play();

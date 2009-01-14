@@ -43,17 +43,20 @@ import javafx.scene.transform.Scale;
 
 var x : Number = 40;
 
+// Image
 var img : Image = Image { url : "{__DIR__}overlay.png" };
 
 Stage {
     scene : Scene {
         content : [
+            // Background image
             ImageView {
                 image : Image { url : "{__DIR__}background.png" }
                 onMouseMoved : function( e : MouseEvent ):Void {
                     x = e.sceneX - 100 * 0.5;
                 }
             },
+            // Overlayed image with opacity set to 0.5
             ImageView {
                 image : bind img
                 transforms : [ Translate { x : bind x, y : 100 - 32 }, Scale { x : 0.5, y : 0.5 } ]

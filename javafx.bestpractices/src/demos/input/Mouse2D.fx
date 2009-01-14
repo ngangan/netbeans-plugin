@@ -41,6 +41,7 @@ import javafx.scene.Scene;
 
 var width : Number = 200;
 var height : Number = 200;
+// Mouse cursor position
 var mouseX : Number = 0;
 var mouseY : Number = 0;
 
@@ -51,6 +52,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color { red : 0.2, green : 0.2, blue :0.2 }
 
+                // On mouse move, update the mouse position variables
                 onMouseMoved : function( e : MouseEvent ): Void {
                     mouseX = e.sceneX;
                     mouseY = e.sceneY;

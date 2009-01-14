@@ -41,8 +41,10 @@ import javafx.animation.KeyFrame;
  * @author Michal Skvor
  */
 
+// y variable updated periodically
 var y : Number = 200;
 
+// Timeline updates y variable
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -59,6 +61,8 @@ Stage {
     scene : Scene {
         fill : Color.DARKGRAY
         content : Line {
+            // Line y position is binded to updated y position so it moves
+            // over time
             transforms : [ Translate { y : bind y }]
             endX : 200
             stroke : Color.WHITE
@@ -70,4 +74,5 @@ Stage {
     height : 232
 }
 
+// Start animation
 timeline.play();

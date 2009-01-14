@@ -41,8 +41,10 @@ import javafx.animation.Interpolator;
  * @author Michal Skvor
  */
 
+// Position variable updated over time
 var xPos : Number = -40;
 
+// Change xPos value from -40 to 240 lineary in 5 seconds
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames : [
@@ -65,11 +67,13 @@ Stage {
     scene : Scene {
         fill : Color.GRAY
         content : [
+            // Create Rectangle and bind its position to xPos variable
             Rectangle {
                 transforms : [ javafx.scene.transform.Translate { x : bind xPos, y : 60 }]
                 width : 40, height : 40
                 fill : Color.WHITE
             },
+            // Create Rectangle and bind its position to 2 * xPos variable
             Rectangle {
                 transforms : [ javafx.scene.transform.Translate { x : bind 2 * xPos, y : 100 }]
                 width : 40, height : 40
@@ -83,4 +87,5 @@ Stage {
     height : 232
 }
 
+// Start movement of rectangles
 timeline.play();

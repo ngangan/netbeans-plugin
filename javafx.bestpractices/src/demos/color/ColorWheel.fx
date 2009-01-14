@@ -76,6 +76,7 @@ class ColorWheelNode extends CustomNode {
         for( i in [1..segments + 1] ) {
             insert Color.rgb( 255, 255, 0 ) into colors;
         }
+        // Create color wheel
         for( i in [0..steps-1] ) {
             if( valueShift == 0 ) {
                 colors[1] = Color.rgb( 255 - ( 255 / steps * i ), 255 - ( 255 / steps * i ), 0 );
@@ -104,6 +105,7 @@ class ColorWheelNode extends CustomNode {
                 colors[11] = Color.rgb( 0, ( 255 / steps ) * i, 0 );
                 colors[12] = Color.rgb((( 255 / 2 ) / steps ) * i, ( 255 / steps ) * i, 0 );
             }
+            // Generate Segments for all wheels
             for( j in [1..segments] ) {
                 var c = colors[j.intValue()];
                 insert Arc {
@@ -129,7 +131,7 @@ Stage {
                                     // content defined above
     }
 
-    width : 206                     // Width and heiight of the frame
+    width : 206                     // Width and height of the frame
     height : 232
-    title : "Color Wheel"
+    title : "Color Wheel"           // Stage title
 }

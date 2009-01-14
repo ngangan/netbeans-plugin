@@ -48,8 +48,10 @@ import java.lang.Math;
 var diameter : Number = bind 45 * Math.sin( angle ) + 210;
 var angle : Number = 0.0;
 
+// Sequence of painted circles
 var circles : Circle[];
 
+// Cycle angle from 0 to 2*PI in 10 seconds interval lineary
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames : [
@@ -68,6 +70,7 @@ var timeline : Timeline = Timeline {
     ]
 };
 
+// Fill the circle sequence
 for( i in [0..4] ) {
     insert Circle {
         transforms : [ Rotate{ angle : angle + 45, pivotX : 130, pivotY : 65 } ]

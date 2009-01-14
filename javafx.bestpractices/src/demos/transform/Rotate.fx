@@ -43,11 +43,13 @@ import java.util.Random;
  * @author Michal Skvor
  */
 
+// Rotation angle
 var angle : Number = 0.0;
 var jitter : Number = 0.0;
 
 var random : Random = new Random();
 
+// Change angle variable by value of jitter variable
 var ticker : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -59,6 +61,7 @@ var ticker : Timeline = Timeline {
     }
 };
 
+// Every second set jitter variable do different value
 var jitterTimeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -73,6 +76,7 @@ var jitterTimeline : Timeline = Timeline {
 Stage {
     scene : Scene {
         fill : Color.GRAY
+        // Create Rectangle and bind rotation angle to angle variable
         content : Rectangle {
             transforms : [
                 javafx.scene.transform.Rotate { angle : bind angle, pivotX : 100, pivotY : 100 },
@@ -89,5 +93,6 @@ Stage {
     height : 232
 }
 
+// Start timelines
 ticker.play();
 jitterTimeline.play();

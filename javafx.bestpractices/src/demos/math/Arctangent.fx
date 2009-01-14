@@ -47,6 +47,7 @@ import java.lang.Math;
  * @author Michal Skvor
  */
 
+// Sequence of all painted eyes
 var eyes : Eye[] = [
     Eye { x : 50, y : 16, size : 40 },
     Eye { x : 64, y : 85, size : 20 },
@@ -78,11 +79,14 @@ Stage {
     height : 232
 }
 
+// Visual representation of eye
 class Eye extends CustomNode {
 
+    // Eye position
     public var x : Number;
     public var y : Number;
 
+    // Radius of Eye
     public var size : Number;
 
     public var mouse : MouseEvent;
@@ -92,12 +96,14 @@ class Eye extends CustomNode {
         return Group {
             transforms : Translate { x : bind x, y : bind y }
             content : [
+                // Eye circle
                 Circle {
                     radius : bind size
                     fill : Color.WHITE
                 },
+                // Eye pupil
                 Circle {
-                    transforms : Rotate { angle : bind angle }
+                    transforms : Rotate { angle : bind angle } // Pupil is moved in mouse direction
                     centerX : bind size / 2, centerY : 0, radius : bind size / 2
                     fill : Color.rgb( 153, 153, 153 )
                 }

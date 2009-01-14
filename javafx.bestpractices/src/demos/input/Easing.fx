@@ -55,6 +55,7 @@ Stage {
                 width : 200, height : 200
                 fill : Color{ red: 0.2, green : 0.2, blue : 0.2 }
 
+                // When mouse is moved. Update position where ball should be moved
                 onMouseMoved : function( e : MouseEvent ): Void {
                     easing.targetX = e.sceneX;
                     easing.targetY = e.sceneY;
@@ -71,15 +72,20 @@ Stage {
     height : 232
 }
 
+// Visual representation of ball
 class Ball extends CustomNode {
+    // Ball positions
     var x : Number;
     var y : Number;
+
     public var targetX : Number = 100;
     public var targetY : Number = 100;
 
+    // Easing coeficient
     var easing : Number = 0.05;
 
     init {
+        // Start easing updater
         timer.play();
     }
 

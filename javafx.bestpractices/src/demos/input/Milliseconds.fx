@@ -40,9 +40,12 @@ import javafx.animation.KeyFrame;
  * @author Michal Skvor
  */
 
+// Milliseconds value
 var miliseconds : Integer;
+// Sequence of colors
 var colors : Color[];
 
+// This updates colors depending on system time
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
     keyFrames :
@@ -60,7 +63,9 @@ var timeline : Timeline = Timeline {
         }
 };
 
+// Bars sequence
 var barrs : Rectangle[];
+// Generate bars and set colors
 for( i in [0..9] ) {
     var ii : Integer = i;
     insert Color {} into colors;
@@ -81,4 +86,5 @@ Stage {
     height : 232
 }
 
+// Start color updater
 timeline.play();

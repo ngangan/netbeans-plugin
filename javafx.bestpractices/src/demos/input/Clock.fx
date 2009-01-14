@@ -63,6 +63,7 @@ Stage {
 
 clockWork.timer.play();
 
+// Clas representing clock work
 class ClockWork extends CustomNode {
 
     var seconds : Number;
@@ -70,12 +71,14 @@ class ClockWork extends CustomNode {
     var hours : Number;
 
     init {
+        // Initialization of values to actual time
         var calendar : Calendar = Calendar.getInstance();
         seconds = calendar.get( Calendar.SECOND );
         minutes = calendar.get( Calendar.MINUTE );
         hours = calendar.get( Calendar.HOUR_OF_DAY );
     }
 
+    // Timeline responsible for automatic one second updates of clock hands
     public var timer : Timeline = Timeline {
         repeatCount : Timeline.INDEFINITE
         keyFrames :
@@ -90,6 +93,7 @@ class ClockWork extends CustomNode {
             },
     };
 
+    // Visual representation of clocks
     public override function create(): Node {
         return Group {
             content : [
@@ -99,6 +103,7 @@ class ClockWork extends CustomNode {
                     radius : 80
                     fill : Color.GRAY
                 },
+                // Second hand
                 Line {
                     transforms : [ Rotate { angle : bind seconds * 6, pivotX : 100, pivotY : 100 }]
                     startX : 100
@@ -107,6 +112,7 @@ class ClockWork extends CustomNode {
                     endY : 100
                     stroke : Color.WHITE
                 },
+                // Minutes hand
                 Line {
                     transforms : [ Rotate { angle : bind minutes * 6, pivotX : 100, pivotY : 100 }]
                     startX : 100
@@ -116,6 +122,7 @@ class ClockWork extends CustomNode {
                     stroke : Color.WHITE
                     strokeWidth : 2
                 },
+                // Hours hand
                 Line {
                     transforms : [ Rotate { angle : bind hours * 30, pivotX : 100, pivotY : 100 }]
                     startX : 100

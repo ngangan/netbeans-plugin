@@ -72,12 +72,17 @@ Stage {
 
 class StoringInputNode extends CustomNode {
 
+    // Sequence of circles
     var circles : Circle[];
+
+    // Mouse position
     var mouseX : Number;
     var mouseY : Number;
 
+    // Number of circles following the cursor
     var length : Integer = 60;
 
+    // Periodically update circles calling update function
     var timer : Timeline = Timeline {
         repeatCount: Timeline.INDEFINITE
         keyFrames :
@@ -89,20 +94,26 @@ class StoringInputNode extends CustomNode {
             }
     }
 
+    // This function updates sizes of circles. Deletes last one and add new in
+    // the position of mouse
     public function update() : Void {
+        // Move all but last circles by one position
         for( i in [0..length - 1] ) {
             circles[i].centerX = circles[i+1].centerX;
             circles[i].centerY = circles[i+1].centerY;
             circles[i].radius = circles[i+1].radius;
         }
+        // Create new circle to actual mouse position
         circles[length] = Circle {
             centerX : mouseX, centerY : mouseY, radius : 30, fill : Color.WHITE, opacity : 0.3
         };
+        // Decrease size of all circles to one quarter
         for( i in [0..length] ) {
             circles[i].radius = i / 4;
         }
     }
 
+    // Create sequence of all circles
     public override function create(): Node {
         return Group {
             content : bind circles
@@ -110,9 +121,11 @@ class StoringInputNode extends CustomNode {
     }
 
     init {
+        // Fill up sequence of painted circles
         for( i in [0..length] ) {
             insert Circle { fill : Color.WHITE } into circles;
         }
+        // Start updater
         timer.play();
     }
 }
