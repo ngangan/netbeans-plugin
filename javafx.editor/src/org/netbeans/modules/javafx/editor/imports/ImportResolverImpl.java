@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import org.netbeans.api.javafx.source.ClassIndex;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.modules.javafx.editor.imports.ui.FixImportsLayout;
@@ -41,13 +42,17 @@ import javax.lang.model.element.TypeElement;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.lang.ref.SoftReference;
 import java.text.Collator;
 import java.util.*;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +64,6 @@ import java.util.logging.Logger;
  */
 final class ImportResolverImpl extends Thread implements ImportResolver, FocusListener {
     private ClassIndex index;
-    //    private CompilationInfo ci;
     private SoftReference<JTextComponent> component;
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.DEPENDENCIES, ClassIndex.SearchScope.SOURCE);
     private final Object LOCK = new Object();
@@ -69,6 +73,8 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
     private static final TypesComparator TYPES_COMPARATOR = new TypesComparator();
     private boolean interupt = false;
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle");
+    private CompilationInfo ci;
+    private Map<Element, Long> positions;
 
     /**
      * Allocates a new <code>Thread</code> object. This constructor has
@@ -81,15 +87,15 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
      * @param component holding editor.
      * @see #Thread(ThreadGroup, Runnable, String)
      */
-    private ImportResolverImpl(ClassIndex index, /*CompilationInfo ci,*/ JTextComponent component) {
+    private ImportResolverImpl(ClassIndex index, CompilationInfo ci, JTextComponent component) {
         this.index = index;
-//        this.ci = ci;
+        this.ci = ci;
         this.component = new SoftReference<JTextComponent>(component);
         component.addFocusListener(this);
     }
 
-    public static ImportResolver create(ClassIndex index, /*CompilationInfo ci,*/ JTextComponent component) {
-        return new ImportResolverImpl(index, /*ci,*/ component);
+    public static ImportResolver create(ClassIndex index, CompilationInfo ci, JTextComponent component) {
+        return new ImportResolverImpl(index, ci, component);
     }
 
     public synchronized void resolve(ImportsModel model, Element e) {
@@ -104,6 +110,10 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
         }
         offerToQueue(elements);
         ensureStart();
+    }
+
+    public void setElementPositions(Map<Element, Long> positions) {
+        this.positions = positions;
     }
 
     private void ensureStart() {
@@ -214,7 +224,7 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
                 if (log.isLoggable(Level.INFO)) {
                     log.log(Level.INFO, "Showing dialog..."); // NOI18N
                 }
-                fil.show(convert(types), getHeaderText(e), comp.getCaretPosition(), new MyListSelectionListener(), null, null, -1);
+                fil.show(convert(types), getHeaderText(e), getOffset(comp, e), new MyListSelectionListener(), null, null, -1);
             }
         };
         try {
@@ -244,6 +254,20 @@ final class ImportResolverImpl extends Thread implements ImportResolver, FocusLi
             }
         };
         SwingUtilities.invokeLater(runnable);
+    }                                                                    
+
+    private int getOffset(JTextComponent comp, Element e) {
+        try {
+            if (positions.containsKey(e)) {
+                int pos = positions.get(e).intValue();
+                Rectangle rectangle = comp.modelToView(pos);
+                comp.scrollRectToVisible(rectangle);
+                return pos;
+            }
+        } catch (BadLocationException e1) {
+            if (log.isLoggable(Level.INFO)) log.info(e1.getMessage());
+        }
+        return comp.getCaretPosition();
     }
 
     private List<FixItem> convert(Set<ElementHandle<TypeElement>> types) {

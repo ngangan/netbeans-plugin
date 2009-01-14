@@ -35,9 +35,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -48,10 +46,13 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
     private final CompilationInfo info;
     protected UnitTree cu;
     private final Collection<Name> variableNames = new TreeSet<Name>(new InnerComparator());
+    private Map<Element, Long> positions = new HashMap<Element, Long>();
+    protected SourcePositions sp;
 
     IdentifierVisitor(CompilationInfo info) {
         this.info = info;
         cu = this.info.getCompilationUnit();
+        sp = info.getTrees().getSourcePositions();
     }
 
 
@@ -73,9 +74,11 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
                 Tree parent = path.getParentPath().getLeaf();
                 if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
                     elements.add(element);
+                    positions.put(element, sp.getStartPosition(cu, node));
                 }
             } else {
                 elements.add(element);
+                positions.put(element, sp.getStartPosition(cu, node));
             }
         }
         return elements;
@@ -94,11 +97,20 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
             Element element = toElement(node.getType());
             if (element != null) {
                 elements.add(element);
+                positions.put(element, sp.getStartPosition(cu, node));
             }
         }
         super.visitFunctionValue(node, elements);
         return elements;
 
+    }
+
+    /**
+     * Gets positions associated with elements.
+     * @return defensive copy of positions start positions.
+     */
+    Map<Element, Long> getPositions() {
+        return new HashMap<Element, Long>(positions);
     }
 
     private static class InnerComparator implements Comparator<Name> {

@@ -43,6 +43,7 @@ package org.netbeans.modules.javafx.editor.imports;
 
 import javax.lang.model.element.Element;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -51,4 +52,6 @@ import java.util.Collection;
 public interface ImportResolver {
     void resolve(ImportsModel model, Element e);
     void resolve(ImportsModel model, Collection<Element> elements);
+
+    void setElementPositions(Map<Element, Long> positions);
 }

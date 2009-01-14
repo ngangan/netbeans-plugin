@@ -65,7 +65,7 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
     }
 
     public void run(CompilationInfo cp) throws Exception {
-        if (canceled.get()) return;
+        if (canceled.get() || file.get() == null || !file.get().isValid()) return;
         final JavaFXDocument document = getDoc(file.get());
         if (document == null || canceled.get()) return;
         Iterable<ImportsModel.ModelEntry> entries = configureModel(cp);
@@ -101,7 +101,7 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
     }
 
     private JavaFXDocument getDoc(FileObject file) {
-        if (file == null) return null;
+        if (file == null || !file.isValid()) return null;        
         DataObject od = null;
         try {
             od = DataObject.find(file);

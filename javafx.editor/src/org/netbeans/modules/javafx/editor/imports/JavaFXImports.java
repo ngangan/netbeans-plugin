@@ -126,9 +126,11 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
                             }
                             ClassIndex index = ClasspathInfo.create(source).getClassIndex();
                             Set<Element> elements = new TreeSet<Element>(InternalSetComparator.create());
-                            cc.getCompilationUnit().accept(new IdentifierVisitor(cc), elements);
+                            IdentifierVisitor iv = new IdentifierVisitor(cc);
+                            cc.getCompilationUnit().accept(iv, elements);
                             ImportsModel model = new ImportsModel(cc);
-                            ImportResolver ir = ImportResolverImpl.create(index, target);
+                            ImportResolver ir = ImportResolverImpl.create(index, cc, target);
+                            ir.setElementPositions(iv.getPositions());
                             ir.resolve(model, elements);
                         }
 
