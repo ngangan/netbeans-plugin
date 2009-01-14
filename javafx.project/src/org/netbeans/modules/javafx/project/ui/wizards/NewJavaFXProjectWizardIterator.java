@@ -46,12 +46,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.project.ProjectManager;
+import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
 import org.netbeans.modules.javafx.project.ui.FoldersListSettings;
 import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
@@ -144,6 +151,8 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                     resultSet.add (srcFo);
                 }
             }
+
+            createRuntimeProfiles( h );        
             break;
         default:
             h = JavaFXProjectGenerator.createProject(dirF, name, mainClass, type == WizardType.APP ? MANIFEST_FILE : null);
@@ -156,6 +165,8 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                     assert mainClassFo != null : "sourcesRoot: " + sourcesRoot + ", mainClass: " + mainClass;        //NOI18N
                     // Returning FileObject of main class, will be called its preferred action
                     resultSet.add (mainClassFo);
+
+                    createRuntimeProfiles( h );
                 } catch (Exception x) {
                     ErrorManager.getDefault().notify(x);
                 }
@@ -189,7 +200,46 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                         
         return resultSet;
     }
-    
+
+    private void createRuntimeProfiles( AntProjectHelper helper ) throws IOException {
+        // Create runtime profiles
+        JavaFXProject project = (JavaFXProject)ProjectManager.getDefault().
+                findProject( helper.getProjectDirectory());
+        JavaFXProjectProperties projectProperties = new JavaFXProjectProperties(
+                project, project.getUpdateHelper(), project.evaluator(), project.getReferenceHelper(), null );
+
+        Map<String, Map<String, String>> profiles = projectProperties.readRunConfigs();
+
+        Map<String, String> profile;
+
+        // Browser
+        profile = new TreeMap<String, String>();
+        profile.put( "$label", "Browser" ); //NOI18N
+        profile.put( "javafx.profile", "desktop" ); //NOI18N
+        profile.put( "execution.target", "applet" ); //NOI18N
+        profiles.put( "browser", profile );
+        // Web start
+        profile = new TreeMap<String, String>();
+        profile.put( "$label", "Web Start" ); //NOI18N
+        profile.put( "javafx.profile", "desktop" ); //NOI18N
+        profile.put( "execution.target", "jnlp" ); //NOI18N
+        profiles.put( "webstart", profile );
+
+        // Mobile
+        try {
+            if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator").isDirectory()) { // NOI18N
+                profile = new TreeMap<String, String>();
+                profile.put( "$label", "Mobile" ); //NOI18N
+                profile.put( "javafx.profile", "mobile" ); //NOI18N
+                profile.put( "execution.target", "midp" ); //NOI18N
+                profiles.put( "mobile", profile );
+            }
+        } catch( URISyntaxException e ) { /* Should not happen */ }
+
+        EditableProperties prj = project.getUpdateHelper().getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );
+        EditableProperties prv = project.getUpdateHelper().getProperties( AntProjectHelper.PRIVATE_PROPERTIES_PATH );
+        projectProperties.storeRunConfigs( profiles, prj, prv);
+    }
         
     private transient int index;
     private transient WizardDescriptor.Panel[] panels;
