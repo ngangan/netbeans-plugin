@@ -521,8 +521,10 @@ private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     boolean firstPopup = true;
 
 private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_deviceComboPopupMenuWillBecomeVisible
+    deviceCombo.setSelectedItem(deviceCombo.getEditor().getItem());
     if (firstPopup) {
         firstPopup = false;
+        deviceCombo.addItem(NbBundle.getMessage(CustomizerRun.class, "NODE_PleaseWait"));//NOI18N
         RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
                     PlatformUiSupport.PlatformKey pk = (PlatformUiSupport.PlatformKey)uiProperties.PLATFORM_MODEL.getSelectedItem();
@@ -538,8 +540,11 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
                                     final String list = p.getProperty("device.list"); //NOI18N
                                     if (list != null) SwingUtilities.invokeLater(new Runnable() {
                                         public void run() {
+                                            Object dev = deviceCombo.getEditor().getItem();
+                                            deviceCombo.removeAllItems();
                                             for (String name : list.split(",")) 
                                                 deviceCombo.addItem(name.trim());
+                                            deviceCombo.setSelectedItem(dev);
                                             if (deviceCombo.isPopupVisible()) {
                                                 deviceCombo.hidePopup();
                                                 deviceCombo.showPopup();
