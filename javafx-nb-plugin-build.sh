@@ -77,7 +77,7 @@ javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/b
 jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxc.jar
 jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
-javafx-fxd-netbeans-support.zip.url=${PRODUCTION_SUITE_URL}/label=macosx-universal2/artifact/installer/macosx/build/javafx-fxd-netbeans-support-1.0-macosx-universal.zip
+javafx-fxd-netbeans-support.zip.url=${PRODUCTION_SUITE_URL}/label=windows-i586/artifact/installer/win/build/javafx-fxd-netbeans-support-1.1-windows-i586.zip
 EOF
 
 # Get Netbeans binary
