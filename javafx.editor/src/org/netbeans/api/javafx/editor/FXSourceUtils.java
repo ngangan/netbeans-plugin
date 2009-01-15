@@ -109,11 +109,26 @@ public final class FXSourceUtils {
             case TypeTags.BOOLEAN:
                 return "Boolean" + suffix; // NOI18N
 
+            case TypeTags.BYTE:
+                return "Byte" + suffix; // NOI18N
+
             case TypeTags.DOUBLE:
-                return "Number" + suffix; // NOI18N
+                return "Double" + suffix; // NOI18N
+
+            case TypeTags.FLOAT:
+                return "Float" + suffix; // NOI18N
 
             case TypeTags.INT:
                 return "Integer" + suffix; // NOI18N
+
+            case TypeTags.LONG:
+                return "Long" + suffix; // NOI18N
+
+            case TypeTags.CHAR:
+                return "Character" + suffix; // NOI18N
+
+            case TypeTags.SHORT:
+                return "Short" + suffix; // NOI18N
 
             case TypeTags.VOID:
                 return "Void" + suffix; // NOI18N
