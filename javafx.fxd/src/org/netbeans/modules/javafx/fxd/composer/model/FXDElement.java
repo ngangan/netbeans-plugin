@@ -75,6 +75,7 @@ public final class FXDElement {
     public FXDElement(final FXZDataObject dObj, final String id) {
         assert dObj != null;
         assert id != null;
+        assert id.length() > 0;
         
         m_dObj = dObj;
         m_id   = id;
@@ -82,7 +83,7 @@ public final class FXDElement {
     }
             
     public boolean isVisible() {
-        //TODO use JSONObject to determine this
+        //TODO use FXDNode to determine this
         return getController().getNode(m_id) != null;
     }
     
@@ -96,13 +97,14 @@ public final class FXDElement {
     
     //TODO should be private
     public DocumentElement getDocumentElement() {
+        DocumentElement de = null;
         try {
-            return m_dObj.getDataModel().getFXDContainer().getFileModel().getElementById(m_id);
+            de = m_dObj.getDataModel().getFXDContainer().getFileModel().getElementById(m_id);
         } catch (Exception ex) {
             //TODO Do not swallow it
             Exceptions.printStackTrace(ex);
         }
-        return null;
+        return de;
     }
     
     public int getStartOffset() {

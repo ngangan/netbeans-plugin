@@ -5,9 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import com.sun.scenario.scenegraph.JSGPanel;
-import com.sun.scenario.scenegraph.SGNode;
-import com.sun.scenario.scenegraph.fx.FXNode;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -16,12 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import javax.swing.SwingUtilities;
+
 import org.openide.util.Utilities;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ComposerAction;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.preview.PreviewTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+
+import com.sun.scenario.scenegraph.JSGPanel;
+import com.sun.scenario.scenegraph.SGNode;
+import com.sun.scenario.scenegraph.fx.FXNode;
+
+import com.sun.javafx.tools.fxd.TargetProfile;
 
 /**
  *
@@ -156,8 +160,10 @@ public final class FXDComposerController {
     }
     
     public void refresh() {
-        m_previewTopComponent.refresh();
-        repaint();
+        if ( m_previewTopComponent != null) {
+            m_previewTopComponent.refresh();
+            repaint();
+        }
     }
     
     public short getScreenChangeTicker() {
@@ -171,6 +177,15 @@ public final class FXDComposerController {
                 FXNode scene = (FXNode) getSGPanel().getScene();
                 scene.setScaleX(zoomRatio);
                 scene.setScaleY(zoomRatio);
+                refresh();
+            }
+        }
+    }
+
+    public void setPreviewProfile(TargetProfile profile) {
+        if ( m_dObj.getDataModel().setPreviewProfile(profile)) {
+            m_screenChangeTicker++;
+            if ( hasPreviewTC()) {
                 refresh();
             }
         }

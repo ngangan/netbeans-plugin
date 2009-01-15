@@ -7,10 +7,11 @@ package org.netbeans.modules.javafx.fxd.composer.source;
        
 import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.StringTokenizer;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
@@ -28,10 +29,10 @@ import org.netbeans.modules.editor.structure.api.DocumentModel.DocumentModelTran
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.spi.DocumentModelProvider;
 
+import org.netbeans.modules.javafx.fxd.composer.misc.CharSeqReader;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
-import static org.netbeans.modules.javafx.fxd.composer.source.TextParser.Direction.BACKWARD;
 import org.openide.util.Exceptions;
 
 /**
@@ -104,28 +105,20 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 trans.removeDocumentElement(rootDE.getElement(0), true);
             }            
         }
-        
-        TextParser textParser = new TextParser( doc.getText());
-        
-        //System.err.println("Model update started ...");
 
-        if ( textParser.gotoChar('{')) {
-            textParser.fetchChar(BACKWARD);
-            textParser.skipWhite(BACKWARD);
-            textParser.skipNonWhite(BACKWARD);
-
-            int nodesStartPos = textParser.getPosition() + 1;
-            int textSize      = textParser.getSize();
-            CharSequence nodes = textParser.subsequence(nodesStartPos, textSize);
-            FXDParser fxdParser = new FXDParser(nodes, new ContentHandler() {
+        Reader docReader = new CharSeqReader(doc.getText());
+        final StringBuilder statMsg = new StringBuilder(" "); // NOI18N
+                    
+        try {
+            FXDParser fxdParser = new FXDParser(docReader, new ContentHandler() {
                 private boolean m_isLastNode = true;
-                
+
                 public Object startNode(String typeName, int startOff) {
                     return new NodeBuilder(typeName, startOff);
                 }
 
                 public void attribute(Object node, String name, String value, int startOff, int endOff) throws Exception {
-                    NodeBuilder deb = (NodeBuilder) node; 
+                    NodeBuilder deb = (NodeBuilder) node;
                     if ( value == null) {
                         if ( m_isLastNode) {
                             //System.err.println(String.format("Adding attribute %s <%d, %d>", name, startOff, endOff));
@@ -140,7 +133,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
 
                 public void endNode(Object node, int endOff) throws Exception {
                     //System.err.println("Node ended");
-                    NodeBuilder deb = (NodeBuilder) node;                    
+                    NodeBuilder deb = (NodeBuilder) node;
                     DocumentElement de = model.getLeafElementForOffset(deb.m_startOffset);
                     if ( de != model.getRootElement() && FXDFileModel.FXD_NODE.equals(de.getType())) {
                         if ( !deb.isEqual(de.getAttributes())) {
@@ -165,73 +158,39 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 }
 
                 public void endNodeArray(Object node, int endOff) {
-                    //NodeArrayBuilder nab = (NodeArrayBuilder) node; 
+                    //NodeArrayBuilder nab = (NodeArrayBuilder) node;
                     m_isLastNode = false;
                 }
-                
-            }, nodesStartPos);
-            
-            final StringBuilder statMsg = new StringBuilder(" "); // NOI18N
+            });
+
             showStatusText(dObj, " Parsing text..."); // NOI18N
-            
-            try {
-                fxdParser.parseObject();
-                reportDeletedElements(trans, model.getRootElement());
-                doc.putProperty( PROP_PARSE_ERROR, null);
-                //s_root = com.sun.javafx.tools.fxd.container.scene.fxd.Parser.parse( nodes);
-                
-            //System.err.println("Model update done ...");
-            } catch( DocumentModelException e) {
-                //s_root = null;
-                throw e;
-            } catch( DocumentModelTransactionCancelledException e) {
-                //s_root = null;
-                throw e;
-            } catch (Exception ex) {
-                //s_root = null;
+
+            fxdParser.parseObject();
+            reportDeletedElements(trans, model.getRootElement());
+            doc.putProperty( PROP_PARSE_ERROR, null);
+        } catch( DocumentModelTransactionCancelledException e) {
+            //s_root = null;
+            throw e;
+        } catch (Exception ex) {
+            if ( ex instanceof FXDSyntaxErrorException) {
                 statMsg.append( "Syntax error: "); //NOI18N
-                String msg = ex.getLocalizedMessage();
-                doc.putProperty( PROP_PARSE_ERROR, msg);
-                //TODO Nasty hack, increase the row index where to error has been found
-                //to compensate the few lines at the top of the document that are not
-                //recognized by the FXD parser
-                try {
-                    int end;
-                    if ( (end=msg.lastIndexOf(']')) != -1) { // NOI18N
-                        int start;
-                        if ( (start=msg.lastIndexOf('[', end)) != -1) {
-                            StringTokenizer st = new StringTokenizer( msg.substring(start+1, end), ","); // NOI18N
-                            if ( st.countTokens() == 2) {
-                                int [] startCoords = FXDParser.index2coords(textParser.subsequence(0, textParser.getSize()), nodesStartPos);
-                                int [] coords = new int[2];
-                                for (int i = 0; i < coords.length; i++) {
-                                    coords[i] = Integer.parseInt(st.nextToken().trim());
-                                }
-                                msg = String.format( "%s[%d,%d]%s", // NOI18N
-                                        msg.substring(0, start),
-                                        coords[0] + startCoords[0] - 1,
-                                        coords[1] - 1,
-                                        msg.substring(end+1));
-                                statMsg.append( msg);
-                            }
-                        }
-                    }
-                } catch( Exception e) {
-                    e.printStackTrace();
-                }
-                doc.putProperty( PROP_PARSE_ERROR, statMsg.toString());
-                cleanModel(trans, model);
-                try {
-                    trans.addDocumentElement("Invalid FXD syntax", FXDFileModel.FXD_ERROR, NO_ATTRS, nodesStartPos, textSize); // NOI18N
-                } catch (BadLocationException ex1) {
-                    Exceptions.printStackTrace(ex1);
-                }
-            } finally {
-                showStatusText(dObj, statMsg.toString());
+            } else {
+                statMsg.append( "Unknown error: "); //NOI18N
             }
+            String msg = ex.getLocalizedMessage();
+            statMsg.append(msg);
+            doc.putProperty( PROP_PARSE_ERROR, msg);
+            cleanModel(trans, model);
+            try {
+                trans.addDocumentElement("Invalid FXD syntax", FXDFileModel.FXD_ERROR, NO_ATTRS, 0, doc.getLength()); // NOI18N
+            } catch (BadLocationException ex1) {
+                Exceptions.printStackTrace(ex1);
+            }
+        } finally {
+            showStatusText(dObj, statMsg.toString());
         }
     }
-    
+
     protected static void showStatusText( DataObject dObj, final String msg) {
         final EditorCookie ec = dObj.getCookie( EditorCookie.class);
         if ( ec != null) {

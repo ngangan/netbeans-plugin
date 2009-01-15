@@ -94,8 +94,9 @@ final class ImageHolder extends JPanel {
     //    if (canPaint.get()) {
             try {
                 doPaintChildren(g);
-            }
-            catch (OutOfMemoryError e) {
+            } catch (Throwable e) {
+                System.err.println("Out of Memory");
+                e.printStackTrace();
                 canPaint.set( false );
                 remove( imagePanel );
                 setLayout( new LabelLayout() );

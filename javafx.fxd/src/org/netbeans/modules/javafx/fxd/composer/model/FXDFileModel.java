@@ -121,7 +121,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
 
     public synchronized FXDNode getRootNode() {
         //TODO Use better construction
-        return (FXDNode) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0), true, true);
+        return (FXDNode) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0), true);
     }    
         
     protected DocumentElement findElement( final DocumentElement de, final String id) {
@@ -309,7 +309,8 @@ public final class FXDFileModel implements DocumentModelStateListener {
 //            getSceneManager().setBusyState(MODEL_UPDATE_TOKEN, false);
         }
     }
-    
+
+    /*
     private static boolean checkEqual( final com.sun.javafx.tools.fxd.FXDElement elem1, final com.sun.javafx.tools.fxd.FXDElement elem2) {
         if ( elem1.getKind() != elem2.getKind()) {
             System.err.println( String.format("Kind mismatch: %s - %s", elem1.toString(), elem2.toString()));
@@ -394,4 +395,5 @@ public final class FXDFileModel implements DocumentModelStateListener {
             }
         }
     }
+     */
 }

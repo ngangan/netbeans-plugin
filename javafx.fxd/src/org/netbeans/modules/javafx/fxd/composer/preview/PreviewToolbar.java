@@ -21,6 +21,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import com.sun.javafx.tools.fxd.TargetProfile;
 
 /**
  *
@@ -29,8 +30,9 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 final class PreviewToolbar extends FXDToolbar {
     private static final String[] ZOOM_VALUES = new String[]{"400%", "300%", "200%", "100%", "75%", "50%", "25%"}; //NOI18N
     
-    private final FXZDataObject       m_dObj;
-    private final JComboBox           m_zoomComboBox;
+    private final FXZDataObject  m_dObj;
+    private final JComboBox      m_zoomComboBox;
+    private final JComboBox      m_profileComboBox;
     
     public PreviewToolbar( FXZDataObject dObj, ActionLookup lookup) {
         m_dObj = dObj;
@@ -57,7 +59,10 @@ final class PreviewToolbar extends FXDToolbar {
         addButton( lookup.get(HighlightActionFactory.ToggleHighlightAction.class));
         add(createToolBarSeparator(), constrains);
         addButton( lookup.get(ActionController.GenerateUIStubAction.class));
-        
+
+        add(createToolBarSeparator(), constrains);
+        addCombo(m_profileComboBox=createProfileCombo());
+
         constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;
         constrains.fill = GridBagConstraints.HORIZONTAL;
@@ -68,8 +73,7 @@ final class PreviewToolbar extends FXDToolbar {
     void refresh() {
         updateZoomCombo();
     }
-             
-    
+                 
     private JComboBox createZoomCombo() {
         final JComboBox zoomComboBox = new JComboBox(ZOOM_VALUES);
         final ComboBoxEditor cbe = zoomComboBox.getEditor();
@@ -149,5 +153,26 @@ final class PreviewToolbar extends FXDToolbar {
     
     private void updateZoomCombo() {
         m_zoomComboBox.getEditor().setItem(Integer.toString((int) ( m_dObj.getDataModel().getZoomRatio() * 100 + 0.5)) + "%"); //NOI18N
-    }            
+    }
+
+    private JComboBox createProfileCombo() {
+        final JComboBox profileComboBox = new JComboBox(
+            new Object[] {
+                TargetProfile.desktop,
+                TargetProfile.mobile
+            }
+        );
+
+        profileComboBox.setSelectedItem( m_dObj.getDataModel().getPreviewProfile());
+        
+        profileComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                TargetProfile profile = (TargetProfile) profileComboBox.getSelectedItem();
+                m_dObj.getController().setPreviewProfile(profile);
+            }
+        });
+
+        return profileComboBox;
+    }
+
 }

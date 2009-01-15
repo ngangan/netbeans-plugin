@@ -10,7 +10,6 @@
         <move todir="external/javafx-fxd-netbeans-support" flatten="true">
             <fileset dir="external">
               <include name="**/*.jar"/>
-              <include name="**/javafx-fxd-1.0-javadoc.zip"/>
             </fileset>
         </move>   
         

@@ -11,9 +11,13 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.FXDElement;
 import com.sun.javafx.tools.fxd.FXDNode;
 import com.sun.javafx.tools.fxd.FXDNodeArray;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -24,21 +28,34 @@ final class DocumentElementWrapper {
     
     private static abstract class FXDElementWrapper implements FXDElement {
         protected DocumentElement m_de;
-        protected final boolean m_remapID;
         
-        public FXDElementWrapper( final DocumentElement de, boolean remapID) {
+        public FXDElementWrapper( final DocumentElement de) {
             m_de = de;
-            m_remapID = remapID;
         }
         
         public void release() {
             m_de = null;
         }
     }
-    
-    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDNode {        
-        public FXDNodeWrapper(final DocumentElement de, boolean remapID) {
-            super(de, remapID);
+
+    private static final Enumeration ID_ELEM = new Enumeration() {
+        public boolean hasMoreElements() {
+            return true;
+        }
+
+        public Object nextElement() {
+            return FXDNode.ATTR_NAME_ID;
+        }
+    };
+
+    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDNode, Enumeration {
+        private final boolean     m_injectID;
+        private       Enumeration m_attrEnum = null;
+
+        public FXDNodeWrapper(final DocumentElement de) {
+            super(de);
+            m_injectID = m_de.getAttributes().isDefined(FXDNode.ATTR_NAME_ID) == false &&
+                         isIDSupported(getTypeName());
         }        
 
         public String getTypeName() {
@@ -46,11 +63,15 @@ final class DocumentElementWrapper {
         }
 
         public int getAttrNum() {
-            return m_de.getAttributes().getAttributeCount();
+            int attrNum = m_de.getAttributes().getAttributeCount();
+            if ( !m_injectID) {
+                attrNum++;
+            }
+            return attrNum;
         }
 
         public Object getAttrValue(String name) {
-            if ( m_remapID && FXDNode.ATTR_NAME_ID.equals(name)) {
+            if ( FXDNode.ATTR_NAME_ID.equals(name)) {
                 //override existing ID with the element start offset
                 return Integer.toString(m_de.getStartOffset());
             } else {
@@ -65,10 +86,10 @@ final class DocumentElementWrapper {
                             if ( name.equals(de.getName())) {
                                 if ( FXDFileModel.FXD_ATTRIBUTE.equals( de.getType())) {
                                     assert de.getElementCount() == 1;
-                                    return wrap(de.getElement(0), false, m_remapID);
+                                    return wrap(de.getElement(0), false);
                                 } else {
                                     assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( de.getType());
-                                    return wrap(de, false, m_remapID);
+                                    return wrap(de, false);
                                 }
                             }
                         }
@@ -80,8 +101,16 @@ final class DocumentElementWrapper {
         }
 
         @SuppressWarnings("unchecked")         
-        public Enumeration<String> getAttrNames() {
-            return (Enumeration<String>) m_de.getAttributes().getAttributeNames();
+        public Enumeration getAttrNames() {
+            Enumeration attrNames = m_de.getAttributes().getAttributeNames();
+            assert attrNames != null;
+
+            if ( m_injectID) {
+                m_attrEnum = ID_ELEM;
+                return this;
+            } else {
+                return attrNames;
+            }
         }
 
         public int getKind() {
@@ -106,10 +135,30 @@ final class DocumentElementWrapper {
                     if ( m_index >= childDE.size()) {
                         throw new NoSuchElementException();
                     }
-                    return wrap( childDE.get(m_index++), false, m_remapID);
+                    return wrap( childDE.get(m_index++), false);
                 }
             };
-        }        
+        }
+
+        @Override
+        public void release() {
+            super.release();
+            m_attrEnum = null;
+        }
+
+        public boolean hasMoreElements() {
+            assert m_attrEnum != null;
+            return m_attrEnum.hasMoreElements();
+        }
+
+        public Object nextElement() {
+            assert m_attrEnum != null;
+            Object o = m_attrEnum.nextElement();
+            if ( m_attrEnum == ID_ELEM) {
+                m_attrEnum = m_de.getAttributes().getAttributeNames();
+            }
+            return o;
+        }
     }
 
     private static void collectChildren( final DocumentElement de, List<DocumentElement> childrenList) {
@@ -126,8 +175,8 @@ final class DocumentElementWrapper {
     }
     
     private static final class FXDRootNodeWrapper extends FXDNodeWrapper {
-        public FXDRootNodeWrapper(final DocumentElement de, boolean remapID) {
-            super(de, remapID);
+        public FXDRootNodeWrapper(final DocumentElement de) {
+            super(de);
         }
         
         @Override
@@ -142,8 +191,8 @@ final class DocumentElementWrapper {
     
     private static final class FXDNodeArrayWrapper extends FXDElementWrapper implements FXDNodeArray {
 
-        public FXDNodeArrayWrapper(final DocumentElement de, boolean remapID) {
-            super(de, remapID);
+        public FXDNodeArrayWrapper(final DocumentElement de) {
+            super(de);
         }        
 
         public int getLength() {
@@ -156,7 +205,7 @@ final class DocumentElementWrapper {
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
                 return de.getName();
             } else {
-                return wrap( de, false, m_remapID);
+                return wrap( de, false);
             }
         }
 
@@ -180,7 +229,7 @@ final class DocumentElementWrapper {
                     if ( m_index >= m_de.getElementCount()) {
                         throw new NoSuchElementException();
                     }
-                    FXDElement elem = wrap( m_de.getElement(m_index), false, m_remapID);
+                    FXDElement elem = wrap( m_de.getElement(m_index), false);
                     m_index = advance(m_index+1);
                     return elem;
                 }
@@ -196,17 +245,59 @@ final class DocumentElementWrapper {
         }        
     }
 
-    public static FXDElement wrap( final DocumentElement de, boolean isRoot, boolean remapId) {
+    public static FXDElement wrap( final DocumentElement de, boolean isRoot) {
         String type = de.getType();
         if ( FXDFileModel.FXD_NODE.equals( type)) {
-            return isRoot ? new FXDRootNodeWrapper(de, remapId) : new FXDNodeWrapper(de, remapId);
+            return isRoot ? new FXDRootNodeWrapper(de) : new FXDNodeWrapper(de);
         } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
-            return new FXDNodeArrayWrapper(de, remapId);
+            return new FXDNodeArrayWrapper(de);
         } else if ( FXDFileModel.FXD_ERROR.equals(type)) {
             // nothing to do
             return null;
         } else {    
             throw new RuntimeException( "Unknown DocumentElement type: " + type); //NOI18N
         }
+    }
+
+    private static final String [] DEFAULT_IMPORTS = {
+        "javafx.scene.image.",
+        "javafx.scene.transform.",
+        "javafx.geometry.",
+        "javafx.scene.",
+        "javafx.scene.paint.",
+        "javafx.scene.effect.light.",
+        "javafx.scene.shape.",
+        "javafx.scene.text.",
+        "javafx.scene.effect.",
+        ""
+    };
+
+    private static Map<String,Boolean> CLASSES_WITH_ID = new HashMap<String, Boolean>();
+
+    public static boolean isIDSupported( String typeName) {
+        Boolean state = CLASSES_WITH_ID.get(typeName);
+        if ( state == null) {
+            state = Boolean.valueOf( isIDSupportedImpl(typeName));
+            CLASSES_WITH_ID.put(typeName, state);
+        }
+        return state.booleanValue();
+    }
+
+    private static boolean isIDSupportedImpl( String typeName) {
+        for ( String importStr : DEFAULT_IMPORTS) {
+            String className = importStr.concat(typeName);
+            try {
+                Class clazz = Class.forName(className);
+                try {
+                    Method m = clazz.getMethod("get$id");
+                    assert m != null;
+                    return true;
+                } catch( Exception e) {
+                    return false;
+                }
+            } catch (ClassNotFoundException ex) {
+            }
+        }
+        return false;
     }
 }

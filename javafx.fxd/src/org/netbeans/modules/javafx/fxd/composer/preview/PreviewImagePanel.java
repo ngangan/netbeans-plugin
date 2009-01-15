@@ -2,36 +2,27 @@
  *  Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
-
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import com.sun.scenario.scenegraph.JSGPanel;
-import com.sun.scenario.scenegraph.fx.FXNode;
-import java.awt.AWTEvent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.geom.Rectangle2D;
+import java.net.URL;
+
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import com.sun.javafx.tools.fxd.LoaderExtended;
-import java.awt.Dimension;
-import java.awt.geom.Rectangle2D;
-import java.net.URL;
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.openide.util.NbBundle;
+
+import com.sun.javafx.tools.fxd.*;
+
+import com.sun.scenario.scenegraph.JSGPanel;
+import com.sun.scenario.scenegraph.fx.FXNode;
+
 
 /**
  *
@@ -40,11 +31,12 @@ import org.openide.util.NbBundle;
 final class PreviewImagePanel extends JPanel implements ActionLookup {
     private static final float       ZOOM_STEP = (float) 1.1;
     
-    private final FXZDataObject      m_dObj;
-    private final Action []          m_actions;
-    private final Color              m_defaultBackground;
-    private       JSGPanel           m_sgPanel = null;
-    private       int                m_changeTickerCopy = -1;
+    private final FXZDataObject m_dObj;
+    private final Action []     m_actions;
+    private final Color         m_defaultBackground;
+    private       JSGPanel      m_sgPanel = null;
+    private       int           m_changeTickerCopy = -1;
+    private       TargetProfile m_previewProfileCopy = null;
         
     PreviewImagePanel(final FXZDataObject dObj) {
         m_dObj = dObj;
@@ -77,7 +69,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         final FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
         if (  fxzArchive != null) {
             final int tickerCopy = fxzArchive.getChangeTicker();
-            if ( tickerCopy != m_changeTickerCopy) {
+            final TargetProfile profileCopy = m_dObj.getDataModel().getPreviewProfile();
+            if ( tickerCopy != m_changeTickerCopy || profileCopy != m_previewProfileCopy) {
                 removeAll();
                 setBackground( Color.WHITE);
                 final JLabel label = createWaitPanel();
@@ -111,7 +104,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             javafx.scene.Node$Intf node;                                            
                                             try {
                                                 fModel.readLock();
-                                                node = LoaderExtended.getLoaderExtended().load(fxz);
+                                                AnalyzerStatistics stats = new AnalyzerStatistics();
+                                                node = LoaderAnalyzer.get().load(fxz, m_dObj.getDataModel().getPreviewProfile(), stats);
                                             } finally {
                                                 fModel.readUnlock();
                                             }
@@ -128,7 +122,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                     }
                                                 };
                                                 m_sgPanel.setBackground(Color.WHITE);
-                            //                    FXNode fNode = new FXNode(sgNode);
                                                 m_sgPanel.setScene( fxNode);
 
                                                 removeAll();
@@ -139,7 +132,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 m_sgPanel.addMouseMotionListener(mec);
                                                 m_sgPanel.addMouseWheelListener(mec);
 
-                                                m_changeTickerCopy = tickerCopy;
+                                                m_changeTickerCopy   = tickerCopy;
+                                                m_previewProfileCopy = profileCopy;
                                                 updateZoom();
                                             } else {
                                                 setBackground( m_defaultBackground);
