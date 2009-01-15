@@ -264,15 +264,18 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
+            <property name="${{application.args}}" value=""/>
             <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true">
                 <arg line="${{application.args}}"/>
             </java>
         </target>
         <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
+            <property name="mobile.device" value="DefaultFxPhone1"/>
             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}" failonerror="true">
                 <arg value="${{run.jvmargs}}"/>
                 <arg value="-Xdescriptor:${{jad.file}}"/>
+                <arg value="-Xdevice:${{mobile.device}}"/>
             </exec>
         </target>
         <target depends="init,jar" if="applet.execution.trigger" name="browser-run">

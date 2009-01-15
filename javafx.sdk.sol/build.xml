@@ -73,7 +73,7 @@ made subject to such option by the copyright holder.
     <target name="main">
         <mkdir dir="build/main"/>
         <javac srcdir="instsrc" destdir="build/main"/>
-        <filter token="SDK_DIR" value="javafx-sdk1.0"/>
+        <filter token="SDK_DIR" value="javafx-sdk"/>
         <copy file="main/main.properties" todir="build/main" overwrite="true" filtering="true"/>
     </target>
     
