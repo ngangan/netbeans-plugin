@@ -69,6 +69,8 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.rmi.RemoteException;
 import java.util.logging.Logger;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 /**
  * @author answer
@@ -142,7 +144,11 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            if (target != null) {
+            if (!Bridge.isStarted()) {
+                String message = NbBundle.getMessage(JavaFXEditorKit.class, "PREVIEW_DISABLED_BY_FIREWALL");          //NOI18N
+                NotifyDescriptor d = new NotifyDescriptor.Message(message, NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(d);
+            } else if (target != null) {
                 JavaFXDocument doc = (JavaFXDocument) target.getDocument();
                 if (doc != null) {
                     doc.enableExecution(true);
@@ -154,7 +160,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             PreviewButton b = new PreviewButton();
             b.setSelected(false);
             b.setAction(this);
-            b.setEnabled(Bridge.isStarted());
+//            b.setEnabled(Bridge.isStarted());
             b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
             b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
             return b;
@@ -164,7 +170,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
             public PreviewButton() {
                 super();
-                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
+//                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
             }
 
             public void stateChanged(ChangeEvent evt) {
