@@ -57,8 +57,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,17 +77,19 @@ public class NbServiceTagSupport {
     
     private static String NB_VERSION;
     
-    private static String GF_VERSION;
+    private static final String USER_HOME = System.getProperty("user.home"); // NOI18N
+
+    private static final String SUPER_IDENTITY_FILE_NAME = ".superId"; // NOI18N
     
-    private static final String USER_HOME = System.getProperty("user.home");
+    private static final String DEFAULT_NETBEANS_DIR = ".netbeans"; // NOI18N
     
-    private static final String USER_DIR = System.getProperty("netbeans.user");
+    private static final String USER_DIR = System.getProperty("netbeans.user"); // NOI18N
     
-    private static final String ST_DIR = "servicetag";
+    private static final String ST_DIR = "servicetag"; // NOI18N
     
-    private static final String ST_FILE = "servicetag";
+    private static final String ST_FILE = "servicetag"; // NOI18N
     
-    private static final String REG_FILE = "registration.xml";
+    private static final String REG_FILE = "registration.xml"; // NOI18N
     
     /** Dir in home dir */
     private static File svcTagDirHome;
@@ -113,27 +119,26 @@ public class NbServiceTagSupport {
     
     private static File registerHtmlParent;
     
-    private final static String REGISTRATION_HTML_NAME = "register";
+    private final static String REGISTRATION_HTML_NAME = "register"; // NOI18N
     
     private static boolean inited = false;
     
     private static void init () {
-        LOG.log(Level.FINE,"Initializing");
+        LOG.log(Level.FINE,"Initializing"); // NOI18N
         NB_CLUSTER = NbBundle.getMessage(NbServiceTagSupport.class,"nb.cluster");
         NB_VERSION = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.nb.version");    
-        GF_VERSION = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.version");
         
         //This return platfomX dir but we need install dir
-        File f = new File(System.getProperty("netbeans.home"));
+        File f = new File(System.getProperty("netbeans.home")); // NOI18N
         
         nbInstallDir = f.getParentFile();
-        LOG.log(Level.FINE,"NetBeans install dir is:" + nbInstallDir);
+        LOG.log(Level.FINE,"NetBeans install dir is:" + nbInstallDir); // NOI18N
         
         nbClusterDir = new File(nbInstallDir,NB_CLUSTER);
-        LOG.log(Level.FINE,"nb cluster dir is:" + nbClusterDir);
+        LOG.log(Level.FINE,"nb cluster dir is:" + nbClusterDir); // NOI18N
         
         svcTagDirNb = new File(nbClusterDir.getPath() + File.separator + ST_DIR);
-        svcTagDirHome = new File(USER_HOME + File.separator + ".netbeans-registration"
+        svcTagDirHome = new File(USER_HOME + File.separator + ".netbeans-registration" // NOI18N
         + File.separator + NB_VERSION);
         if (nbClusterDir.canWrite() && (!svcTagDirNb.exists())) {
             svcTagDirNb.mkdirs();
@@ -151,38 +156,248 @@ public class NbServiceTagSupport {
         inited = true;
     }
 
-    /** 
-     * First look in registration data if NetBeans service tag exists.
+    /** Returns NetBeans IDE product name. Used as source for servicetag. */
+    public static String getProductName () {
+        return NbBundle.getMessage(NbServiceTagSupport.class,"nb.product.name");
+    }
+
+    /**
+     * Returns array of products based on registration data content. It is used as list of products
+     * in offline registration page.
+     */
+    public static String [] getProductNames (RegistrationData regData) {
+        List<String> names = new ArrayList<String>();
+        String nbProductURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.nb.urn");
+
+        boolean isGFAdded = false, isASAdded = false;
+
+        Collection<ServiceTag> svcTags = regData.getServiceTags();
+        for (ServiceTag st : svcTags) {
+            if (nbProductURN.equals(st.getProductURN())) {
+                names.add(getProductName());
+            } else if (st.getProductDefinedInstanceID().contains("glassfish.home")) { // NOI18N
+                String [] arr = st.getProductDefinedInstanceID().split(","); // NOI18N
+                for (String s : arr) {
+                    if (s.contains("glassfish.home")) { // NOI18N
+                        String arrGF[] = s.split("="); // NOI18N
+                        if (arrGF.length >= 2) {
+                            if (arrGF[1].toUpperCase(Locale.ENGLISH).contains("GLASSFISH")) { // NOI18N
+                                if (!isGFAdded) {
+                                    names.add("GlassFish V2 UR2"); // NOI18N
+                                    isGFAdded = true;
+                                }
+                            } else if (arrGF[1].toUpperCase(Locale.ENGLISH).contains("APPSERVER") || // NOI18N
+                                       arrGF[1].toUpperCase(Locale.ENGLISH).contains("SDK")) { // NOI18N
+                                if (!isASAdded) {
+                                    names.add("Sun Java System Application Server 9.1 Update 2"); // NOI18N
+                                    isASAdded = true;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            } else if (st.getProductName().contains("Sun Java System Application Server")) { // NOI18N
+                if (!isASAdded) {
+                    names.add("Sun Java System Application Server 9.1 Update 2"); // NOI18N
+                    isASAdded = true;
+                }
+            } else if (st.getProductName().contains("Sun GlassFish Enterprise Server")) { // NOI18N
+                if (!isGFAdded) {
+                    names.add("GlassFish V2 UR2"); // NOI18N
+                    isGFAdded = true;
+                }
+            } else if (st.getProductName().contains("J2SE 5.0 Development Kit")) { // NOI18N
+                names.add(st.getProductName());
+            } else if (st.getProductName().contains("Java SE 6 Development Kit")) { // NOI18N
+                names.add(st.getProductName());
+            }
+        }
+        return names.toArray(new String [0]);
+    }
+
+    /**
+     * Returns product id based on registration data content. It is used as parameter
+     * in registration URL.
+     */
+    public static String getProductId (RegistrationData regData) {
+        //Default we assume NB is always installed (as we do not have product page without NB anyway)
+        String productId = "nb"; // NOI18N
+
+        boolean isJDK = false, isGF = false, isAS = false;
+        Collection<ServiceTag> svcTags = regData.getServiceTags();
+        for (ServiceTag st : svcTags) {
+            if (st.getProductDefinedInstanceID().contains("glassfish.home")) { // NOI18N
+                String [] arr = st.getProductDefinedInstanceID().split(","); // NOI18N
+                for (String s : arr) {
+                    if (s.contains("glassfish.home")) { // NOI18N
+                        String arrGF[] = s.split("="); // NOI18N
+                        if (arrGF.length >= 2) {
+                            if (arrGF[1].toUpperCase(Locale.ENGLISH).contains("GLASSFISH")) { // NOI18N
+                                isGF = true;
+                            } else if (arrGF[1].toUpperCase(Locale.ENGLISH).contains("APPSERVER") || // NOI18N
+                                       arrGF[1].toUpperCase(Locale.ENGLISH).contains("SDK")) { // NOI18N
+                                isAS = true;
+                            }
+                        }
+                        break;
+                    }
+                }
+            } else if (st.getProductName().contains("Sun Java System Application Server")) { // NOI18N
+                isAS = true;
+            } else if (st.getProductName().contains("Sun GlassFish Enterprise Server")) { // NOI18N
+                isGF = true;
+            } else if (st.getProductName().contains("J2SE 5.0 Development Kit")) { // NOI18N
+                isJDK = true;
+            } else if (st.getProductName().contains("Java SE 6 Development Kit")) { // NOI18N
+                isJDK = true;
+            }
+        }
+        if (isJDK && (isGF || isAS)) {
+            productId = "nbgfjdk"; // NOI18N
+        } else if (isJDK) {
+            productId = "nbjdk"; // NOI18N
+        } else if (isGF) {
+            productId = "nbgf"; // NOI18N
+        } else if (isAS) {
+            productId = "nbas"; // NOI18N
+        }
+        return productId;
+    }
+
+    /**
+     * First look in registration data if NB service tag exists.
      * If not then create new service tag.
      * 
      * @param source client who creates service tag eg.: "NetBeans IDE 6.0.1 Installer" 
      * or "NetBeans IDE 6.0.1"
      * @param javaVersion IDE will provides java version on which IDE is running ie. value of system
      * property java.version. Installer will provide java version selected to run IDE                
-     * @return service tag instance for NetBeans
+     * @return service tag instance for NB
      * @throws java.io.IOException
      */
     public static ServiceTag createNbServiceTag (String source, String javaVersion) throws IOException {
         if (!inited) {
             init();
         }
-        LOG.log(Level.FINE,"Creating NetBeans service tag");
+        LOG.log(Level.FINE,"Creating NetBeans service tag"); // NOI18N
         
-        ServiceTag st = getNbServiceTag();
-        if (st != null) {
-            if ((serviceTagFileNb.exists() || serviceTagFileHome.exists())) {
-                LOG.log(Level.FINE,
-                "NetBeans service tag is already created and saved in registration.xml");
-                return st;
-            } else {
-                LOG.log(Level.FINE,"NetBeans service tag is already created");
-            }
+        ServiceTag st = getNbServiceTag();    
+        // New service tag entry if not created
+        if (st == null) {
+            LOG.log(Level.FINE,"Creating new service tag"); // NOI18N
+            st = newNbServiceTag(source, javaVersion);
+            // Add the service tag to the registration data in NB
+            getRegistrationData().addServiceTag(st);
+            writeRegistrationXml();
         }
         
+        // Install a system service tag if supported
+        if (Registry.isSupported()) {
+            LOG.log(Level.FINE,"Add service tag to system registry"); // NOI18N
+            installSystemServiceTag(st);
+        } else {
+            LOG.log(Level.FINE,"Cannot add service tag to system registry as ST infrastructure is not found"); // NOI18N
+        }
+        return st;
+    }
+    
+    /**
+     * First look in registration data if JavaFX service tag exists.
+     * If not then create new service tag.
+     *
+     * @param source client who creates service tag eg.: "NetBeans IDE 6.0.1 Installer"
+     * or "NetBeans IDE 6.0.1"
+     * @param javaVersion IDE will provides java version on which IDE is running ie. value of system
+     * property java.version. Installer will provide java version selected to run IDE
+     * @return service tag instance for JavaFX
+     * @throws java.io.IOException
+     */
+    public static ServiceTag createJavaFXServiceTag (String source, String javaVersion) throws IOException {
+        if (!inited) {
+            init();
+        }
+        LOG.log(Level.FINE,"Creating JavaFX service tag");
+
+        ServiceTag st = getJavaFXServiceTag();
         // New service tag entry if not created
         if (st == null) {
             LOG.log(Level.FINE,"Creating new service tag");
-            st = newNbServiceTag(source, javaVersion);
+            st = newJavaFXServiceTag(source, javaVersion);
+            // Add the service tag to the registration data in NB
+            getRegistrationData().addServiceTag(st);
+            writeRegistrationXml();
+        }
+
+        // Install a system service tag if supported
+        if (Registry.isSupported()) {
+            LOG.log(Level.FINE,"Add service tag to system registry");
+            installSystemServiceTag(st);
+        } else {
+            LOG.log(Level.FINE,"Cannot add service tag to system registry as ST infrastructure is not found");
+        }
+        return st;
+    }
+
+    /**
+     * First look in registration data if JavaFX SDK service tag exists.
+     * If not then create new service tag.
+     *
+     * @param source client who creates service tag eg.: "NetBeans IDE 6.0.1 Installer"
+     * or "NetBeans IDE 6.0.1"
+     * @param javaVersion IDE will provides java version on which IDE is running ie. value of system
+     * property java.version. Installer will provide java version selected to run IDE
+     * @return service tag instance for JavaFX SDK
+     * @throws java.io.IOException
+     */
+    public static ServiceTag createJavaFXSdkServiceTag (String source, String javaVersion) throws IOException {
+        if (!inited) {
+            init();
+        }
+        LOG.log(Level.FINE,"Creating JavaFX SDK service tag");
+
+        ServiceTag st = getJavaFXSdkServiceTag();
+        // New service tag entry if not created
+        if (st == null) {
+            LOG.log(Level.FINE,"Creating new service tag");
+            st = newJavaFXSdkServiceTag(source, javaVersion);
+            // Add the service tag to the registration data in NB
+            getRegistrationData().addServiceTag(st);
+            writeRegistrationXml();
+        }
+
+        // Install a system service tag if supported
+        if (Registry.isSupported()) {
+            LOG.log(Level.FINE,"Add service tag to system registry");
+            installSystemServiceTag(st);
+        } else {
+            LOG.log(Level.FINE,"Cannot add service tag to system registry as ST infrastructure is not found");
+        }
+        return st;
+    }
+    
+    /** 
+     * First look in registration data if CND service tag exists.
+     * If not then create new service tag.
+     * 
+     * @param source client who creates service tag eg.: "NetBeans IDE 6.0.1 Installer" 
+     * or "NetBeans IDE 6.0.1"
+     * @param javaVersion IDE will provides java version on which IDE is running ie. value of system
+     * property java.version. Installer will provide java version selected to run IDE                
+     * @return service tag instance for CND
+     * @throws java.io.IOException
+     */
+    public static ServiceTag createCndServiceTag (String source, String javaVersion) throws IOException {
+        if (!inited) {
+            init();
+        }
+        LOG.log(Level.FINE,"Creating CND service tag");
+        
+        ServiceTag st = getCndServiceTag();
+        // New service tag entry if not created
+        if (st == null) {
+            LOG.log(Level.FINE,"Creating new service tag");
+            st = newCndServiceTag(source, javaVersion);
             // Add the service tag to the registration data in NB
             getRegistrationData().addServiceTag(st);
             writeRegistrationXml();
@@ -204,33 +419,30 @@ public class NbServiceTagSupport {
      * @return service tag instance for GlassFish
      * @throws java.io.IOException
      */
-    public static ServiceTag createGfServiceTag
-    (String source, String jdkHomeUsedByGlassfish, String jdkVersionUsedByGlassfish, String glassfishHome) throws IOException {
+    public static ServiceTag createGfServiceTag (String source, String jdkHomeUsedByGlassfish,
+    String jdkVersionUsedByGlassfish, String glassfishHome, String gfVersion) throws IOException {
         if (!inited) {
             init();
         }
         LOG.log(Level.FINE,"Creating GlassFish service tag");
-        
-        ServiceTag st = getGfServiceTag();
+
+        ServiceTag st = getGfServiceTag(gfVersion);
         if (st != null) {
             if ((serviceTagFileNb.exists() || serviceTagFileHome.exists())) {
                 LOG.log(Level.FINE,
                 "GlassFish service tag is already created and saved in registration.xml");
-                return st;
             } else {
                 LOG.log(Level.FINE,"GlassFish service tag is already created");
             }
-        }
-        
-        // New service tag entry if not created
-        if (st == null) {
+        } else {
+            // New service tag entry if not created
             LOG.log(Level.FINE,"Creating new GlassFish service tag");
-            st = newGfServiceTag(source, jdkHomeUsedByGlassfish, jdkVersionUsedByGlassfish, glassfishHome);
+            st = newGfServiceTag(source, jdkHomeUsedByGlassfish, jdkVersionUsedByGlassfish, glassfishHome, gfVersion);
             // Add the service tag to the registration data in NB
             getRegistrationData().addServiceTag(st);
             writeRegistrationXml();
         }
-       
+
         return st;
     }
     
@@ -241,13 +453,13 @@ public class NbServiceTagSupport {
      * @return service tag instance for GlassFish
      * @throws java.io.IOException
      */
-    public static ServiceTag createGfServiceTag (ServiceTag serviceTag) throws IOException {
+    public static ServiceTag createGfServiceTag (ServiceTag serviceTag, String gfVersion) throws IOException {
         if (!inited) {
             init();
         }
         LOG.log(Level.FINE,"Creating GlassFish service tag");
-        
-        ServiceTag st = getGfServiceTag();
+
+        ServiceTag st = getGfServiceTag(gfVersion);
         if (st != null) {
             //If GF service tag already exists replace it with passed instance
             if (!st.equals(serviceTag)) {
@@ -405,33 +617,128 @@ public class NbServiceTagSupport {
                                       productURN,
                                       parentName,
                                       parentURN,
-                                      getNbProductDefinedId(javaVersion),
+                                      getNbProductDefinedId(javaVersion, true),
                                       "NetBeans.org",
                                       System.getProperty("os.arch"),
                                       getZoneName(),
                                       svcTagSource);
     }
+
+    /**
+     * Create new service tag instance for JavaFX
+     * @param svcTagSource
+     * @return
+     * @throws java.io.IOException
+     */
+    private static ServiceTag newJavaFXServiceTag (String svcTagSource, String javaVersion) throws IOException {
+        // Determine the product URN and name
+        String productURN, productName, productVersion, parentURN, parentName;
+
+        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.urn");
+        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.name");
+
+        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.version");
+
+        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.parent.urn");
+        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.parent.name");
+
+        return ServiceTag.newInstance(ServiceTag.generateInstanceURN(),
+                                      productName,
+                                      productVersion,
+                                      productURN,
+                                      parentName,
+                                      parentURN,
+                                      getNbProductDefinedId(javaVersion, false),
+                                      "NetBeans.org",
+                                      System.getProperty("os.arch"),
+                                      getZoneName(),
+                                      svcTagSource);
+    }
+
+    /**
+     * Create new service tag instance for JavaFX SDK
+     * @param svcTagSource
+     * @return
+     * @throws java.io.IOException
+     */
+    private static ServiceTag newJavaFXSdkServiceTag (String svcTagSource, String javaVersion) throws IOException {
+        // Determine the product URN and name
+        String productURN, productName, productVersion, parentURN, parentName;
+
+        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.urn");
+        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.name");
+
+        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.version");
+
+        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.parent.urn");
+        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.parent.name");
+
+        return ServiceTag.newInstance(ServiceTag.generateInstanceURN(),
+                                      productName,
+                                      productVersion,
+                                      productURN,
+                                      parentName,
+                                      parentURN,
+                                      getNbProductDefinedId(javaVersion, false),
+                                      "Sun Microsystems",
+                                      System.getProperty("os.arch"),
+                                      getZoneName(),
+                                      svcTagSource);
+    }
     
+     /**
+     * Create new service tag instance for CND
+     * @param svcTagSource
+     * @return
+     * @throws java.io.IOException
+     */
+    private static ServiceTag newCndServiceTag (String svcTagSource, String javaVersion) throws IOException {
+        // Determine the product URN and name
+        String productURN, productName, parentURN, parentName;
+
+        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.cnd.urn");
+        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.cnd.name");
+        
+        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.cnd.parent.urn");
+        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.cnd.parent.name");
+
+        return ServiceTag.newInstance(ServiceTag.generateInstanceURN(),
+                                      productName,
+                                      NB_VERSION,
+                                      productURN,
+                                      parentName,
+                                      parentURN,
+                                      getNbProductDefinedId(javaVersion, false),
+                                      "NetBeans.org",
+                                      System.getProperty("os.arch"),
+                                      getZoneName(),
+                                      svcTagSource);
+    }
+
     /**
      * Create new service tag instance for GlassFish
      * @param svcTagSource
      * @return
      * @throws java.io.IOException
      */
-    private static ServiceTag newGfServiceTag
-    (String svcTagSource, String jdkHomeUsedByGlassfish, String jdkVersionUsedByGlassfish, String glassfishHome) throws IOException {
+    private static ServiceTag newGfServiceTag (String svcTagSource, String jdkHomeUsedByGlassfish,
+    String jdkVersionUsedByGlassfish, String glassfishHome, String gfVersion) throws IOException {
         // Determine the product URN and name
-        String productURN, productName, parentURN, parentName;
-
-        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.urn");
-        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.name");
+        String productURN, productName, parentURN, parentName, productVersion;
+        String key = "";
+        if (!"".equals(gfVersion)) {
+            key += "." + gfVersion;
+        }
+        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.urn" + key);
+        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.name" + key);
+        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.version" + key);
         
-        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.parent.urn");
-        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.parent.name");
+        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.parent.urn" + key);
+        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.gf.parent.name" + key);
 
         return ServiceTag.newInstance(ServiceTag.generateInstanceURN(),
                                       productName,
-                                      GF_VERSION,
+                                      productVersion,
                                       productURN,
                                       parentName,
                                       parentURN,
@@ -444,7 +751,7 @@ public class NbServiceTagSupport {
     
     /**
      * Return the NetBeans service tag from local registration data.
-     * Return null if srevice tag is not found.
+     * Return null if service tag is not found.
      * 
      * @return a service tag for 
      */
@@ -461,16 +768,75 @@ public class NbServiceTagSupport {
     }
     
     /**
+     * Return the JavaFX service tag from local registration data.
+     * Return null if srevice tag is not found.
+     *
+     * @return a service tag for
+     */
+    private static ServiceTag getJavaFXServiceTag () throws IOException {
+        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.urn");
+        RegistrationData regData = getRegistrationData();
+        Collection<ServiceTag> svcTags = regData.getServiceTags();
+        for (ServiceTag st : svcTags) {
+            if (productURN.equals(st.getProductURN())) {
+                return st;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return the JavaFX SDK service tag from local registration data.
+     * Return null if service tag is not found.
+     *
+     * @return a service tag for
+     */
+    private static ServiceTag getJavaFXSdkServiceTag () throws IOException {
+        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.urn");
+        RegistrationData regData = getRegistrationData();
+        Collection<ServiceTag> svcTags = regData.getServiceTags();
+        for (ServiceTag st : svcTags) {
+            if (productURN.equals(st.getProductURN())) {
+                return st;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return the NetBeans service tag from local registration data.
+     * Return null if srevice tag is not found.
+     * 
+     * @return a service tag for 
+     */
+    private static ServiceTag getCndServiceTag () throws IOException {
+        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.cnd.urn");
+        RegistrationData regData = getRegistrationData();
+        Collection<ServiceTag> svcTags = regData.getServiceTags();
+        for (ServiceTag st : svcTags) {
+            if (productURN.equals(st.getProductURN())) {
+                return st;
+            }
+        }
+        return null;
+    }
+    /**
      * Return the GlassFish service tag from local registration data.
      * Return null if service tag is not found.
      * 
      * @return a service tag for 
      */
-    private static ServiceTag getGfServiceTag () throws IOException {
+    private static ServiceTag getGfServiceTag (String gfVersion) throws IOException {
         RegistrationData regData = getRegistrationData();
         Collection<ServiceTag> svcTags = regData.getServiceTags();
+        String key = "";
+        if (!"".equals(gfVersion)) {
+            key += "." + gfVersion;
+        }
+        String productURN = NbBundle.getMessage(NbServiceTagSupport.class, "servicetag.gf.urn" + key);
+
         for (ServiceTag st : svcTags) {
-            if (st.getProductName().startsWith("Sun Java System Application Server")) {
+            if (st.getProductURN().equals(productURN)) {
                 return st;
             }
         }
@@ -510,22 +876,82 @@ public class NbServiceTagSupport {
      * cleanup if necessary.  See RFE# 6574781 Service Tags Enhancement. 
      *
      */
-    private static String getNbProductDefinedId (String javaVersion) {
+    private static String getNbProductDefinedId (String javaVersion, boolean addUuid) {
         StringBuilder definedId = new StringBuilder();
         definedId.append("id=");
         definedId.append(NB_VERSION);
-        
-        String location = ",dir=" + nbInstallDir.getPath() + ",java.version=" + javaVersion;
+
+        if (addUuid) {
+            definedId.append(",uuid=");
+            definedId.append(getSuperId());
+        }
+
+        definedId.append(",java.version=");
+        definedId.append(javaVersion);
+
+        String location = ",dir=" + nbInstallDir.getPath();
         if ((definedId.length() + location.length()) < 256) {
             definedId.append(location);
         } else {
             // if it exceeds the limit, we will not include the location
             LOG.log(Level.INFO, "Warning: Product defined instance ID exceeds the field limit:");
         }
-
+        
         return definedId.toString();
     }
     
+    /**
+     * Returns id unique to user. It is either read from file $HOME/.netbeans/.superId or if this fil;e does not
+     * exist id is generated and fstored to this file.
+     * 
+     * @return id unique to user
+     * 
+     */
+    private static String getSuperId () {
+        String superId = "";
+        File f = new File(USER_HOME + File.separator + DEFAULT_NETBEANS_DIR + File.separator + SUPER_IDENTITY_FILE_NAME);
+        if (f.exists()) {
+            // read existing super Id
+            BufferedReader r = null;
+            try {
+                r = new BufferedReader(new FileReader(f));
+                superId = r.readLine().trim();
+            } catch (IOException ex) {
+                LOG.log(Level.INFO,"Error: Cannot read from file:" + f, ex);
+            } finally {
+                try {
+                    if (r != null) {
+                        r.close();
+                    }
+                } catch (IOException ex) {
+                    LOG.log(Level.INFO,"Error: Cannot close input stream of file:" + f, ex);
+                }
+            }
+        } else {
+            File dir = new File(USER_HOME + File.separator + DEFAULT_NETBEANS_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            Writer w = null;
+            try {
+                w = new BufferedWriter(new FileWriter(f));
+                superId = UUID.randomUUID().toString();
+                w.write(superId);
+            } catch (IOException ex) {
+                LOG.log(Level.INFO,"Error: Cannot write to file:" + f, ex);
+            } finally {
+                try {
+                    if (w != null) {
+                        w.close ();
+                    }
+                } catch (IOException ex) {
+                    LOG.log(Level.INFO,"Error: Cannot close writer to file:" + f, ex);
+                }
+            }
+        }
+        return superId;
+    }
+
     /**
      * Returns the product defined instance ID for GlassFish.
      * It is a list of comma-separated name/value pairs.
@@ -585,7 +1011,7 @@ public class NbServiceTagSupport {
      * Returns the instance urn stored in the servicetag file
      * or empty string if file not exists.
      */
-    private static String getInstalledURN() throws IOException {
+    private static String getInstalledURN(String urn) throws IOException {
         if (serviceTagFileNb.exists() || serviceTagFileHome.exists()) {
             File srcFile = null;
             if (serviceTagFileNb.exists()) {
@@ -596,8 +1022,14 @@ public class NbServiceTagSupport {
             BufferedReader in = null;
             try {
                 in = new BufferedReader(new FileReader(srcFile));
-                String urn = in.readLine().trim();
-                return urn;
+                String line = in.readLine();
+                while (line != null) {
+                    if (urn.equals(line.trim())) {
+                        return urn;
+                    }
+                    line = in.readLine();
+                }
+                return "";
             } finally {
                 if (in != null) {
                     in.close();
@@ -608,7 +1040,7 @@ public class NbServiceTagSupport {
     }
     
     private static void installSystemServiceTag(ServiceTag st) throws IOException {
-        if (getInstalledURN().length() > 0) {
+        if (getInstalledURN(st.getInstanceURN()).length() > 0) {
             // Already installed
             LOG.log(Level.INFO, "ST is already installed ie. we have file servicetag.");
             return;
@@ -644,11 +1076,11 @@ public class NbServiceTagSupport {
             //Install in the system ST registry
             Registry.getSystemRegistry().addServiceTag(st);
 
-            // Write the instance_run to the servicetag file
+            // Write (append if any presents) the instance_run to the servicetag file            
             BufferedWriter out = null;
             try {
                 LOG.log(Level.FINE,"Creating file: " + targetFile);
-                out = new BufferedWriter(new FileWriter(targetFile));
+                out = new BufferedWriter(new FileWriter(targetFile, true));
                 out.write(st.getInstanceURN());
                 out.newLine();
             } finally {
@@ -724,6 +1156,7 @@ public class NbServiceTagSupport {
     
     private static final String NB_HEADER_PNG_KEY = "@@NB_HEADER_PNG@@";
     private static final String PRODUCT_KEY = "@@PRODUCT@@";
+    private static final String PRODUCT_TITLE_KEY = "@@PRODUCT_TITLE@@";
     private static final String REGISTRATION_URL_KEY = "@@REGISTRATION_URL@@";
     private static final String REGISTRATION_PAYLOAD_KEY = "@@REGISTRATION_PAYLOAD@@";
 
@@ -789,18 +1222,23 @@ public class NbServiceTagSupport {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
         PrintWriter pw = new PrintWriter(f,"UTF-8");
         String line = null;
-        String productName = "";
+        String productName = "", productNameTitle = "";
         for (int i = 0; i < productNames.length; i++) {
             if (i > 0) {
                 productName +=
                 " " + NbBundle.getMessage(NbServiceTagSupport.class,"MSG_junction") + " ";
+                productNameTitle +=
+                " " + NbBundle.getMessage(NbServiceTagSupport.class,"MSG_junction") + " ";
             }
             productName += "<strong>" + productNames[i] + "</strong>";
+            productNameTitle += productNames[i];
         }
         while ((line = reader.readLine()) != null) {
             String output = line;
             if (line.contains(PRODUCT_KEY)) {
                 output = line.replace(PRODUCT_KEY, productName);
+            } else if (line.contains(PRODUCT_TITLE_KEY)) {
+                output = line.replace(PRODUCT_TITLE_KEY, productNameTitle);
             } else if (line.contains(NB_HEADER_PNG_KEY)) {
                 output = line.replace(NB_HEADER_PNG_KEY, headerImageSrc);
             } else if (line.contains(REGISTRATION_URL_KEY)) {

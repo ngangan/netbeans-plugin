@@ -51,6 +51,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.netbeans.installer.product.Registry;
 import org.netbeans.installer.product.components.Product;
+import org.netbeans.installer.product.dependencies.Requirement;
 import org.netbeans.installer.utils.FileUtils;
 import org.netbeans.installer.utils.LogManager;
 import org.netbeans.installer.utils.ResourceUtils;
@@ -119,7 +120,6 @@ public class NbServiceTagCreateAction extends WizardAction {
         final Registry registry = Registry.getInstance();
         products.addAll(registry.getProducts(INSTALLED_SUCCESSFULLY));
         products.addAll(registry.getProducts(INSTALLED_WITH_WARNINGS));
-        Product jdkProduct = null;
         source = SOURCE_NAME;
 
         try {
@@ -145,41 +145,65 @@ public class NbServiceTagCreateAction extends WizardAction {
         }
 
         for (Product product : products) {
-            String uid = product.getUid();
-            if (uid.equals("nb-base")) {
+            if (product.getUid().startsWith("nb-")) {
                 createSTNetBeans(product);
-            } else if (uid.equals("glassfish")) {
+            }
+        }
+        for (Product product : products) {
+            String uid = product.getUid();
+            if (uid.equals("glassfish")) {
                 createSTGlassFish(product, true);
+            } else if (uid.equals("glassfish-mod")) {
+                createSTGlassFish(product, false);
             } else if (uid.equals("sjsas")) {
                 createSTGlassFish(product, false);
             } else if (uid.equals("jdk")) {
-                jdkProduct = product;
+                createSTJDK(product);
             }
-        }
-        // JDK ST should be created at the end since it requires netbeans.home to be set
-        if(jdkProduct!=null) {
-            createSTJDK(jdkProduct);
         }
         LogManager.logExit("... finished service tags action");
     }
+    
+    private File getNetBeansLocation(Product product) {
+        File nbLocation = null;
 
-    private void createSTNetBeans(Product nbProduct) {
+        if (product.getUid().equals("nb-base")) {
+            nbLocation = product.getInstallationLocation();
+        } else if (product.getUid().startsWith("nb-")) {
+            nbLocation = Registry.getInstance().
+                    getProducts(product.getDependencyByUid("nb-base").get(0)).
+                    get(0).getInstallationLocation();
+        }
+        return nbLocation;
+    }
+    
+    private void createSTNetBeans(Product product) {
         try {
-            LogManager.log("... create ST for NetBeans");
-            File nbLocation = nbProduct.getInstallationLocation();
+            File nbLocation = getNetBeansLocation(product);
+            if(nbLocation==null) {
+                return;
+            }
             File nbPlatform = nbLocation.listFiles(new FileFilter() {
-
                 public boolean accept(File pathname) {
                     return pathname.getName().startsWith("platform");
                 }
             })[0];
-
+            
             System.setProperty("netbeans.home", nbPlatform.getPath());
-            NbServiceTagSupport.createNbServiceTag(source,
-                    JavaUtils.getVersion(
-                    new File(NetBeansUtils.getJavaHome(nbPlatform.getParentFile()))).
-                    toJdkStyle());
-            setNetBeansStatus(false);
+            String javaVersion = JavaUtils.getVersion(new File(NetBeansUtils.getJavaHome(nbLocation))).toJdkStyle();
+            
+            if (product.getUid().equals("nb-base")) {
+                LogManager.log("... create ST for NetBeans");
+                NbServiceTagSupport.createNbServiceTag(source, javaVersion);
+                setNetBeansStatus(false);
+            } else if (product.getUid().equals("nb-cnd")) {
+                LogManager.log("... create ST for " + product.getDisplayName());
+                NbServiceTagSupport.createCndServiceTag(source, javaVersion);
+            } else if (product.getUid().equals("nb-javafx")) {
+                LogManager.log("... create ST for " + product.getDisplayName());
+                NbServiceTagSupport.createJavaFXServiceTag(source, javaVersion);
+                NbServiceTagSupport.createJavaFXSdkServiceTag(source, javaVersion);
+            }
         } catch (IOException e) {
             LogManager.log(e);
         }
@@ -221,7 +245,9 @@ public class NbServiceTagCreateAction extends WizardAction {
         File location = gfProduct.getInstallationLocation();
         File gfJavaHome = SystemUtils.getCurrentJavaHome();//default
         try {
+            if(gfProduct.getVersion().getMajor() != 3) {
             gfJavaHome = GlassFishUtils.getJavaHome(location);
+            }
         } catch (IOException e) {
             LogManager.log(e);
         }
@@ -261,13 +287,18 @@ public class NbServiceTagCreateAction extends WizardAction {
             ServiceTag gfST = null;
             if (System.getProperty("netbeans.home") != null) {
                 // java.home system variable usually points to private jre with MacOS exception
-                final File javaHome = (!SystemUtils.isMacOS()) ? new File(gfJavaHome, "jre") : gfJavaHome;
+                final File jreHome = new File(gfJavaHome, "jre");
+                final File javaHome = (SystemUtils.isMacOS() || !jreHome.exists()) ? gfJavaHome : jreHome;
+                final String version = gfProduct.getVersion().getMajor() == 3 ? "v3" : "v2";
                 gfST = NbServiceTagSupport.createGfServiceTag(source,
                         javaHome.getAbsolutePath(),
                         JavaUtils.getVersion(gfJavaHome).toJdkStyle(),
-                        location.getAbsolutePath());
+                        location.getAbsolutePath(),
+                        version);
             }
-            File gfReg = new File(location, "lib/registration/servicetag-registry.xml");
+            final String registry = "lib/registration/servicetag-registry.xml";
+            final String relativeLocation = (gfProduct.getVersion().getMajor() == 3 ? "glassfish/" : "") + registry;
+            File gfReg = new File(location, relativeLocation);
 
             if (gfReg.exists()) {
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -290,6 +321,8 @@ public class NbServiceTagCreateAction extends WizardAction {
                             "<platform_arch>" + System.getProperty("os.arch") + "</platform_arch>");
                 }
                 map.put("<source>Sun Java System Application Server Native Packages</source>",
+                        "<source>" + source + "</source>");
+                map.put("<source>GlassFish V3</source>",
                         "<source>" + source + "</source>");
                 // AppServer installation image has this incorrect vendor
                 map.put("Sun Micosystems Inc.",
@@ -335,6 +368,19 @@ public class NbServiceTagCreateAction extends WizardAction {
             NbServiceTagSupport.createJdkServiceTag(args[1]);
         } catch (IOException e) {
             LogManager.log(e);
+        }
+        if (System.getProperty("java.version").startsWith("1.5")) {
+            //Issue #142607 Wrong installer behaviour after uninstalling bundled jdk
+            File jdkHome = new File(System.getProperty("java.home")).getParentFile();
+            LogManager.log("... jdkhome = " + jdkHome);
+            LogManager.log("... removing ST files that do were not created by JDK installer");
+            new File(jdkHome, "jre/lib/servicetag/registration.xml").delete();
+            new File(jdkHome, "jre/lib/servicetag").delete();
+            for (File f : jdkHome.listFiles()) {
+                if (f.getName().matches("register(_[a-zA-Z]+)*\\.html")) {
+                    f.delete();
+                }
+            }
         }
         LogManager.log("... JDK ST created");
     }

@@ -2,4 +2,3 @@
 nbi/engine/src/**/Bundle*.properties
 nbi/engine/src/data/engine*.properties
 nbi/engine/native/launcher/**/launcher*.properties
-

@@ -85,6 +85,28 @@ public final class FileUtils {
     
     // file/stream read/write ///////////////////////////////////////////////////////
     public static String readFile(
+            final File file, String charset) throws IOException {
+        FileInputStream fis   = new FileInputStream(file);
+        InputStreamReader isr = new InputStreamReader(fis, charset);            
+        final Reader reader = new BufferedReader(isr);
+        try {
+            final char[] buffer = new char[BUFFER_SIZE];
+            final StringBuilder stringBuilder = new StringBuilder();
+            int readLength;
+            while ((readLength = reader.read(buffer)) != -1) {
+                stringBuilder.append(buffer, 0, readLength);
+            }
+            return stringBuilder.toString();
+        } finally {
+            try {
+                reader.close();
+                isr.close();
+                fis.close();
+            } catch(IOException ignord) {            
+            }
+        }
+    }    
+    public static String readFile(
             final File file) throws IOException {
         final Reader reader = new BufferedReader(new FileReader(file));
         try {
@@ -207,7 +229,14 @@ public final class FileUtils {
             } catch (IOException ignord) {}
         }
     }
-    
+    public static List<String> readStringList(
+            final File file, String charset) throws IOException {
+        final List<String> list = new LinkedList<String>();
+        for (String line: StringUtils.splitByLines((readFile(file,charset)))) {
+            list.add(line);
+        }
+        return list;
+    }
     public static List<String> readStringList(
             final File file) throws IOException {
         final List<String> list = new LinkedList<String>();
@@ -295,6 +324,32 @@ public final class FileUtils {
         }
         
         return size;
+    }
+    
+    public static FilesList listFiles(
+            final File file) throws IOException {
+        final FilesList list = new FilesList();
+
+        if (file != null && exists(file)) {
+            try {
+                list.add(file);
+                if (file.isDirectory()) {
+                    File[] files = file.listFiles();
+                    if (files != null) {
+                        for (File f : files) {
+                            list.add(listFiles(f));
+                        }
+                    }
+                } 
+            } catch (SecurityException e) {
+                ErrorManager.notifyError(
+                        ResourceUtils.getString(FileUtils.class,
+                        ERROR_FILE_SECURITY_EXCEPTION_KEY, file),
+                        e);
+            }
+        }
+
+        return list;
     }
     
     public static long getFreeSpace(
@@ -543,7 +598,7 @@ public final class FileUtils {
             LogManager.log("... cannot get canonical file for " + file);
         }
         for (File root: roots) {
-            if (isParent(root, file)) {
+            if (isParent(root, file) || root.equals(file)) {
                 if(result == null ||
                         (result.getAbsolutePath().length() <
                         root.getAbsolutePath().length())) {
@@ -1139,17 +1194,18 @@ public final class FileUtils {
     public static FilesList mkdirs(
             final File file) throws IOException {
         FilesList list = new FilesList();
-        
-        if (!exists(file.getParentFile())) {
-            list.add(mkdirs(file.getParentFile()));
-        }
-        
-        if (exists(file) && file.isFile()) {
-            throw new IOException(ResourceUtils.getString(FileUtils.class,
-                    ERROR_CANT_CREATE_DIR_EXIST_FILE_KEY, file));
-        }
-        
-        if (!exists(file)) {
+
+        if (exists(file)) {
+            if (file.isFile()) {
+                throw new IOException(ResourceUtils.getString(FileUtils.class,
+                        ERROR_CANT_CREATE_DIR_EXIST_FILE_KEY, file));
+            }
+        } else {
+            final File parent = file.getParentFile();
+            if (parent != null && !exists(parent)) {
+                list.add(mkdirs(parent));
+            }
+
             if (file.mkdir()) {
                 list.add(file);
             } else {
@@ -1157,7 +1213,7 @@ public final class FileUtils {
                         ERROR_CANT_CREATE_DIR_KEY, file));
             }
         }
-        
+
         return list;
     }
     

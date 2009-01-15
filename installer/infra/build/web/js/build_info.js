@@ -40,19 +40,27 @@ var BUILD_DISPLAY_VERSION_SHORT = "{build.display.version.short}";
 
 var ZIP_FILES_PREFIX            = "{nb.zip.files.prefix}";
 var BUNDLE_FILES_PREFIX         = "{nb.bundle.files.prefix}";
+var BOUNCER_PRODUCT_PREFIX      = "{nb.bundle.files.prefix}";
 
 var COMMUNITY_BUILD             = "{community.mlbuild}";
 var ADD_MORE_REDIRECT_VALUE     = "{enable.languages.redirect}";
 var MORE_LANGUAGES_REDIRECT_URL = "{alternative.languages.page.url}";
 
-
-var JDK_LATEST_UPDATE = "6";
+var BUILD_LOCATION = "";
 
 var LOAD_OMNITURE_CODE = 1;
 var LOAD_GOOGLE_ANALYTICS_CODE = 1;
+var USE_BOUNCER = 0;
+var ADD_VERSION_INFO_TO_URL = 0;
+
+var BOUNCER_URL = "http://services.netbeans.org/bouncer/index.php";
+
+var SOURCES_AND_BINARIES_URL = "javascript: open_zip_link()";
+//var SOURCES_AND_BINARIES_URL = BUILD_LOCATION + "zip/";
 
 function add_download_tabs() {
-	add_download_tab("6.1");
+	add_download_tab("6.5");
+	add_download_tab(PYTHON_TITLE, PYTHON_LINK);
 	add_download_tab(DEVELOPMENT_TITLE, DEVELOPMENT_BUILDS_LINK);
 	add_download_tab(ARCHIVE_TITLE,ARCHIVE_BUILDS_LINK);
 }

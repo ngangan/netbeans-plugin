@@ -61,7 +61,7 @@ progdir=`pwd`
 
 dmgname=$basename
 # Remove build number from DMG name
-dmgname=`echo "$dmgname" | sed "s/-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]//g"`
+#dmgname=`echo "$dmgname" | sed "s/-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]//g"`
 
 instrument_build() {
    DIR=$1
@@ -76,7 +76,7 @@ instrument_build() {
 
 buildnum=""`find "$zipdir" -name '*[0-9].zip'`
 buildnum="`expr $buildnum : '.*-\(.*\)\..*'`" 
-installdir="NetBeans 6.1"
+installdir="NetBeans 6.1 Dev $buildnum"
 
 ant -f $progdir/build.xml distclean
 

@@ -309,7 +309,7 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
                 map.put(JDIC_STUB_LIB_TOKEN,
                         new File(directory, JDIC_STUB_LIB_SOLARIS));
             }
-            
+
             FileUtils.modifyFile(new File(directory, UC_BIN_SUBDIR), map);
             //ping UC on Tuesdays
             map.put("never", "TUE");//NOI18N
@@ -321,7 +321,7 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
                     directory,
                     DOMAINS_DOMAIN1_IMQ_SUBDIR).getAbsolutePath();
             final String contents = StringUtils.format(
-                    IMQENV_CONF_ADDITION,
+                    SystemUtils.isWindows() ? IMQENV_CONF_ADDITION_WINDOWS : IMQENV_CONF_ADDITION_UNIX,
                     javaHomeString,
                     imqVarHomeString);
 
@@ -610,6 +610,11 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
     public boolean allowModifyMode() {
         return false;
     }
+
+
+    public boolean requireLegalArtifactSaving() {     
+       return false;                                   
+    }    
     
 /////////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -961,9 +966,12 @@ public class ConfigurationLogic extends ProductConfigurationLogic {
     public static final String DOMAINS_DOMAIN1_IMQ_SUBDIR =
             "domains/" + DOMAIN_NAME + "/imq"; // NOI18N
     
-    public static final String IMQENV_CONF_ADDITION =
+    public static final String IMQENV_CONF_ADDITION_WINDOWS =
             "        set IMQ_DEFAULT_JAVAHOME={0}\n" + // NOI18N
             "        set IMQ_DEFAULT_VARHOME={1}\n"; // NOI18N
+    public static final String IMQENV_CONF_ADDITION_UNIX =
+            "        IMQ_DEFAULT_JAVAHOME={0}\n" + // NOI18N
+            "        IMQ_DEFAULT_VARHOME={1}\n"; // NOI18N
     
     public static final String IMQENV_CONF =
             "imq/etc/imqenv.conf"; // NOI18N
