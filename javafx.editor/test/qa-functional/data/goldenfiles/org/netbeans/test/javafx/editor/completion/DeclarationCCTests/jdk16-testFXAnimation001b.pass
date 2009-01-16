@@ -1,4 +1,3 @@
-_$UNUSED$_$ARGS$_
 anim
 KeyFrame
 rotation
@@ -44,5 +43,3 @@ javafx
 javax
 org
 packages
-sun
-sunw
