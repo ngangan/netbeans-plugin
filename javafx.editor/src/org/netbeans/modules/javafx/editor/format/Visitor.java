@@ -678,30 +678,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return ctx.lineStartOffset(getStartPos(tree)) != ctx.lineStartOffset(getEndPos(tree));
     }
 
-    @Override
-    public Queue<Adjustment> visitFunctionValue(FunctionValueTree node, Queue<Adjustment> adjustments) {
-        final Tree tree = getParent();
-        if (tree instanceof FunctionDefinitionTree) {
-            super.visitFunctionValue(node, adjustments);
-        } else {
-            try {
-                if (isFirstOnLine(getStartPos(node))) {
-                    hasComment(node, adjustments);
-                    indentLine(getStartPos(node), adjustments);
-                }
-                verifyFunctionSpaces(ts(node), node, adjustments);
-                super.visitFunctionValue(node, adjustments);
-                indentLine(getEndPos(node), adjustments);
-            } catch (BadLocationException e) {
-                if (log.isLoggable(Level.SEVERE))
-                    log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
-            }
-        }
-        return adjustments;
-
-    }
-
     private boolean holdInvocationChain = false;
+
     private Tree starter;
 
     @Override
@@ -728,6 +706,30 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
+    public Queue<Adjustment> visitFunctionValue(FunctionValueTree node, Queue<Adjustment> adjustments) {
+        /*final Tree tree = getParent();
+        if (tree instanceof FunctionDefinitionTree) {
+            super.visitFunctionValue(node, adjustments);
+        } else {
+            try {
+                if (isFirstOnLine(getStartPos(node))) {
+                    hasComment(node, adjustments);
+                    indentLine(getStartPos(node), adjustments);
+                }
+                verifyFunctionSpaces(ts(node), node, adjustments);
+                super.visitFunctionValue(node, adjustments);
+                indentLine(getEndPos(node), adjustments);
+            } catch (BadLocationException e) {
+                if (log.isLoggable(Level.SEVERE))
+                    log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+            }
+        }*/
+        super.visitFunctionValue(node, adjustments);
+        return adjustments;
+
+    }
+
+    @Override
     public Queue<Adjustment> visitFunctionDefinition(FunctionDefinitionTree node, Queue<Adjustment> adjustments) {
         if (isSynthetic((JFXTree) node)) {
             super.visitFunctionDefinition(node, adjustments);
@@ -738,7 +740,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             int index = node.getModifiers() != null ? getEndPos(node.getModifiers()) : getStartPos(node);
             processStandaloneNode(node, adjustments);
 
-            ts.move(index);
+            ts.move(index);             
             while (ts.moveNext()) {
                 final JFXTokenId id = ts.token().id();
                 switch (id) {
@@ -1339,24 +1341,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         return adjustments;
     }
 
-    /*    @Override
-        public Queue<Adjustment> visitBlock(BlockTree blockTree, Queue<Adjustment> adjustments) {
-            if (!tu.isSynthetic(getCurrentPath())) {
-                try {
-                    final int start = ctx.lineStartOffset(getStartPos(blockTree));
-                    indentLine(start, adjustments);
-                    incIndent();
-                    super.visitBlock(blockTree, adjustments);
-                    decIndent();
-                    verifyBraces(blockTree, adjustments, cs.getOtherBracePlacement(), false);
-                } catch (BadLocationException e) {
-                    if (log.isLoggable(Level.SEVERE)) log.severe("Reformat failed. " + e);
-                }
-            }
-
-            return adjustments;
-        }
-    */
     @Override
     public Queue<Adjustment> visitWhileLoop(WhileLoopTree node, Queue<Adjustment> adjustments) {
         try {
@@ -1541,7 +1525,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitBlockExpression(BlockExpressionTree node, Queue<Adjustment> adjustments) {
-        if (isSynthetic((JFXTree) node)) {
+        final Tree tree = getParent(); 
+        if (isSynthetic((JFXTree) node) || (tree instanceof FunctionValueTree)) {
             super.visitBlockExpression(node, adjustments);
             return adjustments;
         }
