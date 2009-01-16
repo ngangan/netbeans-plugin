@@ -67,20 +67,27 @@ public class JavaFXTestCase extends JellyTestCase {
         System.out.println("XTEST_WORK_DIR = " + Util.WORK_DIR);
     }
 
-    public class ClassNameComponentChooser implements ComponentChooser {
+    public static class ClassNameComponentChooser implements ComponentChooser {
 
+        String name;
         String text;
 
-        public ClassNameComponentChooser(String text) {
+        public ClassNameComponentChooser(String name) {
+            this(name, "");
+        }
+
+        public ClassNameComponentChooser(String name, String text) {
+            this.name = name;
             this.text = text;
         }
 
         public boolean checkComponent(Component component) {
-            return component.toString().contains(text);
+            String description = component.toString();
+            return description.contains(name) && description.contains(text);
         }
 
         public String getDescription() {
-            return "ButtonComponentChooser: \"" + text + "\"";
+            return "[ClassNameComponentChooser] name: \"" + name + "\" text: \"" + text + "\"";
         }
     }
 }

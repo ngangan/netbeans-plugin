@@ -40,16 +40,34 @@
 package qa.javafx.functional.library.operator;
 
 import java.awt.Point;
+import javax.swing.JComponent;
 import org.netbeans.jellytools.PaletteOperator;
+import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComponentOperator;
 import org.netbeans.jemmy.operators.JListOperator;
+import qa.javafx.functional.library.JavaFXTestCase.ClassNameComponentChooser;
 import qa.javafx.functional.library.MouseRobot;
+import qa.javafx.functional.library.Util;
 
 /**
  *
  * @author andromeda
  */
 public class FXPaletteOperator extends PaletteOperator{
+
+    public void expand(String category){
+        expand( new JCheckBoxOperator(this, category), true);
+    }
+
+    public JListOperator getList(String category){
+        expand(category);
+        //Util.showComponents(this);
+        JComponentOperator comp = new JComponentOperator(this, new ClassNameComponentChooser("CategoryButton", category));
+        comp = new JComponentOperator((JComponent) comp.getParent());
+        //return new JListOperator(comp, new ClassNameComponentChooser("", category));
+        return new JListOperator(comp);
+        
+    }
 
     public void dragNDrop(JComponentOperator comp){
         JListOperator list = lstComponents();
@@ -66,6 +84,24 @@ public class FXPaletteOperator extends PaletteOperator{
         MouseRobot.dragNDrop(list, x1, y1, comp, x2, y2);
 
         
+    }
+
+
+    public void dragNDrop(JListOperator list, int index, JComponentOperator comp){
+        //JListOperator list = lstComponents();
+        Point point = list.getClickPoint(index);
+
+        int x1 = point.x;
+        int y1 = point.y;
+
+        int x2 = comp.getCenterXForClick();
+        int y2 = comp.getCenterYForClick();
+
+        System.out.println("[palette] Drag and Drop");
+
+        MouseRobot.dragNDrop(list, x1, y1, comp, x2, y2);
+
+
     }
 
 }
