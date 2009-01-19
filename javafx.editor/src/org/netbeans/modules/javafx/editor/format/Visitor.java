@@ -136,10 +136,11 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
             verifyVarSpaces(node, adjustments);
             if (isMultiline(node) && node.getOnReplaceTree() == null) {
-                li.moveTo(start);
+                /*li.moveTo(start);
                 if (li.hasNext()) {
                     indentMultiline(li, getEndPos(node), adjustments);
-                }
+                }*/
+                indentEndLine(node, adjustments);
             }
 
         } catch (BadLocationException e) {
@@ -394,7 +395,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @SuppressWarnings({"MethodWithMultipleLoops", "OverlyNestedMethod", "OverlyComplexMethod", // NOI18N
-            "MethodWithMoreThanThreeNegations", "OverlyLongMethod" }) // NOI18N 
+            "MethodWithMoreThanThreeNegations", "OverlyLongMethod" }) // NOI18N
     private void verifySpacesAroundColon(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
         // INDETIFIER WS* (COLON|EQ) WS+ ANY
         if (ts.moveNext()) {
@@ -441,9 +442,13 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
-    private void skipWS(TokenSequence<JFXTokenId> ts) {
-        while (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
+    private void skipWS(TokenSequence<JFXTokenId> ts, boolean forward) {
+        while ((forward ? ts.moveNext() : ts.movePrevious()) && ts.token().id() == JFXTokenId.WS) {
         }
+    }
+
+    private void skipWS(TokenSequence<JFXTokenId> ts) {
+        skipWS(ts, true);
     }
 
     private Position createPosition(int offset) throws BadLocationException {
@@ -476,7 +481,13 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private boolean isOnSameLine(Tree node, Tree tree) throws BadLocationException {
-        return ctx.lineStartOffset(getStartPos(node)) == ctx.lineStartOffset(getStartPos(tree));
+        int index1 = getStartPos(node);
+        int index2 = getStartPos(tree);
+        return isOnSameLine(index1, index2);
+    }
+
+    private boolean isOnSameLine(int index1, int index2) throws BadLocationException {
+        return ctx.lineStartOffset(index1) == ctx.lineStartOffset(index2);
     }
 
 
@@ -901,6 +912,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private void checkEndBrace(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
+        if (log.isLoggable(Level.INFO)) log.info("isOrphanObjectLiterar? " + isOrphanObjectLiterar);
+        if (isOrphanObjectLiterar) return;
         Document doc = ctx.document();
         final int end = getEndPos(node);
         ts.move(end); //getting into last token...
@@ -988,11 +1001,24 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             incIndent();
             isOrphanObjectLiterar = node.getLiteralParts() == null || node.getLiteralParts().size() == 1;
             super.visitInstantiate(node, adjustments);
-            isOrphanObjectLiterar = false;
             decIndent();
-            if (isMultiline(node) && !endsOnSameLine(tree, node)) {
+//            if (isOrphanObjectLiterar) {
+//                //TODO: [RKo] keep on same line!.
+//                int endPos = getEndPos(node);
+//                if (!isOnSameLine(offset, endPos)) {
+//                    TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) ts();
+//                    ts.move(endPos);
+//                    if (ts.movePrevious()) {
+//                        skipWS(ts, false);
+//                        if (ts.moveNext()) {
+//                            adjustments.offer(Adjustment.delete(createPosition(ts.offset()), createPosition(endPos - 1 )));
+//                        }
+//                    }
+//                }
+//            } else if (isMultiline(node) && !endsOnSameLine(tree, node)) {
                 indentEndLine(node, adjustments);
-            }
+//            }
+            isOrphanObjectLiterar = false;
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
@@ -1002,7 +1028,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     private boolean endsOnSameLine(Tree tree, Tree node) throws BadLocationException {
-        return ctx.lineStartOffset(getEndPos(node)) == ctx.lineStartOffset(getEndPos(tree));
+        if (isSynthetic((JFXTree) tree) || isSynthetic((JFXTree) node)) return false;
+        return isOnSameLine(getEndPos(node), getEndPos(tree));
     }
 
     private boolean holdOnLine(Tree tree) {

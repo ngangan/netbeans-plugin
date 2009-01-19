@@ -317,7 +317,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         final JavaFXSource s = JavaFXSource.forDocument(context.document());
         try {
             s.runUserActionTask(new Task<CompilationController>() {
-                @SuppressWarnings({"MethodWithMultipleLoops"}) // NOI18N
+                @SuppressWarnings({"MethodWithMultipleLoops", "OverlyComplexMethod"}) // NOI18N
                 public void run(CompilationController controller) throws Exception {
                     final long s = System.currentTimeMillis();
                     final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
@@ -328,8 +328,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                             log.info("The " + phase + " phase has been reached ... OK!");
 
 
-                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
-//                        final Queue<Adjustment> adjustments = new MaskedQueue();
+//                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
+                        final Queue<Adjustment> adjustments = new MaskedQueue();
                         for (Context.Region region : regions) {
                             if (log.isLoggable(Level.INFO))
                                 log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
