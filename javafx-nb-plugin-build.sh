@@ -74,8 +74,8 @@ javafx-sdk.win.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/bu
 javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/lastSuccessfulBuild/artifact/build/macosx-universal/release/bundles/${JDK_FILENAME}-macosx-universal.zip
 javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/lastSuccessfulBuild/artifact/build/linux-i586/release/bundles/${JDK_FILENAME}-linux-i586.zip	
 javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/build/solaris-sparc/release/bundles/${JDK_FILENAME}-solaris-sparc.zip	
-jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxc.jar
-jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/javafx-sdk1.0/lib/shared/javafxdoc.jar
+jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/${JDK_DIRNAME}/lib/shared/javafxc.jar
+jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/${JDK_DIRNAME}/lib/shared/javafxdoc.jar
 nb.cluster.javafx.dir=javafx2
 javafx-fxd-netbeans-support.zip.url=${PRODUCTION_SUITE_URL}/label=windows-i586/artifact/installer/win/build/javafx-fxd-netbeans-support-1.1-windows-i586.zip
 EOF
