@@ -264,7 +264,7 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
-            <property name="${{application.args}}" value=""/>
+            <property name="application.args" value=""/>
             <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true">
                 <arg line="${{application.args}}"/>
             </java>
@@ -321,6 +321,7 @@ is divided into following sections:
             </nbjavafxstart>
         </target>
         <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
+            <property name="application.args" value=""/>
             <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}">
                 <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
                 <jvmarg line="${{run.jvmargs}}"/>
@@ -328,6 +329,7 @@ is divided into following sections:
                     <propertyref prefix="run-sys-prop."/>
                     <mapper from="run-sys-prop.*" to="*" type="glob"/>
                 </syspropertyset>
+                <arg line="${{application.args}}"/>
             </java>
         </target>
         <target name="-debug-midp-debuggee" if="midp.execution.trigger">

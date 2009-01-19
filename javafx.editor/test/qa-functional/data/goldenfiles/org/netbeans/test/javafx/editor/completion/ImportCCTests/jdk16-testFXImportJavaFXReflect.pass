@@ -1,6 +1,8 @@
 FXBooleanValue
 FXClassType
 FXContext
+FXDoubleValue
+FXFloatValue
 FXFunctionMember
 FXFunctionType
 FXFunctionValue
@@ -8,11 +10,12 @@ FXIntegerValue
 FXJavaArrayType
 FXLocal
 FXLocation
+FXLongValue
 FXMember
 FXMemberFilter
-FXNumberValue
 FXObjectValue
 FXPrimitiveType
+FXPrimitiveValue
 FXSequenceBuilder
 FXSequenceType
 FXSequenceValue

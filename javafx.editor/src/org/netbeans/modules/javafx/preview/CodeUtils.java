@@ -183,6 +183,9 @@ public class CodeUtils {
     private static Object run(String name, ClassLoader classLoader) throws Exception {
         Thread.currentThread().setContextClassLoader(classLoader);
         Class<?> mainClass = classLoader.loadClass(name);
+        if (mainClass == null) { // issue #156956
+            return null;
+        }
         Class<?> paramClass = classLoader.loadClass(secuenceClassName); 
         Class<?> sequencesClass = classLoader.loadClass(secuencesClassName); 
         Method runMethod = mainClass.getDeclaredMethod(runMethodName, paramClass);

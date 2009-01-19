@@ -1,6 +1,7 @@
 INDEFINITE
 autoReverse
 currentRate
+framerate
 interpolate
 keyFrames
 paused
