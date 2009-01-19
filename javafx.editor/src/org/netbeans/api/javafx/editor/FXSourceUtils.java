@@ -34,7 +34,10 @@ import java.util.*;
  */
 public final class FXSourceUtils {
 
-    private static final char[] CODE_COMPL_SUBST_BREAKERS = {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', '(', ')', '{', '}', ' ', '\t', '\n', '\r'}; // NOI18N
+    private static final char[] CODE_COMPL_SUBST_BREAKERS = 
+        {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', // NOI18N
+         '(', ')', '{', '}', '[', ']',                     // NOI18N
+         ' ', '\t', '\n', '\r'};                           // NOI18N
 
     // colors for navigator
     private static final String TYPE_COLOR = "#707070"; // NOI18N
