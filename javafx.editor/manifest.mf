@@ -3,7 +3,7 @@ AutoUpdate-Show-In-Client: false
 OpenIDE-Module: org.netbeans.modules.javafx.editor
 OpenIDE-Module-Layer: org/netbeans/modules/javafx/dataloader/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/dataloader/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.5
+OpenIDE-Module-Specification-Version: 1.6
 OpenIDE-Module-Install: org/netbeans/modules/javafx/preview/Bridge.class
 
 Name: org/netbeans/modules/javafx/dataloader/JavaFXDataLoader.class
