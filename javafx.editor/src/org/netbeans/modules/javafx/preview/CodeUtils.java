@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.event.MouseInputAdapter;
 import org.openide.filesystems.FileUtil;
@@ -33,8 +35,8 @@ public class CodeUtils {
     private static final String[] getComponentNames = {"getComponent", "getJComponent"};                        // NOI18N
     private static final String[] frameNames = {"frame", "window"};                                             // NOI18N
     private static final String[] dialogNames = {"jdialog", "jDialog"};                                         // NOI18N
-    private static final String secuencesClassName = "com.sun.javafx.runtime.sequence.Sequences";               // NOI18N
-    private static final String secuenceClassName = "com.sun.javafx.runtime.sequence.Sequence";                 // NOI18N
+    private static final String sequencesClassName = "com.sun.javafx.runtime.sequence.Sequences";               // NOI18N
+    private static final String sequenceClassName = "com.sun.javafx.runtime.sequence.Sequence";                 // NOI18N
     private static final String runMethodName = "javafx$run$";                                                  // NOI18N
     private static final String makeMethodName = "make";                                                        // NOI18N
     private static final String getMethodName = "get";                                                          // NOI18N
@@ -184,10 +186,11 @@ public class CodeUtils {
         Thread.currentThread().setContextClassLoader(classLoader);
         Class<?> mainClass = classLoader.loadClass(name);
         if (mainClass == null) { // issue #156956
+            Logger.getLogger(CodeUtils.class.getName()).log(Level.WARNING, "mainClass for preview is null!"); // NOI18N
             return null;
         }
-        Class<?> paramClass = classLoader.loadClass(secuenceClassName); 
-        Class<?> sequencesClass = classLoader.loadClass(secuencesClassName); 
+        Class<?> paramClass = classLoader.loadClass(sequenceClassName);
+        Class<?> sequencesClass = classLoader.loadClass(sequencesClassName);
         Method runMethod = mainClass.getDeclaredMethod(runMethodName, paramClass);
         runMethod.setAccessible(true);
         Class<?> typeinfoClass = classLoader.loadClass(typeInfoClassName); 
