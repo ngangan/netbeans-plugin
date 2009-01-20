@@ -1436,7 +1436,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 //    public Queue<Adjustment> visitIf(IfTree node, Queue<Adjustment> adjustments) {
     public Queue<Adjustment> visitConditionalExpression(ConditionalExpressionTree node, Queue<Adjustment> adjustments) {
         try {
-            if (!isPreceededByElse(node)) {
+            if (!(isPreceededByElse(node) || holdOnLine(getParent()))) {
                 processStandaloneNode(node, adjustments);
             }
             verifyBraces(node.getTrueExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeIfLeftBrace(), true);
