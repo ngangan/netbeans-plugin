@@ -328,8 +328,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                             log.info("The " + phase + " phase has been reached ... OK!");
 
 
-//                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
-                        final Queue<Adjustment> adjustments = new MaskedQueue();
+                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
+//                        final Queue<Adjustment> adjustments = new MaskedQueue();
                         for (Context.Region region : regions) {
                             if (log.isLoggable(Level.INFO))
                                 log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
