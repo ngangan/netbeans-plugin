@@ -1540,6 +1540,22 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
+    @Override
+    public Queue<Adjustment> visitPostInitDefinition(InitDefinitionTree node, Queue<Adjustment> adjustments) {
+        if (!isSynthetic((JFXTree) node)) {
+            try {
+                processStandaloneNode(node, adjustments);
+                verifySpaceBefore(adjustments, cs.spaceBeforeMethodDeclLeftBrace(), getStartPos(node.getBody()));
+            } catch (BadLocationException e) {
+                if (log.isLoggable(Level.SEVERE))
+                    log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);                
+            }
+        }
+        // POSTINIT is followed by BLOCK so we don't adjust indentation offset.
+        super.visitPostInitDefinition(node, adjustments);
+        return adjustments; 
+    }
+
     /**
      * Gets continuation indent adjustment. This is sum of spaces to be added to current indet to achieve required
      * continuation offset.
@@ -1560,6 +1576,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         try {
             final int start = ctx.lineStartOffset(getStartPos(node));
 
+/*
             if (isEmptyBlock(node)) {
                 incIndent();
                 li.moveTo(start);
@@ -1573,6 +1590,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     }
                 }
             } else {
+*/
                 int endPos = getEndPos(node);
                 if (isFirstOnLine(endPos)) {
                     indentLine(start, adjustments);
@@ -1580,11 +1598,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 incIndent();
                 super.visitBlockExpression(node, adjustments);
                 decIndent();
-                if (isFirstOnLine(endPos) && !endsOnSameLine(node, node.getValue())) {
-                    final int end = ctx.lineStartOffset(endPos);
-                    indentLine(end, adjustments);
-                }
-            }
+//                if (isFirstOnLine(endPos) && !endsOnSameLine(node, node.getValue())) {
+//                    final int end = ctx.lineStartOffset(endPos);
+//                    indentLine(end, adjustments);
+//                }
+                indentEndLine(node, adjustments);
+//            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
                 log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
