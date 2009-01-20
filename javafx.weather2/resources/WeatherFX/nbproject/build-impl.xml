@@ -19,7 +19,7 @@ is divided into following sections:
   - cleanup
 
         -->
-<project xmlns:javafxproject1="http://www.netbeans.org/ns/javafx-project/1" xmlns:javafxproject2="http://www.netbeans.org/ns/javafx-project/2" xmlns:javafxproject3="http://www.netbeans.org/ns/javafx-project/3" basedir=".." default="default" name="WeatherApp-impl">
+<project xmlns:javafxproject1="http://www.netbeans.org/ns/javafx-project/1" xmlns:javafxproject2="http://www.netbeans.org/ns/javafx-project/2" xmlns:javafxproject3="http://www.netbeans.org/ns/javafx-project/3" basedir=".." default="default" name="JavaFXApplication6-impl">
     <target depends="jar" description="Build whole project." name="default"/>
     <!--
                     ======================
@@ -66,6 +66,16 @@ is divided into following sections:
         <condition property="no.deps">
             <istrue value="${no.dependencies}"/>
         </condition>
+        <condition else="" property="codebase.arg" value="-appCodebase ${codebase.url}">
+            <isset property="codebase.url"/>
+        </condition>
+        <property file="${user.properties.file}/../config/preferences/org/apache/tools/ant/module.properties" prefix="ant.module"/>
+        <condition else="" property="verbose.arg" value="-v">
+            <or>
+                <equals arg1="${ant.module.verbosity}" arg2="3"/>
+                <equals arg1="${ant.module.verbosity}" arg2="4"/>
+            </or>
+        </condition>
         <condition else="" property="draggable.arg" value="-draggable">
             <istrue value="${applet.draggable}"/>
         </condition>
@@ -94,6 +104,7 @@ is divided into following sections:
             <and>
                 <equals arg1="${javafx.profile}" arg2="desktop"/>
                 <equals arg1="${execution.target}" arg2="applet"/>
+                <isset property="netbeans.home"/>
             </and>
         </condition>
         <condition property="standard.execution.trigger">
@@ -105,6 +116,7 @@ is divided into following sections:
                 </or>
             </not>
         </condition>
+        <property name="run.jvmargs" value=""/>
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization.-->
@@ -145,9 +157,12 @@ is divided into following sections:
             <arg value="${applet.height}"/>
             <arg value="-appclass"/>
             <arg value="${main.class}"/>
+            <arg line="${codebase.arg}"/>
+            <arg value="-encoding"/>
+            <arg value="${source.encoding}"/>
             <arg value="-p"/>
             <arg value="${javafx.profile}"/>
-            <arg value="-v"/>
+            <arg value="${verbose.arg}"/>
             <arg value="${draggable.arg}"/>
             <arg value="${pack200.arg}"/>
             <arg value="${sign.arg}"/>
@@ -172,36 +187,33 @@ is divided into following sections:
                     =================
     -->
     <target depends="init,compile,jar" description="Run a main class." if="standard.execution.trigger" name="standard-run">
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}"/>
+        <property name="application.args" value=""/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}" jvmargs="${run.jvmargs}">
+            <arg line="${application.args}"/>
+        </java>
     </target>
     <target depends="jar" description="Start MIDP execution" if="midp.execution.trigger" name="midp-run">
         <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
-        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+        <property name="mobile.device" value="DefaultFxPhone1"/>
+        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}" failonerror="true">
+            <arg value="${run.jvmargs}"/>
             <arg value="-Xdescriptor:${jad.file}"/>
+            <arg value="-Xdevice:${mobile.device}"/>
         </exec>
     </target>
     <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
-        <property location="${dist.dir}/${application.title}.html" name="applet.url"/>
-        <condition property="browser" value="open">
-            <os family="mac"/>
+        <makeurl file="${dist.dir}/${application.title}.html" property="applet.local.url"/>
+        <condition else="${applet.local.url}" property="applet.url" value="${codebase.url}/${application.title}.html">
+            <isset property="codebase.url"/>
         </condition>
-        <condition property="browser" value="firefox">
-            <os family="unix"/>
-        </condition>
-        <condition property="browser" value="cmd.exe">
-            <os family="windows"/>
-        </condition>
-        <condition property="browser.args" value="/C">
-            <os family="windows"/>
-        </condition>
-        <property name="browser.args" value=""/>
-        <exec executable="${browser}" spawn="true">
-            <arg value="${browser.args}"/>
-            <arg value="${applet.url}"/>
-        </exec>
+        <nbbrowse url="${applet.url}"/>
     </target>
     <target depends="jar" description="Start javaws execution" if="jnlp.execution.trigger" name="jws-run">
-        <exec executable="${java.home}/bin/javaws">
+        <condition else="${java.home}" property="javaws.home" value="/usr">
+            <os family="mac"/>
+        </condition>
+        <exec executable="${javaws.home}/bin/javaws" failonerror="true">
+            <env key="JAVAWS_VM_ARGS" value="${run.jvmargs}"/>
             <arg file="${dist.dir}/${application.title}.jnlp"/>
         </exec>
     </target>
@@ -232,25 +244,32 @@ is divided into following sections:
         </nbjavafxstart>
     </target>
     <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
+        <property name="application.args" value=""/>
         <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address}"/>
+            <jvmarg line="${run.jvmargs}"/>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
                 <mapper from="run-sys-prop.*" to="*" type="glob"/>
             </syspropertyset>
+            <arg line="${application.args}"/>
         </java>
     </target>
     <target if="midp.execution.trigger" name="-debug-midp-debuggee">
         <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
         <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+            <arg value="${run.jvmargs}"/>
             <arg value="-Xdescriptor:${jad.file}"/>
             <arg value="-Xdebug"/>
             <arg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address},server=n"/>
         </exec>
     </target>
     <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
-        <exec executable="${java.home}/bin/javaws">
-            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${javafx.address}"/>
+        <condition else="${java.home}" property="javaws.home" value="/usr">
+            <os family="mac"/>
+        </condition>
+        <exec executable="${javaws.home}/bin/javaws">
+            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${javafx.address} ${run.jvmargs}"/>
             <arg file="${dist.dir}/${application.title}.jnlp"/>
         </exec>
     </target>
