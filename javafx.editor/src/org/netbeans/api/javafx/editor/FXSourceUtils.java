@@ -204,7 +204,7 @@ public final class FXSourceUtils {
 
         if (element.getKind() != ElementKind.CONSTRUCTOR) {
             TypeMirror rt = element.getReturnType();
-            if (rt.getKind() != TypeKind.VOID) {
+            if (TypeKind.VOID != rt.getKind()) {
                 sb.append(": "); // NOI18N     
                 sb.append("<font color="); // NOI18N
                 sb.append(TYPE_COLOR);
