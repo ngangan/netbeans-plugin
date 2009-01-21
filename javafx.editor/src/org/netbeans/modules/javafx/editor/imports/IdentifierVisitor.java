@@ -88,10 +88,9 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
 
     private static Logger log = Logger.getLogger(IdentifierVisitor.class.getName());
     private Element toElement(Tree node) {
-        if (log.isLoggable(Level.INFO)) log.info("toElement(): " + node);
         Element element = info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
         if (element != null && element.toString().startsWith("java.lang")) return null;
-        if (log.isLoggable(Level.INFO)) log.info("toElement(): Element: " + element);
+        if (log.isLoggable(Level.FINE)) log.fine("toElement(): Element: " + element);
         return element;
     }
 

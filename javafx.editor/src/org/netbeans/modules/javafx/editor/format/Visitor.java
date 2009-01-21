@@ -115,7 +115,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N            
         }
         super.visitInitDefinition(node, adjustments);
         return adjustments;
@@ -145,7 +145,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
         super.visitVariable(node, adjustments);
         return adjustments;
@@ -207,7 +207,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
         super.visitIdentifier(node, adjustments);
         return adjustments;
@@ -281,7 +281,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);   // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);   // NOI18N
         }
         super.visitBinary(node, adjustments);
         return adjustments;
@@ -351,7 +351,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
 
         return adjustments;
@@ -487,7 +487,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
         return adjustments;
     }
@@ -512,7 +512,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
         return adjustments;
     }
@@ -571,7 +571,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
         return adjustments;
     }
@@ -601,7 +601,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);  // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);  // NOI18N
+
         } finally {
             disableContinuosIndent = false;
         }
@@ -620,7 +621,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             indentSimpleStructure(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         super.visitInterpolateValue(node, adjustments);
         return adjustments;
@@ -650,7 +652,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -677,7 +680,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             decIndent();
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -725,7 +729,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             holdInvocationChain = (starter != node);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -746,10 +751,17 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 indentLine(getEndPos(node), adjustments);
             } catch (BadLocationException e) {
                 if (log.isLoggable(Level.SEVERE))
-                    log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                    log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
             }
         }*/
-        super.visitFunctionValue(node, adjustments);
+        final Tree tree = getParent();
+        if (tree instanceof FunctionDefinitionTree) {
+            super.visitFunctionValue(node, adjustments);
+        } else {
+            incIndent();
+            super.visitFunctionValue(node, adjustments);
+            decIndent();
+        }
         return adjustments;
 
     }
@@ -781,7 +793,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         super.visitFunctionDefinition(node, adjustments);
         return adjustments;
@@ -999,7 +1012,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);  // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);  // NOI18N
+
         }
         super.visitAssignment(node, adjustments);
         return adjustments;
@@ -1042,7 +1056,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -1091,7 +1106,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     continue;
                 }
                 case COMMA:
-                case RBRACKET:                
+                case RBRACKET:
                 case WS: {
                     final CharSequence cs = ts.token().text();
                     if (cs != null && "\n".equals(cs.toString()) && shouldIndent) {   // NOI18N
@@ -1206,7 +1221,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getClassDeclBracePlacement(), cs.spaceBeforeClassDeclLeftBrace(), true);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -1259,7 +1275,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);  // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);  // NOI18N
+
         }
         super.visitImport(importTree, adjustments);
         return adjustments;
@@ -1313,7 +1330,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(node, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
         }
         super.visitCompoundAssignment(node, adjustments);
         return adjustments;
@@ -1325,7 +1342,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             processStandaloneNode(returnTree, adjustments);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         super.visitReturn(returnTree, adjustments);
         return adjustments;
@@ -1362,7 +1380,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -1378,7 +1397,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e); // NOI18N
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
+
         }
         return adjustments;
     }
@@ -1406,7 +1426,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeWhileLeftBrace(), true);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
         }
         super.visitWhileLoop(node, adjustments);
         return adjustments;
@@ -1437,7 +1458,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
         }
         boolean followedByBlock = node.getBodyExpression() instanceof BlockExpressionTree;
         if (!followedByBlock) {
@@ -1451,20 +1473,21 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @Override
-//    public Queue<Adjustment> visitIf(IfTree node, Queue<Adjustment> adjustments) {
     public Queue<Adjustment> visitConditionalExpression(ConditionalExpressionTree node, Queue<Adjustment> adjustments) {
         try {
             if (!(isPreceededByElse(node) || holdOnLine(getParent()))) {
                 processStandaloneNode(node, adjustments);
             }
             verifyBraces(node.getTrueExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeIfLeftBrace(), true);
-            verifySpaceBefore(node.getFalseExpression(), adjustments, cs.spaceBeforeElse());
-            verifyBraces(node.getFalseExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace(), true);
+            if (node.getFalseExpression() != null) {
+                verifySpaceBefore(node.getFalseExpression(), adjustments, cs.spaceBeforeElse());
+                verifyBraces(node.getFalseExpression(), adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeElseLeftBrace(), true);
+            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
         }
-//        super.visitIf(node, adjustments);
         super.visitConditionalExpression(node, adjustments);
         return adjustments;
     }
@@ -1497,7 +1520,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeTryLeftBrace(), true);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
         }
         super.visitTry(node, adjustments);
         return adjustments;
@@ -1531,7 +1555,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
         }
         super.visitCatch(node, adjustments);
         return adjustments;
@@ -1587,7 +1612,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 verifySpaceBefore(adjustments, cs.spaceBeforeMethodDeclLeftBrace(), getStartPos(node.getBody()));
             } catch (BadLocationException e) {
                 if (log.isLoggable(Level.SEVERE))
-                    log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                    log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
             }
         }
         // POSTINIT is followed by BLOCK so we don't adjust indentation offset.
@@ -1645,7 +1671,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 //            }
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
-                log.severe(BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY) + e);
+                log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
+
         }
         return adjustments;
     }
