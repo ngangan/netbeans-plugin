@@ -39,7 +39,7 @@ import javafx.scene.Scene;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
-import java.lang.Math;
+import java.util.Random;
 import java.lang.System;
 
 /**
@@ -47,6 +47,7 @@ import java.lang.System;
  */
 
 var parts : Particle[];
+var random : Random = new Random();
 
 var timeline : Timeline = Timeline {
     repeatCount: Timeline.INDEFINITE
@@ -64,8 +65,8 @@ function update() : Void {
     insert Particle {
        x : 100
        y : 100
-       vx : 1 - 2 * Math.random()
-       vy : -2 * Math.random()
+       vx : 1 - 2 * random.nextFloat()
+       vy : -2 * random.nextFloat()
        accx : 0
        accy : 0.05
        timer : 100
