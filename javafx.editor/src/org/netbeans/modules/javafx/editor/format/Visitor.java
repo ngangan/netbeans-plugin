@@ -754,14 +754,9 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
             }
         }*/
-        final Tree tree = getParent();
-        if (tree instanceof FunctionDefinitionTree) {
-            super.visitFunctionValue(node, adjustments);
-        } else {
-            incIndent();
-            super.visitFunctionValue(node, adjustments);
-            decIndent();
-        }
+        incIndent();
+        super.visitFunctionValue(node, adjustments);
+        decIndent();
         return adjustments;
 
     }
