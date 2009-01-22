@@ -38,7 +38,9 @@
  */
 package qa.javafx.functional.library.project;
 
+import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
+import qa.javafx.functional.library.Util;
 
 /**
  *
@@ -59,5 +61,13 @@ public class EditorOperator extends org.netbeans.jellytools.EditorOperator {
     
     public void setText(String text){
         textComponent.setText(text);
+    }
+
+    public void format(){
+        clickForPopup();
+        Util.sleep(2000);
+        //JPopupMenuOperator popup = new JPopupMenuOperator(this);
+        JPopupMenuOperator popup = new JPopupMenuOperator();
+        popup.pushMenu("Format");
     }
 }

@@ -36,6 +36,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.type.TypeKind;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -84,9 +86,12 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         return elements;
     }
 
-
+    private static Logger log = Logger.getLogger(IdentifierVisitor.class.getName());
     private Element toElement(Tree node) {
-        return info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
+        Element element = info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
+        if (element != null && element.toString().startsWith("java.lang")) return null;
+        if (log.isLoggable(Level.FINE)) log.fine("toElement(): Element: " + element);
+        return element;
     }
 
     @Override
@@ -107,6 +112,7 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
 
     /**
      * Gets positions associated with elements.
+     *
      * @return defensive copy of positions start positions.
      */
     Map<Element, Long> getPositions() {
@@ -115,7 +121,7 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
 
     private static class InnerComparator implements Comparator<Name> {
 
-        public int compare(Name o1, Name o2) {            
+        public int compare(Name o1, Name o2) {
             return o1 != null ? o2 != null ? (o1.contentEquals(o2) ? 0 : 1) : -1 : 1;
         }
     }

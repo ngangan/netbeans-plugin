@@ -36,12 +36,15 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.api.javafx.source;
 
 import com.sun.tools.javafx.api.JavafxcTool;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.EventListenerList;
 import javax.tools.JavaFileManager;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
@@ -50,34 +53,44 @@ import org.netbeans.modules.javafx.source.classpath.ProxyFileManager;
 import org.netbeans.modules.javafx.source.classpath.SourceFileManager;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
+import org.openide.util.WeakListeners;
 
 /**
  *
  * @author nenik
  */
 public class ClasspathInfo {
+
     private static final ClassPath EMPTY_PATH = ClassPathSupport.createClassPath(new URL[0]);
+    
     private ClassPath bootPath;
     private ClassPath compilePath;
     private ClassPath srcPath;
+
     private JavaFileManager fileManager;
     private ClassIndex usagesQuery;
-    
+
+    private final ClassPathListener cpListener;
+    private EventListenerList listenerList;
+
     public static ClasspathInfo create(FileObject fo) {
         ClassPath bootPath = ClassPath.getClassPath(fo, ClassPath.BOOT);
         if (bootPath == null) {
             //javac requires at least java.lang
             bootPath = JavaFXPlatform.getDefaultFXPlatform().getBootstrapLibraries();
         }
+
         ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
         if (compilePath == null) {
             compilePath = EMPTY_PATH;
         }
+
         ClassPath srcPath = ClassPath.getClassPath(fo, ClassPath.SOURCE);
         if (srcPath == null) {
             srcPath = EMPTY_PATH;
         }
-        return create (bootPath, compilePath, srcPath);
+        
+        return create(bootPath, compilePath, srcPath);
     }
 
     public static ClasspathInfo create(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
@@ -88,84 +101,88 @@ public class ClasspathInfo {
         this.bootPath = bootPath;
         this.compilePath = compilePath;
         this.srcPath = srcPath;
+
+        this.cpListener = new ClassPathListener ();
+    	this.bootPath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.bootPath));
+    	this.compilePath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.compilePath));
+    	this.srcPath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.srcPath));
     }
 
-    public ClassPath getClassPath (PathKind pathKind) {
-	switch( pathKind ) {
-	    case BOOT:
-		return bootPath;
-	    case COMPILE:
-		return compilePath;
-	    case SOURCE:
-		return srcPath;
-	    default:
-		assert false : "Unknown path type";     //NOI18N
-		return null;
-	}
+    public ClassPath getClassPath(PathKind pathKind) {
+        switch (pathKind) {
+            case BOOT:
+                return bootPath;
+            case COMPILE:
+                return compilePath;
+            case SOURCE:
+                return srcPath;
+            default:
+                assert false : "Unknown path type";     //NOI18N
+                return null;
+        }
     }
 
-    public static enum PathKind {	
-	BOOT,	
-	COMPILE,	
-	SOURCE,	
+    public static enum PathKind {
+        BOOT,
+        COMPILE,
+        SOURCE,
 //	OUTPUT,
     }
 
-/*    
+    /*
     private static File getSymbolsForUrl(URL url) throws IOException {
-        // Danger, Will Robinson!
-        
-        try {
-            ClassLoader friend = org.netbeans.api.java.source.JavaSource.class.getClassLoader();
-            Class cIndex = friend.loadClass("org.netbeans.modules.java.source.usages.Index");
-            //public static File getClassFolder (final URL url) throws IOException {                
-            Method mGetClassFolder = cIndex.getMethod("getClassFolder", URL.class);
-            File file = (File)mGetClassFolder.invoke(null, url);
-//        return Index.getClassFolder(sourceUrl);
-            return file;
-        } catch (Exception e) {
-            throw (IOException)new IOException().initCause(e);
-        }
+    // Danger, Will Robinson!
+
+    try {
+    ClassLoader friend = org.netbeans.api.java.source.JavaSource.class.getClassLoader();
+    Class cIndex = friend.loadClass("org.netbeans.modules.java.source.usages.Index");
+    //public static File getClassFolder (final URL url) throws IOException {
+    Method mGetClassFolder = cIndex.getMethod("getClassFolder", URL.class);
+    File file = (File)mGetClassFolder.invoke(null, url);
+    //        return Index.getClassFolder(sourceUrl);
+    return file;
+    } catch (Exception e) {
+    throw (IOException)new IOException().initCause(e);
+    }
     }
     private static List<URL> getSymbolsForPath(ClassPath cp) throws IOException {
-        List<URL> l = new ArrayList<URL>();
-        for (ClassPath.Entry e : cp.entries()) {
-            URL src = e.getURL();
-            
-            File cacheFolder = getSymbolsForUrl(src);
-            System.err.println("sym for " + src + " = " + cacheFolder);
-            URL cacheUrl = cacheFolder.toURI().toURL();
-            if (!cacheFolder.exists()) {                                
-                 cacheUrl = new URL (cacheUrl.toExternalForm()+"/");     //NOI18N
-            }
-            //            _cache.add(ClassPathSupport.createResource(cacheUrl));
+    List<URL> l = new ArrayList<URL>();
+    for (ClassPath.Entry e : cp.entries()) {
+    URL src = e.getURL();
 
-            
-            l.add(cacheUrl);
-        }
-        return l;
+    File cacheFolder = getSymbolsForUrl(src);
+    System.err.println("sym for " + src + " = " + cacheFolder);
+    URL cacheUrl = cacheFolder.toURI().toURL();
+    if (!cacheFolder.exists()) {
+    cacheUrl = new URL (cacheUrl.toExternalForm()+"/");     //NOI18N
     }
-*/    
+    //            _cache.add(ClassPathSupport.createResource(cacheUrl));
+
+
+    l.add(cacheUrl);
+    }
+    return l;
+    }
+     */
     synchronized JavaFileManager getFileManager(JavafxcTool tool) {
         if (fileManager == null) {
-/*            List<URL> userJavaClasses = null;
+            /*            List<URL> userJavaClasses = null;
             try {
-                userJavaClasses = getSymbolsForPath(srcPath);
+            userJavaClasses = getSymbolsForPath(srcPath);
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+            ioe.printStackTrace();
             }*/
             ClassPath cachedSrcPath = srcPath;
-/*            if (userJavaClasses != null) {
-                URL[] urls = userJavaClasses.toArray(new URL[userJavaClasses.size()]);
-                cachedSrcPath = ClassPathSupport.createProxyClassPath(srcPath, ClassPathSupport.createClassPath(urls));
-                System.err.println("cached=" + cachedSrcPath);
+            /*            if (userJavaClasses != null) {
+            URL[] urls = userJavaClasses.toArray(new URL[userJavaClasses.size()]);
+            cachedSrcPath = ClassPathSupport.createProxyClassPath(srcPath, ClassPathSupport.createClassPath(urls));
+            System.err.println("cached=" + cachedSrcPath);
             }*/
-            fileManager = new ProxyFileManager (
+            fileManager = new ProxyFileManager(
                     new CachingFileManager(bootPath), // cacheFile, ignoreExcludes
                     new CachingFileManager(compilePath), // ignoreExcludes
                     new SourceFileManager(cachedSrcPath),
-                    new MemoryFileManager()
-            );
+                    new MemoryFileManager());
         }
         return this.fileManager;
     }
@@ -182,19 +199,54 @@ public class ClasspathInfo {
     String getSrcPath() {
         return srcPath.toString(ClassPath.PathConversionMode.WARN);
     }
-        
-    void addChangeListener(ChangeListener change) {
-        // TODO
+
+    synchronized void addChangeListener(ChangeListener listener) {
+        if (listenerList == null) {
+            listenerList = new EventListenerList();
+        }
+        listenerList.add(ChangeListener.class, listener);
     }
 
-    public synchronized ClassIndex getClassIndex () {
-        if ( usagesQuery == null ) {
+    synchronized void removeChangeListener(ChangeListener listener) {
+        listenerList.remove(ChangeListener.class, listener);
+    }
+
+    public synchronized ClassIndex getClassIndex() {
+        if (usagesQuery == null) {
             usagesQuery = new ClassIndex(
                     this.bootPath,
                     this.compilePath,
                     this.srcPath);
         }
         return usagesQuery;
+    }
+
+    private void fireChangeListenerStateChanged() {
+        ChangeEvent e = null;
+        if (listenerList == null) {
+            return;
+        }
+        Object[] listeners = listenerList.getListenerList();
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == ChangeListener.class) {
+                if (e == null) {
+                    e = new ChangeEvent(this);
+                }
+                ((ChangeListener) listeners[i + 1]).stateChanged(e);
+            }
+        }
+    }
+    
+    private class ClassPathListener implements PropertyChangeListener {
+        public void propertyChange (PropertyChangeEvent event) {
+            if (ClassPath.PROP_ROOTS.equals(event.getPropertyName())) {
+                synchronized (this) {
+                    // Kill FileManager
+                    fileManager = null;
+                }
+                fireChangeListenerStateChanged();
+            }
+        }
     }
 
 }
