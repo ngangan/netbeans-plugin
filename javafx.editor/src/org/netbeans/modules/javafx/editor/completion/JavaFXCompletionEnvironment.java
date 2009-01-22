@@ -1506,7 +1506,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return null;
     }
 
-    private static TokenSequence<JFXTokenId> previousNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
+    static TokenSequence<JFXTokenId> previousNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
         while (ts.movePrevious()) {
             switch (ts.token().id()) {
                 case WS:
