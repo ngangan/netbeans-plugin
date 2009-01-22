@@ -282,7 +282,9 @@ public final class TreeUtilities {
         while ((p != null) && (scope == null)) {
             try {
                 scope = info.getTrees().getScope(p);
-            } catch (Exception ex) {
+            } catch (ThreadDeath td) {
+                throw td;
+            } catch (Throwable ex) {
                 if (logger.isLoggable(Level.FINEST)) {
                     logger.log(Level.FINEST, "  getScope failed on " + p, ex); // NOI18N
                 }
