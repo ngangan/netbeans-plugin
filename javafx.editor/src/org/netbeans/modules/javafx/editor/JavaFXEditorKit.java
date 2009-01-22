@@ -53,6 +53,7 @@ import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
 import org.netbeans.modules.javafx.preview.Bridge;
+import org.netbeans.modules.javafx.preview.PreviewSideServerFace;
 import org.netbeans.modules.javafx.preview.SerializableImage;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
@@ -305,10 +306,13 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 JavaFXDocument doc = (JavaFXDocument) target.getDocument();
                 if (doc != null) {
                     try {
-                        SerializableImage image = Bridge.getPreview(doc).getPicture();
-                        JPrintPanel printPanel = new JPrintPanel();
-                        printPanel.setImage(image);
-                        PrintManager.printAction(printPanel).actionPerformed(evt);
+                        final PreviewSideServerFace preview = Bridge.getPreview(doc);
+                        if (preview != null) {
+                            SerializableImage image = preview.getPicture();
+                            JPrintPanel printPanel = new JPrintPanel();
+                            printPanel.setImage(image);
+                            PrintManager.printAction(printPanel).actionPerformed(evt);
+                        }
                     } catch (RemoteException ex) {
                         ex.printStackTrace();
                     }

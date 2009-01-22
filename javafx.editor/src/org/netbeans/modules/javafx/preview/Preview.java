@@ -51,6 +51,7 @@ import java.awt.event.InvocationEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLStreamHandlerFactory;
 import java.rmi.*;
@@ -339,8 +340,19 @@ public class Preview {
                     try {
                         Class<?> acc = this.getClass().getClassLoader().loadClass(APC);
                         acc.getDeclaredMethod(DSP).invoke(ac);
-                    } catch (Throwable er) {
-                        er.printStackTrace();
+                        // do not catch java.lang.ThreadDeath exception
+//                    } catch (Throwable ex) {
+//                        Exceptions.printStackTrace(ex);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(Preview.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalAccessException ex) {
+                        Logger.getLogger(Preview.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (NoSuchMethodException ex) {
+                        Logger.getLogger(Preview.class.getName()).log(Level.SEVERE, "This class is not executable", ex); // NI18N
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(Preview.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        Logger.getLogger(Preview.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
