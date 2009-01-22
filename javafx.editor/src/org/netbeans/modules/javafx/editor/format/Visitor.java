@@ -754,9 +754,10 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                     log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e); // NOI18N
             }
         }*/
-        incIndent();
+        boolean changeIndent = !isSynthetic((JFXTree) getParent());
+        if (changeIndent) incIndent();
         super.visitFunctionValue(node, adjustments);
-        decIndent();
+        if (changeIndent) decIndent();
         return adjustments;
 
     }
@@ -1122,7 +1123,6 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private int getStartPos(Tree node) {
         int start = (int) sp().getStartPosition(cu(), node);
-        //noinspection unchecked
         TokenSequence<JFXTokenId> ts = ts();
         ts.move(start);
         while (ts.movePrevious()) {
@@ -1629,7 +1629,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     @Override
     public Queue<Adjustment> visitBlockExpression(BlockExpressionTree node, Queue<Adjustment> adjustments) {
         final Tree tree = getParent();
-        if (isSynthetic((JFXTree) node) || (tree instanceof FunctionValueTree)) {
+        if (isSynthetic((JFXTree) node) /*|| (tree instanceof FunctionValueTree)*/) {
             super.visitBlockExpression(node, adjustments);
             return adjustments;
         }
@@ -1658,12 +1658,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             incIndent();
             super.visitBlockExpression(node, adjustments);
             decIndent();
-//                if (isFirstOnLine(endPos) && !endsOnSameLine(node, node.getValue())) {
-//                    final int end = ctx.lineStartOffset(endPos);
-//                    indentLine(end, adjustments);
-//                }
-            indentEndLine(node, adjustments);
-//            }
+            verifyBraces(node, adjustments, cs.getMethodDeclBracePlacement(), cs.spaceBeforeMethodDeclLeftBrace(), true);
         } catch (BadLocationException e) {
             if (log.isLoggable(Level.SEVERE))
                 log.log(Level.SEVERE, BUNDLE.getString(REFORMAT_FAILED_BUNDLE_KEY), e);
