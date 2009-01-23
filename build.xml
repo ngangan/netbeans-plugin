@@ -54,7 +54,6 @@ made subject to such option by the copyright holder.
     <property name="build.config" value="daily"/>
     <property file="build-${build.config}.properties"/>    
     <property file="build.properties"/>    
-    <available property="netbeans.is.clonned" file="../.hg"/>
     <property name="netbeans.hg.root" location=".."/>
     
     <target name="setup-nbbuild">
