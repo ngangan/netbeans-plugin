@@ -40,13 +40,8 @@
  */
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.SyntheticTree.SynthType;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.Scope;
-import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
@@ -57,23 +52,24 @@ import com.sun.tools.javafx.tree.JFXBreak;
 import com.sun.tools.javafx.tree.JFXContinue;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.Random;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.element.Element;
-import javax.lang.model.type.TypeMirror;
-import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeMirror;
+import javax.swing.text.Document;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
