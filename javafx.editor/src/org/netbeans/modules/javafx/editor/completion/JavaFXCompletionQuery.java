@@ -73,7 +73,7 @@ import java.util.regex.Pattern;
 
 public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements Task<CompilationController> {
     
-    private static final Logger logger = Logger.getLogger(JavaFXCompletionProvider.class.getName());
+    private static final Logger logger = Logger.getLogger(JavaFXCompletionQuery.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     public static final String ERROR = "<error>"; // NOI18N
@@ -494,7 +494,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
             if ((brother.getJavaFXKind() == JavaFXKind.OBJECT_LITERAL_PART) ||
                 (brother.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) ||
-                (brother instanceof JFXErroneous) ||
+                (brother instanceof JFXErroneous) || (brother instanceof JFXTypeUnknown) ||
                 (brother.getJavaFXKind() == JavaFXKind.VARIABLE))
             {
                 path = pathOfBrother;
@@ -560,14 +560,25 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             if (LOGGABLE) log("   (1) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
             return e == offset;
         }
-        if ((t instanceof JFXObjectLiteralPart) || (t instanceof JFXVar)) {
+        if ((t instanceof JFXObjectLiteralPart) || 
+            (t instanceof JFXVar) ||
+            (t instanceof JFXFunctionValue) ) {
+            SourcePositions pos = controller.getTrees().getSourcePositions();
+            UnitTree unit = controller.getCompilationUnit();
+            long s = pos.getStartPosition(unit, t);
+            long e = pos.getEndPosition(unit, t);
             if (t.toString().contains("/*missing*/")) { // ho ho hoooo // NOI18N
-                SourcePositions pos = controller.getTrees().getSourcePositions();
-                UnitTree unit = controller.getCompilationUnit();
-                long s = pos.getStartPosition(unit, t);
-                long e = pos.getEndPosition(unit, t);
                 if (LOGGABLE) log("   (2) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
                 return e == offset;
+            }
+            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+            ts.move((int)e);
+            ts = JavaFXCompletionEnvironment.previousNonWhitespaceToken(ts);
+            if (ts == null || ts.offset() < s) {
+                throw new IllegalStateException("??? No non-whitespace tokens inside " + t);
+            }
+            if (ts.token().id() == JFXTokenId.COLON) {
+                return true;
             }
         }
         if (t instanceof JFXSelect) {
@@ -833,6 +844,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                                     isSynteticMainBlock = true;
                                 }
                             }
+                        }
+                        if ((tree.getJavaFXKind() == Tree.JavaFXKind.TYPE_UNKNOWN) ||
+                            (tree.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) ) {
+                            return null;
                         }
                         if (!isSynteticMainBlock) {
                             throw new Result(new JavaFXTreePath(getCurrentPath(), tree));

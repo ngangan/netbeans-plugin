@@ -70,12 +70,12 @@ public class Weather extends CustomNode {
         if (todayConditionImages == null) {
             todayConditionImages = [
                 ImageView{},
-                ImageView{image: Image{url:"{__DIR__}/imgs/sun.png"}},
-                AnimatedImage.create("{__DIR__}/imgs/cloud", "cloud_00", "png", 33),
-                AnimatedImage.create("{__DIR__}/imgs/rain", "rain_00", "png", 33),
-                AnimatedImage.create("{__DIR__}/imgs/snow", "snow_00", "png", 33),
-                AnimatedImage.create("{__DIR__}/imgs/lightning", "lightning_00", "png", 32),
-                ImageView{image: Image{url:"{__DIR__}/imgs/moon.png"}},
+                ImageView{image: Image{url:"{__DIR__}imgs/sun.png"}},
+                AnimatedImage.create("{__DIR__}imgs/cloud", "cloud_00", "png", 33),
+                AnimatedImage.create("{__DIR__}imgs/rain", "rain_00", "png", 33),
+                AnimatedImage.create("{__DIR__}imgs/snow", "snow_00", "png", 33),
+                AnimatedImage.create("{__DIR__}imgs/lightning", "lightning_00", "png", 32),
+                ImageView{image: Image{url:"{__DIR__}imgs/moon.png"}},
             ]
         }
     }
@@ -85,12 +85,12 @@ public class Weather extends CustomNode {
         if (tomorrowConditionImages == null) {
             tomorrowConditionImages = [
                 ImageView{},
-                ImageView{image: Image{url:"{__DIR__}/imgs/sun.png"}},
-                AnimatedImage.create("{__DIR__}/imgs/cloud", "cloud_00", "png", 33),
-                AnimatedImage.create("{__DIR__}/imgs/rain", "rain_00", "png", 33),        
-                AnimatedImage.create("{__DIR__}/imgs/snow", "snow_00", "png", 33),
-                AnimatedImage.create("{__DIR__}/imgs/lightning", "lightning_00", "png", 32),
-                ImageView{image: Image{url:"{__DIR__}/imgs/moon.png"}},
+                ImageView{image: Image{url:"{__DIR__}imgs/sun.png"}},
+                AnimatedImage.create("{__DIR__}imgs/cloud", "cloud_00", "png", 33),
+                AnimatedImage.create("{__DIR__}imgs/rain", "rain_00", "png", 33),
+                AnimatedImage.create("{__DIR__}imgs/snow", "snow_00", "png", 33),
+                AnimatedImage.create("{__DIR__}imgs/lightning", "lightning_00", "png", 32),
+                ImageView{image: Image{url:"{__DIR__}imgs/moon.png"}},
             ]
         }
     }

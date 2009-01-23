@@ -23,10 +23,10 @@ if [ -d $WORKSPACE/main/ ]; then
     		 hg pull
 	else
                 rm -rf $WORKSPACE/main
-		hg clone http://hg.netbeans.org/$REPO $WORKSPACE/main
+		hg clone http://hg.netbeans.org/release65_fixes $WORKSPACE/main
 	fi
 else
-    hg clone http://hg.netbeans.org/$REPO $WORKSPACE/main
+    hg clone http://hg.netbeans.org/release65_fixes $WORKSPACE/main
 fi
 
 #Get contrib repository
@@ -43,6 +43,7 @@ hg up -C
 cd $WORKSPACE/main/nbbuild
 
 cat > user.build.properties  <<EOF
+nb.cluster.javafx.dir=javafx2
 nb.cluster.javafx=\\
        contrib/javafx.debug,\\
        contrib/javafx.editor,\\
@@ -70,14 +71,14 @@ nb.cluster.javafx=\\
        contrib/javafx.fxd,\\
        contrib/javafx.sdksamples
 
-javafx-sdk.win.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/bundles/${JDK_FILENAME}-windows-i586.zip
-javafx-sdk.mac.url=${SDK_URL}/label=macosx-universal/lastSuccessfulBuild/artifact/build/macosx-universal/release/bundles/${JDK_FILENAME}-macosx-universal.zip
-javafx-sdk.lin.url=${SDK_URL}/label=linux-i586/lastSuccessfulBuild/artifact/build/linux-i586/release/bundles/${JDK_FILENAME}-linux-i586.zip	
-javafx-sdk.sol.url=${SDK_URL}/label=solaris-sparc/lastSuccessfulBuild/artifact/build/solaris-sparc/release/bundles/${JDK_FILENAME}-solaris-sparc.zip	
-jfxcompiler.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/${JDK_DIRNAME}/lib/shared/javafxc.jar
-jfxdoc.jar.url=${SDK_URL}/label=windows-i586/lastSuccessfulBuild/artifact/build/windows-i586/release/javafx-sdk-image/${JDK_DIRNAME}/lib/shared/javafxdoc.jar
-nb.cluster.javafx.dir=javafx2
-javafx-fxd-netbeans-support.zip.url=${PRODUCTION_SUITE_URL}/label=windows-i586/artifact/installer/win/build/javafx-fxd-netbeans-support-1.1-windows-i586.zip
+javafx-sdk.win.url=${SDK_WIN_URL}
+javafx-sdk.mac.url=${SDK_MAC_URL}
+javafx-sdk.lin.url=${SDK_LIN_URL}
+javafx-sdk.sol.url=${SDK_SOL_URL}
+jfxcompiler.jar.url=${COMPILER_URL}
+jfxdoc.jar.url=${JFXDOC_URL}
+javafx-fxd-netbeans-support.zip.url=${PRODUCTION_SUITE_URL}
+
 EOF
 
 # Get Netbeans binary
