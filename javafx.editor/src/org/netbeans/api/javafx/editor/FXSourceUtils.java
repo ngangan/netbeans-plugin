@@ -137,7 +137,11 @@ public final class FXSourceUtils {
                 return "Void" + suffix; // NOI18N
 
             default:
-                return type.toString() + suffix;
+                try {
+                    return type.toString() + suffix;
+                } catch (Exception ex) {
+                    return "<unknown>" + suffix; // NOI18N
+                }
         }
     }
 
