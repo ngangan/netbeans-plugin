@@ -293,8 +293,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 
 
                         final Queue<Adjustment> adjustments;
-//                        adjustments = new LinkedList<Adjustment>();
-                        adjustments = new MaskedQueue();
+                        adjustments = new LinkedList<Adjustment>();
+//                        adjustments = new MaskedQueue();
                         for (Context.Region region : regions) {
                             if (log.isLoggable(Level.INFO))
                                 log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
