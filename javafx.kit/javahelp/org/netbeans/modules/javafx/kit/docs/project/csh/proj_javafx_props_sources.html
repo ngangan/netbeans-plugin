@@ -12,8 +12,7 @@
 <h2>JavaFX  Project Properties Dialog Box: Sources </h2>
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
 <p>The Sources panel enables you to view the location of the project folder,
-	manage source  folders, as well as set the source level of
-	the packages which the IDE will use.
+	manage source  folders as well as specify a source encoding.
 <p>You open the JavaFX  Project Properties dialog box by right-clicking 
     any JavaFX project and choosing Properties.
   <!--explain source level?-->
@@ -27,19 +26,7 @@ the order of classpath elements.
 <li>All of the source roots are packaged into the same JAR file and share the same classpath.
 <li>If you have a source root that needs to be used by several projects, you should create a separate project for the source root and set up compilation dependencies between the projects.
 </ul>
-<p>You can use the SourceLevel  combo box at the bottom of the Sources page to set the Java platform version that the generated JavaFX code should be compatible with. This setting corresponds to the javafxc -source option.
-
-<ul class="note">
-<li>Specifying the source level does not change the Java platform whose libraries and executables are used to compile 
-and run your project. To set the Java platform that is used for compiling and running your project, click Libraries and 
-set the Java Platform setting accordingly. You cannot set the source level of a project to a higher release than the 
-project's Java platform.
-</ul>
-<p>Click on the Includes/Excludes button to invoke the Configure Includes &amp; Excludes dialog. This dialog allows you 
-to specify the packages you want to include in your project. This can be useful if, for example, you are working from a 
-large project that contains many packages maintained in the same location. You can filter the packages scanned from your 
-existing sources by etering paths to the packages you want to either include or exclude. Classes that are not included 
-will not be scanned when the dialog is dismissed.</p>
+<p>You can use the Encoding combo box at the bottom of the Sources page to specify a source encoding to localize your application.
 <dl>
     <dt><a name="seealso">See Also</a></dt>
     <dd><a href="../javafx_proj_process.html">Working with JavaFX Projects</a><br>

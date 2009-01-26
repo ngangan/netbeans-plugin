@@ -39,16 +39,22 @@
 
 package org.netbeans.modules.javafx.preview;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassOutputBuffer;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.preview.CodeUtils.Context;
 import org.openide.cookies.EditorCookie;
@@ -56,6 +62,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
+import org.openide.util.RequestProcessor;
 
 public class PreviewCodeGenerate implements CancellableTask<CompilationInfo> {
     
@@ -75,33 +82,53 @@ public class PreviewCodeGenerate implements CancellableTask<CompilationInfo> {
         process(info);
     }
     
-    public static void process(CompilationInfo info) throws ClassNotFoundException, Exception {
-        FileObject fo = info.getFileObject();
+    public static void process(final CompilationInfo info) throws ClassNotFoundException, Exception {
+        final FileObject fo = info.getFileObject();
         DataObject od = DataObject.find(fo);
         EditorCookie ec = od.getCookie(EditorCookie.class);
-        JavaFXDocument doc = (JavaFXDocument) ec.openDocument();
+        final JavaFXDocument doc = (JavaFXDocument) ec.openDocument();
         if (doc.executionAllowed()) {
-            info.moveToPhase(Phase.CODE_GENERATED);
-            if (info.getClassBytes() != null) {
-                Map<String, byte[]> classBytes = new HashMap<String, byte[]>();
-                for (JavaFileObject jfo : info.getClassBytes()) {
-                    byte[] cb = ((ClassOutputBuffer)jfo).getClassBytes();
-                    if (cb != null)
-                        classBytes.put(((ClassOutputBuffer)jfo).getBinaryName(), cb);
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    JavaFXSource javaFXSource = info.getJavaFXSource();
+                    try {
+                        javaFXSource.runUserActionTask(new Task<CompilationController>() {
+
+                            public void run(CompilationController controller) throws Exception {
+                                if (controller.toPhase(Phase.CODE_GENERATED).lessThan(Phase.CODE_GENERATED)) {
+                                    Logger.getLogger(PreviewCodeGenerate.class.getName()).log(Level.SEVERE, "Can not generate code for preview!"); // NI18N
+                                    return;
+                                }
+                                
+                                if (info.getClassBytes() != null) {
+                                    Map<String, byte[]> classBytes = new HashMap<String, byte[]>();
+                                    for (JavaFileObject jfo : info.getClassBytes()) {
+                                        byte[] cb = ((ClassOutputBuffer) jfo).getClassBytes();
+                                        if (cb != null) {
+                                            classBytes.put(((ClassOutputBuffer) jfo).getBinaryName(), cb);
+                                        }
+                                    }
+
+                                    ClassPath sourceCP = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+                                    ClassPath compileCP = ClassPath.getClassPath(fo, ClassPath.COMPILE);
+                                    ClassPath executeCP = ClassPath.getClassPath(fo, ClassPath.EXECUTE);
+                                    ClassPath bootCP = ClassPath.getClassPath(fo, ClassPath.BOOT);
+
+                                    String className = sourceCP.getResourceName(info.getFileObject(), '.', false);                              // NOI18N
+                                    String fileName = fo.getNameExt();
+
+                                    final PreviewSideServerFace previewSideServerFace = Bridge.getPreview(doc);
+                                    if (previewSideServerFace != null) {
+                                        previewSideServerFace.run(new Context(classBytes, className, fileName, toURLs(sourceCP), toURLs(executeCP), toURLs(bootCP)));
+                                    }
+                                }
+                            }
+                        }, true);
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
                 }
-
-                ClassPath sourceCP = ClassPath.getClassPath(fo, ClassPath.SOURCE);
-                ClassPath compileCP = ClassPath.getClassPath(fo, ClassPath.COMPILE);
-                ClassPath executeCP = ClassPath.getClassPath(fo, ClassPath.EXECUTE);
-                ClassPath bootCP = ClassPath.getClassPath(fo, ClassPath.BOOT);
-
-                String className = sourceCP.getResourceName(info.getFileObject(), '.', false);                              // NOI18N
-                String fileName = fo.getNameExt();
-
-                final PreviewSideServerFace previewSideServerFace = Bridge.getPreview(doc);
-                if (previewSideServerFace != null)
-                    previewSideServerFace.run(new Context(classBytes, className, fileName, toURLs(sourceCP), toURLs(executeCP), toURLs(bootCP)));
-            }
+            });
         }
     }
     
