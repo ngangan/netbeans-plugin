@@ -330,7 +330,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         verifySpacesAroundColon(adjustments, ts);
     }
 
-    @SuppressWarnings({"MethodWithMultipleLoops"})// NOI18N
+    @SuppressWarnings({"MethodWithMultipleLoops"})
+// NOI18N
     private void verifyVarSpaces(VariableTree node, Queue<Adjustment> adjustments) throws BadLocationException {
         TokenSequence<JFXTokenId> ts = ts(node);
         while (ts.moveNext()) {
@@ -363,7 +364,8 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     }
 
     @SuppressWarnings({"MethodWithMultipleLoops", "OverlyNestedMethod", "OverlyComplexMethod", // NOI18N
-            "MethodWithMoreThanThreeNegations", "OverlyLongMethod"}) // NOI18N
+            "MethodWithMoreThanThreeNegations", "OverlyLongMethod"})
+    // NOI18N
     private void verifySpacesAroundColon(Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
         // INDETIFIER WS* (COLON|EQ) WS+ ANY
         if (ts.moveNext()) {
@@ -646,10 +648,10 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     @Override
     public Queue<Adjustment> visitFunctionValue(FunctionValueTree node, Queue<Adjustment> adjustments) {
-        boolean changeIndent = !isSynthetic((JFXTree) getParent());
-        if (changeIndent) incIndent();
+//        boolean changeIndent = !isSynthetic((JFXTree) getParent());
+//        if (changeIndent) incIndent();
         super.visitFunctionValue(node, adjustments);
-        if (changeIndent) decIndent();
+//        if (changeIndent) decIndent();
         return adjustments;
 
     }
@@ -707,9 +709,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
         LineIterator<Element> li = new DocumentLinesIterator(ctx, start);
 //        indentLines(pos, adjustments, li);
-        int oldIndent = indentOffset;
-        indentCommentLines(ts, pos, adjustments, li, oldIndent);
-        indentOffset = oldIndent;
+        if (li.hasNext()) {
+            li.next();
+            int oldIndent = indentOffset;
+            indentCommentLines(ts, pos, adjustments, li, oldIndent);
+            indentOffset = oldIndent;
+        }
     }
 
     private void indentCommentLines(TokenSequence<JFXTokenId> ts, int pos, Queue<Adjustment> adjustments, LineIterator<Element> li, int oldIndent) throws BadLocationException {
@@ -732,12 +737,18 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
         }
     }
 
-    private boolean isPrecededByComment(TokenSequence<JFXTokenId> ts, int pos) {
+    private boolean isPrecededByComment(TokenSequence<JFXTokenId> ts, int pos) throws BadLocationException {
         ts.move(pos);
         while (ts.movePrevious()) {
             JFXTokenId tid = ts.token().id();
             if (tid == JFXTokenId.WS) continue;
-            if (JFXTokenId.isComment(tid)) return true;
+            if (JFXTokenId.isComment(tid)) {
+                if (isFirstOnLine(ts.offset())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
             return false;
         }
         return false;
@@ -832,7 +843,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
 
     private void checkEndBrace(Tree node, Queue<Adjustment> adjustments, TokenSequence<JFXTokenId> ts) throws BadLocationException {
         if (log.isLoggable(Level.INFO)) log.info("isOrphanObjectLiterar? " + isOrphanObjectLiterar);
-        if (isOrphanObjectLiterar) return;
+//        if (isOrphanObjectLiterar) return;
         Document doc = ctx.document();
         final int end = getEndPos(node);
         ts.move(end); //getting into last token...
@@ -923,7 +934,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
             isOrphanObjectLiterar = node.getLiteralParts() == null || node.getLiteralParts().size() == 1;
             super.visitInstantiate(node, adjustments);
             decIndent();
-            verifyBraces(node, adjustments, cs.getOtherBracePlacement(), cs.spaceBeforeMethodDeclLeftBrace(), true);
+            verifyBraces(node, adjustments, cs.getMethodDeclBracePlacement(), cs.spaceBeforeMethodDeclLeftBrace(), true);
             isOrphanObjectLiterar = false;
 
         } catch (BadLocationException e) {
