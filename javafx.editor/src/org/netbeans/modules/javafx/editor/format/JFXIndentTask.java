@@ -274,42 +274,6 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reformat() throws BadLocationException {
-//        final JavaFXSource s = JavaFXSource.forDocument(context.document());
-//        try {
-//            s.runUserActionTask(new Task<CompilationController>() {
-//                public void run(CompilationController controller) throws Exception {
-//                    final long s = System.currentTimeMillis();
-//                    final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
-//                    if (log.isLoggable(Level.INFO))
-//                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
-//                    if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
-//                        if (log.isLoggable(Level.INFO))
-//                            log.info("The " + phase + " phase has been reached ... OK!");
-//                        final int offset = context.startOffset();
-//                        final TreeUtilities tu = controller.getTreeUtilities();
-//                        JavaFXTreePath path;
-//                        if (offset > 0) {
-//                            path = tu.pathFor(offset);
-//                        } else {
-//                            path = tu.pathFor(offset);
-//                            while (path.getParentPath() != null) {
-//                                path = path.getParentPath();
-//                            }
-//                        }
-//                        final int position = (int) controller.getTrees().getSourcePositions()
-//                                .getStartPosition(controller.getCompilationUnit(), path.getLeaf());
-//                        int dot = offset == ZERO ? ZERO : position < ZERO ? ZERO : context.lineIndent(context.lineStartOffset(position));
-//                        Visitor visitor = new Visitor(controller, context, dot);
-////                        final Queue<Adjustment> adjustments = new MaskedQueue();
-//                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
-//                        visitor.scan(path, adjustments);
-//                        applyAdjustments(adjustments);
-//                    }
-//                }
-//            }, true);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
         reformat(context.indentRegions());
     }
 
@@ -328,8 +292,9 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                             log.info("The " + phase + " phase has been reached ... OK!");
 
 
-                        final Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
-//                        final Queue<Adjustment> adjustments = new MaskedQueue();
+                        final Queue<Adjustment> adjustments;
+                        adjustments = new LinkedList<Adjustment>();
+//                        adjustments = new MaskedQueue();
                         for (Context.Region region : regions) {
                             if (log.isLoggable(Level.INFO))
                                 log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
