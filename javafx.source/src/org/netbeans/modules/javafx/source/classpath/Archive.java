@@ -92,11 +92,11 @@ public abstract class Archive {
     
     private static Map<URL, Archive> archives = new HashMap<URL, Archive>();
 
-    public static Archive get(URL root) {
+    public static Archive get(URL root, boolean keepOpened) {
         Archive archive = archives.get(root);
 
         if (archive == null) {
-            archive = create(root);
+            archive = create(root, keepOpened);
             if (archive != null) {
                 archives.put(root, archive );
             }
@@ -106,7 +106,7 @@ public abstract class Archive {
     
     /** Creates proper archive for given file.
      */
-    private static Archive create( URL root) {
+    private static Archive create( URL root, boolean keepOpened) {
         String protocol = root.getProtocol();
         if ("file".equals(protocol)) { // NOI18N
             File f = new File (URI.create(root.toExternalForm()));
@@ -122,7 +122,7 @@ public abstract class Archive {
             if ("file".equals(protocol)) { // NOI18N
                 File f = new File (URI.create(inner.toExternalForm()));
                 if (f.isFile()) {
-                    return new CachingArchive(f);
+                    return new CachingArchive(f, keepOpened);
                 } else {
                     return null;
                 }
@@ -228,6 +228,7 @@ public abstract class Archive {
     private static class CachingArchive extends Archive {
         private final File archiveFile;
         private ZipFile zipFile;
+        private boolean keepOpened;
         
         byte[] names;// = new byte[16384];
         private int nameOffset = 0;
@@ -235,8 +236,9 @@ public abstract class Archive {
         private Map<String, Folder> folders; // = new HashMap<String, Folder>();
 
         /** Creates a new instance of archive from zip file */
-        public CachingArchive( File archiveFile) {
+        public CachingArchive( File archiveFile, boolean keepOpened) {
             this.archiveFile = archiveFile;
+            this.keepOpened = keepOpened;
         }
         
         /** Gets all files in given folder */
@@ -273,8 +275,8 @@ public abstract class Archive {
             String baseName = getString(f.indices[off], f.indices[off+1]);
             if (kinds == null || kinds.contains(FileObjects.getKind(FileObjects.getExtension(baseName)))) {
                 long mtime = join(f.indices[off+3], f.indices[off+2]);
-                if (zipFile == null) {
-                    assert f.delta == 4;
+                if (zipFile == null || !keepOpened) {
+                    // assert f.delta == 4;
                     l.add (FileObjects.zipFileObject(archiveFile, pkg, baseName, mtime));
                 } else {
                     l.add (FileObjects.zipFileObject( zipFile, pkg, baseName, mtime));

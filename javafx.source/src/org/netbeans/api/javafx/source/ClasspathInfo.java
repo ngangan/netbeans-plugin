@@ -179,8 +179,8 @@ public class ClasspathInfo {
             System.err.println("cached=" + cachedSrcPath);
             }*/
             fileManager = new ProxyFileManager(
-                    new CachingFileManager(bootPath), // cacheFile, ignoreExcludes
-                    new CachingFileManager(compilePath), // ignoreExcludes
+                    new CachingFileManager(bootPath, true), // cacheFile, ignoreExcludes
+                    new CachingFileManager(compilePath, false), // ignoreExcludes
                     new SourceFileManager(cachedSrcPath),
                     new MemoryFileManager());
         }
