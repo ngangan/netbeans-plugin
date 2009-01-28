@@ -351,7 +351,17 @@ public abstract class Archive {
                     }
                 }                    
             } finally {
-                this.zipFile = zip;
+                if (keepOpened) {
+                    this.zipFile = zip;
+                } else {
+                    try {
+                        if (zip != null) {
+                            zip.close();
+                        }
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
             }            
             return map;
         }
