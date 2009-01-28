@@ -43,40 +43,28 @@ package org.netbeans.modules.javafx.editor.format;
 
 import com.sun.javafx.api.tree.FunctionValueTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.TreeUtilities;
-import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenId;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Position;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 /**
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  */
 public class JFXIndentTask implements IndentTask, ReformatTask {
     private static Logger log = Logger.getLogger(JFXIndentTask.class.getName());
-    private static final Pattern KEEP_LEVEL_PTRN = Pattern.compile("\\s*(}|\\)|\\])\\s*(;|,)?\\s*");
 
     private final Context context;
-    private TokenSequence<JFXTokenId> ts = null;
-    private static final int ONE = 1;
     private static final int ZERO = 0;
 
 
@@ -100,75 +88,30 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      *          at an invalid offset or e.g. into a guarded section.
      */
     public void reindent() throws BadLocationException {
-//        if (context == null) {
-//            return;
-//        }
-//        if (log.isLoggable(Level.FINE)) log.fine("Reindent...");
-//
-//        final List<Context.Region> regions = context.indentRegions();
-//        if (!regions.isEmpty()) {
-//            for (Context.Region region : regions) {
-//                if (log.isLoggable(Level.FINE))
-//                    log.fine("\tRegion: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
-//                indentRegion(region);
-//            }
-//        } else {
-//            if (log.isLoggable(Level.FINE))
-//                log.fine("\tLine: [" + context.startOffset() + "," + context.endOffset() + "]");
-//            indentLine(context.startOffset());
-//        }
-//        if (log.isLoggable(Level.FINE)) log.fine("... done!");
-        reformat();
-    }
-
-    private void indentLine(int offset) throws BadLocationException {
-        int lso = context.lineStartOffset(offset);
-        int si = getScopeIndent(context.document(), lso) + indentComment(offset, lso);
-        if (context.lineIndent(lso) != si) {
-            context.modifyIndent(lso, si);
+        List<Context.Region> regions = context.indentRegions();
+        boolean skipFormat = false;
+        Queue<Adjustment> adjustments = new LinkedList<Adjustment>();
+        for (Context.Region region : regions) {
+            if (isOnSameLine(region)) {
+                String txt = context.document().getText(region.getStartOffset(), region.getEndOffset() - region.getStartOffset()).trim();
+                if (txt.startsWith("class") || txt.startsWith("import")) {
+                    adjustments.add(Adjustment.indent(context.document().createPosition(region.getStartOffset()), 0));
+                    skipFormat = true;
+                }
+            }
+        }
+        if (!skipFormat) {
+            reformat();
+        } else {
+            applyAdjustments(adjustments);
         }
     }
 
-    private int indentComment(int offset, int lso) {
-        ts().move(offset);
-        Token<JFXTokenId> t = ts().moveNext() ? ts().token() : null;
-        if (t != null && JFXTokenId.isComment(t.id())
-                && ts().offset() < lso
-                && (ts().offset() + t.length()) > lso) {
-            return ONE;
-
-        }
-        return ZERO;
+    private boolean isOnSameLine(Context.Region region) throws BadLocationException {
+        return context.lineStartOffset(region.getStartOffset()) == context.lineStartOffset(region.getEndOffset());
     }
 
-    private void indentRegion(Context.Region region) throws BadLocationException {
-        int offset = region.getStartOffset();
-        do {
-            indentLine(offset);
-            offset = adjustOffsetToNewLine(offset, context.lineStartOffset(offset));
-        } while (offset < region.getEndOffset());
-    }
-
-    private int adjustOffsetToNewLine(int offset, int lso) throws BadLocationException {
-        while (lso == context.lineStartOffset(offset)
-                && offset < context.endOffset()) {
-            offset++;
-        }
-        return offset;
-    }
-
-    private TokenSequence<JFXTokenId> ts() {
-        if (ts != null && ts.isValid()) return ts;
-        final BaseDocument doc = (BaseDocument) context.document();
-        this.ts = getTokenSequence(doc, this.ts != null ? ts.offset() : context.startOffset());
-        return this.ts;
-    }
-
-    private int getIndentStepLevel() {
-        return 4;
-    }
-
-//    private <T> T getSetting(String settingName, Object defVal) {
+    //    private <T> T getSetting(String settingName, Object defVal) {
 //        return (T) SettingsUtil.getValue(JavaFXEditorKit.class, settingName, defVal);
 //    }
 
@@ -177,81 +120,6 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
      */
     public ExtraLock indentLock() {
         return null;
-    }
-
-
-    private int getScopeIndent(Document document, int startOffset) throws BadLocationException {
-        final Position position = document.getStartPosition();
-        if (position.getOffset() == startOffset) {
-            return ZERO;
-        } else {
-            // we simply adapt indent of previous line and adjust if necessary.
-            int lso = context.lineStartOffset(startOffset);
-            int ls = getPreviousLine(lso);
-            if (ls == lso) return ZERO;
-            int level = context.lineIndent(ls); //previous line indent
-
-///*
-            //verify if we need to adjust level in case of previous line.
-            ts().move(ls);
-            Token<JFXTokenId> t = ts.moveNext() ? ts.token() : null;
-            while (t != null && ts.offset() < lso) {
-                if (t.id() == JFXTokenId.LBRACE || t.id() == JFXTokenId.LPAREN || t.id() == JFXTokenId.LBRACKET) {
-                    level += getIndentStepLevel();
-                } else
-                if (t.id() == JFXTokenId.RBRACE || t.id() == JFXTokenId.RPAREN || t.id() == JFXTokenId.RBRACKET) {
-                    level -= getIndentStepLevel();
-                } else if (t.id() == JFXTokenId.COMMENT || t.id() == JFXTokenId.DOC_COMMENT) {
-                    level -= getIndentStepLevel();
-                }
-                t = ts.moveNext() ? ts.token() : null;
-            }
-
-            // Handle special cases. This cases are handled with small guessing.
-            int nlo = adjustOffsetToNewLine(lso, lso); //start offset of next line
-            if (KEEP_LEVEL_PTRN.matcher(document.getText(lso, nlo - lso)).matches()) {
-                // if current line is "closing" line move it -1 level.
-//                level -= getIndentStepLevel();
-            } else if (KEEP_LEVEL_PTRN.matcher(document.getText(ls, lso - ls)).matches()) {
-                // if previous line is "closing" line move this +1 level.
-//                level += getIndentStepLevel();
-            } else {
-                final String previousLineText = document.getText(ls, lso - ls);
-                if (previousLineText.trim().endsWith(":")
-                        || previousLineText.trim().endsWith("=")) {
-                    level += getIndentStepLevel();
-                }
-            }
-            //if we got buggy source code we descent only to zero indent.
-            return Math.max(ZERO, level);
-        }
-    }
-
-    /**
-     * Escaping single newline lines.
-     *
-     * @param lso start of the origin line
-     * @return new nonempty line
-     * @throws BadLocationException if something goes wrong.
-     */
-    private int getPreviousLine(int lso) throws BadLocationException {
-        while (lso > ZERO) {
-            int ls = context.lineStartOffset(Math.max(ZERO, lso - ONE));
-            if (lso - ls > ONE) {
-                return ls;
-            } else {
-                lso = ls;
-            }
-        }
-        return ZERO;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
-        TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
-        TokenSequence<T> seq = (TokenSequence<T>) th.tokenSequence();
-        seq.move(dotPos);
-        return seq;
     }
 
 
@@ -327,6 +195,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         }
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     private class MaskedQueue implements Queue<Adjustment> {
         private final Queue<Adjustment> queue = new LinkedList<Adjustment>();
 
@@ -350,6 +219,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             return queue.toArray();
         }
 
+        @SuppressWarnings({"SuspiciousToArrayCall"})
         public <T> T[] toArray(T[] a) {
             return queue.toArray(a);
         }
@@ -379,6 +249,8 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
             queue.clear();
         }
 
+        @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
+        @Override
         public boolean equals(Object o) {
             return queue.equals(o);
         }
@@ -414,6 +286,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         }
 
         private void dumpStack() {
+            //noinspection ThrowableInstanceNeverThrown
             Exception e = new Exception("-------  StackTrace ---------- ");
             StackTraceElement[] ste = e.getStackTrace();
             System.err.println(e.getMessage());
