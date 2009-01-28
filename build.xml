@@ -80,9 +80,10 @@ made subject to such option by the copyright holder.
     </target>
 
     <target name="nbms">
+        <makeurl file="${netbeans.hg.root}/nbbuild/nbms" property="catalog.base.url"/>
         <ant dir="${netbeans.hg.root}/nbbuild">
             <property name="moduleconfig" value="javafx"/>
-            <property name="catalog.base.url" value="${HUDSON_URL}job/${JOB_NAME}/${BUILD_NUMBER}/artifact/main/nbbuild/nbms"/>
+            <property name="catalog.base.url" value="${catalog.base.url}"/>
             <property name="catalog.file" value="nbms/catalog.xml"/>
             <target name="build-nbms"/> 
             <target name="generate-uc-catalog"/> 
