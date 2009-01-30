@@ -66,9 +66,11 @@ import org.openide.util.WeakListeners;
 public class CachingFileManager implements JavaFileManager, PropertyChangeListener {
     
     protected final ClassPath cp;
+    boolean keepOpened;
     
-    public CachingFileManager(final ClassPath cp) {
+    public CachingFileManager(final ClassPath cp, boolean keepOpened) {
         this.cp = cp;
+        this.keepOpened = keepOpened;
         cp.addPropertyChangeListener(WeakListeners.propertyChange(this, cp));
     }
     
@@ -86,7 +88,7 @@ public class CachingFileManager implements JavaFileManager, PropertyChangeListen
         List<Iterable<JavaFileObject>> idxs = new LinkedList<Iterable<JavaFileObject>>();
         for(ClassPath.Entry entry : this.cp.entries()) {
             try {
-                Archive archive = Archive.get(entry.getURL());
+                Archive archive = Archive.get(entry.getURL(), keepOpened);
                 if (archive != null) {
                     Iterable<JavaFileObject> entries = archive.getFiles( folderName, entry, kinds);
                     idxs.add(entries);
@@ -102,7 +104,7 @@ public class CachingFileManager implements JavaFileManager, PropertyChangeListen
         
         for( ClassPath.Entry root : this.cp.entries()) {
             try {
-                Archive  archive = Archive.get(root.getURL());
+                Archive  archive = Archive.get(root.getURL(), keepOpened);
                 if (archive != null) {
                     Iterable<JavaFileObject> files = archive.getFiles(FileObjects.convertPackage2Folder(pkgName), root, null);
                     for (JavaFileObject e : files) {
@@ -126,7 +128,7 @@ public class CachingFileManager implements JavaFileManager, PropertyChangeListen
         namePair[1] = namePair[1] + kind.extension;
         for( ClassPath.Entry root : this.cp.entries()) {
             try {
-                Archive  archive = Archive.get(root.getURL());
+                Archive  archive = Archive.get(root.getURL(), keepOpened);
                 if (archive != null) {
                     Iterable<JavaFileObject> files = archive.getFiles(namePair[0], root, null);
                     for (JavaFileObject e : files) {

@@ -240,7 +240,12 @@ public class Preview {
         public void remove() {
             checkTread.interrupt();
             threadGroup.skipExceptions(true);
-            if (previewFrame != null) previewFrame.dispose();
+            if (previewFrame != null) {
+                try {
+                    previewFrame.dispose();
+                } catch (NullPointerException e) { // issue #157490
+                }
+            }
             new Thread(new Runnable() {
                 public void run() {
                     acTread.disposeAC();

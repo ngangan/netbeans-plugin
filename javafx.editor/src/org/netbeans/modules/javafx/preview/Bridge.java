@@ -42,6 +42,9 @@ import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import org.openide.windows.OutputWriter;
 import java.beans.PropertyChangeListener;
+import java.rmi.NotBoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
@@ -108,15 +111,46 @@ public class Bridge extends ModuleInstall {
         if (previewSideServerFaces.containsKey(document)) {
             return previewSideServerFaces.get(document);
         } else {
+            Integer hashCode = document.hashCode();
             PreviewSideServerFace previewSideServerFace = null;
+
             try {
                 NBSidePreviewServer preview = new NBSidePreviewServer(document);
                 UnicastRemoteObject.unexportObject(preview, true);
                 NBSideServerFace stub = (NBSideServerFace) UnicastRemoteObject.exportObject(preview, 0);     
-                Integer hashCode = document.hashCode();
                 registry.rebind(NB_SIDE + SPACE + hashCode, stub);
-                previewDispatcher.createPreview(document.hashCode(), document.getDataObject().getPrimaryFile().getNameExt(), document.getPreviewLocation(), document.getPreviewSize());
-                previewSideServerFace = (PreviewSideServerFace) registry.lookup(PREVIEW_SIDE + SPACE + hashCode);
+                boolean needRestart = false;
+                if (previewDispatcher != null) {
+                    previewDispatcher.createPreview(document.hashCode(), document.getDataObject().getPrimaryFile().getNameExt(), document.getPreviewLocation(), document.getPreviewSize());
+                } else {
+                    needRestart = true;
+                }
+
+                try {
+                    previewSideServerFace = (PreviewSideServerFace) registry.lookup(PREVIEW_SIDE + SPACE + hashCode);
+                } catch (Exception e1) {
+                    needRestart = true;
+                }
+
+                // issue #157053
+                // TODO this is dirty hack, ping thread needs to be removed in future at all
+                if (needRestart && isStarted) {
+                    restart();
+                    long t1 = System.currentTimeMillis();
+                    isStarted = false;
+                    while (!isStarted()) {
+                        long delta = (System.currentTimeMillis() - t1) / 1000;
+                        if (delta > 10) { // if not started in 10 seconds - break
+                            return null;
+                        }
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e2) {
+                        }
+                    }
+                    return getPreview(document);
+                }
+
                 preview.setPreviewSideServerFace(previewSideServerFace);
                 previewSideServerFaces.put(document, previewSideServerFace);
                 nbSideServers.put(document, preview);
