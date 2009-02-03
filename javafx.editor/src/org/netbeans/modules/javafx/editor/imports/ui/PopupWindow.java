@@ -49,7 +49,9 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
 
     private Popup popup;
 
-    /** Bounds at which the visible popup has. */
+    /**
+     * Bounds at which the visible popup has.
+     */
     private Rectangle popupBounds;
 
     private JComponent contentComponent;
@@ -75,25 +77,37 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     }
 
     public final void hide() {
-        if (isVisible()) {
-            popup.hide();
-            popup = null;
-            popupBounds = null;
-            if(focusListeningComponent != null) {
-                focusListeningComponent.removeFocusListener(this);
-                focusListeningComponent = null;
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                if (isVisible()) {
+                    popup.hide();
+                    popup = null;
+                    popupBounds = null;
+                    if (focusListeningComponent != null) {
+                        focusListeningComponent.removeFocusListener(PopupWindow.this);
+                        focusListeningComponent = null;
+                    }
+                    contentComponent = null;
+                    anchorOffset = -1;
+                    // Reset screen bounds as well to not cache too long
+                    ScreenBoundsProvider.clear();
+                }
             }
-            contentComponent = null;
-            anchorOffset = -1;
-            // Reset screen bounds as well to not cache too long
-            ScreenBoundsProvider.clear();
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
         }
+
     }
 
     /**
      * Return true if this popup should be focusable (there is a focusable
      * component in it). The popupFactory.getPopup() will use non-null parent
      * editor pane in such case.
+     *
      * @return always false.
      */
     protected boolean isFocusable() {
@@ -102,6 +116,7 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
 
     /**
      * Get the component to which the focus
+     *
      * @return content
      */
     protected JComponent getFocusListeningComponent() {
@@ -136,15 +151,15 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     }
 
     final int getAnchorOffset() {
-	int offset = anchorOffset;
-	if (offset == -1) {
-	    // Get caret position
-	    JTextComponent editorComponent = getEditorComponent();
-	    if (editorComponent != null) {
-		offset = editorComponent.getSelectionStart();
-	    }
-	}
-	return offset;
+        int offset = anchorOffset;
+        if (offset == -1) {
+            // Get caret position
+            JTextComponent editorComponent = getEditorComponent();
+            if (editorComponent != null) {
+                offset = editorComponent.getSelectionStart();
+            }
+        }
+        return offset;
     }
 
     final JComponent getContentComponent() {
@@ -167,7 +182,7 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
         // if there is space between right CC border and right screen edge,
         // add this gap to maximum width
         int gap = screenWidth - (getAnchorOffsetBounds().x + comp.getPreferredSize().width);
-        if(gap > 0) maxSize.width += gap;
+        if (gap > 0) maxSize.width += gap;
 
         setMaxSize(comp, maxSize);
         return comp.getPreferredSize();
@@ -176,7 +191,8 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     /**
      * Sets maximum size for appropriate JComponent, depending on
      * wheteher additional items are present
-     * @param comp comp
+     *
+     * @param comp    comp
      * @param maxSize max allowed size
      */
     private void setMaxSize(JComponent comp, Dimension maxSize) {
@@ -189,7 +205,7 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
 
     final void resetPreferredSize() {
         JComponent comp = getContentComponent();
-        if (comp == null){
+        if (comp == null) {
             return;
         }
         comp.setPreferredSize(null);
@@ -212,15 +228,15 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     }
 
     final Rectangle getAnchorOffsetBounds() {
-	JTextComponent editorComponent = getEditorComponent();
-	if (editorComponent == null) {
-	    return new Rectangle();
-	}
-        if (anchorOffsetBounds == null){
+        JTextComponent editorComponent = getEditorComponent();
+        if (editorComponent == null) {
+            return new Rectangle();
+        }
+        if (anchorOffsetBounds == null) {
             int anchorOffset = getAnchorOffset();
             try {
                 anchorOffsetBounds = editorComponent.modelToView(anchorOffset);
-                if (anchorOffsetBounds != null){
+                if (anchorOffsetBounds != null) {
                     anchorOffsetBounds.x -= getAnchorHorizontalShift();
                 } else {
                     anchorOffsetBounds = new Rectangle(); // use empty rectangle
@@ -244,10 +260,10 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
      * of the content component and the preference of the displaying
      * of the popup either above or below the occupied bounds.
      *
-     * @param occupiedBounds bounds of the rectangle above or below which
-     *   the bounds should be found.
+     * @param occupiedBounds      bounds of the rectangle above or below which
+     *                            the bounds should be found.
      * @param aboveOccupiedBounds whether the bounds should be found for position
-     *   above or below the occupied bounds.
+     *                            above or below the occupied bounds.
      * @return rectangle with absolute screen bounds of the popup.
      */
     private Rectangle findPopupBounds(Rectangle occupiedBounds, boolean aboveOccupiedBounds) {
@@ -276,9 +292,9 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     /**
      * Create and display the popup at the given bounds.
      *
-     * @param popupBounds location and size of the popup.
+     * @param popupBounds       location and size of the popup.
      * @param displayAboveCaret whether the popup is displayed above the anchor
-     *  bounds or below them (it does not be right above them).
+     *                          bounds or below them (it does not be right above them).
      */
     private void show(Rectangle popupBounds, boolean displayAboveCaret) {
         // Hide the original popup if exists
@@ -291,14 +307,14 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
         Dimension origPrefSize = getPreferredSize();
         Dimension newPrefSize = popupBounds.getSize();
         JComponent contComp = getContentComponent();
-        if (contComp == null){
+        if (contComp == null) {
             return;
         }
         contComp.setPreferredSize(newPrefSize);
         showRetainedPreferredSize = newPrefSize.equals(origPrefSize);
 
         focusListeningComponent = getFocusListeningComponent();
-        if(focusListeningComponent != null) {
+        if (focusListeningComponent != null) {
             focusListeningComponent.addFocusListener(this);
         }
 
@@ -310,7 +326,7 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
         JTextComponent owner = Utilities.isMac() ? null : layout.getEditorComponent();
 
         // #76648: Autocomplete box is too close to text
-        if(displayAboveCaret && Utilities.isMac()) {
+        if (displayAboveCaret && Utilities.isMac()) {
             popupBounds.y -= 10;
         }
 
@@ -336,6 +352,7 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     /**
      * Show the popup along the anchor bounds and take
      * the preferred location (above or below caret) into account.
+     *
      * @param occupiedBounds bounds that are occupied.
      */
     void showAlongOccupiedBounds(Rectangle occupiedBounds) {
@@ -353,8 +370,9 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     /**
      * Displays popup right, left of currently occupied bounds if possible,
      * otherwise fallback to above/below
+     *
      * @param occupiedBounds bounds of CC popup
-     * @param unionBounds bounds occupied by all popups
+     * @param unionBounds    bounds occupied by all popups
      */
     void showAlongOrNextOccupiedBounds(Rectangle occupiedBounds, Rectangle unionBounds) {
         Rectangle screen = ScreenBoundsProvider.getScreenBounds(getEditorComponent());
@@ -411,6 +429,7 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
     /**
      * Check whether there is enough space for this popup
      * on its preferred location related to caret.
+     *
      * @param occupiedBounds occupoed bounds
      * @return true if yes
      */
@@ -422,19 +441,19 @@ abstract class PopupWindow<T extends CompletionItem> implements FocusListener {
      * Check whether there is enough space for this popup above
      * or below the given occupied bounds.
      *
-     * @param occupiedBounds bounds above or below which the available
-     *  space should be determined.
+     * @param occupiedBounds      bounds above or below which the available
+     *                            space should be determined.
      * @param aboveOccupiedBounds whether the space should be checked above
-     *  or below the occupiedBounds.
+     *                            or below the occupiedBounds.
      * @return true if there is enough space for the preferred size of this popup
-     *  on the requested side or false if not.
+     *         on the requested side or false if not.
      */
     boolean isEnoughSpace(Rectangle occupiedBounds, boolean aboveOccupiedBounds) {
         Rectangle screen = ScreenBoundsProvider.getScreenBounds(getEditorComponent());
 
         int freeHeight = aboveOccupiedBounds
-            ? occupiedBounds.y - screen.y
-            : (screen.y + screen.height) - (occupiedBounds.y + occupiedBounds.height);
+                ? occupiedBounds.y - screen.y
+                : (screen.y + screen.height) - (occupiedBounds.y + occupiedBounds.height);
         Dimension prefSize = getPreferredSize();
         return (prefSize.height < freeHeight);
     }
