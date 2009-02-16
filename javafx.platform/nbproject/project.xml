@@ -176,7 +176,27 @@ made subject to such option by the copyright holder.
                         <specification-version>7.8</specification-version>
                     </run-dependency>
                 </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.libs.jsr223</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.6</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.javafx.sdk.win</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                </dependency>
             </module-dependencies>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/shared/javafxc.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/shared/javafxdoc.jar</runtime-relative-path>
+            </class-path-extension>
             <test-dependencies>
                 <test-type>
                     <name>unit</name>
@@ -189,6 +209,37 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.api.javafx.platform</package>
                 <package>org.netbeans.modules.javafx.platform</package>
                 <package>org.netbeans.modules.javafx.platform.platformdefinition</package>
+                <package>com.sun.javafx.api</package>
+                <package>com.sun.javafx.api.tree</package>
+                <package>com.sun.javafx.runtime.location</package>
+                <package>com.sun.javafx.runtime.sequence</package>
+                <package>com.sun.scenario.scenegraph</package>
+                <package>com.sun.source.tree</package>
+                <package>com.sun.source.util</package>
+                <package>com.sun.javadoc</package>
+                <package>com.sun.tools.javac.tree</package>
+                <package>com.sun.tools.javac.jvm</package>
+                <package>com.sun.tools.javac.model</package>
+                <package>com.sun.tools.javac.code</package>
+                <package>com.sun.tools.javac.comp</package>
+                <package>com.sun.tools.javac.parser</package>
+                <package>com.sun.tools.javac.util</package>
+                <package>com.sun.tools.javafx.antlr</package>
+                <package>com.sun.tools.javafx.api</package>
+                <package>com.sun.tools.javafx.code</package>
+                <package>com.sun.tools.javafx.comp</package>
+                <package>com.sun.tools.javafx.main</package>
+                <package>com.sun.tools.javafx.script</package>
+                <package>com.sun.tools.javafx.tree</package>
+                <package>com.sun.tools.javafx.util</package>
+                <package>com.sun.tools.javafxdoc</package>
+                <package>javax.lang.model</package>
+                <package>javax.lang.model.element</package>
+                <package>javax.lang.model.type</package>
+                <package>javax.lang.model.util</package>
+                <package>javax.tools</package>
+                <package>org.antlr.runtime</package>
+                <package>org.antlr.runtime.tree</package>
             </public-packages>
             <extra-compilation-unit>
                 <package-root>probesrc</package-root>
