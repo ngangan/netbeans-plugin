@@ -57,13 +57,48 @@ made subject to such option by the copyright holder.
     <property name="netbeans.hg.root" location=".."/>
     
     <target name="setup-nbbuild">
-        <get src="${netbeans.binaries.url}.zip" dest="${netbeans.hg.root}/netbeans.zip" usetimestamp="true"/>
-        <get src="${netbeans.binaries.url}-src.zip" dest="${netbeans.hg.root}/netbeans-src.zip" usetimestamp="true"/>
         <delete dir="${netbeans.hg.root}/nbbuild"/>
-        <unzip src="${netbeans.hg.root}/netbeans-src.zip" dest="${netbeans.hg.root}"/>
-        <unzip src="${netbeans.hg.root}/netbeans.zip" dest="${netbeans.hg.root}/nbbuild"/>
+        <mkdir dir="${netbeans.hg.root}/nbbuild"/>
+        <parallel failonany="true">
+            <sequential>
+                <get src="${netbeans.binaries.url}-src.zip" dest="${netbeans.hg.root}/netbeans-src.zip"/>
+                <unzip src="${netbeans.hg.root}/netbeans-src.zip" dest="${netbeans.hg.root}">
+                    <patternset includes="/nbbuild/"/>
+                </unzip>
+                <property file="${netbeans.hg.root}/nbbuild/cluster.properties"/>
+                <filelist id="modules.refid" dir="${netbeans.hg.root}" files="${nb.cluster.nb},${nb.cluster.platform},${nb.cluster.harness},${nb.cluster.ide},${nb.cluster.websvccommon},${nb.cluster.java},${nb.cluster.profiler},${nb.cluster.j2ee},${nb.cluster.gsf},${nb.cluster.webcommon}"/>
+                <pathconvert pathsep="/," dirsep="/" property="modules.include.list" refid="modules.refid">
+                    <map from="${netbeans.hg.root}" to=""/>
+                </pathconvert>    
+                <unzip src="${netbeans.hg.root}/netbeans-src.zip" dest="${netbeans.hg.root}">
+                    <patternset includes="${modules.include.list}/">
+                        <exclude name="*/*src/" unless="unzip.netbeans.sources"/>
+                        <exclude name="*/*test/" unless="unzip.netbeans.tests"/>
+                    </patternset>
+                </unzip>    
+            </sequential>
+            <sequential>
+                <get src="${netbeans.binaries.url}-java.zip" dest="${netbeans.hg.root}/netbeans.zip"/>
+                <unzip src="${netbeans.hg.root}/netbeans.zip" dest="${netbeans.hg.root}/nbbuild"/>
+            </sequential>
+            <sequential>
+                <mkdir dir="javafx.sdk.win/external"/>
+                <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip"/>
+            </sequential>   
+            <sequential>
+                <mkdir dir="javafx.sdk.mac/external"/>
+                <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip"/>
+            </sequential>   
+            <sequential>
+                <mkdir dir="javafx.sdk.lin/external"/>
+                <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip"/>
+            </sequential>   
+            <sequential>
+                <mkdir dir="javafx.sdk.sol/external"/>
+                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip"/>
+            </sequential>   
+        </parallel>    
         <copy file="build-${build.config}.properties" tofile="${netbeans.hg.root}/nbbuild/user.build.properties" overwrite="true"/>    
-        <mkdir dir="${netbeans.hg.root}/o.n.core"/>
     </target>
     
     <target name="clean">
@@ -94,40 +129,40 @@ made subject to such option by the copyright holder.
         <property name="javafx.sdk.pattern" value="javafx-sdk/**"/>
         <property name="javafx.cluster.dir" location="${netbeans.hg.root}/nbbuild/netbeans/${nb.cluster.javafx.dir}"/>
         <property name="zips.dir" location="${netbeans.hg.root}/nbbuild/zips"/>
-      	<mkdir dir="${zips.dir}"/>
+        <mkdir dir="${zips.dir}"/>
         <zip destfile="${zips.dir}/javafx-cluster-win.zip" update="false" duplicate="preserve">
             <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${javafx.cluster.dir}">
-		            <exclude name="${javafx.sdk.pattern}"/>
-		            <exclude name="**/*-lin.*"/>
-		            <exclude name="**/*-sol.*"/>
-		            <exclude name="**/*-mac.*"/>
+                <exclude name="${javafx.sdk.pattern}"/>
+                <exclude name="**/*-lin.*"/>
+                <exclude name="**/*-sol.*"/>
+                <exclude name="**/*-mac.*"/>
             </zipfileset>
         </zip>
         <zip destfile="${zips.dir}/javafx-cluster-mac.zip" update="false" duplicate="preserve">
             <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${javafx.cluster.dir}">
-		            <exclude name="${javafx.sdk.pattern}"/>
-		            <exclude name="**/*-lin.*"/>
-		            <exclude name="**/*-sol.*"/>
-		            <exclude name="**/*-win.*"/>
+                <exclude name="${javafx.sdk.pattern}"/>
+                <exclude name="**/*-lin.*"/>
+                <exclude name="**/*-sol.*"/>
+                <exclude name="**/*-win.*"/>
           </zipfileset>
         </zip>
         <zip destfile="${zips.dir}/javafx-cluster-lin.zip" update="false" duplicate="preserve">
             <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${javafx.cluster.dir}">
-            		<exclude name="${javafx.sdk.pattern}"/>
-		            <exclude name="**/*-mac.*"/>
-		            <exclude name="**/*-sol.*"/>
-		            <exclude name="**/*-win.*"/>
+                <exclude name="${javafx.sdk.pattern}"/>
+                <exclude name="**/*-mac.*"/>
+                <exclude name="**/*-sol.*"/>
+                <exclude name="**/*-win.*"/>
           </zipfileset>
         </zip>
         <zip destfile="${zips.dir}/javafx-cluster-sol.zip" update="false" duplicate="preserve">
             <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${javafx.cluster.dir}">
-		            <exclude name="${javafx.sdk.pattern}"/>
-		            <exclude name="**/*-lin.*"/>
-		            <exclude name="**/*-mac.*"/>
-		            <exclude name="**/*-win.*"/>
+                <exclude name="${javafx.sdk.pattern}"/>
+                <exclude name="**/*-lin.*"/>
+                <exclude name="**/*-mac.*"/>
+                <exclude name="**/*-win.*"/>
             </zipfileset>
         </zip>
-	      <zip destfile="${zips.dir}/javafx-sdk-win.zip" basedir="javafx.sdk.win/external/javafx_sdk-windows" update="false" duplicate="preserve"/>
+        <zip destfile="${zips.dir}/javafx-sdk-win.zip" basedir="javafx.sdk.win/external/javafx_sdk-windows" update="false" duplicate="preserve"/>
         <zip destfile="${zips.dir}/javafx-sdk-mac.zip" update="false" duplicate="preserve">
             <zipfileset dir="javafx.sdk.mac/external/javafx_sdk-macosx" filemode="755">
                 <include name="javafx-sdk/bin/*"/>
