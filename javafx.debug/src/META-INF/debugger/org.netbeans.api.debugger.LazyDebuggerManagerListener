@@ -1,0 +1,2 @@
+org.netbeans.modules.debugger.javafx.breakpoints.PersistenceManager
+org.netbeans.modules.debugger.javafx.ui.CurrentThreadAnnotationListener

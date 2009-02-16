@@ -1,0 +1,3 @@
+org.netbeans.modules.debugger.javafx.projects.StepIntoActionProvider
+org.netbeans.modules.debugger.javafx.projects.RunToCursorActionProvider
+org.netbeans.modules.debugger.javafx.ui.actions.ToggleBreakpointActionProvider

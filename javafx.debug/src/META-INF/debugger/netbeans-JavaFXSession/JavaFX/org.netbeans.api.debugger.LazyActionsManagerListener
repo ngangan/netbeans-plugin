@@ -1,0 +1,3 @@
+org.netbeans.modules.debugger.javafx.breakpoints.BreakpointsEngineListener
+org.netbeans.modules.debugger.javafx.ui.DebuggerOutput
+org.netbeans.modules.debugger.javafx.ui.BreakpointOutput
