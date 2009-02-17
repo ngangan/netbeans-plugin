@@ -89,6 +89,7 @@ made subject to such option by the copyright holder.
                 <mkdir dir="javafx.sdk.mac/external"/>
                 <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip"/>
             </sequential>   
+<!--
             <sequential>
                 <mkdir dir="javafx.sdk.lin/external"/>
                 <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip"/>
@@ -96,7 +97,8 @@ made subject to such option by the copyright holder.
             <sequential>
                 <mkdir dir="javafx.sdk.sol/external"/>
                 <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip"/>
-            </sequential>   
+            </sequential>
+-->               
         </parallel>    
         <copy file="build-${build.config}.properties" tofile="${netbeans.hg.root}/nbbuild/user.build.properties" overwrite="true"/>    
     </target>
@@ -146,6 +148,7 @@ made subject to such option by the copyright holder.
                 <exclude name="**/*-win.*"/>
           </zipfileset>
         </zip>
+<!--        
         <zip destfile="${zips.dir}/javafx-cluster-lin.zip" update="false" duplicate="preserve">
             <zipfileset prefix="${nb.cluster.javafx.dir}" dir="${javafx.cluster.dir}">
                 <exclude name="${javafx.sdk.pattern}"/>
@@ -162,6 +165,7 @@ made subject to such option by the copyright holder.
                 <exclude name="**/*-win.*"/>
             </zipfileset>
         </zip>
+-->        
         <zip destfile="${zips.dir}/javafx-sdk-win.zip" basedir="javafx.sdk.win/external/javafx_sdk-windows" update="false" duplicate="preserve"/>
         <zip destfile="${zips.dir}/javafx-sdk-mac.zip" update="false" duplicate="preserve">
             <zipfileset dir="javafx.sdk.mac/external/javafx_sdk-macosx" filemode="755">
@@ -171,6 +175,7 @@ made subject to such option by the copyright holder.
                 <exclude name="javafx-sdk/bin/*"/>
             </zipfileset>
         </zip>
+<!--        
         <zip destfile="${zips.dir}/javafx-sdk-lin.zip" update="false" duplicate="preserve">
             <zipfileset dir="javafx.sdk.lin/external/javafx_sdk-linux" filemode="755">
                 <include name="javafx-sdk/bin/*"/>
@@ -187,6 +192,7 @@ made subject to such option by the copyright holder.
                 <exclude name="javafx-sdk/bin/*"/>
             </zipfileset>
         </zip>
+-->        
     </target>
 
     <target name="compress-result">
