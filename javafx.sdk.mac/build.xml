@@ -1,99 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-
-Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
-
-The contents of this file are subject to the terms of either the GNU
-General Public License Version 2 only ("GPL") or the Common
-Development and Distribution License("CDDL") (collectively, the
-"License"). You may not use this file except in compliance with the
-License. You can obtain a copy of the License at
-http://www.netbeans.org/cddl-gplv2.html
-or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
-specific language governing permissions and limitations under the
-License.  When distributing the software, include this License Header
-Notice in each file and include the License file at
-nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
-particular file as subject to the "Classpath" exception as provided
-by Sun in the GPL Version 2 section of the License file that
-accompanied this code. If applicable, add the following below the
-License Header, with the fields enclosed by brackets [] replaced by
-your own identifying information:
-"Portions Copyrighted [year] [name of copyright owner]"
-
-Contributor(s):
-
-The Original Software is NetBeans. The Initial Developer of the Original
-Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
-Microsystems, Inc. All Rights Reserved.
-
-If you wish your version of this file to be governed by only the CDDL
-or only the GPL Version 2, indicate your decision by adding
-"[Contributor] elects to include this software in this distribution
-under the [CDDL or GPL Version 2] license." If you do not indicate a
-single choice of license, a recipient has the option to distribute
-your version of this file under either the CDDL, the GPL Version 2 or
-to extend the choice of license to its licensees as provided above.
-However, if you add GPL Version 2 code and therefore, elected the GPL
-Version 2 license, then the option applies only if the new code is
-made subject to such option by the copyright holder.
--->
-
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="org.netbeans.modules.javafx.userlib" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project org.netbeans.modules.javafx.userlib.</description>
+<project name="org.netbeans.modules.javafx.sdk.mac" default="netbeans" basedir=".">
+    <description>Builds, tests, and runs the project org.netbeans.modules.javafx.sdk.mac.</description>
+    <import file="nbproject/build-impl.xml"/>
 
-    <import file="../../nbbuild/templates/projectized.xml"/>
-
-	<target name="init-release-external" depends="basic-init">
-		<taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="../javafx.sdk.win/lib/FXSDKAntTask.jar"/>
-		<mkdir dir="external"/>
-		<get src="${javafx-sdk.mac.url}" dest="external/javafx_sdk-macosx.zip" usetimestamp="true" verbose="true"/>
-    <delete dir="external/javafx_sdk-macosx" quiet="true"/>
-    <unzip src="external/javafx_sdk-macosx.zip" dest="external/javafx_sdk-macosx">
+    <target name="init-release-external" depends="basic-init">
+      <taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="lib/FXSDKAntTask.jar"/>
+      <mkdir dir="external"/>
+  		<get src="${javafx-sdk.mac.url}" dest="external/javafx_sdk-macosx.zip" usetimestamp="true" verbose="true"/>
+      <delete dir="release" quiet="true"/>
+      <unzip src="external/javafx_sdk-macosx.zip" dest="release">
         <regexpmapper from="^[^/]*/(.*)$" to="javafx-sdk/\1" handledirsep="yes"/>   
-    </unzip>
-		<SetReleaseExternal propertynameprefix="release.external/javafx_sdk-macosx/">
-			<fileset dir="external/javafx_sdk-macosx" excludes="**/lib/*.jar.pack.gz"/>
-		</SetReleaseExternal>
-	</target>
-
-    <target name="init" depends="basic-init,init-release-external,files-init,build-init,-init-proxy, javafx-sdk"/>
-
-    <target name="javafx-sdk">
-		<BuildLibDesc libfile="build/classes/org/netbeans/modules/javafx/sdk/mac/FXUserLib.xml" headerfile="libhead.xml" tailfile="libtail.xml" itemprefix="        &lt;resource>jar:nbinst:///" itemsuffix="!/&lt;/resource>">
-			<fileset dir="external/javafx_sdk-macosx" includes="**/lib/*.jar"/>
-		</BuildLibDesc>
+      </unzip>
     </target>
 
-    <target name="main">
-        <mkdir dir="build/main"/>
-        <javac srcdir="instsrc" destdir="build/main"/>
-        <filter token="SDK_DIR" value="javafx-sdk"/>
-        <copy file="main/main.properties" todir="build/main" overwrite="true" filtering="true"/>
-    </target>
-
-
-    <target name="nbm" depends="init,netbeans,-nbm-prompt-for-storepass,main" description="Build NBM archive.">
-        <mkdir dir="build"/>
-        <property name="nbm.target.cluster" value=""/> <!-- fallback -->
-        <makenbm file="build/${nbm}"
-                 productdir="${cluster}"
-                 module="${module.jar}"
-                 homepage="${nbm.homepage}"
-                 distribution="${nbm.distribution}"
-                 needsrestart="${nbm.needs.restart}"
-                 global="${nbm.is.global}"
-                 targetcluster="${nbm.target.cluster}"
-                 releasedate="${nbm.release.date}"
-                 moduleauthor="${nbm.module.author}">
-            <license file="${custom.license.file}"/>
-            <signature keystore="${keystore}" storepass="${storepass}" alias="${nbm_alias}"/>
-            <main dir="build/main"/>
-        </makenbm>
-    </target>
+    <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
 </project>
