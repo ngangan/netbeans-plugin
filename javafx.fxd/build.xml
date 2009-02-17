@@ -6,6 +6,8 @@
     <description>Builds, tests, and runs the project org.netbeans.modules.javafx.fxd.</description>
     <import file="nbproject/build-impl.xml"/>
     <target name="init-release-external" depends="basic-init">
+        <property name="build.config" value="daily"/>
+        <property file="../build-${build.config}.properties"/>
         <mkdir dir="external"/>
         <get src="${javafx-fxd-netbeans-support.zip.url}" dest="external/javafx-fxd-netbeans-support.zip" usetimestamp="true" verbose="true"/> 
         <delete dir="release"/>

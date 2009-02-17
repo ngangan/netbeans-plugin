@@ -7,7 +7,8 @@
     <import file="nbproject/build-impl.xml"/>
   
     <target name="init-release-external" depends="basic-init">
-      <taskdef resource="org/netbeans/nbbuild/extlibs/defs.properties" classpath="lib/FXSDKAntTask.jar"/>
+      <property name="build.config" value="daily"/>
+      <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
       <get src="${javafx-sdk.win.url}" dest="external/javafx_sdk-windows.zip" usetimestamp="true" verbose="true"/>
       <delete dir="release" quiet="true"/>
