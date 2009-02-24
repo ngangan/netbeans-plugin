@@ -166,10 +166,10 @@ if [ -n "$BASE_DIR" ] ; then
 fi
 
 if [ -n "$DATESTAMP" ]; then
-    NB_BUILD_NUMBER="$DATESTAMP"
+    BUILDNUMBER="$DATESTAMP"
 fi
 
-if [ -z "$NB_BUILD_NUMBER" ] ; then
+if [ -z "$BUILDNUMBER" ] ; then
     echo "Build number is not defined"
     exit 1;
 fi
@@ -183,7 +183,7 @@ run() {
     ################################################################################
     # run the build
     ant build\
-            \"-Dbuild.number=${NB_BUILD_NUMBER}\" \
+            \"-Dbuild.number=${BUILDNUMBER}\" \
             \"-Doutput.dir=${OUTPUT_DIR}\" \
             \"-Dbinary.cache.host=${BINARY_CACHE_HOST}\" \
             \"-Dnb.builds.host=${NB_BUILDS_HOST}\" \
