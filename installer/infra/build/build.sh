@@ -148,7 +148,7 @@ fi
 
 
 if [ -z "$OUTPUT_DIR" ] ; then
-    OUTPUT_DIR="$DIRNAME/../../../../dist/installers"
+    OUTPUT_DIR="$curdir/../../../../dist/installers"
     mkdir -p "$OUTPUT_DIR"
     cd "$OUTPUT_DIR"
     OUTPUT_DIR=`pwd`
