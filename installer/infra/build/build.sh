@@ -108,7 +108,7 @@ fi
 
 if [ -z "$CACHE_DIR" ] ; then
     curdir=`pwd`  
-    CACHE_DIR="$DIRNAME/../../../../NBI-cache"
+    CACHE_DIR="$curdir/../../../../NBI-cache"
     mkdir -p "$CACHE_DIR"
     cd "$CACHE_DIR"
     CACHE_DIR=`pwd`
