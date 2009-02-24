@@ -12,9 +12,7 @@
       <mkdir dir="external"/>
       <get src="${javafx-sdk.win.url}" dest="external/javafx_sdk-windows.zip" usetimestamp="true" verbose="true"/>
       <delete dir="release" quiet="true"/>
-      <unzip src="external/javafx_sdk-windows.zip" dest="release">
-        <regexpmapper from="^[^/]*/(.*)$" to="javafx-sdk/\1" handledirsep="yes"/>   
-      </unzip>
+      <unzip src="external/javafx_sdk-windows.zip" dest="release/javafx-sdk"/>
     </target>
 
     <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
