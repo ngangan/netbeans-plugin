@@ -64,12 +64,14 @@
         <antcall target="clean-platform">
             <param name="product.platforms" value="windows"/>
         </antcall>
+	<!--
         <antcall target="clean-platform">
             <param name="product.platforms" value="linux"/>
         </antcall>
         <antcall target="clean-platform">
             <param name="product.platforms" value="solaris-x86"/>
         </antcall>
+	-->
     </target>
     
     <!--
@@ -83,6 +85,7 @@
             <param name="product.platforms" value="windows"/>
             <param name="product.data.1.uri" value="${product.data.1.uri.windows}"/>
         </antcall>
+	<!--
         <antcall target="build-platform">
             <param name="product.platforms" value="linux"/>
             <param name="product.data.1.uri" value="${product.data.1.uri.linux}"/>
@@ -91,6 +94,7 @@
             <param name="product.platforms" value="solaris-x86"/>
             <param name="product.data.1.uri" value="${product.data.1.uri.solaris-x86}"/>
         </antcall>
+	-->
     </target>
     
     <!--
@@ -104,6 +108,7 @@
             <param name="product.platforms" value="windows"/>
             <param name="product.data.1.uri" value="${product.data.1.uri.windows}"/>
         </antcall>
+	<!--
         <antcall target="release-platform">
             <param name="product.platforms" value="linux"/>
             <param name="product.data.1.uri" value="${product.data.1.uri.linux}"/>
@@ -112,6 +117,7 @@
             <param name="product.platforms" value="solaris-x86"/>
             <param name="product.data.1.uri" value="${product.data.1.uri.solaris-x86}"/>
         </antcall>
+	-->
     </target>
     
     <!--

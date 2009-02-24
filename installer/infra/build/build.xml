@@ -1655,6 +1655,7 @@ jarsigner.storepass=${jarsigner.storepass}
                <param name="bundle.platform"  value="windows"/>
                <param name="bundle.extension" value="exe"/>
         </antcall>
+	<!--
 	<antcall target="generate-javafx-bundle">
                <param name="bundle.platform"  value="linux"/>
                <param name="bundle.extension" value="sh"/>
@@ -1663,6 +1664,7 @@ jarsigner.storepass=${jarsigner.storepass}
                <param name="bundle.platform"  value="solaris-x86"/>
                <param name="bundle.extension" value="sh"/>
         </antcall>
+	-->
     </target>
 
     <target name="generate-javafx-bundle">
