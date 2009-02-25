@@ -37,6 +37,10 @@
                 <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip"/>
             </sequential>
 -->               
+            <sequential>
+                <mkdir dir="javafx.fxd/external"/>
+                <get src="${javafx-fxd-netbeans-support.zip.url}" dest="javafx.fxd/external/javafx-fxd-netbeans-support.zip" usetimestamp="${use.timestamp}" verbose="true"/> 
+            </sequential>   
         </parallel>    
     </target>
     
