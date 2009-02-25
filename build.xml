@@ -13,18 +13,19 @@
         <property file="build-${build.config}.properties"/>    
         <delete dir="build"/>
         <mkdir dir="build"/>
+        <property name="use.timestamp" value="true"/>
         <parallel failonany="true">
             <sequential>
-                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="true" verbose="true"/>
+                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
                 <unzip src="netbeans.zip" dest="build"/>
             </sequential>
             <sequential>
                 <mkdir dir="javafx.sdk.win/external"/>
-                <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip" usetimestamp="true" verbose="true"/>
+                <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
             <sequential>
                 <mkdir dir="javafx.sdk.mac/external"/>
-                <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip" usetimestamp="true" verbose="true"/>
+                <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
 <!--
             <sequential>
