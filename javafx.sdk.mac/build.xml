@@ -12,7 +12,9 @@
       <mkdir dir="external"/>
   		<get src="${javafx-sdk.mac.url}" dest="external/javafx_sdk-macosx.zip" usetimestamp="true" verbose="true"/>
       <delete dir="release" quiet="true"/>
-      <unzip src="external/javafx_sdk-macosx.zip" dest="release/javafx-sdk"/>
+      <unzip src="external/javafx_sdk-macosx.zip" dest="release">
+        <regexpmapper from="^[^/]*/(.*)$" to="javafx-sdk/\1" handledirsep="yes"/>   
+      </unzip>
     </target>
 
     <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
