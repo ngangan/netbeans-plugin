@@ -145,7 +145,8 @@ made subject to such option by the copyright holder.
             <property name="nbm.target.dir" location="${build.updates.dir}"/>
             <property name="${nbm.target.cluster.name}" value="${help.target.cluster}" />
         </subant>
-        <makeupdatedesc desc="${build.updates.dir}/updates.xml" distbase="." automaticgrouping="true">
+        <property name="catalog.base.url" value="."/>
+        <makeupdatedesc desc="${build.updates.dir}/updates.xml" distbase="${catalog.base.url}" automaticgrouping="true">
             <fileset dir="${build.updates.dir}">
                 <include name="*.nbm"/>
             </fileset>
