@@ -30,8 +30,8 @@ package org.netbeans.modules.javafx.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
+import org.netbeans.modules.javafx.editor.format.CompilerIndependentJFXIndentTask;
 import org.netbeans.modules.javafx.editor.format.JFXIndentTask;
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -50,5 +50,6 @@ public class IndentTaskFactory implements IndentTask.Factory{
     public IndentTask createTask(Context context) {
         if (log.isLoggable(Level.FINE)) log.fine("Creating reformat factory"); // NOI18N
         return new JFXIndentTask(context);
+//        return new CompilerIndependentJFXIndentTask(context);
     }
 }
