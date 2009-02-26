@@ -74,7 +74,6 @@ public class JavaFXSourceUtils {
         if (file == null) {
             return false;
         }
-//        System.setProperty("env.class.path", getAdditionalCP(System.getProperty("env.class.path")));
 
         JavaFXSource js = JavaFXSource.forFileObject(file);
         if (js == null) {
@@ -119,39 +118,6 @@ public class JavaFXSourceUtils {
         }
         return result[0];
 
-    }
-
-    public static String getAdditionalCP(String cp) {
-        List<URL> libs = getAdditionalCP();
-        for (int i = 0; i < libs.size(); i++) {
-            FileObject fo = URLMapper.findFileObject(libs.get(i));
-            File f;
-            try {
-                f = FileUtil.archiveOrDirForURL(fo.getURL());
-                if (cp != null) {
-                    if (!cp.contains(f.getAbsolutePath())) {
-                        if (!cp.equals("")) {
-                            cp += File.pathSeparatorChar;
-                        }
-                        cp += f.getAbsolutePath();
-                    }
-                } else {
-                    cp = f.getAbsolutePath();
-                }
-            } catch (FileStateInvalidException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-        return cp;
-    }
-
-    public static List<URL> getAdditionalCP() {
-        LibraryManager lm = LibraryManager.getDefault();
-        Library l = lm.getLibrary("JavaFXUserLib"); // NOI18N
-        if (l == null) {
-            return Collections.emptyList();
-        }
-        return l.getContent("classpath"); // NOI18N
     }
 
     public static TypeElement getEnclosingTypeElement(Element element) throws IllegalArgumentException {

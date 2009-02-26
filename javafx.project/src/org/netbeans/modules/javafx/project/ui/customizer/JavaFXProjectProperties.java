@@ -123,9 +123,6 @@ public class JavaFXProjectProperties {
     
     public static final String FX_RUN_CLASS_NAME 
                 = "net.java.javafx.FXShell";           // NOI18N
-    public static final String FX_BUILD_CLASS_NAME 
-                = "javafx.netbeans.fxuserlib.FXBuild";           // NOI18N
-    public static final String FX_LIBS      = "libs.JavaFXUserLib.classpath"; //NOI18N
     
     // Properties stored in the PROJECT.PROPERTIES    
     public static final String DIST_DIR = "dist.dir"; // NOI18N
