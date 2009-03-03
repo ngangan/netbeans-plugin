@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.netbeans.modules.javafx.lib
+OpenIDE-Module-Name: javafx.lib
+OpenIDE-Module-Specification-Version: 1.8
+

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.netbeans.modules.debugger.javafx.ui
+OpenIDE-Module-Name: debugger.javafx.ui
+OpenIDE-Module-Specification-Version: 1.13
+

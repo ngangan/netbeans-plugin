@@ -63,74 +63,116 @@ made subject to such option by the copyright holder.
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.bestpractices</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.debug</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.editor</code-name-base>
                     <run-dependency>
-                        <specification-version>1.6</specification-version>
+                        <specification-version>1.7</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.fxd</code-name-base>
                     <run-dependency>
-                        <specification-version>1.3</specification-version>
+                        <specification-version>1.4</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.lexer</code-name-base>
                     <run-dependency>
                         <release-version>1</release-version>
-                        <specification-version>1.7</specification-version>
+                        <specification-version>1.8</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.navigation</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.palette</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.profiler</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.project</code-name-base>
                     <run-dependency>
-                        <specification-version>1.6</specification-version>
+                        <specification-version>1.7</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.sdksamples</code-name-base>
                     <run-dependency>
-                        <specification-version>1.3</specification-version>
+                        <specification-version>1.4</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
                     <run-dependency>
-                        <specification-version>1.5</specification-version>
+                        <specification-version>1.6</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.api.debugger.javafx</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.6</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.debugger.javafx</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.6</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.debugger.javafx.ant</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.6</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.debugger.javafx.projects</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.6</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.debugger.javafx.ui</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.13</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.javafx.lib</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.8</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.javafx.userlib</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.7</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>

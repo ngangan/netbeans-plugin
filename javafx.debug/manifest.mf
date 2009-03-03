@@ -3,7 +3,7 @@ OpenIDE-Module: org.netbeans.modules.javafx.debug
 OpenIDE-Module-Layer: org/netbeans/modules/debugger/javafx/resources/mf-layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/debug/resources/Bundle.properties
 AutoUpdate-Show-In-Client: false
-OpenIDE-Module-Specification-Version: 1.5
+OpenIDE-Module-Specification-Version: 1.6
 OpenIDE-Module-Package-Dependencies: com.sun.jdi[VirtualMachineManager]
 OpenIDE-Module-Provides: org.netbeans.api.debugger.javafx.JavaFXDebuggerEngineImpl, org.netbeans.spi.debugger.javafx.EditorContext, org.netbeans.spi.debugger.javafx.SourcePathProvider, org.netbeans.modules.debugger.javafx.ui
 OpenIDE-Module-Requires: org.netbeans.spi.debugger.ui

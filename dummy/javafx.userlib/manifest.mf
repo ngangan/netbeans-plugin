@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.netbeans.modules.javafx.userlib
+OpenIDE-Module-Name: javafx.userlib
+OpenIDE-Module-Specification-Version: 1.7
+
