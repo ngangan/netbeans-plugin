@@ -2,4 +2,4 @@ Manifest-Version: 1.0
 OpenIDE-Module: org.netbeans.modules.debugger.javafx.projects
 OpenIDE-Module-Name: debugger.javafx.projects
 OpenIDE-Module-Specification-Version: 1.6
-
+OpenIDE-Module-Provides: org.netbeans.spi.debugger.javafx.EditorContext, org.netbeans.spi.debugger.javafx.SourcePathProvider
