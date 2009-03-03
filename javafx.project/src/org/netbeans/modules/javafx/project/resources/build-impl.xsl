@@ -359,7 +359,7 @@ is divided into following sections:
     </xsl:comment>
         <target depends="init" name="-javadoc-build">
             <mkdir dir="${{dist.javadoc.dir}}"/>
-            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/javafxdoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" useexternalfile="true">
+            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/javafxdoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true">
                 <fileset dir="${{src.dir}}" includes="**/*.fx"/>
             </javadoc>
             <condition property="javadoc.available">
