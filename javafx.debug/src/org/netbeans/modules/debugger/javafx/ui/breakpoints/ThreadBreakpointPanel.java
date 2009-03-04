@@ -42,6 +42,7 @@
 package org.netbeans.modules.debugger.javafx.ui.breakpoints;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
 import org.netbeans.api.debugger.DebuggerManager;
@@ -60,14 +61,14 @@ import org.openide.util.NbBundle;
 // Implement HelpCtx.Provider interface to provide help ids for help system
 // public class ThreadBreakpointPanel extends JPanel implements Controller {
 // ====
-public class ThreadBreakpointPanel extends JPanel implements Controller, org.openide.util.HelpCtx.Provider {
+public class ThreadBreakpointPanel extends JPanel implements Controllable, org.openide.util.HelpCtx.Provider {
 // </RAVE>
     
     private ConditionsPanel             conditionsPanel;
     private ActionsPanel                actionsPanel; 
     private ThreadBreakpoint            breakpoint;
     private boolean                     createBreakpoint = false;
-    
+    private Controller                  controller = new ControllerImpl();
     
     private static ThreadBreakpoint creteBreakpoint () {
         ThreadBreakpoint mb = ThreadBreakpoint.create ();
@@ -120,6 +121,10 @@ public class ThreadBreakpointPanel extends JPanel implements Controller, org.ope
         // in the 'Add Breakpoint' dialog and when invoked in the 'Breakpoints' view
         putClientProperty("HelpID_AddBreakpointPanel", "debug.add.breakpoint.java.thread"); // NOI18N
         // </RAVE>
+    }
+
+    public Controller getController() {
+        return controller;
     }
     
     // <RAVE>
@@ -200,68 +205,6 @@ public class ThreadBreakpointPanel extends JPanel implements Controller, org.ope
         gridBagConstraints.weighty = 1.0;
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
-
-    
-    // Controller implementation ...............................................
-    
-    /**
-     * Called when "Ok" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean ok () {
-        String msg = valiadateMsg();
-        if (msg == null) {
-            msg = conditionsPanel.valiadateMsg();
-        }
-        if (msg != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
-            return false;
-        }
-        actionsPanel.ok ();
-        switch (cbBreakpointType.getSelectedIndex ()) {
-            case 0:
-                breakpoint.setBreakpointType (ThreadBreakpoint.TYPE_THREAD_STARTED);
-                break;
-            case 1:
-                breakpoint.setBreakpointType (ThreadBreakpoint.TYPE_THREAD_DEATH);
-                break;
-            case 2:
-                breakpoint.setBreakpointType (ThreadBreakpoint.TYPE_THREAD_STARTED_OR_DEATH);
-                break;
-        }
-        breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
-                conditionsPanel.getHitCountFilteringStyle());
-        
-        if (createBreakpoint) 
-            DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
-        return true;
-    }
-    
-    /**
-     * Called when "Cancel" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean cancel () {
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
-    private String valiadateMsg () {
-        return null;
-    }
-    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cPanel;
@@ -271,5 +214,73 @@ public class ThreadBreakpointPanel extends JPanel implements Controller, org.ope
     private javax.swing.JPanel pActions;
     private javax.swing.JPanel pSettings;
     // End of variables declaration//GEN-END:variables
-    
+
+    private class ControllerImpl implements Controller {
+        /**
+         * Called when "Ok" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean ok () {
+            String msg = valiadateMsg();
+            if (msg == null) {
+                msg = conditionsPanel.valiadateMsg();
+            }
+            if (msg != null) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
+                return false;
+            }
+            actionsPanel.ok ();
+            switch (cbBreakpointType.getSelectedIndex ()) {
+                case 0:
+                    breakpoint.setBreakpointType (ThreadBreakpoint.TYPE_THREAD_STARTED);
+                    break;
+                case 1:
+                    breakpoint.setBreakpointType (ThreadBreakpoint.TYPE_THREAD_DEATH);
+                    break;
+                case 2:
+                    breakpoint.setBreakpointType (ThreadBreakpoint.TYPE_THREAD_STARTED_OR_DEATH);
+                    break;
+            }
+            breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
+                    conditionsPanel.getHitCountFilteringStyle());
+
+            if (createBreakpoint)
+                DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
+            return true;
+        }
+
+        /**
+         * Called when "Cancel" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean cancel () {
+            return true;
+        }
+
+        /**
+         * Return <code>true</code> whether value of this customizer
+         * is valid (and OK button can be enabled).
+         *
+         * @return <code>true</code> whether value of this customizer
+         * is valid
+         */
+        public boolean isValid () {
+            return true;
+        }
+
+        private String valiadateMsg () {
+            return null;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+    }
 }

@@ -42,6 +42,7 @@
 package org.netbeans.modules.debugger.javafx.ui.breakpoints;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
 import org.netbeans.api.debugger.DebuggerManager;
@@ -62,13 +63,14 @@ import org.openide.util.NbBundle;
 // Implement HelpCtx.Provider interface to provide help ids for help system
 // public class ExceptionBreakpointPanel extends JPanel implements Controller {
 // ====
-public class ExceptionBreakpointPanel extends JPanel implements Controller, org.openide.util.HelpCtx.Provider {
+public class ExceptionBreakpointPanel extends JPanel implements Controllable, org.openide.util.HelpCtx.Provider {
 // </RAVE>
     
     private ConditionsPanel             conditionsPanel;
     private ActionsPanel                actionsPanel; 
     private ExceptionBreakpoint         breakpoint;
     private boolean                     createBreakpoint = false;
+    private Controller                  controller = new ControllerImpl();
     
     private static ExceptionBreakpoint creteBreakpoint () {
         String className;
@@ -135,6 +137,10 @@ public class ExceptionBreakpointPanel extends JPanel implements Controller, org.
         // in the 'Add Breakpoint' dialog and when invoked in the 'Breakpoints' view
         putClientProperty("HelpID_AddBreakpointPanel", "debug.add.breakpoint.java.exception"); // NOI18N
         // </RAVE>
+    }
+
+    public Controller getController() {
+        return controller;
     }
     
     // <RAVE>
@@ -239,76 +245,6 @@ public class ExceptionBreakpointPanel extends JPanel implements Controller, org.
 
         getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(ExceptionBreakpointPanel.class, "ACSN_ExceptionBreakpoint")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
-
-    
-    // Controller implementation ...............................................
-    
-    /**
-     * Called when "Ok" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean ok () {
-        String msg = valiadateMsg();
-        if (msg == null) {
-            msg = conditionsPanel.valiadateMsg();
-        }
-        if (msg != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
-            return false;
-        }
-        actionsPanel.ok ();
-        String className = tfExceptionClassName.getText ().trim ();
-        breakpoint.setExceptionClassName (className);
-        
-        switch (cbBreakpointType.getSelectedIndex ()) {
-            case 0:
-                breakpoint.setCatchType (ExceptionBreakpoint.TYPE_EXCEPTION_CATCHED);
-                break;
-            case 1:
-                breakpoint.setCatchType (ExceptionBreakpoint.TYPE_EXCEPTION_UNCATCHED);
-                break;
-            case 2:
-                breakpoint.setCatchType (ExceptionBreakpoint.TYPE_EXCEPTION_CATCHED_UNCATCHED);
-                break;
-        }
-        breakpoint.setClassFilters(conditionsPanel.getClassMatchFilter());
-        breakpoint.setClassExclusionFilters(conditionsPanel.getClassExcludeFilter());
-        breakpoint.setCondition (conditionsPanel.getCondition());
-        breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
-                conditionsPanel.getHitCountFilteringStyle());
-        
-        if (createBreakpoint) 
-            DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
-        return true;
-    }
-    
-    /**
-     * Called when "Cancel" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean cancel () {
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
-    private String valiadateMsg () {
-        if (tfExceptionClassName.getText().trim ().length() == 0) {
-            return NbBundle.getMessage(ExceptionBreakpointPanel.class, "MSG_No_Exception_Class_Name_Spec");
-        }
-        return null;
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cPanel;
@@ -320,5 +256,83 @@ public class ExceptionBreakpointPanel extends JPanel implements Controller, org.
     private javax.swing.JPanel pSettings;
     private javax.swing.JTextField tfExceptionClassName;
     // End of variables declaration//GEN-END:variables
-    
+
+    /**
+     * Controller implementation
+     */
+    private class ControllerImpl implements Controller {
+
+        /**
+         * Called when "Ok" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean ok () {
+            String msg = valiadateMsg();
+            if (msg == null) {
+                msg = conditionsPanel.valiadateMsg();
+            }
+            if (msg != null) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
+                return false;
+            }
+            actionsPanel.ok ();
+            String className = tfExceptionClassName.getText ().trim ();
+            breakpoint.setExceptionClassName (className);
+
+            switch (cbBreakpointType.getSelectedIndex ()) {
+                case 0:
+                    breakpoint.setCatchType (ExceptionBreakpoint.TYPE_EXCEPTION_CATCHED);
+                    break;
+                case 1:
+                    breakpoint.setCatchType (ExceptionBreakpoint.TYPE_EXCEPTION_UNCATCHED);
+                    break;
+                case 2:
+                    breakpoint.setCatchType (ExceptionBreakpoint.TYPE_EXCEPTION_CATCHED_UNCATCHED);
+                    break;
+            }
+            breakpoint.setClassFilters(conditionsPanel.getClassMatchFilter());
+            breakpoint.setClassExclusionFilters(conditionsPanel.getClassExcludeFilter());
+            breakpoint.setCondition (conditionsPanel.getCondition());
+            breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
+                    conditionsPanel.getHitCountFilteringStyle());
+
+            if (createBreakpoint)
+                DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
+            return true;
+        }
+
+        /**
+         * Called when "Cancel" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean cancel () {
+            return true;
+        }
+
+        /**
+         * Return <code>true</code> whether value of this customizer
+         * is valid (and OK button can be enabled).
+         *
+         * @return <code>true</code> whether value of this customizer
+         * is valid
+         */
+        public boolean isValid () {
+            return true;
+        }
+
+        private String valiadateMsg () {
+            if (tfExceptionClassName.getText().trim ().length() == 0) {
+                return NbBundle.getMessage(ExceptionBreakpointPanel.class, "MSG_No_Exception_Class_Name_Spec");
+            }
+            return null;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+        }
+    }
 }

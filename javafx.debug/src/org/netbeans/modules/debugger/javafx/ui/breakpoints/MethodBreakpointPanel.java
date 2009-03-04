@@ -42,6 +42,7 @@
 package org.netbeans.modules.debugger.javafx.ui.breakpoints;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeListener;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import org.netbeans.api.debugger.DebuggerManager;
@@ -62,7 +63,7 @@ import org.openide.util.NbBundle;
 // Implement HelpCtx.Provider interface to provide help ids for help system
 // public class MethodBreakpointPanel extends JPanel implements Controller {
 // ====
-public class MethodBreakpointPanel extends JPanel implements Controller, org.openide.util.HelpCtx.Provider {
+public class MethodBreakpointPanel extends JPanel implements Controllable, org.openide.util.HelpCtx.Provider {
 // </RAVE>
     
     private ConditionsPanel             conditionsPanel;
@@ -70,7 +71,7 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
     private MethodBreakpoint            breakpoint;
     private boolean                     createBreakpoint = false;
     private JEditorPane                 tfClassName;
-    
+    private Controller                  controller = new ControllerImpl();
     
     private static MethodBreakpoint createBreakpoint () {
         String className;
@@ -156,6 +157,10 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
         // in the 'Add Breakpoint' dialog and when invoked in the 'Breakpoints' view
         putClientProperty("HelpID_AddBreakpointPanel", "debug.add.breakpoint.java.method"); // NOI18N
         // </RAVE>
+    }
+
+    public Controller getController() {
+        return controller;
     }
     
     /** @return comma-separated parameter types */
@@ -428,99 +433,6 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
             tfMethodName.setEnabled (true);
         }
     }//GEN-LAST:event_cbAllMethodsActionPerformed
-
-    
-    // Controller implementation ...............................................
-    
-    /**
-     * Called when "Ok" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean ok () {
-        String msg = valiadateMsg();
-        if (msg == null) {
-            msg = conditionsPanel.valiadateMsg();
-        }
-        if (msg != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
-            return false;
-        }
-        actionsPanel.ok ();
-        //String className = ((String) tfPackageName.getText ()).trim ();
-        //if (className.length () > 0)
-        //    className += '.';
-        String className = tfClassName.getText ().trim ();
-        breakpoint.setClassFilters (new String[] {className});
-        if (!cbAllMethods.isSelected ()) {
-            String methodAndSignature = tfMethodName.getText ().trim ();
-            String methodName;
-            String signature;
-            int index = methodAndSignature.indexOf("(");	//NOI18N
-            if (index < 0) {
-                methodName = methodAndSignature;
-                signature = null;
-            } else {
-                methodName = methodAndSignature.substring(0, index).trim();
-                int end = methodAndSignature.indexOf(")", index);	//NOI18N
-                if (end < 0) {
-                    end = methodAndSignature.length();
-                }
-                signature = methodAndSignature.substring(index + 1, end);
-                signature = createSignatureFromParamTypes(signature);
-            }
-            breakpoint.setMethodName (methodName);
-            breakpoint.setMethodSignature(signature);
-        } else {
-            breakpoint.setMethodName ("");
-        }
-        switch (cbBreakpointType.getSelectedIndex ()) {
-            case 0:
-                breakpoint.setBreakpointType (MethodBreakpoint.TYPE_METHOD_ENTRY);
-                break;
-            case 1:
-                breakpoint.setBreakpointType (MethodBreakpoint.TYPE_METHOD_EXIT);
-                break;
-            case 2:
-                breakpoint.setBreakpointType (MethodBreakpoint.TYPE_METHOD_ENTRY | MethodBreakpoint.TYPE_METHOD_EXIT);
-                break;
-        }
-        breakpoint.setCondition (conditionsPanel.getCondition());
-        breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
-                conditionsPanel.getHitCountFilteringStyle());
-        
-        if (createBreakpoint) 
-            DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
-        return true;
-    }
-    
-    /**
-     * Called when "Cancel" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean cancel () {
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
-    private String valiadateMsg () {
-        if (tfClassName.getText().trim ().length() == 0 || (tfMethodName.getText().trim ().length() == 0 && !cbAllMethods.isSelected())) {
-            return NbBundle.getMessage(MethodBreakpointPanel.class, "MSG_No_Class_or_Method_Name_Spec");
-        }
-        return null;
-    }
-    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cPanel;
@@ -536,20 +448,103 @@ public class MethodBreakpointPanel extends JPanel implements Controller, org.ope
     private javax.swing.JTextField tfMethodName;
     // End of variables declaration//GEN-END:variables
 
-    /*
-    public static class ClassEditorKit extends NbEditorKit {
-        
-        static final String MIME_TYPE = "text/x-nb-debugger-javafx-class"; // NOI18N
-        
-        public ClassEditorKit() {
-            //updateActions();
+    private class ControllerImpl implements Controller {
+        /**
+         * Called when "Ok" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean ok () {
+            String msg = valiadateMsg();
+            if (msg == null) {
+                msg = conditionsPanel.valiadateMsg();
+            }
+            if (msg != null) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
+                return false;
+            }
+            actionsPanel.ok ();
+            //String className = ((String) tfPackageName.getText ()).trim ();
+            //if (className.length () > 0)
+            //    className += '.';
+            String className = tfClassName.getText ().trim ();
+            breakpoint.setClassFilters (new String[] {className});
+            if (!cbAllMethods.isSelected ()) {
+                String methodAndSignature = tfMethodName.getText ().trim ();
+                String methodName;
+                String signature;
+                int index = methodAndSignature.indexOf("(");	//NOI18N
+                if (index < 0) {
+                    methodName = methodAndSignature;
+                    signature = null;
+                } else {
+                    methodName = methodAndSignature.substring(0, index).trim();
+                    int end = methodAndSignature.indexOf(")", index);	//NOI18N
+                    if (end < 0) {
+                        end = methodAndSignature.length();
+                    }
+                    signature = methodAndSignature.substring(index + 1, end);
+                    signature = createSignatureFromParamTypes(signature);
+                }
+                breakpoint.setMethodName (methodName);
+                breakpoint.setMethodSignature(signature);
+            } else {
+                breakpoint.setMethodName ("");
+            }
+            switch (cbBreakpointType.getSelectedIndex ()) {
+                case 0:
+                    breakpoint.setBreakpointType (MethodBreakpoint.TYPE_METHOD_ENTRY);
+                    break;
+                case 1:
+                    breakpoint.setBreakpointType (MethodBreakpoint.TYPE_METHOD_EXIT);
+                    break;
+                case 2:
+                    breakpoint.setBreakpointType (MethodBreakpoint.TYPE_METHOD_ENTRY | MethodBreakpoint.TYPE_METHOD_EXIT);
+                    break;
+            }
+            breakpoint.setCondition (conditionsPanel.getCondition());
+            breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
+                    conditionsPanel.getHitCountFilteringStyle());
+
+            if (createBreakpoint)
+                DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
+            return true;
         }
-        
-        @Override
-        public String getContentType() {
-            return MIME_TYPE;
+
+        /**
+         * Called when "Cancel" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean cancel () {
+            return true;
+        }
+
+        /**
+         * Return <code>true</code> whether value of this customizer
+         * is valid (and OK button can be enabled).
+         *
+         * @return <code>true</code> whether value of this customizer
+         * is valid
+         */
+        public boolean isValid () {
+            return true;
+        }
+
+        private String valiadateMsg () {
+            if (tfClassName.getText().trim ().length() == 0 || (tfMethodName.getText().trim ().length() == 0 && !cbAllMethods.isSelected())) {
+                return NbBundle.getMessage(MethodBreakpointPanel.class, "MSG_No_Class_or_Method_Name_Spec");
+            }
+            return null;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
     }
-     */
 }

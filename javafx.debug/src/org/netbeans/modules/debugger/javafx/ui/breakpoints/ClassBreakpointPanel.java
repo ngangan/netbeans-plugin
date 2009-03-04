@@ -42,6 +42,7 @@
 package org.netbeans.modules.debugger.javafx.ui.breakpoints;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
 import org.netbeans.api.debugger.DebuggerManager;
@@ -61,14 +62,15 @@ import org.openide.util.NbBundle;
 // Implement HelpCtx.Provider interface to provide help ids for help system
 // public class ClassBreakpointPanel extends JPanel implements Controller {
 // ====
-public class ClassBreakpointPanel extends JPanel implements Controller, org.openide.util.HelpCtx.Provider {
+public class ClassBreakpointPanel extends JPanel implements Controllable, org.openide.util.HelpCtx.Provider {
 // </RAVE>
     
     private ConditionsPanel             conditionsPanel;
     private ActionsPanel                actionsPanel; 
     private ClassLoadUnloadBreakpoint   breakpoint;
     private boolean                     createBreakpoint = false;
-    
+
+    private Controller                  controller = new ControllerImpl();
     
     private static ClassLoadUnloadBreakpoint creteBreakpoint () {
         String className;
@@ -137,13 +139,57 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
         // </RAVE>
     }
 
+    public Controller getController() {
+        return controller;
+    }
+
     // <RAVE>
     // Implement getHelpCtx() with the correct helpID
     public org.openide.util.HelpCtx getHelpCtx() {
        return new org.openide.util.HelpCtx("NetbeansDebuggerBreakpointClassJavaFX"); // NOI18N
     }
     // </RAVE>
-    
+
+
+    static String concatClassFilters(String[] cf) {
+        if (cf.length > 0) {
+            StringBuilder sb = new StringBuilder(cf[0]);
+            for (int i = 1; i < cf.length; i++) {
+                sb.append(", ");	//NOI18N
+                sb.append(cf[i]);
+            }
+            return sb.toString();
+        } else {
+            return "";
+        }
+    }
+
+    static String[] parseClassFilters(String classFilter) {
+        int numFilters = 1;
+        int length = classFilter.length();
+        if (length == 0) {
+            return new String[0];
+        }
+        for (int i = 0; i < length; i++) {
+            if (classFilter.charAt(i) == ',') numFilters++;
+        }
+        String[] classFilters = new String[numFilters];
+        if (numFilters == 1) {
+            classFilters[0] = classFilter;
+        } else {
+            int i = 0;
+            int pos = 0;
+            while (pos < length) {
+                int end = classFilter.indexOf(",");	//NOI18N
+                if (end < 0) end = length;
+                classFilters[i] = classFilter.substring(pos, end).trim();
+                i++;
+                pos = end + 1;
+            }
+        }
+        return classFilters;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -236,113 +282,7 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
         add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    
-    // Controller implementation ...............................................
-    
-    /**
-     * Called when "Ok" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean ok () {
-        String msg = valiadateMsg();
-        if (msg == null) {
-            msg = conditionsPanel.valiadateMsg();
-        }
-        if (msg != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
-            return false;
-        }
-        actionsPanel.ok ();
-        
-        String className = tfClassName.getText ().trim ();
-        breakpoint.setClassFilters(parseClassFilters(className));
-        breakpoint.setClassExclusionFilters(conditionsPanel.getClassExcludeFilter());//parseClassFilters(className));
-        
-        switch (cbBreakpointType.getSelectedIndex ()) {
-            case 0:
-                breakpoint.setBreakpointType (ClassLoadUnloadBreakpoint.TYPE_CLASS_LOADED);
-                break;
-            case 1:
-                breakpoint.setBreakpointType (ClassLoadUnloadBreakpoint.TYPE_CLASS_UNLOADED);
-                break;
-            case 2:
-                breakpoint.setBreakpointType (ClassLoadUnloadBreakpoint.TYPE_CLASS_LOADED_UNLOADED);
-                break;
-        }
-        breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
-                conditionsPanel.getHitCountFilteringStyle());
-        if (createBreakpoint)
-            DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
-        return true;
-    }
-    
-    /**
-     * Called when "Cancel" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean cancel () {
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
-    private String valiadateMsg () {
-        if (tfClassName.getText().trim ().length() == 0) {
-            return NbBundle.getMessage(ClassBreakpointPanel.class, "MSG_No_Class_Name_Spec");
-        }
-        return null;
-    }
-    
-    static String concatClassFilters(String[] cf) {
-        if (cf.length > 0) {
-            StringBuilder sb = new StringBuilder(cf[0]);
-            for (int i = 1; i < cf.length; i++) {
-                sb.append(", ");	//NOI18N
-                sb.append(cf[i]);
-            }
-            return sb.toString();
-        } else {
-            return "";
-        }
-    }
-    
-    static String[] parseClassFilters(String classFilter) {
-        int numFilters = 1;
-        int length = classFilter.length();
-        if (length == 0) {
-            return new String[0];
-        }
-        for (int i = 0; i < length; i++) {
-            if (classFilter.charAt(i) == ',') numFilters++;
-        }
-        String[] classFilters = new String[numFilters];
-        if (numFilters == 1) {
-            classFilters[0] = classFilter;
-        } else {
-            int i = 0;
-            int pos = 0;
-            while (pos < length) {
-                int end = classFilter.indexOf(",");	//NOI18N
-                if (end < 0) end = length;
-                classFilters[i] = classFilter.substring(pos, end).trim();
-                i++;
-                pos = end + 1;
-            }
-        }
-        return classFilters;
-    }
-    
+       
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cPanel;
     private javax.swing.JComboBox cbBreakpointType;
@@ -353,5 +293,66 @@ public class ClassBreakpointPanel extends JPanel implements Controller, org.open
     private javax.swing.JPanel pSettings;
     private javax.swing.JTextField tfClassName;
     // End of variables declaration//GEN-END:variables
-    
+
+    /**
+     * Controller implementation
+     */
+    private class ControllerImpl implements Controller {
+
+        public boolean ok() {
+            String msg = valiadateMsg();
+            if (msg == null) {
+                msg = conditionsPanel.valiadateMsg();
+            }
+            if (msg != null) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
+                return false;
+            }
+            actionsPanel.ok ();
+
+            String className = tfClassName.getText ().trim ();
+            breakpoint.setClassFilters(parseClassFilters(className));
+            breakpoint.setClassExclusionFilters(conditionsPanel.getClassExcludeFilter());//parseClassFilters(className));
+
+            switch (cbBreakpointType.getSelectedIndex ()) {
+                case 0:
+                    breakpoint.setBreakpointType (ClassLoadUnloadBreakpoint.TYPE_CLASS_LOADED);
+                    break;
+                case 1:
+                    breakpoint.setBreakpointType (ClassLoadUnloadBreakpoint.TYPE_CLASS_UNLOADED);
+                    break;
+                case 2:
+                    breakpoint.setBreakpointType (ClassLoadUnloadBreakpoint.TYPE_CLASS_LOADED_UNLOADED);
+                    break;
+            }
+            breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
+                    conditionsPanel.getHitCountFilteringStyle());
+            if (createBreakpoint)
+                DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
+            return true;
+        }
+
+        public boolean cancel() {
+            return true;
+        }
+
+        public boolean isValid() {
+            return true;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+//            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+//            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        private String valiadateMsg () {
+            if (tfClassName.getText().trim ().length() == 0) {
+                return NbBundle.getMessage(ClassBreakpointPanel.class, "MSG_No_Class_Name_Spec");
+            }
+            return null;
+        }
+    }
 }

@@ -42,6 +42,7 @@
 package org.netbeans.modules.debugger.javafx.ui.breakpoints;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -75,14 +76,14 @@ import org.openide.util.NbBundle;
 // Implement HelpCtx.Provider interface to provide help ids for help system
 // public class LineBreakpointPanel extends JPanel implements Controller {
 //
-public class LineBreakpointPanel extends JPanel implements Controller, org.openide.util.HelpCtx.Provider {
+public class LineBreakpointPanel extends JPanel implements Controllable, org.openide.util.HelpCtx.Provider {
 // </RAVE>
     
     private ConditionsPanel             conditionsPanel;
     private ActionsPanel                actionsPanel; 
     private LineBreakpoint              breakpoint;
     private boolean                     createBreakpoint = false;
-    
+    private Controller                  controller = new ControllerImpl();
     
     private static LineBreakpoint createBreakpoint () {
         LineBreakpoint mb = LineBreakpoint.create (
@@ -131,7 +132,11 @@ public class LineBreakpointPanel extends JPanel implements Controller, org.openi
         actionsPanel = new ActionsPanel (b);
         pActions.add (actionsPanel, "Center");	//NOI18N
     }
-    
+
+    public Controller getController() {
+        return controller;
+    }
+
     private static int findNumLines(String url) {
         FileObject file;
         try {
@@ -266,76 +271,6 @@ public class LineBreakpointPanel extends JPanel implements Controller, org.openi
 
         getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(LineBreakpointPanel.class, "ACSN_LineBreakpoint")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
-
-    
-    // Controller implementation ...............................................
-    
-    /**
-     * Called when "Ok" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean ok () {
-        String msg = valiadateMsg();
-        if (msg == null) {
-            msg = conditionsPanel.valiadateMsg();
-        }
-        if (msg != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
-            return false;
-        }
-        actionsPanel.ok ();
-        breakpoint.setLineNumber(Integer.parseInt(tfLineNumber.getText().trim()));
-        breakpoint.setCondition (conditionsPanel.getCondition());
-        breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
-                conditionsPanel.getHitCountFilteringStyle());
-        
-        if (createBreakpoint)
-            DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
-        return true;
-    }
-    
-    /**
-     * Called when "Cancel" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean cancel () {
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
-    private String valiadateMsg () {
-        int line;
-        try {
-            line = Integer.parseInt(tfLineNumber.getText().trim());
-        } catch (NumberFormatException e) {
-            return NbBundle.getMessage(LineBreakpointPanel.class, "MSG_No_Line_Number_Spec");
-        }
-        if (line <= 0) {
-            return NbBundle.getMessage(LineBreakpointPanel.class, "MSG_NonPositive_Line_Number_Spec");
-        }
-        int maxLine = findNumLines(breakpoint.getURL());
-        if (maxLine == 0) { // Not found
-            maxLine = Integer.MAX_VALUE; // Not to bother the user when we did not find it
-        }
-        if (line > maxLine) {
-            return NbBundle.getMessage(LineBreakpointPanel.class, "MSG_TooBig_Line_Number_Spec",
-                    Integer.toString(line), Integer.toString(maxLine));
-        }
-        return null;
-    }
-    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cPanel;
@@ -347,5 +282,82 @@ public class LineBreakpointPanel extends JPanel implements Controller, org.openi
     private javax.swing.JTextField tfFileName;
     private javax.swing.JTextField tfLineNumber;
     // End of variables declaration//GEN-END:variables
-    
+
+    /**
+     * Controller implementation
+     */
+    private class ControllerImpl implements Controller {
+        /**
+         * Called when "Ok" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean ok () {
+            String msg = valiadateMsg();
+            if (msg == null) {
+                msg = conditionsPanel.valiadateMsg();
+            }
+            if (msg != null) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
+                return false;
+            }
+            actionsPanel.ok ();
+            breakpoint.setLineNumber(Integer.parseInt(tfLineNumber.getText().trim()));
+            breakpoint.setCondition (conditionsPanel.getCondition());
+            breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
+                    conditionsPanel.getHitCountFilteringStyle());
+
+            if (createBreakpoint)
+                DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
+            return true;
+        }
+
+        /**
+         * Called when "Cancel" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean cancel () {
+            return true;
+        }
+
+        /**
+         * Return <code>true</code> whether value of this customizer
+         * is valid (and OK button can be enabled).
+         *
+         * @return <code>true</code> whether value of this customizer
+         * is valid
+         */
+        public boolean isValid () {
+            return true;
+        }
+
+        private String valiadateMsg () {
+            int line;
+            try {
+                line = Integer.parseInt(tfLineNumber.getText().trim());
+            } catch (NumberFormatException e) {
+                return NbBundle.getMessage(LineBreakpointPanel.class, "MSG_No_Line_Number_Spec");
+            }
+            if (line <= 0) {
+                return NbBundle.getMessage(LineBreakpointPanel.class, "MSG_NonPositive_Line_Number_Spec");
+            }
+            int maxLine = findNumLines(breakpoint.getURL());
+            if (maxLine == 0) { // Not found
+                maxLine = Integer.MAX_VALUE; // Not to bother the user when we did not find it
+            }
+            if (line > maxLine) {
+                return NbBundle.getMessage(LineBreakpointPanel.class, "MSG_TooBig_Line_Number_Spec",
+                        Integer.toString(line), Integer.toString(maxLine));
+            }
+            return null;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+        }
+    }
+        
 }

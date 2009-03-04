@@ -42,6 +42,7 @@
 package org.netbeans.modules.debugger.javafx.ui.breakpoints;
 
 import java.awt.Dimension;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 
 import org.netbeans.api.debugger.DebuggerManager;
@@ -61,14 +62,14 @@ import org.openide.util.NbBundle;
 // Implement HelpCtx.Provider interface to provide help ids for help system
 // public class FieldBreakpointPanel extends JPanel implements Controller {
 // ====
-public class FieldBreakpointPanel extends JPanel implements Controller, org.openide.util.HelpCtx.Provider {
+public class FieldBreakpointPanel extends JPanel implements Controllable, org.openide.util.HelpCtx.Provider {
 // </RAVE>
     
     private ConditionsPanel             conditionsPanel;
     private ActionsPanel                actionsPanel; 
     private FieldBreakpoint             breakpoint;
     private boolean                     createBreakpoint = false;
-    
+    private Controller                  controller = new ControllerImpl();
     
     private static FieldBreakpoint creteBreakpoint () {
         String className;
@@ -140,6 +141,10 @@ public class FieldBreakpointPanel extends JPanel implements Controller, org.open
         // in the 'Add Breakpoint' dialog and when invoked in the 'Breakpoints' view
         putClientProperty("HelpID_AddBreakpointPanel", "debug.add.breakpoint.java.field"); // NOI18N
         // </RAVE>
+    }
+
+    public Controller getController() {
+        return controller;
     }
     
     // <RAVE>
@@ -269,74 +274,6 @@ public class FieldBreakpointPanel extends JPanel implements Controller, org.open
 
         getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(FieldBreakpointPanel.class, "ACSN_FieldBreakpoint")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
-
-    
-    // Controller implementation ...............................................
-    
-    /**
-     * Called when "Ok" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean ok () {
-        String msg = valiadateMsg();
-        if (msg == null) {
-            msg = conditionsPanel.valiadateMsg();
-        }
-        if (msg != null) {
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
-            return false;
-        }
-        actionsPanel.ok ();
-        String className = tfClassName.getText ().trim ();
-        breakpoint.setClassName (className);
-        breakpoint.setFieldName (tfFieldName.getText ().trim ());
-        switch (cbBreakpointType.getSelectedIndex ()) {
-            case 0:
-                breakpoint.setBreakpointType (FieldBreakpoint.TYPE_ACCESS);
-                break;
-            case 1:
-                breakpoint.setBreakpointType (FieldBreakpoint.TYPE_MODIFICATION);
-                break;
-            case 2:
-                breakpoint.setBreakpointType (FieldBreakpoint.TYPE_ACCESS | FieldBreakpoint.TYPE_MODIFICATION);
-                break;
-        }
-        breakpoint.setCondition (conditionsPanel.getCondition());
-        breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
-                conditionsPanel.getHitCountFilteringStyle());
-        
-        if (createBreakpoint) 
-            DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
-        return true;
-    }
-    
-    /**
-     * Called when "Cancel" button is pressed.
-     *
-     * @return whether customizer can be closed
-     */
-    public boolean cancel () {
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
-    private String valiadateMsg () {
-        if (tfClassName.getText().trim ().length() == 0 || tfFieldName.getText().trim ().length() == 0) {
-            return NbBundle.getMessage(FieldBreakpointPanel.class, "MSG_No_Class_or_Field_Name_Spec");
-        }
-        return null;
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cPanel;
@@ -350,5 +287,79 @@ public class FieldBreakpointPanel extends JPanel implements Controller, org.open
     private javax.swing.JTextField tfClassName;
     private javax.swing.JTextField tfFieldName;
     // End of variables declaration//GEN-END:variables
-    
+
+    private class ControllerImpl implements Controller {
+        
+        /**
+         * Called when "Ok" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean ok () {
+            String msg = valiadateMsg();
+            if (msg == null) {
+                msg = conditionsPanel.valiadateMsg();
+            }
+            if (msg != null) {
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(msg));
+                return false;
+            }
+            actionsPanel.ok ();
+            String className = tfClassName.getText ().trim ();
+            breakpoint.setClassName (className);
+            breakpoint.setFieldName (tfFieldName.getText ().trim ());
+            switch (cbBreakpointType.getSelectedIndex ()) {
+                case 0:
+                    breakpoint.setBreakpointType (FieldBreakpoint.TYPE_ACCESS);
+                    break;
+                case 1:
+                    breakpoint.setBreakpointType (FieldBreakpoint.TYPE_MODIFICATION);
+                    break;
+                case 2:
+                    breakpoint.setBreakpointType (FieldBreakpoint.TYPE_ACCESS | FieldBreakpoint.TYPE_MODIFICATION);
+                    break;
+            }
+            breakpoint.setCondition (conditionsPanel.getCondition());
+            breakpoint.setHitCountFilter(conditionsPanel.getHitCount(),
+                    conditionsPanel.getHitCountFilteringStyle());
+
+            if (createBreakpoint)
+                DebuggerManager.getDebuggerManager ().addBreakpoint (breakpoint);
+            return true;
+        }
+
+        /**
+         * Called when "Cancel" button is pressed.
+         *
+         * @return whether customizer can be closed
+         */
+        public boolean cancel () {
+            return true;
+        }
+
+        /**
+         * Return <code>true</code> whether value of this customizer
+         * is valid (and OK button can be enabled).
+         *
+         * @return <code>true</code> whether value of this customizer
+         * is valid
+         */
+        public boolean isValid () {
+            return true;
+        }
+
+        private String valiadateMsg () {
+            if (tfClassName.getText().trim ().length() == 0 || tfFieldName.getText().trim ().length() == 0) {
+                return NbBundle.getMessage(FieldBreakpointPanel.class, "MSG_No_Class_or_Field_Name_Spec");
+            }
+            return null;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+        }
+    }
+
 }

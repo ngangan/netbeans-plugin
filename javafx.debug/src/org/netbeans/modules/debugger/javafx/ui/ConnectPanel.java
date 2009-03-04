@@ -57,6 +57,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -92,6 +93,7 @@ import org.openide.awt.Mnemonics;
 import org.openide.util.Cancellable;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.netbeans.modules.debugger.javafx.ui.breakpoints.Controllable;
 
 
 /**
@@ -102,8 +104,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jan Jancura
  */
-public class ConnectPanel extends JPanel implements 
-Controller, ActionListener {
+public class ConnectPanel extends JPanel implements Controllable, ActionListener {
 
     /** List of all AttachingConnectors.*/
     private List                    connectors;
@@ -111,6 +112,7 @@ Controller, ActionListener {
     private JComboBox               cbConnectors;
     /** List of JTextFields containing all parameters of curentConnector. */
     private JTextField[]            tfParams;
+    private Controller              controller = new ControllerImpl();
 
 
     public ConnectPanel () {
@@ -170,6 +172,10 @@ Controller, ActionListener {
         }
         
         cbConnectors.setSelectedIndex (defaultIndex);
+    }
+
+    public Controller getController() {
+        return controller;
     }
 
     /**
@@ -303,105 +309,7 @@ Controller, ActionListener {
         if (w != null) ((Window) w).pack (); // ugly hack...
         return;
     }
-    
-    public boolean cancel () {
-        return true;
-    }
-    
-    public boolean ok () {
-        int index = cbConnectors.getSelectedIndex ();
-        final Connector connector = (Connector) connectors.get (index);
-        final Map args = getEditedArgs (tfParams, connector);
-        if (args == null) return true; // CANCEL
-        saveArgs (args, connector);
         
-        // Take the start off the AWT EQ:
-        final RequestProcessor.Task[] startTaskPtr = new RequestProcessor.Task[1];
-        startTaskPtr[0] = RequestProcessor.getDefault().create(new Runnable() {
-            public void run() {
-                final Thread theCurrentThread = Thread.currentThread();
-                ProgressHandle progress = ProgressHandleFactory.createHandle(
-                        NbBundle.getMessage(ConnectPanel.class, "CTL_connectProgress"),
-                        new Cancellable() {
-                            public boolean cancel() {
-                                theCurrentThread.interrupt();
-                                return startTaskPtr[0].isFinished();
-                            }
-                });
-                try {
-                    //System.out.println("Before progress.start()");
-                    progress.start();
-                    //System.out.println("After progress.start()");
-                    DebuggerEngine[] es = null;
-                    if (connector instanceof AttachingConnector)
-                        es = DebuggerManager.getDebuggerManager ().startDebugging (
-                            DebuggerInfo.create (
-                                AttachingDICookie.ID,
-                                new Object [] {
-                                    AttachingDICookie.create (
-                                        (AttachingConnector) connector,
-                                        args
-                                    )
-                                }
-                            )
-                        );
-                    else
-                    if (connector instanceof ListeningConnector)
-                        es = DebuggerManager.getDebuggerManager ().startDebugging (
-                            DebuggerInfo.create (
-                                ListeningDICookie.ID,
-                                new Object [] {
-                                    ListeningDICookie.create (
-                                        (ListeningConnector) connector,
-                                        args
-                                    )
-                                }
-                            )
-                        );
-                    if (es != null) {
-                        for (int i = 0; i < es.length; i++) {
-                            JavaFXDebugger d = es[i].lookupFirst(null, JavaFXDebugger.class);
-                            if (d == null) continue;
-                            try {
-                                // workaround for #64227
-                                if (d.getState() != d.STATE_RUNNING) 
-                                    d.waitRunning ();
-                            } catch (DebuggerStartException dsex) {
-                                //ErrorManager.getDefault().notify(ErrorManager.USER, dsex);
-                                // Not necessary to notify - message written to debugger console.
-                            }
-                        }
-                    }
-                } finally {
-                    //System.out.println("Before progress.finish()");
-                    progress.finish();
-                    //System.out.println("After progress.finish()");
-                }
-            }
-        });
-        Runnable action = new Runnable() {
-            
-            public void run() {
-                startTaskPtr[0].schedule(0);
-            }
-        };
-//TODO XXX No DIalog Binding in javafx.source
-//        ScanDialog.runWhenScanFinished(action, NbBundle.getMessage (ConnectPanel.class, "CTL_Connect"));   //NOI18N
-        //System.out.println("Before return from ConnectPanel.ok()");
-        return true;
-    }
-    
-    /**
-     * Return <code>true</code> whether value of this customizer 
-     * is valid (and OK button can be enabled).
-     *
-     * @return <code>true</code> whether value of this customizer 
-     * is valid
-     */
-    public boolean isValid () {
-        return true;
-    }
-    
     
     // private helper methods ..................................................
     
@@ -574,6 +482,115 @@ Controller, ActionListener {
             return null;
         }
     }
-    
+
+    /**
+     * Controller implementation
+     */
+    private class ControllerImpl implements Controller {
+        public boolean cancel () {
+            return true;
+        }
+
+        public boolean ok () {
+            int index = cbConnectors.getSelectedIndex ();
+            final Connector connector = (Connector) connectors.get (index);
+            final Map args = getEditedArgs (tfParams, connector);
+            if (args == null) return true; // CANCEL
+            saveArgs (args, connector);
+
+            // Take the start off the AWT EQ:
+            final RequestProcessor.Task[] startTaskPtr = new RequestProcessor.Task[1];
+            startTaskPtr[0] = RequestProcessor.getDefault().create(new Runnable() {
+                public void run() {
+                    final Thread theCurrentThread = Thread.currentThread();
+                    ProgressHandle progress = ProgressHandleFactory.createHandle(
+                            NbBundle.getMessage(ConnectPanel.class, "CTL_connectProgress"),
+                            new Cancellable() {
+                                public boolean cancel() {
+                                    theCurrentThread.interrupt();
+                                    return startTaskPtr[0].isFinished();
+                                }
+                    });
+                    try {
+                        //System.out.println("Before progress.start()");
+                        progress.start();
+                        //System.out.println("After progress.start()");
+                        DebuggerEngine[] es = null;
+                        if (connector instanceof AttachingConnector)
+                            es = DebuggerManager.getDebuggerManager ().startDebugging (
+                                DebuggerInfo.create (
+                                    AttachingDICookie.ID,
+                                    new Object [] {
+                                        AttachingDICookie.create (
+                                            (AttachingConnector) connector,
+                                            args
+                                        )
+                                    }
+                                )
+                            );
+                        else
+                        if (connector instanceof ListeningConnector)
+                            es = DebuggerManager.getDebuggerManager ().startDebugging (
+                                DebuggerInfo.create (
+                                    ListeningDICookie.ID,
+                                    new Object [] {
+                                        ListeningDICookie.create (
+                                            (ListeningConnector) connector,
+                                            args
+                                        )
+                                    }
+                                )
+                            );
+                        if (es != null) {
+                            for (int i = 0; i < es.length; i++) {
+                                JavaFXDebugger d = es[i].lookupFirst(null, JavaFXDebugger.class);
+                                if (d == null) continue;
+                                try {
+                                    // workaround for #64227
+                                    if (d.getState() != d.STATE_RUNNING)
+                                        d.waitRunning ();
+                                } catch (DebuggerStartException dsex) {
+                                    //ErrorManager.getDefault().notify(ErrorManager.USER, dsex);
+                                    // Not necessary to notify - message written to debugger console.
+                                }
+                            }
+                        }
+                    } finally {
+                        //System.out.println("Before progress.finish()");
+                        progress.finish();
+                        //System.out.println("After progress.finish()");
+                    }
+                }
+            });
+            Runnable action = new Runnable() {
+
+                public void run() {
+                    startTaskPtr[0].schedule(0);
+                }
+            };
+    //TODO XXX No DIalog Binding in javafx.source
+    //        ScanDialog.runWhenScanFinished(action, NbBundle.getMessage (ConnectPanel.class, "CTL_Connect"));   //NOI18N
+            //System.out.println("Before return from ConnectPanel.ok()");
+            return true;
+        }
+
+        /**
+         * Return <code>true</code> whether value of this customizer
+         * is valid (and OK button can be enabled).
+         *
+         * @return <code>true</code> whether value of this customizer
+         * is valid
+         */
+        public boolean isValid () {
+            return true;
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+        }
+        
+    }
 }
 
