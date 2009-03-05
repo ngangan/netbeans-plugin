@@ -49,7 +49,7 @@ public class IndentTaskFactory implements IndentTask.Factory{
      */
     public IndentTask createTask(Context context) {
         if (log.isLoggable(Level.FINE)) log.fine("Creating reformat factory"); // NOI18N
-        return new JFXIndentTask(context);
-//        return new CompilerIndependentJFXIndentTask(context);
+//        return new JFXIndentTask(context);
+        return new CompilerIndependentJFXIndentTask(context);
     }
 }
