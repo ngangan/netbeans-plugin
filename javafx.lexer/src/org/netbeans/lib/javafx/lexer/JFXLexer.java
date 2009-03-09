@@ -81,7 +81,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             final LexerInputStream reader = new LexerInputStream();
             reader.setLexerInput(lexerInput);
 
-            ANTLRReaderStream input = new ANTLRInputStream(reader);
+            ANTLRReaderStream input = new ANTLRInputStream(reader, "UTF-8"); //NOI18N
             lexer = new v4Lexer(input);
             final LexerState ls = (LexerState) info.state();
             if (ls != null) {
@@ -154,15 +154,21 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
 
     static class LexerInputStream extends InputStream {
         private LexerInput input;
+        private byte[] bytes = new byte[0];
+        private int i = 0;
 
         public void setLexerInput(LexerInput input) {
             this.input = input;
         }
 
         public int read() throws IOException {
-            final int c = input.read();
-            if (c == LexerInput.EOF) return -1;
-            return c;
+            if (i >= bytes.length) {
+                final int c = input.read();
+                if (c == LexerInput.EOF) return -1;
+                bytes = new String(new char[] {(char)c}).getBytes("UTF-8"); //NOI18N
+                i = 0;
+            }
+            return bytes[i++];
         }
     }
 
