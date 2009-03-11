@@ -292,6 +292,7 @@ public class SilentWindowPeer implements WindowPeer {
                     ImageIO.write(bi, "PNG", out); //NOI18N
                 } catch (IOException ex) {
                     ex.printStackTrace();
+                    out.close();
                     System.exit(1);
                 }
                 System.exit(0);

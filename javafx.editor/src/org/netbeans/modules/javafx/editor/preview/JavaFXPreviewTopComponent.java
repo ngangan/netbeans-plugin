@@ -41,6 +41,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
 
     private BufferedImage bi;
     private DataObject oldD;
+    private Process pr;
     
     private final RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
         public void run() {
@@ -88,7 +89,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             };
                             File basedir = FileUtil.toFile(p.getProjectDirectory());
                             try {
-                                Process pr = Runtime.getRuntime().exec(args, null, basedir);
+                                pr = Runtime.getRuntime().exec(args, null, basedir);
                                 pr.waitFor();
                                 if (pr.exitValue() == 0) {
                                     args = new String[] {
@@ -100,10 +101,11 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                     };
                                     pr = Runtime.getRuntime().exec(args, null, basedir);
                                     bi = ImageIO.read(pr.getInputStream());
-                                    pr.waitFor();
                                 };
                             } catch (Exception ex) {
                                 Logger.getAnonymousLogger().log(Level.INFO, ex.getLocalizedMessage(), ex);
+                            } finally {
+                                pr.destroy();
                             }
                         }
                     }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  *
@@ -35,6 +34,7 @@ public class Main {
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
+                SilentWindowPeer.out.close();
                 System.exit(1);
             }
         }, "Preview Timeout").start(); //NOI18N
