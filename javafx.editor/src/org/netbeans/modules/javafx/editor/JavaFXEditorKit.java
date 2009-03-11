@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.editor;
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.print.PrintManager;
 import org.netbeans.editor.BaseAction;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.BaseKit;
@@ -55,7 +54,6 @@ import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.openide.util.WeakListeners;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -65,10 +63,8 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.rmi.RemoteException;
 import java.util.logging.Logger;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
+import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
 
 /**
  * @author answer
@@ -104,14 +100,10 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     @Override
     protected Action[] createActions() {
         Action[] superActions = super.createActions();
-        ResetFXPreviewExecution resetAction = new ResetFXPreviewExecution();
-        PrintFXPreview previewAction = new PrintFXPreview();
         Action[] javafxActions = new Action[]{
                 new CommentAction("//"),                                        //NOI18N
                 new UncommentAction("//"),                                      //NOI18N
-                new ToggleFXPreviewExecution(resetAction, previewAction),
-                resetAction,
-                previewAction,
+                new ToggleFXPreviewExecution(),
                 new JavaDefaultKeyTypedAction(),
                 new JavaDeleteCharAction(deletePrevCharAction, false),
                 new JavaFXGoToDeclarationAction(),
@@ -124,34 +116,27 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
 
     public class ToggleFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
-        ResetFXPreviewExecution resetAction = null;
-        PrintFXPreview previewAction = null;
 
         @Override
         protected Object clone() throws CloneNotSupportedException {
             return super.clone();
         }
 
-        public ToggleFXPreviewExecution(ResetFXPreviewExecution resetAction, PrintFXPreview previewAction) {
+        public ToggleFXPreviewExecution() {
             super(toggleFXPreviewExecution);
-            this.resetAction = resetAction;
-            this.previewAction = previewAction;
             putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
                     "org/netbeans/modules/javafx/editor/resources/preview.png")));                                                  // NOI18N
             putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));        // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-//            if (!Bridge.isStarted()) {
-//                String message = NbBundle.getMessage(JavaFXEditorKit.class, "PREVIEW_DISABLED_BY_FIREWALL");          //NOI18N
-//                NotifyDescriptor d = new NotifyDescriptor.Message(message, NotifyDescriptor.ERROR_MESSAGE);
-//                DialogDisplayer.getDefault().notify(d);
-//            } else if (target != null) {
-//                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
-//                if (doc != null) {
-//                    doc.enableExecution(true);
-//                }
-//            }
+            JavaFXPreviewTopComponent tc = JavaFXPreviewTopComponent.findInstance();
+            if (tc.isOpened()) {
+                tc.close();
+            } else {
+                tc.open();
+                tc.requestActive();
+            }
         }
 
         public java.awt.Component getToolbarPresenter() {
@@ -164,20 +149,10 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             return b;
         }
 
-        private final class PreviewButton extends JButton implements ChangeListener {
+        private final class PreviewButton extends JButton {
 
             public PreviewButton() {
                 super();
-//                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
-            }
-
-            public void stateChanged(ChangeEvent evt) {
-//
-//
-//                setEnabled(Bridge.isStarted());
-//
-//
-//
             }
 
             @Override
@@ -223,121 +198,6 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             return null;
         }
 
-    }
-
-    public static class ResetFXPreviewExecution extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
-
-        public ResetFXPreviewExecution() {
-            super(buttonResetFXPreviewExecution);
-            putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/reset_preview.png")));                                    // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("reset-fx-preview-execution")); // NOI18N
-        }
-
-        public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            if (target != null) {
-                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
-            }
-//
-//
-//            Bridge.restart();
-//
-//
-        }
-
-        private final class ResetButton extends JButton implements ChangeListener {
-            private boolean state;
-
-            public ResetButton() {
-                super();
-//
-//
-//                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
-//
-//
-            }
-
-            public void stateChanged(ChangeEvent e) {
-//                if (!Bridge.isStarted()) {
-//                    state = isEnabled();
-//                    setEnabled(false);
-//                } else {
-//                    setEnabled(state);
-//                }
-            }
-        }
-
-        public java.awt.Component getToolbarPresenter() {
-            ResetButton b = new ResetButton();
-            b.setAction(this);
-            b.putClientProperty("resetPreviewMark", Boolean.TRUE);              // NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
-            b.setEnabled(false);
-            return b;
-        }
-    }
-
-
-    public static class PrintFXPreview extends BaseAction implements org.openide.util.actions.Presenter.Toolbar {
-
-        class JPrintPanel extends JPanel {
-            private BufferedImage offscreenBuffer = null;
-
-            public JPrintPanel() {
-                super();
-                putClientProperty("print.printable", Boolean.TRUE);             // NOI18N
-            }
-
-            public void setImage(BufferedImage image) {
-                this.offscreenBuffer = image;
-                setSize(offscreenBuffer.getWidth(), offscreenBuffer.getHeight());
-            }
-
-            @Override
-            public void print(Graphics g) {
-                g.drawImage(offscreenBuffer, 0, 0, null);
-            }
-
-            @Override
-            public boolean isShowing() {
-                return true;
-            }
-        }
-
-        public PrintFXPreview() {
-            super(buttonPrintFXPreview);
-            putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/print_preview.png")));                            // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("print-fx-preview"));   // NOI18N
-        }
-
-        public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            if (target != null) {
-                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
-                if (doc != null) {
-//                    try {
-//                        final PreviewSideServerFace preview = Bridge.getPreview(doc);
-//                        if (preview != null) {
-//                            SerializableImage image = preview.getPicture();
-//                            JPrintPanel printPanel = new JPrintPanel();
-//                            printPanel.setImage(image);
-//                            PrintManager.printAction(printPanel).actionPerformed(evt);
-//                        }
-//                    } catch (RemoteException ex) {
-//                        ex.printStackTrace();
-//                    }
-                }
-            }
-        }
-
-        public java.awt.Component getToolbarPresenter() {
-            JButton b = new JButton(this);
-            b.setAction(this);
-            b.putClientProperty("printPreviewMark", Boolean.TRUE);                  //NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
-            b.setEnabled(false);
-            return b;
-        }
     }
 
     public static class JavaDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
