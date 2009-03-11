@@ -61,8 +61,6 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.javafx.preview.PreviewCodeGenerate;
-import org.netbeans.modules.javafx.preview.Bridge;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
@@ -79,15 +77,10 @@ public class JavaFXDocument extends NbEditorDocument {
     
     private JEditorPane pane = null;
     private Component editor = null;
-    private JComponent fakePrintComponent = null;
     boolean executionEnabled = false;
     boolean errorAndSyntaxEnabled = false;
     private Point previewLocation = new Point(0, 0);
     private Dimension previewSize = new Dimension(200, 200);
-    
-    static{
-        Bridge.start();
-    }
     
     public JavaFXDocument(String mimeType)  {
         super(mimeType);
@@ -197,11 +190,22 @@ public class JavaFXDocument extends NbEditorDocument {
         }
         if (!enabled) {
             executionEnabled = false;
-            Bridge.closePreview(this);
+//
+//
+//
+//            Bridge.closePreview(this);
+//
+//
+//
+//
         }
         else {
             if (executionEnabled && (executionEnabled == enabled)) {
-                Bridge.moveToFront(this);
+//
+//
+//                Bridge.moveToFront(this);
+//
+//
             } else {
                 executionEnabled = true;
                 final JavaFXSource js = JavaFXSource.forDocument(this);
@@ -209,7 +213,11 @@ public class JavaFXDocument extends NbEditorDocument {
                     js.runUserActionTask(new Task<CompilationController>() {
                         public void run(CompilationController controller) throws Exception {
                             controller.toPhase(Phase.CODE_GENERATED);
-                            PreviewCodeGenerate.process(controller);
+//
+//
+//                            PreviewCodeGenerate.process(controller);
+//
+//
                         }
                     }, true);
                 } catch (IOException ex) {

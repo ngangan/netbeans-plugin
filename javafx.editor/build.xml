@@ -5,4 +5,16 @@
 <project name="org.netbeans.modules.javafx.editor" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project org.netbeans.modules.javafx.editor.</description>
     <import file="nbproject/build-impl.xml"/>
+    <target name="preview" depends="init">
+        <mkdir dir="build/previewclasses"/>
+        <javac srcdir="previewsrc" destdir="build/previewclasses" source="1.5" debug="true" deprecation="true" target="1.5" bootclasspath="../build/netbeans/javafx2/javafx-sdk/lib/desktop/rt15.jar"/>
+        <mkdir dir="${cluster}/modules/ext"/>
+        <jar jarfile="${cluster}/modules/ext/org-netbeans-javafx-preview.jar">
+            <manifest>
+                <attribute name="NetBeans-Own-Library" value="true"/>
+            </manifest>
+            <fileset dir="build/previewclasses"/>
+        </jar>
+    </target>
+    <target name="netbeans-extra" depends="preview"/>
 </project>

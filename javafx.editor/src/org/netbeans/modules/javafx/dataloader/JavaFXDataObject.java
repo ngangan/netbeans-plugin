@@ -40,10 +40,7 @@
 package org.netbeans.modules.javafx.dataloader;
 
 import java.io.IOException;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
-import org.netbeans.modules.javafx.preview.Bridge;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
@@ -195,7 +192,12 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         
         @Override
         protected void notifyClosed() {
-            Bridge.closePreview((JavaFXDocument) getDocument());
+//
+//            
+//            Bridge.closePreview((JavaFXDocument) getDocument());
+//
+//
+//
         }
     }
     

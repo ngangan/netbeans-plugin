@@ -548,6 +548,12 @@ made subject to such option by the copyright holder.
             <public-packages>
                 <package>org.netbeans.api.javafx.editor</package>
             </public-packages>
+            <extra-compilation-unit>
+                <package-root>previewsrc</package-root>
+                <classpath/>
+                <built-to>build/previewclasses</built-to>
+                <built-to>${cluster}/modules/ext/org-netbeans-javafx-preview.jar</built-to>
+            </extra-compilation-unit>
         </data>
     </configuration>
 </project>

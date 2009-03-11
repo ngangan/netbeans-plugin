@@ -52,9 +52,6 @@ import org.netbeans.modules.editor.NbEditorKit;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
-import org.netbeans.modules.javafx.preview.Bridge;
-import org.netbeans.modules.javafx.preview.PreviewSideServerFace;
-import org.netbeans.modules.javafx.preview.SerializableImage;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -145,16 +142,16 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            if (!Bridge.isStarted()) {
-                String message = NbBundle.getMessage(JavaFXEditorKit.class, "PREVIEW_DISABLED_BY_FIREWALL");          //NOI18N
-                NotifyDescriptor d = new NotifyDescriptor.Message(message, NotifyDescriptor.ERROR_MESSAGE);
-                DialogDisplayer.getDefault().notify(d);
-            } else if (target != null) {
-                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
-                if (doc != null) {
-                    doc.enableExecution(true);
-                }
-            }
+//            if (!Bridge.isStarted()) {
+//                String message = NbBundle.getMessage(JavaFXEditorKit.class, "PREVIEW_DISABLED_BY_FIREWALL");          //NOI18N
+//                NotifyDescriptor d = new NotifyDescriptor.Message(message, NotifyDescriptor.ERROR_MESSAGE);
+//                DialogDisplayer.getDefault().notify(d);
+//            } else if (target != null) {
+//                JavaFXDocument doc = (JavaFXDocument) target.getDocument();
+//                if (doc != null) {
+//                    doc.enableExecution(true);
+//                }
+//            }
         }
 
         public java.awt.Component getToolbarPresenter() {
@@ -175,7 +172,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             }
 
             public void stateChanged(ChangeEvent evt) {
-                setEnabled(Bridge.isStarted());
+//
+//
+//                setEnabled(Bridge.isStarted());
+//
+//
+//
             }
 
             @Override
@@ -236,7 +238,11 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             if (target != null) {
                 JavaFXDocument doc = (JavaFXDocument) target.getDocument();
             }
-            Bridge.restart();
+//
+//
+//            Bridge.restart();
+//
+//
         }
 
         private final class ResetButton extends JButton implements ChangeListener {
@@ -244,16 +250,20 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
             public ResetButton() {
                 super();
-                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
+//
+//
+//                Bridge.addStartListener(WeakListeners.create(ChangeListener.class, this, null));
+//
+//
             }
 
             public void stateChanged(ChangeEvent e) {
-                if (!Bridge.isStarted()) {
-                    state = isEnabled();
-                    setEnabled(false);
-                } else {
-                    setEnabled(state);
-                }
+//                if (!Bridge.isStarted()) {
+//                    state = isEnabled();
+//                    setEnabled(false);
+//                } else {
+//                    setEnabled(state);
+//                }
             }
         }
 
@@ -278,8 +288,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 putClientProperty("print.printable", Boolean.TRUE);             // NOI18N
             }
 
-            public void setImage(SerializableImage image) {
-                offscreenBuffer = image.getBufferedImage();
+            public void setImage(BufferedImage image) {
+                this.offscreenBuffer = image;
                 setSize(offscreenBuffer.getWidth(), offscreenBuffer.getHeight());
             }
 
@@ -305,17 +315,17 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             if (target != null) {
                 JavaFXDocument doc = (JavaFXDocument) target.getDocument();
                 if (doc != null) {
-                    try {
-                        final PreviewSideServerFace preview = Bridge.getPreview(doc);
-                        if (preview != null) {
-                            SerializableImage image = preview.getPicture();
-                            JPrintPanel printPanel = new JPrintPanel();
-                            printPanel.setImage(image);
-                            PrintManager.printAction(printPanel).actionPerformed(evt);
-                        }
-                    } catch (RemoteException ex) {
-                        ex.printStackTrace();
-                    }
+//                    try {
+//                        final PreviewSideServerFace preview = Bridge.getPreview(doc);
+//                        if (preview != null) {
+//                            SerializableImage image = preview.getPicture();
+//                            JPrintPanel printPanel = new JPrintPanel();
+//                            printPanel.setImage(image);
+//                            PrintManager.printAction(printPanel).actionPerformed(evt);
+//                        }
+//                    } catch (RemoteException ex) {
+//                        ex.printStackTrace();
+//                    }
                 }
             }
         }
