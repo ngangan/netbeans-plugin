@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
+import org.netbeans.spi.project.support.ant.PropertyUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
@@ -42,9 +44,16 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
     private BufferedImage bi;
     private DataObject oldD;
     private Process pr;
-    
+
     private final RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
         public void run() {
+            synchronized (JavaFXPreviewTopComponent.this) {
+                if (pr != null) {
+                    pr.destroy();
+                    task.schedule(150);
+                    return;
+                }
+            }
             if (oldD != null) {
                 oldD.removePropertyChangeListener(JavaFXPreviewTopComponent.this);
                 oldD = null;
@@ -55,7 +64,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                 if (d != null) {
                     FileObject f = d.getPrimaryFile();
                     if (f.isData())  bi = null;
-                    if ("fx".equals(f.getExt()) || "java".equals(f.getExt())) { //NOI18N
+                    if ("fx".equals(f.getExt())) { //NOI18N
                         d.addPropertyChangeListener(JavaFXPreviewTopComponent.this);
                         oldD = d;
                         Project p = FileOwnerQuery.getOwner(f);
@@ -69,43 +78,59 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                 src.append(FileUtil.toFile(srcRoot).getAbsolutePath());
                                 if (FileUtil.isParentOf(srcRoot, f)) {
                                     className = FileUtil.getRelativePath(srcRoot, f);
-                                    className = className.substring(0, className.length() - f.getExt().length() - 1).replace('/', '.');
+                                    className = className.substring(0, className.length() - 3).replace('/', '.');
                                 }
                             }
+                            String cp = ev.getProperty("javac.classpath"); //NOI18N
+                            String enc = ev.getProperty("source.encoding");  //NOI18N
+                            if (enc == null || enc.trim().length() == 0) enc = "UTF-8"; //NOI18N
+                            File basedir = FileUtil.toFile(p.getProjectDirectory());
+                            File build = PropertyUtils.resolveFile(basedir, "build/compiled"); //NOI18N
                             String args[] = new String[] {
-                                fxHome + "/bin/javafxpackager" + (Utilities.isWindows() ? ".exe" : ""), //NOI18N
-                                "-src", //NOI18N
+                                fxHome + "/bin/javafxc" + (Utilities.isWindows() ? ".exe" : ""), //NOI18N
+                                cp == null || cp.length() == 0 ? "" : "-cp", //NOI18N
+                                cp,
+                                "-sourcepath", //NOI18N
                                 src.toString(),
                                 "-d", //NOI18N
-                                ev.getProperty("dist.dir")+"/preview", //NOI18N
-                                "-appclass", //NOI18N
-                                className,
-                                "-appname", //NOI18N
-                                "preview", //NOI18N
+                                build.getAbsolutePath(),
                                 "-encoding", //NOI18N
-                                ev.getProperty("source.encoding"), //NOI18N
-                                "-cp", //NOI18N
-                                ev.getProperty("javac.classpath"), //NOI18N
+                                enc,
+                                FileUtil.toFile(f).getAbsolutePath()
                             };
-                            File basedir = FileUtil.toFile(p.getProjectDirectory());
                             try {
-                                pr = Runtime.getRuntime().exec(args, null, basedir);
+                                build.mkdirs();
+                                synchronized (JavaFXPreviewTopComponent.this) {
+                                    pr = Runtime.getRuntime().exec(args, null, basedir);
+                                }
                                 pr.waitFor();
+                                String jvmargs = ev.getProperty("run.jvmargs"); //NOI18N
+                                String appargs = ev.getProperty("application.args");  //NOI18N
                                 if (pr.exitValue() == 0) {
                                     args = new String[] {
                                         fxHome + "/bin/javafx" + (Utilities.isWindows() ? ".exe" : ""), //NOI18N
+                                        jvmargs == null ? "" : jvmargs, //NOI18N
                                         "-cp", //NOI18N
-                                        previewLib.getAbsolutePath() + File.pathSeparator + ev.getProperty("dist.dir")+"/preview/preview.jar", //NOI18N
+                                        previewLib.getAbsolutePath() + File.pathSeparator + build.getAbsolutePath() + File.pathSeparator + cp, //NOI18N
                                         "org.netbeans.javafx.preview.Main", //NOI18N
-                                        className
+                                        className,
+                                        appargs == null ? "" : appargs, //NOI18N
                                     };
-                                    pr = Runtime.getRuntime().exec(args, null, basedir);
-                                    bi = ImageIO.read(pr.getInputStream());
-                                };
+                                    synchronized (JavaFXPreviewTopComponent.this) {
+                                        pr = Runtime.getRuntime().exec(args, null, basedir);
+                                    }
+                                    InputStream in = pr.getInputStream();
+                                    int i = 0;
+                                    while (i++<200 && in.available() == 0) Thread.sleep(50);
+                                    if (in.available() > 0) bi = ImageIO.read(in);
+                                }
                             } catch (Exception ex) {
-                                Logger.getAnonymousLogger().log(Level.INFO, ex.getLocalizedMessage(), ex);
+                                //ignore
                             } finally {
-                                pr.destroy();
+                                synchronized (JavaFXPreviewTopComponent.this) {
+                                    pr.destroy();
+                                    pr = null;
+                                }
                             }
                         }
                     }
@@ -143,7 +168,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setLayout(new java.awt.GridLayout());
+        setLayout(new java.awt.BorderLayout());
     }// </editor-fold>//GEN-END:initComponents
 
 
