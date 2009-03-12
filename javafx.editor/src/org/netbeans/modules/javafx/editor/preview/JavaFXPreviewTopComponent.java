@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -45,12 +44,14 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
     private BufferedImage bi;
     private DataObject oldD;
     private Process pr;
+    private int timer;
 
     private final RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
         public void run() {
             synchronized (JavaFXPreviewTopComponent.this) {
                 if (pr != null) {
                     pr.destroy();
+                    timer = 0;
                     task.schedule(150);
                     return;
                 }
@@ -83,22 +84,21 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                 }
                             }
                             String cp = ev.getProperty("javac.classpath"); //NOI18N
+                            cp = cp == null ? "" : cp.trim();
                             String enc = ev.getProperty("source.encoding");  //NOI18N
                             if (enc == null || enc.trim().length() == 0) enc = "UTF-8"; //NOI18N
                             File basedir = FileUtil.toFile(p.getProjectDirectory());
                             File build = PropertyUtils.resolveFile(basedir, "build/compiled"); //NOI18N
-                            ArrayList<String> args = new ArrayList();
+                            ArrayList<String> args = new ArrayList<String>();
                             args.add(fxHome + "/bin/javafxc" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
-                            if (cp != null || cp.length() > 0) {
-                                args.add("-cp"); //NOI18N
-                                args.add(cp);
-                            }
+                            args.add("-cp"); //NOI18N
+                            args.add(build.getAbsolutePath() + File.pathSeparator + cp);
                             args.add("-sourcepath"); //NOI18N
                             args.add(src.toString());
                             args.add("-d"); //NOI18N
                             args.add(build.getAbsolutePath());
                             args.add("-encoding"); //NOI18N
-                            args.add(enc);
+                            args.add(enc.trim());
                             args.add(FileUtil.toFile(f).getAbsolutePath());
                             try {
                                 build.mkdirs();
@@ -109,7 +109,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                 String jvmargs = ev.getProperty("run.jvmargs"); //NOI18N
                                 String appargs = ev.getProperty("application.args");  //NOI18N
                                 if (pr.exitValue() == 0) {
-                                    args = new ArrayList();
+                                    args = new ArrayList<String>();
                                     args.add(fxHome + "/bin/javafx" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
                                     args.add("-Dcom.apple.backgroundOnly=true"); //NOI18N
                                     if (jvmargs != null) for (String ja : jvmargs.trim().split("\\s+")) args.add(ja); //NOI18N
@@ -122,8 +122,8 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                         pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
                                     }
                                     InputStream in = pr.getInputStream();
-                                    int i = 0;
-                                    while (i++<200 && in.available() == 0) Thread.sleep(50);
+                                    timer = 200;
+                                    while (timer-- > 0 && in.available() == 0) Thread.sleep(50);
                                     if (in.available() > 0) bi = ImageIO.read(in);
                                 }
                             } catch (Exception ex) {
