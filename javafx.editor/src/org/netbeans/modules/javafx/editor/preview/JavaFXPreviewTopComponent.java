@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -86,38 +87,39 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             if (enc == null || enc.trim().length() == 0) enc = "UTF-8"; //NOI18N
                             File basedir = FileUtil.toFile(p.getProjectDirectory());
                             File build = PropertyUtils.resolveFile(basedir, "build/compiled"); //NOI18N
-                            String args[] = new String[] {
-                                fxHome + "/bin/javafxc" + (Utilities.isWindows() ? ".exe" : ""), //NOI18N
-                                cp == null || cp.length() == 0 ? "" : "-cp", //NOI18N
-                                cp,
-                                "-sourcepath", //NOI18N
-                                src.toString(),
-                                "-d", //NOI18N
-                                build.getAbsolutePath(),
-                                "-encoding", //NOI18N
-                                enc,
-                                FileUtil.toFile(f).getAbsolutePath()
-                            };
+                            ArrayList<String> args = new ArrayList();
+                            args.add(fxHome + "/bin/javafxc" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                            if (cp != null || cp.length() > 0) {
+                                args.add("-cp"); //NOI18N
+                                args.add(cp);
+                            }
+                            args.add("-sourcepath"); //NOI18N
+                            args.add(src.toString());
+                            args.add("-d"); //NOI18N
+                            args.add(build.getAbsolutePath());
+                            args.add("-encoding"); //NOI18N
+                            args.add(enc);
+                            args.add(FileUtil.toFile(f).getAbsolutePath());
                             try {
                                 build.mkdirs();
                                 synchronized (JavaFXPreviewTopComponent.this) {
-                                    pr = Runtime.getRuntime().exec(args, null, basedir);
+                                    pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
                                 }
                                 pr.waitFor();
                                 String jvmargs = ev.getProperty("run.jvmargs"); //NOI18N
                                 String appargs = ev.getProperty("application.args");  //NOI18N
                                 if (pr.exitValue() == 0) {
-                                    args = new String[] {
-                                        fxHome + "/bin/javafx" + (Utilities.isWindows() ? ".exe" : ""), //NOI18N
-                                        jvmargs == null ? "" : jvmargs, //NOI18N
-                                        "-cp", //NOI18N
-                                        previewLib.getAbsolutePath() + File.pathSeparator + build.getAbsolutePath() + File.pathSeparator + cp, //NOI18N
-                                        "org.netbeans.javafx.preview.Main", //NOI18N
-                                        className,
-                                        appargs == null ? "" : appargs, //NOI18N
-                                    };
+                                    args = new ArrayList();
+                                    args.add(fxHome + "/bin/javafx" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                                    args.add("-Dcom.apple.backgroundOnly=true"); //NOI18N
+                                    if (jvmargs != null) for (String ja : jvmargs.trim().split("\\s+")) args.add(ja); //NOI18N
+                                    args.add("-cp"); //NOI18N
+                                    args.add(previewLib.getAbsolutePath() + File.pathSeparator + build.getAbsolutePath() + File.pathSeparator + cp); //NOI18N
+                                    args.add("org.netbeans.javafx.preview.Main"); //NOI18N
+                                    args.add(className);
+                                    if (appargs != null) for (String aa : appargs.trim().split("\\s+")) args.add(aa); //NOI18N
                                     synchronized (JavaFXPreviewTopComponent.this) {
-                                        pr = Runtime.getRuntime().exec(args, null, basedir);
+                                        pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
                                     }
                                     InputStream in = pr.getInputStream();
                                     int i = 0;
