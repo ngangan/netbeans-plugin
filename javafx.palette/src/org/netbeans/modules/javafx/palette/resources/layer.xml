@@ -24,7 +24,7 @@
         
     <folder name="JavaFXPalette">
         <folder name="Applications">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="100"/>
             <file name="Stage.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stage.xml">
                 <attr name="position" intvalue="100"/>
@@ -37,8 +37,8 @@
             </file>
         </folder>
         
-        <folder name="Swing Components">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+        <folder name="Swing_Components">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="800"/>
             <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
                 <attr name="position" intvalue="200"/>
@@ -70,7 +70,7 @@
         </folder>
         
         <folder name="Actions">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="300"/>
             <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
                 <attr name="position" intvalue="100"/>
@@ -193,7 +193,7 @@
         </folder>
         
         <folder name="Colors">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="600"/>            
             <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
                 <attr name="position" intvalue="100"/>
@@ -236,7 +236,7 @@
             </file>
         </folder>
         <folder name="Gradients">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="650"/>
             <file name="LinearGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LinearGradient.xml">
                 <attr name="position" intvalue="100"/>
@@ -249,7 +249,7 @@
             </file>
         </folder>
         <folder name="Effects">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="670"/>
             
             <file name="Blend.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Blend.xml">
@@ -296,7 +296,7 @@
             </file>
         </folder>
         <folder name="Animation">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="700"/>            
             <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
                 <attr name="position" intvalue="100"/>
@@ -327,7 +327,7 @@
             </file>
         </folder>
         <folder name="Media">
-            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.resources.Bundle"/>
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="800"/>
             <file name="Media.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Media.xml">
                 <attr name="position" intvalue="100"/>
