@@ -214,13 +214,13 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
 
         // Browser
         profile = new TreeMap<String, String>();
-        profile.put( "$label", "Browser" ); //NOI18N
+        profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_Browser" )); //NOI18N
         profile.put( "javafx.profile", "desktop" ); //NOI18N
         profile.put( "execution.target", "applet" ); //NOI18N
         profiles.put( "browser", profile );
         // Web start
         profile = new TreeMap<String, String>();
-        profile.put( "$label", "Web Start" ); //NOI18N
+        profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_WebStart" )); //NOI18N
         profile.put( "javafx.profile", "desktop" ); //NOI18N
         profile.put( "execution.target", "jnlp" ); //NOI18N
         profiles.put( "webstart", profile );
@@ -229,7 +229,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
         try {
             if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator").isDirectory()) { // NOI18N
                 profile = new TreeMap<String, String>();
-                profile.put( "$label", "Mobile" ); //NOI18N
+                profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_Mobile" )); //NOI18N
                 profile.put( "javafx.profile", "mobile" ); //NOI18N
                 profile.put( "execution.target", "midp" ); //NOI18N
                 profiles.put( "mobile", profile );

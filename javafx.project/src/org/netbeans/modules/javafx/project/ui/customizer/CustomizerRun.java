@@ -412,7 +412,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.insets = new java.awt.Insets(5, 12, 0, 0);
         extPanel.add(deviceCombo, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, "&JVM Arguments:");
+        org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizerRun_JVMArgs")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
