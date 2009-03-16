@@ -5,10 +5,16 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -37,6 +43,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
 
     private static final String PREFERRED_ID = "JavaFXPreviewTopComponent"; //NOI18N
+    private static final Logger log = Logger.getLogger("org.netbeans.javafx.preview"); //NOI18N
 
     private static final File fxHome = InstalledFileLocator.getDefault().locate("javafx-sdk", "org.netbeans.modules.javafx.platform", false); //NOI18N
     private static final File previewLib = InstalledFileLocator.getDefault().locate("modules/ext/org-netbeans-javafx-preview.jar", "org.netbeans.modules.javafx.editor", false); //NOI18N
@@ -102,8 +109,23 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             args.add(FileUtil.toFile(f).getAbsolutePath());
                             try {
                                 build.mkdirs();
+                                log.info(args.toString());
                                 synchronized (JavaFXPreviewTopComponent.this) {
                                     pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
+                                }
+                                if (log.isLoggable(Level.INFO)) {
+                                    ByteArrayOutputStream err = new ByteArrayOutputStream();
+                                    InputStream in = pr.getErrorStream();
+                                    try {
+                                        FileUtil.copy(in, err);
+                                    } catch (IOException e) {
+                                        log.severe(e.getLocalizedMessage());
+                                    } finally {
+                                        try {
+                                            in.close();
+                                        } catch (IOException e) {}
+                                    }
+                                    log.info(err.toString());
                                 }
                                 pr.waitFor();
                                 String jvmargs = ev.getProperty("run.jvmargs"); //NOI18N
@@ -118,8 +140,36 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                     args.add("org.netbeans.javafx.preview.Main"); //NOI18N
                                     args.add(className);
                                     if (appargs != null) for (String aa : appargs.trim().split("\\s+")) args.add(aa); //NOI18N
+                                    log.info(args.toString());
                                     synchronized (JavaFXPreviewTopComponent.this) {
                                         pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
+                                    }
+                                    if (log.isLoggable(Level.INFO)) {
+                                        RequestProcessor.getDefault().execute(new Runnable() {
+                                            public void run() {
+                                                ByteArrayOutputStream err = new ByteArrayOutputStream();
+                                                InputStream in = pr.getErrorStream();
+                                                try {
+                                                    final byte[] BUFFER = new byte[4096];
+                                                    int len;
+                                                    while (pr != null && timer > 0) {
+                                                        while ((len = in.available()) > 0) {
+                                                            len = in.read(BUFFER, 0, BUFFER.length > len ? len : BUFFER.length);
+                                                            err.write(BUFFER, 0, len);
+                                                        }
+                                                        Thread.sleep(50);
+                                                    }
+                                                } catch (IOException e) {
+                                                    log.severe(e.getLocalizedMessage());
+                                                } catch (InterruptedException ie) {
+                                                } finally {
+                                                    try {
+                                                        in.close();
+                                                    } catch (IOException e) {}
+                                                }
+                                                log.info(err.toString());
+                                            }
+                                        });
                                     }
                                     InputStream in = pr.getInputStream();
                                     timer = 200;
