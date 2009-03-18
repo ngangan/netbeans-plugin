@@ -5,13 +5,10 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -133,11 +130,12 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                 if (pr.exitValue() == 0) {
                                     args = new ArrayList<String>();
                                     args.add(fxHome + "/bin/javafx" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                                    args.add("-javaagent:" + previewLib.getAbsolutePath());//NOI18N
+                                    args.add("-Xbootclasspath/p:" + previewLib.getAbsolutePath());//NOI18N
                                     args.add("-Dcom.apple.backgroundOnly=true"); //NOI18N
                                     if (jvmargs != null) for (String ja : jvmargs.trim().split("\\s+")) args.add(ja); //NOI18N
                                     args.add("-cp"); //NOI18N
-                                    args.add(previewLib.getAbsolutePath() + File.pathSeparator + build.getAbsolutePath() + File.pathSeparator + cp); //NOI18N
-                                    args.add("org.netbeans.javafx.preview.Main"); //NOI18N
+                                    args.add(build.getAbsolutePath() + File.pathSeparator + cp); //NOI18N
                                     args.add(className);
                                     if (appargs != null) for (String aa : appargs.trim().split("\\s+")) args.add(aa); //NOI18N
                                     log.info(args.toString());

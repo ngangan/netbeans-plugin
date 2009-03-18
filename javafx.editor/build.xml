@@ -7,10 +7,11 @@
     <import file="nbproject/build-impl.xml"/>
     <target name="preview" depends="init">
         <mkdir dir="build/previewclasses"/>
-        <javac srcdir="previewsrc" destdir="build/previewclasses" source="1.5" debug="true" deprecation="true" target="1.5" bootclasspath="../build/netbeans/javafx2/javafx-sdk/lib/desktop/rt15.jar"/>
+        <javac srcdir="previewsrc" destdir="build/previewclasses" source="1.5" debug="true" deprecation="true" target="1.5"/>
         <mkdir dir="${cluster}/modules/ext"/>
         <jar jarfile="${cluster}/modules/ext/org-netbeans-javafx-preview.jar">
             <manifest>
+                <attribute name="Premain-Class" value="org.netbeans.javafx.preview.SilentPremain"/>
                 <attribute name="NetBeans-Own-Library" value="true"/>
             </manifest>
             <fileset dir="build/previewclasses"/>
