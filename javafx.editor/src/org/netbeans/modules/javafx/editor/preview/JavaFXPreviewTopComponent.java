@@ -133,9 +133,9 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                     args.add("-javaagent:" + previewLib.getAbsolutePath());//NOI18N
                                     args.add("-Xbootclasspath/p:" + previewLib.getAbsolutePath());//NOI18N
                                     args.add("-Dcom.apple.backgroundOnly=true"); //NOI18N
-                                    if (jvmargs != null) for (String ja : jvmargs.trim().split("\\s+")) args.add(ja); //NOI18N
+                                    if (jvmargs != null) for (String ja : jvmargs.trim().split("\\s+")) if (ja.length()>0) args.add(ja); //NOI18N
                                     args.add("-cp"); //NOI18N
-                                    args.add(build.getAbsolutePath() + File.pathSeparator + cp); //NOI18N
+                                    args.add(src.toString() + File.pathSeparator + build.getAbsolutePath() + File.pathSeparator + cp); //NOI18N
                                     args.add(className);
                                     if (appargs != null) for (String aa : appargs.trim().split("\\s+")) args.add(aa); //NOI18N
                                     log.info(args.toString());
