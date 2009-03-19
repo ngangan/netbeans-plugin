@@ -34,6 +34,7 @@ import org.netbeans.modules.javafx.editor.format.JFXIndentTask;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.modules.javafx.editor.format.CompilerIndependentJFXReformatTask;
 
 /**
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
@@ -49,6 +50,7 @@ public class ReformatTaskFactory implements ReformatTask.Factory{
      */
     public ReformatTask createTask(Context context) {
         if (log.isLoggable(Level.FINE)) log.fine(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
-        return new JFXIndentTask(context);
+//        return new JFXIndentTask(context);
+        return new CompilerIndependentJFXReformatTask(context);
     }
 }
