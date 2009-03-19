@@ -79,6 +79,15 @@ public class CompilerIndependentJFXIndentTask implements IndentTask {
         int elementIndex = rootElement.getElementIndex(startOffset);
         Element prevElement = rootElement.getElement(elementIndex > 0 ? elementIndex - 1 : elementIndex);
         int indent = IndentUtils.lineIndent(document, prevElement.getStartOffset());
+        if (startOffset > 1) {
+            String prevChar = document.getText(startOffset - 2, 1);
+            int tabSize = IndentUtils.tabSize(document);
+            if (prevChar.equals("{")) { // NOI18N
+                indent += tabSize;
+//            } else if (prevChar.equals("}") && indent >= tabSize) { // NOI18N
+//                indent -= tabSize;
+            }
+        }
         context.modifyIndent(context.lineStartOffset(startOffset), indent);
     }
 
