@@ -104,7 +104,6 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                         if (!inDefaultPackage) {
                             me = me.substring(path.length() + 1); //stripping first slash
                             me = me.replace("/", ".");        // NOI18N
-                            System.out.println("Me: " + me); // NOI18N
                         }
                         if (me.equals(packageName) || (inDefaultPackage && packageName == null)) {
                             return;

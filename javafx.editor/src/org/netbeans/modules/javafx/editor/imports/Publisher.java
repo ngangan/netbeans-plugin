@@ -68,10 +68,24 @@ class Publisher implements Runnable {
             doc.remove(dr.start, length);
             int offset = dr.start;
             boolean first = true;
+            boolean hasNL = offset > 0 && doc.getText(offset - 1, 1).equals("\n"); // NOI18N
+            boolean has2NLs = offset > 1 && doc.getText(offset - 2, 2).equals("\n\n"); // NOI18N
             for (ImportsModel.ModelEntry entry : model.getEntries()) {
                 if (entry.isUsed()) {
                     log.info("\t" + entry.toImportStatement()); // NOI18N
-                    String text = (first ? "" : "\n") + entry.toImportStatement(); // NOI18N
+                    String prefix;
+                    if (first) {
+                        if (has2NLs) {
+                            prefix = ""; // NI18N
+                        } else if (hasNL) {
+                            prefix = "\n"; // NI18N
+                        } else {
+                            prefix = "\n\n"; // NI18N
+                        }
+                    } else {
+                        prefix = "\n"; // NI18N
+                    }
+                    String text = prefix + entry.toImportStatement();
                     first = false;
                     doc.insertString(offset, text, null);
                     offset += text.length();
