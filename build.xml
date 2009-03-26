@@ -32,11 +32,11 @@
                 <mkdir dir="javafx.sdk.mac/external"/>
                 <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
-<!--
             <sequential>
                 <mkdir dir="javafx.sdk.lin/external"/>
-                <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip"/>
+                <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
+<!--
             <sequential>
                 <mkdir dir="javafx.sdk.sol/external"/>
                 <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip"/>
@@ -81,7 +81,6 @@
                 <exclude name="**/*-win.*"/>
           </zipfileset>
         </zip>
-<!--        
         <zip destfile="${zips.dir}/javafx-cluster-lin.zip" update="false" duplicate="preserve">
             <zipfileset prefix="javafx2" dir="${javafx.cluster.dir}">
                 <exclude name="${javafx.sdk.pattern}"/>
@@ -90,6 +89,7 @@
                 <exclude name="**/*-win.*"/>
           </zipfileset>
         </zip>
+<!--        
         <zip destfile="${zips.dir}/javafx-cluster-sol.zip" update="false" duplicate="preserve">
             <zipfileset prefix="javafx2" dir="${javafx.cluster.dir}">
                 <exclude name="${javafx.sdk.pattern}"/>
@@ -108,7 +108,6 @@
                 <exclude name="javafx-sdk/bin/*"/>
             </zipfileset>
         </zip>
-<!--        
         <zip destfile="${zips.dir}/javafx-sdk-lin.zip" update="false" duplicate="preserve">
             <zipfileset dir="javafx.sdk.lin/release" filemode="755">
                 <include name="javafx-sdk/bin/*"/>
@@ -117,6 +116,7 @@
                 <exclude name="javafx-sdk/bin/*"/>
             </zipfileset>
         </zip>
+<!--        
         <zip destfile="${zips.dir}/javafx-sdk-sol.zip" update="false" duplicate="preserve">
             <zipfileset dir="javafx.sdk.sol/release" filemode="755">
                 <include name="javafx-sdk/bin/*"/>
