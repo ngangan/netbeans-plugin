@@ -10,7 +10,12 @@
     <target name="files-init" depends="-release.files">
         <property name="release.files" value=""/>
         <property name="build.config" value="daily"/>
-        <property file="build-${build.config}.properties"/>    
+        <property file="build-${build.config}.properties"/>
+        <property environment="env"/>
+        <condition property="catalog.base.url" value="${env.HUDSON_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBER}/artifact/build/updates">
+            <isset property="env.HUDSON_URL"/>
+        </condition>
+        
         <delete dir="build"/>
         <mkdir dir="build"/>
         <property name="use.timestamp" value="true"/>
