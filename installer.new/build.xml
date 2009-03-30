@@ -29,7 +29,15 @@
       <arg file="build/linux"/>
     </exec>
   </target>
-  
+
+  <target name="build-ant-lib">
+    <mkdir dir="build/ant-lib"/>
+    <javac srcdir="ant-lib-src" destdir="build/ant-lib"/>
+    <taskdef name="currentmillis" classname="org.netbeans.installer.javafx.CurrentMillisTask" classpath="build/ant-lib"/>
+    <taskdef name="firstfname" classname="org.netbeans.installer.javafx.FirstFNameTask" classpath="build/ant-lib"/>
+    <taskdef name="genlist" classname="org.netbeans.installer.javafx.GenListTask" classpath="build/ant-lib"/>
+  </target>
+ 
   <target name="build-logic" depends="unzip-javase">
     <mkdir dir="build/logic"/>
     <javac srcdir="logic-src" destdir="build/logic" classpath="build/windows"/>
@@ -42,7 +50,7 @@
     </jar>  
   </target>
 
-  <target name="build-data">
+  <target name="build-data" depends="build-ant-lib">
     <mkdir dir="build/data/common-cluster/javafx2"/>
     <copy todir="build/data/common-cluster/javafx2">
       <fileset dir="../build/netbeans/javafx2">
@@ -108,13 +116,11 @@
 
   <target name="build-registry" depends="build-javafx-package">
     <property name="base.version" value="6.5.1.0.200903060201"/>
-    <script language="javascript"><![CDATA[
-      project.setProperty("timestamp", java.util.Calendar.getInstance().getTimeInMillis());
-      project.setProperty("base.win.version", project.resolveFile("build/windows/data/nb-base").list()[0]);
-      project.setProperty("javase.win.version", project.resolveFile("build/windows/data/nb-javase").list()[0]);
-      project.setProperty("base.lin.version", project.resolveFile("build/linux/data/nb-base").list()[0]);
-      project.setProperty("javase.lin.version", project.resolveFile("build/linux/data/nb-javase").list()[0]);
-    ]]></script>
+    <currentmillis property="timestamp"/>
+    <firstfname property="base.win.version" dir="build/windows/data/nb-base"/>
+    <firstfname property="javase.win.version" dir="build/windows/data/nb-javase"/>
+    <firstfname property="base.lin.version" dir="build/linux/data/nb-base"/>
+    <firstfname property="javase.lin.version" dir="build/linux/data/nb-javase"/>
     <checksum property="icon.md5" file="resources/icon.png" algorithm="MD5"/>
     <length property="icon.length" file="resources/icon.png"/>
     <checksum property="logic.md5" file="build/logic.jar" algorithm="MD5"/>
@@ -284,37 +290,10 @@
 
 <!-- helper subroutines -->
   <target name="-list-files">
-      <fileset id="fileset" dir="${dir}"/>
       <echo file="${list.file}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <files-list>]]>   
 </echo>
-      <script language="javascript"><![CDATA[
-      importClass(java.io.File);
-      fileset = project.getReference("fileset");
-      basedir  = fileset.getDir(project);
-      srcDirs = fileset.getDirectoryScanner(project).getIncludedDirectories();
-      for (i=0; i<srcDirs.length; i++) {
-        dir = new File(basedir, srcDirs[i]);
-        call = project.createTask("antcall");
-        call.setTarget("-list-dir");
-        p1 = call.createParam(); p1.setName("name");    p1.setValue(srcDirs[i].replace('\\', '/'));
-        p2 = call.createParam(); p2.setName("lastMod"); p2.setValue(dir.lastModified());
-        p3 = call.createParam(); p3.setName("empty");   p3.setValue(dir.list().length == 0);
-        call.perform();
-      }
-      srcFiles = fileset.getDirectoryScanner(project).getIncludedFiles();
-      for (i=0; i<srcFiles.length; i++) {
-        var name = srcFiles[i];
-        var file = new File(basedir, name);
-        call = project.createTask("antcall");
-        call.setInheritAll(false);
-        call.setTarget("-list-file");
-        var p1 = call.createParam(); p1.setName("file");    p1.setLocation(file);
-        var p2 = call.createParam(); p2.setName("name");    p2.setValue(name.replace('\\', '/'));
-        var p3 = call.createParam(); p3.setName("lastMod"); p3.setValue(file.lastModified());
-        call.perform();
-      }
-    ]]></script>
+      <genlist dir="${dir}"/>
       <echo file="${list.file}" append="true"><![CDATA[</files-list>]]></echo>
   </target>  
   
