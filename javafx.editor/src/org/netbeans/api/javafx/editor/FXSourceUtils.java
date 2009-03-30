@@ -139,7 +139,7 @@ public final class FXSourceUtils {
             default:
                 try {
                     return type.toString() + suffix;
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     return "<unknown>" + suffix; // NOI18N
                 }
         }
