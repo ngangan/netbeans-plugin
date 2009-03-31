@@ -91,7 +91,8 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
 
     private Iterable<ImportsModel.ModelEntry> configureModel(CompilationInfo cp) {
         Set<Element> elements = new TreeSet<Element>(JavaFXImports.InternalSetComparator.create());
-        cp.getCompilationUnit().accept(new IdentifierVisitor(cp), elements);
+        IdentifierVisitor iv = new IdentifierVisitor(cp);
+        iv.scan(cp.getCompilationUnit(), elements);
         ImportsModel model = new ImportsModel(cp);
         for (Element element : elements) {
             if (canceled.get()) return Collections.emptyList();

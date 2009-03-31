@@ -38,13 +38,13 @@ import javax.lang.model.type.TypeKind;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
- * @todo Make it cancelable.
  */
-class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collection<Element>> {
+class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, Collection<Element>> {
     private final CompilationInfo info;
     protected UnitTree cu;
     private final Collection<Name> variableNames = new TreeSet<Name>(new InnerComparator());
@@ -57,10 +57,9 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         sp = info.getTrees().getSourcePositions();
     }
 
-
     @Override
     public Collection<Element> visitVariable(VariableTree node, Collection<Element> elements) {
-        variableNames.add(node.getName());
+        variableNames.add(node.getName());       
         return super.visitVariable(node, elements);
     }
 
@@ -69,10 +68,11 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         if (variableNames.contains(node.getName())) {
             return elements;
         }
-        Element element = toElement(node);
+        Element element = info.getTrees().getElement(getCurrentPath());
+
         if (element != null) {
             if ((element.asType().getKind() == TypeKind.PACKAGE)) {
-                JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+                JavaFXTreePath path = getCurrentPath();
                 Tree parent = path.getParentPath().getLeaf();
                 if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
                     elements.add(element);
@@ -96,7 +96,7 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
 
     @Override
     public Collection<Element> visitFunctionValue(FunctionValueTree node, Collection<Element> elements) {
-        JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+        JavaFXTreePath path = getCurrentPath();
         JFXTree tree = (JFXTree) path.getParentPath().getLeaf();
         if (tree.getGenType() == SyntheticTree.SynthType.COMPILED) {
             Element element = toElement(node.getType());
