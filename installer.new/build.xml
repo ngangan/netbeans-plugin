@@ -64,10 +64,23 @@
     </exec>
   </target>
 
-  <target name="build-mac-pkg" depends="mount-mac-dmg" if="running.on.mac">
+  <target name="build-servicetag" depends="clean">
+    <javac srcdir="servicetag-src" destdir="build/servicetag"/>
+    <mkdir dir="build/pkgscripts"/>
+    <jar destfile="build/pkgscripts/servicetag.jar">
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
+      <fileset dir="build/servicetag"/>
+      <manifest>
+        <attribute name="Main-Class" value="org.netbeans.installer.mac.ServiceTagGenerator"/>
+      </manifest>
+    </jar>  
+  </target>
+  
+  <target name="build-mac-pkg" depends="mount-mac-dmg,build-servicetag" if="running.on.mac">
     <mkdir dir="build/pkgscripts"/>
     <copy todir="build/pkgscripts">
-      <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,servicetag.jar,servicetag.sh,get_current_jdk.sh"/>
+      <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,servicetag.sh,get_current_jdk.sh"/>
+      <fileset file="pkg-src/postflight"/>
     </copy>
     <exec executable="sh" failonerror="yes">
         <arg value="-c"/>
@@ -83,6 +96,7 @@
     <copy todir="build/mac-mount">
       <fileset dir="mac-patch-src"/>
     </copy>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Resources/License.txt">
     <copy todir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/javafx.pkg">
       <fileset dir="build/javafx.pkg"/>
     </copy>
@@ -302,7 +316,7 @@
     </echoxml>
   </target>
   
-  <target name="patch" depends="build-javafx-package,build-registry">
+  <target name="patch" depends="build-javafx-package,build-registry,build-servicetag">
     <propertyfile file="build/windows/data/engine.properties">
       <entry  key="nbi.overall.license.resource" value="$S{nbi.overall.license.javafx.resource}"/>
       <entry  key="NWP.welcome.page.type" value="javafx"/>
@@ -344,11 +358,13 @@
     <echo file="build/windows/data/registry.xml"><![CDATA[${original.registry.win}${javafx.registry.win}</components></registry>]]></echo>    
     <echo file="build/linux/data/registry.xml"><![CDATA[${original.registry.lin}${javafx.registry.lin}</components></registry>]]></echo>    
     <copy todir="build/windows" overwrite="true">
-      <fileset dir="patch-src"/>
+      <fileset dir="build/servicetag"/>
     </copy>
     <copy todir="build/linux" overwrite="true">
-      <fileset dir="patch-src"/>
+      <fileset dir="build/servicetag"/>
     </copy>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/windows/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/linux/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
   </target>
   
   <target name="jar-installers" depends="patch">
