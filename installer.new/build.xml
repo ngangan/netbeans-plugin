@@ -65,6 +65,7 @@
   </target>
 
   <target name="build-servicetag" depends="clean">
+    <mkdir dir="build/servicetag"/>
     <javac srcdir="servicetag-src" destdir="build/servicetag"/>
     <mkdir dir="build/pkgscripts"/>
     <jar destfile="build/pkgscripts/servicetag.jar">
