@@ -10,7 +10,10 @@
     <delete dir="build"/>
     <delete dir="../build/installers"/>
     <condition property="running.on.mac">
-      <os family="mac"/>
+      <and>
+        <os family="mac"/>
+        <available file="/Developer/Tools/packagemaker"/>
+      </and>  
     </condition>  
   </target>
 
