@@ -1,6 +1,7 @@
 <project name="javafx-plugin-installers" default="build-installers">
   
   <property name="javafx.version" value="1.5.0.0.70"/>
+  <property name="ant.build.javac.target" value="1.5"/>
   
   <target name="clean">
     <exec executable="umount" osfamily="mac" failifexecutionfails="false">
