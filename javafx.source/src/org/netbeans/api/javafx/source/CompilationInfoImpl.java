@@ -149,7 +149,7 @@ public class CompilationInfoImpl {
         this.classBytes = bytes;
     }
 
-    JavafxcTaskImpl getJavafxcTask() {
+    synchronized JavafxcTaskImpl getJavafxcTask() {
         if (cTask == null) {
             cTask = source.createJavafxcTask(new DiagnosticListenerImpl());
         }

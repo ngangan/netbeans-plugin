@@ -63,6 +63,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -231,9 +233,13 @@ public final class JavaFXSource {
         return task;
   }
 
+    final private Semaphore phaseSemaphor = new Semaphore(1);
+
     public Phase moveToPhase(Phase phase, CompilationInfoImpl cc, boolean cancellable) throws IOException {
         FileObject file = getFileObject();
-        
+
+        try {
+        phaseSemaphor.acquire();
         if (cc.phase.lessThan(Phase.PARSED) && !phase.lessThan(Phase.PARSED)) {
             if (cancellable && CompilationJob.currentRequest.isCanceled()) {
                 //Keep the currentPhase unchanged, it may happen that an userActionTask
@@ -336,6 +342,11 @@ public final class JavaFXSource {
                 cc.setPhase(Phase.CODE_GENERATED);
             }
             
+        }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            phaseSemaphor.release();
         }
         
         return phase;
