@@ -80,9 +80,8 @@
   <target name="build-mac-pkg" depends="mount-mac-dmg,build-servicetag" if="running.on.mac">
     <mkdir dir="build/pkgscripts"/>
     <copy todir="build/pkgscripts">
-      <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,servicetag.sh,get_current_jdk.sh"/>
-      <fileset file="pkg-src/postflight"/>
-      <fileset file="pkg-src/Description.plist"/>
+      <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
+      <fileset file="pkg-src"/>
     </copy>
     <exec executable="sh" failonerror="yes">
         <arg value="-c"/>
