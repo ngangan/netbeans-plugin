@@ -18,9 +18,11 @@
       <property name="build.config" value="daily"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
-      <get src="${netbeans.windows.installer.url}" dest="external/netbeans-javase-windows.exe" usetimestamp="true" verbose="true"/>
-      <get src="${netbeans.linux.installer.url}" dest="external/netbeans-javase-linux.sh" usetimestamp="true" verbose="true"/>
-      <get src="${netbeans.macosx.installer.url}" dest="external/netbeans-javase-macosx.dmg" usetimestamp="true" verbose="true"/>
+      <parallel>
+        <get src="${netbeans.windows.installer.url}" dest="external/netbeans-javase-windows.exe" usetimestamp="true" verbose="true"/>
+        <get src="${netbeans.linux.installer.url}" dest="external/netbeans-javase-linux.sh" usetimestamp="true" verbose="true"/>
+        <get src="${netbeans.macosx.installer.url}" dest="external/netbeans-javase-macosx.dmg" usetimestamp="true" verbose="true"/>
+      </parallel>  
   </target>
  
   <target name="build-mac-cluster" depends="clean" if="running.on.mac">
