@@ -96,7 +96,7 @@
     <copy todir="build/mac-mount">
       <fileset dir="mac-patch-src"/>
     </copy>
-    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Resources/License.txt">
+    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Resources/License.txt"/>
     <copy todir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/javafx.pkg">
       <fileset dir="build/javafx.pkg"/>
     </copy>
