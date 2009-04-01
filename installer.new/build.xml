@@ -82,6 +82,7 @@
     <copy todir="build/pkgscripts">
       <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,servicetag.sh,get_current_jdk.sh"/>
       <fileset file="pkg-src/postflight"/>
+      <fileset file="pkg-src/Description.plist"/>
     </copy>
     <exec executable="sh" failonerror="yes">
         <arg value="-c"/>
