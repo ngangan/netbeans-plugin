@@ -29,6 +29,9 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.*;
+import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javac.code.Type.ErrorType;
+import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXTree;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
@@ -113,7 +116,7 @@ class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, 
     }
 
     private static boolean isImportable(Element element) {
-        return element != null && !element.toString().startsWith("java.lang");  //no need to import anything from java.lang.* package
+        return element != null && !element.toString().startsWith("java.lang.String");  //java.lang.String is automagically accessibl
     }
 
     /**
