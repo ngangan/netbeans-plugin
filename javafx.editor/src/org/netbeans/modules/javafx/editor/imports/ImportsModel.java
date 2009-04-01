@@ -102,7 +102,8 @@ public final class ImportsModel {
     boolean isImported(Element e) {
         if (isLocal(e)) return true;
         for (ModelEntry entry : entries) {
-            if (entry != null && entry.includes(e.asType().toString())) {
+            // #158596 - use e.toString() instead of e.asType().toString() to prevent problems with generified types
+            if (entry != null && entry.includes(e.toString())) {
                 entry.setUsage();
                 return true;
             }
