@@ -393,7 +393,6 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
          * @param key  The key for the localized error message.
          * @param args Fields of the error message.
          */
-        @Override
         public void error(String key, Object... args) {
             error(null, key, args);
         }
@@ -406,7 +405,6 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
          * @param key  The key for the localized error message.
          * @param args Fields of the error message.
          */
-        @Override
         public void error(JCDiagnostic.DiagnosticPosition pos, String key, Object... args) {
             error(pos.getStartPosition(), key, args);
         }
