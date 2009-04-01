@@ -13,7 +13,7 @@
     <condition property="running.on.mac">
       <and>
         <os family="mac"/>
-        <available file="/Developer/Tools/packagemaker"/>
+        <available file="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker"/>
       </and>  
     </condition>  
   </target>
@@ -86,7 +86,7 @@
     </copy>
     <exec executable="sh" failonerror="yes">
         <arg value="-c"/>
-        <arg value="/Developer/Tools/packagemaker -build -v -ds -p build/javafx.pkg -f build/mac-cluster -i pkg-src/Info.plist -r build/pkgscripts -d pkg-src/Description.plist"/>
+        <arg value="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -v -ds -p build/javafx.pkg -f build/mac-cluster -i pkg-src/Info.plist -r build/pkgscripts -d pkg-src/Description.plist"/>
     </exec>                                         
   </target>
 
