@@ -74,13 +74,15 @@ class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, 
             if ((element.asType().getKind() == TypeKind.PACKAGE)) {
                 JavaFXTreePath path = getCurrentPath();
                 Tree parent = path.getParentPath().getLeaf();
-                if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT && isImportable(element)) {
                     elements.add(element);
                     positions.put(element, sp.getStartPosition(cu, node));
                 }
             } else {
-                elements.add(element);
-                positions.put(element, sp.getStartPosition(cu, node));
+                if (isImportable(element)) {
+                    elements.add(element);
+                    positions.put(element, sp.getStartPosition(cu, node));
+                }
             }
         }
         return elements;
@@ -89,8 +91,8 @@ class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, 
     private static Logger log = Logger.getLogger(IdentifierVisitor.class.getName());
     private Element toElement(Tree node) {
         Element element = info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
-        if (element != null && element.toString().startsWith("java.lang.String")) return null;
-        if (log.isLoggable(Level.FINE)) log.fine("toElement(): Element: " + element);
+        
+        if (log.isLoggable(Level.FINE)) log.fine("toElement(): Element: " + (element != null ? element : "<null>")); // NOI18N
         return element;
     }
 
@@ -100,7 +102,7 @@ class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, 
         JFXTree tree = (JFXTree) path.getParentPath().getLeaf();
         if (tree.getGenType() == SyntheticTree.SynthType.COMPILED) {
             Element element = toElement(node.getType());
-            if (element != null) {
+            if (isImportable(element)) {
                 elements.add(element);
                 positions.put(element, sp.getStartPosition(cu, node));
             }
@@ -108,6 +110,10 @@ class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, 
         super.visitFunctionValue(node, elements);
         return elements;
 
+    }
+
+    private static boolean isImportable(Element element) {
+        return element != null && !element.toString().startsWith("java.lang");  //no need to import anything from java.lang.* package
     }
 
     /**
