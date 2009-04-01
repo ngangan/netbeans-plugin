@@ -3,16 +3,104 @@
   <property name="javafx.version" value="1.5.0.0.70"/>
   
   <target name="clean">
+    <exec executable="umount" osfamily="mac" failifexecutionfails="false">
+      <arg value="-f"/>
+      <arg file="build/mac-mount"/>
+    </exec>  
     <delete dir="build"/>
     <delete dir="../build/installers"/>
+    <condition property="running.on.mac">
+      <os family="mac"/>
+    </condition>  
   </target>
-  
+
   <target name="download-javase" depends="clean">
       <property name="build.config" value="daily"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
       <get src="${netbeans.windows.installer.url}" dest="external/netbeans-javase-windows.exe" usetimestamp="true" verbose="true"/>
       <get src="${netbeans.linux.installer.url}" dest="external/netbeans-javase-linux.sh" usetimestamp="true" verbose="true"/>
+      <get src="${netbeans.macosx.installer.url}" dest="external/netbeans-javase-macosx.dmg" usetimestamp="true" verbose="true"/>
+  </target>
+ 
+  <target name="build-mac-cluster" depends="clean" if="running.on.mac">
+    <mkdir dir="build/mac-cluster/javafx2"/>
+    <copy todir="build/mac-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <exclude name="**/*-sol.*"/>
+        <exclude name="**/*-win.*"/>
+        <exclude name="**/*-lin.*"/>
+      </fileset>
+      <fileset dir="../javafx.sdk.mac/release"/>  
+    </copy>
+    <exec executable="sh" dir="build/mac-cluster/javafx2/javafx-sdk/bin" failonerror="yes">
+      <arg value="-c"/>
+      <arg value="chmod +x *"/>
+    </exec>  
+  </target>
+  
+  <target name="mount-mac-dmg" depends="download-javase,build-mac-cluster" if="running.on.mac">
+    <mkdir dir="build/mac-mount"/>
+    <exec executable="hdiutil" failonerror="yes">
+      <arg value="convert"/>
+      <arg value="-format"/>
+      <arg value="UDSP"/>
+      <arg file="external/netbeans-javase-macosx.dmg"/>
+      <arg value="-o"/>
+      <arg file="build/netbeans-6.5.1-javafx-macosx"/>
+    </exec>  
+    <exec executable="hdiutil" failonerror="yes">
+      <arg value="mount"/>
+      <arg value="-readwrite"/>
+      <arg value="-mountpoint"/>
+      <arg file="build/mac-mount"/>
+      <arg file="build/netbeans-6.5.1-javafx-macosx.sparseimage"/>
+    </exec>
+  </target>
+
+  <target name="build-mac-pkg" depends="mount-mac-dmg" if="running.on.mac">
+    <mkdir dir="build/pkgscripts"/>
+    <copy todir="build/pkgscripts">
+      <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,servicetag.jar,servicetag.sh,get_current_jdk.sh"/>
+    </copy>
+    <exec executable="sh" failonerror="yes">
+        <arg value="-c"/>
+        <arg value="/Developer/Tools/packagemaker -build -v -ds -p build/javafx.pkg -f build/mac-cluster -i pkg-src/Info.plist -r build/pkgscripts -d pkg-src/Description.plist"/>
+    </exec>                                         
+  </target>
+
+  <target name="patch-mac-dmg" depends="mount-mac-dmg,build-mac-pkg" if="running.on.mac">
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
+        <arg value="-c"/>
+        <arg value="sed -i '' 's/addproduct_id.sh &quot;NB&quot;/addproduct_id.sh &quot;NBFX&quot;/' postflight"/>            
+    </exec>
+    <copy todir="build/mac-mount">
+      <fileset dir="mac-patch-src"/>
+    </copy>
+    <copy todir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/javafx.pkg">
+      <fileset dir="build/javafx.pkg"/>
+    </copy>
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
+      <arg value="-c"/>
+      <arg value="chmod +x *"/>
+    </exec>  
+  </target>
+
+  <target name="build-mac-dmg" depends="patch-mac-dmg" if="running.on.mac">
+    <exec executable="hdiutil">
+      <arg value="detach"/>
+      <arg file="build/mac-mount"/>
+    </exec>  
+    <mkdir dir="../build/installers"/>
+    <exec executable="hdiutil" failonerror="yes">
+      <arg value="convert"/>
+      <arg value="-format"/>
+      <arg value="UDZO"/>
+      <arg file="build/netbeans-6.5.1-javafx-macosx.sparseimage"/>
+      <arg value="-o"/>
+      <arg file="../build/installers/netbeans-6.5.1-javafx-macosx.dmg"/>
+    </exec>  
   </target>
   
   <target name="unzip-javase" depends="download-javase">
@@ -263,7 +351,7 @@
     <zip destfile="build/netbeans-6.5.1-javafx-linux.jar" compress="true" level="9" basedir="build/linux"/>
   </target>
 
-  <target name="build-installers" depends="jar-installers">
+  <target name="build-installers" depends="build-mac-dmg,jar-installers">
     <mkdir dir="../build/installers"/>
     <java jar="build/netbeans-6.5.1-javafx-windows.jar" fork="true">
       <arg value="--platform"/>
