@@ -29,6 +29,9 @@
 package org.netbeans.modules.javafx.editor.imports;
 
 import com.sun.javafx.api.tree.*;
+import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javac.code.Type.ErrorType;
+import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXTree;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
@@ -38,13 +41,13 @@ import javax.lang.model.type.TypeKind;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
- * @todo Make it cancelable.
  */
-class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collection<Element>> {
+class IdentifierVisitor extends CancellableTreePathScanner<Collection<Element>, Collection<Element>> {
     private final CompilationInfo info;
     protected UnitTree cu;
     private final Collection<Name> variableNames = new TreeSet<Name>(new InnerComparator());
@@ -57,10 +60,9 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         sp = info.getTrees().getSourcePositions();
     }
 
-
     @Override
     public Collection<Element> visitVariable(VariableTree node, Collection<Element> elements) {
-        variableNames.add(node.getName());
+        variableNames.add(node.getName());       
         return super.visitVariable(node, elements);
     }
 
@@ -69,18 +71,21 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         if (variableNames.contains(node.getName())) {
             return elements;
         }
-        Element element = toElement(node);
+        Element element = info.getTrees().getElement(getCurrentPath());
+
         if (element != null) {
             if ((element.asType().getKind() == TypeKind.PACKAGE)) {
-                JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+                JavaFXTreePath path = getCurrentPath();
                 Tree parent = path.getParentPath().getLeaf();
-                if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                if (parent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT && isImportable(element)) {
                     elements.add(element);
                     positions.put(element, sp.getStartPosition(cu, node));
                 }
             } else {
-                elements.add(element);
-                positions.put(element, sp.getStartPosition(cu, node));
+                if (isImportable(element)) {
+                    elements.add(element);
+                    positions.put(element, sp.getStartPosition(cu, node));
+                }
             }
         }
         return elements;
@@ -89,18 +94,18 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
     private static Logger log = Logger.getLogger(IdentifierVisitor.class.getName());
     private Element toElement(Tree node) {
         Element element = info.getTrees().getElement(JavaFXTreePath.getPath(cu, node));
-        if (element != null && element.toString().startsWith("java.lang.String")) return null;
-        if (log.isLoggable(Level.FINE)) log.fine("toElement(): Element: " + element);
+        
+        if (log.isLoggable(Level.FINE)) log.fine("toElement(): Element: " + (element != null ? element : "<null>")); // NOI18N
         return element;
     }
 
     @Override
     public Collection<Element> visitFunctionValue(FunctionValueTree node, Collection<Element> elements) {
-        JavaFXTreePath path = JavaFXTreePath.getPath(cu, node);
+        JavaFXTreePath path = getCurrentPath();
         JFXTree tree = (JFXTree) path.getParentPath().getLeaf();
         if (tree.getGenType() == SyntheticTree.SynthType.COMPILED) {
             Element element = toElement(node.getType());
-            if (element != null) {
+            if (isImportable(element)) {
                 elements.add(element);
                 positions.put(element, sp.getStartPosition(cu, node));
             }
@@ -108,6 +113,10 @@ class IdentifierVisitor extends JavaFXTreeScanner<Collection<Element>, Collectio
         super.visitFunctionValue(node, elements);
         return elements;
 
+    }
+
+    private static boolean isImportable(Element element) {
+        return element != null && !element.toString().startsWith("java.lang.String");  //java.lang.String is automagically accessibl
     }
 
     /**

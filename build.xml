@@ -18,7 +18,6 @@
         
         <delete dir="build"/>
         <mkdir dir="build"/>
-        <mkdir dir="installer.new/external"/>
         <property name="use.timestamp" value="true"/>
         <parallel failonany="true">
             <sequential>
@@ -37,18 +36,10 @@
                 <mkdir dir="javafx.sdk.lin/external"/>
                 <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
-<!--
             <sequential>
                 <mkdir dir="javafx.sdk.sol/external"/>
-                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip"/>
+                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>
--->               
-            <sequential>
-                <get src="${netbeans.windows.installer.url}" dest="installer.new/external/netbeans-javase-windows.exe" usetimestamp="true" verbose="true"/>
-            </sequential>   
-            <sequential>
-                <get src="${netbeans.linux.installer.url}" dest="installer.new/external/netbeans-javase-linux.sh" usetimestamp="true" verbose="true"/>
-            </sequential>   
         </parallel>    
     </target>
     

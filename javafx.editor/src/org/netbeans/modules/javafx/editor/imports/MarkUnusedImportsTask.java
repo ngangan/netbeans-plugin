@@ -65,33 +65,38 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
     }
 
     public void run(CompilationInfo cp) throws Exception {
-        if (canceled.get() || file.get() == null || !file.get().isValid()) return;
-        final JavaFXDocument document = getDoc(file.get());
-        if (document == null || canceled.get()) return;
-        Iterable<ImportsModel.ModelEntry> entries = configureModel(cp);
-        if (canceled.get()) return;
-        ArrayList<ErrorDescription> warnings = new ArrayList<ErrorDescription>();
-        for (ImportsModel.ModelEntry entry : entries) {
+        try {
+            if (canceled.get() || file.get() == null || !file.get().isValid()) return;
+            final JavaFXDocument document = getDoc(file.get());
+            if (document == null || canceled.get()) return;
+            Iterable<ImportsModel.ModelEntry> entries = configureModel(cp);
             if (canceled.get()) return;
-            if (!entry.isUsed() && entry.tree != null) {
-                long start = cp.getTrees().getSourcePositions().getStartPosition(cp.getCompilationUnit(), entry.tree);
-                long end = cp.getTrees().getSourcePositions().getEndPosition(cp.getCompilationUnit(), entry.tree);
-                Position sp = document.createPosition((int) start);
-                Position ep = document.createPosition((int) end + 2 /*SEMI + WS[NL]*/);
-                warnings.add(ErrorDescriptionFactory.createErrorDescription(
-                        Severity.WARNING,
-                        MessageFormat.format(BUNDLE.getString("Editor.unusedImports.message2user"), entry.type),   // NOI18N
-                        Collections.<Fix>singletonList(new RemoveImportFix(document, sp, ep)), 
-                        document, sp, ep));
+            ArrayList<ErrorDescription> warnings = new ArrayList<ErrorDescription>();
+            for (ImportsModel.ModelEntry entry : entries) {
+                if (canceled.get()) return;
+                if (!entry.isUsed() && entry.tree != null) {
+                    long start = cp.getTrees().getSourcePositions().getStartPosition(cp.getCompilationUnit(), entry.tree);
+                    long end = cp.getTrees().getSourcePositions().getEndPosition(cp.getCompilationUnit(), entry.tree);
+                    Position sp = document.createPosition((int) start);
+                    Position ep = document.createPosition((int) end + 2 /*SEMI + WS[NL]*/);
+                    warnings.add(ErrorDescriptionFactory.createErrorDescription(
+                            Severity.WARNING,
+                            MessageFormat.format(BUNDLE.getString("Editor.unusedImports.message2user"), entry.type),   // NOI18N
+                            Collections.<Fix>singletonList(new RemoveImportFix(document, sp, ep)),
+                            document, sp, ep));
+                }
             }
+            if (canceled.get()) return;
+            HintsController.setErrors(document, "unused-imports", warnings); // NOI18N
+        } finally {
+            canceled.set(false);
         }
-        if (canceled.get()) return;
-        HintsController.setErrors(document, "unused-imports", warnings); // NOI18N
     }
 
     private Iterable<ImportsModel.ModelEntry> configureModel(CompilationInfo cp) {
         Set<Element> elements = new TreeSet<Element>(JavaFXImports.InternalSetComparator.create());
-        cp.getCompilationUnit().accept(new IdentifierVisitor(cp), elements);
+        IdentifierVisitor iv = new IdentifierVisitor(cp);
+        iv.scan(cp.getCompilationUnit(), elements);
         ImportsModel model = new ImportsModel(cp);
         for (Element element : elements) {
             if (canceled.get()) return Collections.emptyList();

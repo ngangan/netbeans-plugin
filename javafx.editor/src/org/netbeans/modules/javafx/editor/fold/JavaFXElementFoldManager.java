@@ -397,7 +397,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     if (node.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
                         end = findBodyEnd(node, cu, sp, doc);
                     }
-                    JavaFXTreePath pa = JavaFXTreePath.getPath(cu, node);
+                    JavaFXTreePath pa = getCurrentPath(); //JavaFXTreePath.getPath(cu, node);
                     if (start != (-1) && end != (-1) &&
                             !info.getTreeUtilities().isSynthetic(pa)) {
                         
@@ -456,7 +456,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 Document doc = operation.getHierarchy().getComponent().getDocument();
                 int start = findBodyStart(node, cu, sp, doc);
                 int end   = findBodyEnd(node, cu, sp, doc);
-                JavaFXTreePath pa = JavaFXTreePath.getPath(cu, node);
+                JavaFXTreePath pa = getCurrentPath();
                 if (start != (-1) && end != (-1) &&
                         !info.getTreeUtilities().isSynthetic(pa)) {
                     if (LOGGABLE) log("visitClassDeclaration adding fold [" + start + ":" + end + "] for tree: " + node); // NOI18N
