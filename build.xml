@@ -36,12 +36,10 @@
                 <mkdir dir="javafx.sdk.lin/external"/>
                 <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
-<!--
             <sequential>
                 <mkdir dir="javafx.sdk.sol/external"/>
-                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip"/>
+                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>
--->               
         </parallel>    
     </target>
     
