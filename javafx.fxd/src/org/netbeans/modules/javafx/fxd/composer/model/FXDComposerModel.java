@@ -2,7 +2,6 @@
  *  Copyright 2008 Sun Microsystems, Inc. All rights reserved.
  *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
-
 package org.netbeans.modules.javafx.fxd.composer.model;
 
 import java.io.FileNotFoundException;
@@ -10,6 +9,8 @@ import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 import com.sun.javafx.tools.fxd.TargetProfile;
+import com.sun.javafx.tools.fxd.container.FXDContainer;
+import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 
 /**
  *
@@ -21,6 +22,7 @@ public class FXDComposerModel {
     private transient Exception   m_fxzArchiveException = null;
     
     /** persistent properties */
+    private String        m_selectedEntry  = FXDContainer.MAIN_CONTENT;
     private boolean       m_isHighlightOn  = true;
     private boolean       m_showTooltip    = true;
     private float         m_zoomRatio      = 1.0f;
@@ -92,6 +94,19 @@ public class FXDComposerModel {
     boolean setPreviewProfile(TargetProfile profile) {
         if ( profile != m_previewProfile) {
             m_previewProfile = profile;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String getSelectedEntry() {
+        return m_selectedEntry;
+    }
+
+    boolean setSelectedEntry( String selectedEntry) {
+        if ( !FXDComposerUtils.safeEquals( selectedEntry, m_selectedEntry)) {
+            m_selectedEntry = selectedEntry;
             return true;
         } else {
             return false;

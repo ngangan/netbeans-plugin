@@ -14,38 +14,42 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.text.BadLocationException;
+import javax.swing.SwingUtilities;
 import org.netbeans.editor.BaseDocument;
-import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.javafx.fxd.composer.misc.ByteArrayBuffer;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import com.sun.javafx.tools.fxd.FXDNode;
+import org.openide.util.Exceptions;
+
+import com.sun.javafx.tools.fxd.FXDRootElement;
 import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
-import javax.swing.SwingUtilities;
-import javax.swing.text.EditorKit;
-import org.openide.util.Exceptions;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 
 /**
  *
  * @author Pavel Benes
  */
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
-    private final    FXZDataObject            m_dObj;
+    private final    FXZDataObject             m_dObj;
     // controls the access to the FXDFileModel object
-    private final    Object                   m_lock = new Object();
-    private          List<FXZArchiveEntry>    m_entries;
-    private          FXDFileModel             m_fileModel = null;
-    private final    List<TableModelListener> m_tableListeners;
-    private volatile int                      m_changeTicker = 0; 
-    private volatile boolean                  m_entryChanged = false;
+    private final    Object                    m_lock = new Object();
+    private          List<FXZArchiveEntry>     m_entries;
+    private final    Map<String, FXDFileModel> m_fileModels = new HashMap<String, FXDFileModel>(8);
+    private final    List<TableModelListener>  m_tableListeners;
+    private volatile int                       m_changeTicker = 0;
+    private volatile boolean                   m_entryChanged = false;
     
     private final EntryValue [] m_values = new EntryValue[] {
         new EntryValue( "name", String.class, false) {  //NOI18N
@@ -119,6 +123,28 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
         public FXZArchiveEntry( final File file) throws FileNotFoundException, IOException {
             this( file.getName(), file);
+        }
+
+        public FXZArchiveEntry( String name, final byte[] data) throws IOException {
+            m_name = name;
+            m_size = data.length;
+            m_buffer = new ByteArrayBuffer( (int) m_size);
+            m_compressedSize = -1;
+
+            CountingOutputStream cout = new CountingOutputStream();
+            ZipOutputStream zout = new ZipOutputStream(cout);
+            zout.setMethod( ZipOutputStream.DEFLATED);
+                    
+            zout.putNextEntry( new ZipEntry(m_name));
+            for ( int b : data) {
+                m_buffer.write(b);
+                zout.write(b);
+            }
+
+            zout.closeEntry();
+            zout.finish();                                   
+            m_compressedSize = cout.getSize();
+            fireTableChanged( new TableModelEvent( FXZArchive.this));
         }
         
         public FXZArchiveEntry( String name, final File file) {
@@ -283,16 +309,19 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return m_entryChanged;
     }
 
-    public FXDFileModel getFileModel() {
+    public FXDFileModel getFileModel(String entryName) {
         synchronized( m_lock) {
-            if ( m_fileModel == null) {
+            FXDFileModel fModel = m_fileModels.get( entryName);
+
+            if ( fModel == null) {
                 try {
-                    m_fileModel = new FXDFileModel(this);
+                    fModel = new FXDFileModel(this, entryName);
+                    m_fileModels.put( entryName, fModel);
                 } catch( Exception e) {
                     Exceptions.printStackTrace(e);
                 }
             }
-            return m_fileModel;
+            return fModel;
         }
     }
     
@@ -305,14 +334,25 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return sum;
     }
 
+    public synchronized FXZArchiveEntry add( String name, final byte[] data) throws FileNotFoundException, IOException {
+        checkEntries();       
+        FXZArchiveEntry entry = new FXZArchiveEntry(name, data);
+        add( entry); 
+        return entry;
+    }
+
     public synchronized FXZArchiveEntry add( final File file) throws FileNotFoundException, IOException {
         checkEntries();       
         FXZArchiveEntry entry = new FXZArchiveEntry(file);
+        add(entry);
+        return entry;
+    }
+
+    private void add( FXZArchiveEntry entry) {
         int index = m_entries.size();
         m_entries.add( entry);
         incrementChangeTicker(true);
         fireTableChanged( new TableModelEvent( this, index, index, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT));
-        return entry;
     }
     
     public synchronized void remove(final String [] entryNames) {
@@ -356,22 +396,25 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
    
-    public synchronized void save(BaseDocument doc, EditorKit kit, OutputStream fout) throws FileNotFoundException, IOException, BadLocationException  {        
+    public synchronized void save(OutputStream fout) throws FileNotFoundException, IOException, BadLocationException  {        
         checkEntries();
         FXZContainerBuilder builder = new FXZContainerBuilder( fout);
-
-        OutputStream out = builder.add( MAIN_CONTENT);
-        kit.write(out, doc, 0, doc.getLength());
-        out.close();
-
+        
         //System.err.println("Entry num: " + m_entries.size());
         for (FXZArchiveEntry entry : m_entries) {
-            if ( !MAIN_CONTENT.equals( entry.m_name)) {
-                //System.err.println("Adding entry: " + entry.getName());  //NOI18N
-                out = builder.add( entry.getName());
+            FXZEditorSupport sup;
+    
+            OutputStream out = builder.add( entry.m_name);
+            
+            if ( (sup=m_dObj.getEditorSupport( entry.m_name)) != null) {
+                BaseDocument doc = (BaseDocument) sup.getDocument();
+                Writer writer = new OutputStreamWriter( out);
+                doc.write( writer, 0, doc.getLength());                
+                writer.flush();
+            } else {
                 entry.write(out);
-                out.close();
             }
+            out.close();
         }
         builder.close();
         try {
@@ -394,7 +437,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
     @Override
     public synchronized InputStream open(String entryName) throws FileNotFoundException, IOException {
-        //System.err.println("Opening the entry " + entryName);
+        System.err.println("Opening the entry " + entryName);
         checkEntries();
         entryName = removeMagicDirVar(entryName);
         int index = getEntryIndex(entryName);
@@ -406,8 +449,9 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
     }
 
     @Override
-    public FXDNode getRoot( final String entryName) throws IOException, DocumentModelException {
-        return getFileModel().getRootNode();
+    public FXDRootElement getRoot( final String entryName) {
+        //System.err.println("Getting root for the entry " + entryName);
+        return getFileModel(entryName).getRootNode();
     }
     
     public int getRowCount() {
@@ -454,6 +498,16 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             listener.tableChanged(e);
         }
     }   
+
+    @Override
+    public String[] getEntryNames() {
+        String [] entryNames = new String[ m_entries.size()];
+
+        for (int i = 0; i < entryNames.length; i++) {
+            entryNames[i] = m_entries.get(i).getName();
+        }
+        return entryNames;
+    }
     
     public static String getSizeText( long size) {
         if ( size < 0) {

@@ -8,6 +8,7 @@
     <target name="init-release-external" depends="basic-init">
         <property name="build.config" value="daily"/>
         <property file="../build-${build.config}.properties"/>
+        <!--
         <mkdir dir="external"/>
         <get src="${javafx-fxd-netbeans-support.zip.url}" dest="external/javafx-fxd-netbeans-support.zip" usetimestamp="true" verbose="true"/> 
         <delete dir="release"/>
@@ -17,7 +18,8 @@
                 <include name="**/*.jar"/>
             </patternset>
             <mapper type="flatten"/>    
-        </unzip>   
+        </unzip>
+        -->
     </target>
     
     <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>

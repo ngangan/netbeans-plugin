@@ -10,19 +10,21 @@ import javax.swing.*;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 
+import org.openide.util.NbBundle;
+
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
-import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
-import org.openide.util.NbBundle;
+import org.netbeans.modules.javafx.fxd.composer.model.*;
 
-import com.sun.javafx.tools.fxd.*;
-
+import com.sun.scenario.scenegraph.SGNode;
 import com.sun.scenario.scenegraph.JSGPanel;
 import com.sun.scenario.scenegraph.fx.FXNode;
+import com.sun.javafx.sg.PGNode;
 
+import com.sun.javafx.tools.fxd.*;
+import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 
 /**
  *
@@ -37,6 +39,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private       JSGPanel      m_sgPanel = null;
     private       int           m_changeTickerCopy = -1;
     private       TargetProfile m_previewProfileCopy = null;
+    private       String        m_selectedEntryCopy = null;
         
     PreviewImagePanel(final FXZDataObject dObj) {
         m_dObj = dObj;
@@ -66,11 +69,14 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     synchronized void refresh() {
-        final FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
+        FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
         if (  fxzArchive != null) {
             final int tickerCopy = fxzArchive.getChangeTicker();
             final TargetProfile profileCopy = m_dObj.getDataModel().getPreviewProfile();
-            if ( tickerCopy != m_changeTickerCopy || profileCopy != m_previewProfileCopy) {
+            final String  selectedEntryCopy = m_dObj.getDataModel().getSelectedEntry();
+            if ( tickerCopy != m_changeTickerCopy || 
+                 profileCopy != m_previewProfileCopy ||
+                 !FXDComposerUtils.safeEquals( selectedEntryCopy,m_selectedEntryCopy)) {
                 removeAll();
                 setBackground( Color.WHITE);
                 final JLabel label = createWaitPanel();
@@ -83,17 +89,17 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                     @Override
                     public void run() {
                         final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
-                        final FXDFileModel fModel = fxz.getFileModel();
+                        final FXDFileModel fModel = fxz.getFileModel(selectedEntryCopy);
                         fModel.updateModel();
                         //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
                         
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
-                                if ( fxzArchive.getFileModel().isError()) {
+                                if ( fModel.isError()) {
                                     setBackground( m_defaultBackground);
                                     label.setIcon(null);
                                     label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
-                                            fxzArchive.getFileModel().getErrorMsg()));
+                                            fModel.getErrorMsg()));
                                     return;
                                 } 
                                 
@@ -101,17 +107,18 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                 SwingUtilities.invokeLater( new Runnable() {
                                     public void run() {
                                         try {
-                                            javafx.scene.Node$Intf node;                                            
+                                            javafx.scene.Node node;                                            
                                             try {
                                                 fModel.readLock();
-                                                AnalyzerStatistics stats = new AnalyzerStatistics();
-                                                node = LoaderAnalyzer.get().load(fxz, m_dObj.getDataModel().getPreviewProfile(), stats);
+                                                PreviewStatistics stats = new PreviewStatistics();
+                                                System.out.println("Selected entry: " + selectedEntryCopy);
+                                                node = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, stats);
                                             } finally {
                                                 fModel.readUnlock();
                                             }
                                             //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
                                             //Object   group  = m.invoke(fxNode);
-                                            FXNode fxNode = node.impl_getFXNode();  
+                                            PGNode fxNode = node.impl_getPGNode();
 
                                             if (fxNode != null) {
                                                 m_sgPanel = new JSGPanel() {
@@ -122,7 +129,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                     }
                                                 };
                                                 m_sgPanel.setBackground(Color.WHITE);
-                                                m_sgPanel.setScene( fxNode);
+                                                m_sgPanel.setScene( (SGNode) fxNode);
 
                                                 removeAll();
                                                 add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
@@ -134,6 +141,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                                                 m_changeTickerCopy   = tickerCopy;
                                                 m_previewProfileCopy = profileCopy;
+                                                m_selectedEntryCopy  = selectedEntryCopy;
                                                 updateZoom();
                                             } else {
                                                 setBackground( m_defaultBackground);
@@ -176,19 +184,20 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     private void updateZoom() {
-        assert m_sgPanel != null;
-        float zoom = m_dObj.getDataModel().getZoomRatio();
-        FXNode fxNode = (FXNode) m_sgPanel.getScene();
-        fxNode.setTranslateX( 0);
-        fxNode.setTranslateY( 0);
-        fxNode.setScaleX(zoom);
-        fxNode.setScaleY(zoom);
-        Rectangle2D bounds = fxNode.getTransformedBounds();
-        
-        fxNode.setTranslateX( -bounds.getX());
-        fxNode.setTranslateY( -bounds.getY());
-        
-        m_sgPanel.invalidate();
+        if ( m_sgPanel != null) {
+            float zoom = m_dObj.getDataModel().getZoomRatio();
+            FXNode fxNode = (FXNode) m_sgPanel.getScene();
+            fxNode.setTranslateX( 0);
+            fxNode.setTranslateY( 0);
+            fxNode.setScaleX(zoom);
+            fxNode.setScaleY(zoom);
+            Rectangle2D bounds = fxNode.getTransformedBounds();
+
+            fxNode.setTranslateX( (float) -bounds.getX());
+            fxNode.setTranslateY( (float) -bounds.getY());
+
+            m_sgPanel.invalidate();
+        }
     }
     
     final class ZoomToFitAction extends AbstractFXDAction {
@@ -199,8 +208,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void actionPerformed(ActionEvent e) {
-            FXNode fxNode = (FXNode) m_sgPanel.getScene();
-            Rectangle2D bounds = fxNode.getBoundsInLocal();
+            Rectangle2D bounds = m_sgPanel.getScene().getBounds();
             
             Dimension panelSize = getParent().getSize();
             

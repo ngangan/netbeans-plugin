@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.fxd.composer.navigator;
 import java.util.Collection;
 import javax.swing.JComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;

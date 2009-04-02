@@ -235,6 +235,18 @@ made subject to such option by the copyright holder.
                 <package>javax.tools</package>
                 <package>org.antlr.runtime</package>
                 <package>org.antlr.runtime.tree</package>
+                <package>javafx.scene</package>
+                <package>com.sun.javafx.geom</package>
+                <package>com.sun.javafx.runtime</package>
+                <package>com.sun.javafx.tools.fxd</package>
+                <package>com.sun.javafx.tools.fxd.container</package>
+                <package>com.sun.javafx.tools.fxd.container.misc</package>
+                <package>com.sun.javafx.tools.fxd.container.scene.fxd</package>
+                <package>com.sun.javafx.tools.fxd.container.builder</package>
+                <package>com.sun.javafx.tools.fxd.container.generator</package>
+                <package>com.sun.scenario.scenegraph.fx</package>
+                <package>com.sun.javafx.sg</package>
+
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxc.jar</runtime-relative-path>
@@ -242,6 +254,40 @@ made subject to such option by the copyright holder.
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxdoc.jar</runtime-relative-path>
             </class-path-extension>
+
+            <!-- FXDLoader classpath begin -->
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/shared/javafxrt.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-swing.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-geom.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-anim.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-common.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-swing.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-common.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-desktop.jar</runtime-relative-path>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
+            </class-path-extension>
+            <!-- FXD Loader classpath end -->
+
             <extra-compilation-unit>
                 <package-root>probesrc</package-root>
                 <classpath/>

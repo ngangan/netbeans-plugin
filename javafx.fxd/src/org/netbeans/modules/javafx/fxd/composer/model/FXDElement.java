@@ -99,7 +99,8 @@ public final class FXDElement {
     public DocumentElement getDocumentElement() {
         DocumentElement de = null;
         try {
-            de = m_dObj.getDataModel().getFXDContainer().getFileModel().getElementById(m_id);
+            FXDComposerModel model = m_dObj.getDataModel();
+            de = model.getFXDContainer().getFileModel(model.getSelectedEntry()).getElementById(m_id);
         } catch (Exception ex) {
             //TODO Do not swallow it
             Exceptions.printStackTrace(ex);

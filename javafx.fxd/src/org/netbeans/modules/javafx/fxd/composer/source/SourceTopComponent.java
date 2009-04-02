@@ -5,23 +5,23 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
 
-import javax.swing.JComponent;
+import javax.swing.Box;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
-import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.editor.EditorUI;
-import org.netbeans.editor.StatusBar;
-import org.netbeans.editor.Utilities;
+
 import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.modules.javafx.fxd.composer.misc.FXDToolbar;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
+import org.netbeans.modules.javafx.fxd.composer.preview.PreviewToolbar;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
-import org.openide.loaders.DataObject;
 import org.openide.text.CloneableEditor;
 import org.openide.text.NbDocument;
 import org.openide.util.Lookup;
@@ -34,32 +34,52 @@ import org.openide.windows.TopComponent;
  *
  * @author Pavel Benes
  */
-public final class SourceTopComponent extends CloneableEditor implements Runnable  {
-    public static final String CELL_ERROR = "error"; // NOI18N
-    
-    private transient JComponent m_toolbar = null;
+public final class SourceTopComponent extends CloneableEditor implements Runnable  {    
+    private transient JToolBar  m_toolbar = null;
+    private transient JComboBox m_entryCombo = null;
     
     public SourceTopComponent( FXZDataObject dObj) {
         super( dObj.getEditorSupport());
+        System.out.println("*** Creating TC for " + getEditorSupport().m_entryName);
     }
-
-    public synchronized JComponent getToolbar() {
+    
+    public FXZEditorSupport getEditorSupport() {
+        return (FXZEditorSupport) cloneableEditorSupport();
+    }
+    
+    public synchronized JToolBar getToolbar() {
         if (m_toolbar == null) {
+            System.out.println("*** Creating toolbar for " + getEditorSupport().m_entryName);
             final JEditorPane editorPane = getEditorPane();
             if (editorPane!= null) {
                 final Document doc = editorPane.getDocument();
                 if (doc instanceof NbDocument.CustomToolbar) {
-                    m_toolbar = ((NbDocument.CustomToolbar) doc).createToolbar(editorPane);
+                    m_toolbar = ((NbDocument.CustomToolbar) doc).createToolbar(editorPane);                    
+                    m_entryCombo = PreviewToolbar.createEntryCombo( getDataObject(), "Source-" + getEditorSupport().m_entryName);      
+                    
+                    m_toolbar.add( Box.createHorizontalStrut(3), 0);
+                    m_toolbar.add( PreviewToolbar.createToolBarSeparator(), 1);
+                    m_toolbar.add( Box.createHorizontalStrut(5), 2);
+                    m_toolbar.add( FXDToolbar.createLabel("Scene:"), 3);
+                    m_toolbar.add( Box.createHorizontalStrut(2), 4);
+                    FXDToolbar.addCombo(m_toolbar, m_entryCombo, 5, false);
                 }
             }
             if (m_toolbar == null) {
                 // attempt to create own toolbar??
-                m_toolbar = new javax.swing.JPanel();
+                m_toolbar = new javax.swing.JToolBar();
             }
         }
+        
         return m_toolbar;
     }
-           
+            
+    public void refresh() {
+        if ( m_entryCombo != null) {
+            PreviewToolbar.updateEntryCombo( getDataObject(), m_entryCombo);
+        }
+    }
+    
     @Override
     public void updateName() {
         Mutex.EVENT.readAccess(this);
@@ -84,9 +104,9 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
             })
         });
     }    
-
+    
     @Override    
-    public void componentOpened() { 
+    public void componentOpened() {
         getDataObject().init();            
         super.componentOpened();
         if ( getDataObject().getDataModel().getFXDContainer() == null) {
@@ -103,29 +123,7 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
     @Override
     public void componentShowing() {
         super.componentShowing();
-        addErrorStatusBarCell( getDataObject());
-    }
-
-    public static void addErrorStatusBarCell( final DataObject dObj) {
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                EditorCookie ec = dObj.getCookie(EditorCookie.class);
-                if ( ec != null) {
-                    JEditorPane [] panes = ec.getOpenedPanes();
-                    if ( panes != null && panes.length > 0 && panes[0] != null) {
-                        EditorUI eui = Utilities.getEditorUI(panes[0]);
-                        StatusBar sBar = eui == null ? null : eui.getStatusBar();
-                        if (sBar != null && sBar.getCellByName(CELL_ERROR) == null) {
-                            StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < 60; i++) {
-                                sb.append( 'A');
-                            }
-                            sBar.addCell( CELL_ERROR, new String [] { sb.toString()});
-                        }
-                    }
-                }
-            }            
-        });        
+        refresh();
     }
     
     @Override
@@ -157,7 +155,7 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
         SwingUtilities.invokeLater( new Runnable() {
             @SuppressWarnings({"deprecation"})
             public void run() {
-                EditorCookie ed = dObj.getCookie(EditorCookie.class);
+                EditorCookie ed = (EditorCookie) dObj.getEditorSupport();
                 try {
                     if (ed != null) {
                         ed.openDocument();
@@ -178,9 +176,9 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
                                 if (tc != null) {
                                     tc.requestActive();
                                     // the requestActive itself does not work
-                                    tc.requestFocus();
+                                    //tc.requestFocus();
                                 }
-                                
+                                pane.requestFocusInWindow();
                             }
                         }
                     } else {
@@ -199,14 +197,14 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
             ((FXZDataObject)dObj).selectView( FXZDataObject.TEXT_VIEW_INDEX);
         }
         
-        EditCookie ck = dObj.getCookie(EditCookie.class);
+        EditCookie ck = (EditCookie) dObj.getEditorSupport();
         if (ck != null) {
             //System.err.println("Edit cookie found, editing ...");
             ck.edit();
             return true;
         }
 
-        OpenCookie oc = dObj.getCookie(OpenCookie.class);
+        OpenCookie oc = (OpenCookie) dObj.getEditorSupport();
         if (oc != null) {
             //System.err.println("Open cookie found, opening ...");
             oc.open();

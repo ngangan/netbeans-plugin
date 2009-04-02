@@ -138,6 +138,39 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private static final String ENTRY_PATTERN = "content-%d.fxd";
+    
+    final class NewArchiveEntryAction extends AbstractFXDAction {
+        public NewArchiveEntryAction() {  
+            super("new_entry", true);  //NOI18N
+        }        
+        public void actionPerformed(ActionEvent e) {
+            String[] entries = m_archive.getEntryNames();
+            int index = 0;
+            
+            loop: while(true)  {
+                index++;
+                String newEntryName = String.format( ENTRY_PATTERN, index);
+                for ( String name : entries) {
+                    if ( name.equals( newEntryName)) {
+                        continue loop;
+                    }
+                }
+                try {
+                    String content = "// empty content";
+                    m_archive.add( newEntryName, content.getBytes("UTF-8"));
+                    update();
+                    return;
+                } catch( Exception ex) {
+                    ex.printStackTrace();
+                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                            NbBundle.getMessage(ArchivePanel.class, "ERROR_CANNOT_NEW_ENTRY",  //NOI18N
+                            ex.getLocalizedMessage()), NotifyDescriptor.Message.ERROR_MESSAGE));
+                }
+            }
+        }
+    };      
+
     final class AddArchiveEntryAction extends AbstractFXDAction {
         public AddArchiveEntryAction() {  
             super("add_entry", true);  //NOI18N
@@ -243,11 +276,13 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
         return (String) tableContent.getModel().getValueAt(row, 0);
     }
     
-    private final Action m_addAction     = new AddArchiveEntryAction();
-    private final Action m_removeAction  = new RemoveArchiveEntryAction();
-    private final Action m_replaceAction = new ReplaceArchiveEntryAction();
+    private final Action m_newEntryAction = new NewArchiveEntryAction();
+    private final Action m_addAction      = new AddArchiveEntryAction();
+    private final Action m_removeAction   = new RemoveArchiveEntryAction();
+    private final Action m_replaceAction  = new ReplaceArchiveEntryAction();
     
     private final Action [] m_actions = new Action[] {
+        m_newEntryAction,
         m_addAction,
         m_removeAction,
         m_replaceAction

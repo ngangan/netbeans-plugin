@@ -5,15 +5,9 @@
 
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.ComboBoxEditor;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDToolbar;
@@ -27,12 +21,13 @@ import com.sun.javafx.tools.fxd.TargetProfile;
  *
  * @author Pavel Benes
  */
-final class PreviewToolbar extends FXDToolbar {
+public final class PreviewToolbar extends FXDToolbar {
     private static final String[] ZOOM_VALUES = new String[]{"400%", "300%", "200%", "100%", "75%", "50%", "25%"}; //NOI18N
     
     private final FXZDataObject  m_dObj;
     private final JComboBox      m_zoomComboBox;
-    private final JComboBox      m_profileComboBox;
+    //private final JComboBox      m_profileComboBox;
+    private final JComboBox      m_entryComboBox;
     
     public PreviewToolbar( FXZDataObject dObj, ActionLookup lookup) {
         m_dObj = dObj;
@@ -41,7 +36,12 @@ final class PreviewToolbar extends FXDToolbar {
         constrains.anchor = GridBagConstraints.WEST;
         constrains.insets = new Insets(0, 3, 0, 2);
         add(createToolBarSeparator(), constrains);
-        
+
+        add( createLabel("Scene:"), constrains, -1);
+        addCombo( this, m_entryComboBox=createEntryCombo(m_dObj, "preview"), -1, true);
+
+        add(createToolBarSeparator(), constrains);
+
         addButton( lookup.get( SelectActionFactory.PreviousSelectionAction.class));
         addButton( lookup.get( SelectActionFactory.NextSelectionAction.class));
         addButton( lookup.get( SelectActionFactory.ParentSelectionAction.class));
@@ -49,7 +49,7 @@ final class PreviewToolbar extends FXDToolbar {
         
         addButton( lookup.get( PreviewImagePanel.ZoomToFitAction.class));
         
-        addCombo(m_zoomComboBox=createZoomCombo());
+        addCombo( this, m_zoomComboBox=createZoomCombo(), -1, true);
         
         addButton( lookup.get(PreviewImagePanel.ZoomInAction.class));
         addButton( lookup.get(PreviewImagePanel.ZoomOutAction.class));
@@ -61,7 +61,7 @@ final class PreviewToolbar extends FXDToolbar {
         addButton( lookup.get(ActionController.GenerateUIStubAction.class));
 
         add(createToolBarSeparator(), constrains);
-        addCombo(m_profileComboBox=createProfileCombo());
+        addCombo(this, createProfileCombo(), -1, true);
 
         constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;
@@ -72,6 +72,7 @@ final class PreviewToolbar extends FXDToolbar {
 
     void refresh() {
         updateZoomCombo();
+        updateEntryCombo(m_dObj, m_entryComboBox);
     }
                  
     private JComboBox createZoomCombo() {
@@ -175,4 +176,62 @@ final class PreviewToolbar extends FXDToolbar {
         return profileComboBox;
     }
 
+   
+    private static final String PROP_COMBO = "COMBO_NAME";
+    
+    public static JComboBox createEntryCombo(final FXZDataObject  dObj, String comboName) {
+        final JComboBox entryComboBox = new JComboBox();
+
+        assert comboName != null;
+        
+        updateEntryCombo( dObj, entryComboBox);
+        
+        entryComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                String entryName = (String) entryComboBox.getSelectedItem();
+                dObj.selectEntry(entryName);
+            }
+        });
+        
+        entryComboBox.putClientProperty( PROP_COMBO, comboName);
+        return entryComboBox;
+    }
+
+    public static void updateEntryCombo( FXZDataObject  dObj, JComboBox entryCombo) {
+        String [] entryNames = dObj.getDataModel().getFXDContainer().getEntryNames();
+
+        boolean syncNeeded = false;
+
+        if ( entryNames.length == entryCombo.getItemCount()) {
+            for ( int i = 0; i < entryNames.length; i++) {
+                if ( !entryNames[i].equals( entryCombo.getItemAt(i))) {
+                    syncNeeded = true;
+                    break;
+                }
+            }
+        } else {
+            syncNeeded = true;
+        }
+
+        if ( syncNeeded) {
+            // remove listeners to prevent actions to be fired during the combo update
+            ActionListener [] listeners = entryCombo.getActionListeners();
+            for ( ActionListener l : listeners) {
+                entryCombo.removeActionListener(l);
+            }
+            entryCombo.removeAllItems();
+            for ( String entryName: entryNames) {
+                entryCombo.addItem(entryName);
+            }
+            // put back the temporarily removed listeners
+            for ( ActionListener l : listeners) {
+                entryCombo.addActionListener(l);
+            }
+        }
+
+        String selectedEntry = dObj.getDataModel().getSelectedEntry();
+        
+        System.out.println("Selecting in the combo: " + entryCombo.getClientProperty( PROP_COMBO) + " - "+ selectedEntry);
+        entryCombo.setSelectedItem( selectedEntry);
+    }
 }

@@ -178,16 +178,14 @@ public final class SelectActionFactory extends AbstractComposerActionFactory {
         MouseEvent me;
         
         if (!isOutsideEvent && (me=getSelectionEvent(e)) != null) {
-            List<FXDElement> elems = m_dObj.getController().getElementsAt(me.getX(), me.getY());
+            FXDElement elem = m_dObj.getController().getElementAt(me.getX(), me.getY());
 
-            if (!elems.isEmpty())  {
-                FXDElement topElem = elems.get(0);
-                
+            if (elem != null)  {
                 if (me.getClickCount() > 1) {
-                    SourceTopComponent.selectElement(m_dObj, topElem.getStartOffset(), true);
+                    SourceTopComponent.selectElement(m_dObj, elem.getStartOffset(), true);
                 } 
                 
-                return select( new FXDElement[] { topElem}, true);
+                return select( new FXDElement[] { elem}, true);
             }    
         }
         return null;

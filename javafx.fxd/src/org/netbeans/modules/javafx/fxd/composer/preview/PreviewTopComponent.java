@@ -24,7 +24,6 @@ import org.openide.util.Lookup;
 import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Mutex;
 import org.openide.util.RequestProcessor;

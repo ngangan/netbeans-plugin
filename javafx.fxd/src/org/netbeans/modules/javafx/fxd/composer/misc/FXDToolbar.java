@@ -14,6 +14,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -81,7 +82,7 @@ public abstract class FXDToolbar extends JToolBar {
         return button;
     }
 
-    protected void addCombo( JComboBox comboBox) {
+    public static void addCombo( JToolBar toolbar, JComboBox comboBox, int index, boolean isEditable) {
         GridBagConstraints constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;
 
@@ -94,17 +95,28 @@ public abstract class FXDToolbar extends JToolBar {
         comboBox.setMinimumSize(size);
         comboBox.setMaximumSize(size);
 
-        comboBox.setEditable(true);
+        comboBox.setEditable(isEditable);
 
-        add(comboBox, constrains);
+       toolbar.add(comboBox, constrains, index);
     }
     
-    protected static JSeparator createToolBarSeparator() {
+    public static JLabel createLabel( String text) {
+        JLabel label = new JLabel(text);
+        Dimension size = label.getMinimumSize();
+        label.setPreferredSize(size);
+        label.setSize(size);
+        label.setMinimumSize(size);
+        label.setMaximumSize(size);
+        return label;
+    }
+    
+    public static JSeparator createToolBarSeparator() {
         JSeparator toolBarSeparator = new JSeparator(JSeparator.VERTICAL);
-        Dimension dim = new Dimension(2, 22);
+        Dimension dim = new Dimension(4, 22);
         toolBarSeparator.setPreferredSize(dim);
         toolBarSeparator.setSize(dim);
         toolBarSeparator.setMinimumSize(dim);
+        toolBarSeparator.setMaximumSize(dim);
         return toolBarSeparator;
     }
     

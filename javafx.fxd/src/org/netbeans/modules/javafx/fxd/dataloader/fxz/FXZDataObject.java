@@ -39,16 +39,28 @@
 
 package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
+
+import javax.swing.JEditorPane;
+import javax.swing.SwingUtilities;
+import javax.swing.text.StyledDocument;
 import org.netbeans.core.api.multiview.MultiViewHandler;
 import org.netbeans.core.api.multiview.MultiViewPerspective;
 import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.javafx.fxd.composer.navigator.FXDNavigatorContent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.openide.cookies.EditCookie;
+import org.openide.cookies.EditorCookie;
+import org.openide.cookies.LineCookie;
+import org.openide.cookies.OpenCookie;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
@@ -57,8 +69,10 @@ import org.openide.loaders.SaveAsCapable;
 import org.openide.nodes.Node;
 import org.openide.nodes.CookieSet;
 import org.openide.nodes.Node.Cookie;
+import org.openide.text.Line.Set;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.Task;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ProxyLookup;
@@ -77,26 +91,79 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public static final int    TEXT_VIEW_INDEX    = 1;
     public static final int    ARCHIVE_VIEW_INDEX = 2;
     
-    InstanceContent                                     m_ic;
-    private transient volatile Lookup                   m_lookup;
-    private transient          FXZEditorSupport         m_edSup = null;
-    private transient          FXDComposerModel         m_model = null;
-    private transient          FXDComposerController    m_controller = null;
-    private transient          MultiViewElementCallback m_callback = null;
-    private transient          int                      m_defaultViewIndex;
+    InstanceContent                                          m_ic;
+    private transient volatile Lookup                        m_lookup;
+    private transient          FXZEditorSupport              m_edSup = null;
+    private transient          Map<String, FXZEditorSupport> m_supports = new HashMap<String,FXZEditorSupport>();
+    private transient          FXDComposerModel              m_model = null;
+    private transient          FXDComposerController         m_controller = null;
+    private transient          MultiViewElementCallback      m_callback = null;
+    private transient          int                           m_defaultViewIndex;
 
+    private class CommonCookie implements EditorCookie, EditCookie, OpenCookie, LineCookie, EditorCookie.Observable {
+                
+        public void open() {
+            getBaseSupport().open();
+        }
+
+        public boolean close() {
+            return getBaseSupport().close();
+        }
+
+        public Task prepareDocument() {
+            return getEditorSupport().prepareDocument();
+        }
+
+        public StyledDocument openDocument() throws IOException {
+            return getEditorSupport().openDocument();
+        }
+
+        public StyledDocument getDocument() {
+            return getEditorSupport().getDocument();
+        }
+
+        public void saveDocument() throws IOException {
+            getBaseSupport().saveDocument();
+        }
+
+        public boolean isModified() {
+            return getBaseSupport().isModified();
+        }
+
+        public JEditorPane[] getOpenedPanes() {
+            return getBaseSupport().getOpenedPanes();
+        }
+
+        public Set getLineSet() {
+            return getEditorSupport().getLineSet();
+        }
+
+        public void edit() {
+            getBaseSupport().edit();
+        }
+
+        public void addPropertyChangeListener(PropertyChangeListener arg0) {
+            getBaseSupport().addPropertyChangeListener(arg0);
+        }
+
+        public void removePropertyChangeListener(PropertyChangeListener arg0) {
+            getBaseSupport().removePropertyChangeListener(arg0);
+        }
+        
+    }
+    
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
-        super(pf, loader);
+       super(pf, loader);
 
         getCookieSet().assign( SaveAsCapable.class, new SaveAsCapable() {
             public void saveAs(FileObject folder, String fileName) throws IOException {
-                getEditorSupport().saveAs( folder, fileName);
+                getBaseSupport().saveAs( folder, fileName);
             }
         });
 
-        getCookieSet().add(FXZEditorSupport.class, new CookieSet.Factory() {
+        getCookieSet().add(CommonCookie.class, new CookieSet.Factory() {
             public <T extends Cookie> T createCookie(Class<T> klass) {
-                return klass.cast(getEditorSupport());
+                return klass.cast( new CommonCookie());
             }
         });
         
@@ -134,25 +201,60 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public synchronized void init() {
         getController().init();
     }
+
+    public synchronized void selectEntry( String entryName) {
+        assert entryName != null;
+        String currentEntry = getEntryName();
+        if ( !currentEntry.equals( entryName)) {
+            System.out.println("Selecting entry: " + entryName);
+            getController().setSelectedEntry(entryName);
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    FXDNavigatorContent.getDefault().navigate(FXZDataObject.this);
+                }
+            });
+        }
+    }
     
     public synchronized FXZEditorSupport getEditorSupport() {
-        if(m_edSup == null) {
-            m_edSup = new FXZEditorSupport(this);
+        String entryName = getEntryName();
+        
+        FXZEditorSupport supp = m_supports.get(entryName);
+        
+        if ( supp == null) {
+            supp = new FXZEditorSupport( this, entryName, m_edSup == null);
+            if (m_edSup == null) {
+                m_edSup = supp;
+            }
+            m_supports.put( entryName, supp);
         }
-        return m_edSup;
+
+        return supp;
+    }
+            
+    public FXZEditorSupport getBaseSupport() {
+        return m_edSup != null ? m_edSup : getEditorSupport();
+    }
+
+    public FXZEditorSupport getEditorSupport(String entryName) {
+        return m_supports.get(entryName);
     }
     
     public synchronized void reset() {
-        m_ic     = new InstanceContent();
-        m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
+        if ( m_model != null) {
+            m_model = null;
+            m_ic     = new InstanceContent();
+            m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
 
-        m_defaultViewIndex = VISUAL_VIEW_INDEX;
-        m_model = null;
-        if ( m_controller != null) {
-            m_controller.close();
-            m_controller = null;
+            m_defaultViewIndex = VISUAL_VIEW_INDEX;
+            if ( m_controller != null) {
+                m_controller.close();
+                m_controller = null;
+            }
+            m_callback = null;
+            m_supports.clear();
+            m_edSup = null;
         }
-        m_callback = null;
     }
 
     public void setDefaultView( int viewIndex) {
@@ -171,13 +273,20 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         MultiViewHandler handler = MultiViews.findMultiViewHandler( getMVTC());
 
         if (handler != null) {
-            MultiViewPerspective perspective =  handler.getPerspectives()[index];        
+            MultiViewPerspective perspective =  handler.getPerspectives()[index];   
             handler.requestActive(perspective);
         } else {
             setDefaultView(index);
         }
     }
     
+    public synchronized String getEntryName() {
+        if ( m_model == null) {
+            return FXDContainer.MAIN_CONTENT;
+        } else {
+            return m_model.getSelectedEntry();
+        }
+    }
     public synchronized FXDComposerModel getDataModel() {
         if (m_model == null) {
             try {

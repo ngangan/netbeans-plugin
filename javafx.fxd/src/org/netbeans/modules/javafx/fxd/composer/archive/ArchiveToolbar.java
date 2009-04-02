@@ -25,6 +25,7 @@ final class ArchiveToolbar extends FXDToolbar {
         add(createToolBarSeparator(), constrains);
         
         if (lookup != null) {
+            addButton( lookup.get( ArchivePanel.NewArchiveEntryAction.class));
             addButton( lookup.get( ArchivePanel.AddArchiveEntryAction.class));
             addButton( lookup.get( ArchivePanel.RemoveArchiveEntryAction.class));
             addButton( lookup.get( ArchivePanel.ReplaceArchiveEntryAction.class));

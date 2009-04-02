@@ -4,12 +4,14 @@
  */
 package org.netbeans.modules.javafx.fxd.dataloader.fxd;
 
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.nodes.CookieSet;
 import org.openide.nodes.Node;
+import org.openide.text.DataEditorSupport;
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 
@@ -25,6 +27,14 @@ public final class FXDDataObject extends FXDZDataObject {
         cookies.add(this);
     }
 
+    public DataEditorSupport getEditorSupport() {
+        return m_edSup;
+    }
+    
+    public String getEntryName() {
+        return FXDContainer.MAIN_CONTENT;
+    }
+    
     @Override
     protected Node createNodeDelegate() {
         return new FXDDataNode(this, getLookup());

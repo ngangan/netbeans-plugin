@@ -26,6 +26,9 @@ import com.sun.scenario.scenegraph.SGNode;
 import com.sun.scenario.scenegraph.fx.FXNode;
 
 import com.sun.javafx.tools.fxd.TargetProfile;
+import com.sun.scenario.scenegraph.SGGroup;
+import com.sun.scenario.scenegraph.SGParent;
+import org.netbeans.modules.javafx.fxd.composer.source.SourceElement;
 
 /**
  *
@@ -98,7 +101,13 @@ public final class FXDComposerController {
     }   
     
     public PreviewTopComponent getPreviewComponent() {
-        return m_previewTopComponent;        
+        return m_previewTopComponent;            
+    }
+    
+    private SourceElement m_sourceElement;
+    
+    public void setSourceElement( final SourceElement sourceElement) {
+        m_sourceElement = sourceElement;
     }
     
     public void setPreviewComponent( final PreviewTopComponent previewTopComponent) {
@@ -112,11 +121,9 @@ public final class FXDComposerController {
        
     public SGNode getNode(final String id) {
         SGNode root = getRootNode();
-        if (root != null) {
-            return root.lookup(id);
-        } else {
-            return null;
-        }
+        SGNode node = root != null ? root.lookup(id) : null;
+        System.out.println("Lookup for " + id + " -> " + node);
+        return node;
     }
         
     protected boolean hasPreviewTC() {
@@ -130,40 +137,71 @@ public final class FXDComposerController {
         } else {
             return null;
         }        
+    }    
+
+    private static void pick( SGParent parent, List<SGNode> selected, Point2D point) {
+                
+        for ( SGNode child : parent.getChildren()) {
+            String id = child.getID();
+            if ( id != null) {
+                System.out.println("****** ID:" + id + " " + child);
+            }
+            if ( child instanceof FXNode) {
+                child = ((FXNode) child).getLeaf();
+                id = child.getID();
+                if ( id != null) {
+                    System.out.println("****** ID:" + id + " " + child);
+                }
+            }
+            if( child instanceof SGParent) {
+                pick( (SGParent) child, selected, point);
+            } else {
+                if ( child.contains(point)) {
+                    selected.add(child);
+                }
+            }
+        }
     }
     
-    private static final List<FXDElement> NO_ELEMENTS = new ArrayList<FXDElement>(0);
-    
-    public List<FXDElement> getElementsAt( int x, int y) {
-        List<FXDElement> elems = NO_ELEMENTS;
+    public FXDElement getElementAt( int x, int y) {
+        FXDElement elem = null;
 
         SGNode root = getRootNode();
         if (root != null) {
-            List<SGNode> nodes = root.pick(new Point2D.Float(x,y));
-            elems = new ArrayList<FXDElement>(nodes.size());
-            
-            for (SGNode node : nodes) {
-                String id;                
-                if ( (id=node.getID()) != null) {
-                   elems.add( new FXDElement(m_dObj, id));
-                }
+            SGNode n1 = root.lookup("0");
+            System.out.println("0 node: " + n1);
+            List<SGNode> selected = new ArrayList<SGNode>();
+            pick( (SGGroup) ((FXNode)root).getLeaf(), selected, new Point2D.Float(x, y));
+            String id;
+            System.out.println("Selected: \n");
+            for ( SGNode node : selected) {
+                System.out.println("\t" + node.getID() + "[" + node);
+            }
+            int selNum;
+            if ( (selNum=selected.size()) > 0 && (id=selected.get(selNum-1).getID()) != null) {
+                elem = new FXDElement(m_dObj, id);
             }
         } 
         
-        //System.err.println(String.format( "Elements at [%d,%d]: %s", x, y, elems.toString()));
-        return elems;
+        return elem;
     }
     
     public void repaint() {
 //        m_imageContainer.setTryPaint();
-        m_previewTopComponent.repaint();
+        if ( m_previewTopComponent != null) {
+            m_previewTopComponent.repaint();
+        }
     }
     
     public void refresh() {
         if ( m_previewTopComponent != null) {
             m_previewTopComponent.refresh();
-            repaint();
         }
+        
+        if ( m_sourceElement != null) {
+            m_sourceElement.refresh();
+        }
+        repaint();
     }
     
     public short getScreenChangeTicker() {
@@ -188,6 +226,13 @@ public final class FXDComposerController {
             if ( hasPreviewTC()) {
                 refresh();
             }
+        }
+    }
+
+    public void setSelectedEntry( String entryName) {
+        if ( m_dObj.getDataModel().setSelectedEntry(entryName)) {
+            m_screenChangeTicker++;
+            refresh();
         }
     }
 

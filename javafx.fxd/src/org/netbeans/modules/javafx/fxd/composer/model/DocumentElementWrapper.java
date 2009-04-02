@@ -5,19 +5,18 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.util.Enumeration;
-import org.netbeans.modules.editor.structure.api.DocumentElement;
-import com.sun.javafx.tools.fxd.FXDElement;
-import com.sun.javafx.tools.fxd.FXDNode;
-import com.sun.javafx.tools.fxd.FXDNodeArray;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import org.openide.util.Exceptions;
+
+import org.netbeans.modules.editor.structure.api.DocumentElement;
+import com.sun.javafx.tools.fxd.*;
+
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 
 /**
  *
@@ -25,8 +24,8 @@ import org.openide.util.Exceptions;
  */
 final class DocumentElementWrapper {
     private DocumentElementWrapper() {}
-    
-    private static abstract class FXDElementWrapper implements FXDElement {
+
+    private static abstract class FXDElementWrapper implements com.sun.javafx.tools.fxd.FXDElement {
         protected DocumentElement m_de;
         
         public FXDElementWrapper( final DocumentElement de) {
@@ -44,17 +43,17 @@ final class DocumentElementWrapper {
         }
 
         public Object nextElement() {
-            return FXDNode.ATTR_NAME_ID;
+            return FXDObjectElement.ATTR_NAME_ID;
         }
     };
 
-    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDNode, Enumeration {
+    private static class FXDNodeWrapper extends FXDElementWrapper implements FXDObjectElement, Enumeration {
         private final boolean     m_injectID;
         private       Enumeration m_attrEnum = null;
 
         public FXDNodeWrapper(final DocumentElement de) {
             super(de);
-            m_injectID = m_de.getAttributes().isDefined(FXDNode.ATTR_NAME_ID) == false &&
+            m_injectID = m_de.getAttributes().isDefined(FXDObjectElement.ATTR_NAME_ID) == false &&
                          isIDSupported(getTypeName());
         }        
 
@@ -71,7 +70,7 @@ final class DocumentElementWrapper {
         }
 
         public Object getAttrValue(String name) {
-            if ( FXDNode.ATTR_NAME_ID.equals(name)) {
+            if ( FXDObjectElement.ATTR_NAME_ID.equals(name)) {
                 //override existing ID with the element start offset
                 return Integer.toString(m_de.getStartOffset());
             } else {
@@ -114,24 +113,24 @@ final class DocumentElementWrapper {
         }
 
         public int getKind() {
-            return FXDElement.KIND_OBJECT;
+            return com.sun.javafx.tools.fxd.FXDElement.KIND_OBJECT;
         }
 
         public boolean isLeaf() {            
             return m_de.getElementCount() == 0;
         }
 
-        public Enumeration<FXDElement> children() {
+        public Enumeration children() {
             final List<DocumentElement> childDE = new ArrayList<DocumentElement>();
             collectChildren(m_de, childDE);
-            return new Enumeration<FXDElement>() {
+            return new Enumeration() {
                 private int m_index = 0;
 
                 public boolean hasMoreElements() {
                     return m_index < childDE.size();
                 }
 
-                public FXDElement nextElement() {
+                public Object nextElement() {
                     if ( m_index >= childDE.size()) {
                         throw new NoSuchElementException();
                     }
@@ -174,7 +173,7 @@ final class DocumentElementWrapper {
         }
     }
     
-    private static final class FXDRootNodeWrapper extends FXDNodeWrapper {
+    private static final class FXDRootNodeWrapper extends FXDNodeWrapper implements FXDRootElement {
         public FXDRootNodeWrapper(final DocumentElement de) {
             super(de);
         }
@@ -186,10 +185,15 @@ final class DocumentElementWrapper {
             } else {
                 return super.getAttrValue(name);
             }
-        }        
+        }
+
+        public int getAllChildrenNum() {
+            return -1;
+        }
+
     }
     
-    private static final class FXDNodeArrayWrapper extends FXDElementWrapper implements FXDNodeArray {
+    private static final class FXDNodeArrayWrapper extends FXDElementWrapper implements FXDArrayElement {
 
         public FXDNodeArrayWrapper(final DocumentElement de) {
             super(de);
@@ -210,26 +214,26 @@ final class DocumentElementWrapper {
         }
 
         public int getKind() {
-            return FXDElement.KIND_ARRAY;
+            return com.sun.javafx.tools.fxd.FXDElement.KIND_ARRAY;
         }
 
         public boolean isLeaf() {
             return m_de.getElementCount() == 0;
         }
 
-        public Enumeration<FXDElement> children() {
-            return new Enumeration<FXDElement>() {
+        public Enumeration children() {
+            return new Enumeration() {
                 private int m_index = advance(0);
 
                 public boolean hasMoreElements() {
                     return m_index < m_de.getElementCount();
                 }
 
-                public FXDElement nextElement() {
+                public Object nextElement() {
                     if ( m_index >= m_de.getElementCount()) {
                         throw new NoSuchElementException();
                     }
-                    FXDElement elem = wrap( m_de.getElement(m_index), false);
+                    com.sun.javafx.tools.fxd.FXDElement elem = wrap( m_de.getElement(m_index), false);
                     m_index = advance(m_index+1);
                     return elem;
                 }
@@ -245,7 +249,7 @@ final class DocumentElementWrapper {
         }        
     }
 
-    public static FXDElement wrap( final DocumentElement de, boolean isRoot) {
+    public static com.sun.javafx.tools.fxd.FXDElement wrap( final DocumentElement de, boolean isRoot) {
         String type = de.getType();
         if ( FXDFileModel.FXD_NODE.equals( type)) {
             return isRoot ? new FXDRootNodeWrapper(de) : new FXDNodeWrapper(de);

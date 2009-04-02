@@ -83,7 +83,6 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactor
 import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
 import org.openide.cookies.EditorCookie;
-import org.openide.loaders.DataObject;
 import org.openide.nodes.Node.Cookie;
 import org.openide.text.DataEditorSupport;
 import org.openide.util.Lookup;
@@ -114,6 +113,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
     private final JLabel                msgLabel;    
     private final WeakHashMap<FXDZDataObject, WeakReference<NavigatorContentPanel>> uiCache = new WeakHashMap<FXDZDataObject, WeakReference<NavigatorContentPanel>>();    
     private       FXDZDataObject        peerDO = null;
+    private       String                entryName = null;
     private       NavigatorContentPanel navigatorPanel = null; 
     private       boolean               blockNotification = false;
     private       boolean               editorOpened      = false;    
@@ -145,7 +145,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
         }
         
         if ( d != null) {
-            EditorCookie ec = d.getCookie(EditorCookie.class);
+            EditorCookie ec = (EditorCookie) d.getEditorSupport();
             if(ec == null) {
     //            ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL, "The DataObject " + d.getName() + "(class=" + d.getClass().getName() + ") has no EditorCookie!?");
                 System.err.println("The DataObject " + d.getName() + "(class=" + d.getClass().getName() + ") has no EditorCookie!?");  //NOI18N
@@ -159,7 +159,8 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                         //there is something we can navigate in
                         navigate(d, bdoc);
                         //remember the peer dataobject to be able the call EditorCookie.close() when closing navigator
-                        this.peerDO = d;
+                        peerDO = d;
+                        entryName = peerDO.getEntryName();
                         //check if the editor for the DO has an opened pane
                         editorOpened = ec.getOpenedPanes() != null && ec.getOpenedPanes().length > 0;
                     }
@@ -183,7 +184,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
      * support releases a strong reference to NbEditorDocument. */
     private void closeDocument(FXDZDataObject dobj) {
         if(dobj != null) {
-            EditorCookie ec = peerDO.getCookie(EditorCookie.class);
+            EditorCookie ec = (EditorCookie) peerDO.getEditorSupport();
             if(ec != null) {
                 JEditorPane panes[] = ec.getOpenedPanes();
                 //call EC.close() if there isn't any pane and the editor was opened
@@ -213,7 +214,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             if(cp != null) {
                 //if(DEBUG) System.out.println("panel is cached");
                 //test if the document associated with the panel is the same we got now
-                cachedPanel = bdoc == cp.getDocument() ? cp : null;
+                cachedPanel = bdoc == cp.m_doc ? cp : null;
                 if(cachedPanel == null) {
                     //if(DEBUG) System.out.println("but the document is different - creating a new UI...");
                     //if(DEBUG) System.out.println("the cached document : " + cp.getDocument());
@@ -409,7 +410,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                     }
                 }
             });
-                        
+                                
             JScrollPane treeView = new JScrollPane(tree);
             treeView.setBorder(BorderFactory.createEmptyBorder());
             treeView.setViewportBorder(BorderFactory.createEmptyBorder());
@@ -467,10 +468,6 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             add(filtersPanel, BorderLayout.SOUTH);
             dm.addDocumentModelListener(m_modelListener);
         }        
-
-        public Document getDocument() {
-            return m_doc;
-        }
         
         @SuppressWarnings("unchecked")
         protected Cookie getCookie(Class clazz) {
@@ -545,9 +542,9 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
      }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if(evt.getPropertyName() == EditorCookie.Observable.PROP_DOCUMENT) {
+        if( EditorCookie.Observable.PROP_DOCUMENT.equals( evt.getPropertyName())) {
             if(evt.getNewValue() == null) {
-                final DataObject dobj = ((DataEditorSupport)evt.getSource()).getDataObject();
+                final FXDZDataObject dobj =(FXDZDataObject) ((DataEditorSupport)evt.getSource()).getDataObject();
                 if(dobj != null) {
                     editorOpened = false;
                     //document is being closed
@@ -556,7 +553,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                     
                     
                     //remove the property change listener from the DataObject's EditorSupport
-                    EditorCookie ec = dobj.getCookie(EditorCookie.class);
+                    EditorCookie ec = (EditorCookie) dobj.getEditorSupport();
                     if(ec != null)
                         ((EditorCookie.Observable)ec).removePropertyChangeListener(this);
                     
@@ -564,7 +561,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                     //otherwise the ClonableEditorSupport locks itself (new call to CES from CES.propertyChange))
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if(dobj.isValid()) navigate( (FXDZDataObject) dobj);
+                            if(dobj.isValid()) navigate(dobj);
                         }
                     });
                 }

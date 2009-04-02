@@ -5,9 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
        
-import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +31,8 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
+
+import com.sun.javafx.tools.fxd.container.scene.fxd.*;
 
 /**
  *
@@ -117,31 +116,39 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     return new NodeBuilder(typeName, startOff);
                 }
 
-                public void attribute(Object node, String name, String value, int startOff, int endOff) throws Exception {
+                public void attribute(Object node, String name, String value, int startOff, int endOff) throws FXDException {
                     NodeBuilder deb = (NodeBuilder) node;
                     if ( value == null) {
-                        if ( m_isLastNode) {
-                            //System.err.println(String.format("Adding attribute %s <%d, %d>", name, startOff, endOff));
-                            trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE, NO_ATTRS, startOff, endOff);
-                        } else {
-                            //System.err.println(String.format("Adding array attribute %s <%d, %d>", name, startOff, endOff));
-                            trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE_ARRAY, NO_ATTRS, startOff, endOff);
-                        }
+                        try {
+                            if ( m_isLastNode) {
+                                //System.err.println(String.format("Adding attribute %s <%d, %d>", name, startOff, endOff));
+                                trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE, NO_ATTRS, startOff, endOff);
+                            } else {
+                                //System.err.println(String.format("Adding array attribute %s <%d, %d>", name, startOff, endOff));
+                                trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE_ARRAY, NO_ATTRS, startOff, endOff);
+                            }
+                       } catch( Exception e) {
+                           throw new FXDException(e);
+                       }
                     }
                     deb.addAttribute( name, value, startOff, endOff);
                 }
 
-                public void endNode(Object node, int endOff) throws Exception {
+                public void endNode(Object node, int endOff) throws FXDException {
                     //System.err.println("Node ended");
                     NodeBuilder deb = (NodeBuilder) node;
                     DocumentElement de = model.getLeafElementForOffset(deb.m_startOffset);
-                    if ( de != model.getRootElement() && FXDFileModel.FXD_NODE.equals(de.getType())) {
-                        if ( !deb.isEqual(de.getAttributes())) {
-                            //System.err.println("Attributes changes for " + deb.m_typeName);
-                            trans.updateDocumentElementAttribs(de, deb.getAttributeMap());
+                    try {
+                        if ( de != model.getRootElement() && FXDFileModel.FXD_NODE.equals(de.getType())) {
+                            if ( !deb.isEqual(de.getAttributes())) {
+                                //System.err.println("Attributes changes for " + deb.m_typeName);
+                                trans.updateDocumentElementAttribs(de, deb.getAttributeMap());
+                            }
+                        } else {
+                            deb.build(trans, endOff);
                         }
-                    } else {
-                        deb.build(trans, endOff);
+                    } catch( Exception e) {
+                        throw new FXDException(e);
                     }
                     m_isLastNode = true;
                 }
@@ -151,9 +158,13 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     return null;
                 }
 
-                public void arrayElement(Object node, String value, int startOff, int endOff) throws BadLocationException, DocumentModelTransactionCancelledException {
+                public void arrayElement(Object node, String value, int startOff, int endOff) throws FXDException {
                     if ( value != null) {
-                        trans.addDocumentElement(value, FXDFileModel.FXD_ARRAY_ELEM, NO_ATTRS, startOff, endOff);
+                        try {
+                            trans.addDocumentElement(value, FXDFileModel.FXD_ARRAY_ELEM, NO_ATTRS, startOff, endOff);
+                        } catch (Exception ex) {
+                            throw new FXDException( ex);
+                        }
                     }
                 }
 
@@ -201,7 +212,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                         EditorUI eui = Utilities.getEditorUI(panes[0]);
                         StatusBar sb = eui == null ? null : eui.getStatusBar();
                         if (sb != null) {
-                            sb.setText(SourceTopComponent.CELL_ERROR, msg);
+                            sb.setText(SourceEditorWrapper.CELL_ERROR, msg);
                         }
                     }
                 }

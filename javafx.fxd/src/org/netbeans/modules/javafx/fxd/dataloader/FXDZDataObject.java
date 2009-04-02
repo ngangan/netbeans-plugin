@@ -9,6 +9,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
+import org.openide.text.DataEditorSupport;
 import org.openide.windows.TopComponent;
 
 /**
@@ -20,5 +21,7 @@ public abstract class FXDZDataObject extends MultiDataObject {
         super(pf, loader);
     }
     
+    public abstract DataEditorSupport getEditorSupport();
+    public abstract String            getEntryName();
     public abstract TopComponent getMVTC();
 }

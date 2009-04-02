@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.tools.fxd.FXDObjectElement;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelStateListener;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import com.sun.javafx.tools.fxd.FXDNode;
+import com.sun.javafx.tools.fxd.FXDRootElement;
 import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
 import org.openide.cookies.EditorCookie;
@@ -38,6 +39,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     public static final String FXD_ERROR           = "error";        //NOI18N
     
     private final    FXZArchive     m_archive;
+    private final    String         m_entryName;
     private final    DocumentModel  m_docModel;
     private final    Object         m_lock = new Object();
     private volatile boolean        m_sourceChanged = false;
@@ -51,13 +53,12 @@ public final class FXDFileModel implements DocumentModelStateListener {
         public boolean visitAttribute( String attrName, String attrValue);
     }
         
-    public FXDFileModel( FXZArchive archive) throws IOException, DocumentModelException {
+    public FXDFileModel( FXZArchive archive, String entryName) throws IOException, DocumentModelException {
         assert archive != null;
-        m_archive  = archive;
+        m_archive   = archive;
+        m_entryName = entryName;
         m_docModel = getDocumentModel( archive.getDataObject());
         m_docModel.addDocumentModelStateListener(this);
-        //m_docModel.getDocument().addDocumentListener(this);
-        //System.err.println("File model created."); //NOI18N
     }
           
     BaseDocument getDocument() {
@@ -119,9 +120,9 @@ public final class FXDFileModel implements DocumentModelStateListener {
         return findElement( m_docModel.getRootElement(), id);
     }
 
-    public synchronized FXDNode getRootNode() {
+    public synchronized FXDRootElement getRootNode() {
         //TODO Use better construction
-        return (FXDNode) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0), true);
+        return (FXDRootElement) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0), true);
     }    
         
     protected DocumentElement findElement( final DocumentElement de, final String id) {
@@ -160,7 +161,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     }
     
     public static boolean isSignificant(final DocumentElement de) {
-        String id = (String) de.getAttributes().getAttribute( FXDNode.ATTR_NAME_ID);
+        String id = (String) de.getAttributes().getAttribute( FXDObjectElement.ATTR_NAME_ID);
         return id != null && id.length() > 0;
     }
         
@@ -169,7 +170,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     }
 
     public static BaseDocument getDocument( final FXZDataObject dObj) throws IOException {
-        EditorCookie ec = dObj.getCookie(EditorCookie.class);
+        EditorCookie ec = dObj.getEditorSupport();
         if(ec == null) {
             throw new IllegalArgumentException("The DataObject " + dObj.getName() + "(class=" + dObj.getClass().getName() + ") has no EditorCookie!?"); // NOI18N
         } else {

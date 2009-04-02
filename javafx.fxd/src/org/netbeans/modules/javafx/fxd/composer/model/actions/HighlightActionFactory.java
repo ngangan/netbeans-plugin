@@ -75,8 +75,8 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
             if ( !isOutsideEvent) {
                 if ( evt.getID() == MouseEvent.MOUSE_MOVED) {
                     MouseEvent me = (MouseEvent) evt;
-                    List<FXDElement> elems = getController().getElementsAt(me.getX(), me.getY());
-                    if ( elems.isEmpty() || !elems.get(0).equals(m_highlighted))  {
+                    FXDElement elem = getController().getElementAt(me.getX(), me.getY());
+                    if ( elem == null || elem.equals(m_highlighted))  {
                         actionCompleted();
                     }
                 } else if ( evt.getID() == MouseEvent.MOUSE_EXITED) {
@@ -193,9 +193,9 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
         if ( !isOutsideEvent && e.getID() == MouseEvent.MOUSE_MOVED) {
             if ( !getController().getActionController().containsAction(HighlightAction.class)) {
                 MouseEvent me = (MouseEvent)e;
-                List<FXDElement> elems = getController().getElementsAt(me.getX(), me.getY());
-                if (!elems.isEmpty())  {
-                    return new HighlightAction(elems.get(0));
+                FXDElement elem = getController().getElementAt(me.getX(), me.getY());
+                if ( elem != null)  {
+                    return new HighlightAction( elem);
                 }
             }             
         }
