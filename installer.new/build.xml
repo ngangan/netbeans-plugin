@@ -45,6 +45,10 @@
       <arg value="-c"/>
       <arg value="chmod +x *"/>
     </exec>  
+    <exec executable="sh" dir="build/mac-cluster/javafx2/javafx-sdk/emulator/bin">
+      <arg value="-c"/>
+      <arg value="chmod +x *"/>
+    </exec>  
   </target>
   
   <target name="mount-mac-dmg" depends="download-javase,build-mac-cluster" if="running.on.mac">
@@ -232,9 +236,11 @@
     <jar destfile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" compress="true" level="9">
       <zipfileset dir="build/data/lin-cluster" filemode="755">
         <include name="javafx-sdk/bin/*"/>
+        <include name="javafx-sdk/emulator/bin/*"/>
       </zipfileset>
       <zipfileset dir="build/data/lin-cluster">
         <exclude name="javafx-sdk/bin/*"/>
+        <exclude name="javafx-sdk/emulator/bin/*"/>
       </zipfileset>
     </jar>
     <mkdir dir="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
@@ -242,9 +248,11 @@
     <jar destfile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" compress="true" level="9">
       <zipfileset dir="build/data/sol-cluster" filemode="755">
         <include name="javafx-sdk/bin/*"/>
+        <include name="javafx-sdk/emulator/bin/*"/>
       </zipfileset>
       <zipfileset dir="build/data/sol-cluster">
         <exclude name="javafx-sdk/bin/*"/>
+        <exclude name="javafx-sdk/emulator/bin/*"/>
       </zipfileset>
     </jar>
     <copy file="build/logic.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
