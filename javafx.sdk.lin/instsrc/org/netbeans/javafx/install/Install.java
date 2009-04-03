@@ -127,10 +127,12 @@ public class Install {
     }
 
     private static void installUnix(String targetDir) throws IOException {
-		setPermission(targetDir, "javafx");
-		setPermission(targetDir, "javafxc");
-		setPermission(targetDir, "javafxdoc");
-		setPermission(targetDir, "javafxpackager");
+		setPermission(targetDir + File.separatorChar + "bin", "javafx");
+		setPermission(targetDir + File.separatorChar + "bin", "javafxc");
+		setPermission(targetDir + File.separatorChar + "bin", "javafxdoc");
+		setPermission(targetDir + File.separatorChar + "bin", "javafxpackager");
+		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "bin", "preverify");
+		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "bin", "emulator");
     }
 
     private static void setPermission(String folder, String file) throws IOException {
@@ -153,8 +155,8 @@ public class Install {
         try {
             String sdkUser = System.getProperty("sdk.home.user"); // NOI18N
             String sdkInstall = System.getProperty("sdk.home.install"); // NOI18N    
-            if (sdkUser != null) install(sdkUser + File.separatorChar + "bin");
-            if (sdkInstall != null) install(sdkInstall + File.separatorChar + "bin");
+            if (sdkUser != null) install(sdkUser);
+            if (sdkInstall != null) install(sdkInstall);
         } catch (IOException ex) {
             // under normal circumstances it should never happen
             ex.printStackTrace();

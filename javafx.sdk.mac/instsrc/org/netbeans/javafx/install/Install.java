@@ -132,6 +132,8 @@ public class Install {
 		setPermission(targetDir + File.separatorChar + "bin", "javafxdoc");
 		setPermission(targetDir + File.separatorChar + "bin", "javafxpackager");
 		setPermission(targetDir + File.separatorChar + "lib" + File.separatorChar + "desktop", "jmcServerDaemon");
+		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "bin", "preverify");
+		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "bin", "emulator");
     }
 
     private static void setPermission(String folder, String file) throws IOException {
