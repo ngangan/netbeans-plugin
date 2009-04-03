@@ -43,9 +43,11 @@ package org.netbeans.modules.javafx.project;
 
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -66,6 +68,7 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.java.queries.UnitTestForSourceQuery;
 import org.netbeans.api.java.source.ui.ScanDialog;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
@@ -467,6 +470,19 @@ class JavaFXActionProvider implements ActionProvider {
     public boolean isActionEnabled( String command, Lookup context ) {
         FileObject buildXml = findBuildXml();
         if (  buildXml == null || !buildXml.isValid()) return false;
+        if ("mobile".equals(project.evaluator().getProperty("javafx.profile"))) {
+            JavaFXPlatform jp = JavaFXProjectUtil.getActivePlatform(project.evaluator().getProperty("platform.active")); //NOI18N
+            if (jp == null) return false;
+            try {
+                File f = new File(jp.getJavaFXFolder().toURI());
+                if (!new File(f, "emulator/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
+                if (command.equals(COMMAND_RUN) || command.equals(COMMAND_RUN_SINGLE) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_SINGLE) || command.equals(COMMAND_DEBUG_STEP_INTO)) { //NOI18N
+                    if (!new File(f, "emulator/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
+                }
+            } catch (URISyntaxException e) {
+                return false;
+            }
+        }
         if (command.equals(COMMAND_RUN_SINGLE) || command.equals(COMMAND_DEBUG_SINGLE)) {
             boolean foundExactlyOne = false;;
             for (FileObject srcPath : project.getSourceRoots().getRoots()) {

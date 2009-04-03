@@ -55,7 +55,6 @@ import org.netbeans.modules.profiler.utils.AppletSupport;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.spi.project.AuxiliaryConfiguration;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
@@ -86,6 +85,7 @@ import java.util.Properties;
 import javax.swing.event.ChangeListener;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
+import org.netbeans.modules.javafx.project.JavaFXProject;
 
 /**
  * @author Tomas Hurka
@@ -201,6 +201,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     // --- ProjectTypeProfiler implementation ------------------------------------------------------------------------------
     public boolean isProfilingSupported(final Project project) {
+        if (!(project instanceof JavaFXProject) || !"desktop".equals(((JavaFXProject)project).evaluator().getProperty("javafx.profile"))) return false;
 
         final AuxiliaryConfiguration aux = (AuxiliaryConfiguration) project.getLookup().lookup(AuxiliaryConfiguration.class);
 

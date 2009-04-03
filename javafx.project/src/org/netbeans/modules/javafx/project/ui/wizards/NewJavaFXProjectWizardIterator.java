@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -71,6 +70,7 @@ import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 
 /**
  * Wizard to create a new JavaFX project.
@@ -227,7 +227,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
 
         // Mobile
         try {
-            if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator").isDirectory()) { // NOI18N
+            if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) { // NOI18N
                 profile = new TreeMap<String, String>();
                 profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_Mobile" )); //NOI18N
                 profile.put( "javafx.profile", "mobile" ); //NOI18N

@@ -107,7 +107,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         if (pk != null) {
             JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
             if (jp instanceof JavaFXPlatform) try {
-                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator").isDirectory()); //NOI18N
+                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()); //NOI18N
             } catch (URISyntaxException e) {}
         }
         
