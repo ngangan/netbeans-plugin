@@ -18,6 +18,8 @@ public class ScreenShot {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if (w.getComponents().length > 0) try {
+                    w.addNotify();
+                    w.validate();
                     Component c = w.getComponents()[0];
                     Dimension bounds = c.getSize();
                     BufferedImage bi = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_RGB);
