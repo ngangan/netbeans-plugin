@@ -45,7 +45,7 @@
     
     <target name="clean" depends="-init,testuserdir-delete" description="Clean everything.">
         <mkdir dir="build/netbeans"/>
-        <subant target="clean" buildpath="${modules.sorted};installer.new" inheritrefs="false" inheritall="false"/>
+        <subant target="clean" buildpath="${modules.sorted};installer" inheritrefs="false" inheritall="false"/>
         <delete dir="${dist.dir}"/>
         <delete failonerror="false" includeemptydirs="true">
             <fileset dir="build">
@@ -55,7 +55,7 @@
     </target>
     
     <target name="build-installers" depends="nbms">
-        <ant dir="installer.new"/>
+        <ant dir="installer"/>
     </target>
 
 </project>
