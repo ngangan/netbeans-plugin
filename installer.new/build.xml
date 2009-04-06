@@ -465,12 +465,15 @@
     <echo file="build/solaris/data/registry.xml"><![CDATA[${original.registry.lin}${javafx.registry.lin}</components></registry>]]></echo>    
     <copy todir="build/windows" overwrite="true">
       <fileset dir="build/servicetag"/>
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
     </copy>
     <copy todir="build/linux" overwrite="true">
       <fileset dir="build/servicetag"/>
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
     </copy>
     <copy todir="build/solaris" overwrite="true">
       <fileset dir="build/servicetag"/>
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
     </copy>
     <copy file="../netbeans-license-javafx.txt" tofile="build/windows/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
     <copy file="../netbeans-license-javafx.txt" tofile="build/linux/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
