@@ -65,7 +65,9 @@ made subject to such option by the copyright holder.
         </condition>
         <property name="javac.source" value="1.4"/>
         <property name="javac.target" value="${javac.source}"/>
-        <property name="javac.compilerargs" value=""/>
+        <condition property="javac.compilerargs" value="-Xbootclasspath/p:${netbeans.dest.dir}/javafx2/javafx-sdk/lib/shared/javafxc.jar" else="">
+            <os family="mac"/>
+        </condition>
         <property name="module.auto.deps.xml" location="module-auto-deps.xml"/>
         <condition property="has.module.auto.deps">
             <available file="${module.auto.deps.xml}"/>
