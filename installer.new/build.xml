@@ -22,11 +22,12 @@
       <property name="build.config" value="daily"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
+      <property name="use.timestamp" value="true"/>
       <parallel>
-        <get src="${netbeans.windows.installer.url}" dest="external/netbeans-javase-windows.exe" usetimestamp="true" verbose="true"/>
-        <get src="${netbeans.linux.installer.url}" dest="external/netbeans-javase-linux.sh" usetimestamp="true" verbose="true"/>
-        <get src="${netbeans.macosx.installer.url}" dest="external/netbeans-javase-macosx.dmg" usetimestamp="true" verbose="true"/>
-        <get src="${netbeans.solaris.installer.url}" dest="external/netbeans-javase-solaris.sh" usetimestamp="true" verbose="true"/>
+        <get src="${netbeans.windows.installer.url}" dest="external/netbeans-javase-windows.exe" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.linux.installer.url}" dest="external/netbeans-javase-linux.sh" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.macosx.installer.url}" dest="external/netbeans-javase-macosx.dmg" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.solaris.installer.url}" dest="external/netbeans-javase-solaris.sh" usetimestamp="${use.timestamp}" verbose="true"/>
       </parallel>  
   </target>
  
