@@ -45,19 +45,18 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.text.Collator;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
  * Algorithm:
- * * Collect all important symbols
- * * Collect all imports.
- * * iterate over all symbols and verify if it is already imported or have to be.
- * * collect resulting set of import
- * * modify document
+ * * Collect all declared imports
+ * * Collect all unresolved type elements
+ * * Generate option sets for unresolved type elements
+ * * Let the user resolve the unresolved type elements (select one type for an unresolved element)
+ * * Modify document
  *
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.org">RKo</a>)
+ * @author Jaroslav Bachorik
  */
 public final class JavaFXImports extends BaseAction implements JFXImportManager {
 
@@ -111,7 +110,6 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
         return new Runnable() {
             public void run() {
                 final JavaFXSource s = JavaFXSource.forDocument(document);
-                int caret = target.getCaret().getDot();
                 try {
                     s.runUserActionTask(new Task<CompilationController>() {
                         public void run(CompilationController cc) throws Exception {
@@ -125,20 +123,16 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
                                 throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
                             }
                             ClassIndex index = ClasspathInfo.create(source).getClassIndex();
-                            Set<Element> elements = new TreeSet<Element>(InternalSetComparator.create());
-                            IdentifierVisitor iv = new IdentifierVisitor(cc);
-                            iv.scan(cc.getCompilationUnit(), elements);
-                            ImportsModel model = new ImportsModel(cc);
-                            ImportResolver ir = ImportResolverImpl.create(index, cc, target);
-                            ir.setElementPositions(iv.getPositions());
-                            ir.resolve(model, elements);
+                            ImportsWalker iw = new ImportsWalker(cc, index);
+                            ImportsModel imn = new ImportsModel();
+                            iw.scan(cc.getCompilationUnit(), imn);
+                            ImportResolverImpl ir = ImportResolverImpl.create(cc, target);
+                            ir.resolve(imn);
                         }
 
                     }, false);
                 } catch (IOException e) {
                     throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e); // NOI18N
-                } finally {
-                    target.getCaret().setDot(caret);
                 }
             }
         };
