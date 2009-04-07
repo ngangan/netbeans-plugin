@@ -1,221 +1,227 @@
 /*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
- *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common
- * Development and Distribution License("CDDL") (collectively, the
- * "License"). You may not use this file except in compliance with the
- * License. You can obtain a copy of the License at
- * http://www.netbeans.org/cddl-gplv2.html
- * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- * specific language governing permissions and limitations under the
- * License.  When distributing the software, include this License Header
- * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
- * accompanied this code. If applicable, add the following below the
- * License Header, with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * Contributor(s):
- *
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package org.netbeans.modules.javafx.editor.imports;
 
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.JFXImportManager;
-
-import javax.lang.model.element.Element;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.logging.Logger;
+import java.util.HashSet;
+import java.util.Set;
+import javax.lang.model.element.TypeElement;
+import org.netbeans.api.javafx.source.ElementHandle;
 
 /**
- * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
- * @todo documentation
+ * This is a collector for all relevant information gathered during scanning for
+ * imports. It holds the information about the declared imports, the import usage
+ * and also the start and end position of the imports block
+ * @author Jaroslav Bachorik
  */
-public final class ImportsModel {
-    public static final int UNSET = -1;
-    public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
-    private final Collection<ModelEntry> entries = new TreeSet<ModelEntry>();
-    private final int start;
-    private final int end;
+public class ImportsModel {
+    final static public class Unresolved implements Comparable<Unresolved> {
+        final private String unresolvedName;
+        final private Set<ElementHandle<TypeElement>> options;
+        final private long elementPos;
+        private String resolved = null;
 
+        public Unresolved(long pos, String unresolvedName, Set<ElementHandle<TypeElement>> options) {
+            this.unresolvedName = unresolvedName;
+            this.options = options;
+            this.elementPos = pos;
+        }
 
-    ImportsModel(CompilationInfo ci) {
-        if (ci == null) throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle").getString("Compilation_info_cannot_be_null.")); // NOI18N
-        List<? extends ImportTree> trees = ci.getCompilationUnit().getImports();
-        if (!trees.isEmpty()) {
-            int start = Integer.MAX_VALUE;
-            int end = 0;
-            for (ImportTree anImport : trees) {
-                entries.add(new ModelEntry(anImport));
-                start = Math.min(start, getStart(anImport, ci));
-                end = Math.max(end, getEnd(anImport, ci));
+        public Set<ElementHandle<TypeElement>> getOptions() {
+            return options;
+        }
+
+        public String getUnresolvedElement() {
+            return unresolvedName;
+        }
+
+        public String getResolvedName() {
+            return resolved;
+        }
+
+        public void resolve(String element) {
+            resolved = element;
+        }
+
+        public long getElementPos() {
+            return elementPos;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
             }
-            this.start = start;
-            this.end = end;
-        } else {
-            end = start = UNSET;            
-        }
-    }
-
-    public int getStart() {
-        return start;
-    }
-
-    public int getEnd() {
-        return end;
-    }
-
-    private int getEnd(Tree node, CompilationInfo ci) {
-        return (int) sp(ci).getEndPosition(ci.getCompilationUnit(), node);
-    }
-
-    private SourcePositions sp(CompilationInfo ci) {
-        return ci.getTrees().getSourcePositions();
-    }
-
-    private int getStart(Tree node, CompilationInfo ci) {
-        return (int) sp(ci).getStartPosition(ci.getCompilationUnit(), node);
-    }
-
-
-    public void addImport(String qn) {
-        entries.add(new ModelEntry(qn));
-    }
-
-    private boolean isLocal(Element e) {
-        return false;
-    }
-
-    boolean isImported(Element e) {
-        if (isLocal(e)) return true;
-        for (ModelEntry entry : entries) {
-            // #158596 - use e.toString() instead of e.asType().toString() to prevent problems with generified types
-            if (entry != null && entry.includes(e.toString())) {
-                entry.setUsage();
-                return true;
+            if (getClass() != obj.getClass()) {
+                return false;
             }
-        }
-        return false;
-    }
-
-
-    void optimize() {
-
-    }
-
-    void append(ModelEntry modelEntry) {
-        entries.add(modelEntry);
-    }
-
-    public Iterable<ModelEntry> getEntries() {
-        return entries;
-    }
-
-
-    static class ModelEntry implements Comparable<ModelEntry> {
-        String type;
-        ImportTree tree;
-        boolean stared;
-        boolean dStared;
-        boolean isUsed = false;
-
-        public ModelEntry(ImportTree tree) {
-            this.tree = tree;
-            Tree qi = tree.getQualifiedIdentifier();
-            type = qi.toString();
-            verifyType();
-        }
-
-        private void verifyType() {
-            stared = type.endsWith(".*"); // NOI18N
-            dStared = type.endsWith(".**"); // NOI18N
-            if (stared || dStared) {
-                int index = type.indexOf(".*"); // NOI18N
-                type = type.substring(0, index);
+            final Unresolved other = (Unresolved) obj;
+            if (this.unresolvedName != other.unresolvedName && (this.unresolvedName == null || !this.unresolvedName.equals(other.unresolvedName))) {
+                return false;
             }
-        }
-
-        ModelEntry(String type) {
-            this.type = type;
-            verifyType();
-            isUsed = true;
-        }
-
-        boolean includes(String type) {
-            if (type == null) return false;
-            if (dStared) {
-                return type.startsWith(this.type);
-            } else if (stared) {
-                int dotIndex = type.lastIndexOf('.'); // NOI18N
-                return dotIndex > -1 && this.type.equals(type.substring(0, dotIndex));
-            }
-            return this.type.equals(type) || canBeThisType(type);
-        }
-
-        private boolean canBeThisType(String type) { // NOI18N
-            int index = this.type.lastIndexOf('.');
-            return index > 0 && this.type.substring(index).equals(type);
-        }
-
-        String toImportStatement() {
-            return "import " + type + (stared ? ".*" : "") + (dStared ? ".**" : "") + ";"; // NOI18N
-        }
-
-        void setUsage() {
-            isUsed = true;
-        }
-
-        boolean isUsed() {
-            return isUsed;
-        }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            ModelEntry that = (ModelEntry) o;
-
-//            if (dStared != that.dStared) return false;
-//            if (stared != that.stared) return false;
-//            if (tree != null ? !tree.equals(that.tree) : that.tree != null) return false;
-            if (type != null ? !type.equals(that.type) : that.type != null) return false;
-
             return true;
         }
 
+        @Override
         public int hashCode() {
-            int result;
-            result = (type != null ? type.hashCode() : 0);
-//            result = 31 * result + (tree != null ? tree.hashCode() : 0);
-//            result = 31 * result + (stared ? 1 : 0);
-//            result = 31 * result + (dStared ? 1 : 0);
-            return result;
+            int hash = 7;
+            hash = 97 * hash + (this.unresolvedName != null ? this.unresolvedName.hashCode() : 0);
+            return hash;
         }
 
-        public int compareTo(ModelEntry o) {
-            return type != null ? o != null ? type.compareToIgnoreCase(o.type) : -1 : 1;
+        public int compareTo(Unresolved o) {
+            if (this.getResolvedName() == null && o.getResolvedName() != null) return 1;
+            if (this.getResolvedName() != null && o.getResolvedName() == null) return -1;
+            if (this.getResolvedName() == null && o.getResolvedName() == null) return 0;
+
+            if (this.getResolvedName().startsWith("javafx") && !o.getResolvedName().startsWith("javafx")) return -1;
+            if (!this.getResolvedName().startsWith("javafx") && o.getResolvedName().startsWith("javafx")) return 1;
+
+            return this.getResolvedName().compareTo(o.getResolvedName());
         }
 
 
-        public String toString() {
-            return "ModelEntry[" + // NOI18N
-                    "type='" + type + '\'' + // NOI18N
-                    ']'; // NOI18N
+    }
+    final static public class Declared {
+        final private String importName;
+        final private long start, end;
+
+        public Declared(String importName, long start, long end) {
+            this.importName = importName;
+            this.start = start;
+            this.end = end;
         }
+
+        public long getEnd() {
+            return end;
+        }
+
+        public String getImportName() {
+            return importName;
+        }
+
+        public long getStart() {
+            return start;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Declared other = (Declared) obj;
+            if ((this.importName == null) ? (other.importName != null) : !this.importName.equals(other.importName)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 67 * hash + (this.importName != null ? this.importName.hashCode() : 0);
+            return hash;
+        }
+
     }
 
+    final private Set<Declared> declaredImports = new HashSet<Declared>();
+    final private Set<String> usedImports = new HashSet<String>();
+    final private Set<Unresolved> unresolved = new HashSet<Unresolved>();
 
+    private long importsStart = Integer.MAX_VALUE;
+    private long importsEnd = Integer.MIN_VALUE;
+
+    /**
+     * Call this method to indicate import declaration
+     * @param imprt The import statement
+     * @param start The start position in the document
+     * @param end The end position in the document
+     */
+    public void addDeclaredImport(String imprt, long start, long end) {
+        importsStart = Math.min(importsStart, start);
+        importsEnd = Math.max(importsEnd, end);
+
+        declaredImports.add(new Declared(imprt, start, end));
+    }
+
+    /**
+     * Call this method to indicate the usage of a particular type
+     * @param className The type class name
+     */
+    public void addUsage(String className) {
+        usedImports.add(className);
+    }
+
+    /**
+     * Call this method to indicate the occurance of an unknown type
+     * @param unresolvedName The type name of the unresolved eleemnt
+     * @param options The list of types that could be used to resolve the element
+     * @param pos The element position in the document
+     */
+    public void addUnresolved(String unresolvedName, Set<ElementHandle<TypeElement>> options, long pos) {
+        unresolved.add(new Unresolved(pos, unresolvedName, options));
+    }
+
+    /**
+     * Calculates the set of unused imports
+     * It uses full text matching as well as wildcard matching
+     * @return Return a new set of all unused imports
+     */
+    public Set<Declared> getUnusedImports() {
+        Set<Declared> unused = new HashSet<Declared>();
+        for(Declared declared : declaredImports) {
+            if (declared.importName.endsWith(".*")) {
+                int imprtLen = declared.importName.length() - 1;
+                String target = declared.importName.substring(0, imprtLen);
+                boolean found = false;
+                for(String imprt : usedImports) {
+                    if (imprt.length() > imprtLen) {
+                        if (imprt.indexOf(".", imprtLen + 1) > -1)  continue;
+                        if (imprt.substring(0, imprtLen).equals(target)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found) {
+                    unused.add(declared);
+                }
+            } else {
+                if (!usedImports.contains(declared.importName)) {
+                    unused.add(declared);
+                }
+            }
+        }
+        return unused;
+    }
+
+    /**
+     *
+     * @return Return the set of all unresolved types
+     */
+    public Set<Unresolved> getUnresolved() {
+        return unresolved;
+    }
+
+    /**
+     *
+     * @return Returns the position in the document where imports end
+     */
+    public long getImportsEnd() {
+        return importsEnd;
+    }
+
+    /**
+     *
+     * @return Return the position in the document where imports start
+     */
+    public long getImportsStart() {
+        return importsStart;
+    }
 }

@@ -71,27 +71,30 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
     private final FixPopup<T> fixPopup;
     protected static FixImportsLayout<CompletionItem> instance = new FixImportsLayout<CompletionItem>();
     private boolean canceled = false;
+    private Object LOCK = null;
 
-//    private Stack<PopupWindow<T>> visiblePopups;
-
+    /**
+     * Will create a new layout for fix imports popup
+     * @param lock The lock to be used to notify all waiting parties when the popup is closed
+     * @return Returns new {@linkplain FixImportsLayout} instance
+     */
     @SuppressWarnings({"unchecked"})
-    public static <T extends CompletionItem> FixImportsLayout<T> create() {
+    public static <T extends CompletionItem> FixImportsLayout<T> create(Object lock) {
         instance.canceled = false;
+        instance.LOCK = lock;
         return (FixImportsLayout<T>) instance;
     }
 
     FixImportsLayout() {
         fixPopup = new FixPopup<T>();
         fixPopup.setLayout(this);
-        fixPopup.setPreferDisplayAboveCaret(false);        
-//        visiblePopups = new Stack<PopupWindow<T>>();
+        fixPopup.setPreferDisplayAboveCaret(false);
     }
 
     /*public*/ JTextComponent getEditorComponent() {
         return (editorComponentRef != null)
                 ? editorComponentRef.get()
                 : null;
-//                : EditorRegistry.lastFocusedComponent();
     }
 
     public void setEditorComponent(JTextComponent editorComponent) {
@@ -118,6 +121,10 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
         hide();
     }
 
+    public boolean isCancelled() {
+        return canceled;
+    }
+
     @SuppressWarnings({"MethodWithTooManyParameters"})
     public void show(List<T> data, String title, int anchorOffset, ListSelectionListener lsl,
                      String additionalItemsText, String shortcutHint, int selectedIndex) {
@@ -133,6 +140,11 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
             fixPopup.hide();
             fixPopup.completionScrollPane = null;
             unregister();
+            if (LOCK != null) {
+                synchronized(LOCK) {
+                    LOCK.notifyAll();
+                }
+            }
             return true;
         } else { // not visible
             return false;
