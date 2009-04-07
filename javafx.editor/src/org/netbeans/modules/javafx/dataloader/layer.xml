@@ -251,10 +251,10 @@ made subject to such option by the copyright holder.
                 </folder>
 
                 <folder name="Popup">
-                    <file name="format">
+<!--                    <file name="format">
                         <attr name="position" intvalue="1490"/>
                     </file>
-                    <file name="fix-imports">
+-->                    <file name="fix-imports">
                         <attr name="position" intvalue="1500"/>
                     </file>
                     <file name="SeparatorBeforeRun.instance">

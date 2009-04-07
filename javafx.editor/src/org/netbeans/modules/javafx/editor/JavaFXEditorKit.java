@@ -64,6 +64,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
+import org.netbeans.editor.ActionFactory.FormatAction;
 import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
 
 /**
@@ -109,6 +110,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new JavaFXGoToDeclarationAction(),
                 new JavaFXGoToSourceAction(),
                 JavaFXImports.getInstance(),
+                new JavaFXFormatAction(),
                 new JavaFXInsertBreakAction()
         };
         return TextAction.augmentList(superActions, javafxActions);
@@ -433,4 +435,11 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     public HelpCtx getHelpCtx() {
         return new org.openide.util.HelpCtx(JavaFXEditorKit.class);
     }
+
+    private static class JavaFXFormatAction extends FormatAction {
+        public JavaFXFormatAction() {
+            setEnabled(false);
+        }
+    }
+
 }

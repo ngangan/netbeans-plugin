@@ -361,7 +361,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             }
             TokenSequence<JFXTokenId>  ts = th.tokenSequence(JFXTokenId.language());
             boolean firstNormalFold = true;
-            while (ts.moveNext()) {
+            while (ts.isValid() && ts.moveNext()) {
                 Token<JFXTokenId> token = ts.token();
                 try {
                     if (token.id() == JFXTokenId.DOC_COMMENT) {

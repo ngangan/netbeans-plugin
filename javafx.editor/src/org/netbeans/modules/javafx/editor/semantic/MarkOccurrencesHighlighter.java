@@ -281,7 +281,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                 return null;
             }
 
-            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+//            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
 
         /* XXX[pn]: couldn't work before. Did it?
         if (ts != null && tp.getLeaf().getKind() == Kind.CLASS) {
