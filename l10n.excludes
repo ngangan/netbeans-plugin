@@ -1,0 +1,15 @@
+build/**
+dummy/**
+harness/**
+nbproject/**
+*/build/**
+*/nbproject/**
+*/external/**
+*/release/**
+*/main/**
+*/resources/**
+*/test/**
+*
+*/*
+**/Bundle_noi18n.properties
+

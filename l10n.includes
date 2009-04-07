@@ -1,0 +1,13 @@
+**/Bundle*.properties
+**/*.gif
+**/*.html
+**/*.png 
+**/*.css
+**/*.url
+javafx.kit/javahelp/**/*.hs
+javafx.kit/javahelp/**/*.jhm
+javafx.kit/javahelp/**/*.jpeg
+javafx.kit/javahelp/**/*.jpg
+javafx.kit/javahelp/**/*.toc
+javafx.kit/javahelp/**/*.xml
+

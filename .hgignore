@@ -1,6 +1,6 @@
 ~$
 ^build$
-^netbeans.zip$
+^netbeans.*.zip$
 ^dist$
 /build$
 /dist$
@@ -19,5 +19,3 @@ derby\.log
 /gensrc$
 \.ant-targets-build\.xml$
 ^hs_err_pid[0-9]*\.log
-^javafx.graphicssample/src/org/netbeans/modules/javafx/graphicssample/resources/zip/JavaFX2DTutorialProject.zip
-^nbantext.jar
