@@ -73,8 +73,8 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
             int endOffset = region.getEndOffset();
             int length = region.getEndOffset() - region.getStartOffset();
             int elementIndex = rootElement.getElementIndex(startOffset);
-            Element prevElement = rootElement.getElement(elementIndex > 0 ? elementIndex - 1 : elementIndex);
-            int indent = IndentUtils.lineIndent(document, prevElement.getStartOffset());
+            final int prevIndex = elementIndex > 0 ? elementIndex - 1 : elementIndex;
+            int indent = getIndent(document, prevIndex);
 
             String text = document.getText(startOffset, length);
             if (text.startsWith(TEMPLATE_START)) {
@@ -98,7 +98,7 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
                         boolean isTextWSOnly = textBefore.matches("\\s+"); // NOI18N
                         doIndent = textBefore.length() == 0 || isTextWSOnly;
                         if (!doIndent) {
-                            indent = IndentUtils.lineIndent(document, element.getStartOffset());
+                            indent = getIndent(document, i);
                         }
                     } else {
                         doIndent = true;
@@ -109,21 +109,6 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
                     }
                 }
 
-//                text = document.getText(startOffset, length - TEMPLATE_END.length() - TEMPLATE_START.length());
-//                int lineStart = 0;
-//                int c = 0;
-//                while (lineStart != -1) {
-//                    int newOffset = startOffset + lineStart + 1 + c++ * indent;
-//                    context.modifyIndent(newOffset, indent);
-//                    lineStart = text.indexOf("\n", lineStart + 1); // NOI18N
-//                }
-
-//                int[] linesLength = getLinesLength(text);
-//                int lineStart = startOffset;
-//                for (int i = 0; i < linesLength.length; i++) {
-//                    context.modifyIndent(lineStart, indent);
-//                    lineStart += (linesLength[i] + i * indent);
-//                }
             }
         }
     }
@@ -132,12 +117,41 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
         return null;
     }
 
-    private static int[] getLinesLength(String text) {
-        final String[] lines = text.split("\n", -1); // NOI18N
-        int[] length = new int[lines.length];
-        for (int i = 0; i < lines.length; i++) {
-            length[i] = lines[i].length() + 1;
+    /**
+     * return indent for nearest non-ws line
+     */
+    private static int getIndent(final Document document, int elementIndex) throws BadLocationException {
+        Element rootElement = document.getDefaultRootElement();
+        boolean isTextWSOnly;
+        int eso = rootElement.getStartOffset();
+        boolean extendIndent = false;
+        do {
+            if (elementIndex < 1) {
+                break;
+            }
+            Element element = rootElement.getElement(elementIndex--);
+            eso = element.getStartOffset();
+            String elementText = document.getText(eso, element.getEndOffset() - eso);
+            isTextWSOnly = elementText.matches("\\s+"); // NOI18N
+            if (!isTextWSOnly) {
+                final String ett = elementText.trim();
+                extendIndent = ett.endsWith("{") || ett.endsWith("["); // NOI18N
+            }
+        } while (isTextWSOnly);
+
+        int indent = IndentUtils.lineIndent(document, eso);
+        if (extendIndent) {
+            indent += IndentUtils.tabSize(document);
         }
-        return length;
+        return indent;
     }
+
+//    private static int[] getLinesLength(String text) {
+//        final String[] lines = text.split("\n", -1); // NOI18N
+//        int[] length = new int[lines.length];
+//        for (int i = 0; i < lines.length; i++) {
+//            length[i] = lines[i].length() + 1;
+//        }
+//        return length;
+//    }
 }

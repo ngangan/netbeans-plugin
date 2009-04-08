@@ -82,7 +82,7 @@ public class CompilerIndependentJFXIndentTask implements IndentTask {
         if (startOffset > 1) {
             String prevChar = document.getText(startOffset - 2, 1);
             int tabSize = IndentUtils.tabSize(document);
-            if (prevChar.equals("{")) { // NOI18N
+            if (prevChar.equals("{") || prevChar.equals("[")) { // NOI18N
                 indent += tabSize;
 //            } else if (prevChar.equals("}") && indent >= tabSize) { // NOI18N
 //                indent -= tabSize;
