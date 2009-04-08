@@ -251,6 +251,10 @@ made subject to such option by the copyright holder.
                 </folder>
 
                 <folder name="Popup">
+                    <file name="goto-help">
+                        <attr name="position" intvalue="1200"/>
+                    </file>
+
 <!--                    <file name="format">
                         <attr name="position" intvalue="1490"/>
                     </file>

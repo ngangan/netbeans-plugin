@@ -109,6 +109,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new JavaDeleteCharAction(deletePrevCharAction, false),
                 new JavaFXGoToDeclarationAction(),
                 new JavaFXGoToSourceAction(),
+                new JavaFXGotoHelpAction(),
                 JavaFXImports.getInstance(),
                 new JavaFXFormatAction(),
                 new JavaFXInsertBreakAction()
@@ -147,7 +148,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             b.setAction(this);
 //            b.setEnabled(Bridge.isStarted());
             b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("")); // NOI18N
+            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("toolbar")); // NOI18N
             return b;
         }
 
@@ -440,6 +441,29 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         public JavaFXFormatAction() {
             setEnabled(false);
         }
+    }
+
+    private static class JavaFXGotoHelpAction extends BaseAction {
+
+        public JavaFXGotoHelpAction() {
+            super(gotoHelpAction, ABBREV_RESET | MAGIC_POSITION_RESET
+                    | UNDO_MERGE_RESET |SAVE_POSITION);
+            putValue ("helpID", JavaFXGotoHelpAction.class.getName ()); // NOI18N
+            // fix of #25090; [PENDING] there should be more systematic solution for this problem
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("javafx-desc-goto-help")); // NOI18N
+        }
+
+        public void actionPerformed(ActionEvent evt, JTextComponent target) {
+            if (target != null) {
+                GoToSupport.goToJavadoc(target.getDocument(), target.getCaretPosition());
+            }
+        }
+
+        @Override
+        public String getPopupMenuText(JTextComponent target) {
+            return NbBundle.getBundle(JavaFXEditorKit.class).getString("show_javadoc"); // NOI18N
+        }
+
     }
 
 }

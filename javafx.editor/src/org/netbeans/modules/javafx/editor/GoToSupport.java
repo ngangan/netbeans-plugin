@@ -47,6 +47,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import java.io.IOException;
+import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -65,6 +66,7 @@ import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.openide.awt.HtmlBrowser;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
 import org.openide.cookies.OpenCookie;
@@ -85,6 +87,10 @@ public class GoToSupport {
 
     public static void goTo(Document doc, int offset, boolean goToSource) {
         performGoTo(doc, offset, goToSource, false, false);
+    }
+
+    public static void goToJavadoc(Document doc, int offset) {
+        performGoTo(doc, offset, false, false, true);
     }
 
     public static String getGoToElementTooltip(Document doc, final int offset, final boolean goToSource) {
@@ -136,6 +142,14 @@ public class GoToSupport {
                     if (tooltip) {
                         result[0] = FXSourceUtils.getElementTooltip(controller.getJavafxTypes(), el);
                         return;
+                    } else if (javadoc) {
+                        result[0] = null;
+                        URL url = FXSourceUtils.getJavadoc(el, controller).url;
+                        if (url != null) {
+                            HtmlBrowser.URLDisplayer.getDefault().showURL(url);
+                        } else {
+//                            CALLER.beep(goToSource, javadoc);
+                        }
                     } else {
                         if (goToSource && el instanceof VariableElement) {
                             Symbol sym = (Symbol)el;
