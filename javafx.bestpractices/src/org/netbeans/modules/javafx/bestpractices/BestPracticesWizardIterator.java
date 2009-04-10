@@ -99,7 +99,7 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
        
         FileObject mainFile = Repository.getDefault().getDefaultFileSystem().findResource((String) file.getAttribute( "file" )); // NOI18N
         String path = mainFile.getPath().substring( "demos/".length()); // NOI18N
-        AntProjectHelper helper = JavaFXProjectGenerator.createProject( dirF, (String)wizard.getProperty(PROJECT_NAME), null, null );
+        AntProjectHelper helper = JavaFXProjectGenerator.createProject( dirF, (String)wizard.getProperty(PROJECT_NAME), (File[])null, null );
         EditableProperties props = helper.getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );
         
         String srcdir = props.getProperty( "src.dir" ); // NOI18N

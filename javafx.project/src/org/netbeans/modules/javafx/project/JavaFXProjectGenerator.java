@@ -93,11 +93,10 @@ public class JavaFXProjectGenerator {
         final AntProjectHelper[] h = new AntProjectHelper[1];
         dirFO.getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
             public void run() throws IOException {
-                h[0] = createProject(dirFO, name, "src", null, mainClass, manifestFile, manifestFile == null); //NOI18N
+                h[0] = createProject(dirFO, name, "src", mainClass, manifestFile, manifestFile == null); //NOI18N
                 Project p = ProjectManager.getDefault().findProject(dirFO);
                 ProjectManager.getDefault().saveProject(p);
                 FileObject srcFolder = dirFO.createFolder("src"); // NOI18N
-                dirFO.createFolder("test"); // NOI18N
                 if ( mainClass != null ) {
                     createMainClass( mainClass, srcFolder );
                 }
@@ -108,14 +107,14 @@ public class JavaFXProjectGenerator {
     }
 
     public static AntProjectHelper createProject(final File dir, final String name,
-                                                  final File[] sourceFolders, final File[] testFolders, final String manifestFile) throws IOException {
-        assert sourceFolders != null && testFolders != null: "Package roots can't be null";   //NOI18N
+                                                  final File[] sourceFolders, final String manifestFile) throws IOException {
+        assert sourceFolders != null : "Package roots can't be null";   //NOI18N
         final FileObject dirFO = FileUtil.createFolder(dir);
         final AntProjectHelper[] h = new AntProjectHelper[1];
         // this constructor creates only java application type
         dirFO.getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
             public void run () throws IOException {
-                h[0] = createProject(dirFO, name, null, null, null, manifestFile, false);
+                h[0] = createProject(dirFO, name, null, null, manifestFile, false);
                 final JavaFXProject p = (JavaFXProject) ProjectManager.getDefault().findProject(dirFO);
                 final ReferenceHelper refHelper = p.getReferenceHelper();
                 try {
@@ -126,9 +125,6 @@ public class JavaFXProjectGenerator {
                         NodeList nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots"); // NOI18N
                         assert nl.getLength() == 1;
                         Element sourceRoots = (Element) nl.item(0);
-                        nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"test-roots");  //NOI18N
-                        assert nl.getLength() == 1;
-                        Element testRoots = (Element) nl.item(0);
                         for (int i=0; i<sourceFolders.length; i++) {
                             String propName;
                             if (i == 0) {
@@ -155,34 +151,6 @@ public class JavaFXProjectGenerator {
                             h[0].putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, props); // #47609
                         }                
                         
-                        for (int i = 0; i < testFolders.length; i++) {
-                            if (!testFolders[i].exists()) {
-                                testFolders[i].mkdirs();
-                            }
-                            String propName;
-                            if (i == 0) {
-                                //Name the first test root test.src.dir to be compatible with NB 4.0
-                                propName = "test.src.dir";  //NOI18N
-                            }
-                            else {
-                                String name = testFolders[i].getName();
-                                propName = "test." + name + ".dir"; // NOI18N
-                            }                    
-                            int rootIndex = 1;
-                            EditableProperties props = h[0].getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-                            while (props.containsKey(propName)) {
-                                rootIndex++;
-                                propName = "test." + name + rootIndex + ".dir"; // NOI18N
-                            }
-                            String testReference = refHelper.createForeignFileReference(testFolders[i], JavaProjectConstants.SOURCES_TYPE_JAVA);
-                            Element root = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "root"); // NOI18N
-                            root.setAttribute("id", propName); // NOI18N
-                            testRoots.appendChild(root);
-                            props = h[0].getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH); // #47609
-                            props.put(propName, testReference);
-                            h[0].putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, props);
-                        }
-  
                         h[0].putPrimaryConfigurationData(data,true);
                         ProjectManager.getDefault().saveProject (p);
                         return null;
@@ -197,7 +165,7 @@ public class JavaFXProjectGenerator {
     }
 
     private static AntProjectHelper createProject(FileObject dirFO, String name,
-                                                  String srcRoot, String testRoot, String mainClass, String manifestFile, boolean isLibrary) throws IOException {
+                                                  String srcRoot, String mainClass, String manifestFile, boolean isLibrary) throws IOException {
         AntProjectHelper h = ProjectGenerator.createProject(dirFO, JavaFXProjectType.TYPE);
         Element data = h.getPrimaryConfigurationData(true);
         Document doc = data.getOwnerDocument();
@@ -216,15 +184,6 @@ public class JavaFXProjectGenerator {
             ep.setProperty("src.dir", srcRoot); // NOI18N
         }
         data.appendChild (sourceRoots);
-        
-        Element testRoots = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"test-roots");  //NOI18N
-        if (testRoot != null) {
-            Element root = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
-            root.setAttribute ("id","test.src.dir");   //NOI18N
-            testRoots.appendChild (root);
-            ep.setProperty("test.src.dir", testRoot); // NOI18N
-        }
-        data.appendChild (testRoots);
         
         h.putPrimaryConfigurationData(data, true);
         ep.setProperty("dist.dir", "dist"); // NOI18N

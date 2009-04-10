@@ -130,8 +130,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
         switch (type) {
         case EXT:
             File[] sourceFolders = (File[])wiz.getProperty("sourceRoot");        //NOI18N
-            File[] testFolders = (File[])wiz.getProperty("testRoot");            //NOI18N
-            AntProjectHelper h = JavaFXProjectGenerator.createProject(dirF, name, sourceFolders, testFolders, MANIFEST_FILE );
+            AntProjectHelper h = JavaFXProjectGenerator.createProject(dirF, name, sourceFolders, MANIFEST_FILE );
             EditableProperties ep = h.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
             String includes = (String) wiz.getProperty(JavaFXProjectProperties.INCLUDES);
             if (includes == null) {
