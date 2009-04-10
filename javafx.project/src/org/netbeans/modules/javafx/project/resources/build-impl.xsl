@@ -189,7 +189,6 @@ is divided into following sections:
         <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
         </target>
         <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init" name="-init-check">
-            <fail unless="src.dir">Must set src.dir</fail>
             <fail unless="build.dir">Must set build.dir</fail>
             <fail unless="dist.dir">Must set dist.dir</fail>
             <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
@@ -306,7 +305,13 @@ is divided into following sections:
                     <path path="${{javac.classpath}}"/>
                 </classpath>
                 <sourcepath>
-                    <path path="${{src.dir}}"/>
+                    <path>
+                      <xsl:attribute name="path">
+                          <xsl:call-template name="createPath">
+                              <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                          </xsl:call-template>
+                      </xsl:attribute>
+                    </path>
                 </sourcepath>
             </nbjavafxstart>
         </target>
@@ -316,7 +321,13 @@ is divided into following sections:
                     <path path="${{javac.classpath}}"/>
                 </classpath>
                 <sourcepath>
-                    <path path="${{src.dir}}"/>
+                    <path>
+                      <xsl:attribute name="path">
+                          <xsl:call-template name="createPath">
+                              <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                          </xsl:call-template>
+                      </xsl:attribute>
+                    </path>
                 </sourcepath>
             </nbjavafxstart>
         </target>
@@ -360,7 +371,15 @@ is divided into following sections:
         <target depends="init" name="-javadoc-build">
             <mkdir dir="${{dist.javadoc.dir}}"/>
             <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/javafxdoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true">
-                <fileset dir="${{src.dir}}" includes="**/*.fx"/>
+                <xsl:for-each select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots/javafxproject3:root">
+                    <fileset includes="**/*.fx">
+                        <xsl:attribute name="dir">
+                          <xsl:text>${</xsl:text>
+                          <xsl:value-of select="@id"/>
+                          <xsl:text>}</xsl:text>
+                        </xsl:attribute>
+                    </fileset>
+                </xsl:for-each>						
             </javadoc>
             <condition property="javadoc.available">
                 <and>

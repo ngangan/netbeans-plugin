@@ -275,7 +275,7 @@ public class JavaFXProjectGenerator {
 
         ep.setProperty(JavaFXProjectProperties.JAVADOC_PRIVATE, "true"); // NOI18N
         ep.setProperty(JavaFXProjectProperties.JAVADOC_AUTHOR, "true"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_VERSION, "true"); // NOI18N
+        ep.setProperty(JavaFXProjectProperties.JAVADOC_VERSION, "false"); // NOI18N
         ep.setProperty(JavaFXProjectProperties.JAVADOC_ENCODING, ""); // NOI18N
         ep.setProperty(JavaFXProjectProperties.JAVADOC_ADDITIONALPARAM, ""); // NOI18N
         ep.setProperty("jnlp.codebase.type", "local"); // NOI18N
