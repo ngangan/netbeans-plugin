@@ -57,7 +57,9 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         }
         
         protected void addAttribute( String name, String value, int startOff, int endOff) {
-            m_attributes.put(name, value);
+            if ( !m_attributes.containsKey(name)) {
+                m_attributes.put(name, value);
+            }
         }
         
         protected void build(DocumentModelModificationTransaction trans, int endOffset) throws BadLocationException, DocumentModelTransactionCancelledException {

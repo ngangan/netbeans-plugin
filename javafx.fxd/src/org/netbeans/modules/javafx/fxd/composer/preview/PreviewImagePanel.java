@@ -6,6 +6,7 @@ package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import javax.swing.*;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
@@ -187,16 +188,23 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         if ( m_sgPanel != null) {
             float zoom = m_dObj.getDataModel().getZoomRatio();
             FXNode fxNode = (FXNode) m_sgPanel.getScene();
-            fxNode.setTranslateX( 0);
-            fxNode.setTranslateY( 0);
-            fxNode.setScaleX(zoom);
-            fxNode.setScaleY(zoom);
-            Rectangle2D bounds = fxNode.getTransformedBounds();
-
-            fxNode.setTranslateX( (float) -bounds.getX());
-            fxNode.setTranslateY( (float) -bounds.getY());
-
+//            fxNode.setTranslateX( 0);
+//            fxNode.setTranslateY( 0);
+//            fxNode.setScaleX(zoom);
+//            fxNode.setScaleY(zoom);
+//            Rectangle2D bounds = fxNode.getTransformedBounds();
+//
+//            fxNode.setTranslateX( (float) -bounds.getX());
+//            fxNode.setTranslateY( (float) -bounds.getY());
+//
+//            m_sgPanel.invalidate();
+            AffineTransform at = new AffineTransform();
+            at.scale( zoom, zoom);
+            Rectangle2D bounds = fxNode.getBounds(at);
+            at.translate(-bounds.getX(), -bounds.getY());
+            fxNode.setTransform(at);
             m_sgPanel.invalidate();
+            m_sgPanel.getParent().validate();
         }
     }
     
