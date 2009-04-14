@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>“JavaFX 项目属性”对话框：源</title>
+	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>“JavaFX 项目属性”对话框：源 </h2>
+<p> <small><a href="#seealso">另请参见</a>&nbsp; </small> 
+</p><p>“源”面板可让您查看项目文件夹的位置，管理源文件夹并指定源编码。
+</p><p>要打开“JavaFX 项目属性”对话框，请右键单击任意 JavaFX 项目，然后选择“属性”。
+  <!--explain source level?-->
+  
+</p><p>可以使用面板右侧的按钮添加和删除类路径元素，以及更改它们的顺序。 
+</p><p>一个 JavaFX 项目中可以有多个源根目录，但以下情况除外：</p>
+<ul>
+<li>源根目录不能存在于另一个 IDE 项目中。
+</li><li>不能将源根目录添加到同一个项目的另一个编译单元中。例如，在“测试包”下注册的源根目录不能添加到“源包”列表中。
+</li><li>所有源根目录被包装到同一个 JAR 文件中，并且共享相同的类路径。
+</li><li>如果几个项目需要使用同一个源根目录，则应该为该源根目录创建单独的项目，并设置项目之间的编译依赖关系。
+</li></ul>
+<p>您可以使用“源”页面底部的“编码”组合框来指定源编码，以便对应用程序进行本地化。
+</p><dl>
+    <dt><a name="seealso">另请参见</a></dt>
+    <dd><a href="../javafx_proj_process.html">使用 JavaFX 项目</a><br>
+  </dd>
+<dd>“JavaFX 项目属性”对话框：</dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_libraries.html">库</a></dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_documenting.html">生成文档</a></dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_run.html">运行</a></dd>   
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_app.html">应用程序</a></dd>        
+</dl>
+
+<hr>
+<small><a href="../../credits.html">法律声明</a></small> 
+<table border="0" cellpadding="20">
+  <tr> 
+    <td>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+  </tr>
+  <tr> 
+    <td>&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

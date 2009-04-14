@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>“JavaFX 项目属性”对话框：运行</title>
+	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>“JavaFX 项目属性”对话框：运行</h2>
+<p> <small><a href="#seealso">另请参见</a>&nbsp; </small> 
+</p><p>“运行”面板可让您配置用于在本地执行 JavaFX 项目的选项。您可以设置主类和应用程序执行模型以用于部署。此外，还可以在此面板中指定以空格分隔的 JVM 选项列表。 
+</p><p>要打开“JavaFX 项目属性”对话框，请右键单击 JavaFX 项目根节点，然后从弹出式菜单中选择“属性”。 
+</p><p>可用的应用程序执行模型如下所示：
+</p><ul>
+  <li><b>标准执行。</b>IDE 使用您在项目的“属性”对话框中指定的设置来生成项目文件。IDE 根据项目的 <code>dist</code> 文件夹中的类文件运行应用程序。 </li>
+  <li><b>WebStart 执行。</b>如果选中此选项，则 IDE 会创建使用 Java Web Start 执行应用程序的必要工件。这些工件可以在项目的 <code>dist</code> 文件夹中找到，并可用于在 IDE 外部部署应用程序。 </li>
+  <li><b>在浏览器中运行。</b>IDE 会生成使应用程序在 Web 浏览器中运行所必需的一些文件（包括 <i>&lt;project_name&gt;</i>.<code>HTML</code> 文件）。生成的文件可以在项目的 <code>dist</code> 文件夹中找到。在执行操作后，应用程序会在 IDE 用来显示 Web 内容的 Web 浏览器（通常是系统的缺省浏览器）中作为一个 applet 运行。 </li>
+  <li><b>在移动仿真器中运行。</b>选中此选项后，IDE 会为应用程序创建所需的 .JAD（Java 应用程序描述符）文件和 .JAR（Java 归档）文件。然后，它使用移动仿真器工具执行应用程序。JAD 文件对作为 JAR 文件分发的 MIDlet（Java ME 应用程序）进行了介绍。此选项当前仅可用于 Microsoft Windows 平台。 <br> 
+  </li>
+</ul>
+<p><b>注意：</b>
+</p><ul>
+  <li>“主类”字段的“浏览”按钮只显示项目源文件夹中的类。如果要指定项目类路径上某个 JAR 文件中的类，请在“主类”字段中键入全限定类名。 </li>
+</ul>
+<dl>
+    <dt><a name="seealso">另请参见</a></dt>
+    <dd><a href="../javafx_proj_process.html">使用 JavaFX 项目</a>
+	</dd><dd><a href="../javafx_proj_process.html">准备要部署的 JavaFX 应用程序</a><br>
+  </dd>
+<dd>“JavaFX 项目属性”对话框：</dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_sources.html">源</a></dd>   
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_libraries.html">库</a></dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_documenting.html">生成文档</a></dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_app.html">应用程序</a></dd>        
+</dl>
+
+<hr><small><a href="../../credits.html">法律声明</a></small>
+
+<table border="0" cellpadding="20">
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table></body>
+</html>

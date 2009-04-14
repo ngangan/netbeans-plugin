@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+*
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="nbdocs:/org/netbeans/modules/usersguide/ide.css" rel="stylesheet" type="text/css">
+<title>在 JavaFX 项目中设置目标 JDK</title>
+</head>
+<body>
+<h2>在 JavaFX 项目中设置目标 JavaFX SDK</h2>
+<p> <small><a href="#seealso">另请参见</a>&nbsp; </small> 
+</p><p>缺省情况下，新创建的 JavaFX 项目会使用 JavaFX 插件捆绑的 JavaFX SDK。它是用于编译、执行和调试 JavaFX 应用程序并分析该应用程序性能的缺省平台。此平台基于 IDE 安装期间选用的 JavaFX 捆绑库和 Java SE 平台 (JDK)。可以通过选择“帮助”&gt;“关于”，然后单击“详细信息”选项卡来查看您的 IDE 安装所使用的 JDK 版本。（在 MacOS 平台上，选择 &quot;NetBeans&quot; &gt;“关于 NetBeans”）。JDK 版本在 &quot;Java&quot; 字段中列出。 
+</p><ul class="note"> 
+    <li>通过在命令行或 <tt><i>IDE-HOME</i>/etc/netbeans.conf</tt> 文件中使用 <tt>--jdkhome</tt>&nbsp; <i><tt>jdk-home-dir</tt></i> 开关启动 IDE，可以使用不同的 JDK 版本来运行 IDE。有关详细信息，请参见 <a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_startup-switches.html">IDE 启动参数</a>。 
+</li></ul>
+
+<p><b>为 JavaFX 项目设置缺省平台：</b></p>
+<ol>
+  <li>在“项目”窗口中右键单击项目的根节点，然后选择“属性”。<br>
+  另外，在 Windows 平台上，您还可以在“项目”窗口中选择项目，从主菜单中选择“文件”&gt;“项目属性”(<i>JavaFX_project_name</i>)。  </li>
+  <li>在“项目属性”对话框中，选择左窗格中的“库”节点。 </li>
+  <li>在“JavaFX 平台”组合框中选择所需的 JavaFX 平台，然后单击“确定”。 
+    <p>切换 JavaFX 项目的目标平台将会执行以下操作： 
+    </p><ul>
+   	    <li>提供新目标平台的类，以用于代码完成。</li>
+      	  <li>显示目标 SDK 的源代码和 Javadoc 文档（如果可用）。</li>
+      	  <li>使用目标 SDK 的可执行文件（<tt>javafxc</tt> 和 <tt>javafxrt</tt>）编译和执行应用程序。</li>
+      	  <li>根据目标 SDK 的库来编译源代码。
+      	  </li>
+    </ul>
+  </li>
+</ol>
+<p><b>向 IDE 注册其他 JavaFX 平台：</b></p>
+  <ol>
+      <li>从 IDE 的主菜单中选择“工具”&gt;“Java 平台”。</li>
+      <li>从“Java 平台管理器”中，单击“添加平台”按钮。 </li>
+      <li>在“添加 Java 平台”向导中，选择“JavaFX 平台”类型，然后单击“下一步”。</li>
+      <li>指定要分配给新平台配置的“平台名称”。</li>
+      <li>指定包含新 JavaFX 平台所需使用的 JavaFX 库的文件夹。使用“浏览”按钮导航到您要使用的 JavaFX SDK 安装所在的文件夹。如果所选平台不受支持，将会显示一条警告，这种情况下建议不要继续使用此平台。</li>
+      <li>单击“完成”。 <br>
+        新平台将添加到可用 JavaFX 平台的列表中。</li>
+      <li>单击“关闭”以关闭“Java 平台管理器”对话框。 </li>
+</ol>
+<dl>
+    <dt><a name="seealso">另请参见</a></dt>
+    <dd><a href="../compile/javafx_comp_classpath.html">管理 JavaFX 项目的类路径</a></dd>
+      <dd>&nbsp;</dd>
+      <dd>&nbsp;</dd>
+</dl>
+
+<hr>
+<small><a href="../credits.html">法律声明</a></small> 
+</body>
+</html>

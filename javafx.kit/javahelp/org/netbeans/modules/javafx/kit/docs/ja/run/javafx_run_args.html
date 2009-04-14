@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>JavaFX 主クラスと実行時引数の設定</title>
+<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>JavaFX 主クラスと実行時引数の設定</h2>
+<p><small><a href="#seealso">関連項目</a>&nbsp; </small></p>
+<p>JavaFX プロジェクトの主クラスと実行時引数を設定する</p>
+<ol>
+  <li>「プロジェクト」ウィンドウで JavaFX プロジェクトのノードを右クリックし、「プロパティー」を選択します。<br>
+    または、「プロジェクト」ウィンドウでプロジェクトを選択し、メインメニューの「ファイル」&gt;「プロジェクトプロパティー」(<i>JavaFX_project_name</i>) を選択します。 </li>
+  <li>ダイアログの「カテゴリ」区画で「実行」ノードを選択します。</li>
+  <li>「主クラス」フィールドに主クラスの完全修飾名 (たとえば <tt>org.myCompany.myLib.MyLibClass </tt>) を入力します。主クラスは、プロジェクト内か、プロジェクトの実行時クラスパスにある JAR ファイルまたはライブラリのいずれかに存在する必要があります。 </li>
+	  <ul class="note">
+    <li> 「参照」ボタンを使用してプロジェクトの主クラスを選択すると、ファイル選択ダイアログが開き、プロジェクトのソースディレクトリ内のクラスのみ表示されます。クラスパス上にあるライブラリにあるクラスを指定する場合は、「主クラス」フィールドにそのクラスの完全修飾名を入力する必要があります。</li>
+  </ul>
+
+  <li>アプリケーション実行モデルを選択します。
+  <ul>
+  <li><b>標準実行。</b>IDE はプロジェクトをスタンドアロンアプリケーションとして実行します。 </li>
+  <li><b>WebStart 実行。</b>プロジェクトは Java Web Start を使用して実行されます。 </li>
+  <li><b>ブラウザで実行。</b>IDE では、アプリケーションを Web ブラウザで実行できます。 </li>
+  <li><b>モバイルエミュレータで実行。</b>プロジェクトは、JavaFX SDK に含まれているモバイルエミュレータを使用して実行されます。「デバイス」コンボボックスからデバイスを選択して、モバイル実行用のデバイスを指定します。デバイスには、エミュレータまたはコンピュータに接続されている実際のデバイスを指定できます。</li>
+  </ul>
+  </li>
+  <li>標準実行モデルの場合は、「引数」フィールドに必要なアプリケーションのユーザー引数を指定します。</li>
+  <li>「JVM 引数」フィールドに必要な実行時引数を入力します。
+    <p>プロジェクトの主クラスが設定され、新たに追加された引数が保存されます。  </p></li>
+</ol>
+
+<ul class="note">
+        <li>主クラスを指定している JavaFX プロジェクトでは、プロジェクトのクラスパス上の JAR ファイルを <tt>dist/lib</tt> フォルダに自動的にコピーします。また、IDE は個々の JAR ファイルをアプリケーション JAR の <tt>manifest.mf </tt> ファイル内の Class-Path 要素にも追加します。これによって、簡単に IDE の外部でアプリケーションを実行できます。 </li>
+        </ul>  
+
+<dl>
+    <dt><a name="seealso">関連項目</a></dt>
+    <dd><a href="javafx_run_app.html">JavaFX アプリケーションの実行</a></dd>
+</dl>
+
+
+<hr><small><a href="../credits.html">著作権と商標について</a></small>
+
+<table border="0" cellpadding="20">
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table></body>
+</html>

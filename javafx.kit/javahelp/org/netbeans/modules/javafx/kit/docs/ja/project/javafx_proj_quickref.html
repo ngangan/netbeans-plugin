@@ -1,0 +1,151 @@
+
+
+<html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+* Copyright (c) 2008 Sun Microsystems, Inc.
+* All rights reserved. 
+ * Use is subject to license terms.
+-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>JavaFX プロジェクト関連の手順早見表</title>
+<link href="nbdocs:/org/netbeans/modules/usersguide/ide.css"  rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h2>JavaFX プロジェクト関連の手順早見表 </h2>
+<p><small><a href="#seealso">関連項目</a></small></p>
+<p>
+ここでは、JavaFX プロジェクトに対して実行する作業について説明します。詳細な情報を参照するには、右欄に表示されているリンクをクリックしてください。 </p>
+
+<table border="1" cellpadding="5" cellspacing="0" summary="The left column lists the task name. The right column lists the steps to perform.">
+  <tr valign="top"> 
+    <th scope="col" align="left">行う作業...</th>
+    <th scope="col" align="left">手順</th>
+  </tr>
+  <tr valign="top"> 
+    <td>新規 JavaFX プロジェクトを作成する </td>
+    <td><ol>
+        <li> 「ファイル」&gt;「新規プロジェクト」(Ctrl-Shift-N) を選択します。
+          
+
+</li>
+        <li>「新規プロジェクト」ウィザードの「カテゴリ」リストで「JavaFX」を選択します。</li>
+        <li>「プロジェクト」リストで、「JavaFX アプリケーション」を選択し、「次へ」をクリックします。 </li>
+        <li>「名前と場所」パネルで、プロジェクトの名前と場所を指定します。</li>
+    <li>「空のプロジェクト」を選択します。</li>
+    <li>プロジェクトを主プロジェクトとして設定し、必要な場合は主クラスファイルを作成します。<br>
+      詳細は、「<a href="newjavafxappwiz-nameandloc.html">「新規 JavaFX アプリケーション」ウィザード: 名前と場所</a>」を参照してください。</li>
+    </ol></td>
+  </tr>
+<tr valign="top">
+    <td>既存の JavaFX アプリケーションをインポートする </td>
+    <td><ol>
+      <li>「ファイル」&gt;「新規プロジェクト」(Ctrl-Shift-N) を選択します。 </li>
+      <li>「新規プロジェクト」ウィザードの「カテゴリ」リストで「JavaFX」を選択します。</li>
+      <li>「プロジェクト」リストで、「JavaFX アプリケーション」を選択し、「次へ」をクリックします。 </li>
+      <li>「名前と場所」パネルで、プロジェクトの名前と場所を指定します。</li>
+      <li>「ソースから」を選択します。</li>
+      <li>「フォルダを追加」をクリックして、既存のソースファイルが保存されているフォルダに移動し、選択します。 </li>
+      <li>プロジェクトを主プロジェクトとして設定し、必要な場合は主クラスファイルを作成します。<br>
+  詳細は、「<a href="newjavafxappwiz-nameandloc.html">「新規 JavaFX アプリケーション」ウィザード: 名前と場所</a>」を参照してください。 </li>
+      </ol></td>
+  </tr>
+<tr valign="top">
+  <td>プロジェクトにファイルを追加する</td>
+  <td><ol>
+    <li>「プロジェクト」ウィンドウで主プロジェクトノードを選択し、右クリックします。</li>
+  <li>「新規」を選択して、追加するファイルの種類を選択します。</li>
+  <li>「新規ファイル」ウィザードで、ファイル名、場所、およびパッケージを指定します。</li>
+  <li>「完了」をクリックしてファイルを作成します。</li>
+  </ol></td>
+</tr>
+<tr valign="top">
+  <td>ファイルを編集する </td>
+  <td><ol>
+      <li>「プロジェクト」ウィンドウで、プロジェクトのノードを選択し、必要に応じて、そのノードをダブルクリックして、ノードを開きます。</li>
+      <li>編集するファイルがある場所に移動し、ダブルクリックしてファイルをソースエディタで開きます。</li>
+      </ol>
+    <p>ソースエディタの詳細は、「<a href="../editing/editing_javafx_source.html">JavaFX ソースファイルの編集</a>」を参照してください。 </p></td>
+</tr>
+<tr valign="top">
+  <td>主プロジェクトを設定する</td>
+  <td><ul>
+        <li>「プロジェクト」ノードを右クリックし、コンテキストメニューから「主プロジェクトとして設定」を選択します。</li>
+      </ul></td>
+</tr>
+<tr valign="top">
+  <td>プロジェクトを構築する</td>
+  <td><ul>
+        <li>「構築」&gt;「 <a href="../compile/javafx_comp_project.html">主プロジェクトを構築 </a>」(F11) を選択するか、プロジェクトノードを右クリックし、「プロジェクトを構築」を選択します。</li>
+      </ul></td>
+</tr>
+<tr valign="top">
+  <td>プロジェクトを実行する </td>
+  <td><ul>
+        <li>「実行」&gt;「主プロジェクトを実行」</a>(F6) を選択するか、プロジェクトノードを右クリックし、「プロジェクトを実行」を選択します。</li>
+      </ul>
+	</td>
+</tr>
+  <tr valign="top"> 
+    <td>プロジェクトをデバッグする</td>
+    <td> 
+      <ul>
+        <li>「実行」&gt;「<a href="../debug/javafx_debug_about.html">主プロジェクトをデバッグ</a>」(Ctrl-F5) を選択するか、プロジェクトを右クリックし、「プロジェクトをデバッグ」を選択します。<br>
+        <b>注:</b> JavaFX プロジェクトのデバッグセッション中に表示できるのは、生の Java 型のみです。 </li>
+      </ul>
+    </td>
+  </tr>
+<tr valign="top"> 
+    <td>プロジェクトをプロファイルする</td>
+    <td> 
+      <ul>
+        <li>「プロファイル」&gt;<a href="../profiling/javafx_profile_about.html">「主プロジェクトのプロファイル」</a>を選択するか、任意のプロジェクトをクリックして、「プロファイル」を選択します。<br>
+        <b>注:</b> 現在は、プロジェクトレベルでのみプロファイルできます。 </li>
+      </ul>
+    </td>
+  </tr>
+<tr valign="top">
+  <td>配備用にプロジェクトを準備する </td>
+  <td><ol>
+        <li>プロジェクトのルートノードを右クリックし、「プロパティー」を選択します。</li>
+      <li> 「プロジェクトプロパティー」ダイアログで「実行」カテゴリを選択します。</li>
+        <li>使用するアプリケーション実行モデルを選択します。</li>
+        <li>必要な JVM 引数を指定し、「了解」をクリックします。</li>
+        <li>「プロジェクト」ウィンドウで、「実行」&gt;「主プロジェクトを実行」</a>(F6) を選択するか、ルートプロジェクトノードを右クリックし、「プロジェクトを実行」を選択します。<br>
+          アプリケーションの配備に必要なファイルは、/dist フォルダにあります。
+        </li>
+  </ol>
+	  使用可能な配備オプションの詳細は、「<a href="../deploy/javafx_deploy_prep.html">JavaFX アプリケーションを配備するための準備</a>」を参照してください。</td>
+</tr>
+</table>
+
+<dl>
+<dt><a name="seealso">関連項目</a></dt>
+<dd><a href="../about_javafx.html">JavaFX アプリケーションについて</a></dd>
+</dl>
+
+
+
+<hr>
+
+<!-- Start Customer Feedback Link -->
+<!-- <p><b>Comments or questions?</b><br>
+Use the link below to connect to the Visual Web Development contact page. </p>
+  <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="viewerActivator" value="javax.help.LinkButton">
+    <param name="content" value="http://www.netbeans.org/about/contact_form.html?to=4&subject=Feedback:%20Web%20Application%20Help:%20Component Tasks: Quick Reference">
+    <param name="text" value="<html><u><html><u>Click here to send feedback</u></html>">
+         <param name="textFontSize" value="medium">
+        <param name="textColor" value="blue">
+   </object><br> --> 
+<!-- End Customer Feedback Link -->
+  <small><a href="../credits.html">著作権と商標について</a></small> 
+<table cellpadding="50" border="0">
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>管理 JavaFX 项目的类路径</title>
+	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>管理 JavaFX 项目的类路径</h2>
+<p> <small><a href="#seealso">另请参见</a>&nbsp; </small> 
+</p><p>通过将一组类文件添加到 JavaFX 项目的类路径中，可以通知 IDE 在编译和执行期间此项目应该能够访问哪些类。IDE 还使用类路径设置来启用代码完成、自动突出显示编译错误以及重构。 
+</p><ul class="note">
+	<li>源根目录只能位于单个项目中，不能与其他项目共享，无论这些项目打开与否。如果需要在几个项目中使用某个库，请创建一个特殊项目来存储它。
+</li></ul>
+
+<h3> 类路径和 JavaFX 项目</h3>
+<!--todo : add mention of libraries node here & mention contextual menu as primary way to add items to classpath (for more detailed configing, use proj props)-->
+<p>IDE 可分别维护用于编译和运行 JavaFX 项目的类路径。IDE 自动将项目编译类路径中的所有内容添加到项目的运行时类路径中。</p>
+
+        <ul class="note">
+        <li>每当生成指定了主类的 JavaFX 项目时，IDE 都会自动将此项目类路径中的任何 JAR 文件复制到 <tt>dist/lib</tt> 文件夹中。IDE 还会将每个 JAR 文件添加到应用程序 JAR 的 <tt>manifest.mf</tt> 文件的 Class-Path 元素中。这会简化在 IDE 外部运行应用程序的过程。</li>
+        </ul>  
+
+<p><b>编辑 JavaFX 项目的类路径：</b></p>
+<ol>
+  <li>展开项目节点，右键单击“库”节点，然后选择“属性”。<br>
+    另外，您还可以在“项目”窗口中选择项目，从主菜单中选择“文件”&gt;“项目属性”(<i>&lt;JavaFX_project_name&gt;)</i>，然后从“项目属性”对话框中选择“库”类别。 </li>
+    <li>在“项目属性”对话框中，通过单击相应的“添加”按钮，将必要的元素添加到项目的编译类路径中。您可以添加以下任意内容：
+	  <ul><li><b>项目。</b>其他项目生成的 JAR 文件或 WAR 文件以及关联的源文件和 Javadoc 文档。</li>
+      <li><b>库。</b>包含已编译类的 JAR 文件或文件夹的集合，这些文件或文件夹可以有选择地包含关联的源文件和 Javadoc 文档。</li>
+	<li><b>JAR/文件夹。</b>包含编译的类的 JAR 文件或文件夹。</li>
+    </ul>
+   </li>
+  <li>（可选）在生成当前项目时，如果不想重新生成类路径上的所有项目，请单击“在类路径上生成项目”复选框。缺省情况下，在生成当前项目时，将重新生成类路径上和 Web 应用程序中的所有项目，以及“包装”页中列出的项目。</li>
+  <li>（可选）单击“上移”和“下移”按钮来更改类路径优先级。</li>
+  <li>（可选）单击“运行”、“编译测试”或“运行测试”标签对这些类路径进行任何更改。</li>
+</ol>
+
+<ul class="note">
+  <li>也可以使用以下方法将相关项目和其他必需资源添加到项目中：只需在“项目”窗口中右键单击“库”节点，然后从上下文菜单中选择相应项（“添加项目”、“添加库”或“添加 JAR/文件夹”）。
+</li></ul>
+     
+        
+<dl>
+    <dt><a name="seealso">另请参见</a></dt>
+	<dd><a href="../project/javafx_proj_sdk.html">在 JavaFX 项目中设置目标 JavaFX SDK</a></dd>
+    <dd><a href="../run/javafx_run_args.html">设置 JavaFX 主类和运行时参数</a></dd>        
+</dl>
+<hr>
+<small><a href="../credits.html">法律声明</a></small> 
+
+<table border="0" cellpadding="20">
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table></body>
+</html>

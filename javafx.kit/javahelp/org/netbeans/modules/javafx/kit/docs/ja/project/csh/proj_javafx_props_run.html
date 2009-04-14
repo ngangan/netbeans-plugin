@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>JavaFX の「プロジェクトプロパティー」ダイアログ:「実行」</title>
+	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>JavaFX の「プロジェクトプロパティー」ダイアログ:「実行」</h2>
+<p> <small><a href="#seealso">関連項目</a>&nbsp; </small> 
+</p><p>「実行」パネルでは、JavaFX プロジェクトをローカルに実行するためのオプションを設定できます。配備に使用する主クラスとアプリケーション実行モデルを設定できます。このパネルでは、JVM オプションの、スペースで区切ったリストを指定することもできます。 
+</p><p>JavaFX の「プロジェクトプロパティー」ダイアログを開くには、JavaFX プロジェクトのルートノードを右クリックし、ポップアップメニューから「プロパティー」を選択します。 
+</p><p>使用可能なアプリケーション実行モデルは次のとおりです。
+</p><ul>
+  <li><b>標準実行。</b>IDE は、プロジェクトの「プロパティー」ダイアログで指定された設定を使用してプロジェクトのファイルを構築します。IDE は、プロジェクトの <code>dist</code> フォルダ内のクラスファイルからアプリケーションを実行します。 </li>
+  <li><b>WebStart 実行。</b>選択した場合、IDE は Java Web Start を使用してアプリケーションを実行するために必要な成果物を作成します。成果物は、プロジェクトの <code>dist</code> フォルダにあり、IDE の外部にアプリケーションを配備するために使用できます。 </li>
+  <li><b>ブラウザで実行。</b>IDE は、アプリケーションを Web ブラウザで実行するために必要な <i>&lt;project_name&gt;</i>.<code>HTML</code> ファイルなどのファイルを生成します。生成されたファイルは、プロジェクトの <code>dist</code> フォルダに保存されています。実行すると、アプリケーションは、IDE が Web コンテンツの表示に使用する Web ブラウザ (通常はシステムのデフォルトブラウザ) でアプレットとして実行されます。 </li>
+  <li><b>モバイルエミュレータで実行。</b>選択すると、IDE は必要な Java Application Descriptor (.JAD) ファイルと Java Archive (.JAR) ファイルを作成します。この場合は、モバイルエミュレータツールを使用してアプリケーションが実行されます。JAD ファイルには、JAR ファイルとして配布される MIDlet (Java ME アプリケーション) が記述されます。このオプションは現在 Microsoft Windows プラットフォームでのみ選択できます。 <br> 
+  </li>
+</ul>
+<p><b>注</b>
+</p><ul>
+  <li>「主クラス」フィールド上にある「参照」ボタンをクリックすると、プロジェクトのソースフォルダ内にあるクラスだけが表示されます。プロジェクトのクラスパス上にある JAR ファイル内のクラスを指定する場合は、「主クラス」フィールドに目的のクラスの完全修飾名を指定します。 </li>
+</ul>
+<dl>
+    <dt><a name="seealso">関連項目</a></dt>
+    <dd><a href="../javafx_proj_process.html">JavaFX プロジェクトの作業手順</a>
+	</dd><dd><a href="../javafx_proj_process.html">JavaFX アプリケーションを配備するための準備</a><br>
+  </dd>
+<dd>JavaFX の「プロジェクトプロパティー」ダイアログ:</dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_sources.html">ソース</a></dd>   
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_libraries.html">ライブラリ</a></dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_documenting.html">ドキュメント化</a></dd>
+    <dd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="proj_javafx_props_app.html">アプリケーション</a></dd>        
+</dl>
+
+<hr><small><a href="../../credits.html">著作権と商標について</a></small>
+
+<table border="0" cellpadding="20">
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table></body>
+</html>

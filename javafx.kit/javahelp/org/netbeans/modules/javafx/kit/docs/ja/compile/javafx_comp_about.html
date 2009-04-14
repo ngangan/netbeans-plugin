@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>JavaFX アプリケーションの構築について</title>
+	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>JavaFX アプリケーションの構築について</h2>
+<p> <small><a href="#seealso">関連項目</a>&nbsp; </small> 
+</p><p>IDE は、Ant 構築スクリプトを使用して、JavaFX アプリケーションを構築します。IDE は、プロジェクトの「プロパティー」ダイアログで入力されたオプションに基づいて、この構築スクリプトを生成します。 </p>
+  <p>構築プロセスは、次の方法でカスタマイズできます。</p>
+  <ul>
+  <li>「プロジェクトプロパティー」ダイアログでクラスパスや JAR フィルタなどの基本的なオプションを入力する。</li>
+  <li><tt>build.xml </tt> に含まれる IDE で生成された Ant ターゲットをオーバーライドするか、新しいターゲットを作成する。 
+  </li>
+  <li><tt>project.properties </tt> 内のプロパティーを編集し、構築出力ディレクトリやファイルの名前と場所を変更する。</li>
+</ul>
+<p>JavaFX プロジェクトには、JavaFX と Java 両方のソースファイルを含めることができます。JavaFX コンパイラを使用して JavaFX ソースファイルをコンパイルし、Java コンパイラを使用して Java ソースファイルをコンパイルします。プロジェクトが正常に構築されると、単一の JAR ファイルが作成されて、コンパイルされた JavaFX および Java 両方のコードが含まれます。 </p>
+  <!--<h3>Building Free-Form Projects</h3>-->
+  <!--todo : add FF info-->
+
+<dl> 
+      <dt><a name="seealso">関連項目</a></dt>
+ <!--     <dd><a href="javafx_comp_quickref.html">Building Tasks: Quick Reference</a></dd> -->
+      <dd><a href="javafx_comp_process.html">JavaFX プロジェクトの構築手順</a></dd>
+	  <dd><a href="javafx_comp_project.html">JavaFX プロジェクトの構築</a></dd>
+<!--  <dd><a href="javafx_comp_file.html">Compiling a Single JavaFX File</a></dd> -->
+      <dd><a href="javafx_comp_classpath.html">JavaFX プロジェクトのクラスパスの管理</a></dd>  
+</dl>
+
+
+<hr>
+<small><a href="../credits.html">著作権と商標について</a></small> 
+
+<table border="0" cellpadding="20">
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table></body>
+</html>

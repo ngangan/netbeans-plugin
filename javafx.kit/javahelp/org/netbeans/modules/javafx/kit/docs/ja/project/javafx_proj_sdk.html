@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+*
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="nbdocs:/org/netbeans/modules/usersguide/ide.css" rel="stylesheet" type="text/css">
+<title>JavaFX プロジェクトにおけるターゲット JDK の設定</title>
+</head>
+<body>
+<h2>JavaFX プロジェクトにおけるターゲット JavaFX SDK の設定</h2>
+<p> <small><a href="#seealso">関連項目</a>&nbsp; </small> 
+</p><p>デフォルトでは、新しく作成された JavaFX プロジェクトは JavaFX Plugin にバンドルされている JavaFX SDK を使用します。JavaFX SDK は、JavaFX アプリケーションのコンパイル、実行、デバッグ、およびプロファイルに使用されるデフォルトプラットフォームです。このプラットフォームは、バンドルされている JavaFX ライブラリと、IDE のインストール時に使用するよう選択した Java SE プラットフォーム (JDK) に基づいています。IDE インストールで使用している JDK バージョンを表示するには、「ヘルプ」&gt;「バージョン情報」を選択し、「詳細」タブをクリックします (MacOS プラットフォームでは、「NetBeans」&gt;「バージョン情報」を選択します)。「Java」フィールドに JDK のバージョンが表示されます。 
+</p><ul class="note"> 
+    <li>IDE で異なるバージョンの JDK を使用する場合は、コマンド行または <tt><i>IDE-HOME</i>/etc/netbeans.conf</tt> ファイル内で <tt>--jdkhome</tt> <i><tt>&lt;jdk-home-dir&gt;</tt></i> スイッチをオンに指定して IDE を起動します。詳細については、 <a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_startup-switches.html">IDE の起動パラメータ </a>を参照してください。 
+</li></ul>
+
+<p><b>JavaFX プロジェクトにデフォルトのプラットフォームを設定する</b></p>
+<ol>
+  <li>「プロジェクト」ウィンドウでプロジェクトのルートノードを右クリックし、「プロパティー」を選択します。<br>
+  または、Windows プラットフォームの場合、「プロジェクト」ウィンドウでプロジェクトを選択し、メインメニューの「ファイル」&gt;「プロジェクトプロパティー」(<i>JavaFX_project_name</i>) を選択します。  </li>
+  <li>「プロジェクトプロパティー」ダイアログで、左区画の「ライブラリ」ノードを選択します。 </li>
+  <li>「JavaFX プラットフォーム」コンボボックスで目的の JavaFX プラットフォームを選択し、「了解」をクリックします。 
+    <p>JavaFX プロジェクト用のターゲットプラットフォームを切り替えると、処理は次のように変更されます。 
+    </p><ul>
+   	    <li>コード補完の実行時には、新規ターゲットプラットフォームのクラスが優先して使用されます。</li>
+      	  <li>ターゲットの SDK のソースコードと Javadoc ドキュメントがある場合は、それらが表示されます。</li>
+      	  <li>アプリケーションのコンパイルおよび実行に、ターゲット JDK の実行可能ファイル (<tt>javafxc</tt> および <tt>javafxrt</tt>) が使用されます。</li>
+      	  <li>ターゲット SDK のライブラリを使用してソースコードをコンパイルします。
+      	  </li>
+    </ul>
+  </li>
+</ol>
+<p><b>追加の JavaFX プラットフォームを IDE に登録する</b></p>
+  <ol>
+      <li>IDE のメインメニューから「ツール」&gt;「Java プラットフォーム」を選択します。</li>
+      <li>「Java プラットフォームマネージャー」で「プラットフォームを追加」ボタンをクリックします。 </li>
+      <li>「Java プラットフォームを追加」ウィザードで、JavaFX プラットフォームの種類を選択し、「次へ」をクリックします。</li>
+      <li>新しいプラットフォーム設定に割り当てるプラットフォーム名を指定します。</li>
+      <li>新しい JavaFX プラットフォームで使用する必要な JavaFX ライブラリを保存するフォルダを指定します。「参照」ボタンをクリックして、使用する JavaFX SDK インストールのフォルダに移動します。選択したプラットフォームがサポートされない場合は、警告が表示されます。このプラットフォームで処理を続行しないでください。</li>
+      <li>「完了」をクリックします。 <br>
+        新しいプラットフォームが、使用可能な JavaFX プラットフォームのリストに追加されます。</li>
+      <li>「閉じる」をクリックして、「Java プラットフォームマネージャー」ダイアログを閉じます。 </li>
+</ol>
+<dl>
+    <dt><a name="seealso">関連項目</a></dt>
+    <dd><a href="../compile/javafx_comp_classpath.html">JavaFX プロジェクトのクラスパスの管理</a></dd>
+      <dd>&nbsp;</dd>
+      <dd>&nbsp;</dd>
+</dl>
+
+<hr>
+<small><a href="../credits.html">著作権と商標について</a></small> 
+</body>
+</html>

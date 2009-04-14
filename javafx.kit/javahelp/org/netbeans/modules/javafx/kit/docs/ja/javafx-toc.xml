@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
+                     "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+
+
+<toc version="2.0">
+   <tocitem text="IDE Basics">
+	<tocitem text="Getting Started">
+	  <tocitem text="JavaFX Applications" target="javafx_proj_process_top" />
+        </tocitem>
+   </tocitem>
+   <tocitem text="JavaFX Applications" expand="false">
+      <tocitem text="About JavaFX Applications" target="javafx_app_about" />
+
+      <tocitem text="JavaFX Project Setup and Configuration" >
+        <tocitem text="About JavaFX Projects" target="javafx_proj_about" />
+        <tocitem text="Working With JavaFX Projects" target="javafx_proj_process" />
+        <tocitem text="JavaFX Project Tasks: Quick Reference" target="javafx_proj_quickref"/>
+        <tocitem text="Deleting a JavaFX Project" target="javafx_proj_deleting" />
+        <tocitem text="Moving, Copying, and Renaming a JavaFX Project" target="javafx_proj_move_copy_rename" />
+        <tocitem text="Setting the Target JavaFX SDK in a JavaFX Project" target="javafx_proj_sdk" />
+        <tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
+      </tocitem>
+
+      <tocitem text="Editing JavaFX Source Files" >
+        <tocitem text="Editing JavaFX Source Files" target="javafx_editing_source" />
+        <tocitem text="About the JavaFX Palette" target="javafx_editing_palette" />
+        <tocitem text="Using the Navigator Window" target="javafx_nav_window" />
+        <tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
+      </tocitem>
+
+      <tocitem text="Building JavaFX Applications" >
+        <tocitem text="About Building JavaFX Applications" target="javafx_comp_about" />
+		<tocitem text="Working with JavaFX Project Builds" target="javafx_comp_process" />	
+        <tocitem text="Building a JavaFX Project" target="javafx_comp_project" />
+		<tocitem text="Managing the Classpath of JavaFX Projects" target="javafx_comp_classpath" />
+      </tocitem> 
+
+      <tocitem text="Running JavaFX Applications" >
+        <tocitem text="Working with JavaFX Project Execution" target="javafx_run_process" />
+        <tocitem text="Running a JavaFX Application" target="javafx_run_app" />
+        <tocitem text="Setting the Main JavaFX Class and Runtime Arguments" target="javafx_run_args" />
+      </tocitem>
+      
+      <tocitem text="Debugging JavaFX Applications" target="javafx_debug_about" />
+	  <tocitem text="Profiling JavaFX Applications" target="javafx_profile_about" />
+      <tocitem text="Preparing JavaFX Applications for Deployment" target="javafx_deploy_prep" />
+    </tocitem>
+</toc>	

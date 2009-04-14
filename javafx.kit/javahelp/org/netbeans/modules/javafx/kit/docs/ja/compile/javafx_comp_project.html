@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>JavaFX プロジェクトの構築</title>
+	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+</head>
+<body>
+<h2>JavaFX プロジェクトの構築</h2>
+<p> <small><a href="#seealso">関連項目</a>&nbsp; </small> 
+</p><p>JavaFX プロジェクトを構築すると、そのプロジェクトの Ant 構築スクリプトで対応するターゲットが呼び出されます。IDE はソースファイルをコンパイルし、JAR ファイルまたは WAR ファイルなどのパッケージ化された構築出力を生成します。主プロジェクトとそのすべての必須プロジェクトをまとめて構築することも、プロジェクトを個別に構築することもできます。
+</p><p><b>主プロジェクトとその必須プロジェクトをまとめて構築する</b> 
+</p><ul>
+  <li>「実行」&gt;「主プロジェクトを構築」(F11) を選択します。</li>
+	 <p>出力ウィンドウに、Ant 出力とコンパイルエラー (エラーがある場合) が表示されます。
+</p><ul class="note">
+<li>エラーメッセージをダブルクリックするとソースコード内のエラーが発生した場所にジャンプします。
+</li></ul>
+</ul>
+<p><b>プロジェクトとその必須プロジェクトを個別に構築する</b> 
+</p><ul>
+  <li>「プロジェクト」ウィンドウでプロジェクトのノードを右クリックし、「プロジェクトを構築」を選択します。 </li>
+  <p>出力ウィンドウに、Ant 出力とコンパイルエラー (エラーがある場合) が表示されます。
+</p><ul class="note">
+<li>エラーメッセージをダブルクリックするとソースコード内のエラーが発生した場所にジャンプします。 
+</li></ul>
+</ul>
+
+<p><b>プロジェクトの構築を停止する</b> 
+</p><ul>
+  <li>メインメニューから「構築」&gt;「構築/実行を停止」を選択します。</li>
+</ul>
+
+        <ul class="note">
+        <li>主クラスが指定されている JavaFX プロジェクトの場合、IDE は、アプリケーションの構築時にプロジェクトのクラスパス上の任意の JAR ファイルを <tt>dist/lib</tt> フォルダに自動的にコピーします。また、IDE は個々の JAR ファイルをアプリケーション JAR の <tt>manifest.mf </tt> ファイル内の Class-Path 要素にも追加します。これによって、簡単に IDE の外部でアプリケーションを実行できます。</li>
+        </ul>
+
+  <dl> 
+      <dt><a name="seealso">関連項目</a></dt>
+  <!-- <dd><a href="comp_quickref.html">Building Tasks: Quick Reference</a></dd>  
+      <dd><a href="javafx_comp_file.html">Compiling a Single File</a></dd>
+      <dd><a href="comp_jar.html">Building a JAR File</a></dd> 
+   -->
+      <dd><a href="javafx_comp_classpath.html">JavaFX プロジェクトのクラスパスの管理</a></dd>
+      <dd><a href="../run/javafx_run_args.html">JavaFX 主クラスと実行時引数の設定</a></dd>    
+  </dl>
+
+<hr>
+<small><a href="../credits.html">著作権と商標について</a></small> 
+
+<table border="0" cellpadding="20">
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+</table></body>
+</html>
