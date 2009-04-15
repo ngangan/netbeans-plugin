@@ -16,12 +16,15 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFac
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.TargetProfile;
+import java.util.ArrayList;
 
 /**
  *
  * @author Pavel Benes
  */
 public final class PreviewToolbar extends FXDToolbar {
+
+    private static final String FXD_EXTENSION = ".fxd"; //NOI18N
     private static final String[] ZOOM_VALUES = new String[]{"400%", "300%", "200%", "100%", "75%", "50%", "25%"}; //NOI18N
     
     private final FXZDataObject  m_dObj;
@@ -198,7 +201,7 @@ public final class PreviewToolbar extends FXDToolbar {
     }
 
     public static void updateEntryCombo( FXZDataObject  dObj, JComboBox entryCombo) {
-        String [] entryNames = dObj.getDataModel().getFXDContainer().getEntryNames();
+        String [] entryNames = getSceneEntryNames(dObj);
 
         boolean syncNeeded = false;
 
@@ -233,5 +236,24 @@ public final class PreviewToolbar extends FXDToolbar {
         
         System.out.println("Selecting in the combo: " + entryCombo.getClientProperty( PROP_COMBO) + " - "+ selectedEntry);
         entryCombo.setSelectedItem( selectedEntry);
+        entryCombo.setEnabled(entryCombo.getModel().getSize() > 1);
     }
+
+    private static String[] getSceneEntryNames(FXZDataObject  dObj){
+        String [] fullEntryNames = dObj.getDataModel().getFXDContainer().getEntryNames();
+
+        ArrayList<String> entryNames = new ArrayList<String>();
+
+        for (int i = 0; i < fullEntryNames.length; i++){
+            if (isFXDScene(fullEntryNames[i])){
+                entryNames.add(fullEntryNames[i]);
+            }
+        }
+        return entryNames.toArray(new String[]{});
+    }
+
+    private static boolean isFXDScene(String name){
+        return name.endsWith(FXD_EXTENSION);
+    }
+
 }

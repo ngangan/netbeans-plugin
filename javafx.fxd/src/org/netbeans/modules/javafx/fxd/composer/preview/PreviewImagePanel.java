@@ -113,6 +113,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 fModel.readLock();
                                                 PreviewStatistics stats = new PreviewStatistics();
                                                 System.out.println("Selected entry: " + selectedEntryCopy);
+
+                                                m_changeTickerCopy   = tickerCopy;
+                                                m_previewProfileCopy = profileCopy;
+                                                m_selectedEntryCopy  = selectedEntryCopy;
+
                                                 node = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, stats);
                                             } finally {
                                                 fModel.readUnlock();
@@ -140,9 +145,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 m_sgPanel.addMouseMotionListener(mec);
                                                 m_sgPanel.addMouseWheelListener(mec);
 
-                                                m_changeTickerCopy   = tickerCopy;
-                                                m_previewProfileCopy = profileCopy;
-                                                m_selectedEntryCopy  = selectedEntryCopy;
                                                 updateZoom();
                                             } else {
                                                 setBackground( m_defaultBackground);
