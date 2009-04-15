@@ -206,6 +206,7 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.modules.javafx.platform.platformdefinition</package>
                 <package>com.sun.javafx.api</package>
                 <package>com.sun.javafx.api.tree</package>
+                <package>com.sun.javafx.runtime</package>
                 <package>com.sun.javafx.runtime.location</package>
                 <package>com.sun.javafx.runtime.sequence</package>
                 <package>com.sun.scenario.scenegraph</package>
