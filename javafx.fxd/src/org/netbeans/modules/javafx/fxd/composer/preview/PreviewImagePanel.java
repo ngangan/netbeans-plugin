@@ -92,6 +92,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
                         final FXDFileModel fModel = fxz.getFileModel(selectedEntryCopy);
                         fModel.updateModel();
+                        
+                        m_changeTickerCopy = tickerCopy;
+                        m_previewProfileCopy = profileCopy;
+                        m_selectedEntryCopy = selectedEntryCopy;
+
                         //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
                         
                         SwingUtilities.invokeLater( new Runnable() {
@@ -113,10 +118,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 fModel.readLock();
                                                 PreviewStatistics stats = new PreviewStatistics();
                                                 System.out.println("Selected entry: " + selectedEntryCopy);
-
-                                                m_changeTickerCopy   = tickerCopy;
-                                                m_previewProfileCopy = profileCopy;
-                                                m_selectedEntryCopy  = selectedEntryCopy;
 
                                                 node = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, stats);
                                             } finally {
