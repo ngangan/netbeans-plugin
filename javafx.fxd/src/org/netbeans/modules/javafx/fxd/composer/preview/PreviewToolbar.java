@@ -15,16 +15,16 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 import com.sun.javafx.tools.fxd.TargetProfile;
 import java.util.ArrayList;
-
 /**
  *
  * @author Pavel Benes
  */
 public final class PreviewToolbar extends FXDToolbar {
 
-    private static final String FXD_EXTENSION = ".fxd"; //NOI18N
+    private static final String FXD_EXTENSION = "."+FXDContainer.FXD_EXTENSION; // NOI18N
     private static final String[] ZOOM_VALUES = new String[]{"400%", "300%", "200%", "100%", "75%", "50%", "25%"}; //NOI18N
     
     private final FXZDataObject  m_dObj;
