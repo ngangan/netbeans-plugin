@@ -24,7 +24,12 @@ import org.openide.util.NbBundle;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JPopupMenu;
+import javax.swing.ListSelectionModel;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.actions.Presenter;
 
 /**
  *
@@ -38,6 +43,8 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     public ArchivePanel( FXZArchive archive) {
         m_archive = archive;
         initComponents();
+        tableContent.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tableContent.addMouseListener(new PopupListener());
         jScrollPane1.getViewport().setBackground( Color.WHITE);
         
         tableContent.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
@@ -270,9 +277,55 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                 }
             }
         }
-    };      
-    
-    protected String getNameAt( int row) {
+    };
+
+
+    private class PopupListener extends MouseAdapter {
+        private JPopupMenu m_entryPopup;
+
+        public PopupListener() {
+            m_entryPopup = new JPopupMenu();
+            for (int i = 0; i < m_actions.length; i++){
+                if (m_actions[i] instanceof Presenter.Popup){
+                    m_entryPopup.add(((Presenter.Popup)m_actions[i]).getPopupPresenter());
+                } else {
+                    m_entryPopup.add(m_actions[i]);
+                }
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            showPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            showPopup(e);
+        }
+
+        private void showPopup(MouseEvent e) {
+            int row = tableContent.rowAtPoint(e.getPoint());
+            if (row == -1) { //clicked on empty area
+                return;
+            }
+            int modelRow = tableContent.convertRowIndexToModel(row);
+            if (!isRowSelected(modelRow)){
+                tableContent.getSelectionModel().setSelectionInterval(modelRow, modelRow);
+            }
+            
+            if (e.isPopupTrigger()) {
+                m_entryPopup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+
+        private boolean isRowSelected(int row){
+            return tableContent.getSelectionModel().isSelectedIndex(row);
+        }
+    }
+
+
+    protected String getNameAt(int row) {
         return (String) tableContent.getModel().getValueAt(row, 0);
     }
     
