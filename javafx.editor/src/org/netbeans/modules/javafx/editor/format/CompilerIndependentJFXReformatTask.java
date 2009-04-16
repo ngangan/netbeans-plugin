@@ -55,7 +55,7 @@ import org.netbeans.modules.editor.indent.spi.ReformatTask;
  */
 public class CompilerIndependentJFXReformatTask implements ReformatTask {
     private static final String TEMPLATE_START = "&template_start&"; // NOI18N
-    private static final String TEMPLATE_END = "&template_endt&"; // NOI18N
+    private static final String TEMPLATE_END = "&template_end&"; // NOI18N
 
     private final Context context;
 
@@ -81,7 +81,7 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
                 // remove template tags
                 int st = startOffset + text.indexOf(TEMPLATE_START);
                 document.remove(st, TEMPLATE_START.length());
-                int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length();
+                int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length() - 1;
                 document.remove(en, TEMPLATE_END.length());
 
                 // modify indent
