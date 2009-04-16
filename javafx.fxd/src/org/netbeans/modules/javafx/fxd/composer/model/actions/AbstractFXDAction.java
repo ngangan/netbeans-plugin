@@ -113,7 +113,7 @@ public abstract class AbstractFXDAction extends AbstractAction implements Presen
             putValue(Action.SMALL_ICON, icon);
         }
     }
-    
+
     protected final void setDescription(String hint) {
         KeyStroke stroke = (KeyStroke) getValue(Action.ACCELERATOR_KEY);
         if (stroke != null) {
