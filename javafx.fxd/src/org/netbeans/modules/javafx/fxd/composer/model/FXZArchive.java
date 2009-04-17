@@ -450,7 +450,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
     @Override
     public FXDRootElement getRoot( final String entryName) {
-        //System.err.println("Getting root for the entry " + entryName);
+        System.err.println("Getting root for the entry " + entryName);
         return getFileModel(entryName).getRootNode();
     }
     

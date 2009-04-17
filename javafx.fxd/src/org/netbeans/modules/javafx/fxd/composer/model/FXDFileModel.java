@@ -57,7 +57,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
         assert archive != null;
         m_archive   = archive;
         m_entryName = entryName;
-        m_docModel = getDocumentModel( archive.getDataObject());
+        m_docModel = getDocumentModel( archive.getDataObject(), entryName);
         m_docModel.addDocumentModelStateListener(this);
     }
           
@@ -169,8 +169,8 @@ public final class FXDFileModel implements DocumentModelStateListener {
         return de != null && FXD_ERROR.equals(de.getType());
     }
 
-    public static BaseDocument getDocument( final FXZDataObject dObj) throws IOException {
-        EditorCookie ec = dObj.getEditorSupport();
+    public static BaseDocument getDocument( FXZDataObject dObj, String entryName) throws IOException {
+        EditorCookie ec = dObj.getEditorSupport( entryName);
         if(ec == null) {
             throw new IllegalArgumentException("The DataObject " + dObj.getName() + "(class=" + dObj.getClass().getName() + ") has no EditorCookie!?"); // NOI18N
         } else {
@@ -178,8 +178,8 @@ public final class FXDFileModel implements DocumentModelStateListener {
         }
     }
     
-    public static DocumentModel getDocumentModel(final FXZDataObject dObj) throws IOException, DocumentModelException {
-        return DocumentModel.getDocumentModel(getDocument(dObj));
+    public static DocumentModel getDocumentModel(final FXZDataObject dObj, String entryName) throws IOException, DocumentModelException {
+        return DocumentModel.getDocumentModel(getDocument(dObj, entryName));
     }
         
     /**

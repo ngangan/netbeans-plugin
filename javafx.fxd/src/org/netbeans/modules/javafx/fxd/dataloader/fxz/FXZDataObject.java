@@ -217,10 +217,16 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     }
     
     public synchronized FXZEditorSupport getEditorSupport() {
-        String entryName = getEntryName();
-        
+        return getEditorSupport( getEntryName());
+    }
+            
+    public FXZEditorSupport getBaseSupport() {
+        return m_edSup != null ? m_edSup : getEditorSupport();
+    }
+
+    public synchronized FXZEditorSupport getEditorSupport(String entryName) {
         FXZEditorSupport supp = m_supports.get(entryName);
-        
+
         if ( supp == null) {
             supp = new FXZEditorSupport( this, entryName, m_edSup == null);
             if (m_edSup == null) {
@@ -230,14 +236,6 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         }
 
         return supp;
-    }
-            
-    public FXZEditorSupport getBaseSupport() {
-        return m_edSup != null ? m_edSup : getEditorSupport();
-    }
-
-    public FXZEditorSupport getEditorSupport(String entryName) {
-        return m_supports.get(entryName);
     }
     
     public synchronized void reset() {
