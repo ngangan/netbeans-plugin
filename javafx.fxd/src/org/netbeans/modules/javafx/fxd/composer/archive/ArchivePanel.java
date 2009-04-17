@@ -309,7 +309,8 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
             if (row == -1) { //clicked on empty area
                 return;
             }
-            int modelRow = tableContent.convertRowIndexToModel(row);
+            //TODO Use some construction available in JDK1.5
+            int modelRow = 0; //tableContent.convertRowIndexToModel(row);
             if (!isRowSelected(modelRow)){
                 tableContent.getSelectionModel().setSelectionInterval(modelRow, modelRow);
             }
