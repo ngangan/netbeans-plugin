@@ -99,8 +99,10 @@ class Publisher implements Runnable {
                         newImports.append("\nimport ").append(unresolved.getResolvedName()).append(";");
                     }
                 }
-                offsetDiff += newImports.toString().length();
-                doc.insertString(offset, newImports.toString(), null);
+                if (newImports.length() > 0) {
+                    offsetDiff += newImports.toString().length();
+                    doc.insertString(offset, newImports.toString(), null);
+                }
             }
 
             Set<ImportsModel.Declared> unusedSet = new TreeSet<ImportsModel.Declared>(importsComparator);

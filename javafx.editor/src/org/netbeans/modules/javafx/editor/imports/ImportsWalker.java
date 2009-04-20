@@ -92,9 +92,11 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
 
     @Override
     public Void visitImport(ImportTree node, ImportsModel model) {
-        long start = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), node);
-        long end = ci.getTrees().getSourcePositions().getEndPosition(ci.getCompilationUnit(), node);
-        model.addDeclaredImport(node.getQualifiedIdentifier().toString(), start, end);
+        if (node.getQualifiedIdentifier() != null) {
+            long start = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), node);
+            long end = ci.getTrees().getSourcePositions().getEndPosition(ci.getCompilationUnit(), node);
+            model.addDeclaredImport(node.getQualifiedIdentifier().toString(), start, end);
+        }
         return super.visitImport(node, model);
     }
 
