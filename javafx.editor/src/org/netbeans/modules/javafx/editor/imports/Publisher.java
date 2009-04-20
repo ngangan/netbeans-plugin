@@ -100,6 +100,9 @@ class Publisher implements Runnable {
                     }
                 }
                 if (newImports.length() > 0) {
+                    if (offset > 0) {
+                        newImports.insert(0, '\n');
+                    }
                     offsetDiff += newImports.toString().length();
                     doc.insertString(offset, newImports.toString(), null);
                 }
@@ -133,10 +136,20 @@ class Publisher implements Runnable {
 
     @SuppressWarnings({"MethodWithMultipleLoops"})
     private int moveBehindPackage(TokenSequence<JFXTokenId> ts) {
+        boolean wasWS = false;
+        int lastNonWSOffset = 0;
         while (ts.moveNext()) {
             JFXTokenId id = ts.token().id();
             if (JFXTokenId.isComment(id)
                     || id == JFXTokenId.WS) {
+                if (id == JFXTokenId.WS) {
+                    if (!wasWS) {
+                        lastNonWSOffset = ts.offset() - 1;
+                        wasWS = true;
+                    }
+                } else {
+                    wasWS= false;
+                }
                 continue;
             } else if (id == JFXTokenId.PACKAGE) {
                 moveTo(ts, JFXTokenId.SEMI);
@@ -144,7 +157,7 @@ class Publisher implements Runnable {
             }
             break;
         }
-        return ts.offset();
+        return lastNonWSOffset;
     }
 
     private void moveTo(TokenSequence<JFXTokenId> ts, JFXTokenId id) {
