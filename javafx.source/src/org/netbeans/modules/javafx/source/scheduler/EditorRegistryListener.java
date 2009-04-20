@@ -76,13 +76,23 @@ public class EditorRegistryListener implements CaretListener, PropertyChangeList
             if (lastEditor != null) {
                 lastEditor.removeCaretListener(this);
                 lastEditor.removePropertyChangeListener(this);
-                final Document doc = lastEditor.getDocument();
-                JavaFXSource js = null;
-                if (doc != null) {
-                    js = JavaFXSource.forDocument(doc);
+                final Document docOld = lastEditor.getDocument();
+                final Document docNew = editor.getDocument();
+                JavaFXSource jsOld = null;
+                JavaFXSource jsNew = null;
+                if (docOld != null) {
+                    jsOld = JavaFXSource.forDocument(docOld);
                 }
-                if (js != null) {
-                    js.k24 = false;
+                if (docNew != null) {
+                    jsNew = JavaFXSource.forDocument(docNew);
+                }
+                if (jsOld != null) {
+                    jsOld.k24 = false;
+                    jsOld.resetState(true, false);
+                }
+                if (jsNew != null) {
+                    jsNew.k24 = false;
+                    jsNew.resetState(true, false);
                 }
             }
             lastEditor = editor;
