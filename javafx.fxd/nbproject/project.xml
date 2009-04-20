@@ -143,7 +143,6 @@
                 </dependency>
             </module-dependencies>
             <public-packages/>
-            <!--  Now provided directly by the javafx.platform
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxrt.jar</runtime-relative-path>
             </class-path-extension>
@@ -174,7 +173,6 @@
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
             </class-path-extension>
-            -->
         </data>
     </configuration>
 </project>
