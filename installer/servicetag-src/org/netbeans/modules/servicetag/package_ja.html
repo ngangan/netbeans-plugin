@@ -48,40 +48,26 @@
 </head>
 <body bgcolor="white">
 
-This package contains classes that allow the creation 
-and manipulation of service tags. 
-This com.sun.servicetag package is intended for 
-<b>Sun internal use</b> only.
+このパッケージは、サービスタグの作成および操作をおこなうクラスが含まれています。com.sun.servicetag パッケージは <b>Sun 内部での使用</b> のみ想定されています。
 <p>
 </p><dl>
-<dt><b>Service Tag</b></dt>
-<dd>A service tag is an XML-based data structure that contains identifying
-information about an instance of a product or component on a system.
+<dt><b>サービスタグ</b></dt>
+<dd>サービスタグは、システム上のプロダクトやコンポーネントの識別情報を含む XML ベースのデータ構造です。
 </dd>
 </dl>
 <dl>
-<dt><b>Service Tag Registry</b></dt>
-<dd>A service tag registry is a XML-based registry that contains 
-the service tags of all the tagged components on a system.  The 
-service tag registry is present on systems that have the
-Service Tags software installed.
+<dt><b>サービスタグレジストリ</b></dt>
+<dd>サービスタグレジストリは、システム上のすべてのタグ付コンポーネントのサービスタグを含む、XML ベースのレジストリです。サービスタグレジストリは、サービスタグソフトウェアがインストールされたシステム上に存在します。
 </dd>
 </dl>
 <dl>
-<dt><b>Registration Data</b></dt>
-<dd>A registration data is a container of one or more 
-service tags that identify the 
-components for product registration and will be used to interface
-with the Sun Connection registration services.
+<dt><b>登録データ</b></dt>
+<dd>登録データは、プロダクト登録のコンポーネントとして認識された 1 つ以上のサービスタグで、Sun Connection registration サービスとのインタフェースとして使用されます。
 </dd>
 </dl>
 
-This package contains the methods to create service tags, set up the
-registration data for product registration, add service tags to and
-remove them from the system service tag registry.
+このパッケージは、サービスタグの作成、製品登録の登録データの設定、サービスタグの追加、また、システムサービスタグレジストリからの削除を実行するメソッドを含みます。
 <p>
-All methods defined in this package will throw {@code NullPointerException} 
-if {@code null} is passed in any input parameter unless it is stated otherwise.
-In addition, they are multi-thread safe.
-</p>】</body>
+このパッケージで定義されているメソッドはすべて、 {@code null}　が入力パラメータとして渡された場合、起動していたとしても、{@code NullPointerException} をスローします。また、MT-safe です。
+</p></body>
 </html>
