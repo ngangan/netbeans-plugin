@@ -94,7 +94,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         for (Context.Region region : regions) {
             if (isOnSameLine(region)) {
                 String txt = context.document().getText(region.getStartOffset(), region.getEndOffset() - region.getStartOffset()).trim();
-                if (txt.startsWith("class") || txt.startsWith("import")) {
+                if (txt.startsWith("class") || txt.startsWith("import")) { // NOI18N
                     adjustments.add(Adjustment.indent(context.document().createPosition(region.getStartOffset()), 0));
                     skipFormat = true;
                 }
@@ -154,10 +154,10 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
                     final long s = System.currentTimeMillis();
                     final JavaFXSource.Phase phase = controller.toPhase(JavaFXSource.Phase.PARSED);
                     if (log.isLoggable(Level.INFO))
-                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms");
+                        log.info("Parser time: " + (System.currentTimeMillis() - s) + "ms"); // NOI18N
                     if (phase.compareTo(JavaFXSource.Phase.PARSED) >= ZERO) {
                         if (log.isLoggable(Level.INFO))
-                            log.info("The " + phase + " phase has been reached ... OK!");
+                            log.info("The " + phase + " phase has been reached ... OK!"); // NOI18N
 
 
                         final Queue<Adjustment> adjustments;
@@ -165,7 +165,7 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
 //                        adjustments = new MaskedQueue();
                         for (Context.Region region : regions) {
                             if (log.isLoggable(Level.INFO))
-                                log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]");
+                                log.info("Region: [" + region.getStartOffset() + "," + region.getEndOffset() + "]"); // NOI18N
                             final int offset = region.getStartOffset();
                             final TreeUtilities tu = controller.getTreeUtilities();
                             JavaFXTreePath path;
@@ -195,110 +195,110 @@ public class JFXIndentTask implements IndentTask, ReformatTask {
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    private class MaskedQueue implements Queue<Adjustment> {
-        private final Queue<Adjustment> queue = new LinkedList<Adjustment>();
-
-        public int size() {
-            return queue.size();
-        }
-
-        public boolean isEmpty() {
-            return queue.isEmpty();
-        }
-
-        public boolean contains(Object o) {
-            return queue.contains(o);
-        }
-
-        public Iterator<Adjustment> iterator() {
-            return queue.iterator();
-        }
-
-        public Object[] toArray() {
-            return queue.toArray();
-        }
-
-        @SuppressWarnings({"SuspiciousToArrayCall"})
-        public <T> T[] toArray(T[] a) {
-            return queue.toArray(a);
-        }
-
-        public boolean remove(Object o) {
-            return queue.remove(o);
-        }
-
-        public boolean containsAll(Collection<?> c) {
-            return queue.containsAll(c);
-        }
-
-        public boolean addAll(Collection<? extends Adjustment> c) {
-            Thread.dumpStack();
-            return queue.addAll(c);
-        }
-
-        public boolean removeAll(Collection<?> c) {
-            return queue.removeAll(c);
-        }
-
-        public boolean retainAll(Collection<?> c) {
-            return queue.retainAll(c);
-        }
-
-        public void clear() {
-            queue.clear();
-        }
-
-        @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
-        @Override
-        public boolean equals(Object o) {
-            return queue.equals(o);
-        }
-
-        public int hashCode() {
-            return queue.hashCode();
-        }
-
-        public boolean add(Adjustment adjustment) {
-            dumpStack();
-            return queue.add(adjustment);
-        }
-
-        public boolean offer(Adjustment adjustment) {
-            dumpStack();
-            return queue.offer(adjustment);
-        }
-
-        public Adjustment remove() {
-            return queue.remove();
-        }
-
-        public Adjustment poll() {
-            return queue.poll();
-        }
-
-        public Adjustment element() {
-            return queue.element();
-        }
-
-        public Adjustment peek() {
-            return queue.peek();
-        }
-
-        private void dumpStack() {
-            //noinspection ThrowableInstanceNeverThrown
-            Exception e = new Exception("-------  StackTrace ---------- ");
-            StackTraceElement[] ste = e.getStackTrace();
-            System.err.println(e.getMessage());
-            for (int i = 0; i < Math.min(10, ste.length); i++) {
-                System.err.println("\t" + ste[i]);
-            }
-        }
-    }
+//    @SuppressWarnings({"UnusedDeclaration"})
+//    private class MaskedQueue implements Queue<Adjustment> {
+//        private final Queue<Adjustment> queue = new LinkedList<Adjustment>();
+//
+//        public int size() {
+//            return queue.size();
+//        }
+//
+//        public boolean isEmpty() {
+//            return queue.isEmpty();
+//        }
+//
+//        public boolean contains(Object o) {
+//            return queue.contains(o);
+//        }
+//
+//        public Iterator<Adjustment> iterator() {
+//            return queue.iterator();
+//        }
+//
+//        public Object[] toArray() {
+//            return queue.toArray();
+//        }
+//
+//        @SuppressWarnings({"SuspiciousToArrayCall"})
+//        public <T> T[] toArray(T[] a) {
+//            return queue.toArray(a);
+//        }
+//
+//        public boolean remove(Object o) {
+//            return queue.remove(o);
+//        }
+//
+//        public boolean containsAll(Collection<?> c) {
+//            return queue.containsAll(c);
+//        }
+//
+//        public boolean addAll(Collection<? extends Adjustment> c) {
+//            Thread.dumpStack();
+//            return queue.addAll(c);
+//        }
+//
+//        public boolean removeAll(Collection<?> c) {
+//            return queue.removeAll(c);
+//        }
+//
+//        public boolean retainAll(Collection<?> c) {
+//            return queue.retainAll(c);
+//        }
+//
+//        public void clear() {
+//            queue.clear();
+//        }
+//
+//        @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
+//        @Override
+//        public boolean equals(Object o) {
+//            return queue.equals(o);
+//        }
+//
+//        public int hashCode() {
+//            return queue.hashCode();
+//        }
+//
+//        public boolean add(Adjustment adjustment) {
+//            dumpStack();
+//            return queue.add(adjustment);
+//        }
+//
+//        public boolean offer(Adjustment adjustment) {
+//            dumpStack();
+//            return queue.offer(adjustment);
+//        }
+//
+//        public Adjustment remove() {
+//            return queue.remove();
+//        }
+//
+//        public Adjustment poll() {
+//            return queue.poll();
+//        }
+//
+//        public Adjustment element() {
+//            return queue.element();
+//        }
+//
+//        public Adjustment peek() {
+//            return queue.peek();
+//        }
+//
+//        private void dumpStack() {
+//            //noinspection ThrowableInstanceNeverThrown
+//            Exception e = new Exception("-------  StackTrace ---------- ");
+//            StackTraceElement[] ste = e.getStackTrace();
+//            System.err.println(e.getMessage());
+//            for (int i = 0; i < Math.min(10, ste.length); i++) {
+//                System.err.println("\t" + ste[i]);
+//            }
+//        }
+//    }
 
     private void applyAdjustments(Queue<Adjustment> adjustments) throws BadLocationException {
         if (adjustments == null || adjustments.isEmpty()) return;
-        log.info("Applying " + adjustments.size() + " adjustments into source code.");
+        log.info("Applying " + adjustments.size() + " adjustments into source code."); // NOI18N
         while (!adjustments.isEmpty()) {
             final Adjustment adjustment = adjustments.poll();
             adjustment.apply(context);
