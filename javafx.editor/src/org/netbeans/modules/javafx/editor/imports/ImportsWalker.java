@@ -58,7 +58,7 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
 
     @Override
     public Void visitVariable(VariableTree node, ImportsModel model) {
-        if (node != null || node.getName() != null) {
+        if (node != null && node.getName() != null) {
             variableNames.add(node.getName().toString());
         }
         return super.visitVariable(node, model);
