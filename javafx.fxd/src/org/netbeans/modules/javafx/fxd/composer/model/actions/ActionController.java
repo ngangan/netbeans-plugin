@@ -34,7 +34,7 @@ public class ActionController implements ActionLookup {
         m_actionFactories = new ArrayList<ComposerActionFactory>();
         
         m_actionFactories.add( m_selectActionFactory=new SelectActionFactory(dObj));
-        m_actionFactories.add( new HighlightActionFactory(dObj));        
+        m_actionFactories.add( new HighlightActionFactory(dObj));
     } 
     
     public Stack<ComposerAction> getActiveActions() {

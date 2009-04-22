@@ -35,7 +35,7 @@ import org.openide.windows.TopComponent;
  *
  * @author Pavel Benes
  */
-public final class PreviewTopComponent extends TopComponent implements Runnable {    
+public final class PreviewTopComponent extends TopComponent implements Runnable {
     protected transient final FXZDataObject        m_dObj;
     private   transient final PreviewImagePanel    m_imgPanel;
     private   transient final PreviewToolbar       m_toolBar;

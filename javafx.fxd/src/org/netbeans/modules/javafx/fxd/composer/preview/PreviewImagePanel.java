@@ -26,6 +26,12 @@ import com.sun.javafx.sg.PGNode;
 
 import com.sun.javafx.tools.fxd.*;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
+import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
+import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
+import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
+import org.openide.awt.MouseUtils;
+import org.openide.util.actions.Presenter;
+import org.openide.windows.TopComponent;
 
 /**
  *
@@ -146,6 +152,10 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 m_sgPanel.addMouseMotionListener(mec);
                                                 m_sgPanel.addMouseWheelListener(mec);
 
+                                                PopupListener popupL = new PopupListener();
+                                                m_sgPanel.addMouseListener(popupL);
+                                                PreviewImagePanel.this.addMouseListener(popupL);
+
                                                 updateZoom();
                                             } else {
                                                 setBackground( m_defaultBackground);
@@ -210,7 +220,29 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             m_sgPanel.getParent().validate();
         }
     }
-    
+
+    private Action[] getPopupActions() {
+        ActionLookup lookup = ActionLookupUtils.merge(new ActionLookup[]{
+                    PreviewImagePanel.this,
+                    m_dObj.getController().getActionController()
+                });
+        Action[] actions = new Action[]{
+            lookup.get(SelectActionFactory.PreviousSelectionAction.class),
+            lookup.get(SelectActionFactory.NextSelectionAction.class),
+            lookup.get(SelectActionFactory.ParentSelectionAction.class),
+            null,
+            lookup.get(PreviewImagePanel.ZoomToFitAction.class),
+            lookup.get(PreviewImagePanel.ZoomInAction.class),
+            lookup.get(PreviewImagePanel.ZoomOutAction.class),
+            null,
+            lookup.get(HighlightActionFactory.ToggleTooltipAction.class),
+            lookup.get(HighlightActionFactory.ToggleHighlightAction.class),
+            null,
+            lookup.get(ActionController.GenerateUIStubAction.class)
+        };
+        return actions;
+    }
+
     final class ZoomToFitAction extends AbstractFXDAction {
         private static final long serialVersionUID = 2L;
 
@@ -262,11 +294,15 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void mousePressed(MouseEvent e) {
-            processEvent(e);
+            if (!e.isPopupTrigger()){
+                processEvent(e);
+            }
         }
 
         public void mouseReleased(MouseEvent e) {
-            processEvent(e);
+            if (!e.isPopupTrigger()){
+                processEvent(e);
+            }
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -290,18 +326,55 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {
+            if (e.getWheelRotation() > 0){
+                PreviewImagePanel.this.get(ZoomInAction.class).actionPerformed(null);
+            } else {
+                PreviewImagePanel.this.get(ZoomOutAction.class).actionPerformed(null);
+            }
             processEvent(e);
         }
+
+        
         
         protected void processEvent( AWTEvent event) {
             m_dObj.getController().getActionController().processEvent(event);
         }
-    }    
-    
+    }
+
+    private final class PopupListener extends MouseUtils.PopupMouseAdapter {
+
+        private JPopupMenu m_popup;
+
+        public PopupListener() {
+            TopComponent tc = m_dObj.getController().getPreviewComponent();
+
+            Action[] actions = getPopupActions();
+
+            m_popup = new JPopupMenu();
+            for (int i = 0; i < actions.length; i++) {
+                if (actions[i] instanceof Presenter.Popup) {
+                    m_popup.add(((Presenter.Popup) actions[i]).getPopupPresenter());
+                } else if (actions[i] == null){
+                    m_popup.addSeparator();
+                } else {
+                    m_popup.add(actions[i]);
+                }
+                if (actions[i] instanceof AbstractFXDAction) {
+                    ((AbstractFXDAction) actions[i]).registerAction(tc);
+                }
+            }
+        }
+
+        @Override
+        protected void showPopup(MouseEvent e) {
+            m_popup.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
     public Action get(final Class clazz) {
         return ActionLookupUtils.get(m_actions, clazz);
     }
-    
+
     protected PreviewStatusBar getStatusBar() {
         return m_dObj.getController().getPreviewComponent().getStatusBar();
     }
