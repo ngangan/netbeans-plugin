@@ -28,43 +28,38 @@
 
 package org.netbeans.lib.javafx.lexer;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.Language;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
 public class TokenIdGenerator {
-    public static final String FORMAT = "\t{0}(\"{1}\", {2}),"; // NOI18N
+    public static final String FORMAT = "\t{0}(\"{1}\", {2}), // NOI18N"; // NOI18N
 
 
     public static void main(String[] args) {
-        if (args == null || args.length == 0) {
-            System.exit(-2);
-        }
-
-        String tokens = get("-tokens", args); // NOI18N
-        File tokenF = new File(tokens);
-        if (tokens == null || !tokenF.exists()) {
-            System.out.println("Use -tokens to specify token input file."); // NOI18N
+        String tokens = findArg("-tokens", args); // NOI18N
+        if (tokens == null) {
+            System.err.println("Use -tokens <tokens-file> to specify token input file."); // NOI18N
             System.exit(-1);
         }
-
-        BufferedReader r = null;
-        JFXTokenId[] tokenIds = JFXTokenId.values();
-        Map<String, String> nameToCat = new HashMap<String, String>(tokenIds.length);
-        for (JFXTokenId tokenId : tokenIds) {
-            nameToCat.put(tokenId.name(), tokenId.primaryCategory());
+        File tokenF = new File(tokens);
+        if (!tokenF.exists()) {
+            System.err.println("Tokens file " + tokenF + " does not exist."); // NOI18N
+            System.exit(-1);
         }
+        BufferedReader r = null;
+        Language<JFXTokenId> language = JFXTokenId.language();
+        Map<String, TokenIdDesc> name2Desc = new TreeMap<String, TokenIdDesc>();
         try {
             r = new BufferedReader(new FileReader(tokenF));
             MessageFormat f = new MessageFormat(FORMAT);
@@ -74,12 +69,16 @@ public class TokenIdGenerator {
                 String[] elements = line.split("=");
                 String name = elements[0];
                 String category;
-                if (nameToCat.containsKey(name)) {
-                    category = nameToCat.get(name);
+                JFXTokenId id = language.tokenId(name);
+                if (id != null) {
+                    category = id.primaryCategory();
                 } else {
                     category = JFXTokenId.UNKNOWN.primaryCategory();
                 }
-                System.out.println(f.format(new Object[]{name, category, elements[1]}));
+                name2Desc.put(name, new TokenIdDesc(name, category, Integer.parseInt(elements[1])));
+            }
+            for (TokenIdDesc desc : name2Desc.values()) {
+                System.out.println(f.format(new Object[]{desc.name, desc.category, desc.intId}));
             }
             System.exit(0);
         } catch (Exception e) {
@@ -95,11 +94,33 @@ public class TokenIdGenerator {
     }
 
 
-    private static String get(String param, String[] args) {
-        int index = Arrays.binarySearch(args, param);
-        if (index < 0) return null;
-        if (index == args.length - 1) return null;
-        return args[index + 1];
+    private static String findArg(String param, String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (arg.equals(param)) {
+                if (i == args.length - 1)
+                    throw new IllegalArgumentException("Parameter \"" + param + // NOI18N
+                            "\" is not followed by a value"); // NOI18N
+                return args[i + 1];
+            }
+        }
+        return null;
+    }
+
+    private static final class TokenIdDesc {
+
+        TokenIdDesc(String name, String category, int intId) {
+            this.name = name;
+            this.category = category;
+            this.intId = intId;
+        }
+
+        final String name;
+
+        final String category;
+
+        final int intId;
+
     }
 
 }

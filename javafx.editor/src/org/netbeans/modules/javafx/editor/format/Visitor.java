@@ -341,15 +341,12 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
                 case PUBLIC:
                 case PUBLIC_INIT:
                 case PUBLIC_READ:
-                case PUBLIC_READABLE:
                 case PRIVATE:
                 case STATIC:
                 case PROTECTED:
                 case DEF:
                 case VAR:
-                case NON_WRITABLE:
                 case OVERRIDE:
-                case READABLE:
                 case REPLACE:
                     continue;
                 case IDENTIFIER:
