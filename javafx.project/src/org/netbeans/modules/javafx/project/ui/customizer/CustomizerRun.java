@@ -298,7 +298,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         mainPanel.add(jButtonMainClass, gridBagConstraints);
         jButtonMainClass.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jButtonMainClass")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelArguments, "&Arguments:");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelArguments, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustRun_Arguments")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
