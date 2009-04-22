@@ -183,6 +183,7 @@ is divided into following sections:
                 </not>
             </condition>
             <property name="run.jvmargs" value=""/>
+            <available property="emulator.available" file="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}"/>
         </target>
         <target name="-post-init">
         <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
@@ -269,6 +270,7 @@ is divided into following sections:
             </java>
         </target>
         <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
+            <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the execution."/>
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
             <property name="mobile.device" value="DefaultFxPhone1"/>
             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}" failonerror="true">
@@ -344,6 +346,7 @@ is divided into following sections:
             </java>
         </target>
         <target name="-debug-midp-debuggee" if="midp.execution.trigger">
+            <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the debugging."/>
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
                 <arg value="${{run.jvmargs}}"/>
