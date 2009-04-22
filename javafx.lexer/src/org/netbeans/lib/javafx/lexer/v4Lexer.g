@@ -133,7 +133,9 @@ INTO			: 'into';
 INVERSE			: 'inverse';
 LAST			: 'last';
 LAZY			: 'lazy';
+MIXIN			: 'mixin';
 MOD				: 'mod';
+NATIVEARRAY		: 'nativearray';
 NEW				: 'new';
 NOT				: 'not';
 NULL			: 'null';
@@ -977,6 +979,9 @@ COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' 
     
     	{
+                if (getText().startsWith("/**")) {
+                    $type = DOC_COMMENT;
+                }
     		$channel=HIDDEN;
     	}
     ;

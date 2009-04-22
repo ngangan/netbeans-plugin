@@ -5,7 +5,6 @@
 
 package org.netbeans.modules.javafx.editor.imports;
 
-import com.sun.javafx.api.tree.FunctionValueTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -14,7 +13,6 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TriggerTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javafx.tree.JFXOverrideClassVar;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -60,39 +58,45 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
 
     @Override
     public Void visitVariable(VariableTree node, ImportsModel model) {
-        variableNames.add(node.getName().toString());
+        if (node != null && node.getName() != null) {
+            variableNames.add(node.getName().toString());
+        }
         return super.visitVariable(node, model);
     }
 
     @Override
     public Void visitIdentifier(IdentifierTree node, ImportsModel model) {
-        String nodeName = node.getName().toString();
-        if (isResolving(nodeName) || variableNames.contains(nodeName)) {
-            return null;
-        }
-        Element e = ci.getTrees().getElement(getCurrentPath());
+        if (node != null && node.getName() != null) {
+            String nodeName = node.getName().toString();
+            if (isResolving(nodeName) || variableNames.contains(nodeName)) {
+                return null;
+            }
+            Element e = ci.getTrees().getElement(getCurrentPath());
 
-        processItem(e, nodeName, node, model);
+            processItem(e, nodeName, node, model);
+        }
 
         return super.visitIdentifier(node, model);
     }
 
     @Override
     public Void visitTypeClass(TypeClassTree node, ImportsModel model) {
-        String nodeName = node.getClassName().toString();
-        if (isResolving(nodeName) || variableNames.contains(nodeName)) {
-            return null;
-        }
-        Element e = ci.getTrees().getElement(getCurrentPath());
+        if (node != null && node.getClassName() != null) {
+            String nodeName = node.getClassName().toString();
+            if (isResolving(nodeName) || variableNames.contains(nodeName)) {
+                return null;
+            }
+            Element e = ci.getTrees().getElement(getCurrentPath());
 
-        processItem(e, nodeName, node, model);
+            processItem(e, nodeName, node, model);
+        }
         
         return super.visitTypeClass(node, model);
     }
 
     @Override
     public Void visitImport(ImportTree node, ImportsModel model) {
-        if (node.getQualifiedIdentifier() != null) {
+        if (node != null && node.getQualifiedIdentifier() != null) {
             long start = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), node);
             long end = ci.getTrees().getSourcePositions().getEndPosition(ci.getCompilationUnit(), node);
             model.addDeclaredImport(node.getQualifiedIdentifier().toString(), start, end);
@@ -102,9 +106,11 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
 
     @Override
     public Void visitTrigger(TriggerTree node, ImportsModel model) {
-        Tree t = ((JFXOverrideClassVar)node).getInitializer();
-        if (t != null) {
-            t.accept(this, model);
+        if (node != null) {
+            Tree t = ((JFXOverrideClassVar)node).getInitializer();
+            if (t != null) {
+                t.accept(this, model);
+            }
         }
         return super.visitTrigger(node, model);
     }

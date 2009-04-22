@@ -44,6 +44,8 @@ package org.netbeans.lib.javafx.lexer;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javac.util.Log;
+import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javafx.util.MsgSym;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
@@ -68,6 +70,14 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
     private static final Logger logger = Logger.getLogger(Lexer.class.getName());
     private List<Token> tokens = new ArrayList<Token>();
 
+    // quote context --
+    static final int CUR_QUOTE_CTX      = 0;    // 0 = use current quote context
+    static final int SNG_QUOTE_CTX      = 1;    // 1 = single quote quote context
+    static final int DBL_QUOTE_CTX      = 2;    // 2 = double quote quote context
+
+    // Recorded start of string with embedded expression
+    //
+    int eStringStart = 0;
 
     public void emit(Token token) {
         state.token = token;
@@ -216,6 +226,120 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
         quoteStack.resetPercentIsFormat();
     }
 
+   /**
+     * Returns and indicator of what level of nested expressions
+     * the lexer is currently within.
+     * @return 0 - start ste, no expressions are active. >1 indicates
+     *             the level of nesting that the lexer is currently processing.
+     */
+    protected int getLexicalState() {
+        return quoteStack.getLexicalState();
+    }
+
+
+    /**
+     * Overrides the standard ANTLR 3.1 lexer error message generator
+     * to provide a message that will make more sense to JavaFX programmers.
+     * @param e The exception that the lexer raised because it could not decode
+     *          what to do next.
+     * @param tokenNames The ANTLR supplied list of token names as used in the lexer.
+     * @return The string that shuold be used as the error message by the JavaFX compiler
+     */
+    @Override
+    public String getErrorMessage(RecognitionException e, String[] tokenNames) {
+
+        StringBuffer mb = new StringBuffer();
+
+        // No viable alt means that somehow the lexer rule or the
+        // lexer itself found a character that cannot match any
+        // decisions points. In theory, as of the v4 lexer, this cannot
+        // happen unless something went wrong in the gramamr analysis.
+        // However, because there are predicates used for embedded string
+        // expressions, and this can play with the analysis, we cater for it
+        // anyway.
+        //
+        if (e instanceof NoViableAltException) {
+
+            if (e.c == Token.EOF) {
+
+                // Changes in the v4 lexer mean that it shoudl be virtually impossible
+                // to trigger this error. However it is perhaps possible if the lexer
+                // predicts a token, tries to match it and discovers EOF because this
+                // is a file produced on Windows and has no terminating \n. Hence
+                // we look for this EOF sceanrio and report it nicely.
+                //
+                mb.append("Sorry, I scanned to the end of your script from around line " + e.line + " but could not see how to process it. ");
+                mb.append("This can happen if you forget a closing delimiter such as ''' '\"' or '{'");
+
+            } else {
+
+
+                // We managed to predict some lexer token that once we started
+                // down the path, turned out not to be what we thought it was.
+                // With the v4 lexer, this shoudl not be happening, but this message
+                // is used as belt and braces protection.
+                //
+                mb.append("Sorry, but the character " + getCharErrorDisplay(e.c));
+                mb.append("is not allowed in a JavaFX script. Well at least, not here.");
+            }
+
+        } else {
+
+            // Any other kind of exception is something we cannot really deal with
+            // here. So we gather ANTLR's assessment of the error state and
+            // use that.
+            //
+            mb.append(super.getErrorMessage(e, tokenNames));
+        }
+
+        return mb.toString();
+    }
+
+
+    /**
+     * Override for the ANTLR 3.x message display routine so that we can log
+     * errors within the JavaFX compiler infrastructure.
+     *
+     * @param tokenNames ANTLR provided array of the lexer token names
+     * @param e The excpetion that was raised by the lexer, for further action.
+     */
+    @Override
+    public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
+
+        // Find out how we wish to describe this expcetion to the script author/user
+        //
+        String msg = getErrorMessage(e, tokenNames);
+
+        // Record the error for later output or capture by development tools
+        //
+        log.error(getCharIndex(), MsgSym.MESSAGE_JAVAFX_GENERALERROR, msg);
+    }
+
+    protected boolean checkIntLiteralRange(String text, int pos, int radix, boolean negative) {
+        // Because Long.MIN_VALUE < -Long.MAX_VALUE we need to use the actual negative when present
+        //
+        String checkText = negative? "-" + text : text;
+
+        // Correct start position for error display
+        //
+        pos = pos - checkText.length();
+
+        try {
+
+            Convert.string2long(checkText, radix);
+
+        } catch (Exception e) {
+
+            // Number form was too outrageous even for the converter
+            //
+            log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "Long", checkText);
+
+            return false;
+        }
+
+        return true;
+    }
+
     protected void checkIntLiteralRange(String text, int pos, int radix) {
 //
 //        long value = Convert.string2long(text, radix);
@@ -309,6 +433,16 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
 
 
         /**
+         * Encode the lexical state into an integer, to permit incremental lexing in IDEs that support it
+         * @return Level of emdedded
+         */
+        int getLexicalState() {
+            // This is a hack -- state is not invertible yet
+            return (quoteStack == NULL_BQT) ? 0 : quoteStack.braceDepth;
+
+        }
+
+        /**
          * {@inheritDoc}
          */
         public String toString() {
@@ -368,7 +502,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
         }
     }
 
-        private static class MyLog extends Log {
+    private static class MyLog extends Log {
 
 
         static Log instace(Context context) {

@@ -59,140 +59,139 @@ import java.util.logging.Logger;
  */
 public enum JFXTokenId implements TokenId {
 /* v4Lexer tokens. */
-	LAZY("keyword", 39), //NOI18N
-	COMMA("separator", 85),//NOI18N
-	DEF("keyword", 18),//NOI18N
-	AS("keyword", 7),//NOI18N
-	NOTEQ("operator", 104),//NOI18N
-	INTO("keyword", 36),//NOI18N
-	TranslationKeyBody("operator", 119),//NOI18N
-	FALSE("keyword-literal", 23),//NOI18N
-	ABSTRACT("keyword", 4),//NOI18N
-	THEN("keyword", 64),//NOI18N
-	STEP("keyword", 62),//NOI18N
-	PLUSPLUS("operator", 80),//NOI18N
-	IMPORT("keyword", 30),//NOI18N
-	PACKAGE("keyword", 48),//NOI18N
-	SIZEOF("keyword", 60),//NOI18N
-	PIPE("operator", 79),//NOI18N
-	CONTINUE("keyword-directive", 17),//NOI18N
-	ON("keyword", 45),//NOI18N
-	DOT("separator", 86),//NOI18N
-	SingleQuoteBody("string", 110),//NOI18N
-	PRIVATE("keyword", 50),//NOI18N
-	Letter("identifier", 128),//NOI18N
-	AND("keyword", 6),//NOI18N
-	FUNCTION("keyword", 28),//NOI18N
-	TRIGGER("keyword", 67),//NOI18N
-	STRING_LITERAL("string", 111),//NOI18N
-	RBRACKET("separator", 83),//NOI18N
-	RPAREN("separator", 82),//NOI18N
-	RBRACE_LBRACE_STRING_LITERAL("string", 116),//NOI18N
-	ASSERT("keyword-directive", 8),//NOI18N
-	PLUS("operator", 94),//NOI18N
-	FINALLY("keyword-directive", 24),//NOI18N
-	EXTENDS("keyword", 22),//NOI18N
-	AT("keyword", 9),//NOI18N
-	PUBLIC_READABLE("keyword", 54),//NOI18N
-	TIME_LITERAL("time", 121),//NOI18N
-	SUPER("keyword", 63),//NOI18N
-	DECIMAL_LITERAL("number", 122),//NOI18N
-	WS("whitespace", 131),//NOI18N
-	SUBSUB("operator", 108),//NOI18N
-	NEW("keyword", 41),//NOI18N
-	PUBLIC_READ("keyword", 55),//NOI18N
-	EQ("operator", 88),//NOI18N
-	EXCLUSIVE("keyword", 21),//NOI18N
-	LT("operator", 90),//NOI18N
-	BOUND("keyword", 13),//NOI18N
-	LINE_COMMENT("comment", 134), // NOI18N
-	EQEQ("operator", 87), // NOI18N
-	QUOTE_LBRACE_STRING_LITERAL("string", 113), // NOI18N
-	FLOATING_POINT_LITERAL("number", 127), // NOI18N
-	CATCH("keyword-directive", 15), // NOI18N
-	STATIC("keyword", 61), // NOI18N
-	SEMI("separator", 84), // NOI18N
-	ELSE("keyword-directive", 20), // NOI18N
-	INDEXOF("keyword", 31), // NOI18N
-	FORMAT_STRING_LITERAL("format", 118), // NOI18N
-	LTEQ("operator", 92), // NOI18N
-	FIRST("keyword", 25), // NOI18N
-	BREAK("keyword-directive", 14), // NOI18N
-	NULL("keyword-literal", 44), // NOI18N
-	QUES("operator", 106), // NOI18N
-	COLON("operator", 105), // NOI18N
-	DOTDOT("operator", 81), // NOI18N
-	IDENTIFIER("identifier", 130), // NOI18N
-	NextIsPercent("string", 112), // NOI18N
-	INSERT("keyword", 34), // NOI18N
-	TRUE("keyword-literal", 68), // NOI18N
-	DOC_COMMENT("comment", 133), // NOI18N
-	POUND("operator", 78), // NOI18N
-	POSTINIT("keyword", 49), // NOI18N
-	THROW("keyword-directive", 66), // NOI18N
-	WHERE("keyword", 73), // NOI18N
-	PUBLIC("keyword", 53), // NOI18N
-	LTGT("operator", 91), // NOI18N
-	PERCENT("operator", 98), // NOI18N
-	TYPEOF("keyword", 71), // NOI18N
-	LAST("keyword", 38), // NOI18N
-	LBRACKET("separator", 76), // NOI18N
-	MOD("keyword", 40), // NOI18N
-	INIT("keyword", 33), // NOI18N
-	OCTAL_LITERAL("number", 123), // NOI18N
-	HEX_LITERAL("number", 124), // NOI18N
-	OR("keyword", 46), // NOI18N
-	LBRACE("separator", 114), // NOI18N
-	AFTER("keyword", 5), // NOI18N
-	RBRACE("separator", 117), // NOI18N
-	PROTECTED("keyword", 51), // NOI18N
-	INVERSE("keyword", 37), // NOI18N
-	SUBEQ("operator", 100), // NOI18N
-	INSTANCEOF("keyword", 35), // NOI18N
-	TRANSLATION_KEY("i18n-artifact", 120), // NOI18N
-	LPAREN("separator", 77), // NOI18N
-	DoubleQuoteBody("string", 109), // NOI18N
-	SLASHEQ("operator", 102), // NOI18N
-	FROM("keyword", 27), // NOI18N
-	PERCENTEQ("operator", 103), // NOI18N
-	DELETE("keyword", 19), // NOI18N
-	Exponent("number", 126), // NOI18N
-	SLASH("operator", 97), // NOI18N
-	WHILE("keyword-directive", 74), // NOI18N
-	STAREQ("operator", 101), // NOI18N
-	READABLE("keyword", 56), // NOI18N
-	PLUSEQ("operator", 99), // NOI18N
-	PUBLIC_INIT("keyword", 52), // NOI18N
-	REPLACE("keyword", 57), // NOI18N
-	GT("operator", 89), // NOI18N
-	COMMENT("comment", 132), // NOI18N
-	OVERRIDE("keyword", 47), // NOI18N
-	GTEQ("operator", 93), // NOI18N
-	THIS("keyword", 65), // NOI18N
-	WITH("keyword", 75), // NOI18N
-	IN("keyword", 32), // NOI18N
-	REVERSE("keyword", 59), // NOI18N
-	INVALIDC("keyword", 136), // NOI18N
-	JavaIDDigit("identifier", 129), // NOI18N
-	VAR("keyword", 72), // NOI18N
-	CLASS("keyword", 16), // NOI18N
-	TWEEN("keyword", 70), // NOI18N
-	RETURN("keyword-directive", 58), // NOI18N
-	IF("keyword-directive", 29), // NOI18N
-	SUCHTHAT("operator", 107), // NOI18N
-	FOR("keyword-directive", 26), // NOI18N
-	LAST_TOKEN("future-literal", 135), // NOI18N
-	NON_WRITABLE("keyword", 42), // NOI18N
-	BEFORE("keyword", 11), // NOI18N
-	STAR("operator", 96), // NOI18N
-	ATTRIBUTE("keyword", 10), // NOI18N
-	SUB("operator", 95), // NOI18N
-	BIND("keyword", 12), // NOI18N
-	Digits("number", 125), // NOI18N
-	NOT("keyword", 43), // NOI18N
-	TRY("keyword-directive", 69), // NOI18N
-	RBRACE_QUOTE_STRING_LITERAL("string", 115), // NOI18N
-    UNKNOWN("error", 200); // NOI18N
+    ABSTRACT("keyword", 4), // NOI18N
+    AFTER("keyword", 5), // NOI18N
+    AND("keyword", 6), // NOI18N
+    AS("keyword", 7), // NOI18N
+    ASSERT("keyword-directive", 8), // NOI18N
+    AT("keyword", 9), // NOI18N
+    ATTRIBUTE("keyword", 10), // NOI18N
+    BEFORE("keyword", 11), // NOI18N
+    BIND("keyword", 12), // NOI18N
+    BOUND("keyword", 13), // NOI18N
+    BREAK("keyword-directive", 14), // NOI18N
+    CATCH("keyword-directive", 15), // NOI18N
+    CLASS("keyword", 16), // NOI18N
+    COLON("operator", 104), // NOI18N
+    COMMA("separator", 84), // NOI18N
+    COMMENT("comment", 131), // NOI18N
+    CONTINUE("keyword-directive", 17), // NOI18N
+    DECIMAL_LITERAL("number", 122), // NOI18N
+    DEF("keyword", 18), // NOI18N
+    DELETE("keyword", 19), // NOI18N
+    DOC_COMMENT("comment", 132), // NOI18N
+    DOT("separator", 85), // NOI18N
+    DOTDOT("operator", 80), // NOI18N
+    Digits("number", 125), // NOI18N
+    DoubleQuoteBody("string", 109), // NOI18N
+    ELSE("keyword-directive", 20), // NOI18N
+    EQ("operator", 87), // NOI18N
+    EQEQ("operator", 86), // NOI18N
+    EXCLUSIVE("keyword", 21), // NOI18N
+    EXTENDS("keyword", 22), // NOI18N
+    Exponent("number", 126), // NOI18N
+    FALSE("keyword-literal", 23), // NOI18N
+    FINALLY("keyword-directive", 24), // NOI18N
+    FIRST("keyword", 25), // NOI18N
+    FLOATING_POINT_LITERAL("number", 127), // NOI18N
+    FOR("keyword-directive", 26), // NOI18N
+    FORMAT_STRING_LITERAL("format", 118), // NOI18N
+    FROM("keyword", 27), // NOI18N
+    FUNCTION("keyword", 28), // NOI18N
+    GT("operator", 88), // NOI18N
+    GTEQ("operator", 92), // NOI18N
+    HEX_LITERAL("number", 124), // NOI18N
+    IDENTIFIER("identifier", 130), // NOI18N
+    IF("keyword-directive", 29), // NOI18N
+    IMPORT("keyword", 30), // NOI18N
+    IN("keyword", 32), // NOI18N
+    INDEXOF("keyword", 31), // NOI18N
+    INIT("keyword", 33), // NOI18N
+    INSERT("keyword", 34), // NOI18N
+    INSTANCEOF("keyword", 35), // NOI18N
+    INTO("keyword", 36), // NOI18N
+    INVALIDC("keyword", 134), // NOI18N
+    INVERSE("keyword", 37), // NOI18N
+    JavaIDDigit("identifier", 129), // NOI18N
+    LAST("keyword", 38), // NOI18N
+    LAZY("keyword", 39), // NOI18N
+    LBRACE("separator", 114), // NOI18N
+    LBRACKET("separator", 75), // NOI18N
+    LINE_COMMENT("comment", 133), // NOI18N
+    LPAREN("separator", 76), // NOI18N
+    LT("operator", 89), // NOI18N
+    LTEQ("operator", 91), // NOI18N
+    LTGT("operator", 90), // NOI18N
+    Letter("identifier", 128), // NOI18N
+    MIXIN("keyword", 40), // NOI18N
+    MOD("keyword", 41), // NOI18N
+    NATIVEARRAY("keyword", 42), // NOI18N
+    NEW("keyword", 43), // NOI18N
+    NOT("keyword", 44), // NOI18N
+    NOTEQ("operator", 103), // NOI18N
+    NULL("keyword-literal", 45), // NOI18N
+    NextIsPercent("string", 110), // NOI18N
+    OCTAL_LITERAL("number", 123), // NOI18N
+    ON("keyword", 46), // NOI18N
+    OR("keyword", 47), // NOI18N
+    OVERRIDE("keyword", 48), // NOI18N
+    PACKAGE("keyword", 49), // NOI18N
+    PERCENT("operator", 97), // NOI18N
+    PERCENTEQ("operator", 102), // NOI18N
+    PIPE("operator", 78), // NOI18N
+    PLUS("operator", 93), // NOI18N
+    PLUSEQ("operator", 98), // NOI18N
+    PLUSPLUS("operator", 79), // NOI18N
+    POSTINIT("keyword", 50), // NOI18N
+    POUND("operator", 77), // NOI18N
+    PRIVATE("keyword", 51), // NOI18N
+    PROTECTED("keyword", 52), // NOI18N
+    PUBLIC("keyword", 54), // NOI18N
+    PUBLIC_INIT("keyword", 53), // NOI18N
+    PUBLIC_READ("keyword", 55), // NOI18N
+    QUES("operator", 105), // NOI18N
+    QUOTE_LBRACE_STRING_LITERAL("string", 113), // NOI18N
+    RBRACE("separator", 117), // NOI18N
+    RBRACE_LBRACE_STRING_LITERAL("string", 116), // NOI18N
+    RBRACE_QUOTE_STRING_LITERAL("string", 115), // NOI18N
+    RBRACKET("separator", 82), // NOI18N
+    REPLACE("keyword", 56), // NOI18N
+    RETURN("keyword-directive", 57), // NOI18N
+    REVERSE("keyword", 58), // NOI18N
+    RPAREN("separator", 81), // NOI18N
+    SEMI("separator", 83), // NOI18N
+    SIZEOF("keyword", 59), // NOI18N
+    SLASH("operator", 96), // NOI18N
+    SLASHEQ("operator", 101), // NOI18N
+    STAR("operator", 95), // NOI18N
+    STAREQ("operator", 100), // NOI18N
+    STATIC("keyword", 60), // NOI18N
+    STEP("keyword", 61), // NOI18N
+    STRING_LITERAL("string", 112), // NOI18N
+    SUB("operator", 94), // NOI18N
+    SUBEQ("operator", 99), // NOI18N
+    SUBSUB("operator", 107), // NOI18N
+    SUCHTHAT("operator", 106), // NOI18N
+    SUPER("keyword", 62), // NOI18N
+    SingleQuoteBody("string", 111), // NOI18N
+    THEN("keyword", 63), // NOI18N
+    THIS("keyword", 64), // NOI18N
+    THROW("keyword-directive", 65), // NOI18N
+    TIME_LITERAL("time", 121), // NOI18N
+    TRANSLATION_KEY("i18n-artifact", 120), // NOI18N
+    TRIGGER("keyword", 66), // NOI18N
+    TRUE("keyword-literal", 67), // NOI18N
+    TRY("keyword-directive", 68), // NOI18N
+    TWEEN("keyword", 69), // NOI18N
+    TYPEOF("keyword", 70), // NOI18N
+    TranslationKeyBody("operator", 119), // NOI18N
+    VAR("keyword", 71), // NOI18N
+    WHERE("keyword", 72), // NOI18N
+    WHILE("keyword-directive", 73), // NOI18N
+    WITH("keyword", 74), // NOI18N
+    WS("whitespace", 108), // NOI18N
+
+    UNKNOWN("error", 140); // NOI18N
 
     public static final String UNIVERSAL_CATEGORY = "future-literal"; // NOI18N
     private final String primaryCategory;

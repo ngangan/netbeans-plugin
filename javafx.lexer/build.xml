@@ -2,6 +2,15 @@
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
+
+<!--
+ To generate lexer run:
+     ant -Dcompile.grammar=true -Djfxl.jfxc.home=.../openjfx-compiler~marina-setup/openjfx-compiler~marina-master
+ It is expected that the antlr resides in the marina-setup dir under "import" subdirectory.
+ Then it may be necessary to regenerate token ids by running
+     ant -Dcompile.grammar=true -Djfxl.jfxc.home=.../openjfx-compiler~marina-setup/openjfx-compiler~marina-master _generateTokenIds
+ The output can be postprocessed (strip "[java]") and pasted into JFXTokenId.
+  -->
 <project name="org.netbeans.modules.javafx.lexer" default="netbeans" basedir=".">
     <description>Builds, tests, and runs the project org.netbeans.modules.javafx.lexer.</description>
     <import file="nbproject/build-impl.xml"/>
@@ -9,9 +18,7 @@
     <property name="jfxl.antlr.grammar" value="v4Lexer"/>
     <property name="jfxl.jfxc.grammar" value="${jfxl.jfxc.home}/src/share/classes/com/sun/tools/javafx/antlr/${jfxl.antlr.grammar}.g"/>
     <property name="jfxl.lexer.grammar" value="${basedir}/${jfxl.antlr.grammar}.g"/>
-
-
-    <property name="jfxl.antlr.dir" value="${jfxl.jfxc.home}/tools/antlr-3.1"/>
+    <property name="jfxl.antlr.dir" value="${jfxl.jfxc.home}/../import/antlr-3.1.3/antlr-3.1.3"/>
 
     <path id="jfxl.antlr.classpath">
          <fileset dir="${jfxl.antlr.dir}">
@@ -22,14 +29,35 @@
 
     <property name="jfxl.antlr.generated.dir" value="${basedir}/src/org/netbeans/lib/javafx/lexer"/>
 
+    <target name="_generateTokenIds" depends="build-init" if="compile.grammar">
+        <echo message="Generate token IDs."/>
+
+        <path id="jfxl.generateTokenIdsCp">
+                <pathelement path="${build.classes.dir}"/>
+                <fileset dir="${netbeans.dest.dir}">
+                    <include name="ide*/modules/org-netbeans-modules-lexer.jar"/>
+                    <include name="platform*/lib/org-openide-util.jar"/>
+                </fileset>
+                <path refid="cp" />
+        </path>
+        <java classname="org.netbeans.lib.javafx.lexer.TokenIdGenerator"
+              fork="true">
+            <classpath refid="jfxl.generateTokenIdsCp" />
+            <arg value="-tokens"/>
+            <arg value="${jfxl.antlr.generated.dir}/${jfxl.antlr.grammar}.tokens"/>
+        </java>
+    </target>
+
     <target name="_verifyGrammar" depends="build-init" if="compile.grammar">
         <echo message="Verifying grammar compatibility"/>
 
         <path id="jfxl.grammarVerifierCp">
                 <pathelement path="${build.classes.dir}"/>
-                <pathelement path="${netbeans.dest.dir}/ide9/modules/org-netbeans-modules-lexer.jar"/>
-                <pathelement path="${netbeans.dest.dir}/java2/modules/org-netbeans-modules-java-lexer.jar"/>
-                <pathelement path="${netbeans.dest.dir}/platform8/lib/org-openide-util.jar"/>
+                <fileset dir="${netbeans.dest.dir}">
+                    <include name="ide*/modules/org-netbeans-modules-lexer.jar"/>
+                    <include name="java*/modules/org-netbeans-modules-java-lexer.jar"/>
+                    <include name="platform*/lib/org-openide-util.jar"/>
+                </fileset>
                 <path refid="cp" />
         </path>
         <property name="debug.jfxl.grammarVerifierCp" refid="jfxl.grammarVerifierCp"/>
