@@ -19,6 +19,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.*;
 
+import javafx.scene.Node;
 import com.sun.scenario.scenegraph.SGNode;
 import com.sun.scenario.scenegraph.JSGPanel;
 import com.sun.scenario.scenegraph.fx.FXNode;
@@ -119,7 +120,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                 SwingUtilities.invokeLater( new Runnable() {
                                     public void run() {
                                         try {
-                                            javafx.scene.Node node;                                            
+                                            Node node;                                            
                                             try {
                                                 fModel.readLock();
                                                 PreviewStatistics stats = new PreviewStatistics();
