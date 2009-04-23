@@ -234,7 +234,7 @@ public final class PreviewToolbar extends FXDToolbar {
 
         String selectedEntry = dObj.getDataModel().getSelectedEntry();
         
-        System.out.println("Selecting in the combo: " + entryCombo.getClientProperty( PROP_COMBO) + " - "+ selectedEntry);
+        //System.out.println("Selecting in the combo: " + entryCombo.getClientProperty( PROP_COMBO) + " - "+ selectedEntry);
         entryCombo.setSelectedItem( selectedEntry);
         entryCombo.setEnabled(entryCombo.getModel().getSize() > 1);
     }

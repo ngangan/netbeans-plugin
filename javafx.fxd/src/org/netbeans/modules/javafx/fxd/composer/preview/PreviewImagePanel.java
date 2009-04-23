@@ -212,11 +212,16 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 //            fxNode.setTranslateY( (float) -bounds.getY());
 //
 //            m_sgPanel.invalidate();
+
+//            AffineTransform at = new AffineTransform();
+//            at.scale( zoom, zoom);
+
+//            at.translate(-bounds.getX(), -bounds.getY());
+//            fxNode.setTransform(at);
             AffineTransform at = new AffineTransform();
             at.scale( zoom, zoom);
-            Rectangle2D bounds = fxNode.getBounds(at);
-            at.translate(-bounds.getX(), -bounds.getY());
             fxNode.setTransform(at);
+
             m_sgPanel.invalidate();
             m_sgPanel.getParent().validate();
         }

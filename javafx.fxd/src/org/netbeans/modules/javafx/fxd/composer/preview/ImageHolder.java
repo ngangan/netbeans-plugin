@@ -154,6 +154,7 @@ final class ImageHolder extends JPanel {
 
         public void layoutContainer(Container parent) {
             Dimension d = imagePanel.getPreferredSize();
+            System.out.println("Preferred size: " + d);
 //            System.err.println("Panel size: " + d);
 //            com.sun.scenario.scenegraph.JSGPanel sgPanel = (com.sun.scenario.scenegraph.JSGPanel) imagePanel;
 //            com.sun.scenario.scenegraph.fx.FXNode fxNode = (com.sun.scenario.scenegraph.fx.FXNode) sgPanel.getScene();
