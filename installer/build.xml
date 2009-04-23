@@ -403,18 +403,27 @@
   </target>
   
   <target name="patch" depends="build-javafx-package,build-registry,build-servicetag">
-    <propertyfile file="build/windows/data/engine.properties">
-      <entry  key="nbi.overall.license.resource" value="$S{nbi.overall.license.javafx.resource}"/>
-      <entry  key="NWP.welcome.page.type" value="javafx"/>
-    </propertyfile>
-    <propertyfile file="build/linux/data/engine.properties">
-      <entry  key="nbi.overall.license.resource" value="$S{nbi.overall.license.javafx.resource}"/>
-      <entry  key="NWP.welcome.page.type" value="javafx"/>
-    </propertyfile>
-    <propertyfile file="build/solaris/data/engine.properties">
-      <entry  key="nbi.overall.license.resource" value="$S{nbi.overall.license.javafx.resource}"/>
-      <entry  key="NWP.welcome.page.type" value="javafx"/>
-    </propertyfile>
+    <macrodef name="patch-property-file">
+        <attribute name="file"/>
+        <sequential>
+            <propertyfile file="@{file}">
+              <entry  key="nbi.overall.license.resource" value="$S{nbi.overall.license.javafx.resource}"/>
+              <entry  key="NWP.welcome.page.type" value="javafx"/>
+            </propertyfile>
+        </sequential>
+    </macrodef>    
+    <macrodef name="patch-properties">
+        <attribute name="dir"/>
+        <sequential>
+            <patch-property-file file="@{dir}/engine.properties"/>
+            <patch-property-file file="@{dir}/engine_ja.properties"/>
+            <patch-property-file file="@{dir}/engine_pt_BR.properties"/>
+            <patch-property-file file="@{dir}/engine_zh_CN.properties"/>
+        </sequential>
+    </macrodef>    
+    <patch-properties dir="build/windows/data"/>
+    <patch-properties dir="build/linux/data"/>
+    <patch-properties dir="build/solaris/data"/>
     <loadfile property="original.registry.win" srcfile="build/windows/data/registry.xml">
       <filterchain>
         <linecontains negate="true">
