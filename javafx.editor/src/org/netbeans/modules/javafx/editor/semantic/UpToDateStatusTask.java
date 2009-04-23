@@ -39,6 +39,8 @@
 
 package org.netbeans.modules.javafx.editor.semantic;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import java.io.IOException;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -58,11 +60,23 @@ import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.type.TypeKind;
+import javax.swing.text.Position;
+import org.netbeans.api.lexer.Token;
+import org.openide.cookies.LineCookie;
+import org.openide.loaders.DataObject;
+import org.openide.text.Line;
 /**
  *
  * @author David Strupl
@@ -71,6 +85,21 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     
     private static final Logger LOGGER = Logger.getLogger(UpToDateStatusTask.class.getName());
     private static final boolean LOGGABLE = LOGGER.isLoggable(Level.FINE);
+
+    private static final Set<String> CANNOT_RESOLVE = new HashSet<String>(Arrays.asList(
+            "compiler.err.cant.resolve", // NOI18N
+            "compiler.err.cant.resolve.location", // NOI18N
+            "compiler.err.cant.resolve.location.args", // NOI18N
+            "compiler.err.doesnt.exist" // NOI18N
+    ));
+
+    private static final Set<String> UNDERLINE_IDENTIFIER = new HashSet<String>(Arrays.asList(
+            "compiler.err.local.var.accessed.from.icls.needs.final", // NOI18N
+            "compiler.err.var.might.not.have.been.initialized", // NOI18N
+            "compiler.err.report.access" // NOI18N
+    ));
+
+    private static final Set<JFXTokenId> WHITESPACE = EnumSet.of(JFXTokenId.COMMENT, JFXTokenId.DOC_COMMENT, JFXTokenId.LINE_COMMENT, JFXTokenId.WS);
     
     private AtomicBoolean cancel = new AtomicBoolean();
 
@@ -82,6 +111,10 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     
     public void cancel() {
         cancel.set(true);
+    }
+
+    private boolean isCanceled() {
+        return cancel.get();
     }
 
     public void run(CompilationInfo info) {
@@ -113,15 +146,22 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             } else {
                 if (LOGGABLE) log("    source is not JavaFileObject but: " + (d.getSource() != null ? d.getSource().getClass().getName() : "null")); // NOI18N
             }
-            long start = d.getStartPosition();
-            long end = d.getEndPosition();
+            int start = (int)d.getStartPosition();
+            int end = (int)d.getEndPosition();
+
             if (start != Diagnostic.NOPOS && end != Diagnostic.NOPOS) {
-                if (LOGGABLE) log("    start == " + start + "  end == " + end); // NOI18N
-                if (start == end) {
-                    end = skipWhiteSpace(info, (int)start);
-                    if (LOGGABLE) log("  after skip  start == " + start + "  end == " + end); // NOI18N
-                }
+                Position[] positions = null;
                 try {
+                    positions = getLine(info, d, doc, start, end);
+                    start = positions[0].getOffset();
+                    end = positions[1].getOffset();
+
+                    if (LOGGABLE) log("    start == " + start + "  end == " + end); // NOI18
+                    if (start == end) {
+                        end = skipWhiteSpace(info, (int)start);
+                        if (LOGGABLE) log("  after skip  start == " + start + "  end == " + end); // NOI18N
+                    }
+
                     c.add(ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
                         d.getMessage(Locale.getDefault()),
@@ -134,6 +174,8 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                     if (LOGGABLE) {
                         LOGGER.log(Level.INFO, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex); // NOI18N
                     }
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
                 }
             } 
             // let's use the line number
@@ -152,6 +194,138 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
         UpToDateStatusProviderImpl p = UpToDateStatusProviderImpl.forDocument(doc);
         p.refresh(diag, UpToDateStatus.UP_TO_DATE_OK);
+    }
+
+    private Position[] getLine(CompilationInfo info, Diagnostic d, final Document doc, int startOffset, int endOffset) throws IOException {
+        if (LOGGABLE) {
+            LOGGER.fine("diagnostic code: " + d.getCode()); // NOI18N
+        }
+        StyledDocument sdoc = (StyledDocument) doc;
+        DataObject dObj = (DataObject)doc.getProperty(doc.StreamDescriptionProperty );
+        if (dObj == null)
+            return new Position[] {null, null};
+        LineCookie lc = dObj.getCookie(LineCookie.class);
+        int lineNumber = NbDocument.findLineNumber(sdoc, startOffset);
+        int lineOffset = NbDocument.findLineOffset(sdoc, lineNumber);
+        Line line = lc.getLineSet().getCurrent(lineNumber);
+
+        boolean rangePrepared = false;
+
+//        if (INVALID_METHOD_INVOCATION.contains(d.getCode())) {
+//            int[] span = translatePositions(info, handlePossibleMethodInvocation(info, d, doc, startOffset, endOffset));
+//
+//            if (span != null) {
+//                startOffset = span[0];
+//                endOffset = span[1];
+//                rangePrepared = true;
+//            }
+//        }
+//
+        if (CANNOT_RESOLVE.contains(d.getCode()) && !rangePrepared) {
+            int[] span = translatePositions(info, findUnresolvedElementSpan(info, (int) getPrefferedPosition(info, d)));
+
+            if (span != null) {
+                startOffset = span[0];
+                endOffset   = span[1];
+                rangePrepared = true;
+            }
+        }
+
+        if (UNDERLINE_IDENTIFIER.contains(d.getCode())) {
+            int offset = (int) getPrefferedPosition(info, d);
+            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+
+            int diff = ts.move(offset);
+
+            if (ts.moveNext() && diff >= 0 && diff < ts.token().length()) {
+                Token<JFXTokenId> t = ts.token();
+
+                if (t.id() == JFXTokenId.DOT) {
+                    while (ts.moveNext() && WHITESPACE.contains(ts.token().id()));
+                    t = ts.token();
+                }
+
+                if (t.id() == JFXTokenId.NEW) {
+                    while (ts.moveNext() && WHITESPACE.contains(ts.token().id()));
+                    t = ts.token();
+                }
+
+                if (t.id() == JFXTokenId.IDENTIFIER) {
+                    int[] span = translatePositions(info, new int[] {ts.offset(), ts.offset() + t.length()});
+
+                    if (span != null) {
+                        startOffset = span[0];
+                        endOffset   = span[1];
+                        rangePrepared = true;
+                    }
+                }
+            }
+        }
+
+        if (!rangePrepared) {
+            String text = line.getText();
+
+            if (text == null) {
+                //#116560, (according to the javadoc, means the document is closed):
+                cancel();
+                return null;
+            }
+
+            int column = 0;
+            int length = text.length();
+
+            while (column < text.length() && Character.isWhitespace(text.charAt(column)))
+                column++;
+
+            while (length > 0 && Character.isWhitespace(text.charAt(length - 1)))
+                length--;
+
+            if(length == 0) //whitespace only
+                startOffset = lineOffset;
+            else
+                startOffset = lineOffset + column;
+
+            endOffset = lineOffset + length;
+        }
+
+        if (LOGGABLE) {
+            LOGGER.log(Level.FINE, "startOffset = " + startOffset ); // NOI18N
+            LOGGER.log(Level.FINE, "endOffset = " + endOffset ); // NOI18N
+        }
+
+        final int startOffsetFinal = startOffset;
+        final int endOffsetFinal = endOffset;
+        final Position[] result = new Position[2];
+
+        doc.render(new Runnable() {
+            public void run() {
+                if (isCanceled())
+                    return;
+
+                int len = doc.getLength();
+
+                if (startOffsetFinal >= len || endOffsetFinal > len) {
+                    if (LOGGER.isLoggable(Level.WARNING)) {
+                        LOGGER.log(Level.WARNING, "document changed, but not canceled?" ); // NOI18N
+                        LOGGER.log(Level.WARNING, "len = " + len ); // NOI18N
+                        LOGGER.log(Level.WARNING, "startOffset = " + startOffsetFinal ); // NOI18N
+                        LOGGER.log(Level.WARNING, "endOffset = " + endOffsetFinal ); // NOI18N
+                    }
+                    cancel();
+
+                    return;
+                }
+
+                try {
+                    result[0] = NbDocument.createPosition(doc, startOffsetFinal, Position.Bias.Forward);
+                    result[1] = NbDocument.createPosition(doc, endOffsetFinal, Position.Bias.Backward);
+                } catch (BadLocationException e) {
+                    LOGGER.log(Level.SEVERE, "error getting document positions", e); // NOI18N
+                }
+            }
+        });
+
+        return result;
     }
 
     private int skipWhiteSpace(CompilationInfo info, int start) {
@@ -176,6 +350,121 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             if (LOGGABLE) log("NOT skipping the whitespace start == " + start + "  res == " + res); // NOI18N
             return start;
         }
+    }
+
+    public static Token findUnresolvedElementToken(CompilationInfo info, int offset) throws IOException {
+        TokenHierarchy<?> th = info.getTokenHierarchy();
+        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+
+        if (ts == null) {
+            return null;
+        }
+
+        ts.move(offset);
+        if (ts.moveNext()) {
+            Token t = ts.token();
+
+            if (t.id() == JFXTokenId.DOT) {
+                ts.moveNext();
+                t = ts.token();
+            } else {
+                if (t.id() == JFXTokenId.LT) {
+                    ts.moveNext();
+                    t = ts.token();
+                } else {
+                    if (t.id() == JFXTokenId.NEW || t.id() == JFXTokenId.WS) {
+                        boolean cont = ts.moveNext();
+
+                        while (cont && ts.token().id() == JFXTokenId.WS) {
+                            cont = ts.moveNext();
+                        }
+
+                        if (!cont)
+                            return null;
+
+                        t = ts.token();
+                    }
+                }
+            }
+
+            if (t.id() == JFXTokenId.IDENTIFIER) {
+                return ts.offsetToken();
+            }
+        }
+        return null;
+    }
+
+    private static int[] findUnresolvedElementSpan(CompilationInfo info, int offset) throws IOException {
+        Token t = findUnresolvedElementToken(info, offset);
+
+        if (t != null) {
+            return new int[] {
+                t.offset(null),
+                t.offset(null) + t.length()
+            };
+        }
+
+        return null;
+    }
+
+    public static JavaFXTreePath findUnresolvedElement(CompilationInfo info, int offset) throws IOException {
+        int[] span = findUnresolvedElementSpan(info, offset);
+
+        if (span != null) {
+            return info.getTreeUtilities().pathFor(span[0] + 1);
+        } else {
+            return null;
+        }
+    }
+
+    private int[] translatePositions(CompilationInfo info, int[] span) {
+        if (span == null || span[0] == (-1) || span[1] == (-1))
+            return null;
+
+        int start = span[0];
+        int end   = span[1];
+
+        if (start == (-1) || end == (-1))
+            return null;
+
+        return new int[] {start, end};
+    }
+
+    private long getPrefferedPosition(CompilationInfo info, Diagnostic d) throws IOException {
+        if ("compiler.err.doesnt.exist".equals(d.getCode())) { // NOI18N
+            return d.getStartPosition();
+        }
+        if ("compiler.err.cant.resolve.location".equals(d.getCode()) || "compiler.err.cant.resolve.location.args".equals(d.getCode())) { // NOI18N
+            int[] span = findUnresolvedElementSpan(info, (int) d.getPosition());
+
+            if (span != null) {
+                return span[0];
+            } else {
+                return d.getPosition();
+            }
+        }
+        if ("compiler.err.not.stmt".equals(d.getCode())) { // NOI18N
+            //check for "Collections.":
+            JavaFXTreePath path = findUnresolvedElement(info, (int) d.getStartPosition() - 1);
+            Element el = path != null ? info.getTrees().getElement(path) : null;
+
+            if (el == null || el.asType().getKind() == TypeKind.ERROR) {
+                return d.getStartPosition() - 1;
+            }
+
+            if (el.asType().getKind() == TypeKind.PACKAGE) {
+                //check if the package does actually exist:
+                String s = ((PackageElement) el).getQualifiedName().toString();
+                if (info.getElements().getPackageElement(s) == null) {
+                    //it does not:
+                    return d.getStartPosition() - 1;
+                }
+            }
+
+            return d.getStartPosition();
+        }
+
+        return d.getPosition();
     }
 
     private static void log(String s) {
