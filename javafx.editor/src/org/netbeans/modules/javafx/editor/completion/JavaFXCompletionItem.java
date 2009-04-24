@@ -44,6 +44,7 @@ package org.netbeans.modules.javafx.editor.completion;
 import com.sun.javafx.api.tree.*;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import javax.swing.text.Document;
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -138,6 +139,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
     public static JavaFXCompletionItem createParametersItem(ExecutableElement a, ExecutableType b, int anchorOffset, boolean deprecated, int length, String name) {
         return new ParametersItem(a, b, anchorOffset, deprecated, length, name);
+    }
+
+    public static final JavaFXCompletionItem createConstantItem(int substitutionOffset, String constant, int caretBackShift) {
+        return new ConstantItem(substitutionOffset, constant, caretBackShift);
     }
 
     protected JavaFXCompletionItem(int substitutionOffset) {
@@ -1550,6 +1555,91 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             sb.append(") - parameters"); //NOI18N
             return sb.toString();
+        }
+    }
+
+    static class ConstantItem extends JavaFXCompletionItem {
+
+        private static final String STRING_LITERAL_COLOR = "<font color=#CE7B00>"; //NOI18N
+        private static String ICON_RESOURCE = "org/netbeans/modules/javafx/editor/resources/keyword-icon.png"; //NOI18N
+
+        private String leftText;
+        private ImageIcon icon;
+        private final int caretBackShift;
+
+        ConstantItem(int substitutionOffset, String constant, int caretBackShift) {
+            super(substitutionOffset, constant);
+            this.caretBackShift = caretBackShift;
+            if (caretBackShift > constant.length()) {
+                throw new IllegalArgumentException("caretBackShift=" + caretBackShift + // NOI18N
+                        " > constant.length()=" + constant.length());
+            }
+        }
+
+        public int getSortPriority() {
+            return -SMART_TYPE; // Make it first?
+        }
+
+        public CharSequence getSortText() {
+            return textToAdd;
+        }
+
+        public CharSequence getInsertPrefix() {
+            return textToAdd;
+        }
+
+        @Override
+        protected ImageIcon getIcon(){
+            if (icon == null) {
+                icon = new ImageIcon(ImageUtilities.loadImage(ICON_RESOURCE));
+            }
+            return icon;
+        }
+
+        @Override
+        protected String getLeftHtmlText() {
+            if (leftText == null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(STRING_LITERAL_COLOR);
+                sb.append(textToAdd);
+                sb.append(COLOR_END);
+                leftText = sb.toString();
+            }
+            return leftText;
+        }
+
+        @Override
+        protected void substituteText(final JTextComponent c, final int offset,
+                final int len, final String text)
+        {
+            final Document doc = c.getDocument();
+            if (!(doc instanceof BaseDocument))
+                return;
+            ((BaseDocument)doc).runAtomic (new Runnable () {
+                public void run () {
+                    try {
+                        String textToReplace = doc.getText(offset, len);
+                        if (textToReplace.contentEquals(text)) {
+                            return;
+                        }
+                        doc.remove(offset, len);
+                        Position insertedTextEndPos = doc.createPosition(offset);
+                        doc.insertString(offset, text, null);
+
+                        // Move caret
+                        if (caretBackShift > 0) {
+                            c.setCaretPosition(insertedTextEndPos.getOffset() - caretBackShift);
+                        }
+                    } catch (BadLocationException e) {
+                        // Can't update
+                    }
+                }
+            });
+        }
+
+        @Override
+        public String toString() {
+            return textToAdd;
         }
     }
 

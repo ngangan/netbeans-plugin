@@ -41,25 +41,48 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.type.DeclaredType;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
 
 /**
  *
  * @author David Strupl
  */
 public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JFXObjectLiteralPart> {
-    
+
+    // -J-Dorg.netbeans.modules.javafx.editor.completion.environment.ObjectLiteralPartEnvironment.level=FINE
     private static final Logger logger = Logger.getLogger(ObjectLiteralPartEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
     protected void inside(JFXObjectLiteralPart t) throws IOException {
         if (LOGGABLE) log("inside JFXObjectLiteralPart " + t + "  offset == " + offset); // NOI18N
+
+        // For fields with String type add double-quotes completion item
+        if (path != null) {
+            Element e = controller.getTrees().getElement(path);
+            if (e.getKind() == ElementKind.FIELD) {
+                TypeMirror type = e.asType();
+                if (type.getKind() == TypeKind.DECLARED) {
+                    if ("java.lang.String".contentEquals(((TypeElement)((DeclaredType)type).
+                            asElement()).getQualifiedName()))
+                    {
+                        addResult(JavaFXCompletionItem.createConstantItem(
+                                query.getComponent().getCaretPosition(), "\"\"", 1));
+                    }
+                }
+            }
+        }
         addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
         addLocalMembersAndVars(getSmartType(t));
         addValueKeywords();

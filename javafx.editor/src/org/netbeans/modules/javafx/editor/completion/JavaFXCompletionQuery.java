@@ -72,7 +72,8 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements Task<CompilationController> {
-    
+
+    // -J-Dorg.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.level=FINE
     private static final Logger logger = Logger.getLogger(JavaFXCompletionQuery.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
@@ -195,6 +196,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     
     void setElement(ElementHandle element) {
         this.element = element;
+    }
+
+    public JTextComponent getComponent() {
+        return component;
     }
 
     @Override
@@ -490,7 +495,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         JavaFXTreePath pathOfBrother = pathFor(controller, offset > 0 ? offset - 1 : offset);
         Tree t = path.getLeaf();
         Tree brother = pathOfBrother.getLeaf();
-        if (LOGGABLE) log("   borther == " + brother); // NOI18N
+        if (LOGGABLE) log("   brother == " + brother); // NOI18N
         if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
             if ((brother.getJavaFXKind() == JavaFXKind.OBJECT_LITERAL_PART) ||
                 (brother.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) ||
