@@ -49,6 +49,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
 import com.sun.tools.javafxdoc.JavafxdocEnter;
+//import com.sun.tools.javafxdoc.JavafxdocMemberEnter;
 import com.sun.tools.javafxdoc.Messager;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,7 +65,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -227,6 +227,7 @@ public final class JavaFXSource {
 //        JavafxdocClassReader.preRegister(context);
         Messager.preRegister(context, null, DEV_NULL, DEV_NULL, DEV_NULL);
         JavafxdocEnter.preRegister(context);
+//        JavafxdocMemberEnter.preRegister(context);
         JavadocEnv.preRegister(context, cpInfo);
         DocCommentScanner.Factory.preRegister(context);
         
