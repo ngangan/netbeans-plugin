@@ -50,16 +50,16 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class Button implements ActiveEditorDrop {
-
+public class SwingLabel implements ActiveEditorDrop {
+    
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Button.class, "TEMPLATE_Button" );
+        String code = NbBundle.getMessage( SwingLabel.class, "TEMPLATE_SwingLabel" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
-        // Import
-        Imports.addImport( targetComponent, "javafx.ext.swing.SwingButton" ); // NOI18N
+        // Imports
+        Imports.addImport( targetComponent, "javafx.ext.swing.SwingLabel" ); // NOI18N
         
         return true;
     }    

@@ -40,31 +40,31 @@
         <folder name="Swing_Components">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="800"/>
-            <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
+            <file name="SwingButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingButton.xml">
                 <attr name="position" intvalue="200"/>
             </file>
-            <file name="CheckBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CheckBox.xml">
+            <file name="SwingCheckBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingCheckBox.xml">
                 <attr name="position" intvalue="300"/>
             </file>
-            <file name="ComboBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComboBox.xml">
+            <file name="SwingComboBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingComboBox.xml">
                 <attr name="position" intvalue="400"/>
             </file>
-            <file name="ComboBoxItem.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ComboBoxItem.xml">
+            <file name="SwingComboBoxItem.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingComboBoxItem.xml">
                 <attr name="position" intvalue="500"/>
             </file>
-            <file name="Label.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Label.xml">
+            <file name="SwingLabel.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingLabel.xml">
                 <attr name="position" intvalue="600"/>
             </file>
-            <file name="RadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadioButton.xml">
+            <file name="SwingRadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingRadioButton.xml">
                 <attr name="position" intvalue="900"/>
             </file>
-            <file name="Slider.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Slider.xml">
+            <file name="SwingSlider.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingSlider.xml">
                 <attr name="position" intvalue="1000"/>
             </file>
-            <file name="TextField.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/TextField.xml">
+            <file name="SwingTextField.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingTextField.xml">
                 <attr name="position" intvalue="1100"/>
             </file>
-            <file name="ToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleButton.xml">
+            <file name="SwingToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingToggleButton.xml">
                 <attr name="position" intvalue="1200"/>
             </file>            
         </folder>
@@ -337,6 +337,40 @@
             </file>
             <file name="MediaView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MediaView.xml">
                 <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
+        <folder name="Controls">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="430"/>
+            <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="CheckBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CheckBox.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Label.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Label.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="ProgressBar.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ProgressBar.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="ProgressIndicator.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ProgressIndicator.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="RadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadioButton.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="ScrollBar.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScrollBar.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Slider.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Slider.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="TextBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/TextBox.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="ToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleButton.xml">
+                <attr name="position" intvalue="100"/>
             </file>
         </folder>
     </folder>
