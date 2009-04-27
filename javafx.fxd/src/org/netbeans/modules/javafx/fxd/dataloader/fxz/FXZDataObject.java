@@ -225,9 +225,13 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     }
 
     public synchronized FXZEditorSupport getEditorSupport(String entryName) {
+        return getEditorSupport( entryName, true);
+    }
+
+    public synchronized FXZEditorSupport getEditorSupport(String entryName, boolean create) {
         FXZEditorSupport supp = m_supports.get(entryName);
 
-        if ( supp == null) {
+        if ( supp == null && create) {
             supp = new FXZEditorSupport( this, entryName, m_edSup == null);
             if (m_edSup == null) {
                 m_edSup = supp;

@@ -405,8 +405,8 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
             FXZEditorSupport sup;
     
             OutputStream out = builder.add( entry.m_name);
-            
-            if ( (sup=m_dObj.getEditorSupport( entry.m_name)) != null) {
+
+            if ( (sup=m_dObj.getEditorSupport( entry.m_name, false)) != null) {
                 BaseDocument doc = (BaseDocument) sup.getDocument();
                 Writer writer = new OutputStreamWriter( out);
                 doc.write( writer, 0, doc.getLength());                
