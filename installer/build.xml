@@ -236,24 +236,24 @@
     <jar destfile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" basedir="build/data/common-cluster" compress="true" level="9"/>
     <jar destfile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" compress="true" level="9">
       <zipfileset dir="build/data/lin-cluster" filemode="755">
-        <include name="javafx-sdk/bin/*"/>
-        <include name="javafx-sdk/emulator/bin/*"/>
+        <include name="javafx2/javafx-sdk/bin/*"/>
+        <include name="javafx2/javafx-sdk/emulator/bin/*"/>
       </zipfileset>
       <zipfileset dir="build/data/lin-cluster">
-        <exclude name="javafx-sdk/bin/*"/>
-        <exclude name="javafx-sdk/emulator/bin/*"/>
+        <exclude name="javafx2/javafx-sdk/bin/*"/>
+        <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
       </zipfileset>
     </jar>
     <mkdir dir="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
     <jar destfile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" basedir="build/data/common-cluster" compress="true" level="9"/>
     <jar destfile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" compress="true" level="9">
       <zipfileset dir="build/data/sol-cluster" filemode="755">
-        <include name="javafx-sdk/bin/*"/>
-        <include name="javafx-sdk/emulator/bin/*"/>
+        <include name="javafx2/javafx-sdk/bin/*"/>
+        <include name="javafx2/javafx-sdk/emulator/bin/*"/>
       </zipfileset>
       <zipfileset dir="build/data/sol-cluster">
-        <exclude name="javafx-sdk/bin/*"/>
-        <exclude name="javafx-sdk/emulator/bin/*"/>
+        <exclude name="javafx2/javafx-sdk/bin/*"/>
+        <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
       </zipfileset>
     </jar>
     <copy file="build/logic.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
