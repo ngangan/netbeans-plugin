@@ -72,6 +72,10 @@ public class EditorRegistryListener implements CaretListener, PropertyChangeList
 
     public void editorRegistryChanged() {
         final JTextComponent editor = EditorRegistry.lastFocusedComponent();
+        if (editor == null) {
+            return;
+        }
+
         if (lastEditor != editor) {
             if (lastEditor != null) {
                 lastEditor.removeCaretListener(this);

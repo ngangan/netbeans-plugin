@@ -60,6 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
@@ -266,7 +267,8 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             final boolean isParentInherited, final CompilationInfo info,
             final Map<Element, Long> pos) {
 
-        final String name = e.getSimpleName().toString();
+        final Name simpleName = e.getSimpleName();
+        final String name = simpleName != null ? simpleName.toString() : "<null>"; // NOI18N
         final boolean spaceMagic = SpaceMagicUtils.isSpiritualMethod(e.getEnclosingElement());
         if (!spaceMagic && info.getElementUtilities().isSynthetic(e)) {
             return null;
