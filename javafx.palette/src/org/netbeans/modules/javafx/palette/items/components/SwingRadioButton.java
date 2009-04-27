@@ -50,17 +50,16 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class ComboBox implements ActiveEditorDrop {
+public class SwingRadioButton implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( ComboBox.class, "TEMPLATE_ComboBox" ); // NOI18N
+        String code = NbBundle.getMessage( SwingRadioButton.class, "TEMPLATE_SwingRadioButton" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
-        // Import
-        Imports.addImport( targetComponent, "javafx.ext.swing.SwingComboBox" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.ext.swing.SwingComboBoxItem" ); // NOI18N
+        // Imports
+        Imports.addImport( targetComponent, "javafx.ext.swing.SwingRadioButton" ); // NOI18N
         
         return true;
     }    

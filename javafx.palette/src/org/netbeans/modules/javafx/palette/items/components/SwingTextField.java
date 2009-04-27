@@ -50,16 +50,16 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public class ToggleButton implements ActiveEditorDrop {
+public class SwingTextField implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( ToggleButton.class, "TEMPLATE_ToggleButton" ); // NOI18N
+        String code = NbBundle.getMessage( SwingTextField.class, "TEMPLATE_SwingTextField" ); // NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary( code );
         template.insert( targetComponent );
         
         // Imports
-        Imports.addImport( targetComponent, "javafx.ext.swing.SwingToggleButton" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.ext.swing.SwingTextField" ); // NOI18N
         
         return true;
     }    
