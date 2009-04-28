@@ -58,6 +58,7 @@ import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.javafx.editor.FXSourceUtils.URLResult;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -144,7 +145,8 @@ public class GoToSupport {
                         return;
                     } else if (javadoc) {
                         result[0] = null;
-                        URL url = FXSourceUtils.getJavadoc(el, controller).url;
+                        final URLResult res = FXSourceUtils.getJavadoc(el, controller);
+                        URL url = res != null ? res.url : null;
                         if (url != null) {
                             HtmlBrowser.URLDisplayer.getDefault().showURL(url);
                         } else {
