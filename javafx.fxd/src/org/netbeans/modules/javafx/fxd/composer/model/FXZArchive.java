@@ -33,6 +33,7 @@ import org.openide.util.Exceptions;
 import com.sun.javafx.tools.fxd.FXDRootElement;
 import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
+import com.sun.javafx.tools.fxd.container.misc.ProgressNotifier;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
@@ -450,8 +451,17 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
     @Override
     public FXDRootElement getRoot( final String entryName) {
-        System.err.println("Getting root for the entry " + entryName);
         return getFileModel(entryName).getRootNode();
+    }
+
+    @Override
+    public FXDRootElement getRoot( String entryName, ProgressNotifier notifier) {
+        if ( entryName == null) {
+            entryName = MAIN_CONTENT;
+        }
+
+        notifier.nextPhase(getSize( entryName));
+        return getRoot(entryName);
     }
 
     @Override

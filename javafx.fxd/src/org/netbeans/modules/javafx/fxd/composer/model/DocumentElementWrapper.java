@@ -72,7 +72,7 @@ final class DocumentElementWrapper {
         public Object getAttrValue(String name) {
             if ( FXDObjectElement.ATTR_NAME_ID.equals(name)) {
                 //override existing ID with the element start offset
-                return Integer.toString(m_de.getStartOffset());
+                return FXDFileModel.getElementId(m_de);
             } else {
                 String strValue = (String) m_de.getAttributes().getAttribute(name);
                 if ( strValue != null) {
@@ -273,6 +273,7 @@ final class DocumentElementWrapper {
         "javafx.scene.shape.",
         "javafx.scene.text.",
         "javafx.scene.effect.",
+        "javafx.fxd.",
         ""
     };
 

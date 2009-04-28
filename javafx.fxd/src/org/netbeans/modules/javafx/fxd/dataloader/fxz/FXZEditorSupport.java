@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
 import org.netbeans.core.spi.multiview.CloseOperationHandler;
 import org.netbeans.core.spi.multiview.CloseOperationState;
+import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.UndoRedo.Manager;
@@ -97,7 +98,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     @Override
     protected StyledDocument createStyledDocument(EditorKit kit) {
         StyledDocument sd = super.createStyledDocument(kit);
-        sd.putProperty( "entry_name", m_entryName);
+        FXDFileModel.setEntryPrefixForDocument(sd,FXDFileModel.createIdPrefix(m_entryName));
         return sd;
     }
     

@@ -139,9 +139,10 @@ public final class FXDComposerController {
         }        
     }    
 
-    private static void pick( SGParent parent, List<SGNode> selected, Point2D point) {
+    private static void pick( SGParent parent, List<SGNode> selected, Point2D point, String idPrefix, SGNode significantParent) {
         for ( SGNode child : parent.getChildren()) {
             String id = child.getID();
+            SGNode significantChild = (id != null && id.startsWith(idPrefix)) ? child : significantParent;
             if ( child instanceof FXNode) {
                 child = ((FXNode) child).getLeaf();
                 // workaround since the leaf ID is not set
@@ -149,11 +150,12 @@ public final class FXDComposerController {
                     child.setID(id);
                 }
             }
+
             if( child instanceof SGParent) {
-                pick( (SGParent) child, selected, point);
+                pick( (SGParent) child, selected, point, idPrefix, significantChild);
             } else {
-                if ( child.contains(point)) {
-                    selected.add(child);
+                if ( child.getTransformedBounds().contains(point) && significantChild != null) {
+                    selected.add(significantChild);
                 }
             }
         }
@@ -165,10 +167,18 @@ public final class FXDComposerController {
         SGNode root = getRootNode();
         if (root != null) {
             List<SGNode> selected = new ArrayList<SGNode>();
-            pick( (SGGroup) ((FXNode)root).getLeaf(), selected, new Point2D.Float(x, y));
+            String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
+
+            pick( (SGGroup) ((FXNode)root).getLeaf(), selected, new Point2D.Float(x, y), idPrefix, null);
             String id;
             int selNum;
-            if ( (selNum=selected.size()) > 0 && (id=selected.get(selNum-1).getID()) != null) {
+//            System.out.println("*******************************************");
+//            for ( SGNode node : selected) {
+//                System.out.println("\t '" + node.getID() + "' " + node);
+//            }
+            if ( (selNum=selected.size()) > 0 && 
+                 (id=selected.get(selNum-1).getID()) != null &&
+                 id.length() > 0) {
                 elem = new FXDElement(m_dObj, id);
             }
         } 

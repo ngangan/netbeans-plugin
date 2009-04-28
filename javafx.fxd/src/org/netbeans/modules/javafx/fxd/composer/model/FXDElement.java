@@ -117,7 +117,7 @@ public final class FXDElement {
         while ( de != null) {
             de = de.getParentElement();
             if ( de != null && FXDFileModel.FXD_NODE.equals(de.getType())) {
-                String id = FXDFileModel.getIdAttribute(de);
+                String id = FXDFileModel.getElementId(de);
                 return new FXDElement(m_dObj, id);
             }
         }

@@ -20,6 +20,8 @@ import org.netbeans.modules.editor.structure.api.DocumentModelStateListener;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.FXDRootElement;
 import java.io.IOException;
+import javax.swing.text.Document;
+import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
 import org.openide.cookies.EditorCookie;
 /**
@@ -27,7 +29,8 @@ import org.openide.cookies.EditorCookie;
  * @author Pavel Benes
  */
 public final class FXDFileModel implements DocumentModelStateListener {   
-    public static final String DOCUMENT_ROOT_ELEMENT_TYPE = "ROOT_ELEMENT";  //NOI18N
+    public static final String  DOCUMENT_ROOT_ELEMENT_TYPE = "ROOT_ELEMENT";  //NOI18N
+    private static final String PROP_DOCUMENT_ENTRY        = "$ENTRY";
     
     //TODO use intern and direct compare instead of equals
     public static final String FXD_DOC             = "doc";          //NOI18N
@@ -58,6 +61,8 @@ public final class FXDFileModel implements DocumentModelStateListener {
         m_archive   = archive;
         m_entryName = entryName;
         m_docModel = getDocumentModel( archive.getDataObject(), entryName);
+        assert FXDComposerUtils.safeEquals( createIdPrefix(entryName),
+                getEntryPrefixForDocument(m_docModel.getDocument()));
         m_docModel.addDocumentModelStateListener(this);
     }
           
@@ -129,7 +134,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
         //TODO Do not use the String id, use number instead and use fact that the sequence is monotonuous
         DocumentElement result = null;
         
-        if ( id.equals(getIdAttribute(de))) {
+        if ( id.equals(getElementId(de))) {
             return de;
         } else {
             int childNum = de.getElementCount();
@@ -141,17 +146,11 @@ public final class FXDFileModel implements DocumentModelStateListener {
         }
         return result;
     }
-        
-    /**
-     * Convenience helper method.
-     */
-    public static String getIdAttribute(final DocumentElement de) {
-        return String.valueOf(de.getStartOffset());
-    }    
-    
+            
     public static String getElementId(final DocumentElement de) {
         if ( de.getStartOffset() < de.getEndOffset()) {
-            return FXDFileModel.getIdAttribute(de);
+            String entryName = getEntryPrefixForDocument( de.getDocument());
+            return entryName.concat( String.valueOf(de.getStartOffset()));
         } else {
             //TODO
             System.err.println("Deleted element found: " + de);  //NOI18N
@@ -169,6 +168,14 @@ public final class FXDFileModel implements DocumentModelStateListener {
         return de != null && FXD_ERROR.equals(de.getType());
     }
 
+    public static String getEntryPrefixForDocument( Document doc) {
+        return (String) doc.getProperty(PROP_DOCUMENT_ENTRY);
+    }
+
+    public static void setEntryPrefixForDocument( Document doc, String entryName) {
+        doc.putProperty( PROP_DOCUMENT_ENTRY, entryName);
+    }
+
     public static BaseDocument getDocument( FXZDataObject dObj, String entryName) throws IOException {
         EditorCookie ec = dObj.getEditorSupport( entryName);
         if(ec == null) {
@@ -180,6 +187,12 @@ public final class FXDFileModel implements DocumentModelStateListener {
     
     public static DocumentModel getDocumentModel(final FXZDataObject dObj, String entryName) throws IOException, DocumentModelException {
         return DocumentModel.getDocumentModel(getDocument(dObj, entryName));
+    }
+
+    public static String createIdPrefix( String entryName) {
+        entryName = FXDComposerUtils.removeEntryExtension(entryName);
+        entryName += "$";
+        return entryName;
     }
         
     /**
