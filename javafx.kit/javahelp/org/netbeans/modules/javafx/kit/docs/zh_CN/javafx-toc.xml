@@ -4,46 +4,21 @@
 
 
 <toc version="2.0">
-   <tocitem text="IDE Basics">
-	<tocitem text="Getting Started">
-	  <tocitem text="JavaFX Applications" target="javafx_proj_process_top" />
+   <tocitem text="IDE 基础知识"> <tocitem text="入门指南"> <tocitem text="JavaFX 应用程序" target="javafx_proj_process_top"  />
         </tocitem>
    </tocitem>
-   <tocitem text="JavaFX Applications" expand="false">
-      <tocitem text="About JavaFX Applications" target="javafx_app_about" />
-
-      <tocitem text="JavaFX Project Setup and Configuration" >
-        <tocitem text="About JavaFX Projects" target="javafx_proj_about" />
-        <tocitem text="Working With JavaFX Projects" target="javafx_proj_process" />
-        <tocitem text="JavaFX Project Tasks: Quick Reference" target="javafx_proj_quickref"/>
-        <tocitem text="Deleting a JavaFX Project" target="javafx_proj_deleting" />
-        <tocitem text="Moving, Copying, and Renaming a JavaFX Project" target="javafx_proj_move_copy_rename" />
-        <tocitem text="Setting the Target JavaFX SDK in a JavaFX Project" target="javafx_proj_sdk" />
-        <tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
+   <tocitem text="JavaFX 应用程序" expand="false"> <tocitem text="关于 JavaFX 应用程序" target="javafx_app_about"  /> <tocitem text="JavaFX 项目设定和配置" > <tocitem text="关于 JavaFX 项目" target="javafx_proj_about"  /> <tocitem text="使用 JavaFX 项目" target="javafx_proj_process"  /> <tocitem text="JavaFX 项目任务：快速参考" target="javafx_proj_quickref" /> <tocitem text="删除 JavaFX 项目" target="javafx_proj_deleting"  /> <tocitem text="移动、复制、重命名 JavaFX 项目" target="javafx_proj_move_copy_rename"  /> <tocitem text="在 JavaFX 项目中设置目标 JavaFX SDK" target="javafx_proj_sdk"  /> <tocitem text="定制 JavaFX 语法设置" target="javafx_options"  />
       </tocitem>
 
-      <tocitem text="Editing JavaFX Source Files" >
-        <tocitem text="Editing JavaFX Source Files" target="javafx_editing_source" />
-        <tocitem text="About the JavaFX Palette" target="javafx_editing_palette" />
-        <tocitem text="Using the Navigator Window" target="javafx_nav_window" />
-        <tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
+      <tocitem text="编辑 JavaFX 源文件" > <tocitem text="编辑 JavaFX 源文件" target="javafx_editing_source"  /> <tocitem text="关于 JavaFX 面板" target="javafx_editing_palette"  /> <tocitem text="使用导航窗口" target="javafx_nav_window"  /> <tocitem text="使用 JavaFX 预览功能" target="javafx_using_javafxpreview"  />
       </tocitem>
 
-      <tocitem text="Building JavaFX Applications" >
-        <tocitem text="About Building JavaFX Applications" target="javafx_comp_about" />
-		<tocitem text="Working with JavaFX Project Builds" target="javafx_comp_process" />	
-        <tocitem text="Building a JavaFX Project" target="javafx_comp_project" />
-		<tocitem text="Managing the Classpath of JavaFX Projects" target="javafx_comp_classpath" />
+      <tocitem text="生成 JavaFX 应用程序" > <tocitem text="关于生成 JavaFX 应用程序" target="javafx_comp_about"  /> <tocitem text="使用 JavaFX 项目生成" target="javafx_comp_process"  /> <tocitem text="生成 JavaFX 项目" target="javafx_comp_project"  /> <tocitem text="管理 JavaFX 项目的类路径" target="javafx_comp_classpath"  />
       </tocitem> 
 
-      <tocitem text="Running JavaFX Applications" >
-        <tocitem text="Working with JavaFX Project Execution" target="javafx_run_process" />
-        <tocitem text="Running a JavaFX Application" target="javafx_run_app" />
-        <tocitem text="Setting the Main JavaFX Class and Runtime Arguments" target="javafx_run_args" />
+      <tocitem text="运行 JavaFX 应用程序" > <tocitem text="使用 JavaFX 项目执行" target="javafx_run_process"  /> <tocitem text="运行 JavaFX 应用程序" target="javafx_run_app"  /> <tocitem text="设置主 JavaFX 类和运行时参数" target="javafx_run_args"  />
       </tocitem>
       
-      <tocitem text="Debugging JavaFX Applications" target="javafx_debug_about" />
-	  <tocitem text="Profiling JavaFX Applications" target="javafx_profile_about" />
-      <tocitem text="Preparing JavaFX Applications for Deployment" target="javafx_deploy_prep" />
+      <tocitem text="调试 JavaFX 应用程序" target="javafx_debug_about"  /> <tocitem text="分析 JavaFX 应用程序" target="javafx_profile_about"  /> <tocitem text="准备部署 JavaFX 应用程序" target="javafx_deploy_prep"  />
     </tocitem>
 </toc>	
