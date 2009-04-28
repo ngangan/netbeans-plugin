@@ -123,6 +123,9 @@
             <file name="Ellipse.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Ellipse.xml">
                 <attr name="position" intvalue="300"/>
             </file>
+            <file name="Group.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Group.xml">
+                <attr name="position" intvalue="350"/>
+            </file>
             <file name="Image.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Image.xml">
                 <attr name="position" intvalue="400"/>
             </file>
