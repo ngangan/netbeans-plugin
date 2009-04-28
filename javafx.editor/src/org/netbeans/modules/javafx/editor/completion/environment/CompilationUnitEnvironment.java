@@ -159,6 +159,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
         kws.add(FUNCTION_KEYWORD);
         kws.add(PUBLIC_KEYWORD);
         kws.add(IMPORT_KEYWORD);
+        kws.add(MIXIN_KEYWORD);
         boolean beforeAnyClass = true;
         for (Tree t : root.getTypeDecls()) {
             if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {

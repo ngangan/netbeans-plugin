@@ -118,6 +118,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String LAST_KEYWORD = "last"; // NOI18N
     public static final String LAZY_KEYWORD = "lazy"; // NOI18N
     public static final String LET_KEYWORD = "let"; // NOI18N
+    public static final String MIXIN_KEYWORD = "mixin"; // NOI18N
     public static final String NEW_KEYWORD = "new"; // NOI18N
     public static final String NOT_KEYWORD = "not"; // NOI18N
     public static final String NULL_KEYWORD = "null"; // NOI18N
