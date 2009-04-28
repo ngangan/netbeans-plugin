@@ -367,7 +367,14 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             Element element = info.getTrees().getElement(getCurrentPath());
-            Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
+            Set<Modifier> modifiers = null;
+            if (element != null) {
+                // issue #163848
+                try {
+                    modifiers = element.getModifiers();
+                } catch (Exception e) {
+                }
+            }
 
             ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
             while (ts.moveNext()) {
