@@ -164,6 +164,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 label.setIcon(null);
                                             }
                                         } catch( Exception e) {
+                                            e.printStackTrace();
                                             setBackground( m_defaultBackground);
                                             label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
                                                 e.getLocalizedMessage()));

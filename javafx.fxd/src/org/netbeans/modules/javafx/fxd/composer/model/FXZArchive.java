@@ -453,7 +453,18 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         System.err.println("Getting root for the entry " + entryName);
         return getFileModel(entryName).getRootNode();
     }
-    
+
+    @Override
+    protected int getSize( String entryName) {
+        int index = getEntryIndex(entryName);
+        if ( index >= 0) {
+            return (int) m_entries.get(index).m_size;
+        } else {
+            System.err.println("Unknown entry: " + entryName);
+            return -1;
+        }
+    }
+
     public int getRowCount() {
         checkEntries();        
         return m_entries.size();

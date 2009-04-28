@@ -231,6 +231,7 @@ made subject to such option by the copyright holder.
                 <package>com.sun.tools.javafx.tree</package>
                 <package>com.sun.tools.javafx.util</package>
                 <package>com.sun.tools.javafxdoc</package>
+                <package>javafx.lang</package>
                 <package>javax.lang.model</package>
                 <package>javax.lang.model.element</package>
                 <package>javax.lang.model.type</package>
