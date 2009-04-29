@@ -23,7 +23,7 @@ import java.io.IOException;
 import javax.swing.text.Document;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
-import org.openide.cookies.EditorCookie;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 /**
  *
  * @author Pavel Benes
@@ -177,11 +177,11 @@ public final class FXDFileModel implements DocumentModelStateListener {
     }
 
     public static BaseDocument getDocument( FXZDataObject dObj, String entryName) throws IOException {
-        EditorCookie ec = dObj.getEditorSupport( entryName);
-        if(ec == null) {
-            throw new IllegalArgumentException("The DataObject " + dObj.getName() + "(class=" + dObj.getClass().getName() + ") has no EditorCookie!?"); // NOI18N
+        FXZEditorSupport supp = dObj.getEditorSupport( entryName);
+        if(supp == null) {
+            throw new IllegalArgumentException("No editor support found on DataObject" + dObj.getName()); // NOI18N
         } else {
-            return (BaseDocument)ec.openDocument();
+            return (BaseDocument) supp.openDocument(false);
         }
     }
     

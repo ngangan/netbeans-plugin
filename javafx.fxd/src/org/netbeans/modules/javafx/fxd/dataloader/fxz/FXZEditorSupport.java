@@ -11,7 +11,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
 import org.netbeans.modules.javafx.fxd.composer.archive.ArchiveViewDescription;
 import org.netbeans.modules.javafx.fxd.composer.preview.PreviewViewDescription;
 import org.netbeans.modules.javafx.fxd.composer.source.SourceViewDescription;
@@ -48,7 +47,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     public final String m_entryName;
 
     public FXZEditorSupport( FXZDataObject dObj, String entryName, boolean isBase) {
-        super(dObj, new FXDEnv(dObj));
+        super(dObj, new FXDEnv(dObj, entryName));
         m_entryName = entryName;
         
         if ( !isBase) {
@@ -83,11 +82,17 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     
     @Override
     public StyledDocument openDocument() throws IOException {
+        return openDocument(true);
+    }
+
+    public StyledDocument openDocument( boolean changeSelection) throws IOException {
         FXZDataObject dObj = getFXZDataObject();
-        String entryName = dObj.getEntryName();
-        if ( !entryName.equals( m_entryName)) {
-            dObj.selectEntry(m_entryName);
-        } 
+        if ( changeSelection) {
+            String entryName = dObj.getEntryName();
+            if ( !entryName.equals( m_entryName)) {
+                dObj.selectEntry(m_entryName);
+            } 
+        }
         return super.openDocument();
     }
 
@@ -260,9 +265,11 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     
     static final class FXDEnv extends DataEditorSupport.Env {
         private static final long  serialVersionUID = 2L;
+        private final String m_entryName;
         
-        public FXDEnv( FXZDataObject obj) {
+        public FXDEnv( FXZDataObject obj, String entryName) {
             super(obj);
+            m_entryName = entryName;
         }
         
         @Override
@@ -272,9 +279,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
         
         @Override
         public InputStream inputStream() throws IOException {
-            FXDComposerModel model = ((FXZDataObject)getDataObject()).getDataModel();
-            FXDContainer container = model.getFXDContainer();
-            return container.open( model.getSelectedEntry());
+            FXDContainer container = ((FXZDataObject)getDataObject()).getDataModel().getFXDContainer();
+            return container.open( m_entryName);
         }        
                 
         @Override

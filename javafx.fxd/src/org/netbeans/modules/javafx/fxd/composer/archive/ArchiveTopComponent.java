@@ -13,7 +13,6 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
