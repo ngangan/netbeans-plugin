@@ -66,19 +66,23 @@ public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
     protected void inside(CatchTree t) throws IOException {
         if (LOGGABLE) log("inside CatchTree " + t + "  offset == " + offset); // NOI18N
         VariableTree var = t.getParameter();
-        Tree type = var.getType();
-        int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
-        if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos); // NOI18N
-        if (offset <= typePos) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-            if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-            if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
-                addLocalAndImportedTypes(null, null, null, false, getSmartType());
+        if (var != null) {
+            Tree type = var.getType();
+            int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+            if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos); // NOI18N
+            if (offset <= typePos) {
+                TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+                if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
+                if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
+                    addLocalAndImportedTypes(null, null, null, false, getSmartType());
+                }
+                return;
             }
-            return;
+            // TODO:
+            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
+        } else { // t.getParameter() may be null for CATCH - see #163767
+            // Possibly show all exception classes
         }
-        // TODO:
-        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
     }
 
     /**
