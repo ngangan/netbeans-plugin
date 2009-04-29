@@ -170,6 +170,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         INIT_KEYWORD,
         POSTINIT_KEYWORD,
         PUBLIC_KEYWORD, PROTECTED_KEYWORD, PACKAGE_KEYWORD, PUBLIC_INIT_KEYWORD, PUBLIC_READ_KEYWORD,
+        OVERRIDE_KEYWORD,
         VAR_KEYWORD
     };
 
