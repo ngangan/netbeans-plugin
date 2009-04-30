@@ -64,7 +64,7 @@ public class LoadingScreen extends CustomNode  {
     }     
     
     function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
-        return Affine{m00:m00 m01:m01 m02:m02 m10:m10 m11:m11 m12:m12};
+        return Affine{ mxx:m00 mxy:m01 myx:m02 myy:m10 tx:m11 ty:m12};
     }
     
 
