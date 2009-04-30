@@ -172,7 +172,30 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
                 }
             });
         }
-
+        installCheckBox1.addActionListener(new ActionListener() {
+            Font basefont = installCheckBox1.getFont();
+            Font boldfont = basefont.deriveFont(Font.BOLD);
+            {
+                updateFont();
+            }
+            public void actionPerformed(ActionEvent e) {
+                String config = (String) configCombo.getSelectedItem();
+                if (config.length() == 0) {
+                    configs.get(null).put(JavaFXProjectProperties.JAD_INSTALL, String.valueOf(installCheckBox1.isSelected()));
+                } else {
+                    configs.get(config).put(JavaFXProjectProperties.JAD_INSTALL, Boolean.parseBoolean(configs.get(null).get(JavaFXProjectProperties.JAD_INSTALL)) != installCheckBox1.isSelected() ? String.valueOf(installCheckBox1.isSelected()) : null);
+                }
+                updateFont();
+            }
+            void updateFont() {
+                String config = (String) configCombo.getSelectedItem();
+                if (config.length() == 0) {
+                    installCheckBox1.setFont(basefont);
+                } else {
+                    installCheckBox1.setFont(Boolean.parseBoolean(configs.get(null).get(JavaFXProjectProperties.JAD_INSTALL)) == installCheckBox1.isSelected() ? basefont : boldfont); // NOI18N
+                }
+            }
+        });
         jButtonMainClass.addActionListener(new MainClassListener(project.getSourceRoots(), jTextFieldMainClass));
     }
 
@@ -210,6 +233,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         jRadioButton4 = new javax.swing.JRadioButton();
         deviceLabel = new javax.swing.JLabel();
         deviceCombo = new javax.swing.JComboBox();
+        installCheckBox1 = new javax.swing.JCheckBox();
         jvmLabel = new javax.swing.JLabel();
         jvmText = new javax.swing.JTextField();
 
@@ -412,16 +436,25 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.insets = new java.awt.Insets(5, 12, 0, 0);
         extPanel.add(deviceCombo, gridBagConstraints);
 
+        org.openide.awt.Mnemonics.setLocalizedText(installCheckBox1, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizerRun_InstallPermanently")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 12, 0, 0);
+        extPanel.add(installCheckBox1, gridBagConstraints);
+
         org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizerRun_JVMArgs")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         extPanel.add(jvmLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -487,6 +520,7 @@ private void enableDeviceCombo() {
     boolean enabled = jRadioButton4.isEnabled() && jRadioButton4.isSelected();
     deviceLabel.setEnabled(enabled);
     deviceCombo.setEnabled(enabled);
+    installCheckBox1.setEnabled(enabled);
 }
     
     
@@ -614,6 +648,13 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
                 }
                 data[i].setText(v);
             }
+            String v = m.get(JavaFXProjectProperties.JAD_INSTALL);
+            if (v == null) {
+                // display default value
+                v = def.get(JavaFXProjectProperties.JAD_INSTALL);
+            }
+            installCheckBox1.setSelected(Boolean.parseBoolean(v));
+            for (ActionListener l : installCheckBox1.getActionListeners()) l.actionPerformed(null);
         } // else ??
         configDel.setEnabled(activeConfig != null);
     }
@@ -630,6 +671,7 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
     private javax.swing.JComboBox deviceCombo;
     private javax.swing.JLabel deviceLabel;
     private javax.swing.JPanel extPanel;
+    private javax.swing.JCheckBox installCheckBox1;
     private javax.swing.JButton jButtonMainClass;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelArguments;

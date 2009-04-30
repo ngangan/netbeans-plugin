@@ -273,9 +273,12 @@ is divided into following sections:
             <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the execution."/>
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
             <property name="mobile.device" value="DefaultFxPhone1"/>
+            <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
+                <istrue value="${{jad.install}}"/>
+            </condition>
             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}" failonerror="true">
                 <arg value="${{run.jvmargs}}"/>
-                <arg value="-Xdescriptor:${{jad.file}}"/>
+                <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                 <arg value="-Xdevice:${{mobile.device}}"/>
             </exec>
         </target>
@@ -348,9 +351,12 @@ is divided into following sections:
         <target name="-debug-midp-debuggee" if="midp.execution.trigger">
             <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the debugging."/>
             <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
-            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
+            <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
+                <istrue value="${{jad.install}}"/>
+            </condition>
+             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
                 <arg value="${{run.jvmargs}}"/>
-                <arg value="-Xdescriptor:${{jad.file}}"/>
+                <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                 <arg value="-Xdebug"/>
                 <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
             </exec>

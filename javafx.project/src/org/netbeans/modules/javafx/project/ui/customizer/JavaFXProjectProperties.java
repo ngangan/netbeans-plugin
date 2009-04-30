@@ -139,6 +139,7 @@ public class JavaFXProjectProperties {
     public static final String MAIN_FX_RUN_CLASS = "main.fx.class"; // NOI18M // NOI18N
     public static final String MAIN_FX_BUILD_CLASS = "FXBuild.class"; // NOI18M // NOI18N
     public static final String MOBILE_DEVICE = "mobile.device"; //NOI18N
+    public static final String JAD_INSTALL = "jad.install"; //NOI18N
     public static final String JAVAC_SOURCE = "javac.source"; // NOI18N
     public static final String JAVAC_TARGET = "javac.target"; // NOI18N
     public static final String JAVAC_DEBUG = "javac.debug"; // NOI18N
@@ -823,7 +824,7 @@ public class JavaFXProjectProperties {
         });
         Map<String,String> def = new TreeMap<String,String>();
         def.put(MOBILE_DEVICE, "DefaultFxPhone1"); //NOI18N
-        for (String prop : new String[] {MAIN_CLASS, APPLICATION_ARGS, RUN_JVM_ARGS, RUN_WORK_DIR, JAVAFX_PROFILE, EXECUTION_TARGET, MOBILE_DEVICE}) { // NOI18N
+        for (String prop : new String[] {MAIN_CLASS, APPLICATION_ARGS, RUN_JVM_ARGS, RUN_WORK_DIR, JAVAFX_PROFILE, EXECUTION_TARGET, MOBILE_DEVICE, JAD_INSTALL}) { // NOI18N
             String v = updateHelper.getProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH).getProperty(prop);
             if (v == null) {
                 v = updateHelper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH).getProperty(prop);
@@ -865,7 +866,7 @@ public class JavaFXProjectProperties {
         Map<String,String> def = configs.get(null);
         for (String prop : def.keySet()) {
             String v = def.get(prop);
-            EditableProperties ep = (prop.equals(APPLICATION_ARGS) || prop.equals(RUN_WORK_DIR) || prop.equals(MOBILE_DEVICE)) ?
+            EditableProperties ep = (prop.equals(APPLICATION_ARGS) || prop.equals(RUN_WORK_DIR) || prop.equals(MOBILE_DEVICE) || prop.equals(JAD_INSTALL)) ?
                 privateProperties : projectProperties;
             if (!Utilities.compareObjects(v, ep.getProperty(prop))) {
                 if (v != null && v.length() > 0) {
@@ -891,7 +892,7 @@ public class JavaFXProjectProperties {
             for (Map.Entry<String,String> entry2 : c.entrySet()) {
                 String prop = entry2.getKey();
                 String v = entry2.getValue();
-                String path = (prop.equals(APPLICATION_ARGS) || prop.equals(RUN_WORK_DIR) || prop.equals(MOBILE_DEVICE)) ?
+                String path = (prop.equals(APPLICATION_ARGS) || prop.equals(RUN_WORK_DIR) || prop.equals(MOBILE_DEVICE) || prop.equals(JAD_INSTALL)) ?
                     privatePath : sharedPath;
                 EditableProperties ep = updateHelper.getProperties(path);
                 if (!Utilities.compareObjects(v, ep.getProperty(prop))) {
