@@ -51,7 +51,7 @@ public class Weather extends CustomNode {
         }     
     
     function matrix(m00:Number,m01:Number,m02:Number,m10:Number,m11:Number,m12:Number) {
-        return Affine{m00:m00 m01:m01 m02:m02 m10:m10 m11:m11 m12:m12};
+        return Affine{ mxx:m00 mxy:m01 myx:m02 myy:m10 tx:m11 ty:m12 };
         }    
         
     var outlineShape:Shape;
@@ -441,8 +441,9 @@ public class Weather extends CustomNode {
                                 transforms: [
                                 //rotate (67,178,90)
                                 //matrix(0.3866, 0.9865, -0.9074, 0.4203, 178.8594, 90.377),
-                                matrix(0.3866, 0.9865, -0.9074, 0.4203, 178.8594, 90.377),
-                                Translate { x: -3, y : 10 }
+                                //matrix(0.3866, 0.9865, -0.9074, 0.4203, 178.8594, 90.377),
+                                Translate { x: 178, y : 83 },
+                                Rotate { angle: 5.0 }
                                 ]
                                 }]
                             }]
