@@ -25,6 +25,10 @@
                 <unzip src="netbeans.zip" dest="build"/>
             </sequential>
             <sequential>
+                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <unzip src="testdist.zip" dest="build/testdist"/>
+            </sequential>
+            <sequential>
                 <mkdir dir="javafx.sdk.win/external"/>
                 <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>   
