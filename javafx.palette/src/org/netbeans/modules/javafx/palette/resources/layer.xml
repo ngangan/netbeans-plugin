@@ -375,6 +375,9 @@
             <file name="ToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleButton.xml">
                 <attr name="position" intvalue="100"/>
             </file>
+            <file name="Hyperlink.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Hyperlink.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
         </folder>
     </folder>
 </filesystem>
