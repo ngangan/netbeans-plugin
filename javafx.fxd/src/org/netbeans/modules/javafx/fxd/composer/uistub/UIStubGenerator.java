@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.uistub;
 
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
@@ -28,6 +29,9 @@ import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 
 import com.sun.javafx.tools.fxd.container.generator.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
 
 
@@ -36,8 +40,8 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
  * @author Pavel Benes
  */
 public final class UIStubGenerator {
-    private static final String JAVAFX_EXTENSION = ".fx";    //NOI18N
-    private static final String UI_STUB_EXTENSION = "UI" + JAVAFX_EXTENSION;  //NOI18N
+    static final String JAVAFX_EXTENSION = ".fx";    //NOI18N
+    static final String UI_STUB_EXTENSION = "UI" + JAVAFX_EXTENSION;  //NOI18N
     private static final String PACKAGE_SEPARATOR = ".";      //NOI18N
     static final String PACKAGE_NOT_SET = "<enter-your-package-here>";   //NOI18N
 
@@ -70,14 +74,19 @@ public final class UIStubGenerator {
     }
     
     private final FXZDataObject   m_dObj;
-    private final AttributeHolder m_attrs;
     
     public UIStubGenerator( final FXZDataObject dObj) {
         m_dObj = dObj;
-        m_attrs = new AttributeHolder();
-        m_attrs.setStrictTypes(false);        
     }
-    
+
+    public String getFileName() {
+        return m_dObj.getPrimaryFile().getName();
+    }
+
+    public String[] getEntryNames() {
+        return m_dObj.getDataModel().getFXDContainer().getEntryNames();
+    }
+
     public File getInitialDirectory() {
         try {
             FileObject fo = m_dObj.getPrimaryFile();
@@ -89,8 +98,7 @@ public final class UIStubGenerator {
     }
     
     public void generate() {
-        FileObject fo   = m_dObj.getPrimaryFile();
-        String     name = fo.getName();
+        FileObject fo = m_dObj.getPrimaryFile();
         
         if ( fo.hasExt(FXZDataObject.FXZ_EXT)) {
             File file = FileUtil.toFile(fo);
@@ -98,10 +106,8 @@ public final class UIStubGenerator {
                 UIStubGeneratorPanel panel = new UIStubGeneratorPanel(this);
                 
                 File parent = file.getParentFile();
-                File stubFile = new File( parent, name + UI_STUB_EXTENSION);
-                
-                panel.setStubLocation( stubFile.getAbsolutePath());
-                panel.setPackagePath( getPackagePath(stubFile));
+                panel.setStubLocation( parent.getAbsolutePath());
+                panel.setPackagePath( getPackagePath(parent));
                                 
                 DialogDescriptor dd = new DialogDescriptor(panel, NbBundle.getMessage(UIStubGenerator.class, "TITLE_UIStubGeneration"));  //NOI18N
 
@@ -111,13 +117,6 @@ public final class UIStubGenerator {
 
                 if (dd.getValue() == DialogDescriptor.OK_OPTION) {
                     String stubLoc = panel.getStubLocation();
-                    if ( !isValidStubName(stubLoc)) {
-                        NotifyDescriptor d = new NotifyDescriptor.Message(
-                            NbBundle.getMessage(UIStubGenerator.class, "MSG_INVALID_UI_STUB_FILENAME", stubLoc),  //NOI18N 
-                            NotifyDescriptor.ERROR_MESSAGE);
-                        DialogDisplayer.getDefault().notify(d);
-                        return;
-                    }
 
                     String packageName = panel.getPackagePath();
                     if ( !isValidPackagePath(packageName)) {
@@ -128,86 +127,158 @@ public final class UIStubGenerator {
                         return;
                     }
 
-                    stubFile = new File(stubLoc);
-                    if ( stubFile.isDirectory()) {
+                    File stubDir = new File(stubLoc);
+                    if ( !stubDir.isDirectory()) {
                         NotifyDescriptor d = new NotifyDescriptor.Message(
-                            NbBundle.getMessage(UIStubGenerator.class, "MSG_UI_STUB_FILENAME_IS_DIR", stubLoc),  //NOI18N
+                            NbBundle.getMessage(UIStubGenerator.class, "MSG_UI_STUB_FOLDER_IS_NOT_DIR", stubLoc),  //NOI18N
                             NotifyDescriptor.ERROR_MESSAGE);
                         DialogDisplayer.getDefault().notify(d);
                         return;
+                    } 
+
+                    Map<String,String> selected = panel.getSelectedEntries();
+
+                    if ( selected.isEmpty()) {
+                        NotifyDescriptor d = new NotifyDescriptor.Message(
+                            NbBundle.getMessage(UIStubGenerator.class, "MSG_NO_UI_STUBS_SELECTED"),  //NOI18N
+                            NotifyDescriptor.INFORMATION_MESSAGE);
+                        DialogDisplayer.getDefault().notify(d);
+                        return;
                     } else {
-                        if ( stubFile.exists()) {
-                            NotifyDescriptor d = new NotifyDescriptor.Confirmation( 
-                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_MSG", stubFile.getAbsoluteFile()),  //NOI18N
-                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_TITLE"), //NOI18N 
-                                NotifyDescriptor.YES_NO_OPTION,   
+                        Set<String>    uiStubNames   = new HashSet<String>(selected.size());
+                        StringBuilder  existingFiles = new StringBuilder();
+
+                        for ( String uiStubName : selected.values()) {
+                            if ( !isValidStubName(uiStubName)) {
+                                NotifyDescriptor d = new NotifyDescriptor.Message(
+                                    NbBundle.getMessage(UIStubGenerator.class, "MSG_INVALID_UI_STUB_NAME", uiStubName),  //NOI18N
+                                    NotifyDescriptor.ERROR_MESSAGE);
+                                DialogDisplayer.getDefault().notify(d);
+                                return;
+                            }
+                            if ( !uiStubNames.add(uiStubName) ) {
+                                NotifyDescriptor d = new NotifyDescriptor.Message(
+                                    NbBundle.getMessage(UIStubGenerator.class, "MSG_DUPLICATED_UI_STUB_NAME", uiStubName),  //NOI18N
+                                    NotifyDescriptor.ERROR_MESSAGE);
+                                DialogDisplayer.getDefault().notify(d);
+                                return;
+                            }
+                            File uiStubfile = new File( stubDir, uiStubName);
+                            if ( uiStubfile.isDirectory()) {
+                                NotifyDescriptor d = new NotifyDescriptor.Message(
+                                    NbBundle.getMessage(UIStubGenerator.class, "MSG_UI_STUB_IS_DIR", uiStubfile.getAbsolutePath()),  //NOI18N
+                                    NotifyDescriptor.ERROR_MESSAGE);
+                                DialogDisplayer.getDefault().notify(d);
+                                return;
+                            }
+                            if ( uiStubfile.exists()) {
+                                existingFiles.append("\t");
+                                existingFiles.append(uiStubfile.getAbsolutePath());
+                                existingFiles.append("\n");
+                            }
+                        }
+
+                        if ( existingFiles.length() > 0) {
+                            NotifyDescriptor d = new NotifyDescriptor.Confirmation(
+                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_MSG", existingFiles.toString()),  //NOI18N
+                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_TITLE"), //NOI18N
+                                NotifyDescriptor.YES_NO_OPTION,
                                 NotifyDescriptor.WARNING_MESSAGE);
                             if ( DialogDisplayer.getDefault().notify(d) != NotifyDescriptor.YES_OPTION) {
                                 return;
                             }
                         }
-                    }
 
-                    implGenerate( fo.getNameExt(), stubLoc, packageName);                    
+                        implGenerate( fo.getNameExt(), stubLoc, packageName, selected, panel.generateWarnings());
+                    }
                 }
             } catch( Exception e) {
                 e.printStackTrace();
-                //SceneManager.error("Animation export failed", e);
             }
         } else {
             throw new IllegalArgumentException( );
         }        
     }
 
-    private void implGenerate( final String archiveName, final String stubLocation, final String packagePath) {
+//                        if ( stubFile.exists()) {
+//                            NotifyDescriptor d = new NotifyDescriptor.Confirmation(
+//                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_MSG", stubFile.getAbsoluteFile()),  //NOI18N
+//                                NbBundle.getMessage(UIStubGenerator.class, "MSG_FILE_EXISTS_TITLE"), //NOI18N
+//                                NotifyDescriptor.YES_NO_OPTION,
+//                                NotifyDescriptor.WARNING_MESSAGE);
+//                            if ( DialogDisplayer.getDefault().notify(d) != NotifyDescriptor.YES_OPTION) {
+//                                return;
+//                            }
+//                        }
+//
+    private void implGenerate( final String archiveName, final String stubLocation, 
+            final String packagePath, final Map<String,String> selected, final boolean generateWarning) {
         Thread th = new Thread() {
             @Override
             public void run() {
                 try {
-                    // force the model update if changed lately
                     FXDComposerModel dataModel = m_dObj.getDataModel();
-                    FXDFileModel model = dataModel.getFXDContainer().getFileModel( dataModel.getSelectedEntry());
-                    model.updateModel();
+                    File uiStubFile = null;
 
-                    model.visitElements( new FXDFileModel.ElementVisitor() {
-                        public boolean visitElement(String elemType, String elemName, AttributeSet attrs) throws AttributeConflictException {
-                            String id = (String) attrs.getAttribute("id"); //NOI18N 
-                            int    len;
-                            if ( id != null && (len=id.length()) > 0) {
-                                if ( len > 2 && id.charAt(0) == '"' && id.charAt(len-1) == '"') { // NOI18N
-                                    m_attrs.add( new AttributeDescription(elemName, id.substring(1, len-1)));
-                                } else {
-                                    System.err.println("Invalid node id: " + id);  //NOI18N 
+                    for ( String entry : selected.keySet()) {
+                        // force the model update if changed lately
+                        FXDFileModel model = dataModel.getFXDContainer().getFileModel( entry);
+                        model.updateModel();
+
+                        final AttributeHolder attributes = new AttributeHolder();
+                        attributes.setStrictTypes(false);
+
+                        model.visitElements( new FXDFileModel.ElementVisitor() {
+                            public boolean visitElement(String elemType, String elemName, AttributeSet attrs) throws AttributeConflictException {
+                                String id = (String) attrs.getAttribute("id"); //NOI18N
+                                int    len;
+                                if ( id != null && (len=id.length()) > 0) {
+                                    if ( len > 2 && id.charAt(0) == '"' && id.charAt(len-1) == '"') { // NOI18N
+                                        attributes.add( new AttributeDescription(elemName, id.substring(1, len-1)));
+                                    } else {
+                                        System.err.println("Invalid node id: " + id);  //NOI18N
+                                    }
                                 }
+                                return true;
                             }
-                            return true;
-                        }
-                    });
-                    m_attrs.processNames();
+                        });
+                        attributes.processNames();
+                        uiStubFile = new File(stubLocation, selected.get(entry));
+                        writeUIStub( archiveName, uiStubFile, packagePath, entry, attributes, generateWarning);
+                    }
 
-                    final File uiStubFile = new File(stubLocation);
-                    writeUIStub( archiveName, uiStubFile, packagePath);
-
+                    final File singleFile = selected.size() == 1 ? uiStubFile : null;
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            String msgFormat = NbBundle.getMessage(UIStubGenerator.class, "MSG_STUB_CREATED"); //NOI18N
-                            
-                            NotifyDescriptor d = new NotifyDescriptor.Confirmation( 
-                                    String.format(msgFormat, stubLocation),
-                                    NbBundle.getMessage(UIStubGenerator.class, "TITLE_STUB_CREATED"),  //NOI18N 
-                                    NotifyDescriptor.YES_NO_OPTION,
+                            if ( singleFile == null) {
+                                NotifyDescriptor d = new NotifyDescriptor.Message(
+                                    NbBundle.getMessage(UIStubGenerator.class, "MSG_STUBS_CREATED"),  //NOI18N
                                     NotifyDescriptor.INFORMATION_MESSAGE);
-                            if ( DialogDisplayer.getDefault().notify(d) == DialogDescriptor.YES_OPTION) {
-                                FileObject uiStubFO = FileUtil.toFileObject(uiStubFile);
-                                uiStubFO.refresh();
+                                    DialogDisplayer.getDefault().notify(d);
+                            } else {
+                                String path;
                                 try {
-                                    DataObject uiStubDO = DataObject.find(uiStubFO);
-                                    OpenCookie cookie = uiStubDO.getCookie( OpenCookie.class);
-                                    cookie.open();
-                                } catch( Exception e) {
-                                    e.printStackTrace();
-                                    NotifyDescriptor.Exception ne = new NotifyDescriptor.Exception(e);
-                                    DialogDisplayer.getDefault().notifyLater(ne);
+                                    path = singleFile.getCanonicalPath();
+                                } catch( IOException e) {
+                                    path = singleFile.getAbsolutePath();
+                                }
+                                NotifyDescriptor d = new NotifyDescriptor.Confirmation(
+                                        NbBundle.getMessage(UIStubGenerator.class, "MSG_STUB_CREATED_WANA_SEE", path), //NOI18N
+                                        NbBundle.getMessage(UIStubGenerator.class, "TITLE_STUB_CREATED"),  //NOI18N
+                                        NotifyDescriptor.YES_NO_OPTION,
+                                        NotifyDescriptor.INFORMATION_MESSAGE);
+                                if ( DialogDisplayer.getDefault().notify(d) == DialogDescriptor.YES_OPTION) {
+                                    FileObject uiStubFO = FileUtil.toFileObject(singleFile);
+                                    uiStubFO.refresh();
+                                    try {
+                                        DataObject uiStubDO = DataObject.find(uiStubFO);
+                                        OpenCookie cookie = uiStubDO.getCookie( OpenCookie.class);
+                                        cookie.open();
+                                    } catch( Exception e) {
+                                        e.printStackTrace();
+                                        NotifyDescriptor.Exception ne = new NotifyDescriptor.Exception(e);
+                                        DialogDisplayer.getDefault().notifyLater(ne);
+                                    }
                                 }
                             }
                         }
@@ -224,7 +295,8 @@ public final class UIStubGenerator {
         th.start();
     }
     
-    private void writeUIStub( final String archiveName, final File stubFile, String packagePath) throws FileNotFoundException, IOException, AttributeConflictException {
+    private void writeUIStub( final String archiveName, final File stubFile,
+            String packagePath, String entry, AttributeHolder attrs, boolean generateWarning) throws FileNotFoundException, IOException, AttributeConflictException {
         FXWriter writer = new FXWriter(stubFile);
 
         String className = PackagerUtils.getFileName(stubFile);
@@ -237,42 +309,55 @@ public final class UIStubGenerator {
         writer.write( " */");  //NOI18N 
         writer.write( "package " + packagePath + ";");  //NOI18N 
         writer.write( "");  //NOI18N 
-        writer.write( "import java.lang.Object;");  //NOI18N 
-        writer.write( "import java.lang.System;");  //NOI18N 
-        writer.write( "import java.lang.RuntimeException;");  //NOI18N 
+        writer.write( "import java.lang.*;");  //NOI18N
         writer.write( "import javafx.scene.Node;");  //NOI18N 
-        writer.write( "import javafx.fxd.UiStub;");  //NOI18N 
+        writer.write( "import javafx.fxd.FXDNode;");  //NOI18N
         writer.write( "");  //NOI18N 
 
-        writer.write( "public class " + className + " extends UiStub {");  //NOI18N 
+        writer.write( "public class " + className + " extends FXDNode {");  //NOI18N
 
         writer.increaseIndent();
-        writer.write("");  //NOI18N 
-        writer.write( "override public var url = \"{__DIR__}" + archiveName + "\";");  //NOI18N 
+        writer.write("");  //NOI18N
+        String reference;
+        if ( entry == null || FXDContainer.MAIN_CONTENT.equals(entry)) {
+            reference = archiveName;
+        } else {
+            reference = archiveName + "#" + entry;
+        }
+        writer.write( "override public var url = \"{__DIR__}" + reference + "\";");  //NOI18N
+
         writer.write("");  //NOI18N 
         
-        m_attrs.serializeDeclarations(writer, true);
+        attrs.serializeDeclarations(writer, true);
 
         writer.write("");  //NOI18N 
 
-        writer.write("override protected function update() {"); //NOI18N 
+        writer.write("override protected function contentLoaded() : Void {"); //NOI18N
         writer.increaseIndent();
-        writer.write( "lastNodeId = null;");  //NOI18N 
-        writer.write(" try {");  //NOI18N 
-        writer.increaseIndent();
-
-        m_attrs.serializeUpdates(writer, true);
-
+        attrs.serializeUpdates(writer, true);
         writer.decreaseIndent();
-        writer.write( "} catch( e:java.lang.Exception) {");  //NOI18N 
-        writer.increaseIndent();
-        writer.write( "System.err.println(\"Update of the  attribute '{lastNodeId}' failed with: {e}\");");  //NOI18N 
-        writer.write( "throw e;");  //NOI18N 
-        writer.decreaseIndent();
-        writer.write("}");  //NOI18N 
+        writer.write("}");   //NOI18N
 
-        writer.decreaseIndent();
-        writer.write("}");   //NOI18N 
+        if ( generateWarning) {
+            writer.write( "");  //NOI18N
+            writer.write( "/**");  //NOI18N
+            writer.write( " * Check if some element with given id exists and write ");  //NOI18N
+            writer.write( " * a warning if the element could not be found.");  //NOI18N
+            writer.write( " * The whole method can be removed if such warning is not required.");  //NOI18N
+            writer.write( " */");  //NOI18N
+            writer.write( "protected override function getObject( id:String) : Object {");
+            writer.increaseIndent();
+            writer.write( "var obj = super.getObject(id);"); //NOI18N
+            writer.write( "if ( obj == null) {"); //NOI18N
+            writer.increaseIndent();
+            writer.write( "System.err.println(\"WARNING: Element with id {id} not found in {url}\");"); //NOI18N
+            writer.decreaseIndent();
+            writer.write("}");   //NOI18N
+            writer.write( "return obj;"); //NOI18N
+            writer.decreaseIndent();
+            writer.write("}");   //NOI18N
+        }
+
         writer.decreaseIndent();
         writer.write( "}");  //NOI18N 
         writer.write("");  //NOI18N 
@@ -284,7 +369,7 @@ public final class UIStubGenerator {
         StringBuilder pName = new StringBuilder();
 
         File fp=file;
-        while ((fp=fp.getParentFile()) != null) {
+        do {
             String dirName = fp.getName();
             if (dirName.equals("src")) {  //NOI18N
                 return pName.toString();
@@ -294,7 +379,7 @@ public final class UIStubGenerator {
                 }
                 pName.insert( 0, dirName);
             }
-        }
+        } while ((fp=fp.getParentFile()) != null);
         return PACKAGE_NOT_SET;        
     }  
     

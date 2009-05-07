@@ -6,9 +6,15 @@
 
 package org.netbeans.modules.javafx.fxd.composer.uistub;
 
+import com.sun.javafx.tools.fxd.container.FXDContainer;
+import java.awt.Color;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import org.openide.util.NbBundle;
 
 /**
@@ -16,14 +22,34 @@ import org.openide.util.NbBundle;
  * @author  Pavel Benes
  */
 final class UIStubGeneratorPanel extends javax.swing.JPanel {
+    private static final int TABLE_INDEX_SELECTED = 0;
+    private static final int TABLE_INDEX_ENTRY_NAME = 1;
+    private static final int TABLE_INDEX_UISTUB_NAME = 2;
 
     private final UIStubGenerator m_generator;
     private File m_initialDirectory = null;
+
     
     /** Creates new form UIStubGeneratorPanel */
     public UIStubGeneratorPanel( UIStubGenerator generator) {
         m_generator = generator;
         initComponents();
+        jScrollPane1.getViewport().setBackground(Color.WHITE);
+        String[] entryNames = m_generator.getEntryNames();
+        DefaultTableModel tm = (DefaultTableModel) archiveContentTable.getModel();
+        for ( String entryName : entryNames) {
+            if ( entryName.toLowerCase().endsWith( "." + FXDContainer.FXD_EXTENSION)) {
+                String uiStubName;
+                if ( FXDContainer.MAIN_CONTENT.equals( entryName)) {
+                    uiStubName = m_generator.getFileName();
+                } else {
+                    uiStubName = entryName.substring(0, entryName.length() - FXDContainer.FXD_EXTENSION.length());
+                }
+                uiStubName+=UIStubGenerator.UI_STUB_EXTENSION;
+                uiStubName = normalizeUIStubName( uiStubName, false);
+                tm.addRow(new Object[] { true, entryName, uiStubName});
+            }
+        }
     }
     
     public void setStubLocation( String str) {
@@ -41,7 +67,74 @@ final class UIStubGeneratorPanel extends javax.swing.JPanel {
     public String getPackagePath() {
         return packageTextBox.getText();
     }
+
+    public boolean generateWarnings() {
+        return generateWarningCheckBox.isSelected();
+    }
+
+    public Map<String, String> getSelectedEntries() {
+        TableModel tm = archiveContentTable.getModel();
+        int size = tm.getRowCount();
+
+        Map<String,String> selected = new HashMap<String,String>(size);
+        for (int row = 0; row < size; row++) {
+            if ( Boolean.TRUE.equals(tm.getValueAt(row, TABLE_INDEX_SELECTED) )) {
+                selected.put( (String) tm.getValueAt(row, TABLE_INDEX_ENTRY_NAME),
+                              (String) tm.getValueAt(row, TABLE_INDEX_UISTUB_NAME));
+            }
+        }
+        return selected;
+    }
+
+    private String normalizeUIStubName( String uiStubName, boolean complain) {
+        if ( uiStubName == null || uiStubName.length() == 0) {
+            throw new IllegalArgumentException("UI Stub name cannot be an empty string");
+        }
+
+        if ( !uiStubName.endsWith( UIStubGenerator.JAVAFX_EXTENSION)) {
+            throw new IllegalArgumentException("UI Stub name must have the " + UIStubGenerator.JAVAFX_EXTENSION + " extension.");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        char c = uiStubName.charAt(0);
+        if ( !Character.isJavaIdentifierStart(c)) {
+            if ( complain) {
+                throw new IllegalArgumentException("UI Stub name cannot start with character " + c);
+            }
+            sb.append("_");
+        } else {
+            sb.append(c);
+        }
+        int size = uiStubName.length() - UIStubGenerator.JAVAFX_EXTENSION.length();
+
+        for ( int i = 1; i < size; i++) {
+            c = uiStubName.charAt(i);
+            if ( !Character.isJavaIdentifierPart(c)) {
+                if ( complain) {
+                    throw new IllegalArgumentException("UI Stub name cannot contain the character " + c);
+                } else {
+                    sb.append( "_");
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        sb.append( UIStubGenerator.JAVAFX_EXTENSION);
+        return sb.toString();
+    }
     
+//    private int getRowIndexByEntryName( String name) {
+//        TableModel tm = archiveContentTable.getModel();
+//        int size = tm.getRowCount();
+//
+//        for ( int i = 0; i < size; i++) {
+//            if ( name.equals(tm.getValueAt(i, TABLE_INDEX_ENTRY_NAME))) {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -54,8 +147,11 @@ final class UIStubGeneratorPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         stubLocationTextBox = new javax.swing.JTextField();
         stubLocationButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        archiveContentTable = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         packageTextBox = new javax.swing.JTextField();
+        generateWarningCheckBox = new javax.swing.JCheckBox();
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.jLabel1.text")); // NOI18N
 
@@ -68,25 +164,71 @@ final class UIStubGeneratorPanel extends javax.swing.JPanel {
             }
         });
 
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+
+        archiveContentTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Generate", "Name", "UIStub "
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Boolean.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, false, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        archiveContentTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(archiveContentTable);
+        archiveContentTable.getColumnModel().getColumn(0).setMinWidth(60);
+        archiveContentTable.getColumnModel().getColumn(0).setPreferredWidth(60);
+        archiveContentTable.getColumnModel().getColumn(0).setMaxWidth(60);
+        archiveContentTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.archiveContentTable.columnModel.title0")); // NOI18N
+        archiveContentTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.archiveContentTable.columnModel.title3")); // NOI18N
+        archiveContentTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.archiveContentTable.columnModel.title1")); // NOI18N
+
         jLabel2.setText(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.jLabel2.text")); // NOI18N
 
         packageTextBox.setText(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.packageTextBox.text")); // NOI18N
+
+        generateWarningCheckBox.setSelected(true);
+        generateWarningCheckBox.setText(org.openide.util.NbBundle.getMessage(UIStubGeneratorPanel.class, "UIStubGeneratorPanel.generateWarningCheckBox.text")); // NOI18N
+        generateWarningCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generateWarningCheckBoxActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1)
-                    .add(jLabel2))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(packageTextBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .add(stubLocationTextBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(stubLocationButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, generateWarningCheckBox)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1)
+                            .add(jLabel2))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(packageTextBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+                            .add(stubLocationTextBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(stubLocationButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -101,7 +243,10 @@ final class UIStubGeneratorPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(packageTextBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .add(18, 18, 18)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(generateWarningCheckBox))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -113,7 +258,7 @@ private void stubLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if ( m_initialDirectory != null) {
             chooser.setCurrentDirectory(m_initialDirectory);
         }
-        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int r = chooser.showDialog( SwingUtilities.getWindowAncestor(UIStubGeneratorPanel.this),
                 NbBundle.getMessage(UIStubGeneratorPanel.class, "LBL_CHOOSE_STUB_FILE")); //NOI18N
         if (r == JFileChooser.APPROVE_OPTION) {
@@ -126,9 +271,16 @@ private void stubLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {
         }    
 }//GEN-LAST:event_stubLocationButtonActionPerformed
 
+private void generateWarningCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateWarningCheckBoxActionPerformed
+    // TODO add your handling code here:
+}//GEN-LAST:event_generateWarningCheckBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable archiveContentTable;
+    private javax.swing.JCheckBox generateWarningCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField packageTextBox;
     private javax.swing.JButton stubLocationButton;
     private javax.swing.JTextField stubLocationTextBox;

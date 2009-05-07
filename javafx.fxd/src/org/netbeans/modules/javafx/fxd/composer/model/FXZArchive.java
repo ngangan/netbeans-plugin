@@ -436,6 +436,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return -1;
     }
 
+//    @Override
+//    public void close() {
+//    }
+
     @Override
     public synchronized InputStream open(String entryName) throws FileNotFoundException, IOException {
         System.err.println("Opening the entry " + entryName);
