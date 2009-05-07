@@ -852,8 +852,17 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                                 }
                             }
                         }
-                        if ((tree.getJavaFXKind() == Tree.JavaFXKind.TYPE_UNKNOWN) ||
-                            (tree.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) ) {
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) {
+                            JavaFXTreePath parentPath = tp.getParentPath();
+                            if (parentPath != null &&
+                                parentPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION)
+                            {
+                                // happens for unclosed class decl: "class A { |"
+                            } else {
+                                return null;
+                            }
+                        }
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.TYPE_UNKNOWN) {
                             return null;
                         }
                         if (!isSynteticMainBlock) {
