@@ -82,6 +82,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.cookies.EditorCookie;
 import org.openide.nodes.Node.Cookie;
 import org.openide.text.DataEditorSupport;
@@ -140,6 +141,7 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
         
     public void navigate(FXDZDataObject d) {
         if(peerDO != null && peerDO != d) {
+            removeSelectionListener(peerDO);
             //release the original document (see closeDocument() javadoc)
             closeDocument(peerDO);
         }
@@ -160,6 +162,8 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                         navigate(d, bdoc);
                         //remember the peer dataobject to be able the call EditorCookie.close() when closing navigator
                         peerDO = d;
+
+                        addSelectionListener(d);
                         entryName = peerDO.getEntryName();
                         //check if the editor for the DO has an opened pane
                         editorOpened = ec.getOpenedPanes() != null && ec.getOpenedPanes().length > 0;
@@ -178,7 +182,21 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
             setContent(null, null);
         }
     }
-    
+
+    private void addSelectionListener(FXDZDataObject d) {
+        if (d instanceof FXZDataObject) {
+            FXZDataObject fxzDO = (FXZDataObject) d;
+            fxzDO.getController().getSelectionModel().addSelectionListener(this);
+        }
+    }
+
+    private void removeSelectionListener(FXDZDataObject d) {
+        if (d instanceof FXZDataObject) {
+            FXZDataObject fxzDO = (FXZDataObject) d;
+            fxzDO.getController().getSelectionModel().removeSelectionListener(this);
+        }
+    }
+
    /** A hacky fix for XMLSyncSupport - I need to call EditorCookie.close when the navigator
      * is deactivated and there is not view pane for the navigated document. Then a the synchronization
      * support releases a strong reference to NbEditorDocument. */
@@ -226,7 +244,8 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                 cachedPanel = null;
         } else
             cachedPanel = null;
-        
+
+
         //get the model and create the new UI on background
         RequestProcessor.getDefault().post(new Runnable() {
             public void run() {
