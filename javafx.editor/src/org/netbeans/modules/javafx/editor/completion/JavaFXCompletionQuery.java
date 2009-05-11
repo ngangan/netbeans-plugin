@@ -495,7 +495,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         JavaFXTreePath path = pathFor(controller, offset);
         Tree t = path.getLeaf();
         if (LOGGABLE) log("   pathFor returned " + t + // NOI18N
-                "\n   class=" + ((t != null) ? t.getClass() : "<NULL>")); // NOI18N
+                "\n   class=" + ((t != null) ? t.getClass() : "<NULL>") + '\n'); // NOI18N
         JavaFXTreePath pathOfBrother = pathFor(controller, offset > 0 ? offset - 1 : offset);
         Tree brother = pathOfBrother.getLeaf();
         if (LOGGABLE) log("   brother == " + brother); // NOI18N
