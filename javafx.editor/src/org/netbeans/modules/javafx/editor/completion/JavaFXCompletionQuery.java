@@ -493,9 +493,10 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (LOGGABLE) log("getCompletionEnvironment caretOffset: " + caretOffset +  // NOI18N
                 " offset: " + offset + " prefix " + prefix); // NOI18N
         JavaFXTreePath path = pathFor(controller, offset);
-        if (LOGGABLE) log("   pathFor returned " + path.getLeaf()); // NOI18N
-        JavaFXTreePath pathOfBrother = pathFor(controller, offset > 0 ? offset - 1 : offset);
         Tree t = path.getLeaf();
+        if (LOGGABLE) log("   pathFor returned " + t + // NOI18N
+                "\n   class=" + ((t != null) ? t.getClass() : "<NULL>")); // NOI18N
+        JavaFXTreePath pathOfBrother = pathFor(controller, offset > 0 ? offset - 1 : offset);
         Tree brother = pathOfBrother.getLeaf();
         if (LOGGABLE) log("   brother == " + brother); // NOI18N
         if (!t.equals(brother) && isBrokenAtTheEnd(controller, brother, offset)) {
@@ -680,6 +681,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new BinaryTreeEnvironment();
                 break;
             case CONDITIONAL_EXPRESSION:
+                result = new ConditionalExpressionEnvironment();
                 break;
             case BLOCK_EXPRESSION:
                 result = new BlockExpressionEnvironment();
