@@ -72,6 +72,7 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
         boolean afterIdentifier = false;
         boolean afterFor = false;
         boolean afterLParen = false;
+        boolean afterIn = false;
         while (ts.moveNext()) {
             if (ts.offset() >= offset) {
                 break;
@@ -95,6 +96,9 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
                 case IDENTIFIER:
                     afterIdentifier = true;
                     break;
+                case IN:
+                    afterIn = true;
+                    break;
                 default:
                     if (LOGGABLE) log("  default: " + ts.token().id()); // NOI18N
                     // there is too much, return nothing
@@ -102,16 +106,20 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
             }
         }
         if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier); // NOI18N
-        if (afterIdentifier) {
-            addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false)); // NOI18N
-            return;
-        } 
-        if (afterLParen) {
-            if (prefix != null && prefix.length() > 0) {
-                // ok the user has already typed something
-                if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
-            } else {
-                if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
+        if (afterIn) { // Right after "in"
+            localResult(null);
+        } else {
+            if (afterIdentifier) {
+                addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false)); // NOI18N
+                return;
+            }
+            if (afterLParen) {
+                if (prefix != null && prefix.length() > 0) {
+                    // ok the user has already typed something
+                    if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
+                } else {
+                    if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
+                }
             }
         }
     }

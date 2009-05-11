@@ -88,7 +88,7 @@ public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironmen
         if (afterLBracket) {
             // numbers here
         } else {
-            // sequences here
+            localResult(null);
         }
 
     }
