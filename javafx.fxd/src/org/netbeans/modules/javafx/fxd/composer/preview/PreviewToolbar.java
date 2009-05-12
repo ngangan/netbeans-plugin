@@ -18,6 +18,9 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
 import com.sun.javafx.tools.fxd.TargetProfile;
 import java.util.ArrayList;
+import java.util.Collections;
+import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 /**
  *
  * @author Pavel Benes
@@ -240,20 +243,41 @@ public final class PreviewToolbar extends FXDToolbar {
     }
 
     private static String[] getSceneEntryNames(FXZDataObject  dObj){
-        String [] fullEntryNames = dObj.getDataModel().getFXDContainer().getEntryNames();
+        FXDComposerModel model   = dObj.getDataModel();
+        FXZArchive       archive = model.getFXDContainer();
+        String []        entryNames;
 
-        ArrayList<String> entryNames = new ArrayList<String>();
+        if ( archive != null) {
+            String [] fullEntryNames = archive.getEntryNames();
 
-        for (int i = 0; i < fullEntryNames.length; i++){
-            if (isFXDScene(fullEntryNames[i])){
-                entryNames.add(fullEntryNames[i]);
+            ArrayList<String> fxdEntryNames = new ArrayList<String>();
+
+            for (int i = 0; i < fullEntryNames.length; i++){
+                String sceneName = getFXDScene(fullEntryNames[i]);
+                if (sceneName != null){
+                    fxdEntryNames.add(sceneName);
+                }
             }
+            //sort the fxd entries without the extensions
+            Collections.sort(fxdEntryNames);
+            entryNames = new String[fxdEntryNames.size()];
+            for ( int i = 0; i < entryNames.length; i++) {
+                entryNames[i] = fxdEntryNames.get(i) + FXD_EXTENSION;
+            }
+        } else {
+            entryNames = new String[0];
         }
-        return entryNames.toArray(new String[]{});
+
+        return entryNames;
     }
 
-    private static boolean isFXDScene(String name){
-        return name.endsWith(FXD_EXTENSION);
+    private static String getFXDScene(String name){
+        if ( name != null && name.endsWith(FXD_EXTENSION)) {
+            return name.substring(0, name.length() - FXD_EXTENSION.length());
+        } else {
+            return null;
+        }
     }
+
 
 }
