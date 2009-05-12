@@ -120,7 +120,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                 SwingUtilities.invokeLater( new Runnable() {
                                     public void run() {
                                         try {
-                                            Node node;                                            
+                                            Node node;
                                             try {
                                                 fModel.readLock();
                                                 PreviewStatistics stats = new PreviewStatistics();
@@ -163,6 +163,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_EMPTY_DOCUMENT")); //NOI18N
                                                 label.setIcon(null);
                                             }
+                                        } catch( OutOfMemoryError oom) {
+                                            oom.printStackTrace();
+                                            setBackground( m_defaultBackground);
+                                            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW_OOM", //NOI18N
+                                                oom.getLocalizedMessage()));
+                                            label.setIcon(null);
                                         } catch( Exception e) {
                                             e.printStackTrace();
                                             setBackground( m_defaultBackground);
