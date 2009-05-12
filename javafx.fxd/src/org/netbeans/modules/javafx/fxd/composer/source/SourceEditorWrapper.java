@@ -161,19 +161,31 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
     
     @Override
     public void setSize( Dimension dim) {
-        findWrapper(m_delegate, false).setSize(dim.width, dim.height);
+        // an attempt to fix http://javafx-jira.kenai.com/browse/RT-4600
+        EditorLookupWrapper elw = findWrapper(m_delegate, false);
+        if ( elw != null) {
+            elw.setSize(dim.width, dim.height);
+        }
         super.setSize(dim);
     }
 
     @Override
     public void setBounds( Rectangle r) {
-        findWrapper(m_delegate, false).setSize(r.width, r.height);
+        // an attempt to fix http://javafx-jira.kenai.com/browse/RT-4600
+        EditorLookupWrapper elw = findWrapper(m_delegate, false);
+        if ( elw != null) {
+            elw.setSize(r.width, r.height);
+        }
         super.setBounds(r);
     }
 
     @Override
     public void setBounds( int x, int y, int w, int h) {
-        findWrapper(m_delegate, false).setSize(w, h);
+        // an attempt to fix http://javafx-jira.kenai.com/browse/RT-4600
+        EditorLookupWrapper elw = findWrapper(m_delegate, false);
+        if ( elw != null) {
+            elw.setSize(w, h);
+        }
         super.setBounds(x, y, w, h);
     }    
     
