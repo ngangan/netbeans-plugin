@@ -236,11 +236,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         final TypeElement te = (TypeElement) dt.asElement();
         for (Element member : te.getEnclosedElements()) {
             if (LOGGABLE) log("    member1 = " + member + " member1.getKind() " + member.getKind()); // NOI18N
-            if ("<error>".equals(member.getSimpleName().toString())) { // NOI18N
+            String s = member.getSimpleName().toString();
+            if ("<error>".equals(s)) { // NOI18N
+                continue;
+            }
+            // #164909 - prevent internal SDK vars "VCNT$" and "VOFF$"
+            if (s != null && s.indexOf('$') != -1) {
                 continue;
             }
             boolean isStatic = member.getModifiers().contains(STATIC);
-            String s = member.getSimpleName().toString();
               if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
                 if (LOGGABLE) log("    not accessible " + s); // NOI18N
                 continue;
@@ -279,7 +283,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         for (Element member : elements.getAllMembers(te)) {
             if (LOGGABLE) log("    member2 == " + member + " member2.getKind() " + member.getKind()); // NOI18N
             String s = member.getSimpleName().toString();
-            if ("<error>".equals(member.getSimpleName().toString())) { // NOI18N
+            if ("<error>".equals(s)) { // NOI18N
+                continue;
+            }
+            // #164909 - prevent internal SDK vars "VCNT$" and "VOFF$"
+            if (s != null && s.indexOf('$') != -1) {
                 continue;
             }
             if (!controller.getTreeUtilities().isAccessible(scope, member, dt)) {
