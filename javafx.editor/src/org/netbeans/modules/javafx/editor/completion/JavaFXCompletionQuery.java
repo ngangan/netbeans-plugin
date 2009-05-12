@@ -733,6 +733,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case SEQUENCE_INSERT:
                 break;
             case SEQUENCE_RANGE:
+                result = new SequenceRangeEnvironment();
                 break;
             case SEQUENCE_SLICE:
                 break;
