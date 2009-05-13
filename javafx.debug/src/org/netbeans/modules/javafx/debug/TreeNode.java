@@ -796,15 +796,17 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
 
         @Override
         public Void visitVariable(VariableTree tree, List<Node> d) {
-            List<Node> below = new ArrayList<Node>();
-            
-            addCorrespondingElement(below);
-            addCorrespondingType(below);
-            addCorrespondingComments(below);
-            
-            super.visitVariable(tree, below);
-            
-            d.add(new TreeNode(info, getCurrentPath(), below));
+            if (tree.getName() != null) { // Empty try-catch may have null here
+                List<Node> below = new ArrayList<Node>();
+
+                addCorrespondingElement(below);
+                addCorrespondingType(below);
+                addCorrespondingComments(below);
+
+                super.visitVariable(tree, below);
+
+                d.add(new TreeNode(info, getCurrentPath(), below));
+            }
             return null;
         }
 
