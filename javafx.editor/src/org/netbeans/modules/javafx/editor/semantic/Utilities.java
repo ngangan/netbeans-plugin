@@ -216,6 +216,9 @@ public class Utilities {
             rightTrees.add(var.getType());
 
 //            return findIdentifierSpanImpl(info, leaf, var.getType(), Collections.singletonList(var.getInitializer()), var.getName().toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
+            if (var.getName() == null) { // Handle empty try-catch
+                return null;
+            }
             return findIdentifierSpanImpl(info, leaf, var.getModifiers(), rightTrees, var.getName().toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
