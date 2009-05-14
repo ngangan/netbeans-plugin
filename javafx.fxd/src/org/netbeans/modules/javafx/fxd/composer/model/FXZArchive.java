@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -37,6 +38,7 @@ import com.sun.javafx.tools.fxd.container.misc.ProgressNotifier;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.openide.cookies.EditorCookie;
 
 /**
  *
@@ -319,7 +321,8 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                     fModel = new FXDFileModel(this, entryName);
                     m_fileModels.put( entryName, fModel);
                 } catch( Exception e) {
-                    Exceptions.printStackTrace(e);
+                    e.printStackTrace();
+
                 }
             }
             return fModel;
@@ -455,7 +458,11 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
     @Override
     public FXDRootElement getRoot( final String entryName) {
-        return getFileModel(entryName).getRootNode();
+        FXDFileModel model = getFileModel(entryName);
+        if (model != null){
+            return model.getRootNode();
+        }
+        return null;
     }
 
     @Override

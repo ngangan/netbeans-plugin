@@ -127,7 +127,11 @@ public final class FXDFileModel implements DocumentModelStateListener {
 
     public synchronized FXDRootElement getRootNode() {
         //TODO Use better construction
-        return (FXDRootElement) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0), true);
+        if (m_docModel != null){
+            return (FXDRootElement) DocumentElementWrapper.wrap( m_docModel.getRootElement().getElement(0), true);
+        } else {
+            return null;
+        }
     }    
         
     protected DocumentElement findElement( final DocumentElement de, final String id) {

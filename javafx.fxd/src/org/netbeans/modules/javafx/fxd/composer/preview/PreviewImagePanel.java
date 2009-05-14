@@ -99,7 +99,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         final FXZArchive fxz = m_dObj.getDataModel().getFXDContainer();
                         final FXDFileModel fModel = fxz.getFileModel(selectedEntryCopy);
                         fModel.updateModel();
-                        
+
                         m_changeTickerCopy = tickerCopy;
                         m_previewProfileCopy = profileCopy;
                         m_selectedEntryCopy = selectedEntryCopy;
