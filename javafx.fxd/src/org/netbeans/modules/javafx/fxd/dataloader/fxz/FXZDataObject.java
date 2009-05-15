@@ -56,7 +56,10 @@ import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
 import org.netbeans.modules.javafx.fxd.composer.navigator.FXDNavigatorContent;
+import org.netbeans.modules.javafx.fxd.composer.preview.PreviewTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
@@ -72,6 +75,7 @@ import org.openide.nodes.Node.Cookie;
 import org.openide.text.Line.Set;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.Task;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
@@ -103,7 +107,14 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     private class CommonCookie implements EditorCookie, EditCookie, OpenCookie, LineCookie, EditorCookie.Observable {
                 
         public void open() {
-            getBaseSupport().open();
+            try {
+                getBaseSupport().open();
+            } catch (OutOfMemoryError oom){
+                String msg = NbBundle.getMessage(PreviewTopComponent.class, "MSG_CANNOT_SHOW_OOM", //NOI18N
+                        oom.getLocalizedMessage());
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(
+                        msg, NotifyDescriptor.Message.ERROR_MESSAGE));
+            }
         }
 
         public boolean close() {
