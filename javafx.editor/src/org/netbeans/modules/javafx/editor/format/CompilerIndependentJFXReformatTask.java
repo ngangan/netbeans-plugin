@@ -41,9 +41,12 @@
 package org.netbeans.modules.javafx.editor.format;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
@@ -59,58 +62,71 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
 
     private final Context context;
 
+    private static Logger logger = Logger.getLogger( "org.netbeans.modules.javafx.editor.format" ); // NOI18N
+
     public CompilerIndependentJFXReformatTask(Context context) {
         this.context = context;
     }
 
     public void reformat() throws BadLocationException {
-        Document document = context.document();
-        Element rootElement = document.getDefaultRootElement();
-        List<Context.Region> regions = context.indentRegions();
+        final Document document = context.document();
+        final BaseDocument bd = (BaseDocument)document;
+        bd.runAtomic( new Runnable() {
 
-        for (Context.Region region : regions) {
-            int startOffset = region.getStartOffset();
-            int endOffset = region.getEndOffset();
-            int length = region.getEndOffset() - region.getStartOffset();
-            int elementIndex = rootElement.getElementIndex(startOffset);
-            final int prevIndex = elementIndex > 0 ? elementIndex - 1 : elementIndex;
-            int indent = getIndent(document, prevIndex);
+            public void run() {
+                try {
+                    Element rootElement = document.getDefaultRootElement();
+                    List<Context.Region> regions = context.indentRegions();
 
-            String text = document.getText(startOffset, length);
-            if (text.startsWith(TEMPLATE_START)) {
-                // remove template tags
-                int st = startOffset + text.indexOf(TEMPLATE_START);
-                document.remove(st, TEMPLATE_START.length());
-                int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length() - 1;
-                document.remove(en, TEMPLATE_END.length());
+                    for (Context.Region region : regions) {
+                        int startOffset = region.getStartOffset();
+                        int endOffset = region.getEndOffset();
+                        int length = region.getEndOffset() - region.getStartOffset();
+                        int elementIndex = rootElement.getElementIndex(startOffset);
+                        final int prevIndex = elementIndex > 0 ? elementIndex - 1 : elementIndex;
+                        int indent = getIndent(document, prevIndex);
 
-                // modify indent
-                int lastElement = rootElement.getElementIndex(en);
-                for (int i = elementIndex; i <= lastElement; i++) {
-                    Element element = rootElement.getElement(i);
-                    int so = element.getStartOffset();
-                    int currentIndent = context.lineIndent(so);
+                        String text = document.getText(startOffset, length);
+                        if (text.startsWith(TEMPLATE_START)) {
+                            // remove template tags
+                            int st = startOffset + text.indexOf(TEMPLATE_START);
+                            document.remove(st, TEMPLATE_START.length());
+                            int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length() - 1;
+                            document.remove(en, TEMPLATE_END.length());
 
-                    // first line should not be indented if there is something already except whitespaces
-                    boolean doIndent = true;
-                    if (i == elementIndex) {
-                        String textBefore = document.getText(so, startOffset - so);
-                        boolean isTextWSOnly = textBefore.matches("\\s+"); // NOI18N
-                        doIndent = textBefore.length() == 0 || isTextWSOnly;
-                        if (!doIndent) {
-                            indent = getIndent(document, i);
+                            // modify indent
+                            int lastElement = rootElement.getElementIndex(en);
+                            for (int i = elementIndex; i <= lastElement; i++) {
+                                Element element = rootElement.getElement(i);
+                                int so = element.getStartOffset();
+                                int currentIndent = context.lineIndent(so);
+
+                                // first line should not be indented if there is something already except whitespaces
+                                boolean doIndent = true;
+                                if (i == elementIndex) {
+                                    String textBefore = document.getText(so, startOffset - so);
+                                    boolean isTextWSOnly = textBefore.matches("\\s+"); // NOI18N
+                                    doIndent = textBefore.length() == 0 || isTextWSOnly;
+                                    if (!doIndent) {
+                                        indent = getIndent(document, i);
+                                    }
+                                } else {
+                                    doIndent = true;
+                                }
+
+                                if (doIndent) {
+                                    context.modifyIndent(so, currentIndent + indent);
+                                }
+                            }
+
                         }
-                    } else {
-                        doIndent = true;
                     }
-
-                    if (doIndent) {
-                        context.modifyIndent(so, currentIndent + indent);
-                    }
+                } catch( BadLocationException e ) {
+                    logger.log( Level.FINE, e.getLocalizedMessage());
                 }
-
             }
-        }
+
+        });
     }
 
     public ExtraLock reformatLock() {
