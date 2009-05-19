@@ -153,22 +153,30 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                 Position[] positions = null;
                 try {
                     positions = getLine(info, d, doc, start, end);
-                    start = positions[0].getOffset();
-                    end = positions[1].getOffset();
+                    final Position sPosition = positions[0];
+                    final Position ePosition = positions[1];
+                    
+                    if (sPosition != null && ePosition != null) {
+                        start = sPosition.getOffset();
+                        end = ePosition.getOffset();
 
-                    if (LOGGABLE) log("    start == " + start + "  end == " + end); // NOI18
-                    if (start == end) {
-                        end = skipWhiteSpace(info, (int)start);
-                        if (LOGGABLE) log("  after skip  start == " + start + "  end == " + end); // NOI18N
+                        if (LOGGABLE) {
+                            log("    start == " + start + "  end == " + end); // NOI18
+                        }
+                        if (start == end) {
+                            end = skipWhiteSpace(info, (int) start);
+                            if (LOGGABLE) {
+                                log("  after skip  start == " + start + "  end == " + end); // NOI18N
+                            }
+                        }
+
+                        c.add(ErrorDescriptionFactory.createErrorDescription(
+                                Severity.ERROR,
+                                d.getMessage(Locale.getDefault()),
+                                doc,
+                                doc.createPosition((int) start),
+                                doc.createPosition((int) end)));
                     }
-
-                    c.add(ErrorDescriptionFactory.createErrorDescription(
-                        Severity.ERROR,
-                        d.getMessage(Locale.getDefault()),
-                        doc,
-                        doc.createPosition((int) start),
-                        doc.createPosition((int) end)
-                    ));
                     continue;
                 } catch (BadLocationException ex) {
                     if (LOGGABLE) {
