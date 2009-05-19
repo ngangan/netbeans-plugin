@@ -39,6 +39,7 @@
 package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.*;
+import javax.lang.model.element.Name;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -414,18 +415,21 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                         JavaFXTreePath subPath = tu.pathFor((int) start);
                         Element subElement = info.getTrees().getElement(subPath);
                         if (subElement != null) {
-                            String subElementName = subElement.getSimpleName().toString();
+                            final Name simpleName = subElement.getSimpleName();
+                            if (simpleName != null) {
+                                String subElementName = simpleName.toString();
 
-                            if (tokenStr.equals(subElementName)) {
-                                Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
-                                start = ts.offset();
-                                end = start + t.length();
-                                boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
+                                if (tokenStr.equals(subElementName)) {
+                                    Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
+                                    start = ts.offset();
+                                    end = start + t.length();
+                                    boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
 
-                                if (subElement.getKind().isField()) {
-                                    list.add(new Result(start, end, ID_FIELD, t, isStatic));
-                                } else if (ElementKind.METHOD.equals(subElement.getKind())) {
-                                    list.add(new Result(start, end, ID_METHOD_INVOCATION, t, isStatic));
+                                    if (subElement.getKind().isField()) {
+                                        list.add(new Result(start, end, ID_FIELD, t, isStatic));
+                                    } else if (ElementKind.METHOD.equals(subElement.getKind())) {
+                                        list.add(new Result(start, end, ID_METHOD_INVOCATION, t, isStatic));
+                                    }
                                 }
                             }
                         }
