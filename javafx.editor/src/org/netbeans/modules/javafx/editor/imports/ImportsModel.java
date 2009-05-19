@@ -177,13 +177,18 @@ public class ImportsModel {
         Set<Declared> unused = new HashSet<Declared>();
         for(Declared declared : declaredImports) {
             if (declared.importName.endsWith(".*")) {
-                int imprtLen = declared.importName.length() - 1;
+                int imprtLen = declared.importName.length() - 2;
                 String target = declared.importName.substring(0, imprtLen);
                 boolean found = false;
                 for(String imprt : usedImports) {
                     if (imprt.length() > imprtLen) {
-                        if (imprt.indexOf(".", imprtLen + 1) > -1)  continue;
+                        if (imprt.indexOf(".", imprtLen + 2) > -1)  continue;
                         if (imprt.substring(0, imprtLen).equals(target)) {
+                            found = true;
+                            break;
+                        }
+                    } else {
+                        if (imprt.length() == imprtLen && target.equals(imprt)) {
                             found = true;
                             break;
                         }
