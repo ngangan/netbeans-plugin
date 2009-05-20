@@ -40,10 +40,10 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.geom.Bounds2D;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import org.netbeans.modules.javafx.fxd.composer.misc.GraphicUtils;
 
 /**
@@ -331,9 +331,9 @@ public final class FXDElementOutline {
         } */       
     }
     
-    public static float [][] rect2poly( final Rectangle2D bounds, float [][] points) {
-        float x = (float) bounds.getX(),
-              y = (float) bounds.getY(),
+    public static float [][] rect2poly( final Bounds2D bounds, float [][] points) {
+        float x = (float) bounds.x1,
+              y = (float) bounds.y1,
               w = (float) bounds.getWidth(),
               h = (float) bounds.getHeight();
         if ( points == null) {

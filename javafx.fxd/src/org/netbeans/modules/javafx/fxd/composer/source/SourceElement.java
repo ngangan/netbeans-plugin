@@ -92,7 +92,7 @@ public final class SourceElement implements MultiViewElement, Serializable {
         boolean wasCreated = false;
         if (stc == null) {
             stc = new SourceTopComponent(m_dObj);
-            System.out.println("Creating STC for " + entryName + ":" + stc);
+            //System.out.println("Creating STC for " + entryName + ":" + stc);
             m_sourceTCs.put( entryName, stc);
             wasCreated = true;
         }

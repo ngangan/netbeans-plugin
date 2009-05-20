@@ -40,8 +40,8 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.geom.Bounds2D;
 import com.sun.scenario.scenegraph.SGNode;
-import java.awt.geom.Rectangle2D;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.Exceptions;
@@ -135,11 +135,12 @@ public final class FXDElement {
         return false;
     }
     
-    Rectangle2D getBounds() {
+    Bounds2D getBounds() {
         SGNode node = getController().getNode(m_id);
         assert node != null;
-        Rectangle2D tb = node.getTransformedBounds();
-        return tb;
+        Bounds2D bounds = new Bounds2D();
+        node.getCompleteBounds(bounds, null);
+        return bounds;
     }
 
     public boolean isDeleted() {
@@ -152,13 +153,13 @@ public final class FXDElement {
     
     public void repaint(double overlap) {
         if ( !m_isDeleted) {
-            Rectangle2D rect = getBounds();
+            Bounds2D b = getBounds();
             //TODO the attribute elements should not be repainted
-            if ( rect != null) {
-                repaint( (int) Math.round( rect.getX() - overlap),
-                         (int) Math.round(rect.getY() - overlap),
-                         (int) Math.round(rect.getWidth() + 2 * overlap),
-                         (int) Math.round(rect.getHeight() + 2 * overlap));
+            if ( b != null) {
+                repaint( (int) Math.round( b.x1 - overlap),
+                         (int) Math.round(b.y1 - overlap),
+                         (int) Math.round(b.getWidth() + 2 * overlap),
+                         (int) Math.round(b.getHeight() + 2 * overlap));
             }
         }
     }

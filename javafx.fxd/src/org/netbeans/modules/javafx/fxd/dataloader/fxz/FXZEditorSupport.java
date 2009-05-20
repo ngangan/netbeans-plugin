@@ -151,7 +151,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     
     @Override
     protected boolean notifyModified() {
-        System.out.println("Modified " + m_entryName);
+        //System.out.println("Modified " + m_entryName);
         if ( super.notifyModified()) {
             addSaveCookie();
             updateDisplayName();

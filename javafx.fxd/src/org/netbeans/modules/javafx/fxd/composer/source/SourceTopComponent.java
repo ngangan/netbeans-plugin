@@ -40,7 +40,7 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
     
     public SourceTopComponent( FXZDataObject dObj) {
         super( dObj.getEditorSupport());
-        System.out.println("*** Creating TC for " + getEditorSupport().m_entryName);
+        //System.out.println("*** Creating TC for " + getEditorSupport().m_entryName);
     }
     
     public FXZEditorSupport getEditorSupport() {
@@ -49,7 +49,7 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
     
     public synchronized JToolBar getToolbar() {
         if (m_toolbar == null) {
-            System.out.println("*** Creating toolbar for " + getEditorSupport().m_entryName);
+            //System.out.println("*** Creating toolbar for " + getEditorSupport().m_entryName);
             final JEditorPane editorPane = getEditorPane();
             if (editorPane!= null) {
                 final Document doc = editorPane.getDocument();

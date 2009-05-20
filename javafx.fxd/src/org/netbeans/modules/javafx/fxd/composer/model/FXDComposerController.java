@@ -5,10 +5,12 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.geom.AffineTransform;
+import com.sun.javafx.geom.Bounds2D;
+import com.sun.javafx.sg.PGNode;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -23,11 +25,9 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 import com.sun.scenario.scenegraph.JSGPanel;
 import com.sun.scenario.scenegraph.SGNode;
-import com.sun.scenario.scenegraph.fx.FXNode;
 
 import com.sun.javafx.tools.fxd.TargetProfile;
 import com.sun.scenario.scenegraph.SGGroup;
-import com.sun.scenario.scenegraph.SGParent;
 import org.netbeans.modules.javafx.fxd.composer.source.SourceElement;
 
 /**
@@ -139,23 +139,31 @@ public final class FXDComposerController {
         }        
     }    
 
-    private static void pick( SGParent parent, List<SGNode> selected, Point2D point, String idPrefix, SGNode significantParent) {
-        for ( SGNode child : parent.getChildren()) {
+    private static void pick( SGGroup parent, List<SGNode> selected, float x, float y, String idPrefix, SGNode significantParent, AffineTransform accumTx) {
+        for ( PGNode pgChild : parent.getContent()) {
+            SGNode child = (SGNode) pgChild;
             String id = child.getID();
-            SGNode significantChild = (id != null && id.startsWith(idPrefix)) ? child : significantParent;
-            if ( child instanceof FXNode) {
-                child = ((FXNode) child).getLeaf();
-                // workaround since the leaf ID is not set
-                if ( child.getID() == null) {
-                    child.setID(id);
-                }
-            }
-
-            if( child instanceof SGParent) {
-                pick( (SGParent) child, selected, point, idPrefix, significantChild);
+            SGNode significantNode = (id != null && id.startsWith(idPrefix)) ? child : significantParent;
+//            if ( child instanceof FXNode) {
+//                child = ((FXNode) child).getLeaf();
+//                // workaround since the leaf ID is not set
+//                if ( child.getID() == null) {
+//                    child.setID(id);
+//                }
+//            }
+            if( child instanceof SGGroup) {
+                AffineTransform parentTX = new AffineTransform(accumTx);
+                AffineTransform temp = new AffineTransform();
+                child.getTransformMatrix(temp);
+                parentTX.concatenate(temp);
+                pick( (SGGroup) child, selected, x, y, idPrefix, significantNode, parentTX);
             } else {
-                if ( child.getTransformedBounds().contains(point) && significantChild != null) {
-                    selected.add(significantChild);
+                //if ( child.getTransformedBounds().contains(point) && significantChild != null) {
+                Bounds2D bounds = new Bounds2D();
+                child.getCompleteBounds(bounds, accumTx);
+                if ( bounds.contains( x, y) && significantNode != null) {
+//                if ( child.contains(x, y) && significantNode != null) {
+                    selected.add(significantNode);
                 }
             }
         }
@@ -169,7 +177,9 @@ public final class FXDComposerController {
             List<SGNode> selected = new ArrayList<SGNode>();
             String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
 
-            pick( (SGGroup) ((FXNode)root).getLeaf(), selected, new Point2D.Float(x, y), idPrefix, null);
+            AffineTransform accumTx = new AffineTransform();
+            root.getTransformMatrix(accumTx);
+            pick( (SGGroup) root, selected, x, y, idPrefix, null, accumTx);
             String id;
             int selNum;
 //            System.out.println("*******************************************");

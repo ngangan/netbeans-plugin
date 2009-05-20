@@ -4,11 +4,11 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
+import com.sun.javafx.geom.AffineTransform;
+import com.sun.javafx.geom.Bounds2D;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
 import javax.swing.*;
-import java.awt.geom.Rectangle2D;
 import java.net.URL;
 
 import org.openide.util.NbBundle;
@@ -22,10 +22,10 @@ import org.netbeans.modules.javafx.fxd.composer.model.*;
 import javafx.scene.Node;
 import com.sun.scenario.scenegraph.SGNode;
 import com.sun.scenario.scenegraph.JSGPanel;
-import com.sun.scenario.scenegraph.fx.FXNode;
 import com.sun.javafx.sg.PGNode;
 
 import com.sun.javafx.tools.fxd.*;
+import com.sun.scenario.scenegraph.SGGroup;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
@@ -124,7 +124,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             try {
                                                 fModel.readLock();
                                                 PreviewStatistics stats = new PreviewStatistics();
-                                                System.out.println("Selected entry: " + selectedEntryCopy);
+                                                //System.out.println("Selected entry: " + selectedEntryCopy);
 
                                                 node = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, stats);
                                             } finally {
@@ -208,7 +208,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private void updateZoom() {
         if ( m_sgPanel != null) {
             float zoom = m_dObj.getDataModel().getZoomRatio();
-            FXNode fxNode = (FXNode) m_sgPanel.getScene();
+            SGGroup node = m_sgPanel.getSceneGroup();
 //            fxNode.setTranslateX( 0);
 //            fxNode.setTranslateY( 0);
 //            fxNode.setScaleX(zoom);
@@ -227,7 +227,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 //            fxNode.setTransform(at);
             AffineTransform at = new AffineTransform();
             at.scale( zoom, zoom);
-            fxNode.setTransform(at);
+            node.setTransformMatrix(at);
 
             m_sgPanel.invalidate();
             m_sgPanel.getParent().validate();
@@ -264,11 +264,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void actionPerformed(ActionEvent e) {
-            Rectangle2D bounds = m_sgPanel.getScene().getBounds();
+            Bounds2D bounds = new Bounds2D();
+            m_sgPanel.getScene().getCompleteBounds(bounds, null);
             
             Dimension panelSize = getParent().getSize();
             
-                        double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / bounds.getWidth();
+            double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / bounds.getWidth();
             double yRatio = (panelSize.getHeight() - 2 * ImageHolder.CROSS_SIZE) / bounds.getHeight();
             
             m_dObj.getController().setZoomRatio((float) Math.min( xRatio, yRatio));

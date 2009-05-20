@@ -217,7 +217,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         assert entryName != null;
         String currentEntry = getEntryName();
         if ( !currentEntry.equals( entryName)) {
-            System.out.println("Selecting entry: " + entryName);
+            //System.out.println("Selecting entry: " + entryName);
             getController().setSelectedEntry(entryName);
             SwingUtilities.invokeLater( new Runnable() {
                 public void run() {
