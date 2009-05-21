@@ -211,6 +211,7 @@ made subject to such option by the copyright holder.
                 <package>com.sun.javafx.runtime.annotation</package>
                 <package>com.sun.javafx.runtime.location</package>
                 <package>com.sun.javafx.runtime.sequence</package>
+                <package>com.sun.javafx.geom</package>
                 <package>com.sun.scenario.scenegraph</package>
                 <package>com.sun.source.tree</package>
                 <package>com.sun.source.util</package>
