@@ -66,7 +66,7 @@ import java.util.List;
  * @author pnejedly
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  */
-class BracketCompletion {
+final class BracketCompletion {
 
     /**
      * A hook method called after a character was inserted into the
