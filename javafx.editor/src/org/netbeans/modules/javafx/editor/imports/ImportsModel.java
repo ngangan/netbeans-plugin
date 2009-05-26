@@ -118,15 +118,24 @@ public class ImportsModel {
             if ((this.importName == null) ? (other.importName != null) : !this.importName.equals(other.importName)) {
                 return false;
             }
+            if (this.start != other.start) {
+                return false;
+            }
+            if (this.end != other.end) {
+                return false;
+            }
             return true;
         }
 
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 67 * hash + (this.importName != null ? this.importName.hashCode() : 0);
+            hash = 13 * hash + (this.importName != null ? this.importName.hashCode() : 0);
+            hash = 13 * hash + (int) (this.start ^ (this.start >>> 32));
+            hash = 13 * hash + (int) (this.end ^ (this.end >>> 32));
             return hash;
         }
+
 
     }
 
@@ -175,6 +184,8 @@ public class ImportsModel {
      */
     public Set<Declared> getUnusedImports() {
         Set<Declared> unused = new HashSet<Declared>();
+        Set<String> usedImportsTmp = new HashSet<String>(usedImports);
+
         for(Declared declared : declaredImports) {
             if (declared.importName.endsWith(".*")) {
                 int imprtLen = declared.importName.length() - 2;
@@ -198,7 +209,7 @@ public class ImportsModel {
                     unused.add(declared);
                 }
             } else {
-                if (!usedImports.contains(declared.importName)) {
+                if (!usedImportsTmp.remove(declared.importName)) {
                     unused.add(declared);
                 }
             }
