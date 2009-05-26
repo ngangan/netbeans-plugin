@@ -76,7 +76,7 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
             iw.scan(cp.getCompilationUnit(), imn);
             for(ImportsModel.Declared unused : imn.getUnusedImports()) {
                 int start = (int) unused.getStart();
-                int end = Math.min((int) unused.getEnd() + 2  /*SEMI + WS[NL]*/, (int) unused.getEnd());
+                int end = Math.min((int) unused.getEnd() + 2  /*SEMI + WS[NL]*/, (int) document.getEndPosition().getOffset());
                 Position sp = document.createPosition(start);
                 Position ep = document.createPosition(end);
                 warnings.add(ErrorDescriptionFactory.createErrorDescription(
