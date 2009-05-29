@@ -139,7 +139,9 @@ public final class FXDComposerController {
         }        
     }    
 
-    private static void pick( SGGroup parent, List<SGNode> selected, float x, float y, String idPrefix, SGNode significantParent, AffineTransform accumTx) {
+    private static void pick( SGGroup parent, List<SGNode> selected, float x, float y, 
+            String idPrefix, SGNode significantParent, AffineTransform accumTx)
+    {
         for ( PGNode pgChild : parent.getContent()) {
             SGNode child = (SGNode) pgChild;
             String id = child.getID();
@@ -177,9 +179,15 @@ public final class FXDComposerController {
             List<SGNode> selected = new ArrayList<SGNode>();
             String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
 
-            AffineTransform accumTx = new AffineTransform();
-            root.getTransformMatrix(accumTx);
-            pick( (SGGroup) root, selected, x, y, idPrefix, null, accumTx);
+            AffineTransform parentTX = new AffineTransform();
+            getSGPanel().getSceneGroup().getTransformMatrix(parentTX);
+
+            AffineTransform currTx = new AffineTransform();
+            root.getTransformMatrix(currTx);
+
+            parentTX.concatenate(currTx);
+            pick( (SGGroup) root, selected, x, y, idPrefix, null, parentTX);
+
             String id;
             int selNum;
 //            System.out.println("*******************************************");
