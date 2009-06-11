@@ -63,9 +63,9 @@ import org.openide.nodes.Node;
 import org.openide.nodes.PropertySupport;
 import org.openide.nodes.Sheet;
 import org.openide.util.HelpCtx;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.util.Utilities;
 import org.openide.util.WeakListeners;
 
 import static org.openide.util.ImageUtilities.assignToolTipToImage;
@@ -278,12 +278,14 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         WORKER.post(new BuildStatusTask(this));
     }
     
+    @Override
     public Image getIcon(int type) {
         Image i = super.getIcon(type);
         
         return enhanceIcon(i);
     }
     
+    @Override
     public Image getOpenedIcon(int type) {
         Image i = super.getOpenedIcon(type);
         
@@ -292,7 +294,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     
     private Image enhanceIcon(Image i) {
         if (isCompiled != null && !isCompiled.get()) {
-            i = Utilities.mergeImages(i, NEEDS_COMPILE, 16, 0);
+            i = ImageUtilities.mergeImages(i, NEEDS_COMPILE, 16, 0);
         }
         
         return i;
@@ -301,7 +303,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     private static final RequestProcessor WORKER = new RequestProcessor("JavaFX Node Badge Processor", 1); // NOI18N
     
     private static class BuildStatusTask implements Runnable {
-        private JavaFXDataNode node;
+        private final JavaFXDataNode node;
         
         public BuildStatusTask(JavaFXDataNode node) {
             this.node = node;

@@ -42,7 +42,6 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import org.netbeans.modules.javafx.editor.*;
-import java.lang.reflect.Constructor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -67,7 +66,7 @@ public final class ElementOpen {
     }
 
     public static boolean open(final FileObject srcFile, int offset) throws Exception {
-        return GoToSupport.doOpen(srcFile, (int) offset);
+        return GoToSupport.doOpen(srcFile, offset);
     }
     
     public static boolean open(final FileObject srcFile, final ElementHandle elh) throws Exception {

@@ -59,6 +59,7 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 import org.netbeans.editor.ActionFactory.FormatAction;
 import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
+import org.openide.util.ImageUtilities;
 
 /**
  * @author answer
@@ -120,9 +121,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         public ToggleFXPreviewExecution() {
             super(toggleFXPreviewExecution);
-            putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/preview.png")));                                                  // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));        // NOI18N
+            putValue(Action.SMALL_ICON, new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution")); // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -412,10 +412,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             }
         }
 
+        @Override
         public String getPopupMenuText(JTextComponent target) {
             return NbBundle.getBundle(JavaFXEditorKit.class).getString("goto_source_open_source_not_formatted"); //NOI18N
         }
 
+        @Override
         protected Class getShortDescriptionBundleClass() {
             return BaseKit.class;
         }
