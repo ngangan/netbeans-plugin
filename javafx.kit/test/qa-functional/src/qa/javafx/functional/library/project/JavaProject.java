@@ -357,13 +357,12 @@ public class JavaProject extends Project {
             Util.sleep(1000);
         }
 
-        String text = getText();
 
-        boolean compiled = text.contains(BUILD_SUCCESSFUL);
+        boolean compiled = outputText.contains(BUILD_SUCCESSFUL);
         
-        if(!compiled){
-            System.out.println("Build Fails:\n" + text);
-        }
+        //if(!compiled){
+            System.out.println("Build Fails:\n" + outputText);
+        //}
         
         return compiled;
 
