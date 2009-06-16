@@ -58,6 +58,7 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
     public static String PROJECT_NAME = "TestPalette";
 
     static final String[] TESTS = {
+        "testCategories",
         "testCategoryApplications",
         "testCategoryBasicShapes",
         "testCategoryColors",
@@ -105,19 +106,19 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
 
     }
 
-    public void testCategory() {
+    public void testCategories() {
         System.out.println("============  Test Palette!  =======");
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
 
-        for(String category: CATEGORIES){
-            System.out.println("============  Test Category: \"" +    category + "\"  =============");
-            testItems(category);
-            System.out.println("===============================================");
-        }
-
-
-        System.out.println("Fail components: " + failComponents);
-        assertTrue("Failed Palette items: " + failComponents, pass);
+//        for(String category: CATEGORIES){
+//            System.out.println("============  Test Category: \"" +    category + "\"  =============");
+//            testItems(category);
+//            System.out.println("===============================================");
+//        }
+//
+//
+//        System.out.println("Fail components: " + failComponents);
+//        assertTrue("Failed Palette items: " + failComponents, pass);
 
     }
 
@@ -165,6 +166,8 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
             
         }
 
+        System.out.println("Fail components: " + failComponents);
+        assertTrue("Failed Palette items: " + failComponents, pass);
         
     }
 
