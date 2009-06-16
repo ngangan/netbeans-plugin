@@ -356,8 +356,17 @@ public class JavaProject extends Project {
             timeout--;
             Util.sleep(1000);
         }
-            
-            return getText().contains(BUILD_SUCCESSFUL);
+
+        String text = getText();
+
+        boolean compiled = text.contains(BUILD_SUCCESSFUL);
+        
+        if(!compiled){
+            System.out.println("Build Fails:\n" + text);
+        }
+        
+        return compiled;
+
         }
 
     }
