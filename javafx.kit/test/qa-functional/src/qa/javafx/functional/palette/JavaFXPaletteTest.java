@@ -57,22 +57,15 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
 
     public static String PROJECT_NAME = "TestPalette";
 
-    static final String[] TESTS = {
-        "testCategories",
-        "testCategoryApplications",
-        "testCategoryBasicShapes",
-        "testCategoryColors",
-        "testCategoryTransformations",
-
-    };
 
     static final String CATEGORY_APPLICATIONS = "Applications";
     static final String CATEGORY_BASIC_SHAPES = "Basic Shapes";
-
+    static final String CATEGORY_CONTROLS = "Controls";
     static final String CATEGORY_TRANSFORMATIONS = "Transformations";
     static final String CATEGORY_COLORS  = "Colors";
     static final String CATEGORY_GRADIENTS = "Gradients";
     static final String CATEGORY_EFFECTS = "Effects";
+    static final String CATEGORY_ANIMATION = "Animation";
     static final String CATEGORY_MEDIA = "Media";
     static final String CATEGORY_SWING_COMPONENTS = "Swing Components";
 
@@ -122,6 +115,23 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
 
     }
 
+
+    static final String[] TESTS = {
+        "testCategories",
+        "testCategoryApplications",
+        "testCategoryBasicShapes",
+        "testCategoryControls",
+        // "testCategoryPath"
+        "testCategoryTransformations",
+        "testCategoryColors",
+        "testCategoryGradients",
+        "testCategoryEffects",
+        "testCategoryAnimation",
+        "testCategoryMedia",
+        "testCategorySwingComponents",
+
+    };
+
     public void testCategoryApplications() {
             testItems(CATEGORY_APPLICATIONS);
     }
@@ -129,18 +139,38 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
     public void testCategoryBasicShapes() {
             testItems(CATEGORY_BASIC_SHAPES);
     }
-    public void testCategoryColors() {
-            testItems(CATEGORY_COLORS);
+
+    public void testCategoryControls() {
+            testItems(CATEGORY_CONTROLS);
     }
+
     public void testCategoryTransformations() {
             testItems(CATEGORY_TRANSFORMATIONS);
     }
     
-//    public void testCategoryApplications() {
-//            testItems(CATEGORY_APPLICATIONS);
-//    }
+    public void testCategoryColors() {
+            testItems(CATEGORY_COLORS);
+    }
+    
+    public void testCategoryGradients() {
+            testItems(CATEGORY_GRADIENTS);
+    }
 
+    public void testCategoryEffects() {
+            testItems(CATEGORY_EFFECTS);
+    }
 
+    public void testCategoryAnimation() {
+            testItems(CATEGORY_ANIMATION);
+    }
+
+    public void testCategoryMedia() {
+            testItems(CATEGORY_MEDIA);
+    }
+
+    public void testCategorySwingComponents() {
+            testItems(CATEGORY_SWING_COMPONENTS);
+    }
 
     public void testItems(String category) {
         JavaFXProject project = new JavaFXProject(PROJECT_NAME);
