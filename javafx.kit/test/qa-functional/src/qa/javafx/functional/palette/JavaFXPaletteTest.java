@@ -102,6 +102,7 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
     public void testCategories() {
         System.out.println("============  Test Palette!  =======");
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
+        project.build();
 
 //        for(String category: CATEGORIES){
 //            System.out.println("============  Test Category: \"" +    category + "\"  =============");
