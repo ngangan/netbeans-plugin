@@ -115,20 +115,35 @@ public class JavaFXProject extends JavaProject {
 
             JRadioButtonOperator button = new JRadioButtonOperator(propertyDialog, Constant.DEPLOYMENT_MOBILE);
             OperationSystem os = OperationSystem.getOS();
-            if(os == OperationSystem.WINDOWS){
-                button.push();
-            } else {
+
+            if(os == OperationSystem.SOLARIS){
                 if (button.isEnabled()){
+                    new JButtonOperator(propertyDialog, Constant.BUTTON_CANCEL).push();
                     throw new Exception("Mobile deployment is enabled on " + os);
+                }else{
+                    new JButtonOperator(propertyDialog, Constant.BUTTON_CANCEL).push();
                 }
+            } else {
+                button.push();
+                new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
+                propertyDialog.waitClosed();
+                run();
             }
+
+//            if(os == OperationSystem.WINDOWS){
+//                button.push();
+//            } else {
+//                if (button.isEnabled()){
+//                    throw new Exception("Mobile deployment is enabled on " + os);
+//                }
+//            }
             //new JRadioButtonOperator(propertyDialog, Constant.DEPLOYMENT_MOBILE).push();
         }
 
         //Util.sleep(6000);
-        
-        new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
-        run();
-       
+    }
+
+    public boolean isDeployPass(){
+        return getOutput().isCompiled() || getOutput().getText().contains(Constant.DEPLOYMENT_MOBILE_NOT_INCLUDED);
     }
 }
