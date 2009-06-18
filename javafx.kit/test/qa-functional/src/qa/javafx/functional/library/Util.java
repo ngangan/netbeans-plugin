@@ -262,8 +262,7 @@ public class Util {
 
 
     public static void waitScanFinished(){
-        
-        try{Thread.sleep( 3000 ); }catch(Exception e) {}
+        try{Thread.sleep( 7000 ); }catch(Exception e) {}
         
         long waitTime = 50;
         long waitCount = MAX_WAIT_TIME / waitTime;
