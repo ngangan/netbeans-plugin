@@ -73,6 +73,7 @@ public interface Constant {
     
     // ================   Buttons  ========================
     String BUTTON_OK = "OK";
+    String BUTTON_CANCEL = "Cancel";
     String BUTTON_RUN = "Run";
 
     // ================   Tabs  ========================
@@ -97,12 +98,14 @@ public interface Constant {
     String DEPLOYMENT_WEB_START = "Web Start Execution";
     String DEPLOYMENT_BROWSER = "Run in Browser";
     String DEPLOYMENT_MOBILE = "Run in Mobile Emulator";
-    
+
+    String DEPLOYMENT_MOBILE_NOT_INCLUDED = "Current platform does not include mobile device emulator necessary for the execution.";
     // ================   Tests  ========================
     // ============    Smoke  ===========================
     
     String SMOKE_PROFILER_FILE_PATH = "profiler/smoke/Profiler.fx";
     String SMOKE_DEBUGGER_FILE_PATH = "debugger/smoke/Debugger.fx";
-    
+
+
     
 }

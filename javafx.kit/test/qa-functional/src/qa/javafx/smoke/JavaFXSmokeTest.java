@@ -44,7 +44,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
         "testPalette",
         "testEditor",
         "testPreview",
-        "testProfiler",
+        //"testProfiler",
     };
 
 
@@ -173,6 +173,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
 
     public void testProjectCreation() {
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME_HELLO_WORLD);
+        project.openOutput();
 
 
     }
