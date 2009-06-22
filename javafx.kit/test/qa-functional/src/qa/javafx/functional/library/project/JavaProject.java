@@ -334,9 +334,13 @@ public class JavaProject extends Project {
         rootNode.performPopupActionNoBlock("Close");
     }
 
+    public void openOutput() {
+        new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
+    }
+
     public Output getOutput() {
         
-        new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
+        //new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
         return new Output(getName() + " (jar) ");
     }
 
