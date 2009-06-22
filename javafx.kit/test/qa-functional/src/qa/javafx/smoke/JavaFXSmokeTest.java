@@ -44,7 +44,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
         "testPalette",
         "testEditor",
         "testPreview",
-        "testProfiler",
+        //"testProfiler",
     };
 
 
