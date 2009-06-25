@@ -73,6 +73,8 @@ public class JavaFXSmokeDeploymentTest extends JavaFXTestCase {
         JavaFXProject project = JavaFXProject.createProject("SmokeDeploymentMobile", DeploymentType.MOBILE);
         try{
             project.deploy();
+            //assertTrue(project.getOutput().getText(), project.isDeployPass());
+            
         }catch(Exception e){
             fail(e.getMessage());
         }

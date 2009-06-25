@@ -235,6 +235,8 @@ public class JavaProject extends Project {
 
 
         new JButtonOperator(newProject, "Finish").push();
+        newProject.waitClosed();
+        
         try {
             Thread.sleep(TIME_WAIT);
         } catch (Exception e) {
@@ -332,9 +334,13 @@ public class JavaProject extends Project {
         rootNode.performPopupActionNoBlock("Close");
     }
 
+    public void openOutput() {
+        new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
+    }
+
     public Output getOutput() {
         
-        new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
+        //new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
         return new Output(getName() + " (jar) ");
     }
 
@@ -356,8 +362,16 @@ public class JavaProject extends Project {
             timeout--;
             Util.sleep(1000);
         }
-            
-            return getText().contains(BUILD_SUCCESSFUL);
+
+
+        boolean compiled = outputText.contains(BUILD_SUCCESSFUL);
+        
+        //if(!compiled){
+            System.out.println("Build Fails:\n" + outputText);
+        //}
+        
+        return compiled;
+
         }
 
     }

@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -69,7 +70,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Jan Lahoda
+ * @author Jan Lahoda, Anton Chechel
  */
 public class MarkOccurrencesHighlighter implements CancellableTask<CompilationInfo> {
 
@@ -77,58 +78,30 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
     private FileObject file;
 
-    /** Creates a new instance of SemanticHighlighter */
     MarkOccurrencesHighlighter(FileObject file) {
         this.file = file;
     }
 
     public void run(CompilationInfo info) throws IOException {
-//        // dirty hack by nenik
-//        if (((CompilationController) info).toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-//            return; // convert the element to local element
-//        }
-
         resume();
 
-//        Document doc = info.getDocument();
         Document doc = info.getJavaFXSource().getDocument();
-
         if (doc == null) {
             Logger.getLogger(MarkOccurrencesHighlighter.class.getName()).log(Level.FINE, "SemanticHighlighter: Cannot get document!"); // NOI18N
             return;
         }
-
-//        Preferences node = MarkOccurencesSettings.getCurrentNode();
-//        
-//        if (!node.getBoolean(MarkOccurencesSettings.ON_OFF, true)) {
-//            getHighlightsBag(doc).clear();
-//            OccurrencesMarkProvider.get(doc).setOccurrences(Collections.<Mark>emptySet());
-//            return ;
-//        }
-
-//        long start = System.currentTimeMillis();
 
         int caretPosition = MarkOccurrencesHighlighterFactory.getLastPosition(file);
         if (isCancelled()) {
             return;
         }
 
-//        caretPosition = info.getPositionConverter().getJavaSourcePosition(caretPosition);
-
-//        List<int[]> bag = processImpl(info, node, doc, caretPosition);
         List<int[]> bag = processImpl(info, doc, caretPosition);
         if (isCancelled()) {
             return;
         }
 
-//        Logger.getLogger("TIMER").log(Level.FINE, "Occurrences",
-//            new Object[] {((DataObject) doc.getProperty(Document.StreamDescriptionProperty)).getPrimaryFile(), (System.currentTimeMillis() - start)});
-
         if (bag == null) {
-//            if (node.getBoolean(MarkOccurencesSettings.KEEP_MARKS, true)) {
-//                return ;
-//            }
-
             bag = new ArrayList<int[]>();
         }
 
@@ -161,12 +134,9 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         OffsetsBag obag = new OffsetsBag(doc);
         obag.clear();
 
-//        AttributeSet attributes = ColoringManager.getColoringImpl(MO);
         AttributeSet attributes = AttributesUtilities.createImmutable(StyleConstants.Background, new Color(236, 235, 163));
 
         for (int[] span : result) {
-//            int convertedStart = info.getPositionConverter().getOriginalPosition(span[0]);
-//            int convertedEnd   = info.getPositionConverter().getOriginalPosition(span[1]);
             int convertedStart = span[0];
             int convertedEnd = span[1];
 
@@ -184,9 +154,6 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     }
 
     private boolean isIn(int caretPosition, Token<?> span) {
-//        System.err.println("caretPosition = " + caretPosition );
-//        System.err.println("span[0]= " + span[0]);
-//        System.err.println("span[1]= " + span[1]);
         if (span == null) {
             return false;
         }
@@ -194,7 +161,6 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return span.offset(null) <= caretPosition && caretPosition <= span.offset(null) + span.length();
     }
 
-//    List<int[]> processImpl(CompilationInfo info, Preferences node, Document doc, int caretPosition) {
     List<int[]> processImpl(CompilationInfo info, Document doc, int caretPosition) {
         UnitTree cu = info.getCompilationUnit();
 //        TreePath tp = info.getTreeUtilities().pathFor(caretPosition);
@@ -207,128 +173,41 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         }
 
         //detect caret inside the return type or throws clause:
-        /* XXX[pn]: couldn't work before. Did it?
-        if (typePath != null && typePath.getParentPath().getLeaf().getKind() == Kind.METHOD) {
-        //hopefully found something, check:
-        MethodTree decl = (MethodTree) typePath.getParentPath().getLeaf();
-        Tree type = decl.getReturnType();
-        
-        //            if (   node.getBoolean(MarkOccurencesSettings.EXIT, true)
-        //                && isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
-        if (isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
-        MethodExitDetector med = new MethodExitDetector();
-        
-        setExitDetector(med);
-        
-        try {
-        return med.process(info, doc, decl, null);
-        } finally {
-        setExitDetector(null);
-        }
-        }
-        
-        for (Tree exc : decl.getThrows()) {
-        //                if (   node.getBoolean(MarkOccurencesSettings.EXCEPTIONS, true)
-        //                    && isIn(cu, info.getTrees().getSourcePositions(), exc, caretPosition)) {
-        if (isIn(cu, info.getTrees().getSourcePositions(), exc, caretPosition)) {
-        MethodExitDetector med = new MethodExitDetector();
-        
-        setExitDetector(med);
-        
-        try {
-        return med.process(info, doc, decl, Collections.singletonList(exc));
-        } finally {
-        setExitDetector(null);
-        }
-        }
-        }
-        }*/
+        // manowar: a bit of FX magic
+        if (typePath != null) {
+            JavaFXTreePath ggpTypePath = typePath.getParentPath().getParentPath().getParentPath();
+            JavaFXTreePath gpTypePath = typePath.getParentPath().getParentPath();
+            JavaFXTreePath pTypePath = typePath.getParentPath();
+            if (getJFXKind(ggpTypePath) == JavaFXKind.FUNCTION_DEFINITION &&
+                    getJFXKind(gpTypePath) == JavaFXKind.FUNCTION_VALUE &&
+                    getJFXKind(pTypePath) == JavaFXKind.TYPE_CLASS &&
+                    getJFXKind(typePath) == JavaFXKind.IDENTIFIER) {
+                
+                JFXFunctionDefinition decl = (JFXFunctionDefinition) ggpTypePath.getLeaf();
+                Tree type = decl.getJFXReturnType();
 
-        if (isCancelled()) {
-            return null;
-        }
+                if (isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
+                    MethodExitDetector med = new MethodExitDetector();
+                    setExitDetector(med);
+                    try {
+                        return med.process(info, doc, decl, null);
+                    } finally {
+                        setExitDetector(null);
+                    }
+                }
 
-//        if (node.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true)) {
-        if (true) {
-            //detect caret inside the extends/implements clause:
-            /* XXX[pn]: couldn't work before. Did it? 
-            if (typePath != null && typePath.getParentPath().getLeaf().getKind() == Kind.CLASS) {
-            ClassTree ctree = (ClassTree) typePath.getParentPath().getLeaf();
-            int bodyStart = Utilities.findBodyStart(ctree, cu, info.getTrees().getSourcePositions(), doc);
-            
-            boolean isExtends = ctree.getExtendsClause() == typePath.getLeaf();
-            //                boolean isImplements = false;
-            
-            //                for (Tree t : ctree.getImplementsClause()) {
-            //                    if (t == typePath.getLeaf()) {
-            //                        isImplements = true;
-            //                        break;
-            //                    }
-            //                }
-            
-            //                if (   (isExtends && node.getBoolean(MarkOccurencesSettings.OVERRIDES, true))
-            //                    || (isImplements && node.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true))) {
-            if (isExtends) {
-            Element superType = info.getTrees().getElement(typePath);
-            Element thisType  = info.getTrees().getElement(typePath.getParentPath());
-            
-            if (isClass(superType) && isClass(thisType))
-            return detectMethodsForClass(info, doc, typePath.getParentPath(), (TypeElement) superType, (TypeElement) thisType);
+                for (Tree exc : decl.getErrorTrees()) {
+                    if (isIn(cu, info.getTrees().getSourcePositions(), exc, caretPosition)) {
+                        MethodExitDetector med = new MethodExitDetector();
+                        setExitDetector(med);
+                        try {
+                            return med.process(info, doc, decl, Collections.singletonList(exc));
+                        } finally {
+                            setExitDetector(null);
+                        }
+                    }
+                }
             }
-            }*/
-
-            if (isCancelled()) {
-                return null;
-            }
-
-//            TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-
-        /* XXX[pn]: couldn't work before. Did it?
-        if (ts != null && tp.getLeaf().getKind() == Kind.CLASS) {
-        int bodyStart = Utilities.findBodyStart(tp.getLeaf(), cu, info.getTrees().getSourcePositions(), doc);
-        
-        if (caretPosition < bodyStart) {
-        ts.move(caretPosition);
-        
-        if (ts.moveNext()) {
-        //                        if (node.getBoolean(MarkOccurencesSettings.OVERRIDES, true) && ts.token().id() == JavaTokenId.EXTENDS) {
-        if (ts.token().id() == JFXTokenId.EXTENDS) {
-        Tree superClass = ((ClassTree) tp.getLeaf()).getExtendsClause();
-        
-        if (superClass != null) {
-        Element superType = info.getTrees().getElement(new TreePath(tp, superClass));
-        Element thisType  = info.getTrees().getElement(tp);
-        
-        if (isClass(superType) && isClass(thisType))
-        return detectMethodsForClass(info, doc, tp, (TypeElement) superType, (TypeElement) thisType);
-        }
-        }
-        
-        //                        if (node.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true) && ts.token().id() == JavaTokenId.IMPLEMENTS) {
-        //                            List<? extends Tree> superClasses = ((ClassTree) tp.getLeaf()).getImplementsClause();
-        //                            
-        //                            if (superClasses != null) {
-        //                                List<TypeElement> superTypes = new ArrayList<TypeElement>();
-        //                                
-        //                                for (Tree superTypeTree : superClasses) {
-        //                                    if (superTypeTree != null) {
-        //                                        Element superType = info.getTrees().getElement(new TreePath(tp, superTypeTree));
-        //                                        
-        //                                        if (isClass(superType))
-        //                                            superTypes.add((TypeElement) superType);
-        //                                    }
-        //                                }
-        //                                
-        //                                Element thisType  = info.getTrees().getElement(tp);
-        //                                
-        //                                if (!superTypes.isEmpty() && isClass(thisType))
-        //                                    return detectMethodsForClass(info, doc, tp, superTypes, (TypeElement) thisType);
-        //                            }
-        //                            
-        //                        }
-        }
-        }
-        }*/
         }
 
         if (isCancelled()) {
@@ -336,33 +215,23 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         }
 
         Tree tree = tp.getLeaf();
-
-//        if (node.getBoolean(MarkOccurencesSettings.BREAK_CONTINUE, true) && (tree.getKind() == Kind.BREAK || tree.getKind() == Kind.CONTINUE)) {
         if ((tree.getJavaFXKind() == JavaFXKind.BREAK || tree.getJavaFXKind() == JavaFXKind.CONTINUE)) {
             return detectBreakOrContinueTarget(info, doc, tp);
         }
-
-        Element el;
-
-//        el = JavadocImports.findReferencedElement(info, caretPosition);
-//        boolean insideJavadoc = el != null;
 
         if (isCancelled()) {
             return null;
         }
 
         //variable declaration:
-//        if (!insideJavadoc) {
-        el = info.getTrees().getElement(tp);
-//        }
+        Element el = info.getTrees().getElement(tp);
 
-        if (el != null && (!(false/*tree.getKind() == Kind.CLASS*/) || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp))) && !Utilities.isKeyword(tree) && (!(false/*tree.getKind() == Kind.METHOD*/) || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp))) //                && isEnabled(node, el)
-                //                || (insideJavadoc && isEnabled(node, el))
-                ) {
+        if (el != null && !Utilities.isKeyword(tree) &&
+                (tree.getJavaFXKind() != JavaFXKind.CLASS_DECLARATION || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp))) &&
+                (tree.getJavaFXKind() != JavaFXKind.FUNCTION_DEFINITION || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))) {
+
             FindLocalUsagesQuery fluq = new FindLocalUsagesQuery();
-
             setLocalUsages(fluq);
-
             try {
                 List<int[]> bag = new ArrayList<int[]>();
                 for (Token<?> t : fluq.findUsages(el, info, doc)) {
@@ -377,7 +246,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
         return null;
     }
-    private static final Set<JavaFXKind> TYPE_PATH_ELEMENT = EnumSet.of(JavaFXKind.IDENTIFIER, /*JavaFXKind.PRIMITIVE_TYPE, JavaFXKind.PARAMETERIZED_TYPE,*/ JavaFXKind.MEMBER_SELECT/*, JavaFXKind.ARRAY_TYPE*/);
+    
+    private static final Set<JavaFXKind> TYPE_PATH_ELEMENT = EnumSet.of(JavaFXKind.IDENTIFIER, JavaFXKind.MEMBER_SELECT);
 
     private static JavaFXTreePath findTypePath(JavaFXTreePath tp) {
         if (!TYPE_PATH_ELEMENT.contains(tp.getLeaf().getJavaFXKind())) {
@@ -394,37 +264,6 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     private static boolean isClass(Element el) {
         return el != null && (el.getKind().isClass() || el.getKind().isInterface());
     }
-    
-//    private static boolean isEnabled(Preferences node, Element el) {
-//        switch (el.getKind()) {
-//            case ANNOTATION_TYPE:
-//            case CLASS:
-//            case ENUM:
-//            case INTERFACE:
-//            case TYPE_PARAMETER: //???
-//                return node.getBoolean(MarkOccurencesSettings.TYPES, true);
-//            case CONSTRUCTOR:
-//            case METHOD:
-//                return node.getBoolean(MarkOccurencesSettings.METHODS, true);
-//            case ENUM_CONSTANT:
-//                return node.getBoolean(MarkOccurencesSettings.CONSTANTS, true);
-//            case FIELD:
-//                if (el.getModifiers().containsAll(EnumSet.of(Modifier.STATIC, Modifier.FINAL))) {
-//                    return node.getBoolean(MarkOccurencesSettings.CONSTANTS, true);
-//                } else {
-//                    return node.getBoolean(MarkOccurencesSettings.FIELDS, true);
-//                }
-//            case LOCAL_VARIABLE:
-//            case PARAMETER:
-//            case EXCEPTION_PARAMETER:
-//                return node.getBoolean(MarkOccurencesSettings.LOCAL_VARIABLES, true);
-//            case PACKAGE:
-//                return false; //never mark occurrence packages
-//            default:
-//                Logger.getLogger(MarkOccurrencesHighlighter.class.getName()).log(Level.INFO, "Unknow element type: {0}.", el.getKind());
-//                return true;
-//        }
-//    }
     
     private boolean canceled;
     private MethodExitDetector exitDetector;
@@ -457,49 +296,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         canceled = false;
     }
 
-    /*    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, JavaFXTreePath clazz, TypeElement superType, TypeElement thisType) {
-    return detectMethodsForClass(info, document, clazz, Collections.singletonList(superType), thisType);
-    }
-    
-    //    static Coloring MO = ColoringAttributes.add(ColoringAttributes.empty(), ColoringAttributes.MARK_OCCURRENCES);
-    
-    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, JavaFXTreePath clazz, List<TypeElement> superTypes, TypeElement thisType) {
-    List<int[]> highlights = new ArrayList<int[]>();
-    ClassTree clazzTree = (ClassTree) clazz.getLeaf();
-    TypeElement jlObject = info.getElements().getTypeElement("java.lang.Object");
-    
-    OUTER: for (Tree member: clazzTree.getMembers()) {
-    if (isCancelled()) {
-    return null;
-    }
-    
-    if (member.getKind() == Kind.METHOD) {
-    TreePath path = new TreePath(clazz, member);
-    Element el = info.getTrees().getElement(path);
-    
-    if (el.getKind() == ElementKind.METHOD) {
-    for (TypeElement superType : superTypes) {
-    for (ExecutableElement ee : ElementFilter.methodsIn(info.getElements().getAllMembers(superType))) {
-    if (info.getElements().overrides((ExecutableElement) el, ee, thisType) && (superType.getKind().isClass() || !ee.getEnclosingElement().equals(jlObject))) {
-    Token<JFXTokenId> t = Utilities.getToken(info, document, path);
-    
-    if (t != null) {
-    highlights.add(new int[] {t.offset(null), t.offset(null) + t.length()});
-    }
-    continue OUTER;
-    }
-    }
-    }
-    }
-    }
-    }
-    
-    return highlights;
-    }
-     */
     private List<int[]> detectBreakOrContinueTarget(CompilationInfo info, Document document, JavaFXTreePath breakOrContinue) {
         List<int[]> result = new ArrayList<int[]>();
-//        StatementTree target = info.getTreeUtilities().getBreakContinueTarget(breakOrContinue);
         ExpressionTree target = new TreeUtilities(info).getBreakContinueTarget(breakOrContinue);
 
         if (target == null) {
@@ -512,8 +310,6 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             result.add(new int[]{ts.offset(), ts.offset() + ts.token().length()});
         }
 
-//        no labels:        
-//        StatementTree statement = target.getKind() == Kind.LABELED_STATEMENT ? ((LabeledStatementTree) target).getStatement() : target;
         ExpressionTree statement = target;
         Tree block = null;
 
@@ -547,7 +343,6 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         if (bag == null) {
             doc.putProperty(MarkOccurrencesHighlighter.class, bag = new OffsetsBag(doc, false));
 
-//            Object stream = doc.getProperty(Document.StreamDescriptionProperty);
             final OffsetsBag bagFin = bag;
             DocumentListener l = new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) {
@@ -561,15 +356,13 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             };
 
             doc.addDocumentListener(l);
-
-//            if (stream instanceof DataObject) {
-//                Logger.getLogger("TIMER").log(Level.FINE, "MarkOccurrences Highlights Bag", new Object[] {((DataObject) stream).getPrimaryFile(), bag}); //NOI18N
-//                Logger.getLogger("TIMER").log(Level.FINE, "MarkOccurrences Highlights Bag Listener", new Object[] {((DataObject) stream).getPrimaryFile(), l}); //NOI18N
-//            }
         }
-
         return bag;
     }
     
+    private static JavaFXKind getJFXKind(JavaFXTreePath tp) {
+        return tp.getLeaf().getJavaFXKind();
+    }
+
 }
 

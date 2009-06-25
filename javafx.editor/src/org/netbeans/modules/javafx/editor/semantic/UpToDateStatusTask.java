@@ -164,7 +164,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                             log("    start == " + start + "  end == " + end); // NOI18
                         }
                         if (start == end) {
-                            end = skipWhiteSpace(info, (int) start);
+                            end = skipWhiteSpace(info, start);
                             if (LOGGABLE) {
                                 log("  after skip  start == " + start + "  end == " + end); // NOI18N
                             }
@@ -174,8 +174,8 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                                 Severity.ERROR,
                                 d.getMessage(Locale.getDefault()),
                                 doc,
-                                doc.createPosition((int) start),
-                                doc.createPosition((int) end)));
+                                doc.createPosition(start),
+                                doc.createPosition(end)));
                     }
                     continue;
                 } catch (BadLocationException ex) {

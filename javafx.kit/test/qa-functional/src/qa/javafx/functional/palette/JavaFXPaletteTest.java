@@ -56,11 +56,21 @@ import qa.javafx.functional.library.operator.FXPaletteOperator;
 public class JavaFXPaletteTest extends JavaFXTestCase {
 
     public static String PROJECT_NAME = "TestPalette";
-    
-    static final String[] TESTS = {
-        "testCategory",
-    };
 
+
+    static final String CATEGORY_APPLICATIONS = "Applications";
+    static final String CATEGORY_BASIC_SHAPES = "Basic Shapes";
+    static final String CATEGORY_CONTROLS = "Controls";
+    static final String CATEGORY_TRANSFORMATIONS = "Transformations";
+    static final String CATEGORY_COLORS  = "Colors";
+    static final String CATEGORY_GRADIENTS = "Gradients";
+    static final String CATEGORY_EFFECTS = "Effects";
+    static final String CATEGORY_ANIMATION = "Animation";
+    static final String CATEGORY_MEDIA = "Media";
+    static final String CATEGORY_SWING_COMPONENTS = "Swing Components";
+
+
+    
     public static String[] CATEGORIES = {
         "Applications",
         //"Actions",
@@ -89,20 +99,79 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
 
     }
 
-    public void testCategory() {
+    public void testCategories() {
         System.out.println("============  Test Palette!  =======");
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
+        project.openOutput();
+        project.build();
 
-        for(String category: CATEGORIES){
-            System.out.println("============  Test Category: \"" +    category + "\"  =============");
-            testItems(category);
-            System.out.println("===============================================");
-        }
+//        for(String category: CATEGORIES){
+//            System.out.println("============  Test Category: \"" +    category + "\"  =============");
+//            testItems(category);
+//            System.out.println("===============================================");
+//        }
+//
+//
+//        System.out.println("Fail components: " + failComponents);
+//        assertTrue("Failed Palette items: " + failComponents, pass);
+
+    }
 
 
-        System.out.println("Fail components: " + failComponents);
-        assertTrue("Failed Palette items: " + failComponents, pass);
+    static final String[] TESTS = {
+        "testCategories",
+        "testCategoryApplications",
+        "testCategoryBasicShapes",
+        "testCategoryControls",
+        // "testCategoryPath"
+        "testCategoryTransformations",
+        "testCategoryColors",
+        "testCategoryGradients",
+        "testCategoryEffects",
+        "testCategoryAnimation",
+        "testCategoryMedia",
+        "testCategorySwingComponents",
 
+    };
+
+    public void testCategoryApplications() {
+            testItems(CATEGORY_APPLICATIONS);
+    }
+
+    public void testCategoryBasicShapes() {
+            testItems(CATEGORY_BASIC_SHAPES);
+    }
+
+    public void testCategoryControls() {
+            testItems(CATEGORY_CONTROLS);
+    }
+
+    public void testCategoryTransformations() {
+            testItems(CATEGORY_TRANSFORMATIONS);
+    }
+    
+    public void testCategoryColors() {
+            testItems(CATEGORY_COLORS);
+    }
+    
+    public void testCategoryGradients() {
+            testItems(CATEGORY_GRADIENTS);
+    }
+
+    public void testCategoryEffects() {
+            testItems(CATEGORY_EFFECTS);
+    }
+
+    public void testCategoryAnimation() {
+            testItems(CATEGORY_ANIMATION);
+    }
+
+    public void testCategoryMedia() {
+            testItems(CATEGORY_MEDIA);
+    }
+
+    public void testCategorySwingComponents() {
+            testItems(CATEGORY_SWING_COMPONENTS);
     }
 
     public void testItems(String category) {
@@ -129,6 +198,8 @@ public class JavaFXPaletteTest extends JavaFXTestCase {
             
         }
 
+        System.out.println("Fail components: " + failComponents);
+        assertTrue("Failed Palette items: " + failComponents, pass);
         
     }
 

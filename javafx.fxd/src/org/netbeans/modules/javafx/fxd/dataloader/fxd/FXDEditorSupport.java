@@ -69,6 +69,7 @@ public class FXDEditorSupport extends DataEditorSupport implements OpenCookie, E
                 FileObject fxzFO = FileUtil.toFileObject( fs.getJarFile());
                 FXZDataObject dObj = (FXZDataObject) DataObject.find(fxzFO);
                 dObj.setDefaultView( FXZDataObject.TEXT_VIEW_INDEX);
+                dObj.selectEntry(fo.getNameExt());
                 SourceTopComponent.selectPosition( dObj, -1, true);
             } catch( Exception e) {
                 //TODO report

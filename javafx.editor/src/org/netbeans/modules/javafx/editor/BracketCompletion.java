@@ -66,7 +66,7 @@ import java.util.List;
  * @author pnejedly
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  */
-class BracketCompletion {
+final class BracketCompletion {
 
     /**
      * A hook method called after a character was inserted into the
@@ -478,7 +478,8 @@ class BracketCompletion {
         // Check whether character follows the bracket is the same bracket
         if (token != null && token.id() == bracketId
                 // we are escaping right bracket inserted into RL_SL because it is correct statement.
-                && !(bracketId == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
+                // manowar: commented this weird line according issue #156157
+//                && !(bracketId == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
                 ) {
             JFXTokenId leftBracketIntId = JavaFXBracesMatcher.getOposite(bracketId, false);
 
@@ -819,7 +820,7 @@ class BracketCompletion {
 
 
     /**
-     * posWithinString(doc, pos) iff position *pos* is within a string
+     * posWithinString(doc, pos) if position *pos* is within a string
      * literal in document doc.
      *
      * @param doc    the document
@@ -827,7 +828,7 @@ class BracketCompletion {
      * @return true if matched.
      */
     static boolean posWithinString(BaseDocument doc, int dotPos) {
-        return posWithinQuotes(doc, dotPos, '\"', JFXTokenId.STRING_LITERAL, JFXTokenId.DoubleQuoteBody); // NOI18N
+        return posWithinQuotes(doc, dotPos, '\"', JFXTokenId.STRING_LITERAL, JFXTokenId.DoubleQuoteBody, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL); // NOI18N
     }
 
     /**

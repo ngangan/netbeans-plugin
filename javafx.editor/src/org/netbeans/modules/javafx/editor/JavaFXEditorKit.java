@@ -41,31 +41,25 @@
 package org.netbeans.modules.javafx.editor;
 
 import org.netbeans.api.java.queries.SourceLevelQuery;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseAction;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.BaseKit;
 import org.netbeans.editor.LocaleSupport;
 import org.netbeans.modules.editor.NbEditorKit;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 import org.netbeans.editor.ActionFactory.FormatAction;
 import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
+import org.openide.util.ImageUtilities;
 
 /**
  * @author answer
@@ -105,8 +99,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new CommentAction("//"),                                        //NOI18N
                 new UncommentAction("//"),                                      //NOI18N
                 new ToggleFXPreviewExecution(),
-                new JavaDefaultKeyTypedAction(),
-                new JavaDeleteCharAction(deletePrevCharAction, false),
+                new JavaFXDefaultKeyTypedAction(),
+                new JavaFXDeleteCharAction(deletePrevCharAction, false),
                 new JavaFXGoToDeclarationAction(),
                 new JavaFXGoToSourceAction(),
                 new JavaFXGotoHelpAction(),
@@ -127,9 +121,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         public ToggleFXPreviewExecution() {
             super(toggleFXPreviewExecution);
-            putValue(Action.SMALL_ICON, new ImageIcon(org.openide.util.Utilities.loadImage(
-                    "org/netbeans/modules/javafx/editor/resources/preview.png")));                                                  // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution"));        // NOI18N
+            putValue(Action.SMALL_ICON, new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution")); // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -203,7 +196,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
     }
 
-    public static class JavaDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
+    public static class JavaFXDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
 
         /**
          * Check whether there was any important character typed
@@ -279,106 +272,106 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     }
 
 
-    public static class JavaInsertBreakAction extends InsertBreakAction {
+//    public static class JavaInsertBreakAction extends InsertBreakAction {
+//
+//        static final long serialVersionUID = -1506173310438326380L;
+//
+//        @Override
+//        protected Object beforeBreak(JTextComponent target, BaseDocument doc, Caret caret) {
+//            int dotPos = caret.getDot();
+//            if (BracketCompletion.posWithinString(doc, dotPos)) {
+//                try {
+//                    doc.insertString(dotPos, "\"  \"", null);                       // NOI18N
+//                    dotPos += 3;
+//                    caret.setDot(dotPos);
+//                    return dotPos;
+//                } catch (BadLocationException ex) {
+//                    log.severe("Excetion thrown during InsertBreakAction. " + ex);  // NOI18N
+//                }
+//            } else {
+//                try {
+//                    TokenSequence<JFXTokenId> seq = BracketCompletion.getTokenSequence(doc, dotPos);
+//                    JFXTokenId id = seq.moveNext() ? seq.token().id() : null;
+//                    if ((id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) && seq.offset() < dotPos) {
+//                        doc.insertString(dotPos, "* ", null);                       // NOI18N
+//                        caret.setDot(dotPos);
+//                        return dotPos + 3;
+//                    } else {
+//                        return processRawString(doc, caret);
+//                    }
+//                } catch (BadLocationException ex) {
+//                    log.severe("Excetion thrown during InsertBreakAction. " + ex);  // NOI18N
+//                }
+//            }
+//            return null;
+//        }
+//
+//        private Object processRawString(BaseDocument doc, Caret caret) throws BadLocationException {
+//            int dotPos = caret.getDot();
+//            Indent indent = Indent.get(doc);
+//            if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
+//                int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
+//                doc.insertString(end, "}", null);                               // NOI18N
+//                indent.reindent(end);
+//                caret.setDot(end);
+//                return end + 1;
+//            } else {
+//                final String epsylon = doc.getText(dotPos - 1, 2);
+//                final char c = epsylon.charAt(0);
+//                if (c == '[' || c == '(' || c == '{') {                         // NOI18N
+//                    if (epsylon.charAt(1) == BracketCompletion.matching(c)) {
+//                        doc.insertString(dotPos + 1, "\n", null);               // NOI18N
+//                        indent.reindent(dotPos);
+//                        caret.setDot(dotPos);
+//                        return dotPos + 1;
+//                    }
+//                } else if (c == '*') {                                          //NOI18N
+//                    return processStartOfComment(doc, caret, indent);
+//                }
+//            }
+//            return null;
+//        }
+//
+//        private Object processStartOfComment(BaseDocument doc, Caret caret, Indent indent) throws BadLocationException {
+//            int dotPos = caret.getDot();
+//            int start = Math.max(dotPos - 3, 0);
+//            String material = doc.getText(start, dotPos).trim();
+//            if (material.startsWith("/*")) {                                        // NOI18N
+//                doc.insertString(dotPos, " * \n */\n", null);                       // NOI18N
+//                indent.reindent(start, Math.min(start + 8, doc.getLength() - 1));
+//                caret.setDot(dotPos);
+//                return dotPos + 4;
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void afterBreak(JTextComponent target, BaseDocument doc, Caret caret, Object cookie) {
+//            if (cookie != null) {
+//                if (cookie instanceof Integer) {
+//                    int newDot = (Integer) cookie;
+//                    // integer
+////                    int nowDotPos = caret.getDot();
+//                    try {
+//                        caret.setDot(newDot);
+//                        Indent.get(doc).reindent(newDot);
+//                    } catch (BadLocationException ex) {
+//                        log.severe("Exception thrown during InsertBreakAction. " + ex);   // NOI18N
+//                    }
+//                    /*if (newDot > nowDotPos + 1) {
+//                        caret.setDot(newDot);
+//                    } else {
+//                        caret.setDot(nowDotPos + 1);
+//                    }*/
+//                }
+//            }
+//        }
+//
+//    }
 
-        static final long serialVersionUID = -1506173310438326380L;
+    public static class JavaFXDeleteCharAction extends ExtDeleteCharAction {
 
-        @Override
-        protected Object beforeBreak(JTextComponent target, BaseDocument doc, Caret caret) {
-            int dotPos = caret.getDot();
-            if (BracketCompletion.posWithinString(doc, dotPos)) {
-                try {
-                    doc.insertString(dotPos, "\"  \"", null);                       // NOI18N
-                    dotPos += 3;
-                    caret.setDot(dotPos);
-                    return dotPos;
-                } catch (BadLocationException ex) {
-                    log.severe("Excetion thrown during InsertBreakAction. " + ex);  // NOI18N
-                }
-            } else {
-                try {
-                    TokenSequence<JFXTokenId> seq = BracketCompletion.getTokenSequence(doc, dotPos);
-                    JFXTokenId id = seq.moveNext() ? seq.token().id() : null;
-                    if ((id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) && seq.offset() < dotPos) {
-                        doc.insertString(dotPos, "* ", null);                       // NOI18N
-                        caret.setDot(dotPos);
-                        return dotPos + 3;
-                    } else {
-                        return processRawString(doc, caret);
-                    }
-                } catch (BadLocationException ex) {
-                    log.severe("Excetion thrown during InsertBreakAction. " + ex);  // NOI18N
-                }
-            }
-            return null;
-        }
-
-        private Object processRawString(BaseDocument doc, Caret caret) throws BadLocationException {
-            int dotPos = caret.getDot();
-            Indent indent = Indent.get(doc);
-            if (BracketCompletion.isAddRightBrace(doc, dotPos)) {
-                int end = BracketCompletion.getRowOrBlockEnd(doc, dotPos);
-                doc.insertString(end, "}", null);                               // NOI18N
-                indent.reindent(end);
-                caret.setDot(end);
-                return end + 1;
-            } else {
-                final String epsylon = doc.getText(dotPos - 1, 2);
-                final char c = epsylon.charAt(0);
-                if (c == '[' || c == '(' || c == '{') {                         // NOI18N
-                    if (epsylon.charAt(1) == BracketCompletion.matching(c)) {
-                        doc.insertString(dotPos + 1, "\n", null);               // NOI18N
-                        indent.reindent(dotPos);
-                        caret.setDot(dotPos);
-                        return dotPos + 1;
-                    }
-                } else if (c == '*') {                                          //NOI18N
-                    return processStartOfComment(doc, caret, indent);
-                }
-            }
-            return null;
-        }
-
-        private Object processStartOfComment(BaseDocument doc, Caret caret, Indent indent) throws BadLocationException {
-            int dotPos = caret.getDot();
-            int start = Math.max(dotPos - 3, 0);
-            String material = doc.getText(start, dotPos).trim();
-            if (material.startsWith("/*")) {                                        // NOI18N
-                doc.insertString(dotPos, " * \n */\n", null);                       // NOI18N
-                indent.reindent(start, Math.min(start + 8, doc.getLength() - 1));
-                caret.setDot(dotPos);
-                return dotPos + 4;
-            }
-            return null;
-        }
-
-        @Override
-        protected void afterBreak(JTextComponent target, BaseDocument doc, Caret caret, Object cookie) {
-            if (cookie != null) {
-                if (cookie instanceof Integer) {
-                    int newDot = (Integer) cookie;
-                    // integer
-//                    int nowDotPos = caret.getDot();
-                    try {
-                        caret.setDot(newDot);
-                        Indent.get(doc).reindent(newDot);
-                    } catch (BadLocationException ex) {
-                        log.severe("Exception thrown during InsertBreakAction. " + ex);   // NOI18N
-                    }
-                    /*if (newDot > nowDotPos + 1) {
-                        caret.setDot(newDot);
-                    } else {
-                        caret.setDot(nowDotPos + 1);
-                    }*/
-                }
-            }
-        }
-
-    }
-
-    public static class JavaDeleteCharAction extends ExtDeleteCharAction {
-
-        public JavaDeleteCharAction(String nm, boolean nextChar) {
+        public JavaFXDeleteCharAction(String nm, boolean nextChar) {
             super(nm, nextChar);
         }
 
@@ -419,10 +412,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             }
         }
 
+        @Override
         public String getPopupMenuText(JTextComponent target) {
             return NbBundle.getBundle(JavaFXEditorKit.class).getString("goto_source_open_source_not_formatted"); //NOI18N
         }
 
+        @Override
         protected Class getShortDescriptionBundleClass() {
             return BaseKit.class;
         }
@@ -437,6 +432,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         return new org.openide.util.HelpCtx(JavaFXEditorKit.class);
     }
 
+    // TODO do it trough new annotation registration
     private static class JavaFXFormatAction extends FormatAction {
         public JavaFXFormatAction() {
             setEnabled(false);

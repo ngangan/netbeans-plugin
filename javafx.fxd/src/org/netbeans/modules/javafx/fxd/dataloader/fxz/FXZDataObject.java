@@ -49,6 +49,9 @@ import java.util.HashMap;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.StyledDocument;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.core.api.multiview.MultiViewHandler;
 import org.netbeans.core.api.multiview.MultiViewPerspective;
 import org.netbeans.core.api.multiview.MultiViews;
@@ -72,6 +75,7 @@ import org.openide.loaders.SaveAsCapable;
 import org.openide.nodes.Node;
 import org.openide.nodes.CookieSet;
 import org.openide.nodes.Node.Cookie;
+import org.openide.nodes.NodeOperation;
 import org.openide.text.Line.Set;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -81,6 +85,7 @@ import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -107,6 +112,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     private class CommonCookie implements EditorCookie, EditCookie, OpenCookie, LineCookie, EditorCookie.Observable {
                 
         public void open() {
+            openNodeInExplorer();
             try {
                 getBaseSupport().open();
             } catch (OutOfMemoryError oom){
@@ -161,6 +167,56 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
             getBaseSupport().removePropertyChangeListener(arg0);
         }
         
+        private void openNodeInExplorer() {
+            if (isOpenedInProject()){
+                return;
+            }
+
+            boolean opened = false;
+            Node node = getNodeDelegate();
+            java.util.Set<TopComponent> tcs = WindowManager.getDefault().getRegistry().getOpened();
+            for (TopComponent tc : tcs) {
+                if (node.getDisplayName().equals(tc.getName())) {
+                    if (isNodeFromTC(tc, node)) {
+                        opened = true;
+                        break;
+                    }
+                }
+            }
+            if (!opened) {
+                NodeOperation.getDefault().explore(node);
+            }
+        }
+
+        private boolean isOpenedInProject(){
+            Project p = FileOwnerQuery.getOwner(getPrimaryFile());
+            return isProjectOpen(p);
+        }
+
+        // TODO: use OpenProjects#isProjectOpen after migration to newer NetBeans version
+        // where this method is available.
+        private boolean isProjectOpen(Project p) {
+            if (p == null) {
+                return false;
+            }
+            for (Project real : OpenProjects.getDefault().getOpenProjects()) {
+                if (p.equals(real) || real.equals(p)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean isNodeFromTC(TopComponent tc, Node node) {
+            Node[] tcNodes = tc.getActivatedNodes();
+            for (Node n : tcNodes) {
+                if (n == node) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
     
     public FXZDataObject(FileObject pf, FXZDataLoader loader) throws DataObjectExistsException, IOException {
