@@ -46,7 +46,7 @@ import org.netbeans.modules.reglib.NbServiceTagSupport;
 public class ServiceTagGenerator {
 
     public static final String ST_SOURCE =
-            "NetBeans 6.5 Installer";
+            "NetBeans 6.7 Installer";
 
     public static final String JAVA_VERSION =
             System.getProperty("java.version");

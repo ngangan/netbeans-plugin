@@ -60,14 +60,14 @@
       <arg value="UDSP"/>
       <arg file="external/netbeans-javase-macosx.dmg"/>
       <arg value="-o"/>
-      <arg file="build/netbeans-6.5.1-javafx-macosx"/>
+      <arg file="build/netbeans-6.7-javafx-macosx"/>
     </exec>  
     <exec executable="hdiutil" failonerror="yes">
       <arg value="mount"/>
       <arg value="-readwrite"/>
       <arg value="-mountpoint"/>
       <arg file="build/mac-mount"/>
-      <arg file="build/netbeans-6.5.1-javafx-macosx.sparseimage"/>
+      <arg file="build/netbeans-6.7-javafx-macosx.sparseimage"/>
     </exec>
   </target>
 
@@ -87,7 +87,7 @@
   <target name="build-mac-pkg" depends="mount-mac-dmg,build-servicetag" if="running.on.mac">
     <mkdir dir="build/pkgscripts"/>
     <copy todir="build/pkgscripts">
-      <fileset dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
+      <fileset dir="build/mac-mount/NetBeans 6.7.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
       <fileset file="pkg-src"/>
     </copy>
     <exec executable="sh" failonerror="yes">
@@ -97,18 +97,18 @@
   </target>
 
   <target name="patch-mac-dmg" depends="mount-mac-dmg,build-mac-pkg" if="running.on.mac">
-    <exec executable="sh" dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.7.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
         <arg value="-c"/>
         <arg value="sed -i '' 's/addproduct_id.sh &quot;NB&quot;/addproduct_id.sh &quot;NBFX&quot;/' postflight"/>            
     </exec>
     <copy todir="build/mac-mount">
       <fileset dir="mac-patch-src"/>
     </copy>
-    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Resources/License.txt"/>
-    <copy todir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/javafx.pkg">
+    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.7.mpkg/Contents/Resources/License.txt"/>
+    <copy todir="build/mac-mount/NetBeans 6.7.mpkg/Contents/Packages/javafx.pkg">
       <fileset dir="build/javafx.pkg"/>
     </copy>
-    <exec executable="sh" dir="build/mac-mount/NetBeans 6.5.1.mpkg/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.7.mpkg/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
       <arg value="-c"/>
       <arg value="chmod +x *"/>
     </exec>  
@@ -124,9 +124,9 @@
       <arg value="convert"/>
       <arg value="-format"/>
       <arg value="UDZO"/>
-      <arg file="build/netbeans-6.5.1-javafx-macosx.sparseimage"/>
+      <arg file="build/netbeans-6.7-javafx-macosx.sparseimage"/>
       <arg value="-o"/>
-      <arg file="../build/installers/netbeans-6.5.1-javafx-macosx.dmg"/>
+      <arg file="../build/installers/netbeans-6.7-javafx-macosx.dmg"/>
     </exec>  
   </target>
   
@@ -265,7 +265,7 @@
   </target>
 
   <target name="build-registry" depends="build-javafx-package">
-    <property name="base.version" value="6.5.1.0.200903060201"/>
+    <property name="base.version" value="6.7.0.200903060201"/>
     <currentmillis property="timestamp"/>
     <firstfname property="base.win.version" dir="build/windows/data/nb-base"/>
     <firstfname property="javase.win.version" dir="build/windows/data/nb-javase"/>
@@ -490,39 +490,39 @@
   </target>
   
   <target name="jar-installers" depends="patch">
-    <zip destfile="build/netbeans-6.5.1-javafx-windows.jar" compress="true" level="9" basedir="build/windows"/>
-    <zip destfile="build/netbeans-6.5.1-javafx-linux.jar" compress="true" level="9" basedir="build/linux"/>
-    <zip destfile="build/netbeans-6.5.1-javafx-solaris.jar" compress="true" level="9" basedir="build/solaris"/>
+    <zip destfile="build/netbeans-6.7-javafx-windows.jar" compress="true" level="9" basedir="build/windows"/>
+    <zip destfile="build/netbeans-6.7-javafx-linux.jar" compress="true" level="9" basedir="build/linux"/>
+    <zip destfile="build/netbeans-6.7-javafx-solaris.jar" compress="true" level="9" basedir="build/solaris"/>
   </target>
 
   <target name="build-installers" depends="build-mac-dmg,jar-installers">
     <mkdir dir="../build/installers"/>
-    <java jar="build/netbeans-6.5.1-javafx-windows.jar" fork="true">
+    <java jar="build/netbeans-6.7-javafx-windows.jar" fork="true">
       <arg value="--platform"/>
       <arg value="windows"/>
       <arg value="--silent"/>
       <arg value="--create-bundle"/>
-      <arg file="../build/installers/netbeans-6.5.1-javafx-windows.jar"/>
+      <arg file="../build/installers/netbeans-6.7-javafx-windows.jar"/>
       <arg value="--ignore-lock"/>
       <arg value="--userdir"/>
       <arg file="build/userdir-windows"/>
     </java>
-    <java jar="build/netbeans-6.5.1-javafx-linux.jar" fork="true">
+    <java jar="build/netbeans-6.7-javafx-linux.jar" fork="true">
       <arg value="--platform"/>
       <arg value="linux"/>
       <arg value="--silent"/>
       <arg value="--create-bundle"/>
-      <arg file="../build/installers/netbeans-6.5.1-javafx-linux.jar"/>
+      <arg file="../build/installers/netbeans-6.7-javafx-linux.jar"/>
       <arg value="--ignore-lock"/>
       <arg value="--userdir"/>
       <arg file="build/userdir-linux"/>
     </java>
-    <java jar="build/netbeans-6.5.1-javafx-solaris.jar" fork="true">
+    <java jar="build/netbeans-6.7-javafx-solaris.jar" fork="true">
       <arg value="--platform"/>
       <arg value="solaris-x86"/>
       <arg value="--silent"/>
       <arg value="--create-bundle"/>
-      <arg file="../build/installers/netbeans-6.5.1-javafx-solaris.jar"/>
+      <arg file="../build/installers/netbeans-6.7-javafx-solaris.jar"/>
       <arg value="--ignore-lock"/>
       <arg value="--userdir"/>
       <arg file="build/userdir-solaris"/>
