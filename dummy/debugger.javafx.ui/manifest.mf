@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-AutoUpdate-Show-In-Client: false
-OpenIDE-Module: org.netbeans.modules.debugger.javafx.ui
-OpenIDE-Module-Name: debugger.javafx.ui
-OpenIDE-Module-Specification-Version: 1.13
-OpenIDE-Module-Provides: org.netbeans.modules.debugger.javafx.ui
