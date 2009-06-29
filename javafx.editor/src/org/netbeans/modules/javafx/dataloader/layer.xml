@@ -258,7 +258,8 @@ made subject to such option by the copyright holder.
 <!--                    <file name="format">
                         <attr name="position" intvalue="1490"/>
                     </file>
--->                    <file name="fix-imports">
+-->
+                    <file name="fix-imports">
                         <attr name="position" intvalue="1500"/>
                     </file>
                     <file name="SeparatorBeforeRun.instance">
@@ -293,6 +294,18 @@ made subject to such option by the copyright holder.
         <folder name="PreviewExamples">
             <folder name="text">
                 <file name="x-fx" url="resources/JavaFXExample"/>
+            </folder>
+        </folder>
+        <folder name="Editor">
+            <folder name="MarkOccurrences">
+                <folder name="text">
+                    <folder name="x-fx">
+                        <file name="JavaFXMarkOccurences.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.spi.options.OptionsPanelController"/>
+                            <attr name="instanceCreate" newvalue="org.netbeans.modules.javafx.editor.options.MarkOccurencesOptionsPanelController"/>
+                        </file>
+                    </folder>
+                </folder>
             </folder>
         </folder>
     </folder>
