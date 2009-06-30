@@ -501,9 +501,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             return;
         }
         if (LOGGABLE) log("    type.getKind() == " + type.getKind()); // NOI18N
-        if (type.getKind() == ElementKind.LOCAL_VARIABLE ||
-                type.getKind() == ElementKind.FIELD) {
-            String s = type.getSimpleName().toString();
+        if (type.getKind() == ElementKind.LOCAL_VARIABLE || type.getKind() == ElementKind.FIELD) {
+            final Name simpleName = type.getSimpleName();
+            if (simpleName == null) {
+                return;
+            }
+            String s = simpleName.toString();
             if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix); // NOI18N
             TypeMirror tm = trees.getTypeMirror(expPath);
             if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
