@@ -534,7 +534,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     }
     
     private static JavaFXKind getJFXKind(JavaFXTreePath tp) {
-        return tp.getLeaf().getJavaFXKind();
+        return (tp == null || tp.getLeaf() == null) ? null : tp.getLeaf().getJavaFXKind();
     }
 
 }
