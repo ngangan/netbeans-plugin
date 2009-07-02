@@ -304,6 +304,7 @@ made subject to such option by the copyright holder.
             </test-dependencies>
             <public-packages>
                 <package>org.netbeans.modules.javafx.project</package>
+                <package>org.netbeans.modules.javafx.project.api</package>
                 <package>org.netbeans.modules.javafx.project.classpath</package>
             </public-packages>
         </data>
