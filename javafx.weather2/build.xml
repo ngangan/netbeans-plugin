@@ -11,5 +11,5 @@
              basedir="resources/WeatherFX" update="true"/>
     </target>
     
-    <target name="init" depends="basic-init,files-init,build-init,zip-weather"/>
+    <target name="init" depends="harness.init,zip-weather"/>
 </project>
