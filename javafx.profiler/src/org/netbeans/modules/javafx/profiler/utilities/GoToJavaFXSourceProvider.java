@@ -58,8 +58,9 @@ import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.openide.util.lookup.ServiceProvider;
 
-        
+@ServiceProvider(service=GoToSourceProvider.class)
 public class GoToJavaFXSourceProvider extends GoToSourceProvider {
     // field to indicate whether source find was successfull
     final AtomicBoolean result = new AtomicBoolean(false);
