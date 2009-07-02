@@ -60,7 +60,7 @@ import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 
         
-public class GoToJavaFXSourceProvider implements GoToSourceProvider {
+public class GoToJavaFXSourceProvider extends GoToSourceProvider {
     // field to indicate whether source find was successfull
     final AtomicBoolean result = new AtomicBoolean(false);
 

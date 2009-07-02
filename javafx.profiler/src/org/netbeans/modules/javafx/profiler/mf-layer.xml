@@ -75,6 +75,18 @@ made subject to such option by the copyright holder.
     <folder name="Projects">
     <folder name="org-netbeans-modules-javafx-project">
       <folder name="Lookup">
+          <!--
+        <file name="org-netbeans-modules-javafx-profiler-impl-FXProfilingSupport.instance">
+            <attr methodvalue="org.netbeans.modules.projectapi.LazyLookupProviders.forProjectServiceProvider" name="instanceCreate"/>
+            <attr name="class" stringvalue="org.netbeans.modules.javafx.profiler.impl.FXProfilingSupport"/>
+            <attr name="service" stringvalue="org.netbeans.modules.profiler.spi.ProjectProfilingSupport"/>
+        </file>
+        <file name="org-netbeans-modules-javafx-profiler-selector-JavaFXSelectionTreeBuilder.instance">
+            <attr methodvalue="org.netbeans.modules.projectapi.LazyLookupProviders.forProjectServiceProvider" name="instanceCreate"/>
+            <attr name="class" stringvalue="org.netbeans.modules.javafx.profiler.selector.JavaFXSelectionTreeBuilderImpl"/>
+            <attr name="service" stringvalue="org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder"/>
+        </file>
+        -->
         <file name="org.netbeans.modules.javafx.profiler.LookupProviderImpl.instance"/>
       </folder>
     </folder>

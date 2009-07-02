@@ -95,6 +95,7 @@ public class JavaFXFunctionNode extends SelectorNode {
 
                     public void run(CompilationController controller)
                              throws Exception {
+                        controller.toPhase(JavaFXSource.Phase.PARSED);
                     if (method instanceof ExecutableElement)                        
                         signature = JavaFXProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
                     }

@@ -47,11 +47,9 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.lib.profiler.common.SessionSettings;
-import org.netbeans.lib.profiler.marker.Marker;
 import org.netbeans.modules.profiler.AbstractProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.AppletSupport;
-// import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
@@ -83,9 +81,8 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Properties;
 import javax.swing.event.ChangeListener;
-import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.javafx.project.api.JavaFXPropertyEvaluator;
 
 /**
  * @author Tomas Hurka
@@ -132,18 +129,6 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             "JavaFXProjectTypeProfiler_CannotBackupBuildScriptMsg"); // NOI18N
     private static final String MODIFY_BUILDSCRIPT_MANUALLY_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
             "JavaFXProjectTypeProfiler_ModifyBuildScriptManuallyMsg"); // NOI18N
-    private static final String PROJECT_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_ProjectCategory"); // NOI18N
-    private static final String LISTENERS_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_ListenersCategory"); // NOI18N
-    private static final String PAINTERS_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_PaintersCategory"); // NOI18N
-    private static final String IO_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_IoCategory"); // NOI18N
-    private static final String FILES_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_FilesCategory"); // NOI18N
-    private static final String SOCKETS_CATEGORY = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_SocketsCategory"); // NOI18N
     // -----
     public static final ErrorManager err = ErrorManager.getDefault().getInstance("org.netbeans.modules.javafx.profiler"); // NOI18N
     private static final String JavaFX_PROJECT_NAMESPACE_40 = "http://www.netbeans.org/ns/javafx-project/1"; // NOI18N
@@ -157,25 +142,12 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
     private static final String JAVA_MIME_TYPE = "text/x-java"; // NOI18N    
 
     //~ Instance fields ----------------------------------------------------------------------------------------------------------
-    private Marker marker;
     private String mainClassSetManually = null; // used for case when the main class is not set in project and user is prompted for it
 
-    //~ Methods ------------------------------------------------------------------------------------------------------------------
-    @Override
-    public boolean isFileObjectSupported(final Project project, final FileObject fo) {
-        if (!"java".equals(fo.getExt()) && !"class".equals(fo.getExt()) && // NOI18N
-                !"fx".equals(fo.getExt())) {                                         // NOI18N
-            return false; // NOI18N
-        }
-
-        if (JAVA_MIME_TYPE.equals(fo.getMIMEType())) {
-            return SourceUtils.isRunnable(fo);
-        }
-
-        // TBD: need to determine if the selected fx class is executable
-        // currently returns true for any fx file
-        return JAVAFX_MIME_TYPE.equals(fo.getMIMEType());
+    public JavaFXProjectTypeProfiler() {
+        System.out.println("khda");
     }
+
 
     public String getProfilerTargetName(final Project project, final FileObject buildScript, final int type,
             final FileObject profiledClassFile) {
@@ -201,7 +173,13 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     // --- ProjectTypeProfiler implementation ------------------------------------------------------------------------------
     public boolean isProfilingSupported(final Project project) {
-        if (!(project instanceof JavaFXProject) || !"desktop".equals(((JavaFXProject)project).evaluator().getProperty("javafx.profile"))) return false;
+        JavaFXPropertyEvaluator evaluator = project.getLookup().lookup(JavaFXPropertyEvaluator.class);
+        if (evaluator == null) return false; // not a javafx project
+        
+        String profile = evaluator.evaluator().getProperty("javafx.profile");
+        profile = profile != null ? profile : "desktop"; // some projects don't have the property set for "Standard"
+
+        if (evaluator == null || !"desktop".equals(profile)) return false;
 
         final AuxiliaryConfiguration aux = (AuxiliaryConfiguration) project.getLookup().lookup(AuxiliaryConfiguration.class);
 
@@ -621,32 +599,5 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 });
 
         return pe;
-    }
-
-    @Override
-    public org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection[] getDefaultRootMethods(Project project,
-            FileObject profiledClassFile,
-            boolean profileUnderlyingFramework,
-            String[][] projectPackagesDescr) {
-        if (profileUnderlyingFramework) {
-            // No root method should be specified, first executed method will be treated as root method
-            return new ClientUtils.SourceCodeSelection[0];
-        } else {
-            // Profile Project or Profile Single
-            if (profiledClassFile == null) {
-                // Profile Project, extract root methods from the project
-                return JavaFXProjectUtilities.getProjectDefaultRoots(project, projectPackagesDescr);
-            } else {
-                // Profile Single, provide correct root methods
-                String profiledClass = JavaFXProjectUtilities.getToplevelClassName(project, profiledClassFile);
-                return new ClientUtils.SourceCodeSelection[]{new ClientUtils.SourceCodeSelection(profiledClass, "<all>", "")}; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
-            }
-        }
-    }
-
-    @Override
-    public SimpleFilter computePredefinedInstrumentationFilter(Project project, SimpleFilter predefinedInstrFilter,
-            String[][] projectPackagesDescr) {
-        return JavaFXProjectUtilities.computeProjectOnlyInstrumentationFilter(project, predefinedInstrFilter, projectPackagesDescr);
     }
 }

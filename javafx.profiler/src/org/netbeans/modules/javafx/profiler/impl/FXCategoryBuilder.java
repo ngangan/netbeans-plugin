@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -21,11 +21,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Contributor(s):
- * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
- * Microsystems, Inc. All Rights Reserved.
- *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -36,45 +31,28 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.profiler.selector;
+package org.netbeans.modules.javafx.profiler.impl;
 
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
-import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
-import java.util.ArrayList;
-import java.util.List;
-import org.netbeans.modules.javafx.profiler.selector.node.ProjectNode;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.spi.project.ProjectServiceProvider;
+import org.netbeans.modules.profiler.categories.CategoryBuilder;
 
 /**
  *
- * @author cms
+ * @author Jaroslav Bachorik
  */
-@ProjectServiceProvider(projectType="org-netbeans-modules-javafx-project", service=SelectionTreeBuilder.class)
-public class JavaFXSelectionTreeBuilderImpl extends SelectionTreeBuilder {
-    final private JavaFXProject project;
+//@ProjectServiceProvider(service = CategoryBuilder.class, projectTypes={
+//    @ProjectType(id="org-netbeans-modules-javafx-project")
+//})
+public class FXCategoryBuilder extends CategoryBuilder {
 
-    public JavaFXSelectionTreeBuilderImpl(Project project) {
-        super(new Type("fx-desktop", "JavaFX Desktop"), true);
-        this.project = (JavaFXProject)project;
+    public FXCategoryBuilder(Project proj) {
+        super(proj, "org-netbeans-modules-javafx-project");
     }
 
-    @Override
-    public List<? extends SelectorNode> buildSelectionTree() {
-        List<SelectorNode> roots = new ArrayList<SelectorNode>();
-
-        ProjectNode projectRoot = new ProjectNode(project);
-
-        roots.add(projectRoot);
-
-        return roots;
-    }
-
-    @Override
-    public int estimatedNodeCount() {
-        return 1;
-    }
 }
