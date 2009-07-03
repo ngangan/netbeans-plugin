@@ -39,8 +39,6 @@
 
 package org.netbeans.modules.javafx.profiler.utilities;
 
-import java.io.IOException;
-import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.javafx.source.Task;
@@ -48,15 +46,13 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
-import javax.swing.SwingUtilities;
 import org.openide.filesystems.FileObject;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.api.javafx.editor.ElementOpen;
+import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -65,81 +61,47 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
     // field to indicate whether source find was successfull
     final AtomicBoolean result = new AtomicBoolean(false);
 
-    public boolean openSource(final Project project, final String className, final String methodName, String signature) {
+    @Override
+    public boolean openSource(final Project project, final String className, final String methodName, String signature, int line) {
         if (!(project instanceof JavaFXProject))
             return false;
 
-        Iterator<FileObject> files = JavaFXProjectUtilities.getSourceFiles((JavaFXProject)project).iterator();
-        JavaFXSource source = null;
-
-        while(files.hasNext()) {
-            if ((source = JavaFXSource.forFileObject(files.next())) != null) break;
-        }
-
-        final JavaFXSource js = source;
         final CountDownLatch latch = new CountDownLatch(1);
+
+        JavaFXSource source = JavaFXProjectUtilities.getSources((JavaFXProject)project);
+        final FileObject fo = source.getCpInfo().getClassPath(PathKind.SOURCE).findResource(getFXFileName(className));
 
         // cut interface suffix out of the signature
         final String sig = JavaFXProjectUtilities.cutIntfSuffix(signature);
+        final JavaFXSource js = JavaFXSource.forFileObject(fo);
 
         try {
-            // use the prepared javasource repository and perform a task
             js.runUserActionTask(new Task<CompilationController>() {
-                    public void run(CompilationController controller)
-                             throws Exception {
-                        if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                            latch.countDown();
-                        }
 
-                        Element destinationElement = null;
-
-                        // resolve the class by name
-                        TypeElement classElement = JavaFXProjectUtilities.resolveClassByName(className, controller);
-
-                        if ((methodName != null) && (methodName.length() > 0)) {
-                            // if a method name has been specified try to resolve the method
-                            if (classElement != null) {
-                                ElementHandle eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
-                                destinationElement = eh.resolve(controller);
-                            }
-                        }
-
-                        if (destinationElement == null) {
-                            // unsuccessful attempt to resolve a method -> use the class instead
-                            destinationElement = classElement;
-                        }
-                        if (destinationElement != null) {
-                            ProfilerLogger.debug("Opening element: " + destinationElement); // NOI18N
-
-                            final Element openElement = destinationElement;
-                            final CompilationController cc = controller;
-
-                            SwingUtilities.invokeLater(new Runnable() {
-                                    // manipulates the TopComponent - must be executed in EDT
-                                    public void run() {
-                                        // opens the source code on the found method position
-                                        try {                                            
-                                            result.set(ElementOpen.open(cc, openElement));
-                                            latch.countDown();
-                                        } catch (Exception e) {
-                                            ProfilerLogger.log(e);
-                                        }
-                                    }
-                                });
-                        } else {
-                            latch.countDown();
-                        }
-                    }
-                }, false);
-        } catch (IOException ex) {
-            ProfilerLogger.log(ex);
-        }
-
-        try {
+                public void run(CompilationController controller) throws Exception {
+                    controller.moveToPhase(Phase.ANALYZED);
+                    ElementHandle eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
+                    result.set(ElementOpen.open(fo, eh));
+                    latch.countDown();
+                }
+            }, true);
             latch.await();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException e)  {
             Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            ProfilerLogger.log(e);
+            result.set(false);
         }
+
         return result.get();
+    }
+
+    private static String getFXFileName(String className) {
+        String classNameIntern = className.replace('.', '/');
+        int innerIndex = classNameIntern.indexOf("$");
+        if (innerIndex > -1) {
+            classNameIntern = classNameIntern.substring(0, innerIndex);
+        }
+        return classNameIntern.concat(".fx");
     }
 }
