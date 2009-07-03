@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
+import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;

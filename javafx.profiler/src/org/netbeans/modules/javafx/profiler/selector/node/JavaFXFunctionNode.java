@@ -79,6 +79,7 @@ public class JavaFXFunctionNode extends SelectorNode {
     public JavaFXFunctionNode(ClasspathInfo cpInfo, final Element method, JavaFXFunctionsNode parent) {
         super(method.toString(), method.getSimpleName().toString(), getIcon(method), SelectorChildren.LEAF, parent);
 
+
         JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
 
         // workaround for library class nodes
@@ -95,9 +96,12 @@ public class JavaFXFunctionNode extends SelectorNode {
 
                     public void run(CompilationController controller)
                              throws Exception {
-                        controller.toPhase(JavaFXSource.Phase.PARSED);
-                    if (method instanceof ExecutableElement)                        
-                        signature = JavaFXProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
+                        if (controller.toPhase(JavaFXSource.Phase.ANALYZED) == JavaFXSource.Phase.ANALYZED) {
+                            if (method instanceof ExecutableElement)
+                                signature = JavaFXProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
+                        } else {
+                            System.err.println("Hups");
+                        }
                     }
                 }, true);
         } catch (IOException ex) {

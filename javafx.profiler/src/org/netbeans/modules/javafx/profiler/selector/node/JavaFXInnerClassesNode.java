@@ -80,6 +80,8 @@ public class JavaFXInnerClassesNode extends ContainerNode {
                         public void run(CompilationController controller)
                                  throws Exception {
                             if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
+                                classElement = parent.getClassHandle().resolve(controller);
+
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);

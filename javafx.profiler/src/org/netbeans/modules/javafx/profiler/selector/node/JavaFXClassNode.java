@@ -66,7 +66,7 @@ public class JavaFXClassNode extends ContainerNode {
         this.classElement = classElement;
         this.cpInfo = cpInfo;
         signature = new ClientUtils.SourceCodeSelection(JavaFXProjectUtilities.getBinaryName(classElement, classElement.getEnclosingElement()), "*", ""); // NOI18N
-//        this.classHandle = ElementHandle.create(classElement);
+        this.classHandle = ElementHandle.create(classElement);
     }
 
     public ElementHandle<TypeElement> getClassHandle() {

@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Vector;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
@@ -74,22 +75,27 @@ public class JavaFXFunctionsNode extends ContainerNode {
             final List<JavaFXFunctionNode> functionNodes = new ArrayList<JavaFXFunctionNode>();
 
             try {
-                JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+                FileObject fo = JavaFXProjectUtilities.getFile(classElement, parent.cpInfo);
+                JavaFXSource source = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+
+//                final FileObject fo = source.getCpInfo().getClassPath(ClasspathInfo.PathKind.SOURCE).findResource(getFXFileName(className));
 
                 // workaround for library class nodes
-                if (js == null) {
+                if (source == null) {
                     Vector<FileObject> v = new Vector<FileObject>();
                     v.add(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
-                    js = JavaFXSource.create(parent.cpInfo, v);
+                    source = JavaFXSource.create(parent.cpInfo, v);
                 }
-                
-                js.runUserActionTask(new CancellableTask<CompilationController>() {
+
+                final JavaFXSource js = source;
+                source.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
                         }
 
                         public void run(CompilationController controller)
                                  throws Exception {
                             if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
+                                classElement = parent.getClassHandle().resolve(controller);
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);
@@ -97,7 +103,9 @@ public class JavaFXFunctionsNode extends ContainerNode {
                                             ((tek.getKind() == ElementKind.METHOD) ||
                                             (tek.getKind() == ElementKind.CONSTRUCTOR) ||
                                             (tek.getKind() == ElementKind.STATIC_INIT))) {
-                                        JavaFXFunctionNode functionNode = new JavaFXFunctionNode(parent.cpInfo, tek, parent);
+                                        ((ExecutableElement)tek).getReturnType();
+                                        
+                                        JavaFXFunctionNode functionNode = new JavaFXFunctionNode(js.getCpInfo(), tek, parent);
                                         if (functionNode.getSignature() != null) {
                                             functionNodes.add(functionNode);
                                         }
