@@ -71,6 +71,8 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
         JavaFXSource source = JavaFXProjectUtilities.getSources((JavaFXProject)project);
         final FileObject fo = source.getCpInfo().getClassPath(PathKind.SOURCE).findResource(getFXFileName(className));
 
+        if (fo == null) return false; // can go only to symbols from sources
+
         // cut interface suffix out of the signature
         final String sig = JavaFXProjectUtilities.cutIntfSuffix(signature);
         final JavaFXSource js = JavaFXSource.forFileObject(fo);
