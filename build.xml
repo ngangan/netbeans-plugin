@@ -65,7 +65,7 @@
     </target>
 
 
-    <target name="build-installers" depends="nbms">
+    <target name="build-installers" depends="nbms,zip-clusters">
         <ant dir="installer"/>
     </target>
 
