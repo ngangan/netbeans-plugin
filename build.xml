@@ -65,81 +65,8 @@
     </target>
 
 
-    <target name="build-installers" depends="nbms,zip-clusters">
+    <target name="build-installers" depends="nbms">
         <ant dir="installer"/>
-    </target>
-
-    <target name="zip-clusters" depends="nbms">
-        <property name="javafx.sdk.pattern" value="javafx-sdk/**"/>
-        <property name="javafx.cluster.dir" location="build/netbeans/javafx2"/>
-        <property name="zips.dir" location="build/zips"/>
-        <mkdir dir="${zips.dir}"/>
-        <zip destfile="${zips.dir}/javafx-cluster-win.zip" update="false" duplicate="preserve">
-            <zipfileset prefix="javafx2" dir="${javafx.cluster.dir}">
-                <exclude name="${javafx.sdk.pattern}"/>
-
-                <exclude name="**/*-lin.*"/>
-                <exclude name="**/*-sol.*"/>
-                <exclude name="**/*-mac.*"/>
-            </zipfileset>
-        </zip>
-        <zip destfile="${zips.dir}/javafx-cluster-mac.zip" update="false" duplicate="preserve">
-            <zipfileset prefix="javafx2" dir="${javafx.cluster.dir}">
-                <exclude name="${javafx.sdk.pattern}"/>
-
-                <exclude name="**/*-lin.*"/>
-                <exclude name="**/*-sol.*"/>
-                <exclude name="**/*-win.*"/>
-          </zipfileset>
-        </zip>
-
-        <zip destfile="${zips.dir}/javafx-cluster-lin.zip" update="false" duplicate="preserve">
-            <zipfileset prefix="javafx2" dir="${javafx.cluster.dir}">
-                <exclude name="${javafx.sdk.pattern}"/>
-
-                <exclude name="**/*-mac.*"/>
-                <exclude name="**/*-sol.*"/>
-                <exclude name="**/*-win.*"/>
-          </zipfileset>
-        </zip>
-        <zip destfile="${zips.dir}/javafx-cluster-sol.zip" update="false" duplicate="preserve">
-            <zipfileset prefix="javafx2" dir="${javafx.cluster.dir}">
-                <exclude name="${javafx.sdk.pattern}"/>
-
-                <exclude name="**/*-lin.*"/>
-                <exclude name="**/*-mac.*"/>
-                <exclude name="**/*-win.*"/>
-            </zipfileset>
-        </zip>
-
-        <zip destfile="${zips.dir}/javafx-sdk-win.zip" basedir="javafx.sdk.win/release" update="false" duplicate="preserve"/>
-        <zip destfile="${zips.dir}/javafx-sdk-mac.zip" update="false" duplicate="preserve">
-            <zipfileset dir="javafx.sdk.mac/release" filemode="755">
-                <include name="javafx-sdk/bin/*"/>
-            </zipfileset>
-
-            <zipfileset dir="javafx.sdk.mac/release">
-                <exclude name="javafx-sdk/bin/*"/>
-            </zipfileset>
-        </zip>
-
-        <zip destfile="${zips.dir}/javafx-sdk-lin.zip" update="false" duplicate="preserve">
-            <zipfileset dir="javafx.sdk.lin/release" filemode="755">
-                <include name="javafx-sdk/bin/*"/>
-            </zipfileset>
-            <zipfileset dir="javafx.sdk.lin/release">
-                <exclude name="javafx-sdk/bin/*"/>
-            </zipfileset>
-        </zip>
-
-        <zip destfile="${zips.dir}/javafx-sdk-sol.zip" update="false" duplicate="preserve">
-            <zipfileset dir="javafx.sdk.sol/release" filemode="755">
-                <include name="javafx-sdk/bin/*"/>
-            </zipfileset>
-            <zipfileset dir="javafx.sdk.sol/release">
-                <exclude name="javafx-sdk/bin/*"/>
-            </zipfileset>
-        </zip>
     </target>
 
 </project>
