@@ -170,7 +170,9 @@ public class CompilationInfoImpl {
      * @return an list of {@link Diagnostic} 
      */
     List<Diagnostic> getDiagnostics() {
-        Collection<Diagnostic> errors = ((DiagnosticListenerImpl) cTask.getContext().get(DiagnosticListener.class)).errors.values();
+        final DiagnosticListenerImpl dli = (DiagnosticListenerImpl) getContext().get(DiagnosticListener.class);
+        final TreeMap<Integer, Diagnostic> errorsMap = dli.errors;
+        Collection<Diagnostic> errors = errorsMap.values();
         return new ArrayList<Diagnostic>(errors);
     }
     

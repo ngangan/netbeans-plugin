@@ -55,6 +55,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.tools.JavaFileObject;
@@ -248,7 +250,10 @@ public abstract class Archive {
             if (files == null) {
                 return Collections.<JavaFileObject>emptyList();
             } else {
-                assert zipFile != null;
+                if (zipFile == null) {
+                    Logger.getLogger(Archive.CachingArchive.class.getName()).log(Level.FINE, "Archive.CachingArchive: zipFile is null!"); // NOI18N
+                    return Collections.<JavaFileObject>emptyList();
+                }
                 List<JavaFileObject> l = new ArrayList<JavaFileObject>(files.idx / files.delta);
                 for (int i = 0; i < files.idx; i += files.delta) {
                     create(folderName, files, i, kinds, l);
