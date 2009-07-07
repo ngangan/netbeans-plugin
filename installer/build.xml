@@ -49,7 +49,7 @@
     <exec executable="sh" dir="build/mac-cluster/javafx2/javafx-sdk/emulator/bin">
       <arg value="-c"/>
       <arg value="chmod +x *"/>
-    </exec>  
+    </exec> 
   </target>
   
   <target name="mount-mac-dmg" depends="download-javase,build-mac-cluster" if="running.on.mac">
@@ -206,6 +206,14 @@
       </fileset>
       <fileset dir="../javafx.sdk.sol/release"/>  
     </copy>
+    <mkdir dir="build/data/mac-cluster/javafx2"/>
+    <copy todir="build/data/mac-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <include name="**/*-mac.*"/>
+      </fileset>
+      <fileset dir="../javafx.sdk.mac/release"/>  
+    </copy>
     <mkdir dir="build/data/common-cluster/META-INF"/>
     <antcall target="-list-files">
       <param name="list.file" location="build/data/common-cluster/META-INF/files.list"/>
@@ -229,12 +237,10 @@
   </target>
 
   <target name="build-javafx-package" depends="build-logic,build-data">
-    <mkdir dir="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
-    <jar destfile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" basedir="build/data/common-cluster" compress="true" level="9"/>
-    <jar destfile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" basedir="build/data/win-cluster" compress="true" level="9"/>
-    <mkdir dir="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
-    <jar destfile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" basedir="build/data/common-cluster" compress="true" level="9"/>
-    <jar destfile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" compress="true" level="9">
+    <mkdir dir="../build/clusters"/>
+    <jar destfile="../build/clusters/common.jar" basedir="build/data/common-cluster" compress="true" level="9"/>
+    <jar destfile="../build/clusters/windows.jar" basedir="build/data/win-cluster" compress="true" level="9"/>
+    <jar destfile="../build/clusters/linux.jar" compress="true" level="9">
       <zipfileset dir="build/data/lin-cluster" filemode="755">
         <include name="javafx2/javafx-sdk/bin/*"/>
         <include name="javafx2/javafx-sdk/emulator/bin/*"/>
@@ -244,9 +250,7 @@
         <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
       </zipfileset>
     </jar>
-    <mkdir dir="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
-    <jar destfile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" basedir="build/data/common-cluster" compress="true" level="9"/>
-    <jar destfile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" compress="true" level="9">
+    <jar destfile="../build/clusters/solaris.jar" compress="true" level="9">
       <zipfileset dir="build/data/sol-cluster" filemode="755">
         <include name="javafx2/javafx-sdk/bin/*"/>
         <include name="javafx2/javafx-sdk/emulator/bin/*"/>
@@ -256,6 +260,26 @@
         <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
       </zipfileset>
     </jar>
+    <jar destfile="../build/clusters/mac.jar" compress="true" level="9">
+      <zipfileset dir="build/data/mac-cluster" filemode="755">
+        <include name="javafx2/javafx-sdk/bin/*"/>
+        <include name="javafx2/javafx-sdk/emulator/bin/*"/>
+      </zipfileset>
+      <zipfileset dir="build/data/mac-cluster">
+        <exclude name="javafx2/javafx-sdk/bin/*"/>
+        <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+      </zipfileset>
+    </jar>
+
+    <mkdir dir="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
+    <copy file="../build/clusters/common.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copy file="../build/clusters/windows.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <mkdir dir="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
+    <copy file="../build/clusters/common.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copy file="../build/clusters/linux.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <mkdir dir="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
+    <copy file="../build/clusters/common.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copy file="../build/clusters/solaris.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
     <copy file="build/logic.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
     <copy file="build/logic.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
     <copy file="build/logic.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
