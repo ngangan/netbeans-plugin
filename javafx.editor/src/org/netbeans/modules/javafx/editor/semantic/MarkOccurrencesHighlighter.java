@@ -194,41 +194,45 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         //detect caret inside the return type or throws clause:
         // manowar: a bit of FX magic
         if (typePath != null) {
-            JavaFXTreePath ggpTypePath = typePath.getParentPath().getParentPath().getParentPath();
-            JavaFXTreePath gpTypePath = typePath.getParentPath().getParentPath();
             JavaFXTreePath pTypePath = typePath.getParentPath();
-            if (getJFXKind(ggpTypePath) == JavaFXKind.FUNCTION_DEFINITION &&
-                    getJFXKind(gpTypePath) == JavaFXKind.FUNCTION_VALUE &&
-                    getJFXKind(pTypePath) == JavaFXKind.TYPE_CLASS &&
-                    getJFXKind(typePath) == JavaFXKind.IDENTIFIER) {
-                
-                JFXFunctionDefinition decl = (JFXFunctionDefinition) ggpTypePath.getLeaf();
-                Tree type = decl.getJFXReturnType();
+            if (pTypePath != null) {
+                JavaFXTreePath gpTypePath = pTypePath.getParentPath();
+                if (gpTypePath != null) {
+                    JavaFXTreePath ggpTypePath = gpTypePath.getParentPath();
+                    if (getJFXKind(ggpTypePath) == JavaFXKind.FUNCTION_DEFINITION &&
+                            getJFXKind(gpTypePath) == JavaFXKind.FUNCTION_VALUE &&
+                            getJFXKind(pTypePath) == JavaFXKind.TYPE_CLASS &&
+                            getJFXKind(typePath) == JavaFXKind.IDENTIFIER) {
 
-                if (pref.getBoolean(MarkOccurencesSettings.EXIT, true) && isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
-                    MethodExitDetector med = new MethodExitDetector();
-                    setExitDetector(med);
-                    try {
-                        return med.process(info, doc, decl, null);
-                    } finally {
-                        setExitDetector(null);
-                    }
-                }
+                        JFXFunctionDefinition decl = (JFXFunctionDefinition) ggpTypePath.getLeaf();
+                        Tree type = decl.getJFXReturnType();
 
-                if (pref.getBoolean(MarkOccurencesSettings.EXCEPTIONS, true)) {
-                    for (Tree exc : decl.getErrorTrees()) {
-                        if (isIn(cu, info.getTrees().getSourcePositions(), exc, caretPosition)) {
+                        if (pref.getBoolean(MarkOccurencesSettings.EXIT, true) && isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
                             MethodExitDetector med = new MethodExitDetector();
                             setExitDetector(med);
                             try {
-                                return med.process(info, doc, decl, Collections.singletonList(exc));
+                                return med.process(info, doc, decl, null);
                             } finally {
                                 setExitDetector(null);
                             }
                         }
+
+                        if (pref.getBoolean(MarkOccurencesSettings.EXCEPTIONS, true)) {
+                            for (Tree exc : decl.getErrorTrees()) {
+                                if (isIn(cu, info.getTrees().getSourcePositions(), exc, caretPosition)) {
+                                    MethodExitDetector med = new MethodExitDetector();
+                                    setExitDetector(med);
+                                    try {
+                                        return med.process(info, doc, decl, Collections.singletonList(exc));
+                                    } finally {
+                                        setExitDetector(null);
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
-
             }
         }
 
