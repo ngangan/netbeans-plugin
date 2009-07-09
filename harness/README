@@ -707,7 +707,7 @@ release.dir - "${basedir}/release"; location of a directory full of files to
 copy unmodified to the output cluster. Since 6.0 beta2 also applies to module
 suite projects.
 
-run.app.exe - "bin\netbeans.exe"; name of Windows launcher to start (inside
+run.app.exe - "bin\nb.exe"; name of Windows launcher to start (inside
 ${netbeans.dest.dir}) if trying to run the application for interactive testing.
 Only relevant if ${app.name} is unset.
 
@@ -840,8 +840,6 @@ jnlp.platform.codebase - can point to a shared repository which can be generated
   this property. Sample values with prebuilt binaries (good for testing):
 http://www.netbeans.org/download/5_0/jnlp/
 http://www.netbeans.org/download/6_0/jnlp/
-http://bits.netbeans.org/6.1/jnlp/
-http://bits.netbeans.org/6.5/jnlp/
 http://deadlock.netbeans.org/hudson/job/nbms-and-javadoc/lastStableBuild/artifact/nbbuild/build/jnlp/
 
 jnlp.indirect.jars [since 6.0] - optional pattern of JARs in the cluster to load
@@ -854,15 +852,6 @@ jnlp.indirect.jars [since 6.0] - optional pattern of JARs in the cluster to load
   jar.getParentFile() is meaningful. The implementation creates an empty JAR
   entry META-INF/clusterpath/$path where $path is the ('/'-separated) path
   within the cluster where the JAR would be found in a normal installation.
-
-jnlp.indirect.files [since 7.0M1] - optional pattern of files in the cluster to
-  load in JNLP mode. The module may load these files using InstalledFileLocator
-  using the same path in regular as in JNLP mode. Note that the physical path on
-  disk to the resulting file will not necessarily contain the directory prefix
-  that the file in the cluster uses, so do not expect that file.getParentFile()
-  is meaningful. The implementation creates a JAR entry META-INF/files/$path
-  where $path is the ('/'-separated) path within the cluster where the file
-  would be found in a normal installation.
 
 jnlp.verify.excludes - the default implementation of "jnlp" task in common.xml
   does verification and compares that all files from module NBM are really
@@ -881,14 +870,6 @@ jnlp.sign.jars [since 6.0] - defaults to true. If set to false the jars
   will not be signed, only the main (startup) jar. This should allow for 
   faster startup but might compromise JNLP security. Use with extreme care.
 
-jnlp.generate.versions [since 6.7] - Defaults to false, which means versioning 
-  info is not generated (see 
-  http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).
-  If set true, build-jnlp target creates versioning info in jnlp descriptors and version.xml files.
-  This allows for incremental updates of Webstart applications, but requires download via
-  JnlpDownloadServlet (thus run-jnlp and debug-jnlp does not create versioning info even with this
-  property set to true).
-  
 [XXX some of the above should be listed in "Suite Properties"]
 
 
