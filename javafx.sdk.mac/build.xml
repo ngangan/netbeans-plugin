@@ -17,7 +17,7 @@
       </unzip>  
     </target>
 
-    <target name="init" depends="init-release-external,harness.init"/>
+    <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
 
     <target name="main">
         <mkdir dir="build/main"/>
