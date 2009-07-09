@@ -7,7 +7,7 @@
     <import file="nbproject/build-impl.xml"/>
     
 
-    <target name="-pre-build">
+    <target name="-pre-init">
         <property name="build.config" value="daily"/>
         <property file="build-${build.config}.properties"/>
         <property environment="env"/>
@@ -46,7 +46,7 @@
         </parallel>    
     </target>
     
-    <target name="build" depends="-pre-build,suite.build"/>
+    <target name="-init" depends="-pre-init,suite.-init"/>
     
     <target name="clean" depends="-init,testuserdir-delete" description="Clean everything.">
         <mkdir dir="build/netbeans"/>
