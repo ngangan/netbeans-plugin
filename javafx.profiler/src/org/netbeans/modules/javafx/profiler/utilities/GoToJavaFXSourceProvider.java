@@ -41,6 +41,7 @@ package org.netbeans.modules.javafx.profiler.utilities;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -58,6 +59,8 @@ import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service=GoToSourceProvider.class)
 public class GoToJavaFXSourceProvider extends GoToSourceProvider {
+    final private Logger LOGGER = Logger.getLogger(GoToJavaFXSourceProvider.class.getName());
+
     // field to indicate whether source find was successfull
     final AtomicBoolean result = new AtomicBoolean(false);
 
@@ -82,7 +85,20 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
 
                 public void run(CompilationController controller) throws Exception {
                     controller.moveToPhase(Phase.ANALYZED);
-                    ElementHandle eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
+                    
+                    ElementHandle eh;
+                    if (methodName == null) {
+                        String clzName = className;
+                        int anonIndex = className.indexOf("$"); // first anonymous class delimiter
+                        if (anonIndex > -1) {
+                            clzName = clzName.substring(0, anonIndex); // can't handle anonymous inner classes correctly
+                        }
+                        LOGGER.finest("Trying to go to: " + clzName);
+                        eh = new ElementHandle(ElementKind.CLASS, new String[]{clzName});
+                    } else {
+                        LOGGER.finest("Trying to go to: " + className + "." + methodName + "(" + sig + ")");
+                        eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
+                    }
                     result.set(ElementOpen.open(fo, eh));
                     latch.countDown();
                 }
