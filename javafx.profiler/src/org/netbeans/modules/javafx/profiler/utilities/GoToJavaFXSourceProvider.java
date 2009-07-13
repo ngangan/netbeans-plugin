@@ -88,13 +88,8 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
                     
                     ElementHandle eh;
                     if (methodName == null) {
-                        String clzName = className;
-                        int anonIndex = className.indexOf("$"); // first anonymous class delimiter
-                        if (anonIndex > -1) {
-                            clzName = clzName.substring(0, anonIndex); // can't handle anonymous inner classes correctly
-                        }
-                        LOGGER.finest("Trying to go to: " + clzName);
-                        eh = new ElementHandle(ElementKind.CLASS, new String[]{clzName});
+                        LOGGER.finest("Trying to go to: " + className);
+                        eh = ElementHandle.create(JavaFXProjectUtilities.resolveClassByName(className, controller));
                     } else {
                         LOGGER.finest("Trying to go to: " + className + "." + methodName + "(" + sig + ")");
                         eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
