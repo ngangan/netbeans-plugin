@@ -25,38 +25,38 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.javafx.editor;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 
 /**
+ * Thread-safe token sequence which is able to cancell requested process.
  *
  * @author Anton Chechel
  */
-public class ProtectedTokenSequence<T extends TokenId> {
+public class SafeTokenSequence<T extends TokenId> {
 
     private TokenSequence<T> ts;
     private Document doc;
-    private AtomicBoolean cancel;
+    private Cancellable cancellable;
 
-    private ProtectedTokenSequence() {
+    private SafeTokenSequence() {
     }
 
-    public ProtectedTokenSequence(final TokenSequence<T> ts, final Document doc, final AtomicBoolean cancel) {
+    public SafeTokenSequence(final TokenSequence<T> ts, final Document doc, final Cancellable cancellable) {
         this.ts = ts;
         this.doc = doc;
-        this.cancel = cancel;
+        this.cancellable = cancellable;
     }
 
     public Token<T> token() {
         return ts.token();
     }
 
-    public long offset() {
+    public int offset() {
         return ts.offset();
     }
 
@@ -64,10 +64,10 @@ public class ProtectedTokenSequence<T extends TokenId> {
         final boolean[] res = new boolean[1];
         doc.render(new Runnable() {
             public void run() {
-                if (cancel.get()) {
+                if (cancellable.isCancelled()) {
                     res[0] = false;
                 } else if (!ts.isValid()) {
-                    cancel.set(true);
+                    cancellable.cancell();
                     res[0] = false;
                 } else {
                     res[0] = ts.moveNext();
@@ -81,10 +81,10 @@ public class ProtectedTokenSequence<T extends TokenId> {
         final boolean[] res = new boolean[1];
         doc.render(new Runnable() {
             public void run() {
-                if (cancel.get()) {
+                if (cancellable.isCancelled()) {
                     res[0] = false;
                 } else if (!ts.isValid()) {
-                    cancel.set(true);
+                    cancellable.cancell();
                     res[0] = false;
                 } else {
                     res[0] = ts.movePrevious();
@@ -97,16 +97,33 @@ public class ProtectedTokenSequence<T extends TokenId> {
     public void moveEnd() {
         doc.render(new Runnable() {
             public void run() {
-                if (cancel.get()) {
+                if (cancellable.isCancelled()) {
                     return;
                 } else if (!ts.isValid()) {
-                    cancel.set(true);
+                    cancellable.cancell();
                     return;
                 } else {
                     ts.moveEnd();
                 }
             }
         });
+    }
+
+    public int move(final int offset) {
+        final int[] res = new int[1];
+        doc.render(new Runnable() {
+            public void run() {
+                if (cancellable.isCancelled()) {
+                    res[0] = -1;
+                } else if (!ts.isValid()) {
+                    cancellable.cancell();
+                    res[0] = -1;
+                } else {
+                    res[0] = ts.move(offset);
+                }
+            }
+        });
+        return res[0];
     }
     
 }

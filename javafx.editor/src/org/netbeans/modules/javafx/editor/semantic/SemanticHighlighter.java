@@ -41,6 +41,7 @@ package org.netbeans.modules.javafx.editor.semantic;
 import com.sun.javafx.api.tree.*;
 import javax.lang.model.element.Name;
 import org.netbeans.api.editor.settings.AttributesUtilities;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -48,11 +49,7 @@ import org.netbeans.api.javafx.source.TreeUtilities;
 import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
-import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
-import org.openide.util.Exceptions;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -67,6 +64,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.modules.javafx.editor.Cancellable;
+import org.netbeans.modules.javafx.editor.SafeTokenSequence;
 
 /**
  *
@@ -111,21 +110,10 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     }
 
     private boolean process(CompilationInfo info) {
-        DataObject od = null;
-        try {
-            od = DataObject.find(file);
-        } catch (DataObjectNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        EditorCookie ec = od != null ? od.getLookup().lookup(EditorCookie.class) : null;
-        if (ec == null) {
-            return false;
-        }
-        Document doc = ec.getDocument();
+        Document doc = FXSourceUtils.getDocument(file);
         if (doc == null) {
             return false;
         }
-
         identifiers.clear(); // clear cache
         List<Result> result = new ArrayList<Result>();
         UnitTree compilationUnit = info.getCompilationUnit();
@@ -208,13 +196,21 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         private CompilationInfo info;
         private Document doc;
         private TreeUtilities tu;
-        private AtomicBoolean cancel;
+        private Cancellable cancellable;
 
         public JavaFXThreeVisitor(final CompilationInfo info, final Document doc, final AtomicBoolean cancel) {
             super(cancel);
             this.info = info;
             this.doc = doc;
-            this.cancel = cancel;
+            cancellable = new Cancellable() {
+                public boolean isCancelled() {
+                    return cancel.get();
+                }
+
+                public void cancell() {
+                    cancel.set(true);
+                }
+            };
             tu = new TreeUtilities(info);
         }
 
@@ -233,7 +229,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
             while (ts.moveNext()) {
                 Token t = ts.token();
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
@@ -261,7 +257,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
             Token name = null;
 
             ts.moveEnd();
@@ -303,7 +299,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
             while (ts.moveNext()) {
                 // do not highlight parameters and local variables
                 if (element != null && !element.getKind().isField()) {
@@ -336,7 +332,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
 
-            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
             while (ts.moveNext()) {
                 // do not highlight parameters and local variables
                 if (element != null && !element.getKind().isField()) {
@@ -377,7 +373,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 }
             }
 
-            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
             while (ts.moveNext()) {
                 Token t = ts.token();
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
@@ -404,8 +400,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             Element element = info.getTrees().getElement(getCurrentPath());
             if (element != null) {
-            ProtectedTokenSequence<JFXTokenId> ts = new ProtectedTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancel);
-
+                SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
                 while (ts.moveNext()) {
                     Token t = ts.token();
                     String tokenStr = t.text().toString();

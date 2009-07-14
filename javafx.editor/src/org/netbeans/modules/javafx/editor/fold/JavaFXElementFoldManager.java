@@ -51,9 +51,10 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.ext.java.JavaFoldManager;
+import org.netbeans.modules.javafx.editor.Cancellable;
 import org.netbeans.modules.javafx.editor.JavaFXEditorKit;
+import org.netbeans.modules.javafx.editor.SafeTokenSequence;
 import org.netbeans.modules.javafx.editor.semantic.ScanningCancellableTask;
 import org.netbeans.spi.editor.fold.FoldHierarchyTransaction;
 import org.netbeans.spi.editor.fold.FoldOperation;
@@ -339,7 +340,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
     private Fold initialCommentFold;
     private Fold importsFold;
     
-    private final class JavaFXElementFoldVisitor extends CancellableTreePathScanner<Object, Object> {
+    private final class JavaFXElementFoldVisitor extends CancellableTreePathScanner<Object, Object> implements Cancellable {
 
         private List<FoldInfo> folds = new ArrayList<JavaFXElementFoldManager.FoldInfo>();
         private CompilationInfo info;
@@ -359,19 +360,23 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 if (LOGGABLE) log("addCommentsFolds returning because of null token hierarchy."); // NOI18N
                 return;
             }
-            TokenSequence<JFXTokenId>  ts = th.tokenSequence(JFXTokenId.language());
+
+            Document doc = operation.getHierarchy().getComponent().getDocument();
+            if (doc == null) {
+                return;
+            }
+
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(th.tokenSequence(JFXTokenId.language()), doc, this);
             boolean firstNormalFold = true;
-            while (ts.isValid() && ts.moveNext()) {
+            while (ts.moveNext()) {
                 Token<JFXTokenId> token = ts.token();
                 try {
                     if (token.id() == JFXTokenId.DOC_COMMENT) {
-                        Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
                         if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset); // NOI18N
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
                     }
                     if (token.id() == JFXTokenId.COMMENT) {
-                        Document doc   = operation.getHierarchy().getComponent().getDocument();
                         int startOffset = ts.offset();
                         if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]"); // NOI18N
                         if (firstNormalFold) {
@@ -540,6 +545,14 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 }
             }
             return super.visitCompilationUnit(node, p);
+        }
+
+        public boolean isCancelled() {
+            return isCanceled() || stopped;
+        }
+
+        public void cancell() {
+            cancel();
         }
 
     }

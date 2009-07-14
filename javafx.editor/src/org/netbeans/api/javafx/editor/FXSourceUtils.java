@@ -27,6 +27,10 @@ import javax.lang.model.type.TypeMirror;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
+import javax.swing.text.Document;
+import org.openide.cookies.EditorCookie;
+import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
 
 /**
  * 
@@ -574,9 +578,28 @@ public final class FXSourceUtils {
 
     public static boolean isJavaFXClass(final Element element, final CompilationInfo compilationInfo) {
         if (element == null || compilationInfo == null) {
-            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/api/javafx/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isJavaFXClass"));
+            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/api/javafx/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isJavaFXClass")); // NOI18N
         }
         return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
+    }
+
+    public static Document getDocument(final CompilationInfo info) {
+        FileObject file = info.getFileObject();
+        return file != null ? getDocument(file) : null;
+    }
+
+    public static Document getDocument(final FileObject file) {
+        DataObject od = null;
+        try {
+            od = DataObject.find(file);
+        } catch (DataObjectNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+            return null;
+        }
+
+        EditorCookie ec = od != null ? od.getLookup().lookup(EditorCookie.class) : null;
+
+        return ec != null ? ec.getDocument() : null;
     }
 
     private static CharSequence getFragment(Element e) {
