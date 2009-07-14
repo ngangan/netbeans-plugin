@@ -42,18 +42,27 @@ package org.netbeans.modules.javafx.profiler.utilities;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.VariableElement;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ElementVisitor;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.ElementFilter;
 import org.openide.filesystems.FileObject;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
+import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -72,29 +81,38 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
         final CountDownLatch latch = new CountDownLatch(1);
 
         JavaFXSource source = JavaFXProjectUtilities.getSources((JavaFXProject)project);
-        final FileObject fo = source.getCpInfo().getClassPath(PathKind.SOURCE).findResource(getFXFileName(className));
-
-        if (fo == null) return false; // can go only to symbols from sources
 
         // cut interface suffix out of the signature
         final String sig = JavaFXProjectUtilities.cutIntfSuffix(signature);
-        final JavaFXSource js = JavaFXSource.forFileObject(fo);
 
         try {
-            js.runUserActionTask(new Task<CompilationController>() {
+            source.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController controller) throws Exception {
                     controller.moveToPhase(Phase.ANALYZED);
                     
-                    ElementHandle eh;
+                    final ElementHandle[] eh = new ElementHandle[1];
+                    TypeElement classType = JavaFXProjectUtilities.resolveClassByName(className, controller);
                     if (methodName == null) {
                         LOGGER.finest("Trying to go to: " + className);
-                        eh = ElementHandle.create(JavaFXProjectUtilities.resolveClassByName(className, controller));
+                        eh[0] = ElementHandle.create(classType);
                     } else {
-                        LOGGER.finest("Trying to go to: " + className + "." + methodName + "(" + sig + ")");
-                        eh = new ElementHandle(ElementKind.METHOD, new String[] {className, methodName, sig});
+                        LOGGER.finest("Trying to go to: " + controller.getElements().getBinaryName(classType).toString() + "." + methodName + sig);
+
+                        for(Element e : ElementFilter.methodsIn(classType.getEnclosedElements())) {
+                            if (e.getKind() == ElementKind.METHOD) {
+                                if (e.getSimpleName().contentEquals(methodName)) {
+                                    eh[0] = ElementHandle.create(e);
+                                }
+                            }
+                        }
+                        if (eh[0] == null) {
+                            LOGGER.finest("Can not locate method " + className + "." + methodName + sig + " - falling back to top level class");
+                            eh[0] = ElementHandle.create(classType);// fallback to the class
+                        }
                     }
-                    result.set(ElementOpen.open(fo, eh));
+                    Element e = eh[0].resolve(controller);
+                    result.set(ElementOpen.open(controller, e));
                     latch.countDown();
                 }
             }, true);
