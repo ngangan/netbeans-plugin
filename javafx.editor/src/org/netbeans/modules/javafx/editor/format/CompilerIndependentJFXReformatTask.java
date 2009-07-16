@@ -91,8 +91,14 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
                             // remove template tags
                             int st = startOffset + text.indexOf(TEMPLATE_START);
                             document.remove(st, TEMPLATE_START.length());
-                            int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length() - 1;
+                            int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length() - 2;
                             document.remove(en, TEMPLATE_END.length());
+//                            String modifiedText = document.getText(startOffset, length - TEMPLATE_END.length() - TEMPLATE_START.length() - 1);
+//                            System.out.println("===================================================");
+//                            System.out.println("text:\n" + text);
+//                            System.out.println("===================================================");
+//                            System.out.println("mofified text:\n" + modifiedText);
+//                            System.out.println("===================================================");
 
                             // modify indent
                             int lastElement = rootElement.getElementIndex(en);
