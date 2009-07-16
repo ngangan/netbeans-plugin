@@ -279,7 +279,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                     if (ts.moveNext()) {
                         if (pref.getBoolean(MarkOccurencesSettings.OVERRIDES, true) && ts.token().id() == JFXTokenId.EXTENDS) {
 //                            Tree superClass = ((ClassTree) tp.getLeaf()).getExtendsClause();
-                            Tree superClass = (JFXClassDeclaration) typePath.getParentPath().getLeaf();
+                            Tree superClass = typePath.getParentPath() != null ? (JFXClassDeclaration) typePath.getParentPath().getLeaf() : null;
 
                             if (superClass != null) {
                                 Element superType = info.getTrees().getElement(new JavaFXTreePath(tp, superClass));
