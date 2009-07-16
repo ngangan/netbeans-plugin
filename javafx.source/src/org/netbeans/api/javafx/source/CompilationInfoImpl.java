@@ -163,7 +163,7 @@ public class CompilationInfoImpl {
     }
     
     Context getContext() {
-        return cTask.getContext();
+        return getJavafxcTask().getContext();
     }
     /**
      * Returns the errors in the file represented by the {@link JavaSource}.
