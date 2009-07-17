@@ -39,7 +39,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.api.javafx.editor;
 
 /**
  *

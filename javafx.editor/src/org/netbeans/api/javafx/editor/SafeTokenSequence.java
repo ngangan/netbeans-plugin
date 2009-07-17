@@ -25,7 +25,7 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.api.javafx.editor;
 
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.Token;

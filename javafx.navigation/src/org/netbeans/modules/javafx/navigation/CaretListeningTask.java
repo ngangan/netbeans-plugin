@@ -64,8 +64,8 @@ import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
-import org.netbeans.modules.javafx.editor.Cancellable;
-import org.netbeans.modules.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 

@@ -64,8 +64,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.Cancellable;
-import org.netbeans.modules.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  *
