@@ -250,7 +250,7 @@ public abstract class Archive {
             if (files == null) {
                 return Collections.<JavaFileObject>emptyList();
             } else {
-                if (zipFile == null) {
+                if (zipFile == null && archiveFile == null) { // #168529 - zipfile can be null in case keepOpened == false; then archiveFile is used
                     Logger.getLogger(Archive.CachingArchive.class.getName()).log(Level.FINE, "Archive.CachingArchive: zipFile is null!"); // NOI18N
                     return Collections.<JavaFileObject>emptyList();
                 }
