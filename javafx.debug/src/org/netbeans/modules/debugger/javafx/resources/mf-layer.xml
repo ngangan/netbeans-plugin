@@ -150,7 +150,7 @@ made subject to such option by the copyright holder.
                 <file name="org-netbeans-modules-debugger-javafx-ui-actions-SourcesViewAction.instance"/>
             </folder>
         </folder>
-        ->>
+        -->
     </folder>
     
     <folder name="Projects">
