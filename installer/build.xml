@@ -87,7 +87,7 @@
   <target name="build-mac-pkg" depends="mount-mac-dmg,build-servicetag" if="running.on.mac">
     <mkdir dir="build/pkgscripts"/>
     <copy todir="build/pkgscripts">
-      <fileset dir="build/mac-mount/NetBeans 6.7.1 RC.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
+      <fileset dir="build/mac-mount/NetBeans 6.7.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
       <fileset file="pkg-src"/>
     </copy>
     <exec executable="sh" failonerror="yes">
@@ -97,18 +97,18 @@
   </target>
 
   <target name="patch-mac-dmg" depends="mount-mac-dmg,build-mac-pkg" if="running.on.mac">
-    <exec executable="sh" dir="build/mac-mount/NetBeans 6.7.1 RC.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.7.1.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
         <arg value="-c"/>
         <arg value="sed -i '' 's/addproduct_id.sh &quot;NB&quot;/addproduct_id.sh &quot;NBFX&quot;/' postflight"/>            
     </exec>
     <copy todir="build/mac-mount">
       <fileset dir="mac-patch-src"/>
     </copy>
-    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.7.1 RC.mpkg/Contents/Resources/License.txt"/>
-    <copy todir="build/mac-mount/NetBeans 6.7.1 RC.mpkg/Contents/Packages/javafx.pkg">
+    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.7.1.mpkg/Contents/Resources/License.txt"/>
+    <copy todir="build/mac-mount/NetBeans 6.7.1.mpkg/Contents/Packages/javafx.pkg">
       <fileset dir="build/javafx.pkg"/>
     </copy>
-    <exec executable="sh" dir="build/mac-mount/NetBeans 6.7.1 RC.mpkg/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.7.1.mpkg/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
       <arg value="-c"/>
       <arg value="chmod +x *"/>
     </exec>  
