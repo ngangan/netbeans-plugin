@@ -80,7 +80,6 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
 
                     for (Context.Region region : regions) {
                         int startOffset = region.getStartOffset();
-                        int endOffset = region.getEndOffset();
                         int length = region.getEndOffset() - region.getStartOffset();
                         int elementIndex = rootElement.getElementIndex(startOffset);
                         final int prevIndex = elementIndex > 0 ? elementIndex - 1 : elementIndex;
@@ -91,14 +90,8 @@ public class CompilerIndependentJFXReformatTask implements ReformatTask {
                             // remove template tags
                             int st = startOffset + text.indexOf(TEMPLATE_START);
                             document.remove(st, TEMPLATE_START.length());
-                            int en = endOffset - TEMPLATE_END.length() - TEMPLATE_START.length() - 2;
+                            int en = startOffset + text.indexOf(TEMPLATE_END) - TEMPLATE_START.length();
                             document.remove(en, TEMPLATE_END.length());
-//                            String modifiedText = document.getText(startOffset, length - TEMPLATE_END.length() - TEMPLATE_START.length() - 1);
-//                            System.out.println("===================================================");
-//                            System.out.println("text:\n" + text);
-//                            System.out.println("===================================================");
-//                            System.out.println("mofified text:\n" + modifiedText);
-//                            System.out.println("===================================================");
 
                             // modify indent
                             int lastElement = rootElement.getElementIndex(en);
