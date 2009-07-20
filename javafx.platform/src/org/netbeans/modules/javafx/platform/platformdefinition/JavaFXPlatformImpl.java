@@ -400,10 +400,6 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         final Thread tt = Thread.currentThread();
         Thread t = new Thread(new Runnable(){
             public void run(){
-                try{
-                    if (platform instanceof DefaultPlatformImpl)
-                        tt.join(); //hack to avoid overwriting by J2EEPlatform module the properties we put
-                }catch(Exception e){}
                 ProjectManager.mutex().writeAccess(
                         new Runnable(){
                             public void run (){
