@@ -59,6 +59,7 @@ import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -72,12 +73,6 @@ import org.netbeans.api.javafx.editor.SafeTokenSequence;
  * @author Anton Chechel
  */
 public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
-
-    private static final String ID_METHOD = "method"; // NOI18N
-    private static final String ID_METHOD_INVOCATION = "methodInvocation"; // NOI18N
-    private static final String ID_FIELD = "field"; // NOI18N
-    private static final String ID_IDENTIFIER = "identifier"; // NOI18N
-    private static final String ID_CLASS = "class"; // NOI18N
 
     private static final AttributeSet FIELD_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0));
     private static final AttributeSet FIELD_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0), StyleConstants.Italic, Boolean.TRUE);
@@ -146,7 +141,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             // highlighting for variables from cache
-            if (ID_FIELD.equals(result.identifier)) {
+            if (result.type == ResultTypes.FIELD) {
                 for (Result id : identifiers) {
                     final String idText = id.token.text() == null ? "" : id.token.text().toString(); // NOI18N
                     final String resText = result.token.text() == null ? "" : result.token.text().toString(); // NOI18N
@@ -160,19 +155,21 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         getBag(doc).setHighlights(bag);
     }
 
-    private static AttributeSet getAttributeSet(Result res) {
-        if (ID_METHOD.equals(res.identifier)) {
-            return res.isStatic ? METHOD_STATIC_HIGHLIGHT : METHOD_HIGHLIGHT;
-        } else if (ID_METHOD_INVOCATION.equals(res.identifier)) {
-            return res.isStatic ? METHOD_STATIC_INVOCATION_HIGHLIGHT : METHOD_INVOCATION_HIGHLIGHT;
-        } else if (ID_FIELD.equals(res.identifier)) {
-            return res.isStatic ? FIELD_STATIC_HIGHLIGHT : FIELD_HIGHLIGHT;
-        } else if (ID_IDENTIFIER.equals(res.identifier)) {
-            return IDENTIFIER_HIGHLIGHT;
-        } else if (ID_CLASS.equals(res.identifier)) {
-            return res.isStatic ? CLASS_STATIC_HIGHLIGHT : CLASS_HIGHLIGHT;
+    private static AttributeSet getAttributeSet(Result result) {
+        switch (result.type) {
+            case METHOD:
+                return result.attributes.contains(ColoringAttributes.STATIC) ? METHOD_STATIC_HIGHLIGHT : METHOD_HIGHLIGHT;
+            case METHOD_INVOCATION:
+                return result.attributes.contains(ColoringAttributes.STATIC) ? METHOD_STATIC_INVOCATION_HIGHLIGHT : METHOD_INVOCATION_HIGHLIGHT;
+            case FIELD:
+                return result.attributes.contains(ColoringAttributes.STATIC) ? FIELD_STATIC_HIGHLIGHT : FIELD_HIGHLIGHT;
+            case VARIABLE:
+                return IDENTIFIER_HIGHLIGHT;
+            case CLASS:
+                return result.attributes.contains(ColoringAttributes.STATIC) ? CLASS_STATIC_HIGHLIGHT : CLASS_HIGHLIGHT;
+            default:
+                return FIELD_HIGHLIGHT;
         }
-        return FIELD_HIGHLIGHT;
     }
 
     static OffsetsBag getBag(Document doc) {
@@ -236,7 +233,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     start = ts.offset();
                     end = start + t.length();
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    list.add(new Result(start, end, ID_METHOD, t, isStatic));
+                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    list.add(new Result(start, end, ResultTypes.METHOD, t, attr));
                     break;
                 }
             }
@@ -280,7 +278,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             if (name != null) {
                 end = start + name.length();
                 boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                list.add(new Result(start, end, ID_METHOD_INVOCATION, name, isStatic));
+                list.add(new Result(start, end, ResultTypes.METHOD_INVOCATION, name, EnumSet.of(ColoringAttributes.STATIC)));
             }
 
             return super.visitMethodInvocation(tree, list);
@@ -311,7 +309,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     start = ts.offset();
                     end = start + t.length();
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    list.add(new Result(start, end, ID_FIELD, t, isStatic));
+                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    list.add(new Result(start, end, ResultTypes.FIELD, t, attr));
                     break;
                 }
             }
@@ -344,7 +343,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     start = ts.offset();
                     end = start + t.length();
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    identifiers.add(new Result(start, end, ID_IDENTIFIER, t, isStatic)); // identfiers chache
+                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    identifiers.add(new Result(start, end, ResultTypes.VARIABLE, t, attr)); // identfiers chache
 //                    list.add(new Result(start, end, ID_IDENTIFIER, t)); // debug only
                     break;
                 }
@@ -380,7 +380,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     start = ts.offset();
                     end = start + t.length();
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    list.add(new Result(start, end, ID_CLASS, t, isStatic));
+                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    list.add(new Result(start, end, ResultTypes.CLASS, t, attr));
                     break;
                 }
             }
@@ -419,11 +420,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                                     start = ts.offset();
                                     end = start + t.length();
                                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
+                                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
 
                                     if (subElement.getKind().isField()) {
-                                        list.add(new Result(start, end, ID_FIELD, t, isStatic));
+                                        list.add(new Result(start, end, ResultTypes.FIELD, t, attr));
                                     } else if (ElementKind.METHOD.equals(subElement.getKind())) {
-                                        list.add(new Result(start, end, ID_METHOD_INVOCATION, t, isStatic));
+                                        list.add(new Result(start, end, ResultTypes.METHOD_INVOCATION, t, attr));
                                     }
                                 }
                             }
@@ -437,29 +439,36 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         }
     }
 
-    private static class Result {
+    private enum ColoringAttributes {
+        STATIC, DEPRECATED, UNUSED
+    }
 
+    private enum ResultTypes {
+        METHOD, METHOD_INVOCATION, FIELD, VARIABLE, CLASS
+    }
+
+    private static class Result {
         long start;
         long end;
-        String identifier; // XXX temporary since element doesn't work
+        ResultTypes type;
         Token token;
-        boolean isStatic;
+        EnumSet<ColoringAttributes> attributes;
 
-        public Result(long start, long end, String identifier, Token token) {
-            this(start, end, identifier, token, false);
+        public Result(long start, long end, ResultTypes type, Token token) {
+            this(start, end, type, token, EnumSet.noneOf(ColoringAttributes.class));
         }
 
-        public Result(long start, long end, String identifier, Token token, boolean isStatic) {
+        public Result(long start, long end, ResultTypes type, Token token, EnumSet<ColoringAttributes> attributes) {
             this.start = start;
             this.end = end;
-            this.identifier = identifier;
+            this.type = type;
             this.token = token;
-            this.isStatic = isStatic;
+            this.attributes = attributes;
         }
 
         @Override
         public String toString() {
-            return "[" + start + ", " + end + ", " + identifier + "]"; // NOI18N
+            return "[" + start + ", " + end + ", " + type + "]"; // NOI18N
         }
     }
 }
