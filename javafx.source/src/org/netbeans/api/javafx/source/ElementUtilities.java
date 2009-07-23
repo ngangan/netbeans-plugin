@@ -81,7 +81,6 @@ public final class ElementUtilities {
 //    private final ElementsService delegate;
     private final CompilationInfo info;
 
-    /** Creates a new instance of ElementUtilities */
     ElementUtilities(final CompilationInfo info) {
         assert info != null;
         JavafxcTask task = info.impl.getJavafxcTask();
@@ -118,6 +117,7 @@ public final class ElementUtilities {
 //	
 //	return (TypeElement)element.getEnclosingElement(); // Wrong
 //    }
+
     /**
      * 
      * The outermost TypeElement which indirectly encloses this element.
@@ -125,13 +125,16 @@ public final class ElementUtilities {
 //    public TypeElement outermostTypeElement(Element element) {
 //        return delegate.outermostTypeElement(element);
 //    }
+
     /**
      * Returns the implementation of a method in class origin; null if none exists.
      */
 //    public Element getImplementationOf(ExecutableElement method, TypeElement origin) {
 //        return delegate.getImplementationOf(method, origin);
 //    }
-    /**Returns true if the given element is syntetic.
+
+    /**
+     * Returns true if the given element is syntetic.
      * 
      *  @param element to check
      *  @return true if and only if the given element is syntetic, false otherwise
@@ -141,12 +144,23 @@ public final class ElementUtilities {
     }
 
     /**
+     * Returns true if the given element is deprecated.
+     *
+     *  @param element to check
+     *  @return true if and only if the given element is deprecated, false otherwise
+     */
+    public boolean isDeprecated(Element element) {
+        return (((Symbol) element).flags() & Flags.DEPRECATED) != 0;
+    }
+
+    /**
      * Returns true if this element represents a method which overrides a
      * method in one of its superclasses.
      */
 //    public boolean overridesMethod(ExecutableElement element) {
 //        return delegate.overridesMethod(element);
 //    }
+
     /**
      * Returns a binary name of a type.
      * @param element for which the binary name should be returned
@@ -161,6 +175,7 @@ public final class ElementUtilities {
 //            throw new IllegalArgumentException ();
 //        } 
 //    }
+
     /**
      * Get javadoc for given element.
      */
@@ -272,7 +287,8 @@ public final class ElementUtilities {
         return members;
     }
 
-    /**Return members declared in the given scope.
+    /**
+     * Return members declared in the given scope.
      */
     public Iterable<? extends Element> getLocalMembersAndVars(JavafxcScope scope, ElementAcceptor acceptor) {
         ArrayList<Element> members = new ArrayList<Element>();
@@ -335,7 +351,8 @@ public final class ElementUtilities {
         return members;
     }
 
-    /**Return variables declared in the given scope.
+    /**
+     * Return variables declared in the given scope.
      */
 //    public Iterable<? extends Element> getLocalVars(Scope scope, ElementAcceptor acceptor) {
 //        ArrayList<Element> members = new ArrayList<Element>();
@@ -359,7 +376,9 @@ public final class ElementUtilities {
 //        }
 //        return members;
 //    }
-    /**Return {@link TypeElement}s:
+
+    /**
+     * Return {@link TypeElement}s:
      * <ul>
      *    <li>which are imported</li>
      *    <li>which are in the same package as the current file</li>
@@ -427,7 +446,9 @@ public final class ElementUtilities {
 //        }
 //        return members;
 //    }
-    /**Filter {@link Element}s
+
+    /**
+     * Filter {@link Element}s
      */
     public static interface ElementAcceptor {
 
@@ -456,6 +477,7 @@ public final class ElementUtilities {
         }
         return false;
     }
+
     /**
      * Returns true if the element is declared (directly or indirectly) local
      * to a method or variable initializer.  Also true for fields of inner 
@@ -464,6 +486,7 @@ public final class ElementUtilities {
 //    public boolean isLocal(Element element) {
 //        return delegate.isLocal(element);
 //    }
+
     /**
      * Returns true if a method specified by name and type is defined in a
      * class type.
@@ -471,19 +494,22 @@ public final class ElementUtilities {
 //    public boolean alreadyDefinedIn(CharSequence name, ExecutableType method, TypeElement enclClass) {
 //        return delegate.alreadyDefinedIn(name, method, enclClass);
 //    }
+
     /**
      * Returns true if a type element has the specified element as a member.
      */
 //    public boolean isMemberOf(Element e, TypeElement type) {
 //        return delegate.isMemberOf(e, type);
-//    }                
+//    }
+
     /**
      * Returns the parent method which the specified method overrides, or null
      * if the method does not override a parent class method.
      */
 //    public ExecutableElement getOverriddenMethod(ExecutableElement method) {
 //        return delegate.getOverriddenMethod(method);
-//    }        
+//    }
+
     /**
      * Returns true if this element represents a method which 
      * implements a method in an interface the parent class implements.
@@ -491,7 +517,9 @@ public final class ElementUtilities {
 //    public boolean implementsMethod(ExecutableElement element) {
 //        return delegate.implementsMethod(element);
 //    }
-    /**Find all methods in given type and its supertypes, which are not implemented.
+
+    /**
+     * Find all methods in given type and its supertypes, which are not implemented.
      * 
      * @param type to inspect
      * @return list of all unimplemented methods

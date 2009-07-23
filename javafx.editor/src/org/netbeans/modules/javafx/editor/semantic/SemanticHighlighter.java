@@ -39,9 +39,11 @@
 package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.*;
-import javax.lang.model.element.Name;
+
 import org.netbeans.api.editor.settings.AttributesUtilities;
+import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -54,6 +56,7 @@ import org.openide.filesystems.FileObject;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.Name;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
@@ -65,31 +68,19 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  *
  * @author Anton Chechel
  */
 public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
-
-    private static final AttributeSet FIELD_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0));
-    private static final AttributeSet FIELD_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0), StyleConstants.Italic, Boolean.TRUE);
-    private static final AttributeSet METHOD_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE);
-    private static final AttributeSet METHOD_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE, StyleConstants.Italic, Boolean.TRUE);
-    private static final AttributeSet METHOD_INVOCATION_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK);
-    private static final AttributeSet METHOD_STATIC_INVOCATION_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Italic, Boolean.TRUE);
-    private static final AttributeSet IDENTIFIER_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127));
-    private static final AttributeSet CLASS_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE);
-    private static final AttributeSet CLASS_STATIC_HIGHLIGHT = AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE, StyleConstants.Italic, Boolean.TRUE);
-
+    
     private static final Logger LOGGER = Logger.getLogger(SemanticHighlighter.class.getName());
     private static final boolean LOGGABLE = LOGGER.isLoggable(Level.FINE);
 
-    private FileObject file;
-    private AtomicBoolean cancel = new AtomicBoolean();
-    private List<Result> identifiers = new ArrayList<Result>();
+    private final FileObject file;
+    private final AtomicBoolean cancel = new AtomicBoolean();
+    private final List<Result> identifiers = new ArrayList<Result>();
 
     SemanticHighlighter(FileObject file) {
         this.file = file;
@@ -109,6 +100,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         if (doc == null) {
             return false;
         }
+        
         identifiers.clear(); // clear cache
         List<Result> result = new ArrayList<Result>();
         UnitTree compilationUnit = info.getCompilationUnit();
@@ -155,20 +147,72 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         getBag(doc).setHighlights(bag);
     }
 
+    // TODO move coloring attributes to xml
+    // TODO uncomment after fixing #169055
     private static AttributeSet getAttributeSet(Result result) {
         switch (result.type) {
             case METHOD:
-                return result.attributes.contains(ColoringAttributes.STATIC) ? METHOD_STATIC_HIGHLIGHT : METHOD_HIGHLIGHT;
+                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                            StyleConstants.StrikeThrough, Color.BLACK);
+                } else {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
+                }
+//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case METHOD_INVOCATION:
-                return result.attributes.contains(ColoringAttributes.STATIC) ? METHOD_STATIC_INVOCATION_HIGHLIGHT : METHOD_INVOCATION_HIGHLIGHT;
+                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                            StyleConstants.StrikeThrough, Color.BLACK);
+                } else {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
+                }
+//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
+//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case FIELD:
-                return result.attributes.contains(ColoringAttributes.STATIC) ? FIELD_STATIC_HIGHLIGHT : FIELD_HIGHLIGHT;
+                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                            StyleConstants.StrikeThrough, Color.BLACK);
+                } else {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
+                }
+//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
+//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case VARIABLE:
-                return IDENTIFIER_HIGHLIGHT;
+                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
+                    return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                            StyleConstants.StrikeThrough, Color.BLACK);
+                } else {
+                    return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
+                }
+//                return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
+//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case CLASS:
-                return result.attributes.contains(ColoringAttributes.STATIC) ? CLASS_STATIC_HIGHLIGHT : CLASS_HIGHLIGHT;
+                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                            StyleConstants.StrikeThrough, Color.BLACK);
+                } else {
+                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
+                }
+//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             default:
-                return FIELD_HIGHLIGHT;
+                return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0));
         }
     }
 
@@ -232,8 +276,17 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
+
+                    EnumSet<ColoringAttributes> attr = EnumSet.noneOf(ColoringAttributes.class);
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    if (isStatic) {
+                        attr.add(ColoringAttributes.STATIC);
+                    }
+                    boolean isDeprecated = element != null && info.getElementUtilities().isDeprecated(element);
+                    if (isDeprecated) {
+                        attr.add(ColoringAttributes.DEPRECATED);
+                    }
+
                     list.add(new Result(start, end, ResultTypes.METHOD, t, attr));
                     break;
                 }
@@ -277,8 +330,18 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             if (name != null) {
                 end = start + name.length();
+
+                EnumSet<ColoringAttributes> attr = EnumSet.noneOf(ColoringAttributes.class);
                 boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                list.add(new Result(start, end, ResultTypes.METHOD_INVOCATION, name, EnumSet.of(ColoringAttributes.STATIC)));
+                if (isStatic) {
+                    attr.add(ColoringAttributes.STATIC);
+                }
+                    boolean isDeprecated = element != null && info.getElementUtilities().isDeprecated(element);
+                if (isDeprecated) {
+                    attr.add(ColoringAttributes.DEPRECATED);
+                }
+
+                list.add(new Result(start, end, ResultTypes.METHOD_INVOCATION, name, attr));
             }
 
             return super.visitMethodInvocation(tree, list);
@@ -308,8 +371,17 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
+
+                    EnumSet<ColoringAttributes> attr = EnumSet.noneOf(ColoringAttributes.class);
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    if (isStatic) {
+                        attr.add(ColoringAttributes.STATIC);
+                    }
+                    boolean isDeprecated = element != null && info.getElementUtilities().isDeprecated(element);
+                    if (isDeprecated) {
+                        attr.add(ColoringAttributes.DEPRECATED);
+                    }
+
                     list.add(new Result(start, end, ResultTypes.FIELD, t, attr));
                     break;
                 }
@@ -333,8 +405,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
             SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
             while (ts.moveNext()) {
-                // do not highlight parameters and local variables
-                if (element != null && !element.getKind().isField()) {
+                // do not highlight parameters, local variables and packages
+                if (element == null || (element != null && !element.getKind().isField())) {
                     continue;
                 }
 
@@ -342,10 +414,18 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) {
                     start = ts.offset();
                     end = start + t.length();
+
+                    EnumSet<ColoringAttributes> attr = EnumSet.noneOf(ColoringAttributes.class);
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    if (isStatic) {
+                        attr.add(ColoringAttributes.STATIC);
+                    }
+                    boolean isDeprecated = element != null && info.getElementUtilities().isDeprecated(element);
+                    if (isDeprecated) {
+                        attr.add(ColoringAttributes.DEPRECATED);
+                    }
+
                     identifiers.add(new Result(start, end, ResultTypes.VARIABLE, t, attr)); // identfiers chache
-//                    list.add(new Result(start, end, ID_IDENTIFIER, t)); // debug only
                     break;
                 }
             }
@@ -379,8 +459,17 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
+
+                    EnumSet<ColoringAttributes> attr = EnumSet.noneOf(ColoringAttributes.class);
                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                    if (isStatic) {
+                        attr.add(ColoringAttributes.STATIC);
+                    }
+                    boolean isDeprecated = element != null && info.getElementUtilities().isDeprecated(element);
+                    if (isDeprecated) {
+                        attr.add(ColoringAttributes.DEPRECATED);
+                    }
+
                     list.add(new Result(start, end, ResultTypes.CLASS, t, attr));
                     break;
                 }
@@ -402,6 +491,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             if (element != null) {
                 SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
+
                 while (ts.moveNext()) {
                     Token t = ts.token();
                     String tokenStr = t.text().toString();
@@ -410,8 +500,10 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                         start = ts.offset();
                         JavaFXTreePath subPath = tu.pathFor((int) start);
                         Element subElement = info.getTrees().getElement(subPath);
+
                         if (subElement != null) {
                             final Name simpleName = subElement.getSimpleName();
+
                             if (simpleName != null) {
                                 String subElementName = simpleName.toString();
 
@@ -419,8 +511,16 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                                     Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
                                     start = ts.offset();
                                     end = start + t.length();
+
+                                    EnumSet<ColoringAttributes> attr = EnumSet.noneOf(ColoringAttributes.class);
                                     boolean isStatic = modifiers != null && modifiers.contains(Modifier.STATIC);
-                                    EnumSet<ColoringAttributes> attr = isStatic ? EnumSet.of(ColoringAttributes.STATIC) : EnumSet.noneOf(ColoringAttributes.class);
+                                    if (isStatic) {
+                                        attr.add(ColoringAttributes.STATIC);
+                                    }
+                                    boolean isDeprecated = element != null && info.getElementUtilities().isDeprecated(element);
+                                    if (isDeprecated) {
+                                        attr.add(ColoringAttributes.DEPRECATED);
+                                    }
 
                                     if (subElement.getKind().isField()) {
                                         list.add(new Result(start, end, ResultTypes.FIELD, t, attr));
@@ -448,11 +548,11 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     }
 
     private static class Result {
-        long start;
-        long end;
-        ResultTypes type;
-        Token token;
-        EnumSet<ColoringAttributes> attributes;
+        private long start;
+        private long end;
+        private ResultTypes type;
+        private Token token;
+        private EnumSet<ColoringAttributes> attributes;
 
         public Result(long start, long end, ResultTypes type, Token token) {
             this(start, end, type, token, EnumSet.noneOf(ColoringAttributes.class));
