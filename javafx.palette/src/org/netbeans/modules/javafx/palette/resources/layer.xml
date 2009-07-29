@@ -354,6 +354,9 @@
             <file name="Label.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Label.xml">
                 <attr name="position" intvalue="100"/>
             </file>
+            <file name="ListView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ListView.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
             <file name="ProgressBar.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ProgressBar.xml">
                 <attr name="position" intvalue="100"/>
             </file>
@@ -379,5 +382,30 @@
                 <attr name="position" intvalue="100"/>
             </file>
         </folder>
+        <folder name="Layouts">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="440"/>
+            <file name="HBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/HBox.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="VBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/VBox.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="ClipView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ClipView.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Flow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Flow.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Stack.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stack.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Tile.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Tile.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="Panel.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Panel.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+        </folder> 
     </folder>
 </filesystem>
