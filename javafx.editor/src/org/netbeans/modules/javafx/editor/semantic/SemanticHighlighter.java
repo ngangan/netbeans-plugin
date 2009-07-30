@@ -252,7 +252,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     cancel.set(true);
                 }
             };
-            tu = new TreeUtilities(info);
+            tu = TreeUtilities.create(info);
         }
 
         @Override

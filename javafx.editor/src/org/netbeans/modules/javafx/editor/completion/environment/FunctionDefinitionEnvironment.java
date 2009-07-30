@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.lexer.TokenUtilities;
 
 /**
  *
@@ -71,14 +72,14 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
         int startPos = (int) sourcePositions.getStartPosition(root, def);
         JFXType retType = def.getJFXReturnType();
         if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
-        String headerText = controller.getText().substring(startPos, offset > startPos ? offset : startPos);
+        CharSequence headerText = controller.getText().subSequence(startPos, offset > startPos ? offset : startPos);
         if (LOGGABLE) log("  headerText(1) == " + headerText); // NOI18N
-        int parStart = headerText.indexOf('('); // NOI18N
+        int parStart = TokenUtilities.indexOf(headerText, '('); // NOI18N
         if (LOGGABLE) log("  parStart: " + parStart); // NOI18N
         if (parStart >= 0) {
-            int parEnd = headerText.indexOf(')', parStart); // NOI18N
+            int parEnd = TokenUtilities.indexOf(headerText, ')', parStart); // NOI18N
             if (parEnd > parStart) {
-                headerText = headerText.substring(parEnd + 1).trim();
+                headerText = TokenUtilities.trim(headerText.subSequence(parEnd + 1, headerText.length()));
             } else {
 //                for (JFXVar param : def.getParams()) {
 //                    int parPos = (int) sourcePositions.getEndPosition(root, param);
@@ -87,7 +88,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
 //                    }
 //                    parStart = parPos - startPos;
 //                }
-                headerText = headerText.substring(parStart).trim();
+                headerText = TokenUtilities.trim(headerText.subSequence(parStart, headerText.length()));
             }
             if (LOGGABLE) log("  headerText(2) ==" + headerText); // NOI18N
             if (":".equals(headerText)) { // NOI18N
@@ -95,7 +96,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
                 addBasicTypes();
                 return;
             }
-        } else if (retType != null && headerText.trim().length() == 0) {
+        } else if (retType != null && TokenUtilities.trim(headerText).length() == 0) {
             if (LOGGABLE) log("  insideExpression for retType:"); // NOI18N
             insideExpression(new JavaFXTreePath(path, retType));
             return;

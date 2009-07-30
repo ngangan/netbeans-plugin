@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -38,56 +38,50 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.openide.util.Lookup;
-import org.openide.util.LookupEvent;
-import org.openide.util.LookupListener;
-import org.openide.util.RequestProcessor;
+package org.netbeans.modules.javafx.source;
+
+import com.sun.tools.javafx.api.JavafxcTool;
+import javax.tools.JavaFileManager;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.ElementUtilities;
+import org.netbeans.api.javafx.source.JavaFXParserResult;
+import org.netbeans.api.javafx.source.TreeUtilities;
+import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
 
 /**
+ * Accessor for the package-private functionality.
  *
- * @author Jan Lahoda
+ * @author Miloslav Metelka
  */
-final class JavaFXSourceTaskFactoryManager {
 
-    // -J-Dorg.netbeans.api.javafx.source.JavaFXSourceTaskFactoryManager.level=FINEST
-    private static final Logger LOG = Logger.getLogger(JavaFXSourceTaskFactoryManager.class.getName());
+public abstract class ApiSourcePackageAccessor {
     
-    private static JavaFXSourceTaskFactoryManager INSTANCE;
+    private static ApiSourcePackageAccessor INSTANCE;
     
-    public static synchronized void register() {
-        INSTANCE = new JavaFXSourceTaskFactoryManager();
-    }
-    
-    private Lookup.Result<JavaFXSourceTaskFactory> factories;
-    
-    /** Creates a new instance of JavaSourceTaskFactoryManager */
-    private JavaFXSourceTaskFactoryManager() {
-        final RequestProcessor.Task updateTask = new RequestProcessor("JavaSourceTaskFactoryManager Worker", 1).create(new Runnable() { // NOI18N
-            public void run() {
-                update();
-            }
-        });
-        
-        factories = Lookup.getDefault().lookupResult(JavaFXSourceTaskFactory.class);
-        factories.addLookupListener(new LookupListener() {
-            public void resultChanged(LookupEvent ev) {
-                updateTask.schedule(0);
-            }
-        });
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("FX Tasks: " + factories.allInstances());
+    public static ApiSourcePackageAccessor get() {
+        if (INSTANCE == null) {
+            // Enforce the static initializer in Context class to be run
+            try {
+                Class.forName(JavaFXParserResult.class.getName(), true, JavaFXParserResult.class.getClassLoader());
+            } catch (ClassNotFoundException e) { }
         }
-        
-        update();
+        return INSTANCE;
     }
-    
-    private void update() {
-        for (JavaFXSourceTaskFactory f : factories.allInstances()) {
-            f.fileObjectsChanged();
+
+    public static void set(ApiSourcePackageAccessor accessor) {
+        if (INSTANCE != null) {
+            throw new IllegalStateException("Already registered"); // NOI18N
         }
+        INSTANCE = accessor;
     }
+
+    public abstract JavaFXParserResult createResult(JavaFXParserResultImpl impl);
+    
+    public abstract JavaFileManager getFileManager(ClasspathInfo cpInfo, JavafxcTool tool);
+
+    public abstract ElementUtilities createElementUtilities(JavaFXParserResultImpl resultImpl);
+
+    public abstract TreeUtilities createTreeUtilities(JavaFXParserResultImpl resultImpl);
+    
 }

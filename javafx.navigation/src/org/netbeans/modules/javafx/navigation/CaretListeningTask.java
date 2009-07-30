@@ -66,6 +66,9 @@ import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.javafx.source.JavaFXParserResult;
+import org.netbeans.modules.parsing.api.Source;
+import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
@@ -325,13 +328,18 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         final boolean hasDeclaredType = asType.getKind() == TypeKind.DECLARED;
         if (hasDeclaredType) {
             if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
-                JavaFXSource javaFXSource = compilationInfo.getJavaFXSource();
-                FileObject fo = JavaFXSourceUtils.getFile(element, javaFXSource.getCpInfo());
+                FileObject fo = JavaFXSourceUtils.getFile(element, compilationInfo.getClasspathInfo());
                 if (fo != null) {
-                    javaFXSource = JavaFXSource.forFileObject(fo);
+                    try {
+                        JavaFXParserResult parserResult = JavaFXParserResult.create(Source.create(fo),
+                                compilationInfo.getClasspathInfo());
+                        compilationInfo = CompilationController.create(parserResult);
+                    } catch (ParseException e) {
+                        Exceptions.printStackTrace(e);
+                    }
                 }
                 try {
-                    javaFXSource.runWhenScanFinished(new Task<CompilationController>() {
+                    ((CompilationController)compilationInfo).runWhenScanFinished(new Task<CompilationController>() {
                         public void run(CompilationController cc) throws Exception {
                             cc.moveToPhase(Phase.ANALYZED);
                             ElementHandle eh = null;
@@ -345,7 +353,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                                 setJavadoc(ElementJavadoc.create(cc, e2));
                             }
                         }
-                    }, true);
+                    });
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }

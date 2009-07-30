@@ -39,20 +39,25 @@
 
 package org.netbeans.api.javafx.source;
 
+import org.netbeans.modules.javafx.source.CompilationInfoImpl;
 import java.io.IOException;
+import org.openide.util.Exceptions;
 
 /**
  *
  * @author nenik
  */
-public class CompilationController extends CompilationInfo {
+public final class CompilationController extends CompilationInfo {
+
+    public static CompilationController create(JavaFXParserResult result) {
+        if (result == null)
+            throw new IllegalArgumentException("Null result");
+        CompilationInfoImpl impl = new CompilationInfoImpl(result.impl());
+        return new CompilationController(impl);
+    }
 
     CompilationController(CompilationInfoImpl impl) {
         super(impl);
-    }
-
-    public String getText() {
-        return getJavaFXSource().getText();
     }
 
     /** Moves the state to required phase. If given state was already reached 
@@ -69,10 +74,36 @@ public class CompilationController extends CompilationInfo {
      * @throws IOException when the file cannot be red
      */    
     public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase ) throws IOException {
-        return impl.toPhase(phase);
+        return impl().toPhase(phase);
     }
         
-    void invalidate() {
+    public void runUserActionTask(final Task<? super CompilationController> task) throws IOException {
+        if (task == null) {
+            throw new IllegalArgumentException ("Task cannot be null");     //NOI18N
+        }
+
+        try {
+            task.run(this);
+        } catch (Exception ex) {
+          // XXX better handling
+          Exceptions.printStackTrace(ex);
+        } finally {
+        }
+    }
+
+    public void runWhenScanFinished(Task<CompilationController> task) throws IOException {
+        if (task == null) {
+            throw new IllegalArgumentException ("Task cannot be null");     //NOI18N
+        }
+
+        try {
+            task.run(this);
+        } catch (Exception ex) {
+          // XXX better handling
+          Exceptions.printStackTrace(ex);
+        } finally {
+        }
+
     }
 
 }

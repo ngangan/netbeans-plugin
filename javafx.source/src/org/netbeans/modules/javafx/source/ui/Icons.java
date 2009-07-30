@@ -48,7 +48,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import org.openide.util.Utilities;
+import org.openide.util.ImageUtilities;
 
 /**
  *
@@ -65,7 +65,7 @@ public final class Icons {
     }
     
     public static Icon getBusyIcon () {
-        Image img = Utilities.loadImage (WAIT);
+        Image img = ImageUtilities.loadImage (WAIT);
         if (img == null) {
             return null;
         }
@@ -85,34 +85,34 @@ public final class Icons {
 	
 	switch( elementKind ) {
 	    case PACKAGE:
-		img = Utilities.loadImage( ICON_BASE + "package" + GIF_EXTENSION ); // NOI18N
+		img = ImageUtilities.loadImage( ICON_BASE + "package" + GIF_EXTENSION ); // NOI18N
 		break;
 	    case ENUM:	
-		img = Utilities.loadImage( ICON_BASE + "enum" + PNG_EXTENSION ); // NOI18N
+		img = ImageUtilities.loadImage( ICON_BASE + "enum" + PNG_EXTENSION ); // NOI18N
 		break;
 	    case ANNOTATION_TYPE:
-		img = Utilities.loadImage( ICON_BASE + "annotation" + PNG_EXTENSION ); // NOI18N
+		img = ImageUtilities.loadImage( ICON_BASE + "annotation" + PNG_EXTENSION ); // NOI18N
 		break;
 	    case CLASS:	
-		img = Utilities.loadImage( ICON_BASE + "class" + PNG_EXTENSION ); // NOI18N
+		img = ImageUtilities.loadImage( ICON_BASE + "class" + PNG_EXTENSION ); // NOI18N
 		break;
 	    case INTERFACE:
-		img = Utilities.loadImage( ICON_BASE + "interface"  + PNG_EXTENSION ); // NOI18N
+		img = ImageUtilities.loadImage( ICON_BASE + "interface"  + PNG_EXTENSION ); // NOI18N
 		break;
 	    case FIELD:
-		img = Utilities.loadImage( getIconName(elementKind, ICON_BASE + "field", PNG_EXTENSION, modifiers ) ); // NOI18N
+		img = ImageUtilities.loadImage( getIconName(elementKind, ICON_BASE + "field", PNG_EXTENSION, modifiers ) ); // NOI18N
 		break;
 	    case ENUM_CONSTANT: 
-		img = Utilities.loadImage( ICON_BASE + "constant" + PNG_EXTENSION ); // NOI18N
+		img = ImageUtilities.loadImage( ICON_BASE + "constant" + PNG_EXTENSION ); // NOI18N
 		break;
 	    case CONSTRUCTOR:
-		img = Utilities.loadImage( getIconName(elementKind, ICON_BASE + "constructor", PNG_EXTENSION, modifiers ) ); // NOI18N
+		img = ImageUtilities.loadImage( getIconName(elementKind, ICON_BASE + "constructor", PNG_EXTENSION, modifiers ) ); // NOI18N
 		break;
 	    case STATIC_INIT: 	
-		img = Utilities.loadImage( getIconName(elementKind, ICON_BASE + "initializer", PNG_EXTENSION, modifiers ) ); // NOI18N
+		img = ImageUtilities.loadImage( getIconName(elementKind, ICON_BASE + "initializer", PNG_EXTENSION, modifiers ) ); // NOI18N
 		break;
 	    case METHOD: 	
-		img = Utilities.loadImage( getIconName(elementKind, ICON_BASE + "method", PNG_EXTENSION, modifiers ) ); // NOI18N
+		img = ImageUtilities.loadImage( getIconName(elementKind, ICON_BASE + "method", PNG_EXTENSION, modifiers ) ); // NOI18N
 		break;
 	    default:	
 	        img = null;

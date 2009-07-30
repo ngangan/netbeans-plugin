@@ -105,7 +105,7 @@ public class JavaFXFunctionsNode extends ContainerNode {
                                             (tek.getKind() == ElementKind.STATIC_INIT))) {
                                         ((ExecutableElement)tek).getReturnType();
                                         
-                                        JavaFXFunctionNode functionNode = new JavaFXFunctionNode(js.getCpInfo(), tek, parent);
+                                        JavaFXFunctionNode functionNode = new JavaFXFunctionNode(js.getClasspathInfo(), tek, parent);
                                         if (functionNode.getSignature() != null) {
                                             functionNodes.add(functionNode);
                                         }

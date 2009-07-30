@@ -94,7 +94,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     public void run(CompilationInfo info) throws IOException {
         resume();
 
-        Document doc = info.getJavaFXSource().getDocument();
+        Document doc = info.getDocument();
         if (doc == null) {
             Logger.getLogger(MarkOccurrencesHighlighter.class.getName()).log(Level.FINE, "SemanticHighlighter: Cannot get document!"); // NOI18N
             return;
@@ -183,7 +183,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
     List<int[]> processImpl(CompilationInfo info, Preferences pref, Document doc, int caretPosition) {
         UnitTree cu = info.getCompilationUnit();
 //        TreePath tp = info.getTreeUtilities().pathFor(caretPosition);
-        TreeUtilities tu = new TreeUtilities(info);
+        TreeUtilities tu = TreeUtilities.create(info);
         JavaFXTreePath tp = tu.pathFor(caretPosition);
         JavaFXTreePath typePath = findTypePath(tp);
 
@@ -475,7 +475,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
     private List<int[]> detectBreakOrContinueTarget(CompilationInfo info, Document document, JavaFXTreePath breakOrContinue) {
         List<int[]> result = new ArrayList<int[]>();
-        ExpressionTree target = new TreeUtilities(info).getBreakContinueTarget(breakOrContinue);
+        ExpressionTree target = TreeUtilities.create(info).getBreakContinueTarget(breakOrContinue);
 
         if (target == null) {
             return null;

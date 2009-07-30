@@ -37,50 +37,48 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.modules.javafx.source;
 
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
-import javax.tools.Diagnostic.Kind;
-import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.netbeans.modules.parsing.api.Snapshot;
 
 /**
  * Don't use! Should be private, needs some repackaging....
  * @author nenik
  */
 public class CompilationInfoImpl {
+
     static final Logger LOGGER = Logger.getLogger(CompilationInfoImpl.class.getName());
     
-    JavaFXSource.Phase phase = JavaFXSource.Phase.MODIFIED;
-    private UnitTree compilationUnit;    
-    private Iterable <? extends JavaFileObject> classBytes;
+    //final JavaFXSource source;
+    private final JavaFXParserResultImpl parserResultImpl;
 
-    private JavafxcTaskImpl cTask;
-    final JavaFXSource source;
-    
+    public CompilationInfoImpl(JavaFXParserResultImpl parserResult) {
+        this.parserResultImpl = parserResult;
+    }
 
-    CompilationInfoImpl(JavaFXSource source) {
-        assert source != null;
-        this.source = source;
+    public ClasspathInfo getClasspathInfo() {
+        return parserResultImpl.getClasspathInfo();
     }
 
     /**
      * Returns the current phase of the {@link JavaFXSource}.
      * @return {@link JavaFXSource.Phase} the state which was reached by the {@link JavaFXSource}.
      */
-    JavaFXSource.Phase getPhase() {
-        return phase;
+    public JavaFXSource.Phase getPhase() {
+        return JavaFXSource.Phase.from(parserResultImpl.getPhase());
     }
 
     /**
@@ -90,25 +88,20 @@ public class CompilationInfoImpl {
      * 
      * @throws java.lang.IllegalStateException  when the phase is less than {@link JavaFXSource.Phase#PARSED}
      */
-    UnitTree getCompilationUnit() {
-//        if (this.jfo == null) {
-//            throw new IllegalStateException ();
-//        }
-        if (phase.lessThan(JavaFXSource.Phase.PARSED))
-            throw new IllegalStateException("Cannot call getCompilationInfo() if current phase < JavaFXSource.Phase.PARSED. You must call toPhase(Phase.PARSED) first.");//NOI18N
-        return compilationUnit;
+    public UnitTree getCompilationUnit() {
+        return parserResultImpl.getCompilationUnit();
+    }
+
+    public JavafxcTaskImpl getJavafxcTaskImpl() {
+        return parserResultImpl.getJavafxcTaskImpl();
     }
     
     public TokenHierarchy getTokenHierarchy() {
-        return source.getTokenHierarchy();
+        return parserResultImpl.getSnapshot().getTokenHierarchy();
     }
 
-    /**
-     * Returns {@link JavaFXSource} for which this {@link CompilationInfoImpl} was created.
-     * @return JavaFXSource
-     */
-    public JavaFXSource getJavaFXSource() {
-        return source;
+    public Snapshot getSnapshot() {
+        return parserResultImpl.getSnapshot();
     }
     
     /** Moves the state to required phase. If given state was already reached 
@@ -124,76 +117,32 @@ public class CompilationInfoImpl {
      *         reached using this method
      * @throws IOException when the file cannot be red
      */    
-    public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase ) throws IOException {
-        if (phase == JavaFXSource.Phase.MODIFIED) {
-            throw new IllegalArgumentException( "Invalid phase: " + phase );    //NOI18N
-        }
-        JavaFXSource.Phase currentPhase = source.moveToPhase(phase, this, false);
-            return currentPhase.compareTo (phase) < 0 ? currentPhase : phase;
+    public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase) throws IOException {
+        return JavaFXSource.Phase.from(parserResultImpl.toPhase(phase.toCompilationPhase()));
     }
 
-    /**
-     * Sets the current {@link JavaFXSource.Phase}
-     * @param phase
-     */
-    void setPhase(final JavaFXSource.Phase phase) {
-        assert phase != null;
-        this.phase = phase;
+    public Context getContext() {
+        return parserResultImpl.getContext();
     }
 
-    void setCompilationUnit(UnitTree compilationUnit) {
-        assert this.compilationUnit == null;
-        this.compilationUnit = compilationUnit;
-    }
-    void setClassBytes(Iterable <? extends JavaFileObject> bytes) {
-        this.classBytes = bytes;
-    }
-
-    synchronized JavafxcTaskImpl getJavafxcTask() {
-        if (cTask == null) {
-            cTask = source.createJavafxcTask(new DiagnosticListenerImpl());
-        }
-        return cTask;
-    }
-    
-    Iterable <? extends JavaFileObject> getClassBytes() {
-        if (phase.lessThan(JavaFXSource.Phase.CODE_GENERATED))
-            throw new IllegalStateException("Cannot call getCompilationInfo() if current phase < JavaFXSource.CODE_GENERATED. You must call toPhase(Phase.CODE_GENERATED) first.");//NOI18N
-        return classBytes;
-    }
-    
-    Context getContext() {
-        return getJavafxcTask().getContext();
-    }
     /**
      * Returns the errors in the file represented by the {@link JavaSource}.
      * @return an list of {@link Diagnostic} 
      */
-    List<Diagnostic> getDiagnostics() {
-        final DiagnosticListenerImpl dli = (DiagnosticListenerImpl) getContext().get(DiagnosticListener.class);
-        final TreeMap<Integer, Diagnostic> errorsMap = dli.errors;
-        Collection<Diagnostic> errors = errorsMap.values();
-        return new ArrayList<Diagnostic>(errors);
+    public List<Diagnostic> getDiagnostics() {
+        return parserResultImpl.getDiagnostics();
     }
     
     public boolean isErrors() {
-        for (Diagnostic diag: getDiagnostics()) {
-            if (diag.getKind() == Kind.ERROR) return true;
-        }
-        return false;
+        return parserResultImpl.isErrors();
     }
-    
-    static class DiagnosticListenerImpl implements DiagnosticListener<JavaFileObject> {
-        
-        private final TreeMap<Integer,Diagnostic> errors;
-        
-        public DiagnosticListenerImpl() {
-            this.errors = new TreeMap<Integer,Diagnostic>();
-        }
-        
-        public void report(Diagnostic<? extends JavaFileObject> message) {            
-            LOGGER.fine("Error at [" + message.getLineNumber() + ":" + message.getColumnNumber() + "]/" + message.getEndPosition() + " - " + message.getMessage(null)); // NOI18N
-            errors.put((int)message.getPosition(),message);
-        }
+
+    public Iterable<? extends JavaFileObject> getClassBytes() {
+        return parserResultImpl.getClassBytes();
     }
+
+    public JavaFXParserResultImpl parserResultImpl() {
+        return parserResultImpl;
+    }
+
 }

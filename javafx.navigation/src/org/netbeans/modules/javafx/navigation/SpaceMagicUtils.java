@@ -71,10 +71,10 @@ public final class SpaceMagicUtils {
     private SpaceMagicUtils() {
     }
 
-    public static boolean hasSpiritualInvocation(final ElementHandle<? extends Element> elementHandle, final JavaFXSource source) {
+    public static boolean hasSpiritualInvocation(final ElementHandle<? extends Element> elementHandle, CompilationInfo compilationInfo) {
         final Element[] element = new Element[1];
         try {
-            source.runUserActionTask(new Task<CompilationController>() {
+            ((CompilationController)compilationInfo).runUserActionTask(new Task<CompilationController>() {
                 public void run(CompilationController cc) throws Exception {
                     try {
                         element[0] = elementHandle.resolve(cc);
@@ -83,7 +83,7 @@ public final class SpaceMagicUtils {
                         // can't convert to element (incomplete element)
                     }
                 }
-            }, true);
+            });
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }

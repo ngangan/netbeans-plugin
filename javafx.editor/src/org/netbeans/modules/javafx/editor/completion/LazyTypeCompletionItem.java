@@ -68,13 +68,13 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
     private static final Logger logger = Logger.getLogger(LazyTypeCompletionItem.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
     
-    public static final LazyTypeCompletionItem create(ElementHandle<TypeElement> handle, EnumSet<ElementKind> kinds, int substitutionOffset, JavaFXSource javafxSource, boolean insideNew) {
-        return new LazyTypeCompletionItem(handle, kinds, substitutionOffset, javafxSource, insideNew);
+    public static final LazyTypeCompletionItem create(ElementHandle<TypeElement> handle, EnumSet<ElementKind> kinds, int substitutionOffset, CompilationController compilationController, boolean insideNew) {
+        return new LazyTypeCompletionItem(handle, kinds, substitutionOffset, compilationController, insideNew);
     }
     
     private ElementHandle<TypeElement> handle;
     private EnumSet<ElementKind> kinds;
-    private JavaFXSource javafxSource;
+    private CompilationController compilationController;
     private boolean insideNew;
     private String name;
     private String simpleName;
@@ -83,11 +83,11 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
     private CharSequence sortText;
     private int prefWidth = -1;
     
-    private LazyTypeCompletionItem(ElementHandle<TypeElement> handle, EnumSet<ElementKind> kinds, int substitutionOffset, JavaFXSource javafxSource, boolean insideNew) {
+    private LazyTypeCompletionItem(ElementHandle<TypeElement> handle, EnumSet<ElementKind> kinds, int substitutionOffset, CompilationController compilationController, boolean insideNew) {
         super(substitutionOffset);
         this.handle = handle;
         this.kinds = kinds;
-        this.javafxSource = javafxSource;
+        this.compilationController = compilationController;
         this.insideNew = insideNew;
         this.name = handle.getQualifiedName();
         int idx = name.lastIndexOf('.'); //NOI18N
@@ -104,7 +104,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
             }
             try {
                 long t = System.currentTimeMillis();
-                javafxSource.runUserActionTask(new Task<CompilationController>() {
+                compilationController.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(CompilationController controller) throws Exception {
                         controller.toPhase(JavaFXSource.Phase.ANALYZED);
@@ -128,7 +128,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                         }
                         handle = null;
                     }
-                }, true);
+                });
             } catch(Throwable t) {
             }
         }

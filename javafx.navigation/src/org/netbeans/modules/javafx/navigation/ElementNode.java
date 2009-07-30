@@ -52,6 +52,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.Action;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.modules.javafx.navigation.actions.OpenAction;
@@ -74,13 +75,13 @@ public class ElementNode extends AbstractNode {
 
     private static Node WAIT_NODE;
     
-    private final JavaFXSource source;
+    private final CompilationInfo compilationInfo;
     private OpenAction openAction;
     private Description description;
 
-    public ElementNode(Description description, final JavaFXSource source) {
-        super(description.subs == null ? Children.LEAF : new ElementChilren(source, description.subs, description.ui.getFilters()), null);
-        this.source = source;
+    public ElementNode(Description description, final CompilationInfo compilationInfo) {
+        super(description.subs == null ? Children.LEAF : new ElementChilren(compilationInfo, description.subs, description.ui.getFilters()), null);
+        this.compilationInfo = compilationInfo;
         this.description = description;
         setDisplayName(description.name);
     }
@@ -171,7 +172,7 @@ public class ElementNode extends AbstractNode {
 
     private synchronized Action getOpenAction() {
         if (openAction == null) {
-            openAction = new OpenAction(source, description.elementHandle, description.ui.getFileObject(), description.name, description.pos);
+            openAction = new OpenAction(compilationInfo, description.elementHandle, description.ui.getFileObject(), description.name, description.pos);
         }
         return openAction;
     }
@@ -267,15 +268,15 @@ public class ElementNode extends AbstractNode {
 
     private static final class ElementChilren extends Children.Keys<Description> {
         
-        private final JavaFXSource source;
+        private final CompilationInfo compilationInfo;
 
-        public ElementChilren(JavaFXSource source, Set<Description> descriptions, ClassMemberFilters filters) {
-            this.source = source;
+        public ElementChilren(CompilationInfo compilationInfo, Set<Description> descriptions, ClassMemberFilters filters) {
+            this.compilationInfo = compilationInfo;
             resetKeys(descriptions, filters);
         }
 
         protected Node[] createNodes(Description key) {
-            return new Node[]{new ElementNode(key, source)};
+            return new Node[]{new ElementNode(key, compilationInfo)};
         }
 
         void resetKeys(Set<Description> descriptions, ClassMemberFilters filters) {

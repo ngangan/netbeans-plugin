@@ -70,6 +70,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import org.netbeans.modules.javafx.source.JavadocEnv;
+import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
 
 /**
  *
@@ -79,13 +80,15 @@ public final class ElementUtilities {
 
     private final Context ctx;
 //    private final ElementsService delegate;
-    private final CompilationInfo info;
+    private final JavaFXParserResultImpl parserResultImpl;
 
     ElementUtilities(final CompilationInfo info) {
-        assert info != null;
-        JavafxcTask task = info.impl.getJavafxcTask();
-        this.info = info;
-        this.ctx = ((JavafxcTaskImpl) task).getContext();
+        this(info.impl().parserResultImpl());
+    }
+
+    ElementUtilities(JavaFXParserResultImpl parserResultImpl) {
+        this.parserResultImpl = parserResultImpl;
+        this.ctx = parserResultImpl.getJavafxcTaskImpl().getContext();
 //        this.delegate = ElementsService.instance(ctx);
     }
 
@@ -226,7 +229,7 @@ public final class ElementUtilities {
         ArrayList<Element> members = new ArrayList<Element>();
         if (type != null) {
 //            Elements elements = JavacElements.instance(ctx);
-            Elements elements = info.getElements();
+            Elements elements = parserResultImpl.getElements();
             switch (type.getKind()) {
                 case DECLARED:
                     HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
@@ -294,7 +297,7 @@ public final class ElementUtilities {
         ArrayList<Element> members = new ArrayList<Element>();
         HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
 //        Elements elements = JavacElements.instance(ctx);
-        Elements elements = info.getElements();
+        Elements elements = parserResultImpl.getElements();
         Types types = JavafxTypes.instance(ctx);
         TypeElement cls;
         while (scope != null) {

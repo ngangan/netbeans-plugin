@@ -123,11 +123,11 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private void process(CompilationInfo info) {
-        if (LOGGABLE) log("process: " + info.getJavaFXSource().getFileObject()); // NOI18N
+        if (LOGGABLE) log("process: " + info.getFileObject()); // NOI18N
         
-        Document doc = info.getJavaFXSource().getDocument();
+        Document doc = info.getDocument();
         if (doc == null) {
-            if (LOGGABLE) log("  no document for: " + info.getJavaFXSource()); // NOI18N
+            if (LOGGABLE) log("  no document for: " + info); // NOI18N
             return;
         }
 
@@ -139,8 +139,8 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             if (LOGGABLE) log("    diagnostics: " + d); // NOI18N
             if (d.getSource() instanceof JavaFileObject) {
                 JavaFileObject jfo = (JavaFileObject)d.getSource();
-                if (! jfo.getName().equals(info.getJavaFXSource().getFileObject().getNameExt())) {
-                    if (LOGGABLE) log("    in different file: " + jfo.getName() + " vs.: " + info.getJavaFXSource().getFileObject().getNameExt()); // NOI18N
+                if (! jfo.getName().equals(info.getFileObject().getNameExt())) {
+                    if (LOGGABLE) log("    in different file: " + jfo.getName() + " vs.: " + info.getFileObject().getNameExt()); // NOI18N
                     continue;
                 }
             } else {
@@ -351,7 +351,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             return start;
         }
         int res = ts.offset();
-        if (res > start && res < info.getJavaFXSource().getDocument().getLength()) {
+        if (res > start && res < info.getSnapshot().getSource().getDocument(true).getLength()) {
             if (LOGGABLE) log("skipping the whitespace start == " + start + "  res == " + res); // NOI18N
             return res;
         } else {

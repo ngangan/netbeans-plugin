@@ -55,6 +55,7 @@ import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -63,11 +64,14 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.modules.masterfs.providers.AnnotationProvider;
 import org.netbeans.modules.masterfs.providers.InterceptionListener;
+import org.netbeans.modules.parsing.api.Source;
+import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileStatusEvent;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 import org.openide.util.RequestProcessor;
@@ -103,7 +107,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
     }
 
     @Override
-    public Image annotateIcon(Image icon, int iconType, Set files) {
+    public Image annotateIcon(Image icon, int iconType, Set<? extends FileObject> files) {
         boolean inError = false;
         boolean singleFile = files.size() == 1;
 
@@ -269,13 +273,15 @@ public class FXErrorAnnotator extends AnnotationProvider {
             if (!file.getExt().equals("fx")){ // NOI18N
                 return false;
             }
-            final JavaFXSource fxSource = JavaFXSource.forFileObject(file);
-            if (fxSource == null){
-                return false;
-            }
+            final Source source = Source.create(file);
             final boolean isErr[] = {false};
             try{
-                fxSource.runUserActionTask(new CancellableTask<CompilationController>(){
+                if (source == null) {
+                    return false;
+                }
+                JavaFXParserResult parserResult = JavaFXParserResult.create(source, null);
+                final CompilationController compilationController = CompilationController.create(parserResult);
+                compilationController.runUserActionTask(new CancellableTask<CompilationController>(){
                     public void cancel() {
                     }
 
@@ -283,15 +289,17 @@ public class FXErrorAnnotator extends AnnotationProvider {
                         try {
                             dontUpdate = true;
                             if (!cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                                isErr[0] = fxSource.currentInfo.isErrors();
+                                isErr[0] = compilationController.isErrors();
                             }
                         } finally {
                             dontUpdate = false;
                         }
                     }
-                }, true);
+                });
             }catch(IOException e){
                 e.printStackTrace();
+            } catch (ParseException e) {
+                Exceptions.printStackTrace(e);
             }
 
             return isErr[0];

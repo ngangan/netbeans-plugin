@@ -37,48 +37,34 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.javafx.source.parsing;
 
-import com.sun.javafx.api.tree.CompoundAssignmentTree;
-import com.sun.javafx.api.tree.Tree;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.api.lexer.TokenUtilities;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.JavaFXParserResult;
+import org.netbeans.modules.parsing.api.ResultIterator;
+import org.netbeans.modules.parsing.api.UserTask;
 
-/**
- *
- * @author David Strupl
- */
-public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironment<CompoundAssignmentTree> {
-    
-    private static final Logger logger = Logger.getLogger(CompoundAssignmentTreeEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+public final class JavaFXParserTask extends UserTask {
+
+    private final ClasspathInfo classpathInfo;
+
+    private JavaFXParserResult result;
+
+    public JavaFXParserTask(ClasspathInfo classpathInfo) {
+        this.classpathInfo = classpathInfo;
+    }
 
     @Override
-    protected void inside(CompoundAssignmentTree cat) throws IOException {
-        if (LOGGABLE) log("inside CompoundAssignmentTree " + cat); // NOI18N
-        int catTextStart = (int) sourcePositions.getEndPosition(root, cat.getVariable());
-        if (catTextStart != Diagnostic.NOPOS) {
-            Tree expr = cat.getExpression();
-            if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
-                CharSequence catText = getController().getText().subSequence(catTextStart, offset);
-                int eqPos = TokenUtilities.indexOf(catText, '='); // NOI18N
-                //NOI18N
-                if (eqPos > -1) {
-                    localResult(null);
-                    addValueKeywords();
-                }
-            }
-        }
+    public void run(ResultIterator resultIterator) throws Exception {
+        result = (JavaFXParserResult) resultIterator.getParserResult();
     }
 
-
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
+    public ClasspathInfo classpathInfo() {
+        return classpathInfo;
     }
+
+    public JavaFXParserResult result() {
+        return result;
+    }
+
 }

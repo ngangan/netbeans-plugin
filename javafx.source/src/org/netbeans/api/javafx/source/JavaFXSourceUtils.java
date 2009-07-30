@@ -95,7 +95,7 @@ public class JavaFXSourceUtils {
                         UnitTree cu = control.getCompilationUnit();
                         List<? extends Tree> topLevels = cu.getTypeDecls();
                         for (Tree topLevel : topLevels) {
-                            if (((Tree) topLevel).getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+                            if (topLevel.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
                                 TypeElement type = (TypeElement) trees.getElement(JavaFXTreePath.getPath(cu, topLevel));
                                 if (type != null) {
                                     Set<Modifier> modifiers = type.getModifiers();

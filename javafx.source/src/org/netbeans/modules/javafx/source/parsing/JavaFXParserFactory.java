@@ -37,48 +37,59 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.javafx.source.parsing;
 
-import com.sun.javafx.api.tree.CompoundAssignmentTree;
-import com.sun.javafx.api.tree.Tree;
-import java.io.IOException;
+import java.util.Collection;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.api.lexer.TokenUtilities;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
+import org.netbeans.modules.parsing.api.Snapshot;
+import org.netbeans.modules.parsing.spi.ParserFactory;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileStateInvalidException;
+import org.openide.util.Lookup;
 
 /**
  *
- * @author David Strupl
+ * @author Miloslav Metelka
  */
-public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironment<CompoundAssignmentTree> {
-    
-    private static final Logger logger = Logger.getLogger(CompoundAssignmentTreeEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+public final class JavaFXParserFactory extends ParserFactory {
+
+    /** Mime-type of FX sources. */
+    public static final String MIME_TYPE = "text/x-fx";
+
+    /** used by tests to ensure that all instances of parser were GCed */
+    private static final Logger TIMER = Logger.getLogger("TIMER.JavaFXParser");
 
     @Override
-    protected void inside(CompoundAssignmentTree cat) throws IOException {
-        if (LOGGABLE) log("inside CompoundAssignmentTree " + cat); // NOI18N
-        int catTextStart = (int) sourcePositions.getEndPosition(root, cat.getVariable());
-        if (catTextStart != Diagnostic.NOPOS) {
-            Tree expr = cat.getExpression();
-            if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
-                CharSequence catText = getController().getText().subSequence(catTextStart, offset);
-                int eqPos = TokenUtilities.indexOf(catText, '='); // NOI18N
-                //NOI18N
-                if (eqPos > -1) {
-                    localResult(null);
-                    addValueKeywords();
+    public JavaFXParser createParser(final Collection<Snapshot> snapshots) {
+        assert snapshots != null;
+        if (snapshots.size() == 1) {
+            final FileObject fo = snapshots.iterator().next().getSource().getFileObject();
+            try {
+                if (fo == null) {
+                    return null;
                 }
-            }
+                if (fo.getFileSystem().isDefault() && fo.getAttribute("javax.script.ScriptEngine") != null //NOI18N
+                        && fo.getAttribute("template") == Boolean.TRUE) { //NOI18N
+                    // Do not create javaFX parser for templates
+                    return null;
+                }
+            } catch (FileStateInvalidException fsie) {}
         }
+        JavaFXParser parser = new JavaFXParser();
+        if (TIMER.isLoggable(Level.FINE)) {
+            LogRecord rec = new LogRecord(Level.FINE, "JavaFXParser");
+            rec.setParameters(new Object[] { parser });
+            TIMER.log(rec);
+        }
+        return parser;
     }
 
-
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
+    public static JavaFXParserFactory getDefault () {
+        final Lookup lookup = MimeLookup.getLookup (MIME_TYPE);
+        return lookup.lookup (JavaFXParserFactory.class);
     }
+
 }

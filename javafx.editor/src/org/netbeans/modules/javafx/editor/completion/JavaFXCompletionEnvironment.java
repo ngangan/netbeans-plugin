@@ -56,6 +56,8 @@ import org.netbeans.api.javafx.source.ClassIndex.NameKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -77,6 +79,10 @@ import java.io.Writer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.modules.parsing.api.Snapshot;
+import org.netbeans.modules.parsing.api.Source;
+import org.netbeans.modules.parsing.spi.ParseException;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -525,9 +531,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (fqnPrefix == null) {
             fqnPrefix = ""; // NOI18N
         }
-        JavaFXSource js = controller.getJavaFXSource();
         
-        ClasspathInfo info = js.getCpInfo();
+        ClasspathInfo info = controller.getClasspathInfo();
         ArrayList<FileObject> fos = new ArrayList<FileObject>();
         ClassPath cp = info.getClassPath(PathKind.SOURCE);
         fos.addAll(Arrays.asList(cp.getRoots()));
@@ -679,7 +684,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         query.toolTip = new MethodParamsTipPaintComponent(params, types.length, query.component);
                     }
                     startPos = (int) sourcePositions.getEndPosition(root, mi.getMethodSelect());
-                    String text = controller.getText().substring(startPos, offset);
+                    String text = controller.getText().subSequence(startPos, offset).toString();
                     query.anchorOffset = startPos + text.indexOf('('); //NOI18N
                     query.toolTipOffset = startPos + text.lastIndexOf(','); //NOI18N
                     if (query.toolTipOffset < query.anchorOffset) {
@@ -1361,7 +1366,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew, String myPrefix) {
         if (LOGGABLE) log(" addAllTypes "); // NOI18N
         for (ElementHandle<TypeElement> name :
-            controller.getJavaFXSource().getCpInfo().getClassIndex().getDeclaredTypes(
+            controller.getClasspathInfo().getClassIndex().getDeclaredTypes(
                 myPrefix != null ? myPrefix : EMPTY,
                 NameKind.PREFIX,
                 EnumSet.allOf(SearchScope.class))) {
@@ -1384,7 +1389,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 LazyTypeCompletionItem item = LazyTypeCompletionItem.create(
                         name, kinds,
                         query.anchorOffset,
-                        controller.getJavaFXSource(), insideNew);
+                        controller, insideNew);
                 addResult(item);
             }
         }
@@ -1463,9 +1468,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             w.close();
             if (LOGGABLE) log("  source written to " + fo); // NOI18N
             ClasspathInfo info = ClasspathInfo.create(controller.getFileObject());
-            JavaFXSource s = JavaFXSource.create(info,Collections.singleton(fo));
-            if (LOGGABLE) log("  jfxsource obtained " + s); // NOI18N
-            s.runWhenScanFinished(new Task<CompilationController>() {
+            JavaFXParserResult parserResult = JavaFXParserResult.create(Source.create(fo), info);
+            if (LOGGABLE) log("  JavaFXParserResult obtained " + parserResult); // NOI18N
+            CompilationController.create(parserResult).runWhenScanFinished(new Task<CompilationController>() {
                 public void run(CompilationController fakeController) throws Exception {
                     if (LOGGABLE) log("    scan finished"); // NOI18N
                     JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos,true);
@@ -1492,11 +1497,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         query.results.removeAll(toRemove);
                     }
                 }
-            },true);
+            });
         } catch (IOException ex) {
             if (LOGGABLE) {
                 logger.log(Level.FINE,"useFakeSource failed: ",ex); // NOI18N
             }
+        } catch (ParseException e) {
+            Exceptions.printStackTrace(e);
         } finally {
             usingFakeSource--;
         }

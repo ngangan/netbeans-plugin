@@ -235,7 +235,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 JavaFXSource js = JavaFXSource.forDocument(doc);
                 if (js != null) {
                     if (queryType == JavaFXCompletionProvider.DOCUMENTATION_QUERY_TYPE && element != null) {
-                        FileObject fo = JavaFXSourceUtils.getFile(element, js.getCpInfo());
+                        FileObject fo = JavaFXSourceUtils.getFile(element, js.getClasspathInfo());
                         if (fo != null) {
                             js = JavaFXSource.forFileObject(fo);
                         }

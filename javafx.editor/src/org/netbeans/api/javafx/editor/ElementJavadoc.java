@@ -210,7 +210,7 @@ public class ElementJavadoc {
 
     private ElementJavadoc(CompilationInfo compilationInfo, Element element, URL url) {
         ElementUtilities eu = compilationInfo.getElementUtilities();
-        this.cpInfo = compilationInfo.getJavaFXSource().getCpInfo();
+        this.cpInfo = compilationInfo.getClasspathInfo();
         Doc doc = eu.javaDocFor(element);
         boolean isJavaClass = (doc != null) && doc.isClass() && !compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
         boolean localized = false;

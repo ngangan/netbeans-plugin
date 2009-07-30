@@ -99,7 +99,7 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
 
         source = JavaFXSource.forFileObject(JavaFXProjectUtilities.getSourceFiles(project).get(0));
 
-        final ClasspathInfo cpInfo = source.getCpInfo();
+        final ClasspathInfo cpInfo = source.getClasspathInfo();
         ClassIndex index = cpInfo.getClassIndex();
 
         if (isLibraryNode) {

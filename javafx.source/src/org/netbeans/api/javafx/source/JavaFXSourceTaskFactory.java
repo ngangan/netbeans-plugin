@@ -51,6 +51,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
+import org.netbeans.modules.javafx.source.parsing.JavaFXTaskProcessor;
 import org.openide.filesystems.FileObject;
 import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
@@ -187,12 +188,12 @@ public abstract class JavaFXSourceTaskFactory {
         LOG.log(Level.FINEST, BEFORE_ADDING_REMOVING_TASKS);
         
         for (Entry<JavaFXSource, CancellableTask<CompilationInfo>> e : toRemove.entrySet()) {
-            e.getKey().removePhaseCompletionTask( e.getValue());
+            JavaFXTaskProcessor.removePhaseCompletionTask(e.getKey(), e.getValue());
         }
-        
+
         for (Entry<JavaFXSource, CancellableTask<CompilationInfo>> e : toAdd.entrySet()) {
             try {
-                e.getKey().addPhaseCompletionTask(e.getValue(), phase, priority);
+                JavaFXTaskProcessor.addPhaseCompletionTask(e.getKey(), e.getValue(), phase, priority);
 //            } catch (FileObjects.InvalidFileException ie) {
 //                LOG.info("JavaFXSource.addPhaseCompletionTask called on deleted file");       //NOI18N
             } catch (IOException ex) {
@@ -221,7 +222,7 @@ public abstract class JavaFXSourceTaskFactory {
             return ;
         }
 
-        source.rescheduleTask(task);
+        JavaFXTaskProcessor.rescheduleTask(source, task);
     }
 
     private final Map<FileObject, CancellableTask<CompilationInfo>> file2Task;

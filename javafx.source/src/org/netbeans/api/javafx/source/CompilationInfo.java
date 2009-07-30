@@ -38,6 +38,7 @@
  */
 package org.netbeans.api.javafx.source;
 
+import org.netbeans.modules.javafx.source.CompilationInfoImpl;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
@@ -61,10 +62,12 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.swing.text.Document;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.modules.parsing.api.Snapshot;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -73,7 +76,7 @@ import org.openide.filesystems.FileObject;
  */
 public class CompilationInfo {
 
-    final CompilationInfoImpl impl;
+    private final CompilationInfoImpl impl;
     private ElementUtilities elementUtilities;
     private TreeUtilities treeUtilities;
 
@@ -84,8 +87,20 @@ public class CompilationInfo {
         return elementUtilities;
     }
 
+    public Snapshot getSnapshot() {
+        return impl.getSnapshot();
+    }
+
     public FileObject getFileObject() {
-        return impl.getJavaFXSource().getFileObject();
+        return getSnapshot().getSource().getFileObject();
+    }
+
+    public Document getDocument() {
+        return getSnapshot().getSource().getDocument(true);
+    }
+
+    public CharSequence getText() {
+        return impl().getSnapshot().getText();
     }
 
     public TreeUtilities getTreeUtilities() {
@@ -93,10 +108,6 @@ public class CompilationInfo {
             treeUtilities = new TreeUtilities(this);
         }
         return treeUtilities;
-    }
-
-    public CompilationInfo(JavaFXSource source) {
-        impl = new CompilationInfoImpl(source);
     }
 
     public CompilationInfo(CompilationInfoImpl impl) {
@@ -116,8 +127,13 @@ public class CompilationInfo {
      * @return javafxc Trees service
      */
     public JavafxcTrees getTrees() {
-        return JavafxcTrees.instance(impl.getJavafxcTask());
+        return JavafxcTrees.instance(impl.getJavafxcTaskImpl());
     }
+
+    public boolean isErrors() {
+        return impl.isErrors();
+    }
+
     // XXX: hack around lack of support in compiler
     public JavaFXTreePath getPath(Element e) {
         Symbol sym = (Symbol) e;
@@ -188,7 +204,7 @@ public class CompilationInfo {
     }
 
     public Types getTypes() {
-        return impl.getJavafxcTask().getTypes();
+        return impl.getJavafxcTaskImpl().getTypes();
     }
 
     public JavafxTypes getJavafxTypes() {
@@ -196,15 +212,7 @@ public class CompilationInfo {
     }
 
     public Elements getElements() {
-        return impl.getJavafxcTask().getElements();
-    }
-
-    /**
-     * Returns {@link JavaFXSource} for which this {@link CompilationInfo} was created.
-     * @return JavaFXSource
-     */
-    public JavaFXSource getJavaFXSource() {
-        return impl.getJavaFXSource();
+        return impl.getJavafxcTaskImpl().getElements();
     }
 
     /**
@@ -216,6 +224,10 @@ public class CompilationInfo {
      */
     public UnitTree getCompilationUnit() {
         return impl.getCompilationUnit();
+    }
+
+    public ClasspathInfo getClasspathInfo() {
+        return impl.getClasspathInfo();
     }
     
     public Iterable <? extends JavaFileObject> getClassBytes() {
@@ -270,4 +282,9 @@ public class CompilationInfo {
 //        }
         return Collections.unmodifiableList(result);
     }
+
+    CompilationInfoImpl impl() {
+        return impl;
+    }
+
 }

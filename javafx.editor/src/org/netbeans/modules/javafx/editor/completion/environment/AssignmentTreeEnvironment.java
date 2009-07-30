@@ -47,6 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import org.netbeans.api.lexer.TokenUtilities;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
@@ -65,8 +66,8 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
         if (asTextStart != Diagnostic.NOPOS) {
             Tree expr = as.getExpression();
             if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
-                String asText = getController().getText().substring(asTextStart, offset);
-                int eqPos = asText.indexOf('='); // NOI18N
+                CharSequence asText = getController().getText().subSequence(asTextStart, offset);
+                int eqPos = TokenUtilities.indexOf(asText, '='); // NOI18N
                 if (eqPos > -1) {
                     localResult(getSmartType(as));
                     addValueKeywords();

@@ -87,7 +87,7 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
 
     private void fakeIt() {
         try {
-            Document d = controller.getJavaFXSource().getDocument();
+            Document d = controller.getDocument();
             String start = d.getText(0, offset);
             if (LOGGABLE) log("  start = " + start); // NOI18N
             String end = d.getText(offset, d.getLength()-offset);

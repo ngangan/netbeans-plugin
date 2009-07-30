@@ -109,9 +109,8 @@ public class ElementHandle<T extends Element> {
     @SuppressWarnings ("unchecked")     // NOI18N
     public T resolve (final CompilationInfo compilationInfo) {
         if (compilationInfo == null) throw new IllegalArgumentException();
-        assert compilationInfo.impl != null;
-
-        return resolveImpl (compilationInfo.impl.getJavafxcTask());
+        assert compilationInfo.impl() != null;
+        return resolveImpl (compilationInfo.impl().getJavafxcTaskImpl());
     }
 
     public ElementKind getKind() {
@@ -167,14 +166,18 @@ public class ElementHandle<T extends Element> {
         switch (this.kind) {            
             case PACKAGE:
                 assert signatures.length == 1;
-                return (T) jt.getElements().getPackageElement(signatures[0]);
+                @SuppressWarnings("unchecked")
+                T pe = (T) jt.getElements().getPackageElement(signatures[0]);
+                return pe;
             case CLASS:
             case INTERFACE:
             case ENUM:
             case ANNOTATION_TYPE:
             case OTHER: // ??
                 assert signatures.length == 1;
-                return (T)getTypeElementByBinaryName(signatures[0], jt);
+                @SuppressWarnings("unchecked")
+                T te = (T)getTypeElementByBinaryName(signatures[0], jt);
+                return te;
             case METHOD:
             case CONSTRUCTOR:            
             {
@@ -187,7 +190,9 @@ public class ElementHandle<T extends Element> {
                            String[] desc = createExecutableDescriptor((ExecutableElement)member);
                            assert desc.length == 3;
                            if (this.signatures[1].equals(desc[1]) && this.signatures[2].equals(desc[2])) {
-                               return (T) member;
+                               @SuppressWarnings("unchecked")
+                               T m = (T) member;
+                               return m;
                            }
                        }
                    }
@@ -207,7 +212,9 @@ public class ElementHandle<T extends Element> {
                            String[] desc = createExecutableDescriptor((ExecutableElement)member);
                            assert desc.length == 2;
                            if (this.signatures[1].equals(desc[1])) {
-                               return (T) member;
+                               @SuppressWarnings("unchecked")
+                               T m = (T) member;
+                               return m;
                            }
                        }
                    }
@@ -227,7 +234,9 @@ public class ElementHandle<T extends Element> {
                             String[] desc = createFieldDescriptor((VariableElement)member);
                             assert desc.length == 3;
                             if (signatures[1].equals(desc[1]) && signatures[2].equals(desc[2])) {
-                                return (T) member;
+                                @SuppressWarnings("unchecked")
+                                T m = (T) member;
+                                return m;
                             }
                         }
                     }
@@ -431,7 +440,9 @@ public class ElementHandle<T extends Element> {
                     encodeClassName(te, sb,'/'); // NOI18N
                     sb.append(';');	    // NOI18N
                     break;
-                } // else fall through
+                } else {
+                    throw new IllegalArgumentException(type.getKind().toString());
+                }
             }
             default:
                 throw new IllegalArgumentException(type.getKind().toString());
@@ -526,6 +537,7 @@ public class ElementHandle<T extends Element> {
         try {
             // Load the right version of the ElementKind class and convert our instance to it
             Class ekClass = org.netbeans.api.java.source.ElementHandle.class.getClassLoader().loadClass("javax.lang.model.element.ElementKind"); // NOI18N
+            @SuppressWarnings("unchecked")
             Object ekInstance = Enum.valueOf(ekClass, getKind().name());
 
             String[] sig = getSignatures();

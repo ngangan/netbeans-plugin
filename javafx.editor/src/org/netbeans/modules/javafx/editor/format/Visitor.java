@@ -98,7 +98,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     Visitor(CompilationInfo info, Context ctx) {
         this.info = info;
         this.ctx = ctx;
-        tu = new TreeUtilities(info);
+        tu = TreeUtilities.create(info);
         cs = CodeStyle.getDefault(ctx.document());
         li = new DocumentLinesIterator(ctx);
     }

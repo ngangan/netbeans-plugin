@@ -187,7 +187,10 @@ public class ClassIndex {
         // get the partial result from java support:
         Set<?> javaEl = javaIndex.getDeclaredTypes(name, toJava(kind), toJava(scope));
         for (Object o : javaEl) {
-            result.add(ElementHandle.fromJava((org.netbeans.api.java.source.ElementHandle)o));
+            @SuppressWarnings("unchecked")
+            ElementHandle<TypeElement> elem = ElementHandle.fromJava(
+                    (org.netbeans.api.java.source.ElementHandle<TypeElement>) o);
+            result.add(elem);
         }
         
         // and TODO add our data:

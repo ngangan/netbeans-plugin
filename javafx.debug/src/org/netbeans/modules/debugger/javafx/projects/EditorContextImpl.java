@@ -921,7 +921,7 @@ public class EditorContextImpl extends EditorContext {
                     }
                     int offset = currentOffset;
                     //Scope scope = ci.getTreeUtilities().scopeFor(offset);
-                    String text = ci.getText();
+                    CharSequence text = ci.getText();
                     int l = text.length();
                     char c = 0;
                     while (offset < l && (c = text.charAt(offset)) != '(' && c != ')' && c != '\n' && c != '\r') offset++;
@@ -1553,7 +1553,7 @@ public class EditorContextImpl extends EditorContext {
                         return;
 //                    Scope scope = null;
                     int offset = 0;
-                    StyledDocument doc = (StyledDocument) ci.getJavaFXSource().getDocument();
+                    StyledDocument doc = (StyledDocument) ci.getDocument();
                     if (doc != null) {
                         offset = findLineOffset(doc, line);
 //                        scope = ci.getTreeUtilities().scopeFor(offset);
@@ -1772,7 +1772,7 @@ public class EditorContextImpl extends EditorContext {
                         int offset = currentOffset;
                         
                         if (selectedIdentifier == null) {
-                            String text = ci.getText();
+                            CharSequence text = ci.getText();
                             int l = text.length();
                             char c = 0; // Search for the end of the field declaration
                             while (offset < l && (c = text.charAt(offset)) != ';' && c != ',' && c != '\n' && c != '\r') offset++;

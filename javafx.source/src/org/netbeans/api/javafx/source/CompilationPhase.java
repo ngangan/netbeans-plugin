@@ -36,49 +36,24 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
-package org.netbeans.modules.javafx.editor.completion.environment;
-
-import com.sun.javafx.api.tree.CompoundAssignmentTree;
-import com.sun.javafx.api.tree.Tree;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.tools.Diagnostic;
-import org.netbeans.api.lexer.TokenUtilities;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+package org.netbeans.api.javafx.source;
 
 /**
+ * Phase in which source compilation currently is or which a client requests
+ * from a parsing process.
  *
- * @author David Strupl
+ * @author Miloslav Metelka
  */
-public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironment<CompoundAssignmentTree> {
-    
-    private static final Logger logger = Logger.getLogger(CompoundAssignmentTreeEnvironment.class.getName());
-    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+public enum CompilationPhase {
 
-    @Override
-    protected void inside(CompoundAssignmentTree cat) throws IOException {
-        if (LOGGABLE) log("inside CompoundAssignmentTree " + cat); // NOI18N
-        int catTextStart = (int) sourcePositions.getEndPosition(root, cat.getVariable());
-        if (catTextStart != Diagnostic.NOPOS) {
-            Tree expr = cat.getExpression();
-            if (expr == null || offset <= (int) sourcePositions.getStartPosition(root, expr)) {
-                CharSequence catText = getController().getText().subSequence(catTextStart, offset);
-                int eqPos = TokenUtilities.indexOf(catText, '='); // NOI18N
-                //NOI18N
-                if (eqPos > -1) {
-                    localResult(null);
-                    addValueKeywords();
-                }
-            }
-        }
+    MODIFIED,
+    PARSED,
+    ANALYZED,
+    UP_TO_DATE,
+    CODE_GENERATED;
+
+    public boolean lessThan(CompilationPhase p) {
+        return compareTo(p) < 0;
     }
 
-
-    private static void log(String s) {
-        if (LOGGABLE) {
-            logger.fine(s);
-        }
-    }
 }

@@ -185,7 +185,7 @@ public class Utilities {
     }
     
     private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, JavaFXTreePath decl) {
-        TreeUtilities tu = new TreeUtilities(info);
+        TreeUtilities tu = TreeUtilities.create(info);
         if (tu.isSynthetic(decl))
             return null;
         

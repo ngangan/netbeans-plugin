@@ -125,7 +125,7 @@ public final class ElementOpen {
         ElementHandle elh = ElementHandle.create(el);
 
         if (!comp.getJavafxTypes().isJFXClass((Symbol) tel)) { // java
-            return openThroughJavaSupport(comp.getJavaFXSource().getFileObject(), elh);
+            return openThroughJavaSupport(comp.getFileObject(), elh);
         }
         // Find the source file
         final FileObject srcFile = getFile(el, comp);
@@ -147,7 +147,7 @@ public final class ElementOpen {
     }
 
     private static FileObject getFile(Element elem, final CompilationInfo comp) {
-        FileObject ref = comp.getJavaFXSource().getFileObject();
+        FileObject ref = comp.getFileObject();
         ClasspathInfo cpi = ClasspathInfo.create(ref);
         return JavaFXSourceUtils.getFile(elem, cpi);
     }
