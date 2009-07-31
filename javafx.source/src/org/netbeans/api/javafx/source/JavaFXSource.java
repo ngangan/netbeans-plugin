@@ -255,7 +255,7 @@ public final class JavaFXSource {
             return ParserManager.parseWhenScanFinished(sources,
                     new LegacyUserTask(getClasspathInfo(), task));
         } catch (ParseException e) {
-            throw new IOException(e);
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -305,3 +305,4 @@ public final class JavaFXSource {
     }
 
 }
+
