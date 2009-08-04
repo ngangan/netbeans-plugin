@@ -270,7 +270,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
             TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
 
-            if (ts != null && tp.getLeaf().getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) {
+            if (ts != null && tp.getLeaf().getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && typePath != null) {
                 int bodyStart = Utilities.findBodyStart(tp.getLeaf(), cu, info.getTrees().getSourcePositions(), doc);
 
                 if (caretPosition < bodyStart) {
