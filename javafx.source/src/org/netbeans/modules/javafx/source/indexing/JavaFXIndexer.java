@@ -56,12 +56,24 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public void filesDeleted(Iterable<? extends Indexable> itrbl, Context cntxt) {
-            //
+            for(Indexable ixbl : itrbl) {
+                try {
+                    IndexingSupport.getInstance(cntxt).removeDocuments(ixbl);
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, null, e);
+                }
+            }
         }
 
         @Override
         public void filesDirty(Iterable<? extends Indexable> itrbl, Context cntxt) {
-            //
+            for(Indexable ixbl : itrbl) {
+                try {
+                    IndexingSupport.getInstance(cntxt).markDirtyDocuments(ixbl);
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, null, e);
+                }
+            }
         }
 
         @Override
@@ -117,7 +129,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 if (e.getKind() == ElementKind.FIELD) { // can handle only fields for now
                     String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
                     if (LOG.isLoggable(Level.FINEST)) {
-                        LOG.log(Level.FINEST, "Indexing variable {0} as {1}", new String[]{node.toString(), indexVal});
+                        LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
                     index(document, IndexKey.FIELD_DEF, indexVal);
                 }
@@ -126,25 +138,31 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
             @Override
             public Void visitFunctionDefinition(FunctionDefinitionTree node, IndexDocument document) {
-                ExecutableElement e = (ExecutableElement)fxresult.getTrees().getElement(getCurrentPath());
-                if (!e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
-                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
-                    if (LOG.isLoggable(Level.FINEST)) {
-                        LOG.log(Level.FINEST, "Indexing function definition {0} as {1}", new String[]{node.toString(), indexVal});
+                Element el = fxresult.getTrees().getElement(getCurrentPath());
+                if (el.getKind() == ElementKind.METHOD) {
+                    ExecutableElement e = (ExecutableElement)el;
+                    if (!e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
+                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
+                        if (LOG.isLoggable(Level.FINEST)) {
+                            LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
+                        }
+                        index(document, IndexKey.FUNCTION_DEF, indexVal);
                     }
-                    index(document, IndexKey.FUNCTION_DEF, indexVal);
                 }
                 return super.visitFunctionDefinition(node, document);
             }
 
             @Override
             public Void visitMethodInvocation(FunctionInvocationTree node, IndexDocument document) {
-                ExecutableElement e = (ExecutableElement)fxresult.getTrees().getElement(getCurrentPath());
-                String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
-                if (LOG.isLoggable(Level.FINEST)) {
-                    LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}", new String[]{node.toString(), indexVal});
+                Element el = fxresult.getTrees().getElement(getCurrentPath());
+                if (el.getKind() == ElementKind.METHOD) {
+                    ExecutableElement e = (ExecutableElement)el;
+                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
+                    if (LOG.isLoggable(Level.FINEST)) {
+                        LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
+                    }
+                    index(document, IndexKey.FUNCTION_INV, indexVal);
                 }
-                index(document, IndexKey.FUNCTION_INV, indexVal);
                 return super.visitMethodInvocation(node, document);
             }
         };

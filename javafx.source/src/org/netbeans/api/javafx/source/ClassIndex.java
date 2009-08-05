@@ -41,6 +41,7 @@ package org.netbeans.api.javafx.source;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -48,16 +49,19 @@ import org.netbeans.api.java.classpath.ClassPath;
 import javax.lang.model.element.TypeElement;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
 import org.netbeans.modules.javafx.source.indexing.IndexingUtilities;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexResult;
 import org.netbeans.modules.parsing.spi.indexing.support.QuerySupport;
+import org.openide.filesystems.FileObject;
 import static org.netbeans.modules.parsing.spi.indexing.support.QuerySupport.Kind;
 
 import org.openide.util.Exceptions;
@@ -497,22 +501,34 @@ public class ClassIndex {
                 synchronized (ClassIndex.this) {
                     if (source) {            
                         sourceIndices.clear();
-                        createQueriesForRoots (sourcePath, sourceIndices);
+                        createQueriesForRoots (sourcePath, sourceIndices, false);
                     }
                     if (deps) {
                         depsIndices.clear();
                         // not creating binary indeces as we are not indexing them yet
-//                        createQueriesForRoots (bootPath, depsIndices);
-//                        createQueriesForRoots (classPath, depsIndices);
+                        createQueriesForRoots (bootPath, depsIndices, true);
+                        createQueriesForRoots (classPath, depsIndices, true);
                     }
                 }
             }
         });        
     }
         
-    private void createQueriesForRoots (final ClassPath cp, final Set<? super QuerySupport> queries) {
+    private void createQueriesForRoots (final ClassPath cp, final Set<? super QuerySupport> queries, boolean binary) {
         try {
-            queries.add(QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, cp.getRoots()));
+            List<FileObject> roots = new ArrayList<FileObject>();
+            if (binary) {
+            for(FileObject fo : cp.getRoots()) {
+                SourceForBinaryQuery.Result2 rslt = SourceForBinaryQuery.findSourceRoots2(fo.getURL());
+                if (rslt.preferSources()) {
+                    roots.addAll(Arrays.asList(rslt.getRoots()));
+                }
+                queries.add(QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, roots.toArray(new FileObject[roots.size()])));
+            }
+            } else {
+                queries.add(QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, cp.getRoots()));
+            }
+
         } catch (IOException e) {
             LOG.log(Level.SEVERE, null, e);
         }
