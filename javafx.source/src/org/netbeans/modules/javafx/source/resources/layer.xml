@@ -48,6 +48,9 @@ made subject to such option by the copyright holder.
                 <file name="JavaFXParserFactory.instance">
                     <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory"/>
                 </file>
+                <file name="JavaFXIndexer.instance">
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.source.indexing.JavaFXIndexer$Factory"/>
+                </file>
             </folder>
         </folder>
     </folder>

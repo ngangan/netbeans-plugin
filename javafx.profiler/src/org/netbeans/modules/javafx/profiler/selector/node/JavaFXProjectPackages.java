@@ -102,47 +102,12 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
         final ClasspathInfo cpInfo = source.getClasspathInfo();
         ClassIndex index = cpInfo.getClassIndex();
 
-        if (isLibraryNode) {
-            for (String pkgName : index.getPackageNames("", true, scope)) { // NOI18N
-                pkgs.add( new JavaFXPackageNode(cpInfo, pkgName, parent, scope, source, isLibraryNode));
-            }
-
-            Collections.sort(pkgs, JavaFXPackageNode.COMPARATOR);
-        } else {
-            pkgs = collectPackages(parent, cpInfo, project.getFOSourceRoots(), pkgs);
+        for (String pkgName : index.getPackageNames("", true, scope)) { // NOI18N
+            pkgs.add( new JavaFXPackageNode(cpInfo, pkgName, parent, scope, source, isLibraryNode));
         }
 
-        return pkgs;
-    }
+        Collections.sort(pkgs, JavaFXPackageNode.COMPARATOR);
 
-   private List<SelectorNode> collectPackages(ContainerNode parent, ClasspathInfo cpInfo, FileObject[] roots, List<SelectorNode> pkgs) {
-
-        for (int i = 0; i < roots.length; i++) {
-            if (roots[i].isFolder()) {
-                pkgs = collectPackages(parent, cpInfo, roots[i], pkgs);
-            }
-        }
-        return pkgs;
-   }
-
-   private List<SelectorNode> collectPackages(ContainerNode parent, ClasspathInfo cpInfo, FileObject root, List<SelectorNode> pkgs) {
-        FileObject[] files = root.getChildren();
-
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                if (!files[i].isFolder()) {
-                    if (JavaFXProjectUtilities.SOURCES_TYPE_JAVA.equalsIgnoreCase(files[i].getExt()) ||
-                        JavaFXProjectUtilities.SOURCES_TYPE_JAVAFX.equalsIgnoreCase(files[i].getExt())) {
-                        JavaFXPackageNode node = new JavaFXPackageNode(cpInfo, root.getName(), parent, scope, source, isLibraryNode);
-                        if (!pkgs.contains(node))
-                            pkgs.add(node);
-                    }
-                } else {
-                    // this is a folder. Make recursive call.
-                    pkgs = collectPackages(parent, cpInfo, files[i], pkgs);
-                }
-            }
-        }
         return pkgs;
     }
 }

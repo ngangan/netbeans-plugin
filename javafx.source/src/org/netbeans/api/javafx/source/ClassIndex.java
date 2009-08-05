@@ -40,18 +40,26 @@
 package org.netbeans.api.javafx.source;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import org.netbeans.api.java.classpath.ClassPath;
 
 import javax.lang.model.element.TypeElement;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.project.ProjectManager;
+import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
+import org.netbeans.modules.javafx.source.indexing.IndexingUtilities;
+import org.netbeans.modules.parsing.spi.indexing.support.IndexResult;
+import org.netbeans.modules.parsing.spi.indexing.support.QuerySupport;
+import static org.netbeans.modules.parsing.spi.indexing.support.QuerySupport.Kind;
+
 import org.openide.util.Exceptions;
 
 /**
@@ -60,6 +68,8 @@ import org.openide.util.Exceptions;
  * @author nenik
  */
 public class ClassIndex {
+    final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(ClassIndex.class.getName());
+
     //INV: Never null
     private final ClassPath bootPath;
     //INV: Never null
@@ -69,10 +79,10 @@ public class ClassIndex {
 
     //INV: Never null
     //@GuardedBy (this)
-    private final Set<Impl> sourceIndices;
+    private final Set<QuerySupport> sourceIndices;
     //INV: Never null
     //@GuardedBy (this)
-    private final Set<Impl> depsIndices;
+    private final Set<QuerySupport> depsIndices;
 
     private final org.netbeans.api.java.source.ClassIndex javaIndex;
     
@@ -142,6 +152,34 @@ public class ClassIndex {
         DEPENDENCIES
     };
 
+    /**
+     * Encodes a reference type,
+     * used by {@link ClassIndex#getElements} and {@link ClassIndex#getResources}
+     * to restrict the search.
+     */
+    public enum SearchKind {
+
+        /**
+         * The returned class has to extend or implement given element
+         */
+        IMPLEMENTORS,
+
+        /**
+         * The returned class has to call method on given element
+         */
+        METHOD_REFERENCES,
+
+        /**
+         * The returned class has to access a field on given element
+         */
+        FIELD_REFERENCES,
+
+        /**
+         * The returned class contains references to the element type
+         */
+        TYPE_REFERENCES,
+    };
+
     ClassIndex(final ClassPath bootPath, final ClassPath classPath, final ClassPath sourcePath) {
         assert bootPath != null;
         assert classPath != null;
@@ -149,19 +187,10 @@ public class ClassIndex {
         this.bootPath = bootPath;
         this.classPath = classPath;
         this.sourcePath = sourcePath;
-        this.depsIndices = new HashSet<Impl>();
-        this.sourceIndices = new HashSet<Impl>();
-      
+        this.depsIndices = new HashSet<QuerySupport>();
+        this.sourceIndices = new HashSet<QuerySupport>();
+
         javaIndex = org.netbeans.api.java.source.ClasspathInfo.create(bootPath, classPath, sourcePath).getClassIndex();
-/*        this.oldBoot = new HashSet<URL>();
-        this.oldCompile = new  HashSet<URL>();
-        this.oldSources = new HashSet<URL>();
-        
-        final ClassIndexManager manager = ClassIndexManager.getDefault();
-        manager.addClassIndexManagerListener(WeakListeners.create(ClassIndexManagerListener.class, (ClassIndexManagerListener) this.spiListener, manager));
-        this.bootPath.addPropertyChangeListener(WeakListeners.propertyChange(spiListener, this.bootPath));
-        this.classPath.addPropertyChangeListener(WeakListeners.propertyChange(spiListener, this.classPath));
-        this.sourcePath.addPropertyChangeListener(WeakListeners.propertyChange(spiListener, this.sourcePath));                */
         reset (true, true);
     }
 
@@ -179,7 +208,7 @@ public class ClassIndex {
      * It may return null when the caller is a CancellableTask&lt;CompilationInfo&gt; and is cancelled
      * inside call of this method.
      */
-    public Set<ElementHandle<TypeElement>> getDeclaredTypes (final String name, final NameKind kind, final Set<SearchScope> scope) {
+    public Set<ElementHandle<TypeElement>> getDeclaredTypes (final String name, NameKind kind, Set<SearchScope> scope) {
         assert name != null;
         assert kind != null;
         final Set<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
@@ -192,24 +221,50 @@ public class ClassIndex {
                     (org.netbeans.api.java.source.ElementHandle<TypeElement>) o);
             result.add(elem);
         }
-        
-        // and TODO add our data:
-        final Iterable<? extends Impl> queries = getQueries (scope);        
-//        final ResultConvertor<ElementHandle<TypeElement>> thConvertor = ResultConvertor.elementHandleConvertor();
-        try {
-            for (Impl query : queries) {
-                try {
-                    query.getDeclaredTypes (name, kind, result);
-//                } catch (ClassIndexImpl.IndexAlreadyClosedException e) {
-//                    logClosedIndex (query);
-                } catch (IOException e) {
-                    Exceptions.printStackTrace(e);
-                }
-            }
-//            LOGGER.fine(String.format("ClassIndex.getDeclaredTypes returned %d elements\n", result.size()));
-        } catch (InterruptedException e) {
-            return null;
+
+        String searchValue = name;
+        QuerySupport.Kind queryKind;
+        JavaFXIndexer.IndexKey indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_SIMPLE;
+
+        switch (kind) {
+            case CAMEL_CASE:
+                queryKind = QuerySupport.Kind.CAMEL_CASE;
+                break;
+            case CAMEL_CASE_INSENSITIVE:
+                queryKind = QuerySupport.Kind.CASE_INSENSITIVE_CAMEL_CASE;
+                break;
+            case CASE_INSENSITIVE_PREFIX:
+                searchValue = searchValue.toLowerCase(); // case-insensitive index uses all-lower case
+                indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_INSENSITIVE;
+                queryKind = QuerySupport.Kind.CASE_INSENSITIVE_PREFIX;
+                break;
+            case CASE_INSENSITIVE_REGEXP:
+                queryKind = QuerySupport.Kind.CASE_INSENSITIVE_REGEXP;
+                break;
+            case PREFIX:
+                queryKind = QuerySupport.Kind.PREFIX;
+                break;
+            case REGEXP:
+                queryKind = QuerySupport.Kind.REGEXP;
+                break;
+            default:
+                queryKind = QuerySupport.Kind.EXACT;
         }
+        
+        final Iterable<? extends QuerySupport> queries = getQueries (scope);
+        for (QuerySupport query : queries) {
+            try {
+                for(IndexResult ir : query.query(indexKey.toString(), searchValue, queryKind, JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
+                    for(String fqn : matches(name, queryKind, false, ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString()))) {
+                        ElementHandle<TypeElement> handle = new ElementHandle<TypeElement>(ElementKind.CLASS, new String[]{fqn});
+                        result.add(handle);
+                    }
+                }
+            } catch (IOException e) {
+                Exceptions.printStackTrace(e);
+            }
+        }
+        LOG.log(Level.FINER, "ClassIndex.getDeclaredTypes returned {0} elements\n", result.size());
         return result;
     }
 
@@ -230,23 +285,187 @@ public class ClassIndex {
         // get the partial result from java support:
         result.addAll(javaIndex.getPackageNames(prefix, directOnly, toJava(scope)));
 
-        // and TODO add our data:
-        
-        final Iterable<? extends ClassIndex.Impl> queries = getQueries (scope);
-        try {
-            for (ClassIndex.Impl query : queries) {
-                try {
-                    query.getPackageNames (prefix, directOnly, result);
-//                } catch (ClassIndexImpl.IndexAlreadyClosedException e) {
-//                    logClosedIndex (query);
-                } catch (IOException e) {
-                    Exceptions.printStackTrace(e);
+        final Iterable<? extends QuerySupport> queries = getQueries (scope);
+        for (QuerySupport query : queries) {
+            try {
+                for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), prefix, QuerySupport.Kind.PREFIX, JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
+                    String pkgName = ir.getValue(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString()); // only one package name per indexed document
+                    if (pkgName.startsWith(prefix)) {
+                        result.add(pkgName);
+                    }
                 }
+            } catch (IOException e) {
+                Exceptions.printStackTrace(e);
             }
-            return Collections.unmodifiableSet(result);
-        } catch (InterruptedException e) {
-            return null;
         }
+
+        return result;
+    }
+
+    /**
+     * Returns a set of {@link ElementHandle}s containing reference(s) to given element.
+     * @param element for which usages should be found
+     * @param searchKind type of reference, {@see SearchKind}
+     * @param scope to search in {@see SearchScope}
+     * @return set of {@link ElementHandle}s containing the reference(s)
+     * It may return null when the caller is a CancellableTask&lt;CompilationInfo&gt; and is cancelled
+     * inside call of this method.
+     */
+    public Set<? extends ElementHandle> getElements (final ElementHandle handle, final Set<SearchKind> searchKind, final Set<SearchScope> scope) {
+        assert handle != null;
+        assert handle.getSignatures()[0] != null;
+        assert searchKind != null;
+
+        if (handle.getKind() != ElementKind.CLASS) return Collections.EMPTY_SET;
+
+        String typeRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?";
+
+        final Set<ElementHandle<? extends Element>> result = new HashSet<ElementHandle<? extends Element>> ();
+        for(QuerySupport query : getQueries(scope)) {
+            for(SearchKind sk : searchKind) {
+                try {
+                    switch (sk) {
+                        case TYPE_REFERENCES: {
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_DEF.toString()})) {
+                                for(String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString())) {
+                                    if (value.contains(handle.getQualifiedName())) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
+                                }
+                            }
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                                for(String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
+                                    if (value.contains(handle.getQualifiedName())) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
+                                }
+                            }
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
+                                for(String value : ir.getValues(JavaFXIndexer.IndexKey.FIELD_DEF.toString())) {
+                                    if (value.contains(handle.getQualifiedName())) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (IOException e) {}
+            }
+        }
+        
+        return result;
+//        final Set<ClassIndexImpl.UsageType> ut =  encodeSearchKind(element.getKind(),searchKind);
+//        final String binaryName = element.getSignatures()[0];
+//        final ResultConvertor<ElementHandle<TypeElement>> thConvertor = ResultConvertor.elementHandleConvertor();
+//        try {
+//            if (!ut.isEmpty()) {
+//                for (ClassIndexImpl query : queries) {
+//                    try {
+//                        query.search(binaryName, ut, thConvertor, result);
+//                    } catch (ClassIndexImpl.IndexAlreadyClosedException e) {
+//                        logClosedIndex (query);
+//                    } catch (IOException e) {
+//                        Exceptions.printStackTrace(e);
+//                    }
+//                }
+//            }
+//            return Collections.unmodifiableSet(result);
+//        } catch (InterruptedException e) {
+//            return null;
+//        }
+    }
+
+    private static Collection<String> matches(String pattern, Kind queryKind, boolean isFqn, String[] fqns) {
+        Collection<String> result = new ArrayList<String>();
+        Pattern regex = null;
+
+        switch (queryKind) {
+            case EXACT:
+                {
+                    regex = Pattern.compile(isFqn ? escapePattern(pattern) : ".*?" + pattern); // fqn or simple class name
+                    break;
+                }
+            case PREFIX:
+                if (pattern.length() == 0) {
+                    //Special case (all) handle in different way
+                    regex = Pattern.compile(".*");
+                }
+                else {
+                    regex = Pattern.compile("(.+\\.)?" + escapePattern(pattern) + ".*");
+                }
+                break;
+            case CASE_INSENSITIVE_PREFIX:
+                if (pattern.length() == 0) {
+                    //Special case (all) handle in different way
+                    regex = Pattern.compile(".*");
+                }
+                else {
+                    regex = Pattern.compile("(.+\\.)?" + escapePattern(pattern) + ".*", Pattern.CASE_INSENSITIVE);
+                }
+                break;
+            case CAMEL_CASE:
+            case CASE_INSENSITIVE_CAMEL_CASE:
+                if (pattern.length() == 0) {
+                    //Special case (all) handle in different way
+                    regex = Pattern.compile(".*");
+                }
+                {
+                    StringBuilder sb = new StringBuilder("(.+\\.)?");
+//                        String prefix = null;
+                    int lastIndex = 0;
+                    int index;
+                    do {
+                        index = findNextUpper(pattern, lastIndex + 1);
+                        String token = pattern.substring(lastIndex, index == -1 ? pattern.length(): index);
+//                            if ( lastIndex == 0 ) {
+//                                prefix = token;
+//                            }
+                        sb.append(token);
+                        sb.append( index != -1 ?  "[\\p{javaLowerCase}\\p{Digit}_\\$]*" : ".*"); // NOI18N
+                        lastIndex = index;
+                    }
+                    while(index != -1);
+
+                    regex = Pattern.compile(sb.toString());
+                }
+                break;
+            case CASE_INSENSITIVE_REGEXP:
+                if (pattern.length() == 0) {
+                    throw new IllegalArgumentException ();
+                }
+                else {
+                    regex = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE);
+                    break;
+                }
+            case REGEXP:
+                if (pattern.length() == 0) {
+                    throw new IllegalArgumentException ();
+                } else {
+                    regex = Pattern.compile(pattern);
+                    break;
+                }
+            default:
+                throw new UnsupportedOperationException (queryKind.toString());
+        }
+        for(String value : fqns) {
+            if (regex != null && regex.matcher(value).matches()) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    private static String escapePattern(String plainText) {
+        return plainText.replace(".", "\\.");
+    }
+
+    private static int findNextUpper(String text, int offset ) {
+        for( int i = offset; i < text.length(); i++ ) {
+            if ( Character.isUpperCase(text.charAt(i)) ) {
+                return i;
+            }
+        }
+        return -1;
     }
     
     private static Set<org.netbeans.api.java.source.ClassIndex.SearchScope> toJava(Set<SearchScope> scopes) {
@@ -259,67 +478,44 @@ public class ClassIndex {
         return org.netbeans.api.java.source.ClassIndex.NameKind.valueOf(kind.name());
     }
 
-    private synchronized Iterable<? extends Impl> getQueries (final Set<SearchScope> scope) {        
-        Set<Impl> result = new HashSet<Impl> ();
-        if (scope.contains(SearchScope.SOURCE)) {            
-            result.addAll(this.sourceIndices);
-        }        
-        if (scope.contains(SearchScope.DEPENDENCIES)) {
-            result.addAll(this.depsIndices);
+    private Iterable<QuerySupport> getQueries(final Set<SearchScope> scope) {
+        Set<QuerySupport> result = new HashSet<QuerySupport>();
+        synchronized(this) {
+            if (scope.contains(SearchScope.SOURCE)) {
+                result.addAll(this.sourceIndices);
+            }
+            if (scope.contains(SearchScope.DEPENDENCIES)) {
+                result.addAll(this.depsIndices);
+            }
         }
         return result;
     }
-
     
     private void reset (final boolean source, final boolean deps) {
         ProjectManager.mutex().readAccess(new Runnable() {
             public void run() {
                 synchronized (ClassIndex.this) {
                     if (source) {            
-//                        for (Impl impl : sourceIndices) {
-//                            impl.removeClassIndexImplListener(spiListener);
-//                        }
                         sourceIndices.clear();
-                        createQueriesForRoots (sourcePath, true, sourceIndices);
+                        createQueriesForRoots (sourcePath, sourceIndices);
                     }
                     if (deps) {
-//                        for (Impl impl : depsIndeces) {
-//                            impl.removeClassIndexImplListener(spiListener);
-//                        }
                         depsIndices.clear();
-                        createQueriesForRoots (bootPath, false, depsIndices);
-                        createQueriesForRoots (classPath, false, depsIndices);	    
+                        // not creating binary indeces as we are not indexing them yet
+//                        createQueriesForRoots (bootPath, depsIndices);
+//                        createQueriesForRoots (classPath, depsIndices);
                     }
                 }
             }
         });        
     }
         
-    private void createQueriesForRoots (final ClassPath cp, final boolean sources, final Set<? super ClassIndex.Impl> queries) {
-//        final GlobalSourcePath gsp = GlobalSourcePath.getDefault();
-        List<ClassPath.Entry> entries = cp.entries();
-	for (ClassPath.Entry entry : entries) {
-            URL[] srcRoots;
-//            if (!sources) {
-//                srcRoots = gsp.getSourceRootForBinaryRoot (entry.getURL(), cp, true);
-//                if (srcRoots == null) {
-//                    srcRoots = new URL[] {entry.getURL()};
-//                }
-//            }
-//            else {
-                srcRoots = new URL[] {entry.getURL()};
-//            }                
-            for (URL srcRoot : srcRoots) {
-                try {
-                    ClassIndex.Impl ci = ClassIndexManager.createUsagesQuery(srcRoot, sources);
-                    if (ci != null) {
-//                        ci.addClassIndexImplListener(spiListener);
-                        queries.add (ci);
-                    }
-                } catch (IOException ioe) {
-                }
-            }	    
-	}
+    private void createQueriesForRoots (final ClassPath cp, final Set<? super QuerySupport> queries) {
+        try {
+            queries.add(QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, cp.getRoots()));
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, null, e);
+        }
     }
     
     static final class TypeHolder {

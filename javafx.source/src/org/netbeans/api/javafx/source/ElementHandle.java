@@ -324,10 +324,12 @@ public class ElementHandle<T extends Element> {
                 break;
             case LOCAL_VARIABLE: // space magic
             case FIELD:
+            case PARAMETER:
             case ENUM_CONSTANT:
                 assert element instanceof VariableElement;
                 signatures = createFieldDescriptor((VariableElement)element);
                 break;
+
 /*            case TYPE_PARAMETER:
                 assert element instanceof TypeParameterElement;
                 TypeParameterElement tpe = (TypeParameterElement) element;
