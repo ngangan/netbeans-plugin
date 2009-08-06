@@ -6,6 +6,21 @@
     <description>Builds the module suite javafx.</description>
     <import file="nbproject/build-impl.xml"/>
     
+    <target name="-is-local-netbeans">
+        <available file="../nbbuild/netbeans" type="dir" property="local-netbeans-is-available"/>
+    </target>
+
+    <target name="-copy-local-netbeans" if="local-netbeans-is-available" depends="-is-local-netbeans">
+        <mkdir dir="build/netbeans"/>
+        <copy todir="build/netbeans">
+	    <fileset dir="../nbbuild/netbeans"/>
+        </copy>
+    </target>
+
+    <target name="get-netbeans" unless="local-netbeans-is-available" depends="-copy-local-netbeans">
+        <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+        <unzip src="netbeans.zip" dest="build"/>
+    </target>
 
     <target name="files-init" depends="-release.files">
         <property name="release.files" value=""/>
@@ -21,8 +36,7 @@
         <property name="use.timestamp" value="true"/>
         <parallel failonany="true">
             <sequential>
-                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
-                <unzip src="netbeans.zip" dest="build"/>
+	        <antcall target="get-netbeans"/>
             </sequential>
             <sequential>
                 <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
