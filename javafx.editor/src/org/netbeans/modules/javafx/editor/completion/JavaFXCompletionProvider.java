@@ -51,6 +51,8 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.editor.EditorRegistry;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -106,7 +108,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
             ((AbstractDocument)doc).readLock();
         }
         try {
-            TokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset);
+            SafeTokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
             if (ts == null) {
                 return false;
             }
@@ -136,18 +138,20 @@ public class JavaFXCompletionProvider implements CompletionProvider {
     }
     
     @SuppressWarnings("unchecked")
-    public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset) {
+    public static SafeTokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
         if (hierarchy != null) {
-            TokenSequence<?> ts = hierarchy.tokenSequence();
-            while(ts != null && (offset == 0 || ts.moveNext())) {
-                ts.move(offset);
-                if (ts.language() == JFXTokenId.language())
-                    return (TokenSequence<JFXTokenId>)ts;
-                if (!ts.moveNext() && !ts.movePrevious()) {
+            TokenSequence<?> ts_ = hierarchy.tokenSequence();
+            while(ts_ != null && ts_.isValid() && (offset == 0 || ts_.moveNext())) {
+                ts_.move(offset);
+                if (ts_.language() == JFXTokenId.language()) {
+                    SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>((TokenSequence<JFXTokenId>) ts_, doc, Cancellable.Dummy.getInstance());
+                    return ts;
+                }
+                if (!ts_.moveNext() && !ts_.movePrevious()) {
                     if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset); // NOI18N
                     return null;
                 }
-                ts = ts.embedded();
+                ts_ = ts_.embedded();
             }
         }
         if (LOGGABLE) log("getJavaFXTokenSequence returning null (2) for offset " + offset); // NOI18N

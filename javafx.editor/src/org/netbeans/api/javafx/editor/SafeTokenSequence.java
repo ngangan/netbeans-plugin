@@ -56,6 +56,10 @@ public class SafeTokenSequence<T extends TokenId> {
         return ts.token();
     }
 
+    public Token<T> offsetToken() {
+        return ts.offsetToken();
+    }
+
     public int offset() {
         return ts.offset();
     }

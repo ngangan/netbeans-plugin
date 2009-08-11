@@ -45,10 +45,12 @@ import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXErroneousType;
+
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.LAZY_KEYWORD;
+
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -72,7 +74,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos); // NOI18N
         if (offset <= typePos) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
             if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
@@ -80,7 +82,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             }
             return;
         }
-        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
+        SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
         if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id())); // NOI18N
         if ((last != null) && (last.token().id() == JFXTokenId.EQ ||
                 last.token().id() == JFXTokenId.BIND  ||

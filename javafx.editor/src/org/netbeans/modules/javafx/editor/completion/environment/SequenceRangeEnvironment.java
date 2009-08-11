@@ -39,19 +39,15 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXSequenceExplicit;
 import com.sun.tools.javafx.tree.JFXSequenceRange;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
-import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.lexer.TokenHierarchy;
 
 /**
@@ -75,8 +71,8 @@ public class SequenceRangeEnvironment extends JavaFXCompletionEnvironment<JFXSeq
     @Override
     protected void inside(JFXSequenceRange t) throws IOException {
         int start = (int)sourcePositions.getStartPosition(root, t);
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.
-                getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
         ts.move(start);
         State state = State.INIT;
         while (ts.moveNext() && ts.offset() <= offset) {
@@ -104,7 +100,7 @@ public class SequenceRangeEnvironment extends JavaFXCompletionEnvironment<JFXSeq
         localResult(null);
         switch (state) {
             case AFTER_RANGE_END:
-                addKeyword("step", " ", true);
+                addKeyword("step", " ", true); // NOI18N
                 break;
         }
     }

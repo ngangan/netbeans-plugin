@@ -79,7 +79,8 @@ import java.io.Writer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.parsing.api.Snapshot;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.util.Exceptions;
@@ -102,6 +103,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected boolean insideForEachExpressiion = false;
     protected UnitTree root;
     protected JavaFXCompletionQuery query;
+    protected Cancellable cancellable;
 
     protected JavaFXCompletionEnvironment() {
     }
@@ -109,7 +111,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     /*
      * Thies method must be called after constructor before a call to resolveCompletion
      */
-    void init(int offset, String prefix, CompilationController controller, JavaFXTreePath path, SourcePositions sourcePositions, JavaFXCompletionQuery query) {
+    void init(int offset, String prefix, CompilationController controller, JavaFXTreePath path, SourcePositions sourcePositions, final JavaFXCompletionQuery query) {
         this.offset = offset;
         this.prefix = prefix;
         this.isCamelCasePrefix = prefix != null && prefix.length() > 1 && JavaFXCompletionQuery.camelCasePattern.matcher(prefix).matches();
@@ -118,6 +120,16 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         this.sourcePositions = sourcePositions;
         this.query = query;
         this.root = path.getCompilationUnit();
+
+        this.cancellable = new Cancellable() {
+            public boolean isCancelled() {
+                return query.isTaskCancelled();
+            }
+
+            public void cancell() {
+                // do nothing for now
+            }
+        };
     }
 
     /**
@@ -189,7 +201,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     void insideTypeCheck() throws IOException {
         InstanceOfTree iot = (InstanceOfTree) getPath().getLeaf();
-        TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(iot, getOffset());
+        SafeTokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(iot, getOffset());
     }
 
     protected void insideExpression(JavaFXTreePath exPath) throws IOException {
@@ -198,7 +210,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         Tree parent = exPath.getParentPath().getLeaf();
         int endPos = (int) getSourcePositions().getEndPosition(root, et);
         if (endPos != Diagnostic.NOPOS && endPos < offset) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(endPos, offset);
+            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(endPos, offset);
             if (LOGGABLE) log("  last: " + last); // NOI18N
             if (last != null) {
                 return;
@@ -795,7 +807,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (startPos < 0)
                 return ret;
             if (position > startPos) {
-                TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(startPos, position);
+                SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(startPos, position);
                 if (last != null && (last.token().id() == JFXTokenId.LPAREN || last.token().id() == JFXTokenId.COMMA))
                     return ret;
             }
@@ -1395,13 +1407,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(Tree tree, int position) {
+    protected SafeTokenSequence<JFXTokenId> findLastNonWhitespaceToken(Tree tree, int position) {
         int startPos = (int) getSourcePositions().getStartPosition(root, tree);
         return findLastNonWhitespaceToken(startPos, position);
     }
 
-    protected TokenSequence<JFXTokenId> findLastNonWhitespaceToken(int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+    protected SafeTokenSequence<JFXTokenId> findLastNonWhitespaceToken(int startPos, int endPos) {
+        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
         ts.move(endPos);
         ts = previousNonWhitespaceToken(ts);
         if (ts == null || ts.offset() < startPos) {
@@ -1410,13 +1423,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return ts;
     }
 
-    private TokenSequence<JFXTokenId> findFirstNonWhitespaceToken(Tree tree, int position) {
+    private SafeTokenSequence<JFXTokenId> findFirstNonWhitespaceToken(Tree tree, int position) {
         int startPos = (int) getSourcePositions().getStartPosition(root, tree);
         return findFirstNonWhitespaceToken(startPos, position);
     }
 
-    protected TokenSequence<JFXTokenId> findFirstNonWhitespaceToken(int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+    protected SafeTokenSequence<JFXTokenId> findFirstNonWhitespaceToken(int startPos, int endPos) {
+        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
         ts.move(startPos);
         ts = nextNonWhitespaceToken(ts);
         if (ts == null || ts.offset() >= endPos) {
@@ -1435,7 +1449,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (cursorPos >= argStart && cursorPos < argEnd) {
                 return e;
             } else {
-                TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(startPos, cursorPos);
+                SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(startPos, cursorPos);
                 if (last == null) {
                     continue;
                 }
@@ -1509,7 +1523,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected static TokenSequence<JFXTokenId> nextNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
+    protected static SafeTokenSequence<JFXTokenId> nextNonWhitespaceToken(SafeTokenSequence<JFXTokenId> ts) {
         while (ts.moveNext()) {
             switch (ts.token().id()) {
                 case WS:
@@ -1524,7 +1538,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return null;
     }
 
-    static TokenSequence<JFXTokenId> previousNonWhitespaceToken(TokenSequence<JFXTokenId> ts) {
+    static SafeTokenSequence<JFXTokenId> previousNonWhitespaceToken(SafeTokenSequence<JFXTokenId> ts) {
         while (ts.movePrevious()) {
             switch (ts.token().id()) {
                 case WS:

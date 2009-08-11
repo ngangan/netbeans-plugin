@@ -57,6 +57,8 @@ import javax.swing.text.Document;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  *
@@ -75,7 +77,8 @@ public class Utilities {
     
     private static Token<JFXTokenId> findTokenWithText(CompilationInfo info, String text, int start, int end) {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language()).subSequence(start, end);
+        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language()).subSequence(start, end);
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), Cancellable.Dummy.getInstance());
         
         while (ts.moveNext()) {
             Token<JFXTokenId> t = ts.token();
@@ -147,7 +150,8 @@ public class Utilities {
         String member = tree.getIdentifier().toString();
 
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), Cancellable.Dummy.getInstance());
 
         if (ts.move(endPosition) == Integer.MAX_VALUE) {
             return null;
@@ -410,7 +414,8 @@ public class Utilities {
         int start = (int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), leaf);
         
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), Cancellable.Dummy.getInstance());
         
         if (ts.move(start) == Integer.MAX_VALUE) {
             return null;

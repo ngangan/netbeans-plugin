@@ -41,6 +41,8 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.tools.javafx.api.JavafxcScope;
+
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -74,7 +76,8 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         int expEndPos = (int)sourcePositions.getEndPosition(root, fa.getExpression());
         boolean afterDot = false;
         JFXTokenId lastNonWhitespaceTokenId = null;
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
         ts.move(expEndPos);
         while (ts.moveNext()) {
             if (ts.offset() >= offset) {

@@ -56,9 +56,11 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
+import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.ElementOpen;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.editor.FXSourceUtils.URLResult;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -201,7 +203,8 @@ public class GoToSupport {
         
         TokenHierarchy th = TokenHierarchy.get(doc);
         @SuppressWarnings("unchecked")
-        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) th.tokenSequence();
+        TokenSequence<JFXTokenId> ts_ = (TokenSequence<JFXTokenId>) th.tokenSequence();
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, doc, Cancellable.Dummy.getInstance());
 
         if (ts == null)
             return null;

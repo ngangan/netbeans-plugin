@@ -43,8 +43,9 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXSequenceExplicit;
+
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
@@ -64,7 +65,7 @@ public class SequenceExplicitEnvironment extends JavaFXCompletionEnvironment<JFX
     @Override
     protected void inside(JFXSequenceExplicit t) throws IOException {
         if (LOGGABLE) log("inside JFXSequenceExplicit " + t + "  offset == " + offset); // NOI18N
-        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+        SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
         if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         localResult(getSmartType(t));
         addValueKeywords();

@@ -73,6 +73,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.type.TypeKind;
 import javax.swing.text.Position;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.lexer.Token;
 import org.openide.cookies.LineCookie;
 import org.openide.loaders.DataObject;
@@ -102,8 +104,18 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     private static final Set<JFXTokenId> WHITESPACE = EnumSet.of(JFXTokenId.COMMENT, JFXTokenId.DOC_COMMENT, JFXTokenId.LINE_COMMENT, JFXTokenId.WS);
     
     private AtomicBoolean cancel = new AtomicBoolean();
+    private Cancellable cancellable;
 
     UpToDateStatusTask(FileObject file) {
+        this.cancellable = new Cancellable() {
+            public boolean isCancelled() {
+                return UpToDateStatusTask.this.isCanceled();
+            }
+
+            public void cancell() {
+                UpToDateStatusTask.this.cancel();
+            }
+        };
     }
     
     private UpToDateStatusTask() {
@@ -204,6 +216,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         p.refresh(diag, UpToDateStatus.UP_TO_DATE_OK);
     }
 
+    @SuppressWarnings("empty-statement")
     private Position[] getLine(CompilationInfo info, Diagnostic d, final Document doc, int startOffset, int endOffset) throws IOException {
         if (LOGGABLE) {
             LOGGER.fine("diagnostic code: " + d.getCode()); // NOI18N
@@ -241,7 +254,8 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
         if (UNDERLINE_IDENTIFIER.contains(d.getCode())) {
             int offset = (int) getPrefferedPosition(info, d);
-            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            TokenSequence<JFXTokenId> ts_ = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, doc, cancellable);
 
             int diff = ts.move(offset);
 
@@ -307,8 +321,9 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
         doc.render(new Runnable() {
             public void run() {
-                if (isCanceled())
+                if (isCanceled()) {
                     return;
+                }
 
                 int len = doc.getLength();
 
@@ -337,7 +352,8 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private int skipWhiteSpace(CompilationInfo info, int start) {
-        TokenSequence<JFXTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), cancellable);
         ts.move(start);
         boolean nonWSFound = false;
         while (ts.moveNext()) {
@@ -360,9 +376,10 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         }
     }
 
-    public static Token findUnresolvedElementToken(CompilationInfo info, int offset) throws IOException {
+    public Token findUnresolvedElementToken(CompilationInfo info, int offset) throws IOException {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), cancellable);
 
         if (ts == null) {
             return null;
@@ -402,7 +419,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         return null;
     }
 
-    private static int[] findUnresolvedElementSpan(CompilationInfo info, int offset) throws IOException {
+    private int[] findUnresolvedElementSpan(CompilationInfo info, int offset) throws IOException {
         Token t = findUnresolvedElementToken(info, offset);
 
         if (t != null) {
@@ -415,7 +432,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         return null;
     }
 
-    public static JavaFXTreePath findUnresolvedElement(CompilationInfo info, int offset) throws IOException {
+    public JavaFXTreePath findUnresolvedElement(CompilationInfo info, int offset) throws IOException {
         int[] span = findUnresolvedElementSpan(info, offset);
 
         if (span != null) {

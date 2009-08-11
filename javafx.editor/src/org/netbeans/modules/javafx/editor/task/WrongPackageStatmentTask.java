@@ -59,6 +59,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -73,29 +75,60 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
 
     private final FileObject file;
     private final AtomicBoolean canceled = new AtomicBoolean(false);
-
+    private final Cancellable cancellable;
 
     WrongPackageStatmentTask(FileObject file) {
         this.file = file;
+        this.cancellable = new Cancellable() {
+
+            public boolean isCancelled() {
+                return WrongPackageStatmentTask.this.isCanceled();
+            }
+
+            public void cancell() {
+                WrongPackageStatmentTask.this.cancel();
+            }
+        };
     }
 
     public void cancel() {
         canceled.set(true);
     }
 
+    private boolean isCanceled() {
+        return canceled.get();
+    }
+
     public void run(CompilationInfo ci) throws Exception {
-        if (!file.isValid()) return;
+        if (!file.isValid()) {
+            return;
+        }
+
         ExpressionTree packageTree = ci.getCompilationUnit().getPackageName();
         String packageName = packageTree == null ? null : packageTree.toString();
         Project project = FileOwnerQuery.getOwner(file);
-        if (project == null) return;
+        
+        if (project == null) {
+            return;
+        }
+
         int sp = packageTree == null ? 0 : (int) ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), packageTree);
         int ep = packageTree == null ? 0 : (int) ci.getTrees().getSourcePositions().getEndPosition(ci.getCompilationUnit(), packageTree);
+
+        if (isCanceled()) {
+            return;
+        }
+
         if (project instanceof JavaFXProject) {
             JavaFXProject fxp = (JavaFXProject) project;
             FileObject[] sourceRoots = fxp.getFOSourceRoots();
             List<Fix> fixes = new ArrayList<Fix>(2);
+
             for (FileObject sourceRoot : sourceRoots) {
+                if (isCanceled()) {
+                    return;
+                }
+                
                 if (FileUtil.isParentOf(sourceRoot, file)) {
                     String path = sourceRoot.getPath();
                     String me = file.getParent().getPath();
@@ -111,7 +144,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                             if (!inDefaultPackage) {
                                 fixes.add(new ReplacePackageNameFix(ci, me, getDoc(file)));
                             } else {
-                                fixes.add(new SetPackageToDefaultFix(ci, getDoc(file)));
+                                fixes.add(new SetPackageToDefaultFix(ci, getDoc(file), cancellable));
                             }
                             fixes.add(new MoveToFolderFix(file, packageName, sourceRoot));
                         }
@@ -182,7 +215,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                 doc.replace(start, end - start, newName, null);
                 return new ChangeInfo(doc.createPosition(start), doc.createPosition(start + newName.length()));
             } else {
-                doc.insertString(0, "package " + newName + ";\n", null);
+                doc.insertString(0, "package " + newName + ";\n", null); // NOI18N
                 return new ChangeInfo(doc.createPosition(0), doc.createPosition(start + newName.length() + 10));
             }
 
@@ -192,10 +225,12 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
     private static class SetPackageToDefaultFix implements Fix {
         private final CompilationInfo ci;
         private final JavaFXDocument doc;
+        private final Cancellable cancellable;
 
-        private SetPackageToDefaultFix(CompilationInfo ci, JavaFXDocument doc) {
+        private SetPackageToDefaultFix(CompilationInfo ci, JavaFXDocument doc, Cancellable cancellable) {
             this.ci = ci;
             this.doc = doc;
+            this.cancellable = cancellable;
         }
 
         public String getText() {
@@ -209,8 +244,10 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             SourcePositions sp = ci.getTrees().getSourcePositions();
             int start = (int) sp.getStartPosition(cu, pn);
             int end = (int) sp.getEndPosition(cu, pn) + 1;
+            
             //noinspection unchecked
-            TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) TokenHierarchy.get(doc).tokenSequence();
+            TokenSequence<JFXTokenId> ts_ = (TokenSequence<JFXTokenId>) TokenHierarchy.get(doc).tokenSequence();
+            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, ci.getDocument(), cancellable);
             ts.move(start);
             boolean finish = false;
             while (ts.movePrevious() || !finish) {
@@ -246,7 +283,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
 
         public ChangeInfo implement() throws Exception {
             try {
-                String path = packageName == null? "" : packageName.replace('.', '/');
+                String path = packageName == null? "" : packageName.replace('.', '/'); // NOI18N
 
                 FileObject packFile = root.getFileObject(path);
 

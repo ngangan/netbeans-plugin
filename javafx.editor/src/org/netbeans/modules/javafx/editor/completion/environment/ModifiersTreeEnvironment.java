@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.ModifiersTree;
 import com.sun.javafx.api.tree.Tree;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -68,8 +69,8 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
         if (LOGGABLE) log("inside ModifiersTree " + t); // NOI18N
         ModifiersTree mods = t;
         Set<Modifier> m = EnumSet.noneOf(Modifier.class);
-        final TokenSequence<JFXTokenId> idTokenSequence = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
-        TokenSequence<JFXTokenId> ts = idTokenSequence;
+        final TokenSequence<JFXTokenId> ts_ = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
         JFXTokenId lastNonWhitespaceTokenId = null;
         while (ts.moveNext() && ts.offset() < offset) {
             lastNonWhitespaceTokenId = ts.token().id();

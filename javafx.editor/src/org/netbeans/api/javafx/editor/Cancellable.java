@@ -48,4 +48,23 @@ package org.netbeans.api.javafx.editor;
 public interface Cancellable {
     public boolean isCancelled();
     public void cancell();
+
+    public static class Dummy implements Cancellable {
+        private static Dummy instance;
+
+        public static synchronized Dummy getInstance() {
+            if (instance == null) {
+                instance = new Dummy();
+            }
+            return instance;
+        }
+
+        public boolean isCancelled() {
+            return false;
+        }
+
+        public void cancell() {
+        }
+
+    }
 }

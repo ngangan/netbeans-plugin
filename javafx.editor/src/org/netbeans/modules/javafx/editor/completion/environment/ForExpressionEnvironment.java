@@ -50,6 +50,7 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  *
@@ -67,7 +68,8 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
         int start = (int)sourcePositions.getStartPosition(root, foe);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterFor = false;
