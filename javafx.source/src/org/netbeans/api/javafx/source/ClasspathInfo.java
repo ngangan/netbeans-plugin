@@ -213,10 +213,7 @@ public class ClasspathInfo {
 
     public synchronized ClassIndex getClassIndex() {
         if (usagesQuery == null) {
-            usagesQuery = new ClassIndex(
-                    this.bootPath,
-                    this.compilePath,
-                    this.srcPath);
+            usagesQuery = ClassIndex.forClasspathInfo(this);
         }
         return usagesQuery;
     }

@@ -34,6 +34,7 @@ import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
  */
 public class JavaFXIndexer extends EmbeddingIndexer {
     final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(JavaFXIndexer.class.getName());
+    final private static boolean LOG_FINEST = LOG.isLoggable(Level.FINEST);
 
     final public static String NAME = "fx";
     final public static int VERSION = 1;
@@ -89,7 +90,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     @Override
     protected void index(Indexable indexable, Result result, Context context) {
         final JavaFXParserResult fxresult = (JavaFXParserResult)result;
-        if (LOG.isLoggable(Level.FINEST)) {
+        if (LOG_FINEST) {
             LOG.log(Level.FINEST,"Indexing {0}", indexable.toString());
             LOG.log(Level.FINEST, "Tree: {0}", fxresult.getCompilationUnit());
         }
@@ -108,7 +109,11 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             @Override
             public Void visitClassDeclaration(ClassDeclarationTree node, IndexDocument document) {
                 TypeElement type = (TypeElement)fxresult.getTrees().getElement(getCurrentPath());
-
+                if (LOG_FINEST) {
+                    LOG.log(Level.FINEST, "Indexing {0}:", type.getQualifiedName());
+                    LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
+                    LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
+                }
                 index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
                 index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
                 String fqn = type.getQualifiedName().toString();
@@ -128,7 +133,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 Element e = fxresult.getTrees().getElement(getCurrentPath());
                 if (e.getKind() == ElementKind.FIELD) { // can handle only fields for now
                     String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
-                    if (LOG.isLoggable(Level.FINEST)) {
+                    if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
                     index(document, IndexKey.FIELD_DEF, indexVal);
@@ -143,7 +148,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     ExecutableElement e = (ExecutableElement)el;
                     if (!e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
                         String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
-                        if (LOG.isLoggable(Level.FINEST)) {
+                        if (LOG_FINEST) {
                             LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
                         }
                         index(document, IndexKey.FUNCTION_DEF, indexVal);
@@ -158,7 +163,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 if (el.getKind() == ElementKind.METHOD) {
                     ExecutableElement e = (ExecutableElement)el;
                     String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
-                    if (LOG.isLoggable(Level.FINEST)) {
+                    if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
                     index(document, IndexKey.FUNCTION_INV, indexVal);
