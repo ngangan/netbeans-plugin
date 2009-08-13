@@ -374,6 +374,61 @@ final public class ClassIndex {
         return result;
     }
 
+    /**
+     * Returns a set of source files containing reference(s) to given element.
+     * @param element for which usages should be found
+     * @param searchKind type of reference, {@see SearchKind}
+     * @param scope to search in {@see SearchScope}
+     * @return set of {@link FileObject}s containing the reference(s)
+     * It may return null when the caller is a CancellableTask&lt;CompilationInfo&gt; and is cancelled
+     * inside call of this method.
+     */
+    public Set<FileObject> getResources (final ElementHandle<TypeElement> handle, final Set<SearchKind> searchKind, final Set<SearchScope> scope) {
+        assert handle != null;
+        assert handle.getSignatures()[0] != null;
+        assert searchKind != null;
+
+        if (handle.getKind() != ElementKind.CLASS) {
+            return Collections.EMPTY_SET;
+        }
+
+        final Set<FileObject> result = new HashSet<FileObject>();
+        for(FileObject fo : javaIndex.getResources(handle.toJava(), toJavaSearchKind(searchKind), toJavaScope(scope))) {
+            result.add(fo);
+        }
+
+        final String typeRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
+        final String invocationRegex = ".+?#.+?#" + escapePattern(handle.getQualifiedName())  +"#.+";
+
+        try {
+            QuerySupport query = getUsageQuery(scope);
+            for (SearchKind sk : searchKind) {
+
+                switch (sk) {
+                    case TYPE_REFERENCES: {
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_DEF.toString()})) {
+                            result.add(ir.getFile());
+                        }
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                            result.add(ir.getFile());
+                        }
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
+                            result.add(ir.getFile());                        }
+                        break;
+                    }
+                    case METHOD_REFERENCES: {
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                            result.add(ir.getFile());
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+        }
+
+        return result;
+    }
+
     private QuerySupport getQuery(Set<SearchScope> scope) throws IOException {
         Collection<FileObject> roots = getRoots(scope, false);
         return QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, roots.toArray(new FileObject[roots.size()]));

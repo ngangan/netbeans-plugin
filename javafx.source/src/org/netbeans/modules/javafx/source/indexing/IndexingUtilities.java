@@ -24,11 +24,11 @@ final public class IndexingUtilities {
     public static String getIndexValue(ElementHandle<? extends Element> eeh) {
         switch (eeh.getKind()) {
             case CLASS: {
-                return eeh.getSignatures()[0];
+                return eeh.getSignatures()[0].replace("$", ".");
             }
             case FIELD:
             case METHOD: {
-                return eeh.getSignatures()[1] + INDEX_SEPARATOR + convertInternalSignature(eeh.getSignatures()[2]) + INDEX_SEPARATOR + eeh.getSignatures()[0];
+                return eeh.getSignatures()[1] + INDEX_SEPARATOR + convertInternalSignature(eeh.getSignatures()[2].replace("$", ".")) + INDEX_SEPARATOR + eeh.getSignatures()[0].replace("$", ".");
             }
             default: {
                 return eeh.toString();
