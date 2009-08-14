@@ -40,8 +40,8 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import com.sun.javafx.geom.AffineTransform;
 import com.sun.javafx.geom.Bounds2D;
+import com.sun.javafx.geom.transform.Affine2D;
 import com.sun.scenario.scenegraph.SGNode;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
@@ -140,7 +140,7 @@ public final class FXDElement {
         SGNode node = getController().getNode(m_id);
         assert node != null;
         Bounds2D bounds = new Bounds2D();
-        AffineTransform transform = new AffineTransform();
+        Affine2D transform = new Affine2D();
         getController().getSGPanel().getSceneGroup().getTransformMatrix(transform);
         node.getCompleteBounds(bounds, transform);
         return bounds;
