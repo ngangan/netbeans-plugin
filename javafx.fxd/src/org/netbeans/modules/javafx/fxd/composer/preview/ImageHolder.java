@@ -55,6 +55,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -74,7 +75,8 @@ final class ImageHolder extends JPanel {
         add(imagePanel);
         setDoubleBuffered(true);
         canPaint = new AtomicBoolean( true );
-        myErrorComponent = new JLabel( "ERR_UnableRender");  // NOI18N
+        myErrorComponent = new JLabel( 
+                NbBundle.getMessage( ImageHolder.class, "ERR_UnableRender"));  // NOI18N
         myErrorComponent.validate();
         setBackground( Color.WHITE);
     }
