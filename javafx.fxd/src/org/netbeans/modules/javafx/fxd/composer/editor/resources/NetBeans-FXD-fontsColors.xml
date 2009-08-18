@@ -1,0 +1,29 @@
+<!DOCTYPE fontscolors PUBLIC "-//NetBeans//DTD Editor Fonts and Colors settings 1.1//EN" "http://www.netbeans.org/dtds/EditorFontsColors-1_1.dtd">
+<fontscolors>
+    <fontcolor name="default" default="default"/>
+    <fontcolor name="comment" default="comment"/>
+    <fontcolor name="error" default="error"/>
+    <fontcolor name="format" default="string">
+        <font style="bold" />
+    </fontcolor>
+    <fontcolor name="i18n-artifact" default="string">
+        <font style="bold+italic" />
+    </fontcolor>
+    <fontcolor name="identifier" default="identifier"/>
+    <fontcolor name="identifier_attr" default="identifier" foreColor="blue"/>
+    <fontcolor name="keyword" default="keyword"/>
+    <fontcolor name="keyword-directive" default="keyword">
+        <font style="bold" />
+    </fontcolor>
+    <fontcolor name="keyword-literal" default="keyword">
+        <font style="bold" />
+    </fontcolor>
+    <fontcolor name="number" default="number"/>
+    <fontcolor name="operator" default="operator"/>
+    <fontcolor name="separator" default="separator"/>
+    <fontcolor name="string" default="string"/>
+    <fontcolor name="time" foreColor="magenta" default="default"/>
+    <fontcolor name="whitespace" default="whitespace"/>
+    <fontcolor name="future-literal" default="error"/>
+
+</fontscolors>
