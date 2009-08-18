@@ -26,13 +26,11 @@ import org.netbeans.modules.parsing.spi.SourceModificationEvent;
  */
 public class FXDSyntaxErrorParser extends Parser {
 
-    private static Logger logger = Logger.getLogger( FXDSyntaxErrorParser.class.getName() ); // NOI18N
     private Snapshot snapshot;
 
     @Override
     public void parse (Snapshot snapshot, Task task, SourceModificationEvent event) {
         this.snapshot = snapshot;
-        TokenSequence<?> ts = snapshot.getTokenHierarchy().tokenSequence();
     }
 
     @Override
@@ -59,7 +57,6 @@ public class FXDSyntaxErrorParser extends Parser {
 
         FXDParserResult (Snapshot snapshot) {
             super (snapshot);
-            logger.warning(">>>>>>>>TS = "+snapshot.getTokenHierarchy().tokenSequence());
         }
 
         @Override
