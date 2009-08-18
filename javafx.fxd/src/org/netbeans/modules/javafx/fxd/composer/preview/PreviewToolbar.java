@@ -242,6 +242,10 @@ public final class PreviewToolbar extends FXDToolbar {
         entryCombo.setEnabled(entryCombo.getModel().getSize() > 1);
     }
 
+    public static boolean isFXDContent(String name) {
+        return (name != null && name.endsWith(FXD_EXTENSION));
+    }
+
     private static String[] getSceneEntryNames(FXZDataObject  dObj){
         FXDComposerModel model   = dObj.getDataModel();
         FXZArchive       archive = model.getFXDContainer();
@@ -272,7 +276,7 @@ public final class PreviewToolbar extends FXDToolbar {
     }
 
     private static String getFXDScene(String name){
-        if ( name != null && name.endsWith(FXD_EXTENSION)) {
+        if ( isFXDContent(name)) {
             return name.substring(0, name.length() - FXD_EXTENSION.length());
         } else {
             return null;
