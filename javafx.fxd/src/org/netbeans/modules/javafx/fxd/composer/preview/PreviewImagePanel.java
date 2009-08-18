@@ -230,7 +230,9 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             node.setTransformMatrix(at);
 
             m_sgPanel.invalidate();
-            m_sgPanel.getParent().validate();
+            if (m_sgPanel.getParent() != null){
+                m_sgPanel.getParent().validate();
+            }
         }
     }
 
