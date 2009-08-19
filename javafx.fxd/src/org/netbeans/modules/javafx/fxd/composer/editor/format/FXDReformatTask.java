@@ -234,7 +234,7 @@ public class FXDReformatTask implements ReformatTask {
             if ( rowFirstNonWhite >= m_startOffset){
                 return FormatterUtilities.calculateLineIndent(m_baseDoc, m_startOffset);
             } else {
-                return IndentUtils.lineIndent(m_baseDoc, m_startOffset);
+                return FormatterUtilities.getCurrentLineIndent(m_baseDoc, m_startOffset);
             }
         }
 
@@ -284,7 +284,6 @@ public class FXDReformatTask implements ReformatTask {
 
         private void indentLine(int lineStart, int indent) throws BadLocationException {
             if (lineStart >= m_startOffset && lineStart != m_lastIndentedRow){
-                logger.warning("INDENT ("+lineStart+") : "+m_context.lineIndent(m_context.lineStartOffset(lineStart))+" => "+indent);
                 m_lastIndentedRow = lineStart;
                 if (m_context.lineIndent(m_context.lineStartOffset(lineStart)) != indent) {
                     m_adjustments.offer(Adjustment.indent(createPosition(lineStart), indent));

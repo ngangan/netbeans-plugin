@@ -33,12 +33,17 @@ class FormatterUtilities {
      * @throws BadLocationException
      */
     static int calculateLineIndent(Document document, int startOffset) throws BadLocationException {
+        int indent = 0;
         int prevCharIdx = Utilities.getFirstNonWhiteBwd((BaseDocument) document, startOffset);
         if (prevCharIdx == -1){
-            return getPrevLineIndent(document, startOffset);
+             indent = getPrevLineIndent(document, startOffset);
+             if (indent == -1){
+                 indent = getCurrentLineIndent(document, startOffset);
+             }
+             return indent;
         }
-        int rowStart = Utilities.getRowStart((BaseDocument)document, prevCharIdx);
-        int indent = IndentUtils.lineIndent(document, rowStart);
+        
+        indent = getCurrentLineIndent(document, prevCharIdx);
         String prevChar = document.getText(prevCharIdx, 1);
         if (prevChar.equals("{") || prevChar.equals("[")) { // NOI18N
             if (!isNextOnLineRBracket(document, startOffset)) {
@@ -51,7 +56,22 @@ class FormatterUtilities {
     private static int getPrevLineIndent(Document document, int startOffset)
             throws BadLocationException{
         int prevRowStart = Utilities.getRowStart((BaseDocument)document, startOffset, -1);
+        if (prevRowStart == -1){
+            return -1;
+        }
         return IndentUtils.lineIndent(document, prevRowStart);
+    }
+
+    /**
+     * @param document non-null document.
+     * @param offset &gt;= 0 offset anywhere on the line.
+     * @return current line indent
+     * @throws BadLocationException
+     */
+    static int getCurrentLineIndent(Document document, int offset)
+            throws BadLocationException{
+        int rowStart = Utilities.getRowStart((BaseDocument)document, offset);
+        return IndentUtils.lineIndent(document, rowStart);
     }
 
     private static boolean isNextOnLineRBracket(Document document, int startOffset)
