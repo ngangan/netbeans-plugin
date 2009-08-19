@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.MainWindowOperator;
-import org.netbeans.jellytools.NewProjectNameLocationStepOperator;
+import org.netbeans.jellytools.NewJavaProjectNameLocationStepOperator;
 import org.netbeans.jellytools.NewProjectWizardOperator;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.jellytools.ProjectsTabOperator;
@@ -74,7 +74,7 @@ public class Util {
         projectWizard.selectCategory(_category);
         projectWizard.selectProject(_project);
         projectWizard.next();
-        NewProjectNameLocationStepOperator locationWizard = new NewProjectNameLocationStepOperator();
+        NewJavaProjectNameLocationStepOperator locationWizard = new NewJavaProjectNameLocationStepOperator();
         locationWizard.txtProjectName().setText(name);
         locationWizard.txtProjectLocation().setText(location);
         projectWizard.finish();
