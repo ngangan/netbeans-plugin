@@ -255,6 +255,7 @@ public final class JavaFXSource {
             return ParserManager.parseWhenScanFinished(sources,
                     new LegacyUserTask(getClasspathInfo(), task));
         } catch (ParseException e) {
+            Exceptions.printStackTrace(e);
             throw new IOException(e.getMessage());
         }
     }
