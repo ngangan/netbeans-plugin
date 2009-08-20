@@ -1,6 +1,7 @@
 ~$
 ^build$
 ^netbeans.*.zip$
+^netbeans.*.html$
 ^testdist.*.zip$
 ^dist$
 /build$
