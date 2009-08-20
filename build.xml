@@ -13,11 +13,32 @@
     <target name="-copy-local-netbeans" if="local-netbeans-is-available" depends="-is-local-netbeans">
         <mkdir dir="build/netbeans"/>
         <copy todir="build/netbeans">
-	    <fileset dir="../nbbuild/netbeans"/>
+            <fileset dir="../nbbuild/netbeans"/>
         </copy>
+        <property name="netbeans.binaries.url" value="do not need to calculate"/>
     </target>
 
-    <target name="get-netbeans" unless="local-netbeans-is-available" depends="-copy-local-netbeans">
+    <target name="-calculate-netbeans-url" unless="netbeans.binaries.url" depends="-copy-local-netbeans">
+        <get src="${netbeans.base.url}" dest="netbeans.html" usetimestamp="${use.timestamp}" verbose="true"/>
+        <loadfile srcfile="netbeans.html" property="netbeans.binaries.url">
+            <filterchain>
+                <tokenfilter>
+                    <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-]*javase\.zip)&quot;.*" replace="${netbeans.base.url}/\1" flags="im"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <loadfile srcfile="netbeans.html" property="netbeans.testdist.url">
+            <filterchain>
+                <tokenfilter>
+                    <containsregex pattern=".*href=&quot;(testdist[a-z0-9-]*\.zip)&quot;.*" replace="${netbeans.base.url}/\1" flags="im"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <echo>netbeans.binaries.url resolved to ${netbeans.binaries.url}</echo>
+        <echo>netbeans.testdist.url resolved to ${netbeans.testdist.url}</echo>
+    </target> 
+
+    <target name="get-netbeans" unless="local-netbeans-is-available" depends="-calculate-netbeans-url">
         <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
         <unzip src="netbeans.zip" dest="build"/>
     </target>
@@ -38,6 +59,7 @@
             <sequential>
 	        <antcall target="get-netbeans"/>
             </sequential>
+<!--            
             <sequential>
                 <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
                 <unzip src="testdist.zip" dest="build/testdist"/>
@@ -58,6 +80,7 @@
                 <mkdir dir="javafx.sdk.sol/external"/>
                 <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>
+-->            
         </parallel>    
     </target>
     
