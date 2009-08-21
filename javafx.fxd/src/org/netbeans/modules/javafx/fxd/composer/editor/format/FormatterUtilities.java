@@ -47,14 +47,34 @@ import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
+import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 
 /**
  *
  * @author Andrey Korostelev
  */
-class FormatterUtilities {
+public class FormatterUtilities {
 
+    public static final int MULTILINE_STRING_INDENT_STEPS = 2;
+
+    public static boolean onMlStringStartLine(Document document, int startOffset ) throws BadLocationException{
+        return onMlStringStartLine(document, startOffset, true);
+    }
+
+    public static boolean onMlStringStartLine(Document document, int startOffset, boolean beforeBreak ) throws BadLocationException{
+        TokenSequence<FXDTokenId> ts = BracketCompletion.getTokenSequence((BaseDocument)document, startOffset);
+        FXDTokenId id = ts.moveNext() ? ts.token().id() : null;
+        if (id == FXDTokenId.STRING_LITERAL) {
+            int tokenRowStart = Utilities.getRowStart((BaseDocument)document, ts.offset());
+            int breakRowStart = Utilities.getRowStart((BaseDocument)document, startOffset, 
+                    beforeBreak ? 0 : -1);
+            if (tokenRowStart == breakRowStart) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * calculates desired current line indent basing on previous line content.
@@ -76,12 +96,15 @@ class FormatterUtilities {
              }
              return indent;
         }
-        
         indent = getCurrentLineIndent(document, prevCharIdx);
+
+        if (onMlStringStartLine(document, startOffset, false)) {
+            return incIndent(document, indent, FormatterUtilities.MULTILINE_STRING_INDENT_STEPS);
+        }
         String prevChar = document.getText(prevCharIdx, 1);
         if (prevChar.equals("{") || prevChar.equals("[")) { // NOI18N
             if (!isNextOnLineRBracket(document, startOffset)) {
-                indent = incIndent(document, indent);
+                return incIndent(document, indent);
             }
         }
         return indent;
@@ -126,7 +149,11 @@ class FormatterUtilities {
     }
 
     private static int incIndent(Document document, int indent){
-        return indent + IndentUtils.indentLevelSize(document);
+        return incIndent(document, indent, 1);
+    }
+
+    private static int incIndent(Document document, int indent, int steps){
+        return indent + IndentUtils.indentLevelSize(document) * steps;
     }
 
     /**

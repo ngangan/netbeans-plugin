@@ -39,6 +39,7 @@ import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 import java.util.logging.Logger;
 import org.netbeans.editor.Utilities;
+import org.netbeans.modules.javafx.fxd.composer.editor.format.FormatterUtilities;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 
 /**
@@ -59,6 +60,7 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
         try {
             int lineStart = IndentUtils.lineStartOffset(doc, dotPos);
             int lineIndent = IndentUtils.lineIndent(doc, lineStart);
+            int docIndent = IndentUtils.indentLevelSize(doc);
             if (BracketCompletion.posWithinString(doc, dotPos)) {
                 try {
                     // do check before updating document
@@ -68,7 +70,11 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
                         dotPos += 1;
                     }
                     caret.setDot(dotPos);
-                    return dotPos + 1 + lineIndent;
+                    int moveTo = dotPos + 1 + lineIndent;
+                    if(FormatterUtilities.onMlStringStartLine(doc, dotPos)){
+                        moveTo += docIndent * FormatterUtilities.MULTILINE_STRING_INDENT_STEPS;
+                    }
+                    return moveTo;
                 } catch (BadLocationException ex) {
                     log.severe("Exception thrown during InsertBreakAction. " + ex);  // NOI18N
                 }

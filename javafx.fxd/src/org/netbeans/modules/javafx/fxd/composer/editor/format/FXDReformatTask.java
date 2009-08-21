@@ -110,7 +110,6 @@ public class FXDReformatTask implements ReformatTask {
     private static class Formatter{
 
         private static final String NEW_LINE_STRING = "\n"; // NOI18N
-        private static final int MULTILINE_TOKEN_INDENT_STEPS = 2;
 
         private final Context m_context;
         private final BaseDocument m_baseDoc;
@@ -198,12 +197,13 @@ public class FXDReformatTask implements ReformatTask {
         private void formatMultilineString(Token<FXDTokenId> token) throws BadLocationException {
             assert token.id() == FXDTokenId.STRING_LITERAL;
             int tokenEndRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset() + token.length() - 1);
+            int indentSteps = FormatterUtilities.MULTILINE_STRING_INDENT_STEPS;
             // if string is multiline
             if (tokenEndRowStart != m_rowStart) {
-                m_currIndent = incIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
+                m_currIndent = incIndent(m_currIndent, indentSteps);
                 indentLines(m_rowStart, tokenEndRowStart);
                 indentLine(tokenEndRowStart);
-                m_currIndent = decIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
+                m_currIndent = decIndent(m_currIndent, indentSteps);
 
             }
         }
