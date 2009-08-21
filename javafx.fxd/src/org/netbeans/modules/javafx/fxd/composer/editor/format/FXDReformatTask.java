@@ -47,7 +47,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.Position;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
@@ -141,13 +140,11 @@ public class FXDReformatTask implements ReformatTask {
 
         private void process() throws BadLocationException{
             Token<FXDTokenId> token = FormatterUtilities.getNextNonWhiteFwd(m_ts);
-            Element rootElement = m_baseDoc.getDefaultRootElement();
-            //while ((token = FormatterUtilities.getNextNonWhiteFwd(m_ts)) != null){
             while (token != null){
                 // indent all white rows before token
                 int currRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
                 if (m_rowStart < currRowStart ){
-                    indentLines(m_rowStart, currRowStart, rootElement);
+                    indentLines(m_rowStart, currRowStart);
                 }
 
                 // format before endOffset only
@@ -159,26 +156,22 @@ public class FXDReformatTask implements ReformatTask {
                 if (FormatterUtilities.isLBracketToken(token)) {
                     indentLine(m_rowStart);
                     if ((token = FormatterUtilities.getNextNonWhiteFwd(m_ts)) != null) {
-                        //if (!FormatterUtilities.isRBracketToken(token)) {
                         m_currIndent = incIndent(m_currIndent); 
-                        //}
                         int nextTokenRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
                         if (nextTokenRowStart == m_rowStart && !FormatterUtilities.isRBracketToken(token)){
                             m_adjustments.offer(Adjustment.add(createPosition(m_ts.offset()), NEW_LINE_STRING));
                             m_adjustments.offer(Adjustment.indent(createPosition(m_ts.offset() + 1), m_currIndent));
-                        } // TODO else {m_rowStart = nextTokenRowStart;}
-                        //m_adjustments.offer(Adjustment.indent(createPosition(offset + 1), m_currIndent));
+                        }
                         continue;
                     }
                 }
-                    // process right brackets
+                // process right brackets
                 if (FormatterUtilities.isRBracketToken(token)){
                     m_currIndent = decIndent(m_currIndent);
-                    // intend rbracket line only after decreasing indent size
+                    // indent rbracket line only after decreasing indent size
                     indentLine(m_rowStart);
                     if (addBreakBeforeTokenIfNeed()){
                         m_adjustments.offer(Adjustment.indent(createPosition(m_ts.offset() + 1), m_currIndent));
-                        //indentLine(currRowStart);
                     }
 
                     if ((token = FormatterUtilities.getNextNonWhiteFwd(m_ts)) != null) {
@@ -191,17 +184,27 @@ public class FXDReformatTask implements ReformatTask {
                     }
                     continue;
                 }
+                // indent current line
                 indentLine(m_rowStart);
-                // long -> format line-by-line
-                int tokenEndRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset()+token.length()-1);
-                if (tokenEndRowStart != m_rowStart){
-                    m_currIndent = incIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
-                    indentLines(m_rowStart, tokenEndRowStart, rootElement);
-                    indentLine(tokenEndRowStart);
-                    m_currIndent = decIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
-
+                // process multiline string token
+                if (token.id() == FXDTokenId.STRING_LITERAL) {
+                    formatMultilineString(token);
                 }
+                // get next token to process
                 token = FormatterUtilities.getNextNonWhiteFwd(m_ts);
+            }
+        }
+
+        private void formatMultilineString(Token<FXDTokenId> token) throws BadLocationException {
+            assert token.id() == FXDTokenId.STRING_LITERAL;
+            int tokenEndRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset() + token.length() - 1);
+            // if string is multiline
+            if (tokenEndRowStart != m_rowStart) {
+                m_currIndent = incIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
+                indentLines(m_rowStart, tokenEndRowStart);
+                indentLine(tokenEndRowStart);
+                m_currIndent = decIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
+
             }
         }
 
@@ -265,15 +268,10 @@ public class FXDReformatTask implements ReformatTask {
             return newIndent >= 0 ? newIndent : 0;
         }
 
-        private void indentLines(int firstRowStart, int lastRowStart, Element rootElement)
-                throws BadLocationException{
+        private void indentLines(int firstRowStart, int lastRowStart) throws BadLocationException {
             while (firstRowStart < lastRowStart && firstRowStart <= m_endOffset) {
-                // indent current line
                 indentLine(firstRowStart);
-                // retrieve the next line
-                int elementIndex = rootElement.getElementIndex(firstRowStart);
-                Element nextElement = rootElement.getElement(elementIndex + 1);
-                firstRowStart = IndentUtils.lineStartOffset(m_baseDoc, nextElement.getStartOffset());
+                firstRowStart = Utilities.getRowStart(m_baseDoc, firstRowStart, +1);
             }
             m_rowStart = lastRowStart;
         }
