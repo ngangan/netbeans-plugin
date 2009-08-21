@@ -368,10 +368,12 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="org.openide.actions.DeleteAction"/>
                         <attr name="position" intvalue="800"/>
                     </file>
+                    <!--
                     <file name="RenameAction.instance">
                         <attr name="instanceClass" stringvalue="org.openide.actions.RenameAction"/>
                         <attr name="position" intvalue="900"/>
                     </file>
+                    -->
                     <file name="Separator4.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1000"/>

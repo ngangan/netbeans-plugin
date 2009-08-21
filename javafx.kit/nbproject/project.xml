@@ -85,12 +85,6 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.fxd</code-name-base>
-                    <run-dependency>
-                        <specification-version>1.5.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.netbeans.modules.javafx.lexer</code-name-base>
                     <run-dependency>
                         <release-version>1</release-version>
@@ -125,6 +119,12 @@ made subject to such option by the copyright holder.
                     <code-name-base>org.netbeans.modules.javafx.project</code-name-base>
                     <run-dependency>
                         <specification-version>1.8.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.javafx.refactoring</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>

@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
@@ -81,6 +82,14 @@ final public class ClassIndex {
 
     final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(ClassIndex.class.getName());
     final private org.netbeans.api.java.source.ClassIndex javaIndex;
+
+    private static Set<String> javaSearchKinds = new HashSet<String>() {
+        {
+            for(org.netbeans.api.java.source.ClassIndex.SearchKind value : org.netbeans.api.java.source.ClassIndex.SearchKind.values()) {
+                add(value.name());
+            }
+        }
+    };
 
     /**
      * Encodes a type of the name kind used by 
@@ -166,6 +175,7 @@ final public class ClassIndex {
          * The returned class contains references to the element type
          */
         TYPE_REFERENCES,
+        TYPE_DEFS
     };
 
     final private Set<FileObject> indexerSrcRoots = new HashSet<FileObject>();
@@ -383,7 +393,7 @@ final public class ClassIndex {
      * It may return null when the caller is a CancellableTask&lt;CompilationInfo&gt; and is cancelled
      * inside call of this method.
      */
-    public Set<FileObject> getResources (final ElementHandle<TypeElement> handle, final Set<SearchKind> searchKind, final Set<SearchScope> scope) {
+    public Set<FileObject> getResources (final ElementHandle<? extends Element> handle, final Set<SearchKind> searchKind, final Set<SearchScope> scope) {
         assert handle != null;
         assert handle.getSignatures()[0] != null;
         assert searchKind != null;
@@ -397,7 +407,8 @@ final public class ClassIndex {
             result.add(fo);
         }
 
-        final String typeRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
+        final String typeDef = handle.getQualifiedName();
+        final String typeRefRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
         final String invocationRegex = ".+?#.+?#" + escapePattern(handle.getQualifiedName())  +"#.+";
 
         try {
@@ -406,20 +417,27 @@ final public class ClassIndex {
 
                 switch (sk) {
                     case TYPE_REFERENCES: {
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_DEF.toString()})) {
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), typeDef, Kind.EXACT)) {
                             result.add(ir.getFile());
                         }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
-                            result.add(ir.getFile());
-                        }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
-                            result.add(ir.getFile());                        }
+//                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRefRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
+//                            result.add(ir.getFile());
+//                        }
+//                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRefRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
+//                            result.add(ir.getFile());                        }
                         break;
                     }
                     case METHOD_REFERENCES: {
                         for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
                             result.add(ir.getFile());
                         }
+                        break;
+                    }
+                    case TYPE_DEFS: {
+                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.CLASS_FQN.toString(), typeDef, Kind.EXACT)) {
+                            result.add(ir.getFile());
+                        }
+                        break;
                     }
                 }
             }
@@ -435,7 +453,9 @@ final public class ClassIndex {
     }
 
     private QuerySupport getUsageQuery(Set<SearchScope> scope) throws IOException {
-        Collection<FileObject> roots = getRoots(scope, true);
+        Collection<FileObject> roots = new ArrayList<FileObject>();
+        roots.addAll(getRoots(scope, true));
+        roots.addAll(getRoots(scope, false));
         return QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, roots.toArray(new FileObject[roots.size()]));
     }
 
@@ -632,7 +652,7 @@ final public class ClassIndex {
     private static Set<org.netbeans.api.java.source.ClassIndex.SearchScope> toJavaScope(Set<SearchScope> scopes) {
         Set<org.netbeans.api.java.source.ClassIndex.SearchScope> cScopes = EnumSet.noneOf(org.netbeans.api.java.source.ClassIndex.SearchScope.class);
         for (SearchScope scope : scopes) {
-            cScopes.add(org.netbeans.api.java.source.ClassIndex.SearchScope.valueOf(scope.toString()));
+            cScopes.add(org.netbeans.api.java.source.ClassIndex.SearchScope.valueOf(scope.name()));
         }
         return cScopes;
     }
@@ -640,7 +660,9 @@ final public class ClassIndex {
     private static Set<org.netbeans.api.java.source.ClassIndex.SearchKind> toJavaSearchKind(Set<SearchKind> kinds) {
         Set<org.netbeans.api.java.source.ClassIndex.SearchKind> cKinds = EnumSet.noneOf(org.netbeans.api.java.source.ClassIndex.SearchKind.class);
         for (SearchKind kind : kinds) {
-            cKinds.add(org.netbeans.api.java.source.ClassIndex.SearchKind.valueOf(kind.toString()));
+            if (javaSearchKinds.contains(kind.name())) {
+                cKinds.add(org.netbeans.api.java.source.ClassIndex.SearchKind.valueOf(kind.name()));
+            }
         }
         return cKinds;
     }

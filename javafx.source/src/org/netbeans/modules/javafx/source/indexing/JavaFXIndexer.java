@@ -8,7 +8,9 @@ package org.netbeans.modules.javafx.source.indexing;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -41,8 +43,9 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
     public enum IndexKey {
         PACKAGE_NAME,
-        CLASS_FQN, CLASS_NAME_SIMPLE, CLASS_NAME_INSENSITIVE, CLASS_ATTRS,
+        CLASS_FQN, CLASS_NAME_SIMPLE, CLASS_NAME_INSENSITIVE,
         FUNCTION_DEF, FUNCTION_INV, FIELD_DEF,
+        TYPE_REF, TYPE_IMPL,
         NOT_INDEXED
     }
 
@@ -170,6 +173,25 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 }
                 return super.visitMethodInvocation(node, document);
             }
+
+            @Override
+            public Void visitInstantiate(InstantiateTree node, IndexDocument p) {
+                return super.visitInstantiate(node, p);
+            }
+
+            @Override
+            public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
+                Element el = fxresult.getTrees().getElement(getCurrentPath());
+                if (el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) {
+                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(el));
+                    if (LOG_FINEST) {
+                        LOG.log(Level.FINEST, "Indexing type reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                    }
+                    index(document, IndexKey.TYPE_REF, indexVal);
+                }
+                return super.visitTypeClass(node, document);
+            }
+
         };
         visitor.scan(fxresult.getCompilationUnit(), document);
         support.addDocument(document);

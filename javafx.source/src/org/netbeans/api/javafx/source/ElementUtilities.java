@@ -102,24 +102,24 @@ public final class ElementUtilities {
      * is declared, or null if there is none
      * @throws IllegalArgumentException if the provided element is a package element
      */
-//    public TypeElement enclosingTypeElement( Element element ) throws IllegalArgumentException {
-//	
-//	if( element.getKind() == ElementKind.PACKAGE ) {
-//	    throw new IllegalArgumentException();
-//	}
-//	
-//        if (element.getEnclosingElement().getKind() == ElementKind.PACKAGE) {
-//            //element is a top level class, returning null according to the contract:
-//            return null;
-//        }
-//        
-//	while( !(element.getEnclosingElement().getKind().isClass() || 
-//	       element.getEnclosingElement().getKind().isInterface()) ) {
-//	    element = element.getEnclosingElement();
-//	}
-//	
-//	return (TypeElement)element.getEnclosingElement(); // Wrong
-//    }
+    public static TypeElement enclosingTypeElement( Element element ) throws IllegalArgumentException {
+	
+	if( element.getKind() == ElementKind.PACKAGE ) {
+	    throw new IllegalArgumentException();
+	}
+	
+        if (element.getEnclosingElement().getKind() == ElementKind.PACKAGE) {
+            //element is a top level class, returning null according to the contract:
+            return null;
+        }
+        
+	while( !(element.getEnclosingElement().getKind().isClass() || 
+	       element.getEnclosingElement().getKind().isInterface()) ) {
+	    element = element.getEnclosingElement();
+	}
+	
+	return (TypeElement)element.getEnclosingElement(); // Wrong
+    }
 
     /**
      * 
