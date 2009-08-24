@@ -44,6 +44,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.api.lexer.TokenUtilities;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
@@ -56,19 +57,33 @@ import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
  */
 public class FormatterUtilities {
 
-    public static final int MULTILINE_STRING_INDENT_STEPS = 2;
+    static final int MULTILINE_STRING_INDENT_STEPS = 2;
+    static final int MULTILINE_COMMENT_INDENT_CHARS = 1;
 
-    public static boolean onMlStringStartLine(Document document, int startOffset ) throws BadLocationException{
-        return onMlStringStartLine(document, startOffset, true);
+    static boolean stringStartsOnPrevLine(Document document, TokenSequence<FXDTokenId> ts,
+            int startOffset) throws BadLocationException{
+        return isOnTokensLine(document, ts, startOffset, FXDTokenId.STRING_LITERAL, 1);
     }
 
-    public static boolean onMlStringStartLine(Document document, int startOffset, boolean beforeBreak ) throws BadLocationException{
-        TokenSequence<FXDTokenId> ts = BracketCompletion.getTokenSequence((BaseDocument)document, startOffset);
+    /**
+     * tests if startOffset is on specified line of the token.
+     * @param document
+     * @param ts
+     * @param startOffset
+     * @param tid
+     * @param whichTokensLine on which token's line startOffset should be. 
+     * Lines indexes start from 0.
+     * @return
+     * @throws BadLocationException
+     */
+    static boolean isOnTokensLine(Document document, TokenSequence<FXDTokenId> ts,
+            int startOffset, FXDTokenId tid, int whichTokensLine ) throws BadLocationException{
+        ts.move(startOffset);
         FXDTokenId id = ts.moveNext() ? ts.token().id() : null;
-        if (id == FXDTokenId.STRING_LITERAL) {
+        if (id == tid) {
             int tokenRowStart = Utilities.getRowStart((BaseDocument)document, ts.offset());
             int breakRowStart = Utilities.getRowStart((BaseDocument)document, startOffset, 
-                    beforeBreak ? 0 : -1);
+                    -whichTokensLine);
             if (tokenRowStart == breakRowStart) {
                 return true;
             }
@@ -88,7 +103,8 @@ public class FormatterUtilities {
      */
     static int calculateLineIndent(Document document, int startOffset) throws BadLocationException {
         int indent = 0;
-        int prevCharIdx = Utilities.getFirstNonWhiteBwd((BaseDocument) document, startOffset);
+        TokenSequence<FXDTokenId> ts = BracketCompletion.getTokenSequence((BaseDocument)document, startOffset);
+        int prevCharIdx = getFirstNonWhiteCharIdxBwd((BaseDocument)document, ts, startOffset);
         if (prevCharIdx == -1){
              indent = getPrevLineIndent(document, startOffset);
              if (indent == -1){
@@ -97,17 +113,29 @@ public class FormatterUtilities {
              return indent;
         }
         indent = getCurrentLineIndent(document, prevCharIdx);
-
-        if (onMlStringStartLine(document, startOffset, false)) {
+        if (stringStartsOnPrevLine(document, ts, startOffset)) {
             return incIndent(document, indent, FormatterUtilities.MULTILINE_STRING_INDENT_STEPS);
         }
-        String prevChar = document.getText(prevCharIdx, 1);
-        if (prevChar.equals("{") || prevChar.equals("[")) { // NOI18N
-            if (!isNextOnLineRBracket(document, startOffset)) {
-                return incIndent(document, indent);
+        if (isLastOnPrevLineLBracket(document, ts, startOffset)){
+            if (!isNextOnLineRBracket(document, ts, startOffset)){
+                indent = incIndent(document, indent);
             }
         }
+        if (isInsideMlComment(ts, startOffset)) {
+            indent += FormatterUtilities.MULTILINE_COMMENT_INDENT_CHARS;
+        }
         return indent;
+    }
+
+    public static boolean isInsideMlComment(TokenSequence<FXDTokenId> ts, int startOffset){
+        ts.move(startOffset);
+        if (!(ts.moveNext() || ts.movePrevious())) {
+            return false;
+        }
+        if (ts.token().id() == FXDTokenId.COMMENT && startOffset >= ts.offset() + 2) { // dot after '/*'
+            return true;
+        }
+        return false;
     }
 
     private static int getPrevLineIndent(Document document, int startOffset)
@@ -131,18 +159,39 @@ public class FormatterUtilities {
         return IndentUtils.lineIndent(document, rowStart);
     }
 
-    private static boolean isNextOnLineRBracket(Document document, int startOffset)
+    private static boolean isNextOnLineRBracket(Document document,
+            TokenSequence<FXDTokenId> ts, int startOffset)
             throws BadLocationException {
         int eolOffset = Utilities.getRowEnd((BaseDocument) document, startOffset);
         if (startOffset == eolOffset || eolOffset == -1) {
             return false;
         }
-        int nextCharIdx = Utilities.getFirstNonWhiteFwd((BaseDocument) document, startOffset, eolOffset);
-        if (nextCharIdx == -1) {
+        ts.move(startOffset);
+        Token<FXDTokenId> t = getNextNonWhiteFwd(ts);
+        if(t == null){
             return false;
         }
-        String nextChar = document.getText(nextCharIdx, 1);
-        if (nextChar.equals("}") || nextChar.equals("]")) { // NOI18N
+        if (isRBracketToken(t) && ts.offset()+t.length() <= eolOffset){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isLastOnPrevLineLBracket(Document document,
+            TokenSequence<FXDTokenId> ts, int startOffset)
+            throws BadLocationException {
+
+        //int solOffset = Utilities.getRowStart((BaseDocument) document, startOffset, -1);
+        //if (startOffset == solOffset || solOffset == -1) {
+        //    return false;
+        //}
+        ts.move(startOffset);
+        Token<FXDTokenId> t = getNextNonWhiteBwd(ts);
+        if(t == null){
+            return false;
+        }
+        //if (isLBracketToken(t) && ts.offset() >= solOffset){
+        if (isLBracketToken(t)){
             return true;
         }
         return false;
@@ -169,6 +218,27 @@ public class FormatterUtilities {
             }
         }
         return null;
+    }
+
+    /**
+     * finds the first char in backward direction ignoring whitespaces
+     * and comments (single- and multi-line)
+     * @param ts TokenSequence
+     * @return next non white token in backward direction
+     */
+    static int getFirstNonWhiteCharIdxBwd(BaseDocument doc,
+            TokenSequence<FXDTokenId> ts, int offset) throws BadLocationException{
+
+        ts.move(offset);
+        if (ts.moveNext() || ts.movePrevious()){
+            if (!isWhiteToken(ts.token())){
+                return Utilities.getFirstNonWhiteBwd(doc, offset);
+            }
+            Token<FXDTokenId> t = getNextNonWhiteBwd(ts);
+            return t != null ? ts.offset() : -1;
+
+        }
+        return -1;
     }
 
     /**

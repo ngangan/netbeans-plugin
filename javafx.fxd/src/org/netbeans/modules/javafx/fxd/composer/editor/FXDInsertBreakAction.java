@@ -27,7 +27,6 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.editor;
 
-import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.BaseKit;
@@ -39,7 +38,7 @@ import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 import java.util.logging.Logger;
 import org.netbeans.editor.Utilities;
-import org.netbeans.modules.javafx.fxd.composer.editor.format.FormatterUtilities;
+import org.netbeans.modules.editor.indent.api.Indent;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 
 /**
@@ -60,7 +59,6 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
         try {
             int lineStart = IndentUtils.lineStartOffset(doc, dotPos);
             int lineIndent = IndentUtils.lineIndent(doc, lineStart);
-            int docIndent = IndentUtils.indentLevelSize(doc);
             if (BracketCompletion.posWithinString(doc, dotPos)) {
                 try {
                     // do check before updating document
@@ -70,11 +68,7 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
                         dotPos += 1;
                     }
                     caret.setDot(dotPos);
-                    int moveTo = dotPos + 1 + lineIndent;
-                    if(FormatterUtilities.onMlStringStartLine(doc, dotPos)){
-                        moveTo += docIndent * FormatterUtilities.MULTILINE_STRING_INDENT_STEPS;
-                    }
-                    return moveTo;
+                    return Boolean.TRUE;
                 } catch (BadLocationException ex) {
                     log.severe("Exception thrown during InsertBreakAction. " + ex);  // NOI18N
                 }
@@ -82,10 +76,9 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
                 FXDTokenId rightBracket = BracketCompletion.isAddRightBracket(doc, dotPos);
                 if (rightBracket != null) {
                     char bracketChar = BracketCompletion.getBracketChar(rightBracket);
-                    int innerLineIndent = lineIndent + IndentUtils.indentLevelSize(doc);
                     StringBuilder sb = createAdditiveString(doc, lineIndent, String.valueOf(bracketChar));
                     doc.insertString(dotPos, sb.toString(), null);
-                    return dotPos + 1 + innerLineIndent;
+                    return IndentUtils.indentLevelSize(doc);
                 } 
             }
         } catch (BadLocationException e) {
@@ -121,33 +114,27 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
         if (cookie != null) {
             if (cookie instanceof Integer) {
                 // integer
-                int nowDotPos = (Integer) cookie;
-                caret.setDot(nowDotPos);
+                int moveDotPos = (Integer) cookie;
+                caret.getDot();
+                caret.setDot(caret.getDot() + moveDotPos);
             }
         }
     }
 
     private Object commentBlockCompletion(JTextComponent target, BaseDocument doc, final int dotPosition) {
         try {
-            TokenHierarchy<BaseDocument> tokens = TokenHierarchy.get(doc);
-            TokenSequence<?> ts = tokens.tokenSequence();
-            ts.move(dotPosition);
-            if (!((ts.moveNext() || ts.movePrevious()) 
-                    && (ts.token().id() == FXDTokenId.COMMENT || ts.token().id() == FXDTokenId.UNKNOWN))) {
-                return null;
-            }
-
             int jdoffset = dotPosition - 2;
             if (jdoffset >= 0) {
                 CharSequence content = org.netbeans.lib.editor.util.swing.DocumentUtilities.getText(doc);
-                if (isOpenComment(content, dotPosition - 1) && !isClosedComment(content, dotPosition)) {
-                    // complete open comment
-                    // note that the formater will add one line of comment
-                    doc.insertString(dotPosition, "*/", null); // NOI18N
-                    doc.getFormatter().indentNewLine(doc, dotPosition);
-                    target.setCaretPosition(dotPosition);
+                if(insideComment(doc, dotPosition, content)){
+                    if (!isClosedComment(content, dotPosition)){
+                        doc.insertString(dotPosition, "\n*/", null); // NOI18N
+                        indentLine(doc, dotPosition + 1);
+                    }
+                    doc.insertString(dotPosition, "* ", null); // NOI18N
 
-                    return Boolean.TRUE;
+                    target.setCaretPosition(dotPosition);
+                    return 2; // caret should be after '* ' - move on 2 chars
                 }
             }
         } catch (BadLocationException ex) {
@@ -155,6 +142,34 @@ public class FXDInsertBreakAction extends BaseKit.InsertBreakAction {
             Exceptions.printStackTrace(ex);
         }
         return null;
+    }
+
+    private boolean insideComment(BaseDocument doc, final int dotPosition, CharSequence content) {
+        TokenSequence ts = BracketCompletion.getTokenSequence(doc, dotPosition);
+        if (!(ts.moveNext() || ts.movePrevious())) {
+            return false;
+        }
+        if (ts.token().id() == FXDTokenId.COMMENT && dotPosition >= ts.offset() + 2) { // dot after '/*'
+            return true;
+        }
+        if (ts.token().id() == FXDTokenId.UNKNOWN && isOpenComment(content, dotPosition - 1)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static void indentLine(BaseDocument doc, final int offset) throws BadLocationException {
+        final Indent indent = Indent.get(doc);
+        doc.runAtomic(new Runnable() {
+
+            public void run() {
+                try {
+                    indent.reindent(offset);
+                } catch (BadLocationException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        });
     }
 
     private static boolean isOpenComment(CharSequence content, int pos) {
