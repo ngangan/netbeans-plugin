@@ -181,10 +181,6 @@ public class FormatterUtilities {
             TokenSequence<FXDTokenId> ts, int startOffset)
             throws BadLocationException {
 
-        //int solOffset = Utilities.getRowStart((BaseDocument) document, startOffset, -1);
-        //if (startOffset == solOffset || solOffset == -1) {
-        //    return false;
-        //}
         ts.move(startOffset);
         Token<FXDTokenId> t = getNextNonWhiteBwd(ts);
         if(t == null){

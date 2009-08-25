@@ -281,12 +281,27 @@ public class FXDReformatTask implements ReformatTask {
         }
 
         private void indentLine(int lineStart, int indent) throws BadLocationException {
-            if (lineStart >= m_startOffset && lineStart != m_lastIndentedRow){
-                m_lastIndentedRow = lineStart;
+            if (lineStart >= m_startOffset && lineStart != m_lastIndentedRow) {
+
+                if (isInsideMlComment(lineStart)){
+                    indent += FormatterUtilities.MULTILINE_COMMENT_INDENT_CHARS;
+                }
                 if (m_context.lineIndent(m_context.lineStartOffset(lineStart)) != indent) {
                     m_adjustments.offer(Adjustment.indent(createPosition(lineStart), indent));
                 }
+                m_lastIndentedRow = lineStart;
             }
+        }
+
+        private boolean isInsideMlComment(int offset) {
+            boolean result = false;
+            int tsOffset = m_ts.offset();
+            if (FormatterUtilities.isInsideMlComment(m_ts, offset)) {
+                result = true;
+            }
+            m_ts.move(tsOffset);
+            m_ts.moveNext();
+            return result;
         }
 
         private Position createPosition(int offset) throws BadLocationException {
