@@ -50,7 +50,7 @@ import org.netbeans.modules.editor.indent.spi.IndentTask;
 
 /**
  *
- * @author Anton Chechel
+ * @author Andrey Korostelev
  */
 public class FXDIndentTask implements IndentTask {
 

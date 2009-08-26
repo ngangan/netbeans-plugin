@@ -47,7 +47,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.Position;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
@@ -111,7 +110,6 @@ public class FXDReformatTask implements ReformatTask {
     private static class Formatter{
 
         private static final String NEW_LINE_STRING = "\n"; // NOI18N
-        private static final int MULTILINE_TOKEN_INDENT_STEPS = 2;
 
         private final Context m_context;
         private final BaseDocument m_baseDoc;
@@ -119,7 +117,7 @@ public class FXDReformatTask implements ReformatTask {
         private TokenSequence<FXDTokenId> m_ts;
         Queue<Adjustment> m_adjustments;
         private int m_currIndent;
-        private int m_rowStart;
+        private int m_lastRowStart;
         private int m_startOffset;
         private int m_endOffset;
         private int m_lastIndentedRow;
@@ -141,44 +139,38 @@ public class FXDReformatTask implements ReformatTask {
 
         private void process() throws BadLocationException{
             Token<FXDTokenId> token = FormatterUtilities.getNextNonWhiteFwd(m_ts);
-            Element rootElement = m_baseDoc.getDefaultRootElement();
-            //while ((token = FormatterUtilities.getNextNonWhiteFwd(m_ts)) != null){
             while (token != null){
                 // indent all white rows before token
                 int currRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
-                if (m_rowStart < currRowStart ){
-                    indentLines(m_rowStart, currRowStart, rootElement);
+                if (m_lastRowStart < currRowStart ){
+                    indentLines(m_lastRowStart, currRowStart);
                 }
 
                 // format before endOffset only
-                if (m_rowStart > m_endOffset){
+                if (m_lastRowStart > m_endOffset){
                     return;
                 }
 
                 // process left brackets
                 if (FormatterUtilities.isLBracketToken(token)) {
-                    indentLine(m_rowStart);
+                    indentLine(m_lastRowStart);
+                    m_currIndent = incIndent(m_currIndent);
                     if ((token = FormatterUtilities.getNextNonWhiteFwd(m_ts)) != null) {
-                        //if (!FormatterUtilities.isRBracketToken(token)) {
-                        m_currIndent = incIndent(m_currIndent); 
-                        //}
                         int nextTokenRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
-                        if (nextTokenRowStart == m_rowStart && !FormatterUtilities.isRBracketToken(token)){
+                        if (nextTokenRowStart == m_lastRowStart && !FormatterUtilities.isRBracketToken(token)){
                             m_adjustments.offer(Adjustment.add(createPosition(m_ts.offset()), NEW_LINE_STRING));
                             m_adjustments.offer(Adjustment.indent(createPosition(m_ts.offset() + 1), m_currIndent));
-                        } // TODO else {m_rowStart = nextTokenRowStart;}
-                        //m_adjustments.offer(Adjustment.indent(createPosition(offset + 1), m_currIndent));
+                        }
                         continue;
                     }
                 }
-                    // process right brackets
+                // process right brackets
                 if (FormatterUtilities.isRBracketToken(token)){
                     m_currIndent = decIndent(m_currIndent);
-                    // intend rbracket line only after decreasing indent size
-                    indentLine(m_rowStart);
+                    // indent rbracket line only after decreasing indent size
+                    indentLine(m_lastRowStart);
                     if (addBreakBeforeTokenIfNeed()){
                         m_adjustments.offer(Adjustment.indent(createPosition(m_ts.offset() + 1), m_currIndent));
-                        //indentLine(currRowStart);
                     }
 
                     if ((token = FormatterUtilities.getNextNonWhiteFwd(m_ts)) != null) {
@@ -191,17 +183,28 @@ public class FXDReformatTask implements ReformatTask {
                     }
                     continue;
                 }
-                indentLine(m_rowStart);
-                // long -> format line-by-line
-                int tokenEndRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset()+token.length()-1);
-                if (tokenEndRowStart != m_rowStart){
-                    m_currIndent = incIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
-                    indentLines(m_rowStart, tokenEndRowStart, rootElement);
-                    indentLine(tokenEndRowStart);
-                    m_currIndent = decIndent(m_currIndent, MULTILINE_TOKEN_INDENT_STEPS);
-
+                // indent current line
+                indentLine(m_lastRowStart);
+                // process multiline string token
+                if (token.id() == FXDTokenId.STRING_LITERAL) {
+                    formatMultilineString(token);
                 }
+                // get next token to process
                 token = FormatterUtilities.getNextNonWhiteFwd(m_ts);
+            }
+        }
+
+        private void formatMultilineString(Token<FXDTokenId> token) throws BadLocationException {
+            assert token.id() == FXDTokenId.STRING_LITERAL;
+            int tokenEndRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset() + token.length() - 1);
+            int indentSteps = FormatterUtilities.MULTILINE_STRING_INDENT_STEPS;
+            // if string is multiline
+            if (tokenEndRowStart != m_lastRowStart) {
+                m_currIndent = incIndent(m_currIndent, indentSteps);
+                indentLines(m_lastRowStart, tokenEndRowStart);
+                indentLine(tokenEndRowStart);
+                m_currIndent = decIndent(m_currIndent, indentSteps);
+
             }
         }
 
@@ -211,7 +214,7 @@ public class FXDReformatTask implements ReformatTask {
          */
         private boolean addBreakBeforeTokenIfNeed() throws BadLocationException{
             int tokenRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
-            if (tokenRowStart == m_rowStart) {
+            if (tokenRowStart == m_lastRowStart) {
                 int prevTokenRowStart = getPrevNotWhiteTokenRowStart();
                 if(prevTokenRowStart == tokenRowStart){
                     m_adjustments.offer(Adjustment.add(createPosition(m_ts.offset()), NEW_LINE_STRING));
@@ -230,7 +233,7 @@ public class FXDReformatTask implements ReformatTask {
 
         private int initialIndent() throws BadLocationException{
             int rowFirstNonWhite = Utilities.getRowFirstNonWhite(m_baseDoc, m_startOffset);
-            m_rowStart = IndentUtils.lineStartOffset(m_baseDoc, m_startOffset);
+            m_lastRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_startOffset);
             if ( rowFirstNonWhite >= m_startOffset){
                 return FormatterUtilities.calculateLineIndent(m_baseDoc, m_startOffset);
             } else {
@@ -265,17 +268,12 @@ public class FXDReformatTask implements ReformatTask {
             return newIndent >= 0 ? newIndent : 0;
         }
 
-        private void indentLines(int firstRowStart, int lastRowStart, Element rootElement)
-                throws BadLocationException{
+        private void indentLines(int firstRowStart, int lastRowStart) throws BadLocationException {
             while (firstRowStart < lastRowStart && firstRowStart <= m_endOffset) {
-                // indent current line
                 indentLine(firstRowStart);
-                // retrieve the next line
-                int elementIndex = rootElement.getElementIndex(firstRowStart);
-                Element nextElement = rootElement.getElement(elementIndex + 1);
-                firstRowStart = IndentUtils.lineStartOffset(m_baseDoc, nextElement.getStartOffset());
+                firstRowStart = Utilities.getRowStart(m_baseDoc, firstRowStart, +1);
             }
-            m_rowStart = lastRowStart;
+            m_lastRowStart = lastRowStart;
         }
 
         private void indentLine(int lineStart) throws BadLocationException {
@@ -283,12 +281,27 @@ public class FXDReformatTask implements ReformatTask {
         }
 
         private void indentLine(int lineStart, int indent) throws BadLocationException {
-            if (lineStart >= m_startOffset && lineStart != m_lastIndentedRow){
-                m_lastIndentedRow = lineStart;
+            if (lineStart >= m_startOffset && lineStart != m_lastIndentedRow) {
+
+                if (isInsideMlComment(lineStart)){
+                    indent += FormatterUtilities.MULTILINE_COMMENT_INDENT_CHARS;
+                }
                 if (m_context.lineIndent(m_context.lineStartOffset(lineStart)) != indent) {
                     m_adjustments.offer(Adjustment.indent(createPosition(lineStart), indent));
                 }
+                m_lastIndentedRow = lineStart;
             }
+        }
+
+        private boolean isInsideMlComment(int offset) {
+            boolean result = false;
+            int tsOffset = m_ts.offset();
+            if (FormatterUtilities.isInsideMlComment(m_ts, offset)) {
+                result = true;
+            }
+            m_ts.move(tsOffset);
+            m_ts.moveNext();
+            return result;
         }
 
         private Position createPosition(int offset) throws BadLocationException {
