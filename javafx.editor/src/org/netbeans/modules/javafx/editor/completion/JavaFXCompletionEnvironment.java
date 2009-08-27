@@ -246,7 +246,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
         DeclaredType dt = (DeclaredType) type;
         if (LOGGABLE) log("  elementKind == " + dt.asElement().getKind()); // NOI18N
-        if (dt.asElement().getKind() != ElementKind.CLASS) {
+        final ElementKind kind = dt.asElement().getKind();
+        if (kind != ElementKind.CLASS && kind != ElementKind.ENUM) {
             return;
         }
         
@@ -276,7 +277,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 continue;
             }
             String tta = textToAdd;
-            if (fields && member.getKind() == ElementKind.FIELD) {
+            if (fields && (member.getKind() == ElementKind.FIELD || member.getKind() == ElementKind.ENUM_CONSTANT)) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     if (":".equals(textToAdd)) { // NOI18N
                         JavafxTypes types = controller.getJavafxTypes();
