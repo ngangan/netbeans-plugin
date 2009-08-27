@@ -412,7 +412,7 @@ made subject to such option by the copyright holder.
     <folder name="Templates">
         <folder name="JavaFX">
             <attr name="position" intvalue="910"/>
-            <file name="JavaFXEmpty.fx" url="JavaFXEmpty.fx">
+            <file name="JavaFXEmpty.fx" url="JavaFXEmpty.fx_">
                 <attr name="position" intvalue="100"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
@@ -426,7 +426,7 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.icon"
                       urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
-            <file name="JavaFXClass.fx" url="JavaFXClass.fx">
+            <file name="JavaFXClass.fx" url="JavaFXClass.fx_">
                 <attr name="position" intvalue="200"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
@@ -441,7 +441,7 @@ made subject to such option by the copyright holder.
                       urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
 
-            <file name="JavaFXStage.fx" url="JavaFXStage.fx">
+            <file name="JavaFXStage.fx" url="JavaFXStage.fx_">
                 <attr name="position" intvalue="300"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
