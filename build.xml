@@ -59,7 +59,6 @@
             <sequential>
 	        <antcall target="get-netbeans"/>
             </sequential>
-<!--            
             <sequential>
                 <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
                 <unzip src="testdist.zip" dest="build/testdist"/>
@@ -80,7 +79,6 @@
                 <mkdir dir="javafx.sdk.sol/external"/>
                 <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true"/>
             </sequential>
--->            
         </parallel>    
     </target>
     
