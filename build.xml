@@ -39,8 +39,16 @@
     </target> 
 
     <target name="get-netbeans" unless="local-netbeans-is-available" depends="-calculate-netbeans-url">
-        <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
-        <unzip src="netbeans.zip" dest="build"/>
+        <parallel failonany="true">
+            <sequential>        
+                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <unzip src="netbeans.zip" dest="build"/>
+            </sequential>
+            <sequential>
+                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <unzip src="testdist.zip" dest="build/testdist"/>
+            </sequential>
+        </parallel>
     </target>
 
     <target name="files-init" depends="-release.files">
@@ -58,10 +66,6 @@
         <parallel failonany="true">
             <sequential>
 	        <antcall target="get-netbeans"/>
-            </sequential>
-            <sequential>
-                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
-                <unzip src="testdist.zip" dest="build/testdist"/>
             </sequential>
             <sequential>
                 <mkdir dir="javafx.sdk.win/external"/>
