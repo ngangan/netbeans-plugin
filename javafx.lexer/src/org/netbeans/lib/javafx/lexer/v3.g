@@ -179,16 +179,16 @@ tokens {
 @lexer::header {
 package org.netbeans.lib.javafx.lexer;
 
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.Convert;
-import com.sun.tools.javac.util.Log;
+import com.sun.tools.mjavac.util.Context;
+import com.sun.tools.mjavac.util.Convert;
+import com.sun.tools.mjavac.util.Log;
 import com.sun.tools.javafx.util.MsgSym;
 }
 
 @header {
 package org.netbeans.lib.javafx.lexer;
 
-import com.sun.tools.javac.util.Context;
+import com.sun.tools.mjavac.util.Context;
 import org.antlr.runtime.tree.*;
 import org.antlr.runtime.*;
 

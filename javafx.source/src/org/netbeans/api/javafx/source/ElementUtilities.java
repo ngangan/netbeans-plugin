@@ -43,19 +43,19 @@ package org.netbeans.api.javafx.source;
 import com.sun.javadoc.Doc;
 import com.sun.javafx.api.JavafxcTask;
 import com.sun.source.tree.Scope;
-import com.sun.tools.javac.code.Flags;
-import com.sun.tools.javac.code.Source;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javac.code.Symbol.PackageSymbol;
-import com.sun.tools.javac.code.Symbol.VarSymbol;
-import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.ClassType;
-import com.sun.tools.javac.code.Types;
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.Name;
+import com.sun.tools.mjavac.code.Flags;
+import com.sun.tools.mjavac.code.Source;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.PackageSymbol;
+import com.sun.tools.mjavac.code.Symbol.VarSymbol;
+import com.sun.tools.mjavac.code.Symtab;
+import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.mjavac.code.Type.ClassType;
+import com.sun.tools.mjavac.code.Types;
+import com.sun.tools.mjavac.util.Context;
+import com.sun.tools.mjavac.util.Name;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.code.JavafxTypes;
@@ -271,7 +271,7 @@ public final class ElementUtilities {
                 case SHORT:
                 case VOID:
                     Type t = Symtab.instance(ctx).classType;
-                    com.sun.tools.javac.util.List<Type> typeargs = Source.instance(ctx).allowGenerics() ? com.sun.tools.javac.util.List.of((Type) type) : com.sun.tools.javac.util.List.<Type>nil();
+                    com.sun.tools.mjavac.util.List<Type> typeargs = Source.instance(ctx).allowGenerics() ? com.sun.tools.mjavac.util.List.of((Type) type) : com.sun.tools.mjavac.util.List.<Type>nil();
                     t = new ClassType(t.getEnclosingType(), typeargs, t.tsym);
                     Element classPseudoMember = new VarSymbol(Flags.STATIC | Flags.PUBLIC | Flags.FINAL, Name.Table.instance(ctx)._class, t, ((Type) type).tsym);
                     if (acceptor == null || acceptor.accept(classPseudoMember, type)) {
