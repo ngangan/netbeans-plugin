@@ -1,0 +1,2 @@
+org.netbeans.modules.javafx.debugger.JavaFXBreakpointAnnotationListener
+org.netbeans.modules.javafx.debugger.breakpoints.PersistenceManager
