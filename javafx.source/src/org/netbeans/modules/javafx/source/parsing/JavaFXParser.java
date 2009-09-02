@@ -40,8 +40,8 @@
 package org.netbeans.modules.javafx.source.parsing;
 
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.mjavac.parser.DocCommentScanner;
-import com.sun.tools.mjavac.util.Context;
+import com.sun.tools.javac.parser.DocCommentScanner;
+import com.sun.tools.javac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
 import com.sun.tools.javafxdoc.JavafxdocEnter;
