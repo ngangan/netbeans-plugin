@@ -305,7 +305,7 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init" if="netbeans.home" name="-debug-start-debugger">
-            <nbjavafxstart addressproperty="javafx.address" name="${{application.title}}" transport="dt_socket">
+            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
@@ -318,10 +318,10 @@ is divided into following sections:
                       </xsl:attribute>
                     </path>
                 </sourcepath>
-            </nbjavafxstart>
+            </nbjpdastart>
         </target>
         <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
-            <nbjavafxstart addressproperty="javafx.address" name="${{application.title}}" stopclassname="${{main.class}}" transport="dt_socket">
+            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" stopclassname="${{main.class}}" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
@@ -334,7 +334,7 @@ is divided into following sections:
                       </xsl:attribute>
                     </path>
                 </sourcepath>
-            </nbjavafxstart>
+            </nbjpdastart>
         </target>
         <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
             <property name="application.args" value=""/>
