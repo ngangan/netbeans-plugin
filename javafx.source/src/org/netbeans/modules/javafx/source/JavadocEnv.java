@@ -41,16 +41,16 @@
 package org.netbeans.modules.javafx.source;
 
 import com.sun.javadoc.ClassDoc;
-import com.sun.tools.mjavac.code.Flags;
-import com.sun.tools.mjavac.code.Kinds;
-import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
-import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
-import com.sun.tools.mjavac.code.Symbol.PackageSymbol;
-import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
-import com.sun.tools.mjavac.code.Symbol.VarSymbol;
-import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.mjavac.util.Name;
-import com.sun.tools.mjavac.util.Position;
+import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.code.Kinds;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.javac.code.Symbol.PackageSymbol;
+import com.sun.tools.javac.code.Symbol.TypeSymbol;
+import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.util.Position;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
@@ -369,7 +369,7 @@ public class JavadocEnv extends DocEnv {
             TypeSymbol s = sym;
             while (s != null && st.hasMoreTokens()) {
                 Name clsName = nameTable.fromString(st.nextToken());
-                com.sun.tools.mjavac.code.Scope.Entry e = s.members().lookup(clsName);
+                com.sun.tools.javac.code.Scope.Entry e = s.members().lookup(clsName);
                 s = null;
                 while (e.scope != null) {
                     if (e.sym.kind == Kinds.TYP && (e.sym.flags_field & Flags.SYNTHETIC) == 0) {

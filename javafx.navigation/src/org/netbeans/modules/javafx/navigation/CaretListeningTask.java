@@ -41,7 +41,7 @@
 package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.javac.code.Symbol;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
