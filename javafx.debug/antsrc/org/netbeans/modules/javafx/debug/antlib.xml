@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<antlib>
-    <taskdef name="nbjavafxconnect" classname="org.netbeans.modules.javafx.debug.JavaFXConnect"/>
-    <taskdef name="nbjavafxstart" classname="org.netbeans.modules.javafx.debug.JavaFXStart"/>
-    <taskdef name="nbjavafxreload" classname="org.netbeans.modules.javafx.debug.JavaFXReload"/>
-    <taskdef name="nbjavafxappreloaded" classname="org.netbeans.modules.javafx.debug.JavaFXAppReloaded"/>
-</antlib>
