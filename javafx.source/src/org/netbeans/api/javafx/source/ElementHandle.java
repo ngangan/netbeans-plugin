@@ -39,10 +39,10 @@
 
 package org.netbeans.api.javafx.source;
 
-import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.mjavac.code.Symtab;
-import com.sun.tools.mjavac.jvm.Target;
-import com.sun.tools.mjavac.model.JavacElements;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symtab;
+import com.sun.tools.javac.jvm.Target;
+import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 
 import javax.lang.model.element.*;

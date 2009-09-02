@@ -39,7 +39,7 @@
 
 package org.netbeans.modules.javafx.profiler.utilities;
 
-import com.sun.tools.mjavac.code.Kinds;
+import com.sun.tools.javac.code.Kinds;
 import java.io.IOException;
 import java.util.LinkedList;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -57,10 +57,10 @@ import org.openide.filesystems.FileUtil;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
 import org.netbeans.modules.javafx.source.classpath.FileObjects;
-import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.mjavac.code.TypeTags;
-import com.sun.tools.mjavac.util.Convert;
-import com.sun.tools.mjavac.util.Name;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.TypeTags;
+import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javac.util.Name;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
