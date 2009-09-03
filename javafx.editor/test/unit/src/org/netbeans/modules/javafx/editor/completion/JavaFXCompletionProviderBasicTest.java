@@ -55,4 +55,8 @@ public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
         performTest("Model", 8, null, "packages.pass");
     }
 
+    public void testColorRGBParams() throws Exception {
+        performTest("Color", 75, null, "colorRGBParams.pass");
+    }
+
 }
