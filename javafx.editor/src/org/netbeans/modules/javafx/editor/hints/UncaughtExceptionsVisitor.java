@@ -43,12 +43,13 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.AssignmentTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -66,13 +67,13 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
 
     private CompilationInfo compilationInfo;
     private ClassIndex classIndex;
-    private List<String> instantTypes;
+    private Set<String> instantTypes;
     private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE);
 
     UncaughtExceptionsVisitor(CompilationInfo compilationInfo, ClassIndex classIndex) {
         this.compilationInfo = compilationInfo;
         this.classIndex = classIndex;
-        instantTypes = new ArrayList<String>();
+        instantTypes = new HashSet<String>();
     }
 
     @Override
@@ -109,6 +110,13 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
         String typeName = (node.getExpression().toString().replace("{}","").trim()); //NOI18N
         instantTypes.add(typeName);
         return super.visitAssignment(node, p);
+    }
+
+    @Override
+    public Void visitInstantiate(InstantiateTree node, UncaughtExceptionsModel p) {
+        String typeName = (node.getIdentifier().toString().replace("{}","").trim()); //NOI18N
+        instantTypes.add(typeName);
+        return super.visitInstantiate(node, p);
     }
 
     static String getMethodName(String fullMethodName) {
