@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -162,7 +162,9 @@ public class CompletionTestBase extends NbTestCase {
                     if (type == ClassPath.BOOT) {
                         return bootPath;
                     }
-                } catch (IOException ex) {}
+                } catch (IOException ex) {
+                    // XXX: describe here why it is safe to eat the exception
+                }
                 return null;
             }
         };
@@ -245,7 +247,9 @@ public class CompletionTestBase extends NbTestCase {
 
         File goldenFile = new File(getDataDir(), "/goldenfiles/org/netbeans/modules/javafx/editor/completion/JavaFXCompletionProviderTest/" + goldenFileName);
         File diffFile = new File(getWorkDir(), getName() + ".diff");
-        assertFile(output, goldenFile, diffFile);
+        String message = "The files:\n  " + goldenFile.getAbsolutePath() + "\n  " +
+                output.getAbsolutePath() + "\nshould have the same content.";
+        assertFile(message, output, goldenFile, diffFile);
 
         if (toPerformItemRE != null) {
             assertNotNull(goldenFileName2);
