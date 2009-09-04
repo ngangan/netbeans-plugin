@@ -5,8 +5,8 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.geom.AffineTransform;
 import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.Affine2D;
 import com.sun.javafx.sg.PGNode;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -140,7 +140,7 @@ public final class FXDComposerController {
     }    
 
     private static void pick( SGGroup parent, List<SGNode> selected, float x, float y, 
-            String idPrefix, SGNode significantParent, Affine2D accumTx)
+            String idPrefix, SGNode significantParent, AffineTransform accumTx)
     {
         for ( PGNode pgChild : parent.getContent()) {
             SGNode child = (SGNode) pgChild;
@@ -154,8 +154,8 @@ public final class FXDComposerController {
 //                }
 //            }
             if( child instanceof SGGroup) {
-                Affine2D parentTX = new Affine2D(accumTx);
-                Affine2D temp = new Affine2D();
+                AffineTransform parentTX = new AffineTransform(accumTx);
+                AffineTransform temp = new AffineTransform();
                 child.getTransformMatrix(temp);
                 parentTX.concatenate(temp);
                 pick( (SGGroup) child, selected, x, y, idPrefix, significantNode, parentTX);
@@ -179,10 +179,10 @@ public final class FXDComposerController {
             List<SGNode> selected = new ArrayList<SGNode>();
             String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
 
-            Affine2D parentTX = new Affine2D();
+            AffineTransform parentTX = new AffineTransform();
             getSGPanel().getSceneGroup().getTransformMatrix(parentTX);
 
-            Affine2D currTx = new Affine2D();
+            AffineTransform currTx = new AffineTransform();
             root.getTransformMatrix(currTx);
 
             parentTX.concatenate(currTx);

@@ -5,18 +5,10 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
 
-import org.netbeans.modules.javafx.fxd.composer.editor.FXDKeyTypedAction;
 import java.util.Map;
 import javax.swing.Action;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Caret;
 import javax.swing.text.TextAction;
-import org.netbeans.editor.ActionFactory.FormatAction;
-import org.netbeans.editor.BaseDocument;
-import org.netbeans.editor.BaseKit;
 import org.netbeans.modules.editor.NbEditorKit;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
-import org.netbeans.modules.javafx.fxd.composer.editor.FXDInsertBreakAction;
 
 /**
  *
@@ -39,6 +31,38 @@ public class FXDKit extends NbEditorKit implements org.openide.util.HelpCtx.Prov
         return new org.openide.util.HelpCtx(FXDKit.class);
     }
     
+    /** Create new instance of syntax coloring parser */
+    /*
+    @Override
+    public Syntax createSyntax(Document doc) {
+        return new XMLDefaultSyntax();
+    }*/
+  
+    /*
+    @Override
+    public Document createDefaultDocument() {
+        //Document doc = new FXDEditorDocument(getContentType());
+        //return doc;
+        return super.createDefaultDocument();
+    }*/
+
+
+    /** Create syntax support */
+    /*
+    @Override
+    public SyntaxSupport createSyntaxSupport(BaseDocument doc) {
+        return new XMLSyntaxSupport(doc);
+    }*/
+    
+    /*
+    @Override
+    public void install(JEditorPane c) {
+        super.install(c);
+        if (Boolean.getBoolean("netbeans.experimental.xml.nodeselectors")) {  // NOI18N
+            new NodeSelector(c);
+        }
+    }*/
+
     // hack to be settings browseable //??? more info needed    
     public static void setMap(Map map) {
         settings = map;
@@ -58,35 +82,29 @@ public class FXDKit extends NbEditorKit implements org.openide.util.HelpCtx.Prov
      * Provide XML related actions.
      */
     protected @Override Action[] createActions() {
-        Action[] actions = new Action[]{
-            new CommentAction("//"), //NOI18N
-            new UncommentAction("//"), //NOI18N
-            new FXDFormatAction(),
-            new FXDKeyTypedAction(),
-            new FXDDeleteCharAction(deletePrevCharAction, false),
-            new FXDInsertBreakAction()
+        Action[] actions = new Action[] {
         };
         return TextAction.augmentList(super.createActions(), actions);
-    }
+    }    
     
-    private static class FXDDeleteCharAction extends ExtDeleteCharAction {
-
-        public FXDDeleteCharAction(String nm, boolean nextChar) {
-            super(nm, nextChar);
+    /*
+    public class FXDEditorDocument extends NbEditorDocument {
+        public FXDEditorDocument(Class kitClass) {
+            super(kitClass);
         }
 
-        @Override
-        protected void charBackspaced(BaseDocument doc, int dotPos, Caret caret, char ch)
-                throws BadLocationException {
-            BracketCompletion.charBackspaced(doc, dotPos, ch);
+        public FXDEditorDocument(String mimeType) {
+            super(mimeType);
+        }
+        
+        public @Override boolean addLayer(DrawLayer layer, int visibility) {
+            //filter out the syntax layer adding
+            if(!(layer instanceof DrawLayerFactory.SyntaxLayer)) {
+                return super.addLayer(layer, visibility);
+            } else {
+                return false;
+            }
         }
     }
-
-    private static class FXDFormatAction extends FormatAction {
-        public FXDFormatAction() {
-            putValue(Action.NAME, BaseKit.formatAction);
-            setEnabled(false);
-        }
-    }
-
+   */ 
 }

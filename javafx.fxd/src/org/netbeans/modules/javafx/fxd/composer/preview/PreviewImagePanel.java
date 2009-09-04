@@ -4,8 +4,8 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
+import com.sun.javafx.geom.AffineTransform;
 import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.Affine2D;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -220,19 +220,17 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 //
 //            m_sgPanel.invalidate();
 
-//            Affine2D at = new Affine2D();
+//            AffineTransform at = new AffineTransform();
 //            at.scale( zoom, zoom);
 
 //            at.translate(-bounds.getX(), -bounds.getY());
 //            fxNode.setTransform(at);
-            Affine2D at = new Affine2D();
+            AffineTransform at = new AffineTransform();
             at.scale( zoom, zoom);
             node.setTransformMatrix(at);
 
             m_sgPanel.invalidate();
-            if (m_sgPanel.getParent() != null){
-                m_sgPanel.getParent().validate();
-            }
+            m_sgPanel.getParent().validate();
         }
     }
 

@@ -1,0 +1,29 @@
+/*
+ *  Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+
+package org.netbeans.modules.javafx.fxd.composer.editor;
+
+import org.netbeans.api.lexer.Token;
+import org.netbeans.spi.lexer.Lexer;
+
+/**
+ *
+ * @author Pavel Benes
+ */
+public class FXDLexer implements Lexer<FXDTokenId> {
+
+    public Token<FXDTokenId> nextToken() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object state() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void release() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+}

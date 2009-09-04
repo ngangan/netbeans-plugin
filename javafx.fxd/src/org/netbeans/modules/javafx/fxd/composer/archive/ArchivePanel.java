@@ -27,10 +27,7 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
-import org.netbeans.modules.javafx.fxd.composer.preview.PreviewToolbar;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.actions.Presenter;
 
@@ -55,24 +52,19 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                 if ( !e.getValueIsAdjusting()) {
                     boolean allowReplace;
                     boolean allowRemove;
-                    boolean allowEditView;
                     
                     switch( tableContent.getSelectedRowCount()) {
                         case 0:
-                            allowRemove = false;
-                            allowReplace = false;
-                            allowEditView = false;
+                            allowRemove=false;
+                            allowReplace=false;
                             break;
                         case 1:
-                            allowRemove = true;
-                            allowReplace = true;
-                            allowEditView = isFXDEntrySelected();
-
+                            allowRemove=true;
+                            allowReplace=true;
                             break;
                         default:
-                            allowRemove = true;
-                            allowReplace = false;
-                            allowEditView = false;
+                            allowRemove=true;
+                            allowReplace=false;
                             break;
                     }
                     int [] rows = tableContent.getSelectedRows();
@@ -83,9 +75,7 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
                         }
                     }
                     m_removeAction.setEnabled(allowRemove);
-                    m_replaceAction.setEnabled(allowReplace);
-                    m_editAction.setEnabled(allowEditView);
-                    m_viewAction.setEnabled(allowEditView);
+                    m_replaceAction.setEnabled(allowReplace);                    
                 }
             }
         });
@@ -289,61 +279,17 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
         }
     };
 
-    final class ViewArchiveEntryAction extends AbstractFXDAction {
-
-        public ViewArchiveEntryAction() {
-            super("view_entry", false);  //NOI18N
-        }
-        public void actionPerformed(ActionEvent e) {
-            int row = tableContent.getSelectedRow();
-            if (row >= 0) {
-                String entryName = getNameAt(row);
-                FXZDataObject dObj = m_archive.getDataObject();
-                dObj.selectView(FXZDataObject.VISUAL_VIEW_INDEX);
-                dObj.selectEntry(entryName);
-            }
-        }
-    };
-
-    final class EditArchiveEntryAction extends AbstractFXDAction {
-
-        public EditArchiveEntryAction() {
-            super("edit_entry", false);  //NOI18N
-        }
-        public void actionPerformed(ActionEvent e) {
-            int row = tableContent.getSelectedRow();
-            if (row >= 0) {
-                String entryName = getNameAt(row);
-                FXZDataObject dObj = m_archive.getDataObject();
-                dObj.selectView(FXZDataObject.TEXT_VIEW_INDEX);
-                dObj.selectEntry(entryName);
-            }
-        }
-    };
 
     private class PopupListener extends MouseAdapter {
         private JPopupMenu m_entryPopup;
 
         public PopupListener() {
             m_entryPopup = new JPopupMenu();
-            for (int i = 0; i < m_popup_actions.length; i++){
-                if (m_popup_actions[i] == null){
-                    m_entryPopup.add(new JSeparator());
-                } else if (m_popup_actions[i] instanceof Presenter.Popup){
-                    m_entryPopup.add(((Presenter.Popup)m_popup_actions[i]).getPopupPresenter());
+            for (int i = 0; i < m_actions.length; i++){
+                if (m_actions[i] instanceof Presenter.Popup){
+                    m_entryPopup.add(((Presenter.Popup)m_actions[i]).getPopupPresenter());
                 } else {
-                    m_entryPopup.add(m_popup_actions[i]);
-                }
-            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.isPopupTrigger()){
-                showPopup(e);
-            }else {
-                if (e.getClickCount() >= 2 && m_editAction.isEnabled()){
-                    m_editAction.actionPerformed(null);
+                    m_entryPopup.add(m_actions[i]);
                 }
             }
         }
@@ -378,16 +324,6 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     }
 
 
-    /*
-     * tests if selected entry is FXD.
-     * should be invoked after check that only one row is selected.
-     */
-    private boolean isFXDEntrySelected(){
-        int row = tableContent.getSelectedRow();
-        String entryName = getNameAt(row);
-        return PreviewToolbar.isFXDContent(entryName);
-    }
-
     protected String getNameAt(int row) {
         return (String) tableContent.getModel().getValueAt(row, 0);
     }
@@ -396,20 +332,8 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     private final Action m_addAction      = new AddArchiveEntryAction();
     private final Action m_removeAction   = new RemoveArchiveEntryAction();
     private final Action m_replaceAction  = new ReplaceArchiveEntryAction();
-    private final Action m_viewAction  = new ViewArchiveEntryAction();
-    private final Action m_editAction  = new EditArchiveEntryAction();
     
     private final Action [] m_actions = new Action[] {
-        m_newEntryAction,
-        m_addAction,
-        m_removeAction,
-        m_replaceAction
-    };
-
-    private final Action [] m_popup_actions = new Action[] {
-        m_editAction,
-        m_viewAction,
-        null,
         m_newEntryAction,
         m_addAction,
         m_removeAction,
