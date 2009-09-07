@@ -83,6 +83,8 @@ public class FXDKit extends NbEditorKit implements org.openide.util.HelpCtx.Prov
      */
     protected @Override Action[] createActions() {
         Action[] actions = new Action[] {
+            new CommentAction("//"), //NOI18N
+            new UncommentAction("//"), //NOI18N
         };
         return TextAction.augmentList(super.createActions(), actions);
     }    

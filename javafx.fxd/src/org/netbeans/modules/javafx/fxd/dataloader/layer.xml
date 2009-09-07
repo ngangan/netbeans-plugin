@@ -202,6 +202,17 @@ made subject to such option by the copyright holder.
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
+
+                <folder name="Toolbars">
+                    <folder name="Default">
+                        <file name="comment">
+                            <attr name="position" intvalue="20200"/>
+                        </file>
+                        <file name="uncomment">
+                            <attr name="position" intvalue="20300"/>
+                        </file>
+                    </folder>
+                </folder>
             </folder>
         </folder>
         <folder name="multipart">
@@ -216,6 +227,17 @@ made subject to such option by the copyright holder.
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
+
+                <folder name="Toolbars">
+                    <folder name="Default">
+                        <file name="comment">
+                            <attr name="position" intvalue="20200"/>
+                        </file>
+                        <file name="uncomment">
+                            <attr name="position" intvalue="20300"/>
+                        </file>
+                    </folder>
+                </folder>
             </folder>
         </folder>
     </folder>
