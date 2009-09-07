@@ -41,6 +41,7 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 
+import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
@@ -48,19 +49,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import org.netbeans.api.javafx.source.CompilationInfo;
 
 
 final class UncaughtExceptionsModel {
 
     private Collection<UncaughtExceptionsModel.Hint> unresovedHints;
+    private CompilationInfo compilationInfo;
+
+    public UncaughtExceptionsModel(CompilationInfo compilationInfo) {
+        this.compilationInfo = compilationInfo;
+    }
 
     public void addThrowHint(List<Type> thrownExceptions, Tree tree) {
         if (unresovedHints == null) {
             unresovedHints = new HashSet<Hint>();
         }
-
+        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
+        int length = end - start;
         assert thrownExceptions != null;
-        Hint hint = new Hint(thrownExceptions, tree);
+        Hint hint = new Hint(thrownExceptions, tree, length, start);
         unresovedHints.add(hint);
     }
 
@@ -88,12 +98,16 @@ final class UncaughtExceptionsModel {
         private List<Type> exceptions;
         private Tree tree;
         private Tree catchTree;
+        private int length;
+        private int start;
 
         private Hint() {}
 
-        private Hint(List<Type> thrownExceptions, Tree tree) {
+        private Hint(List<Type> thrownExceptions, Tree tree, int length, int start) {
             this.exceptions = new ArrayList<Type>(thrownExceptions);
             this.tree = tree;
+            this.length = length + 1;
+            this.start = start;
         }
 
         private void setCatchTree(Tree catchTree) {
@@ -114,6 +128,14 @@ final class UncaughtExceptionsModel {
 
         void removeException(Type type) {
             exceptions.remove(type);
+        }
+
+        int getLength() {
+            return length;
+        }
+
+        int getStartPosition() {
+            return start;
         }
 
     }

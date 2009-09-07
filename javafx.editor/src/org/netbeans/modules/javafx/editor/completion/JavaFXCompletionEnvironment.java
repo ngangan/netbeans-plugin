@@ -328,11 +328,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
 
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    boolean isInherited = !te.equals(((Symbol) member.getEnclosingElement()).enclClass());
+                    boolean isDeprecated = elements.isDeprecated(member);
                     addResult(
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
                             (ExecutableType) member.asType(),
-                            query.anchorOffset, false, false, false, false));
+                            query.anchorOffset, isInherited, isDeprecated, false, false));
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
                 String tta = textToAdd;

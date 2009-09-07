@@ -68,8 +68,9 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
     
     @SuppressWarnings("unchecked")  //Properties cast to Map<String,String> // NOI18N
     static JavaPlatform create(Map<String,String> properties, List<URL> sources, List<URL> javadoc) {
-        // XXX java.home??
-        File javaHome = FileUtil.normalizeFile(new File(System.getProperty("jdk.home")));       //NOI18N
+        File javaHome = FileUtil.normalizeFile(new File(System.getProperty("java.home")));       //NOI18N
+        assert javaHome != null : "java.home supposed to be set";
+        assert javaHome.isDirectory() : "java.home supposed to be directory";
         List<URL> javaFolders = new ArrayList<URL>();
         URL fxFolder = null;
         try {

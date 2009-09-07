@@ -1,4 +1,6 @@
-Color.rgb c
+javafx.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int) - parameters
+javafx.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int, arg3 : float) - parameters
+javafx.scene.paint.Color c
 bind
 false
 new
