@@ -92,7 +92,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo, classIndex);
-                UncaughtExceptionsModel model = new UncaughtExceptionsModel();
+                UncaughtExceptionsModel model = new UncaughtExceptionsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
                 if (model.getThrowHints() != null) {

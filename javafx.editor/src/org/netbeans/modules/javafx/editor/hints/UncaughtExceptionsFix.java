@@ -80,9 +80,7 @@ class UncaughtExceptionsFix implements Fix {
         Iterator iterator = hint.getExceptions().iterator();
         StringBuilder block = new StringBuilder();
         if (hint.getCatchTree() == null) {
-            int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
-            int lenght = hint.getTree().toString().length() + 1;
-            String method = document.getText(start, lenght);
+            String method = document.getText(hint.getStartPosition(), hint.getLength());
             block.append("try {\n    ") //NOI18N
                     .append(method).append("\n}"); //NOI18N
             
@@ -95,8 +93,8 @@ class UncaughtExceptionsFix implements Fix {
                     block.append("\n"); //NOI18N
                 }
             }
-            document.remove(start, lenght);
-            document.insertString(start, block.toString(), null);
+            document.remove(hint.getStartPosition(), hint.getLength());
+            document.insertString(hint.getStartPosition(), block.toString(), null);
         } else {
 
             int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getCatchTree());
