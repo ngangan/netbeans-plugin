@@ -47,14 +47,15 @@ import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
 
 final class UncaughtExceptionsModel {
 
-    private Collection<UncaughtExceptionsModel.Hint> unresovedHints;
+    private Map<Tree, UncaughtExceptionsModel.Hint> unresovedHints;
     private CompilationInfo compilationInfo;
 
     public UncaughtExceptionsModel(CompilationInfo compilationInfo) {
@@ -63,7 +64,10 @@ final class UncaughtExceptionsModel {
 
     public void addThrowHint(List<Type> thrownExceptions, Tree tree) {
         if (unresovedHints == null) {
-            unresovedHints = new HashSet<Hint>();
+            unresovedHints = new HashMap<Tree,Hint>();
+        }
+        if (unresovedHints.keySet().contains(tree)) {
+            return;
         }
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
@@ -71,12 +75,12 @@ final class UncaughtExceptionsModel {
         int length = end - start;
         assert thrownExceptions != null;
         Hint hint = new Hint(thrownExceptions, tree, length, start);
-        unresovedHints.add(hint);
+        unresovedHints.put(tree, hint);
     }
 
     public void addCatchTree(Hint hint, Tree catchTree) {
         assert unresovedHints != null;
-        if (!unresovedHints.contains(hint)) {
+        if (!unresovedHints.values().contains(hint)) {
             throw new IllegalArgumentException("Hint does not existst in Set of added hints"); //NOI18N
         }
         hint.setCatchTree(catchTree);
@@ -86,11 +90,11 @@ final class UncaughtExceptionsModel {
         if (unresovedHints == null) {
             return Collections.EMPTY_LIST;
         }
-        return Collections.unmodifiableCollection(unresovedHints);
+        return Collections.unmodifiableCollection(unresovedHints.values());
     }
 
     public void removeHint(Hint hint) {
-        unresovedHints.remove(hint);
+        unresovedHints.remove(hint.getTree());
     }
 
     static final class Hint {
@@ -140,5 +144,3 @@ final class UncaughtExceptionsModel {
 
     }
 }
-
-
