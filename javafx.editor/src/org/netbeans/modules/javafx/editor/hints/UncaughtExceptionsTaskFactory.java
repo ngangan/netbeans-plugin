@@ -103,6 +103,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     HintsController.setErrors(getDocument(file), "Try-Catch", errors); //NOI18N
                 }
             }
+            
         };
     }
 
