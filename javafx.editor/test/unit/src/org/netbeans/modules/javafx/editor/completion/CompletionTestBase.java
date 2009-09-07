@@ -66,12 +66,12 @@ import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.source.gen.WhitespaceIgnoringDiff;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Language;
-import org.netbeans.junit.NbTestCase;
 import org.netbeans.modules.editor.completion.CompletionItemComparator;
 import org.netbeans.modules.java.source.TreeLoader;
 import org.netbeans.modules.java.source.usages.BinaryAnalyser;
@@ -80,6 +80,7 @@ import org.netbeans.modules.java.source.usages.ClassIndexManager;
 import org.netbeans.modules.java.source.usages.IndexUtil;
 import org.netbeans.modules.javafx.dataloader.JavaFXDataLoader;
 import org.netbeans.modules.javafx.editor.JavaFXEditorKit;
+import org.netbeans.modules.javafx.platform.JavaFXTestBase;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionProvider;
@@ -104,7 +105,7 @@ import org.openide.util.lookup.ProxyLookup;
 /**
  * Based on java.editor
  */
-public class CompletionTestBase extends NbTestCase {
+public class CompletionTestBase extends JavaFXTestBase {
 
     static {
         JavaFXCompletionProviderBasicTest.class.getClassLoader().setDefaultAssertionStatus(true);
@@ -141,15 +142,18 @@ public class CompletionTestBase extends NbTestCase {
 
     @Override
     protected void setUp() throws Exception {
-// this call did not do anything
-//        GlobalSourcePathTestUtil.setUseLibraries (false);
+        super.setUp();
+        // XXX: this call did not do anything
+//        GlobalSourcePathTestUtil.setUseLibraries(false);
         XMLFileSystem system = new XMLFileSystem();
         system.setXmlUrls(new URL[] {
             JavaFXCompletionProviderBasicTest.class.getResource("/org/netbeans/modules/javafx/dataloader/layer.xml"),
-//            JavaFXCompletionProviderBasicTest.class.getResource("/org/netbeans/modules/defaults/mf-layer.xml")
         });
-        Repository repository = new Repository(new MultiFileSystem(new FileSystem[] {FileUtil.createMemoryFileSystem(), system}));
-        final ClassPath bootPath = createClassPath(System.getProperty("sun.boot.class.path"));
+        Repository repository = new Repository(new MultiFileSystem(
+                new FileSystem[] {FileUtil.createMemoryFileSystem(), system}));
+        final ClassPath bootPath = ClassPathSupport.createProxyClassPath(
+                createClassPath(System.getProperty("sun.boot.class.path")),
+                JavaFXPlatform.getDefault().getBootstrapLibraries());
         ClassPathProvider cpp = new ClassPathProvider() {
             public ClassPath findClassPath(FileObject file, String type) {
                 try {
@@ -309,7 +313,7 @@ public class CompletionTestBase extends NbTestCase {
     }
 
     // XXX this method could probably be removed... use standard FileUtil stuff
-    private static URL getRootURL  (File f) {
+    private static URL getRootURL(File f) {
         URL url = null;
         try {
             if (isArchiveFile(f)) {
