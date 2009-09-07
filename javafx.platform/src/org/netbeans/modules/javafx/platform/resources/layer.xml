@@ -62,7 +62,7 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-
+<!--
     <folder name="Templates">
         <folder name="Services">
             <folder name="Platforms">
@@ -78,7 +78,7 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
-
+-->
 
     <folder name="xml">
         <folder name="entities">
