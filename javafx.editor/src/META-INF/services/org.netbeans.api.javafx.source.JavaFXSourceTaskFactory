@@ -5,4 +5,5 @@ org.netbeans.modules.javafx.editor.semantic.MarkOccurrencesHighlighterFactory
 org.netbeans.modules.javafx.editor.imports.MarkUnusedImportsTaskFactory
 org.netbeans.modules.javafx.editor.task.WrongPackageStatmentTaskFactory
 org.netbeans.modules.javafx.editor.hints.UncaughtExceptionsTaskFactory
+#org.netbeans.modules.javafx.editor.hints.EmptyCatchTaskFactory
 #org.netbeans.modules.javafx.preview.JavaFXSourcePreviewTaskFactory

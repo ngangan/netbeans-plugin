@@ -53,16 +53,16 @@ import java.util.Map;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
 
-final class UncaughtExceptionsModel {
+final class HintsModel {
 
-    private Map<Tree, UncaughtExceptionsModel.Hint> unresovedHints;
+    private Map<Tree, HintsModel.Hint> unresovedHints;
     private CompilationInfo compilationInfo;
 
-    public UncaughtExceptionsModel(CompilationInfo compilationInfo) {
+    public HintsModel(CompilationInfo compilationInfo) {
         this.compilationInfo = compilationInfo;
     }
 
-    public void addThrowHint(List<Type> thrownExceptions, Tree tree) {
+    public void addHint(List<Type> thrownExceptions, Tree tree) {
         if (unresovedHints == null) {
             unresovedHints = new HashMap<Tree,Hint>();
         }
@@ -73,7 +73,6 @@ final class UncaughtExceptionsModel {
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         int length = end - start;
-        assert thrownExceptions != null;
         Hint hint = new Hint(thrownExceptions, tree, length, start);
         unresovedHints.put(tree, hint);
     }
@@ -86,7 +85,7 @@ final class UncaughtExceptionsModel {
         hint.setCatchTree(catchTree);
     }
 
-    public Collection<Hint> getThrowHints() {
+    public Collection<Hint> getHints() {
         if (unresovedHints == null) {
             return Collections.EMPTY_LIST;
         }
@@ -108,7 +107,9 @@ final class UncaughtExceptionsModel {
         private Hint() {}
 
         private Hint(List<Type> thrownExceptions, Tree tree, int length, int start) {
-            this.exceptions = new ArrayList<Type>(thrownExceptions);
+            if (thrownExceptions != null) {
+                this.exceptions = new ArrayList<Type>(thrownExceptions);
+            }
             this.tree = tree;
             this.length = length + 1;
             this.start = start;
@@ -127,6 +128,9 @@ final class UncaughtExceptionsModel {
         }
 
         Collection<Type> getExceptions() {
+            if (exceptions == null) {
+                return null;
+            }
             return Collections.unmodifiableList(exceptions);
         }
 

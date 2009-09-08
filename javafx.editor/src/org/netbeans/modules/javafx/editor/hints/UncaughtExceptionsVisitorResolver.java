@@ -45,7 +45,7 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.TryTree;
 import java.util.ArrayList;
-import org.netbeans.modules.javafx.editor.hints.UncaughtExceptionsModel.Hint;
+import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Type;
 import java.util.Collection;
@@ -55,11 +55,11 @@ import java.util.HashSet;
  *
  * @author karol harezlak
  */
-final class UncaughtExceptionsVisitorResolver extends JavaFXTreePathScanner<Void, UncaughtExceptionsModel> {
+final class UncaughtExceptionsVisitorResolver extends JavaFXTreePathScanner<Void, HintsModel> {
 
     @Override
-    public Void visitTry(TryTree node, UncaughtExceptionsModel model) {
-        Collection<Hint> hints = new HashSet<Hint>(model.getThrowHints());
+    public Void visitTry(TryTree node, HintsModel model) {
+        Collection<Hint> hints = new HashSet<Hint>(model.getHints());
         Collection<ExpressionTree> nodes = new ArrayList<ExpressionTree>(node.getBlock().getStatements());
         nodes.add(node.getBlock().getValue());
         for (Tree node_ : nodes) {

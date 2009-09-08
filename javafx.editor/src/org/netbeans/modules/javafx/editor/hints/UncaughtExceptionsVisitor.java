@@ -61,7 +61,7 @@ import org.netbeans.api.javafx.source.ElementHandle;
  *
  * @author karol harezlak
  */
-final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, UncaughtExceptionsModel> {
+final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsModel> {
 
     private CompilationInfo compilationInfo;
     private ClassIndex classIndex;
@@ -75,7 +75,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
     }
 
     @Override
-    public Void visitMethodInvocation(FunctionInvocationTree node, UncaughtExceptionsModel model) {
+    public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel model) {
         //String treeClassType = getClassName(node.toString());
         
         if (node.toString().contains(".")) { //NOI18N
@@ -101,11 +101,18 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
                         if (!methodSymbol.getSimpleName().toString().equals(getMethodName(node.toString()))) {
                             continue;
                         }
-                        List<Type> thrownExceptions = methodSymbol.getThrownTypes();
+                        List<Type> thrownExceptions = null;
+                        //Hack for JAVAC ISSUE - methodSymbol.getThrownTypes() throws null pointer exception
+                        try {
+                            thrownExceptions = methodSymbol.getThrownTypes();
+                        } catch (NullPointerException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                         
                         if (thrownExceptions == null || thrownExceptions.size() == 0) {
                             continue;
                         }
-                        model.addThrowHint(thrownExceptions, node);
+                        model.addHint(thrownExceptions, node);
                     }
                 }
             }
@@ -114,14 +121,14 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
     }
 
     @Override
-    public Void visitAssignment(AssignmentTree node, UncaughtExceptionsModel p) {
+    public Void visitAssignment(AssignmentTree node, HintsModel p) {
         String typeName = (node.getExpression().toString().replace("{}", "").trim()); //NOI18N
         instantTypes.add(typeName);
         return super.visitAssignment(node, p);
     }
 
     @Override
-    public Void visitInstantiate(InstantiateTree node, UncaughtExceptionsModel p) {
+    public Void visitInstantiate(InstantiateTree node, HintsModel p) {
         String typeName = (node.getIdentifier().toString().replace("{}", "").trim()); //NOI18N
         instantTypes.add(typeName);
         return super.visitInstantiate(node, p);

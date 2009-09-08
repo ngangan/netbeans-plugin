@@ -45,7 +45,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import java.util.Iterator;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.hints.UncaughtExceptionsModel.Hint;
+import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.Fix;
 import org.openide.util.NbBundle;

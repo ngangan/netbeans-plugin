@@ -38,13 +38,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+
 package org.netbeans.modules.javafx.editor.hints;
 
+
+
+
+import com.sun.javafx.api.tree.CatchTree;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
@@ -52,6 +56,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Type;
 import java.util.Collections;
 import java.util.Iterator;
+
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
@@ -65,30 +70,33 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class EmptyCatchTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
-    public UncaughtExceptionsTaskFactory() {
+    public EmptyCatchTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
+
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         return new CancellableTask<CompilationInfo>() {
 
-            @Override
             public void cancel() {
             }
 
-            @Override
             public void run(CompilationInfo compilationInfo) throws Exception {
-                if (file == null) {
-                    throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
-                }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo, classIndex);
-                HintsModel model = new HintsModel(compilationInfo);
-                tcw.scan(compilationInfo.getCompilationUnit(), model);
-                new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
+                final HintsModel model = new HintsModel(compilationInfo);
+                new JavaFXTreePathScanner() {
+
+                    @Override
+                    public Object visitCatch(CatchTree node, Object p) {
+                        if (node.getBlock().getStatements().size() != 0 || node.getBlock().getValue() != null) {
+                            model.addHint(null, node);
+                        }
+                        return super.visitCatch(node, p);
+                    }
+                }.scan(compilationInfo.getCompilationUnit(), null);
+                
                 if (model.getHints() != null) {
                     Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
                     for (Hint hint : model.getHints()) {
@@ -97,26 +105,29 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     HintsController.setErrors(HintsUtils.getDocument(file), "Try-Catch", errors); //NOI18N
                 }
             }
-            
         };
+
     }
 
-    private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
+     private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
         StringBuilder sb = new StringBuilder(" "); //NOI18N
-        Iterator<Type> iterator = hint.getExceptions().iterator();
-        while (iterator.hasNext()) {
-            sb.append(iterator.next().toString());
-            if (iterator.hasNext()) {
-                sb.append(", "); //NOI18N
-            }
-        }
+//        Iterator<Type> iterator = hint.getExceptions().iterator();
+//        while (iterator.hasNext()) {
+//            sb.append(iterator.next().toString());
+//            if (iterator.hasNext()) {
+//                sb.append(", "); //NOI18N
+//            }
+//        }
         Fix fix = new UncaughtExceptionsFix(HintsUtils.getDocument(file), hint, compilationInfo);
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(UncaughtExceptionsTaskFactory.class, "TITLE_UNREPORTED_EXCEPTION") + sb, //NOI18N
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "DZIALA", //NOI18N
                 Collections.singletonList(fix), file, start, end);
 
         return ed;
     }
+
+   
+
 }
