@@ -48,6 +48,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.WeakHashMap;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -75,6 +77,9 @@ import org.netbeans.modules.parsing.api.Source;
  * @author David Strupl
  */
 public final class JavaFXSource {
+
+    //Already logged warning about running in AWT
+    private static final Set<StackTraceElement> warnedAboutRunInEQ = new HashSet<StackTraceElement>();
 
     static {
         JavaFXSourceTaskFactoryManager.register();
@@ -222,6 +227,15 @@ public final class JavaFXSource {
     public void runUserActionTask( final Task<? super CompilationController> task, final boolean shared) throws IOException {
         if (task == null) {
             throw new IllegalArgumentException ("Task cannot be null");     //NOI18N
+        }
+
+        boolean a = false;
+        assert a = true;
+        if (a && javax.swing.SwingUtilities.isEventDispatchThread()) {
+            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[1];
+            if (stackTraceElement != null && warnedAboutRunInEQ.add(stackTraceElement)) {
+                LOGGER.warning("ParserManager.parse called in AWT event thread by: " + stackTraceElement); // NOI18N
+            }
         }
 
         if (this.files.size()<=1) {
