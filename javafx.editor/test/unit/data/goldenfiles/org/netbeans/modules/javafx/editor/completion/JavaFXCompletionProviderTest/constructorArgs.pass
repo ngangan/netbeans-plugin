@@ -1,0 +1,3 @@
+java.lang.String color
+java.lang.String id
+int nOfWheels

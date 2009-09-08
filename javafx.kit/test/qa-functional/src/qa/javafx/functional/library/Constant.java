@@ -82,6 +82,7 @@ public interface Constant {
     // ================   Menu items  ========================
 
     String POPUP_MENU_ITEM_RUN = "Run Project";
+    String POPUP_MENU_ITEM_BUILD = "Build Project";
     String POPUP_MENU_ITEM_PROFILE = "Profile";
     String POPUP_MENU_ITEM_DEBUG = "Debug Project";
     String POPUP_MENU_ITEM_PROPERTIES = "Properties";
