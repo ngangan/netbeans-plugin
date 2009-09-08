@@ -41,16 +41,9 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.AssignmentTree;
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.CompoundAssignmentTree;
-import com.sun.javafx.api.tree.EmptyStatementTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.TypeAnyTree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.Collection;
@@ -83,6 +76,8 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
 
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, UncaughtExceptionsModel model) {
+        //String treeClassType = getClassName(node.toString());
+        
         if (node.toString().contains(".")) { //NOI18N
             instantTypes.add(getClassName(node.toString()));
         }
@@ -91,8 +86,13 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
             Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(instantType, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
             for (ElementHandle<TypeElement> elementHandle : options) {
                 TypeElement typeElement = elementHandle.resolve(compilationInfo);
+                
                 if (typeElement == null) {
                     continue;
+                }
+                String elementType = getMethodName(typeElement.getQualifiedName().toString()).trim();
+                if (!elementType.equals(instantType)) {
+                    break;
                 }
                 Collection<? extends Element> c = compilationInfo.getElements().getAllMembers(typeElement);
                 for (Element element : c) {
@@ -141,13 +141,8 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, Uncaug
     }
 
     private static String getClassName(String fullMethodName) {
-
-
         int end = fullMethodName.indexOf("."); //NOI18N
-
         String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
-
-
         return className;
     }
 }
