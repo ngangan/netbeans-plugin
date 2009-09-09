@@ -42,9 +42,9 @@ package org.netbeans.modules.javafx.editor.completion;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.tools.mjavac.code.Scope;
-import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.javac.code.Scope;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
@@ -123,7 +123,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
         this.cancellable = new Cancellable() {
             public boolean isCancelled() {
-                return query.isTaskCancelled();
+                return query.isTaskCancelled0();
             }
 
             public void cancell() {
@@ -234,7 +234,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("         isStatic == " + isStatic); // NOI18N
         addMembers(type, methods, fields, null,sc, true, !isStatic);
     }
-    
+
     protected void addMembers(final TypeMirror type,
             final boolean methods, final boolean fields,
             final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
@@ -250,7 +250,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (kind != ElementKind.CLASS && kind != ElementKind.ENUM) {
             return;
         }
-        
+
         Elements elements = controller.getElements();
         final TypeElement te = (TypeElement) dt.asElement();
         for (Element member : te.getEnclosedElements()) {
@@ -328,11 +328,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
 
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    boolean isInherited = !te.equals(((Symbol) member.getEnclosingElement()).enclClass());
+                    boolean isDeprecated = elements.isDeprecated(member);
                     addResult(
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
                             (ExecutableType) member.asType(),
-                            query.anchorOffset, false, false, false, false));
+                            query.anchorOffset, isInherited, isDeprecated, false, false));
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
                 String tta = textToAdd;
@@ -544,7 +546,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (fqnPrefix == null) {
             fqnPrefix = ""; // NOI18N
         }
-        
+
         ClasspathInfo info = controller.getClasspathInfo();
         ArrayList<FileObject> fos = new ArrayList<FileObject>();
         ClassPath cp = info.getClassPath(PathKind.SOURCE);
@@ -1122,7 +1124,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         return pe.getEnclosedElements();
     }
-    
+
     protected void addPackageContent(PackageElement pe, EnumSet<ElementKind> kinds, DeclaredType baseType, boolean insideNew) {
         if (LOGGABLE) log("addPackageContent " + pe); // NOI18N
         Elements elements = controller.getElements();
@@ -1208,7 +1210,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             scope = scope.getEnclosingScope();
         }
     }
-    
+
     protected void addLocalAndImportedTypes(final EnumSet<ElementKind> kinds, final DeclaredType baseType, final Set<? extends Element> toExclude, boolean insideNew, TypeMirror smart) {
         if (LOGGABLE) log("addLocalAndImportedTypes"); // NOI18N
         JavafxcTrees trees = controller.getTrees();
@@ -1235,9 +1237,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             query.hasAdditionalItems = true;
         }
     }
-    
+
     private void addLocalAndImportedTypes(Iterable<? extends Element> from,
-            final EnumSet<ElementKind> kinds, final DeclaredType baseType, 
+            final EnumSet<ElementKind> kinds, final DeclaredType baseType,
             final Set<? extends Element> toExclude,
             boolean insideNew, TypeMirror smart, JavafxcScope originalScope,
             PackageElement myPackage,boolean simpleNameOnly) {
@@ -1375,7 +1377,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         return null;
     }
-    
+
     protected void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew, String myPrefix) {
         if (LOGGABLE) log(" addAllTypes "); // NOI18N
         for (ElementHandle<TypeElement> name :

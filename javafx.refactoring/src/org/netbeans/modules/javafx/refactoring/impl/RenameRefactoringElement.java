@@ -94,9 +94,6 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     }
 
     public PositionBounds getPosition() {
-        if (des == null || oldText == null) {
-            System.err.println("kurva");
-        }
         return new PositionBounds(des.createPositionRef(startPosition, Bias.Forward), des.createPositionRef(startPosition + oldText.length(), Bias.Forward));
     }
 
@@ -105,25 +102,40 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     }
 
     public void performChange() {
+        final Document doc = des.getDocument();
+        if (doc instanceof GuardedDocument) {
+            ((GuardedDocument)doc).runAtomic(new Runnable() {
 
-            Document doc = des.getDocument();
-            if (doc instanceof GuardedDocument) {
-                ((GuardedDocument)doc).runAtomic(new Runnable() {
-
-                    public void run() {
-                        try {
+                public void run() {
+                    try {
+                        synchronized(doc) {
                             TransformationContext tc = context.lookup(TransformationContext.class);
                             int offset = tc.getRealOffset(startPosition);
-                            System.err.println("removing " + oldText.length() + "chars @" + offset);
-                            des.getDocument().remove(offset, oldText.length());
-                            des.getDocument().insertString(offset, newName, null);
-                            context.lookup(TransformationContext.class).replaceText(startPosition, oldText.length(), newName.length());
-                        } catch (BadLocationException e) {
-                            e.printStackTrace();
+                            if (doc.getText(offset, oldText.length()).equals(oldText)) {
+                                doc.remove(offset, oldText.length());
+                                doc.insertString(offset, newName, null);
+                                tc.replaceText(startPosition, oldText.length(), newName.length());
+                            } else {
+                                System.err.println("stop");
+                                System.err.println("Line: " + getLine(doc, offset));
+                            }
                         }
+                    } catch (BadLocationException e) {
+                        e.printStackTrace();
                     }
-                });
-            }
+                }
+            });
+        }
+    }
+
+    private String getLine(Document doc, int offset) throws BadLocationException {
+        int lineOff = offset;
+        while(lineOff >=0 && !doc.getText(lineOff, 1).equals("\n")) lineOff--;
+        lineOff++;
+        int lineOff1 = offset;
+        while(lineOff1 < doc.getLength() && !doc.getText(lineOff1, 1).equals("\n")) lineOff1++;
+
+        return doc.getText(lineOff, lineOff1 - lineOff + 1);
     }
 
     private String elementName() {
@@ -154,7 +166,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
             }
         }, true);
         if (startPosition == -1) {
-            System.err.println(handle);
+            System.err.println("*** Can not resolve: " + handle);
             throw new IOException();
         }
     }
@@ -169,7 +181,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                 foundClass = true;
                 continue;
             }
-            if (foundClass && currentToken.text().equals(oldText)) {
+            if (foundClass && currentToken.id() == JFXTokenId.IDENTIFIER) {
                 startPosition = currentToken.offset(cc.getTokenHierarchy());
                 break;
             }

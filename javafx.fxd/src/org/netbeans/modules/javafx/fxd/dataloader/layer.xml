@@ -198,36 +198,10 @@ made subject to such option by the copyright holder.
                     <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
                     <attr name="beaninfo" boolvalue="false"/>
                 </file>
-
+                
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
-
-                <!-- indentation and formatting -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-IndentTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-ReformatTaskFactory.instance"/>
-                <!-- syntax Error -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
-
-                <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
-                    <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
-                </file>
-                <folder name="FontsColors">
-                    <folder name="NetBeans">
-                        <folder name="Defaults">
-                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
-                            </file>
-                        </folder>
-                    </folder>
-                </folder>
-                <!--
-                <folder name="CompletionProviders">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
-                </folder>
-                -->
 
                 <folder name="Toolbars">
                     <folder name="Default">
@@ -254,28 +228,6 @@ made subject to such option by the copyright holder.
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
 
-
-                <!-- indentation and formatting -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-IndentTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-ReformatTaskFactory.instance"/>
-                <!-- syntax Error -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
-
-                <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
-                    <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
-                </file>
-                <folder name="FontsColors">
-                    <folder name="NetBeans">
-                        <folder name="Defaults">
-                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
-                            </file>
-                        </folder>
-                    </folder>
-                </folder>
-
                 <folder name="Toolbars">
                     <folder name="Default">
                         <file name="comment">
@@ -286,20 +238,6 @@ made subject to such option by the copyright holder.
                         </file>
                     </folder>
                 </folder>
-                <!--
-                <folder name="CompletionProviders">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
-                </folder>
-                -->
-
-            </folder>
-        </folder>
-    </folder>
-
-    <folder name="OptionsDialog">
-        <folder name="PreviewExamples">
-            <folder name="text">
-                <file name="x-fxd" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/example.fxd"/>
             </folder>
         </folder>
     </folder>
@@ -325,7 +263,7 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
                 <attr name="template" boolvalue="true"/>
 		<attr name="position" intvalue="251"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
                 <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/fxd/FXDTemplateHelp.html"/>
                 <attr name="templateCategory" stringvalue="javafx"/>                
             </file>
@@ -333,7 +271,7 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
                 <attr name="template" boolvalue="true"/>
 		<attr name="position" intvalue="252"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
                 <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/fxz/FXZTemplateHelp.html"/>
                 <attr name="templateCategory" stringvalue="javafx"/>                
             </file>

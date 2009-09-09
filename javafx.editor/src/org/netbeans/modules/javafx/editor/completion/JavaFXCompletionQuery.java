@@ -152,11 +152,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String WHERE_KEYWORD = "where"; // NOI18N
     public static final String WHILE_KEYWORD = "while"; // NOI18N
     public static final String WITH_KEYWORD = "with"; // NOI18N
-    
+
     public static final String[] STATEMENT_KEYWORDS = new String[]{
         FOR_KEYWORD,
         IF_KEYWORD,
-        TRY_KEYWORD, 
+        TRY_KEYWORD,
         WHILE_KEYWORD
     };
     public static final String[] STATEMENT_SPACE_KEYWORDS = new String[]{
@@ -178,7 +178,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     };
 
     static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}"); // NOI18N
-    
+
     public Set<JavaFXCompletionItem> results;
     boolean hasAdditionalItems;
     JToolTip toolTip;
@@ -201,7 +201,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
 
         this.cancellable = new Cancellable() {
             public boolean isCancelled() {
-                return isTaskCancelled();
+                return isTaskCancelled0();
             }
 
             public void cancell() {
@@ -209,7 +209,11 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             }
         };
     }
-    
+
+    boolean isTaskCancelled0() {
+        return hasTask && isTaskCancelled();
+    }
+
     void setElement(ElementHandle element) {
         this.element = element;
     }
@@ -400,14 +404,14 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (anchorOffset == -1) {
             anchorOffset = env.getOffset();
         }
-        
+
         // make sure the init method was called
         if (env.query != this) {
             throw new IllegalStateException("init method not called before resolveCompletion"); // NOI18N
         }
-        
+
         Phase resPhase = controller.toPhase(Phase.ANALYZED);
-        
+
         if  ((!resPhase.lessThan(Phase.ANALYZED)) && (! env.isTreeBroken())) {
             Tree leaf = env.getPath().getLeaf();
             env.inside(leaf);
@@ -425,7 +429,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         } else {
             if (LOGGABLE) log("Completion not resolved: phase: " + resPhase); // NOI18N
         }
-        
+
         if (LOGGABLE) log("Results: " + results); // NOI18N
     }
 
@@ -531,7 +535,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             UnitTree unit = controller.getCompilationUnit();
             long s = pos.getStartPosition(unit, t);
             long e = pos.getEndPosition(unit, t);
-            while (t != null && 
+            while (t != null &&
                     ( (offset <= s) || (offset >= e) ||
                       (t.getJavaFXKind() == JavaFXKind.ERRONEOUS)
                     )
@@ -567,9 +571,9 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         result.init(offset, prefix, controller, path, controller.getTrees().getSourcePositions(), this);
         return result;
     }
-    
+
     /**
-     * 
+     *
      * @param t
      * @return
      */
@@ -583,7 +587,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             if (LOGGABLE) log("   (1) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
             return e == offset;
         }
-        if ((t instanceof JFXObjectLiteralPart) || 
+        if ((t instanceof JFXObjectLiteralPart) ||
             (t instanceof JFXVar) ||
             (t instanceof JFXFunctionValue) ) {
             SourcePositions pos = controller.getTrees().getSourcePositions();
@@ -801,7 +805,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         if (result == null) {
             result = new JavaFXCompletionEnvironment();
         }
-        
+
         return result;
     }
     public static JavaFXTreePath pathFor(CompilationController info, int pos) {
@@ -948,7 +952,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 pos.getEndPosition(info.getCompilationUnit(), t) + "]:" + s.toString(); // NOI18N
         return res;
     }
-            
+
     private static void log(String s) {
         if (LOGGABLE) {
             logger.fine(s);

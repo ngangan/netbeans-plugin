@@ -29,19 +29,10 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeAnyTree;
-import com.sun.javafx.api.tree.TypeArrayTree;
-import com.sun.javafx.api.tree.TypeCastTree;
-import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -50,7 +41,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;

@@ -68,4 +68,17 @@ public enum OperationSystem {
         }
         return UNKNOWN;
     }
+
+    public String getLabel() {
+
+        switch(this){
+            case WINDOWS: return "windows-i586";
+            case MAC: return "macosx-universal";
+            case LINUX: return "linux-i586";
+            case SOLARIS: return "solaris-i586";
+            default: return "unlnown-label";
+        }
+       
+    }
+
 }
