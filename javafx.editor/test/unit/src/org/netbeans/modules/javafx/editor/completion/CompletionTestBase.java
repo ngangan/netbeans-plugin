@@ -116,6 +116,7 @@ public class CompletionTestBase extends JavaFXTestBase {
     }
 
     static final int FINISH_OUTTIME = 5 * 60 * 1000;
+    private ClassPath bootPath;
 
     public static class Lkp extends ProxyLookup {
 
@@ -151,9 +152,6 @@ public class CompletionTestBase extends JavaFXTestBase {
         });
         Repository repository = new Repository(new MultiFileSystem(
                 new FileSystem[] {FileUtil.createMemoryFileSystem(), system}));
-        final ClassPath bootPath = ClassPathSupport.createProxyClassPath(
-                createClassPath(System.getProperty("sun.boot.class.path")),
-                JavaFXPlatform.getDefault().getBootstrapLibraries());
         ClassPathProvider cpp = new ClassPathProvider() {
             public ClassPath findClassPath(FileObject file, String type) {
                 try {
@@ -164,7 +162,7 @@ public class CompletionTestBase extends JavaFXTestBase {
                         return ClassPathSupport.createClassPath(new FileObject[0]);
                     }
                     if (type == ClassPath.BOOT) {
-                        return bootPath;
+                        return getBootClassPath();
                     }
                 } catch (IOException ex) {
                     // XXX: describe here why it is safe to eat the exception
@@ -188,13 +186,13 @@ public class CompletionTestBase extends JavaFXTestBase {
         for (ClassPath.Entry entry : sourcePath.entries()) {
             mgr.createUsagesQuery(entry.getURL(), true);
         }
-        final ClasspathInfo cpInfo = ClasspathInfo.create(bootPath, ClassPathSupport.createClassPath(new URL[0]), sourcePath);
+        final ClasspathInfo cpInfo = ClasspathInfo.create(getBootClassPath(), ClassPathSupport.createClassPath(new URL[0]), sourcePath);
         assertNotNull(cpInfo);
         final JavaFXSource js = JavaFXSource.create(cpInfo, Collections.<FileObject>emptyList());
         assertNotNull(js);
         js.runUserActionTask(new Task<CompilationController>() {
             public void run(CompilationController parameter) throws Exception {
-                for (ClassPath.Entry entry : bootPath.entries()) {
+                for (ClassPath.Entry entry : getBootClassPath().entries()) {
                     final URL url = entry.getURL();
                     final ClassIndexImpl cii = mgr.createUsagesQuery(url, false);
                     ClassIndexManager.getDefault().writeLock(new ClassIndexManager.ExceptionAction<Void>() {
@@ -209,6 +207,21 @@ public class CompletionTestBase extends JavaFXTestBase {
             }
         }, true);
 //        Utilities.setCaseSensitive(true);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        this.bootPath = null;
+        super.tearDown();
+    }
+
+    private ClassPath getBootClassPath() {
+        if (this.bootPath == null) {
+            this.bootPath = ClassPathSupport.createProxyClassPath(
+                    createClassPath(System.getProperty("sun.boot.class.path")),
+                    JavaFXPlatform.getDefault().getBootstrapLibraries());
+        }
+        return this.bootPath;
     }
 
     protected void performTest(String source, int caretPos, String textToInsert, String goldenFileName) throws Exception {
