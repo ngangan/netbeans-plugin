@@ -111,10 +111,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     @Override
     public boolean canRename(Lookup lkp) {
         DataNode target = lkp.lookup(DataNode.class);
-        if (target != null) {
-            System.err.println("Checking " + target.getDataObject().getPrimaryFile());
-            System.err.println("Rename should be " + (SourceUtils.isJavaFXFile(target.getDataObject().getPrimaryFile()) ? "enabled" : "disabled"));
-        }
         return target != null && SourceUtils.isJavaFXFile(target.getDataObject().getPrimaryFile());
     }
 
