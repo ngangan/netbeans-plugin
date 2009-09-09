@@ -134,7 +134,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             @Override
             public Void visitVariable(VariableTree node, IndexDocument document) {
                 Element e = fxresult.getTrees().getElement(getCurrentPath());
-                if (e.getKind() == ElementKind.FIELD) { // can handle only fields for now
+                if (e != null && e.getKind() == ElementKind.FIELD) { // can handle only fields for now
                     String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
                     if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal});

@@ -498,7 +498,8 @@ public class ElementHandle<T extends Element> {
 	    throw new IllegalArgumentException("Can't handle local variable"); //NOI18N
 	}
         result[0] = encodeClassNameOrArray((TypeElement) enclosingElement);
-        result[1] = ve.getSimpleName().toString();
+        Name n = ve.getSimpleName();
+        result[1] = n == null ? "?" : n.toString();
         StringBuilder sb = new StringBuilder();
         encodeType(ve.asType(), sb);
         result[2] = sb.toString();
