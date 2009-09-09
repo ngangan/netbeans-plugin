@@ -48,7 +48,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                 List vc = new ArrayList();
                 for( int i = 0; i < ch.length; i++ ) {
                     Object obj = ch[i];
-                    System.out.println(" - " + obj );
+//                    System.out.println(" - " + obj );
                     if( obj instanceof ClassVariable ) {
                         ClassVariable cv = (ClassVariable)obj;
 //                        vc.add( obj );
@@ -65,10 +65,19 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
         } else {
             // Root static class
             Object[] children = original.getChildren( parent, from, to );
+            List vc = new ArrayList();
             for( int i = 0; i < children.length; i++ ) {
-                System.out.println(" - " + children[i]);
+                Object child = children[i];
+                if( child instanceof Field ) {
+                    Field f = (Field)child;
+                    if( f.getName().startsWith( "$" )) {
+                        vc.add( child );
+                    }
+                } else {
+                    System.out.println(" - " + child.toString());
+                }
             }
-            visibleChildren = original.getChildren( parent, from, to );
+            visibleChildren = vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         }
         return visibleChildren;
     }
