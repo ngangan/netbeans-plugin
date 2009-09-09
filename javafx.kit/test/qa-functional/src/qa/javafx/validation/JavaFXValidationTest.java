@@ -1,29 +1,15 @@
 package qa.javafx.validation;
 
-import qa.javafx.smoke.*;
 import qa.javafx.functional.library.Util;
-import java.io.File;
-import java.io.FileFilter;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.MainWindowOperator;
 //import org.netbeans.jellytools.ProjectsTabOperator;
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jellytools.nodes.Node;
-import org.netbeans.jemmy.TimeoutExpiredException;
-import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JCheckBoxOperator;
-import org.netbeans.jemmy.operators.JDialogOperator;
-import org.netbeans.jemmy.operators.JMenuBarOperator;
-import org.netbeans.jemmy.operators.JTabbedPaneOperator;
-import org.netbeans.jemmy.operators.JTableOperator;
-import org.netbeans.jemmy.operators.JTextComponentOperator;
-import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.netbeans.jemmy.operators.JListOperator;
+
+import org.netbeans.jemmy.operators.*;
 
 import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
 
 import junit.framework.Test;
@@ -31,16 +17,13 @@ import junit.textui.TestRunner;
 import org.netbeans.jemmy.operators.JRadioButtonOperator;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.operator.FXPaletteOperator;
-import qa.javafx.functional.library.operator.FXPreviewOperator;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -56,7 +39,8 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
     final static String JAVAFX_SDK_LABEL = "Test JavaFX SDK";
 
-    final static String JAVAFX_SDK_DIR = "TBD";
+    final static String JAVAFX_SDK_DIR = "D:/Temp/zip/javafx-sdk1.2";
+    final static String JAVAFX_SDK_URL = "http://jre.sfbay.sun.com/java/re/javafx/1.2.1/promoted/fcs/b06/bundles/windows-i586/javafx_sdk-1_2_1-windows-i586.zip";
 
 
     static String[] TESTS = {
@@ -119,7 +103,7 @@ public class JavaFXValidationTest extends JavaFXTestCase {
         //JButtonOperator browseButton = new JButtonOperator(platformsDialog, "Browse...");
 
         // Create a JavaFX Project
-         JavaFXProject project = JavaFXProject.createProject("TestJavaFX Project");
+         JavaFXProject project = JavaFXProject.createProject("TestJavaFXProject");
 
          project.getProjectNode().performPopupActionNoBlock("Properties");
 
@@ -127,10 +111,55 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
         JDialogOperator propertiesDialog = new JDialogOperator("Project Properties");
 
-        Util.sleep(2000);
 
         //JListOperator listOperator = new JListOperator(propertiesDialog);
         //listOperator.clickOnItem("Libraries");
+
+        JTreeOperator treeOperator = new JTreeOperator(propertiesDialog);
+        //System.out.println("*********  Show Tree *****************");
+        //Util.showComponents(treeOperator);
+        Object root = treeOperator.getRoot();
+        //TreeModel model = treeOperator.getModel();
+        
+        TreePath treepPath = new TreePath(new Object[]{root, treeOperator.getModel().getChild(root, 1)});
+        treeOperator.selectPath(treepPath);
+
+        //System.out.println("*********  Show Properties Dialog *****************");
+        //Util.showComponents(propertiesDialog);
+        //Util.sleep(2000);
+
+        JComboBoxOperator comboboxOperator = new JComboBoxOperator(propertiesDialog);
+
+        //comboboxOperator.setSelectedItem(JAVAFX_SDK_LABEL);
+
+        boolean checkSDK = false;
+        for(int i=0; i< comboboxOperator.getItemCount(); i++){
+            Object obj = comboboxOperator.getItemAt(i);
+            if(obj != null && JAVAFX_SDK_LABEL.equals(obj.toString())){
+                checkSDK = true;
+                System.out.println("Item2 : \"" + obj + "\"");
+                comboboxOperator.setSelectedIndex(i);
+            }
+        }
+
+        new JButtonOperator(propertiesDialog, "OK").push();
+        
+        if(!checkSDK){
+            fail("Custom JavaFX SDK is not found in the project properties");
+        }
+
+        Util.waitScanFinished();
+
+        project.build();
+
+        if(!project.getOutput().isCompiled()){
+            fail("Project BUILD FAILS");
+            System.out.println(project.getOutput().getText());
+        }
+
+
+        System.out.println("The end");
+
 
         Util.sleep(7000);
 
@@ -142,7 +171,7 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
 
     public void saveJavaFXSDK(){
-        String urlString = "TBD";
+        String urlString = JAVAFX_SDK_URL;
 
         try {
             String destinationname = "TBD";
