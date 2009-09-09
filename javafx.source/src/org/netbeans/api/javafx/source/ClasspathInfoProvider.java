@@ -39,8 +39,6 @@
 
 package org.netbeans.api.javafx.source;
 
-import org.netbeans.api.javafx.source.ClasspathInfo;
-
 /**
  *
  * @author Tomas Zezula

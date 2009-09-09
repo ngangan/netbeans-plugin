@@ -42,17 +42,23 @@ import com.sun.tools.javafx.api.JavafxcTool;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import javax.tools.JavaFileManager;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.queries.SourceForBinaryQuery;
+import org.netbeans.api.java.queries.SourceForBinaryQuery.Result2;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.modules.javafx.source.classpath.CachingFileManager;
 import org.netbeans.modules.javafx.source.classpath.ProxyFileManager;
 import org.netbeans.modules.javafx.source.classpath.SourceFileManager;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileStateInvalidException;
+import org.openide.util.Exceptions;
 import org.openide.util.WeakListeners;
 
 /**
@@ -80,14 +86,59 @@ public class ClasspathInfo {
             bootPath = JavaFXPlatform.getDefaultFXPlatform().getBootstrapLibraries();
         }
 
+        List<URL> srcUrls = new ArrayList<URL>();
+        List<URL> clsUrls = new ArrayList<URL>();
+
+        for(ClassPath.Entry entry : ClassPath.getClassPath(fo, ClassPath.COMPILE).entries()) {
+            Result2 rslt = SourceForBinaryQuery.findSourceRoots2(entry.getURL());
+            if (rslt.preferSources()) {
+                for(FileObject root : rslt.getRoots()) {
+                    try {
+                        srcUrls.add(root.getURL());
+                    } catch (FileStateInvalidException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
+            } else {
+                clsUrls.add(entry.getURL());
+            }
+        }
+        
         ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
-        if (compilePath == null) {
-            compilePath = EMPTY_PATH;
+        if (compilePath != null) {
+            for(ClassPath.Entry entry : compilePath.entries()) {
+                Result2 rslt = SourceForBinaryQuery.findSourceRoots2(entry.getURL());
+                if (rslt.preferSources()) {
+                    for(FileObject root : rslt.getRoots()) {
+                        try {
+                            srcUrls.add(root.getURL());
+                        } catch (FileStateInvalidException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
+                } else {
+                    clsUrls.add(entry.getURL());
+                }
+            }
         }
 
         ClassPath srcPath = ClassPath.getClassPath(fo, ClassPath.SOURCE);
-        if (srcPath == null) {
+        if (srcPath != null) {
+            for(ClassPath.Entry entry : ClassPath.getClassPath(fo, ClassPath.SOURCE).entries()) {
+                srcUrls.add(entry.getURL());
+            }
+        }
+
+        if (clsUrls.isEmpty()) {
+            compilePath = EMPTY_PATH;
+        } else {
+            compilePath = ClassPathSupport.createClassPath(clsUrls.toArray(new URL[clsUrls.size()]));
+        }
+
+        if (srcUrls.isEmpty()) {
             srcPath = EMPTY_PATH;
+        } else {
+            srcPath = ClassPathSupport.createClassPath(srcUrls.toArray(new URL[srcUrls.size()]));
         }
         
         return create(bootPath, compilePath, srcPath);
