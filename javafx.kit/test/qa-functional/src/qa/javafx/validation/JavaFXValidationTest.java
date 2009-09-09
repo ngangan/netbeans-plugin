@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.tree.TreePath;
+import qa.javafx.functional.library.project.OperationSystem;
 
 /**
  *
@@ -39,12 +40,16 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
     final static String JAVAFX_SDK_LABEL = "Test JavaFX SDK";
 
-    final static String JAVAFX_SDK_DIR = "D:/Temp/zip/javafx-sdk1.2";
-    final static String JAVAFX_SDK_URL = "http://jre.sfbay.sun.com/java/re/javafx/1.2.1/promoted/fcs/b06/bundles/windows-i586/javafx_sdk-1_2_1-windows-i586.zip";
+    final static String JAVAFX_SDK_VER = "javafx-sdk1.2";
+    final static String JAVAFX_SDK_URL = "http://jre.sfbay.sun.com/java/re/javafx/1.2.1/promoted/fcs/b06/bundles";
+
+    String JAVAFX_SDK_DIR;
+
 
 
     static String[] TESTS = {
         "testJavaFXPlatform",
+        "testJavaFXProject",
     };
 
 
@@ -63,11 +68,24 @@ public class JavaFXValidationTest extends JavaFXTestCase {
         TestRunner.run(new NbTestSuite(JavaFXValidationTest.class));
     }
 
+
+
+    
     public void testJavaFXPlatform() {
         //System.setOut(getLog());
 
+        System.out.println("[validation] setup");
+        JAVAFX_SDK_DIR= getDataDir().getAbsolutePath() + File.separator;
+        System.out.println("XTEST_WORK_DIR = " + JAVAFX_SDK_DIR);
+
         System.out.println("  Test JavaFX Plaform  ");
 
+        String dst = Util.WORK_DIR;
+
+        System.out.println("Destination dir: \"" + JAVAFX_SDK_DIR + "\"");
+        
+        saveJavaFXSDK();
+        
 
         new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Tools|Java Platforms");
         JDialogOperator managerDialog = new JDialogOperator(DIALOG_MANAGER_TITLE);
@@ -87,7 +105,7 @@ public class JavaFXValidationTest extends JavaFXTestCase {
         nameTextField.setText(JAVAFX_SDK_LABEL);
 
         JTextFieldOperator folderTextField = new JTextFieldOperator(platformsDialog, 1);
-        folderTextField.setText(JAVAFX_SDK_DIR);
+        folderTextField.setText(JAVAFX_SDK_DIR + "/" + JAVAFX_SDK_VER);
 
 
         JButtonOperator finishButton = new JButtonOperator(platformsDialog, "Finish");
@@ -100,9 +118,16 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
         Util.sleep(2000);
 
+
         //JButtonOperator browseButton = new JButtonOperator(platformsDialog, "Browse...");
 
+    }
+
+    public void testJavaFXProject() {
+
         // Create a JavaFX Project
+
+
          JavaFXProject project = JavaFXProject.createProject("TestJavaFXProject");
 
          project.getProjectNode().performPopupActionNoBlock("Properties");
@@ -171,10 +196,27 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
 
     public void saveJavaFXSDK(){
-        String urlString = JAVAFX_SDK_URL;
+
+        //windows-i586/javafx_sdk-1_2_1-windows-i586.zip
+
+        OperationSystem os = OperationSystem.getOS();
+        String label = os.getLabel();
+
+        String url = JAVAFX_SDK_URL + "/" + label + "/javafx_sdk-1_2_1-" + label + ".zip";
+        
+        new File(JAVAFX_SDK_DIR).mkdirs();
+        unzipFile(url, JAVAFX_SDK_DIR);
+    }
+
+    public void unzipFile(String src, String dst){
+        System.out.println("*** UNzip File");
+        System.out.println("   from: \"" + src + "\"");
+        System.out.println("   to  : \"" + dst + "\"");
+
+        String urlString = src;
 
         try {
-            String destinationname = "TBD";
+            String destinationname = dst;
             byte[] buf = new byte[1024];
             ZipInputStream zipinputstream = null;
             ZipEntry zipentry;
