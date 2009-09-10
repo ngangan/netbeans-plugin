@@ -27,6 +27,7 @@
  */
 package org.netbeans.lib.javafx.lexer;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,13 +46,48 @@ import java.util.Map;
  * @author nenik
  */
 public class DFA extends org.antlr.runtime.DFA {
-   private static Map<String, short[]> map = new HashMap<String, short[]>();
-    public static short[] unpackEncodedString(String def) {
-        short[] shorts = map.get(def);
-        if (shorts == null) {
-            shorts = org.antlr.runtime.DFA.unpackEncodedString(def);
-            map.put(def, shorts);
+    private static Map<ArrayWrapper,ArrayWrapper> cache = new HashMap<ArrayWrapper, ArrayWrapper>();
+
+    public static short[] getShared(short[] shorts) {
+        ArrayWrapper wrapper = new ArrayWrapper(shorts);
+        if (cache.containsKey(wrapper)) {
+            wrapper = cache.get(wrapper);
+        } else {
+            cache.put(wrapper, wrapper);
         }
-        return shorts;
+        return wrapper.array;
+    }
+
+    public static short[] unpackEncodedString(String def) {
+        short[] shorts = org.antlr.runtime.DFA.unpackEncodedString(def);
+        return getShared(shorts);
+    }
+
+    private static class ArrayWrapper {
+        short[] array;
+        int hashcode;
+
+        ArrayWrapper(short[] data) {
+            array = data;
+            int sum = data.length;
+            for (short v : data) {
+                sum = sum * 33 + v;
+            }
+            hashcode = sum;
+        }
+
+        public @Override int hashCode() {
+            return hashcode;
+        }
+
+        public @Override boolean equals(Object obj) {
+            if (obj instanceof ArrayWrapper) {
+                ArrayWrapper other = (ArrayWrapper)obj;
+                if (other.hashcode != hashcode) return false;
+                return Arrays.equals(other.array, array);
+            }
+            return false;
+        }
+
     }
 }
