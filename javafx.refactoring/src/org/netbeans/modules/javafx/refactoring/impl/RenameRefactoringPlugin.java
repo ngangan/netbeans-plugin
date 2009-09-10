@@ -183,26 +183,37 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
             final AtomicReference<ElementHandle> origHandle = new AtomicReference<ElementHandle>();
 
             final Set<FileObject> refFos = new HashSet<FileObject>();
+            refFos.add(treePathHandle.getFileObject());
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(final CompilationController cc) throws Exception {
                     final ClassIndex ci = cc.getClasspathInfo().getClassIndex();
                     Element el = treePathHandle.resolveElement(cc);
                     origHandle.set(ElementHandle.create(el));
-                    refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
-                    if ((el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) && ((TypeElement)el).getNestingKind() == NestingKind.TOP_LEVEL) {
-                        new JavaFXTreePathScanner<Void, Void>() {
+                    switch(el.getKind()) {
+                        case CLASS:
+                        case INTERFACE: {
+                            refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
+                            if (((TypeElement)el).getNestingKind() == NestingKind.TOP_LEVEL) {
+                                new JavaFXTreePathScanner<Void, Void>() {
 
-                            @Override
-                            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-                                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-                                if (te.getNestingKind() == NestingKind.MEMBER) {
-                                    refFos.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
-                                }
-                                return super.visitClassDeclaration(node, p);
+                                    @Override
+                                    public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                                        TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                                        if (te.getNestingKind() == NestingKind.MEMBER) {
+                                            refFos.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
+                                        }
+                                        return super.visitClassDeclaration(node, p);
+                                    }
+
+                                }.scan(cc.getCompilationUnit(), null);
                             }
-
-                        }.scan(cc.getCompilationUnit(), null);
+                            break;
+                        }
+                        case FIELD: {
+                            refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            break;
+                        }
                     }
                 }
             }, true);

@@ -27,6 +27,8 @@ final public class IndexingUtilities {
                 return eeh.getSignatures()[0].replace("$", ".");
             }
             case FIELD:
+            case LOCAL_VARIABLE:
+            case PARAMETER:
             case METHOD: {
                 return eeh.getSignatures()[1] + INDEX_SEPARATOR + convertInternalSignature(eeh.getSignatures()[2].replace("$", ".")) + INDEX_SEPARATOR + eeh.getSignatures()[0].replace("$", ".");
             }

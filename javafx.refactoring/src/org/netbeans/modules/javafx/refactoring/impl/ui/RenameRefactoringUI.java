@@ -78,45 +78,29 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
         this.handle = handle;
 
         Element element = handle.resolveElement(info);
-        if (element.getKind() == ElementKind.CLASS || element.getKind() == ElementKind.INTERFACE) {
-            oldName = element.getSimpleName().toString();
-            if (oldName.equals(handle.getFileObject().getName())) {
-                refactoring = new RenameRefactoring(Lookups.fixed(handle, handle.getFileObject()));
-            } else {
-                Set<FileObject> typeDefFO = info.getClasspathInfo().getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
-                if (typeDefFO.size() == 1) {
-                    refactoring = new RenameRefactoring(Lookups.fixed(handle, typeDefFO.iterator().next()));
+        switch (element.getKind()) {
+            case CLASS:
+            case INTERFACE:
+            case FIELD: {
+                oldName = element.getSimpleName().toString();
+                if (oldName.equals(handle.getFileObject().getName())) {
+                    refactoring = new RenameRefactoring(Lookups.fixed(handle, handle.getFileObject()));
                 } else {
-                    refactoring = new RenameRefactoring(Lookups.singleton(handle));
+                    Set<FileObject> typeDefFO = info.getClasspathInfo().getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+                    if (typeDefFO.size() == 1) {
+                        refactoring = new RenameRefactoring(Lookups.fixed(handle, typeDefFO.iterator().next()));
+                    } else {
+                        refactoring = new RenameRefactoring(Lookups.singleton(handle));
+                    }
                 }
+                break;
             }
+            
 
         }
-//        refactoring.getContext().add(ClasspathInfo.create(handle.getFileObject()));
 
         dispOldName = oldName;
-        //this(jmiObject, (FileObject) null, true);
     }
-
-//    public RenameRefactoringUI(FileObject file, TreePathHandle handle, CompilationInfo info) {
-//        if (handle!=null) {
-//            this.handle = handle;
-//            this.refactoring = new RenameRefactoring(Lookups.fixed(file, handle));
-//            oldName = handle.resolveElement(info).getSimpleName().toString();
-////            showSyncOption = handle.resolve(info) != null && handle.resolveElement(info).getSimpleName().contentEquals(file.getName());
-//        } else {
-//            this.refactoring = new RenameRefactoring(Lookups.fixed(file));
-//            oldName = file.getName();
-//        }
-//        dispOldName = oldName;
-//        ClassIndex ci = info.getClasspathInfo().getClassIndex();
-//
-//        ClasspathInfo cpInfo = handle==null?ClasspathInfo.create(file):ClasspathInfo.create(handle.getFileObject());
-//        refactoring.getContext().add(cpInfo);
-//        topLevelSyncedDefault = true;
-//        useExtendedInfo();
-//        //this(jmiObject, (FileObject) null, true);
-//    }
 
     public RenameRefactoringUI(NonRecursiveFolder file) {
         this.refactoring = new RenameRefactoring(Lookups.singleton(file));
