@@ -58,7 +58,7 @@ public class JavaFXCompletionItemTest extends NbTestCase {
         items.add(JavaFXCompletionItem.createKeywordItem(JavaFXCompletionQuery.FALSE_KEYWORD, null, 1, false));
         items.add(JavaFXCompletionItem.createKeywordItem(JavaFXCompletionQuery.FALSE_KEYWORD, null, 2, false));
         items.add(JavaFXCompletionItem.createKeywordItem(JavaFXCompletionQuery.TRUE_KEYWORD, null, 1, false));
-        assertEquals("one items", 2, items.size());
+        assertEquals("two items", 2, items.size());
     }
 
 }
