@@ -116,31 +116,25 @@ public class JavaFXIndexer extends EmbeddingIndexer {
         IndexDocument document = support.createDocument(indexable);
 
         JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
-            Stack<TypeElement> lastSeenClassStack = new Stack();
             @Override
             public Void visitClassDeclaration(ClassDeclarationTree node, IndexDocument document) {
-                try {
-                    TypeElement type = (TypeElement)fxresult.getTrees().getElement(getCurrentPath());
-                    if (LOG_FINEST) {
-                        LOG.log(Level.FINEST, "Indexing {0}:", type.getQualifiedName());
-                        LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
-                        LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
-                    }
-                    index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
-                    index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
-                    String fqn = type.getQualifiedName().toString();
-                    index(document, IndexKey.CLASS_FQN, fqn);
-                    if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
-                        int pkgLen = fqn.lastIndexOf(".");
-                        if (pkgLen > -1) {
-                            index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
-                        }
-                    }
-                    lastSeenClassStack.push(type);
-                    return super.visitClassDeclaration(node, document);
-                } finally {
-                    lastSeenClassStack.pop();
+                TypeElement type = (TypeElement)fxresult.getTrees().getElement(getCurrentPath());
+                if (LOG_FINEST) {
+                    LOG.log(Level.FINEST, "Indexing {0}:", type.getQualifiedName());
+                    LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
+                    LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
                 }
+                index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
+                index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
+                String fqn = type.getQualifiedName().toString();
+                index(document, IndexKey.CLASS_FQN, fqn);
+                if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
+                    int pkgLen = fqn.lastIndexOf(".");
+                    if (pkgLen > -1) {
+                        index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
+                    }
+                }
+                return super.visitClassDeclaration(node, document);
             }
 
             @Override
