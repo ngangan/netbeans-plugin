@@ -42,6 +42,9 @@ package org.netbeans.api.javafx.source;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -83,6 +86,7 @@ public final class JavaFXSource {
 
     static {
         JavaFXSourceTaskFactoryManager.register();
+	hackCompilersLexer();
     }
 
     public static enum Phase {
@@ -319,5 +323,34 @@ public final class JavaFXSource {
         return sources.iterator().next();
     }
 
-}
+    private static void hackCompilersLexer() {
+        try {
+            // cache provider is not an API
+            Class dfa = Class.forName("org.netbeans.lib.javafx.lexer.DFA", true, Thread.currentThread().getContextClassLoader());
+            Method share = dfa.getDeclaredMethod("getShared", new short[0].getClass());
 
+            // compiler internals access
+            Class cls = Class.forName("com.sun.tools.javafx.antlr.v4Lexer");
+            Field[] fields = cls.getDeclaredFields();
+            for (Field fld : fields) {
+                if ((fld.getModifiers() & Modifier.STATIC) == 0) continue;
+                if ("[[S".equals(fld.getType().getName())) {
+                    // grab the outer array
+                    fld.setAccessible(true);
+                    short[][] outer = (short[][]) fld.get(null);
+
+                    // process the array entry by entry
+                    for (int i=0; i<outer.length; i++) {
+                        short[] replacement = (short[])share.invoke(null, outer[i]);
+                        outer[i] = replacement;
+                    }
+                }
+            }
+        } catch (Exception ex) { // not fatal
+            boolean devel = false;
+            assert devel = true;
+            if (devel) LOGGER.warning(
+                    "Failed the compiler cleanup, expect higher heap usage.");
+        }
+    }
+}
