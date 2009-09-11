@@ -349,7 +349,7 @@ public final class JavaFXSource {
         } catch (Exception ex) { // not fatal
             boolean devel = false;
             assert devel = true;
-            if (devel) Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).warning(
+            if (devel) LOGGER.warning(
                     "Failed the compiler cleanup, expect higher heap usage.");
         }
     }
