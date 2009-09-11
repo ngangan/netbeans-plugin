@@ -30,6 +30,8 @@ package org.netbeans.modules.javafx.refactoring.impl;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -45,7 +47,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Name;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -141,6 +143,33 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
             p.add(TreePathHandle.create(getCurrentPath(), cc));
         }
         return super.visitVariable(node, p);
+    }
+
+    @Override
+    public Void visitFunctionDefinition(FunctionDefinitionTree node, Set<TreePathHandle> p) {
+        if (origHandle.getKind() != ElementKind.METHOD) return super.visitFunctionDefinition(node, p);
+        Element e = cc.getTrees().getElement(getCurrentPath());
+        ElementHandle eh = ElementHandle.create(e);
+
+        if (origHandle.equals(eh)) {
+            p.add(TreePathHandle.create(getCurrentPath(), cc));
+        }
+        return super.visitFunctionDefinition(node, p);
+    }
+
+    @Override
+    public Void visitMethodInvocation(FunctionInvocationTree node, Set<TreePathHandle> p) {
+        if (origHandle.getKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, p);
+        Element e = cc.getTrees().getElement(getCurrentPath());
+        ExecutableElement ee = (ExecutableElement)e;
+        System.err.println("Return type of " + e + " : " + ee.getReturnType());
+        ElementHandle eh = ElementHandle.create(e);
+
+        if (origHandle.equals(eh)) {
+            p.add(TreePathHandle.create(getCurrentPath(), cc));
+        }
+        
+        return super.visitMethodInvocation(node, p);
     }
 
     @Override

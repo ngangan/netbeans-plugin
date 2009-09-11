@@ -164,7 +164,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 if (el.getKind() == ElementKind.METHOD) {
                     ExecutableElement e = (ExecutableElement)el;
                     if (!e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
-                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClassStack.peek().getQualifiedName().toString();
+                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
                         if (LOG_FINEST) {
                             LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
                         }
@@ -179,7 +179,10 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 Element el = fxresult.getTrees().getElement(getCurrentPath());
                 if (el.getKind() == ElementKind.METHOD) {
                     ExecutableElement e = (ExecutableElement)el;
-                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClassStack.peek().getQualifiedName().toString();
+                    ExecutableElement ee = (ExecutableElement)e;
+                    System.err.println("Return type of " + e + " : " + ee.getReturnType());
+                    
+                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
                     if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }

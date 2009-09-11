@@ -410,7 +410,7 @@ final public class ClassIndex {
         final String typeDef = (handle.getKind() == ElementKind.CLASS || handle.getKind() == ElementKind.INTERFACE) ? handle.getQualifiedName() : "";
 
 //        final String typeRefRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
-//        final String invocationRegex = ".+?#.+?#" + escapePattern(handle.getQualifiedName())  +"#.+";
+        final String indexingVal = IndexingUtilities.getIndexValue(handle);
 
         try {
             QuerySupport query = getUsageQuery(scope);
@@ -423,18 +423,20 @@ final public class ClassIndex {
                         }
                         break;
                     }
-//                    case METHOD_REFERENCES: {
-//                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
-//                            result.add(ir.getFile());
-//                        }
-//                        break;
-//                    }
-                    case FIELD_REFERENCES: {
-                        String x = IndexingUtilities.getIndexValue(handle);
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), x, Kind.EXACT)) {
+                    case METHOD_REFERENCES: {
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
                             result.add(ir.getFile());
                         }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_REF.toString(), x, Kind.EXACT)) {
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), indexingVal, Kind.EXACT)) {
+                            result.add(ir.getFile());
+                        }
+                        break;
+                    }
+                    case FIELD_REFERENCES: {
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), indexingVal, Kind.EXACT)) {
+                            result.add(ir.getFile());
+                        }
+                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_REF.toString(), indexingVal, Kind.EXACT)) {
                             result.add(ir.getFile());
                         }
                         break;

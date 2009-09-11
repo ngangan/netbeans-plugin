@@ -89,21 +89,6 @@ public class ClasspathInfo {
         List<URL> srcUrls = new ArrayList<URL>();
         List<URL> clsUrls = new ArrayList<URL>();
 
-        for(ClassPath.Entry entry : ClassPath.getClassPath(fo, ClassPath.COMPILE).entries()) {
-            Result2 rslt = SourceForBinaryQuery.findSourceRoots2(entry.getURL());
-            if (rslt.preferSources()) {
-                for(FileObject root : rslt.getRoots()) {
-                    try {
-                        srcUrls.add(root.getURL());
-                    } catch (FileStateInvalidException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                }
-            } else {
-                clsUrls.add(entry.getURL());
-            }
-        }
-        
         ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
         if (compilePath != null) {
             for(ClassPath.Entry entry : compilePath.entries()) {

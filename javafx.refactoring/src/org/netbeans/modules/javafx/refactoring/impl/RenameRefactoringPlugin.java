@@ -176,7 +176,7 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
         final Set<TreePathHandle> references = new HashSet<TreePathHandle>();
         final Map<FileObject, TransformationContext> contextMap = new HashMap<FileObject, TransformationContext>();
 
-        references.add(treePathHandle);
+//        references.add(treePathHandle);
 
         JavaFXSource jfxs = JavaFXSource.forFileObject(treePathHandle.getFileObject());
         try {
@@ -212,6 +212,10 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
                         }
                         case FIELD: {
                             refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            break;
+                        }
+                        case METHOD: {
+                            refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
                             break;
                         }
                     }

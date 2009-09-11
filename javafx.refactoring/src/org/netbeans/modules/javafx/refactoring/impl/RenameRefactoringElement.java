@@ -162,8 +162,10 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                         findTypeName(path, cc);
                         break;
                     }
-                    case VARIABLE: {
-                        findVariableName(path, cc);
+                    case VARIABLE:
+                    case METHOD_INVOCATION:
+                    case FUNCTION_DEFINITION: {
+                        findIdentifier(path, cc);
                         break;
                     }
                 }
@@ -205,12 +207,14 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
         }
     }
 
-    private void findVariableName(JavaFXTreePath path, CompilationController cc) {
+    private void findIdentifier(JavaFXTreePath path, CompilationController cc) {
         TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
         tokens.moveStart();
+        System.err.println("tokens");
         while(tokens.moveNext()) {
             final Token<JFXTokenId> currentToken = tokens.token();
-            if (currentToken.id() == JFXTokenId.IDENTIFIER) {
+            System.err.println(currentToken.id() + " > " + currentToken.text());
+            if (currentToken.id() == JFXTokenId.IDENTIFIER && currentToken.text().toString().equals(oldText)) {
                 startPosition = currentToken.offset(cc.getTokenHierarchy());
                 break;
             }
