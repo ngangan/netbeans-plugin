@@ -42,6 +42,8 @@ package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javafx.code.JavafxFlags;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -57,6 +59,9 @@ import javax.swing.text.Document;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
@@ -467,18 +472,19 @@ public class Utilities {
         return false;
     }
     
-//    public static boolean isPrivateElement(Element el) {
-//        if (el.getKind() == ElementKind.PARAMETER)
-//            return true;
-//        
-//        if (el.getKind() == ElementKind.LOCAL_VARIABLE)
-//            return true;
-//        
-//        if (el.getKind() == ElementKind.EXCEPTION_PARAMETER)
-//            return true;
-//        
-//        return el.getModifiers().contains(Modifier.PRIVATE);
-//    }
-//    
+    public static boolean isPrivateElement(Element el) {
+        if (el.getKind() == ElementKind.PARAMETER)
+            return true;
+        
+        if (el.getKind() == ElementKind.LOCAL_VARIABLE)
+            return true;
+        
+        if (el.getKind() == ElementKind.EXCEPTION_PARAMETER)
+            return true;
+        
+        Symbol sy = (Symbol)el;
+        return el.getModifiers().contains(Modifier.PRIVATE) || (sy.flags() & JavafxFlags.SCRIPT_PRIVATE) > 0;
+    }
+    
 
 }
