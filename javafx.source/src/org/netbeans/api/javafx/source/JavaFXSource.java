@@ -242,7 +242,7 @@ public final class JavaFXSource {
             }
         }
 
-        if (this.files.size()<=1) {
+        if (this.files.size()>=1) {
             try {
                 ParserManager.parse(sources, new LegacyUserTask(getClasspathInfo(), task));
             } catch (Exception ex) {
