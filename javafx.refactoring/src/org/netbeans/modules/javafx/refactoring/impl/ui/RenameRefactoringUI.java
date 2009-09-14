@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.NestingKind;
+import javax.lang.model.element.TypeElement;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -87,12 +89,16 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
                 if (oldName.equals(handle.getFileObject().getName())) {
                     refactoring = new RenameRefactoring(Lookups.fixed(handle, handle.getFileObject()));
                 } else {
-                    Set<FileObject> typeDefFO = info.getClasspathInfo().getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
-                    if (typeDefFO.size() == 1) {
-                        refactoring = new RenameRefactoring(Lookups.fixed(handle, typeDefFO.iterator().next()));
-                    } else {
-                        refactoring = new RenameRefactoring(Lookups.singleton(handle));
+                    if (element.getKind() == ElementKind.CLASS || element.getKind() == ElementKind.INTERFACE) {
+                        if (((TypeElement)element).getNestingKind() == NestingKind.TOP_LEVEL) {
+                            Set<FileObject> typeDefFO = info.getClasspathInfo().getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+                            if (typeDefFO.size() == 1) {
+                                refactoring = new RenameRefactoring(Lookups.fixed(handle, typeDefFO.iterator().next()));
+                                break;
+                            }
+                        }
                     }
+                    refactoring = new RenameRefactoring(Lookups.singleton(handle));
                 }
                 break;
             }
