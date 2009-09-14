@@ -8,6 +8,7 @@ import com.sun.tools.javac.code.TypeTags;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
+import javax.swing.text.BadLocationException;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
@@ -583,10 +584,16 @@ public final class FXSourceUtils {
         return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
     }
 
-    public static Document getDocument(final CompilationInfo info) {
-        FileObject file = info.getFileObject();
-        return file != null ? getDocument(file) : null;
+    public static String getText(final CompilationInfo info) {
+        Document document = info.getDocument();
+        try {
+            return document.getText(0, document.getLength());
+        } catch (BadLocationException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
     }
+
 
     public static Document getDocument(final FileObject file) {
         DataObject od = null;
