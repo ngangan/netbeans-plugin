@@ -346,14 +346,12 @@ made subject to such option by the copyright holder.
                     <file name="org-netbeans-modules-profiler-actions-ProfileSingleActionPopup.instance_hidden"/>
 
 
-                    <file name="CompileFile.instance">
-                        <attr name="instanceCreate"
-                              methodvalue="org.netbeans.modules.java.project.JavaProjectModule.compile"/>
+                    <file name="CompileFile.shadow">
+                        <attr name="originalFile" stringvalue="Actions/Project/org-netbeans-modules-project-ui-CompileSingle.instance"/>
                         <attr name="position" intvalue="620"/>
                     </file>
-                    <file name="RunFile.instance">
-                        <attr name="instanceCreate"
-                              methodvalue="org.netbeans.modules.java.project.JavaProjectModule.run"/>
+                    <file name="RunFile.shadow">
+                        <attr name="originalFile" stringvalue="Actions/Project/org-netbeans-modules-project-ui-RunSingle.instance"/>
                         <attr name="position" intvalue="640"/>
                     </file>
                     <!--
