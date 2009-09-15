@@ -42,7 +42,6 @@ package org.netbeans.modules.javafx.editor.rename;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.source.tree.Tree.Kind;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
