@@ -398,7 +398,7 @@ public class JFXReformatTask implements ReformatTask {
                 if (tree instanceof FakeBlock) {
                     endPos = Integer.MAX_VALUE;
                 } else {
-                    endPos = (int) getEndPos(tree);
+                    endPos = (int) getEndPos(tree) + 1; // HACK: javafx sp.getEndPosition() returns position before semicolumn
                 }
             }
             try {
