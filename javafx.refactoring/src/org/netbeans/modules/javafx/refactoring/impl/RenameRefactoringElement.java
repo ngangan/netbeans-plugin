@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Position.Bias;
+import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -47,9 +48,12 @@ import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.cookies.EditorCookie;
+import org.openide.cookies.LineCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.text.DataEditorSupport;
+import org.openide.text.Line;
+import org.openide.text.NbDocument;
 import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 
@@ -67,6 +71,8 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     private String newName;
     private TreePathHandle handle;
     private DataEditorSupport des;
+    private GuardedDocument doc;
+    private LineCookie lc;
 
     final public static RenameRefactoringElement create(TreePathHandle handle, String newName, String oldName, Lookup context) {
         try {
@@ -90,7 +96,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
             int lineNo = Utilities.getLineOffset((BaseDocument)des.getDocument(), startPosition) + 1;
 
             StringBuilder origLine = new StringBuilder();
-            int delta = extractLine(des.getDocument(), startPosition, origLine);
+            int delta = extractLine(startPosition, origLine);
 
             StringBuilder newLine = new StringBuilder(origLine);
             newLine.replace(delta, delta + oldText.length(), newName);
@@ -135,7 +141,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                             } else {
                                 if (DEBUG) {
                                     StringBuilder sb = new StringBuilder();
-                                    extractLine(doc, offset, sb);
+                                    extractLine(offset, sb);
                                     LOGGER.finest("Can not rename due to name mismatch: " + processDiff(oldText, realText));
                                 }
                             }
@@ -185,7 +191,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                 j++;
             } else {
                 int oldLCS = (i+1 == oldLength) ? Integer.MIN_VALUE : opt[i+1][j];
-                int newLCS = (j+1 == oldLength) ? Integer.MIN_VALUE : opt[i][j+1];
+                int newLCS = (j+1 == newLength) ? Integer.MIN_VALUE : opt[i][j+1];
                 if (oldLCS >= newLCS)  {
                     if (!closingTag.equals("</b>]")) {
                         sb.append(closingTag);
@@ -207,20 +213,13 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
         return sb.toString();
     }
 
-    private int extractLine(Document doc, int offset, StringBuilder sb) throws BadLocationException {
-        int lineOff = offset;
-        while(lineOff >=0 && !doc.getText(lineOff, 1).equals("\n")) lineOff--;
-        lineOff++;
-        int lineOff1 = offset;
-        while(lineOff1 < doc.getLength() && !doc.getText(lineOff1, 1).equals("\n")) lineOff1++;
+    private int extractLine(int offset, StringBuilder sb) throws BadLocationException {
+        int lineNo = Utilities.getLineOffset(doc, offset);
+        Line l = lc.getLineSet().getCurrent(lineNo);
+        sb.append(l.getText().trim());
+        int lineOff = NbDocument.findLineOffset((StyledDocument)doc, lineNo);
 
-        String line = doc.getText(lineOff, lineOff1 - lineOff + 1);
-        int counter = 0;
-        while(Character.isWhitespace(line.charAt(counter))) {
-            counter++;
-        }
-        lineOff += counter;
-        sb.append(line.trim());
+        lineOff = Utilities.getFirstNonWhiteFwd(doc, lineOff);
         return offset - lineOff;
     }
 
@@ -231,6 +230,8 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     private void init() throws IOException {
         DataObject dobj = DataObject.find(handle.getFileObject());
         des = (DataEditorSupport)dobj.getCookie(EditorCookie.class);
+        doc = (GuardedDocument)des.getDocument();
+        lc = dobj.getCookie(LineCookie.class);
         
         JavaFXSource jfxs = JavaFXSource.forFileObject(handle.getFileObject());
         jfxs.runUserActionTask(new Task<CompilationController>() {
