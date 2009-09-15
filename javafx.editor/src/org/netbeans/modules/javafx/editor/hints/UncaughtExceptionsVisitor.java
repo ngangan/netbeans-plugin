@@ -76,10 +76,8 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
 
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel model) {
-        //String treeClassType = getClassName(node.toString());
-        
         if (node.toString().contains(".")) { //NOI18N
-            instantTypes.add(getClassName(node.toString()));
+            instantTypes.add(HintsUtils.getObjectName(node.toString()));
         }
         for (String instantType : instantTypes) {
             //TODO WeakCash for optimization
@@ -90,7 +88,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                 if (typeElement == null) {
                     continue;
                 }
-                String elementType = getMethodName(typeElement.getQualifiedName().toString()).trim();
+                String elementType = HintsUtils.getMethodName(typeElement.getQualifiedName().toString()).trim();
                 if (!elementType.equals(instantType)) {
                     break;
                 }
@@ -98,7 +96,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                 for (Element element : c) {
                     if (element instanceof MethodSymbol) {
                         MethodSymbol methodSymbol = (MethodSymbol) element;
-                        if (!methodSymbol.getSimpleName().toString().equals(getMethodName(node.toString()))) {
+                        if (!methodSymbol.getSimpleName().toString().equals(HintsUtils.getMethodName(node.toString()))) {
                             continue;
                         }
                         List<Type> thrownExceptions = null;
@@ -134,22 +132,4 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         return super.visitInstantiate(node, p);
     }
 
-    static String getMethodName(String fullMethodName) {
-        String methodName;
-        if (fullMethodName.contains(".")) { //NOI18N
-            int start = fullMethodName.lastIndexOf("."); //NOI18N
-            int end = fullMethodName.length();
-            methodName = fullMethodName.substring(start + 1, end).replace("()", "").trim(); //NOI18N
-        } else {
-            methodName = fullMethodName;
-        }
-
-        return methodName;
-    }
-
-    private static String getClassName(String fullMethodName) {
-        int end = fullMethodName.indexOf("."); //NOI18N
-        String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
-        return className;
-    }
 }

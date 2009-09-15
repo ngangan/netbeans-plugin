@@ -75,7 +75,7 @@ class UncaughtExceptionsFix implements Fix {
     @Override
     public ChangeInfo implement() throws Exception {
         //TODO Unique ex var name
-        String exceptionName = "ex";
+        String exceptionName = "ex"; //NOI18N
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         Iterator iterator = hint.getExceptions().iterator();
         StringBuilder block = new StringBuilder();

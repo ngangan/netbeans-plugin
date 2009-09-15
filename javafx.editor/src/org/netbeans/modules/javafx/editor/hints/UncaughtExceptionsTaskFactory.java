@@ -40,6 +40,9 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.CatchTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -49,9 +52,13 @@ import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
 import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javac.code.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
@@ -94,10 +101,9 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     for (Hint hint : model.getHints()) {
                         errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
                     }
-                    HintsController.setErrors(HintsUtils.getDocument(file), "Try-Catch", errors); //NOI18N
+                    HintsController.setErrors(FXSourceUtils.getDocument(file), "Try-Catch", errors); //NOI18N
                 }
             }
-            
         };
     }
 
@@ -110,7 +116,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                 sb.append(", "); //NOI18N
             }
         }
-        Fix fix = new UncaughtExceptionsFix(HintsUtils.getDocument(file), hint, compilationInfo);
+        Fix fix = new UncaughtExceptionsFix(FXSourceUtils.getDocument(file), hint, compilationInfo);
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());
@@ -118,5 +124,41 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                 Collections.singletonList(fix), file, start, end);
 
         return ed;
+    }
+
+    private class UncaughtExceptionsVisitorResolver extends JavaFXTreePathScanner<Void, HintsModel> {
+
+        @Override
+        public Void visitTry(TryTree node, HintsModel model) {
+            Collection<Hint> hints = new HashSet<Hint>(model.getHints());
+            Collection<ExpressionTree> nodes = new ArrayList<ExpressionTree>(node.getBlock().getStatements());
+            nodes.add(node.getBlock().getValue());
+            for (Tree node_ : nodes) {
+                for (Hint hint : hints) {
+                    if (hint.getTree() == node_) {
+                        Collection<Type> hintTypes = new ArrayList(hint.getExceptions());
+                        for (Type hintType : hintTypes) {
+                            //TODO JavaFXTypeClass does not provide full class name, it should use full class names not simple names
+                            for (CatchTree catchType : node.getCatches()) {
+                                String hintTypeName = HintsUtils.getMethodName(hintType.toString());
+                                if (catchType.getParameter() == null) {
+                                    continue;
+                                }
+                                String catchTypeName = HintsUtils.getMethodName(catchType.getParameter().getType().toString());
+                                if (hintTypeName.equals(catchTypeName)) {
+                                    hint.removeException(hintType);
+                                }
+                            }
+                        }
+                        if (hint.getExceptions().size() == 0) {
+                            model.removeHint(hint);
+                        } else {
+                            model.addCatchTree(hint, node);
+                        }
+                    }
+                }
+            }
+            return super.visitTry(node, model);
+        }
     }
 }

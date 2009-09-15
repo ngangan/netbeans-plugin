@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,32 +53,16 @@ import java.util.Map;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
 
-final class HintsModel {
+final class UncaughtExceptionsModel {
 
-    private Map<Tree, HintsModel.Hint> unresovedHints;
+    private Map<Tree, UncaughtExceptionsModel.Hint> unresovedHints;
     private CompilationInfo compilationInfo;
 
-    public HintsModel(CompilationInfo compilationInfo) {
+    public UncaughtExceptionsModel(CompilationInfo compilationInfo) {
         this.compilationInfo = compilationInfo;
     }
-     public void addHint(Tree tree) {
-        addHint(null, tree);
-    }
 
-     public void addHint(Tree tree, List<MethodSymbol> abstractMethods) {
-        addHint(tree, abstractMethods, null, null, null, null);
-    }
-
-    public void addHint(List<Type> thrownExceptions, Tree tree) {
-        addHint(tree, null, thrownExceptions, null, null, null);
-    }
-    
-
-    public void addHint(Tree tree, String varName, Integer start, Integer end) {
-        addHint(tree, null,null,varName, start, end);
-    }
-
-     private void addHint(Tree tree, List<MethodSymbol> abstractMethods, List<Type> thrownExceptions, String name, Integer start, Integer end) {
+    public void addThrowHint(List<Type> thrownExceptions, Tree tree) {
         if (unresovedHints == null) {
             unresovedHints = new HashMap<Tree,Hint>();
         }
@@ -87,14 +70,11 @@ final class HintsModel {
             return;
         }
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        if (start == null) {
-            start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-        }
-        if (end == null) {
-            end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
-        }
+        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         int length = end - start;
-        Hint hint = new Hint(thrownExceptions, abstractMethods, tree, length, start, name);
+        assert thrownExceptions != null;
+        Hint hint = new Hint(thrownExceptions, tree, length, start);
         unresovedHints.put(tree, hint);
     }
 
@@ -106,15 +86,11 @@ final class HintsModel {
         hint.setCatchTree(catchTree);
     }
 
-    public Collection<Hint> getHints() {
+    public Collection<Hint> getThrowHints() {
         if (unresovedHints == null) {
             return Collections.EMPTY_LIST;
         }
         return Collections.unmodifiableCollection(unresovedHints.values());
-    }
-
-    public void addMethod(MethodSymbol method) {
-
     }
 
     public void removeHint(Hint hint) {
@@ -123,36 +99,24 @@ final class HintsModel {
 
     static final class Hint {
 
-        private List<Type> exceptions = new ArrayList<Type>();
+        private List<Type> exceptions;
         private Tree tree;
         private Tree catchTree;
         private int length;
         private int start;
-        private List<MethodSymbol> abstractMethods;
-        private String name;
 
         private Hint() {}
 
-        private Hint(List<Type> thrownExceptions, List<MethodSymbol> abstractMethods, Tree tree, int length, int start, String name) {
-            if (thrownExceptions != null) {
-                this.exceptions = new ArrayList<Type>(thrownExceptions);
-            }
+        private Hint(List<Type> thrownExceptions, Tree tree, int length, int start) {
+            this.exceptions = new ArrayList<Type>(thrownExceptions);
             this.tree = tree;
             this.length = length + 1;
             this.start = start;
-            if (abstractMethods != null) {
-                this.abstractMethods = new ArrayList<MethodSymbol>(abstractMethods);
-            }
-            this.name = name;
         }
 
         private void setCatchTree(Tree catchTree) {
             this.catchTree = catchTree;
         }
-
-        void addMethod(MethodSymbol method) {
-            abstractMethods.add(method);
-        } 
 
         Tree getTree() {
             return tree;
@@ -162,14 +126,7 @@ final class HintsModel {
             return catchTree;
         }
 
-        List<MethodSymbol> getAbstractMethods() {
-            return Collections.unmodifiableList(abstractMethods);
-        }
-
         Collection<Type> getExceptions() {
-            if (exceptions == null) {
-                return null;
-            }
             return Collections.unmodifiableList(exceptions);
         }
 
@@ -183,10 +140,6 @@ final class HintsModel {
 
         int getStartPosition() {
             return start;
-        }
-
-        String getName() {
-            return name;
         }
 
     }

@@ -53,10 +53,9 @@ import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
 import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.tools.javac.code.Type;
 import java.util.Collections;
-import java.util.Iterator;
 
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
@@ -64,7 +63,6 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -102,7 +100,7 @@ public class EmptyCatchTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     for (Hint hint : model.getHints()) {
                         errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
                     }
-                    HintsController.setErrors(HintsUtils.getDocument(file), "Try-Catch", errors); //NOI18N
+                    HintsController.setErrors(FXSourceUtils.getDocument(file), "Try-Catch", errors); //NOI18N
                 }
             }
         };
@@ -118,7 +116,7 @@ public class EmptyCatchTaskFactory extends EditorAwareJavaSourceTaskFactory {
 //                sb.append(", "); //NOI18N
 //            }
 //        }
-        Fix fix = new UncaughtExceptionsFix(HintsUtils.getDocument(file), hint, compilationInfo);
+        Fix fix = new UncaughtExceptionsFix(FXSourceUtils.getDocument(file), hint, compilationInfo);
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());
