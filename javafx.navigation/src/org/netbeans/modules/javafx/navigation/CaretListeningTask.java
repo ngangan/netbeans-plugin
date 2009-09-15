@@ -51,13 +51,11 @@ import javax.lang.model.type.TypeMirror;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
@@ -89,7 +87,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private boolean canceled;
     private static ElementHandle<Element> lastEh;
     private static ElementHandle<Element> lastEhForNavigator;
-    private static final Set<JFXTokenId> TOKENS_TO_SKIP = EnumSet.of(JFXTokenId.WS,
+    private static final Set<? extends TokenId> TOKENS_TO_SKIP = EnumSet.of(JFXTokenId.WS,
             JFXTokenId.COMMENT,
             JFXTokenId.LINE_COMMENT,
             JFXTokenId.DOC_COMMENT);
@@ -127,7 +125,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                 CaretListeningTask.this.cancel();
             }
         };
-        Document doc = FXSourceUtils.getDocument(compilationInfo);
+        Document doc = compilationInfo.getDocument();
 
         SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tokens.tokenSequence(), doc, cancellable);
         boolean inJavadoc = false;
@@ -537,7 +535,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         return e;
     }
 
-    private void skipTokens(SafeTokenSequence<JFXTokenId> ts, Set<JFXTokenId> typesToSkip) {
+    private void skipTokens(SafeTokenSequence<JFXTokenId> ts, Set<? extends TokenId> typesToSkip) {
         while (ts.moveNext()) {
             if (!typesToSkip.contains(ts.token().id())) {
                 return;

@@ -10,6 +10,7 @@ import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TableModel;
 import org.netbeans.spi.viewmodel.TableModelFilter;
 import org.netbeans.spi.viewmodel.UnknownTypeException;
+import org.netbeans.spi.debugger.ui.Constants;
 
 /**
  *
@@ -41,7 +42,7 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
         
         colValue = original.getValueAt( node, columnID );
         // Type
-        if( "LocalsType".equals( columnID )) {
+        if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnID )) {
             if( node instanceof Field ) {
                 if( "int".equals( colValue )) {
                     return "Integer";

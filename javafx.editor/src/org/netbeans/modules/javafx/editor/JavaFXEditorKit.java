@@ -59,6 +59,7 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 import org.netbeans.editor.ActionFactory.FormatAction;
 import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
+import org.netbeans.modules.javafx.editor.rename.InstantRenameAction;
 import org.openide.util.ImageUtilities;
 
 /**
@@ -102,6 +103,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new JavaFXDefaultKeyTypedAction(),
                 new JavaFXDeleteCharAction(deletePrevCharAction, false),
                 new JavaFXGoToDeclarationAction(),
+                new InstantRenameAction(),
                 new JavaFXGoToSourceAction(),
                 new JavaFXGotoHelpAction(),
                 JavaFXImports.getInstance(),
@@ -379,6 +381,21 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         protected void charBackspaced(BaseDocument doc, int dotPos, Caret caret, char ch)
                 throws BadLocationException {
             BracketCompletion.charBackspaced(doc, dotPos, ch);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent evt, JTextComponent target) {
+            target.putClientProperty(JavaFXDeleteCharAction.class, this);
+
+            try {
+                super.actionPerformed(evt, target);
+            } finally {
+                target.putClientProperty(JavaFXDeleteCharAction.class, null);
+            }
+        }
+
+        public boolean getNextChar() {
+            return nextChar;
         }
     }
 

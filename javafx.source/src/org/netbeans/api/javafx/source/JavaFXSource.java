@@ -42,12 +42,17 @@ package org.netbeans.api.javafx.source;
 import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.WeakHashMap;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -76,8 +81,12 @@ import org.netbeans.modules.parsing.api.Source;
  */
 public final class JavaFXSource {
 
+    //Already logged warning about running in AWT
+    private static final Set<StackTraceElement> warnedAboutRunInEQ = new HashSet<StackTraceElement>();
+
     static {
         JavaFXSourceTaskFactoryManager.register();
+	hackCompilersLexer();
     }
 
     public static enum Phase {
@@ -224,7 +233,16 @@ public final class JavaFXSource {
             throw new IllegalArgumentException ("Task cannot be null");     //NOI18N
         }
 
-        if (this.files.size()<=1) {
+        boolean a = false;
+        assert a = true;
+        if (a && javax.swing.SwingUtilities.isEventDispatchThread()) {
+            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[1];
+            if (stackTraceElement != null && warnedAboutRunInEQ.add(stackTraceElement)) {
+                LOGGER.warning("ParserManager.parse called in AWT event thread by: " + stackTraceElement); // NOI18N
+            }
+        }
+
+        if (this.files.size()>=1) {
             try {
                 ParserManager.parse(sources, new LegacyUserTask(getClasspathInfo(), task));
             } catch (Exception ex) {
@@ -305,5 +323,34 @@ public final class JavaFXSource {
         return sources.iterator().next();
     }
 
-}
+    private static void hackCompilersLexer() {
+        try {
+            // cache provider is not an API
+            Class dfa = Class.forName("org.netbeans.lib.javafx.lexer.DFA", true, Thread.currentThread().getContextClassLoader());
+            Method share = dfa.getDeclaredMethod("getShared", new short[0].getClass());
 
+            // compiler internals access
+            Class cls = Class.forName("com.sun.tools.javafx.antlr.v4Lexer");
+            Field[] fields = cls.getDeclaredFields();
+            for (Field fld : fields) {
+                if ((fld.getModifiers() & Modifier.STATIC) == 0) continue;
+                if ("[[S".equals(fld.getType().getName())) {
+                    // grab the outer array
+                    fld.setAccessible(true);
+                    short[][] outer = (short[][]) fld.get(null);
+
+                    // process the array entry by entry
+                    for (int i=0; i<outer.length; i++) {
+                        short[] replacement = (short[])share.invoke(null, outer[i]);
+                        outer[i] = replacement;
+                    }
+                }
+            }
+        } catch (Exception ex) { // not fatal
+            boolean devel = false;
+            assert devel = true;
+            if (devel) LOGGER.warning(
+                    "Failed the compiler cleanup, expect higher heap usage.");
+        }
+    }
+}

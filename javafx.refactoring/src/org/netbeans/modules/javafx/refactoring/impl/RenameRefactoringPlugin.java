@@ -29,19 +29,10 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeAnyTree;
-import com.sun.javafx.api.tree.TypeArrayTree;
-import com.sun.javafx.api.tree.TypeCastTree;
-import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -50,7 +41,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
@@ -186,33 +176,48 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
         final Set<TreePathHandle> references = new HashSet<TreePathHandle>();
         final Map<FileObject, TransformationContext> contextMap = new HashMap<FileObject, TransformationContext>();
 
-        references.add(treePathHandle);
+//        references.add(treePathHandle);
 
         JavaFXSource jfxs = JavaFXSource.forFileObject(treePathHandle.getFileObject());
         try {
             final AtomicReference<ElementHandle> origHandle = new AtomicReference<ElementHandle>();
 
             final Set<FileObject> refFos = new HashSet<FileObject>();
+            refFos.add(treePathHandle.getFileObject());
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(final CompilationController cc) throws Exception {
                     final ClassIndex ci = cc.getClasspathInfo().getClassIndex();
                     Element el = treePathHandle.resolveElement(cc);
                     origHandle.set(ElementHandle.create(el));
-                    refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
-                    if ((el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) && ((TypeElement)el).getNestingKind() == NestingKind.TOP_LEVEL) {
-                        new JavaFXTreePathScanner<Void, Void>() {
+                    switch(el.getKind()) {
+                        case CLASS:
+                        case INTERFACE: {
+                            refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
+                            if (((TypeElement)el).getNestingKind() == NestingKind.TOP_LEVEL) {
+                                new JavaFXTreePathScanner<Void, Void>() {
 
-                            @Override
-                            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-                                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-                                if (te.getNestingKind() == NestingKind.MEMBER) {
-                                    refFos.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
-                                }
-                                return super.visitClassDeclaration(node, p);
+                                    @Override
+                                    public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                                        TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                                        if (te.getNestingKind() == NestingKind.MEMBER) {
+                                            refFos.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
+                                        }
+                                        return super.visitClassDeclaration(node, p);
+                                    }
+
+                                }.scan(cc.getCompilationUnit(), null);
                             }
-
-                        }.scan(cc.getCompilationUnit(), null);
+                            break;
+                        }
+                        case FIELD: {
+                            refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            break;
+                        }
+                        case METHOD: {
+                            refFos.addAll(ci.getResources(origHandle.get(), EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            break;
+                        }
                     }
                 }
             }, true);
