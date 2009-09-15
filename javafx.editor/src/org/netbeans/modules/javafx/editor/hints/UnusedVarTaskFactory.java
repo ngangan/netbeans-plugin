@@ -293,7 +293,7 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
     private void updateEditor(CompilationInfo compilationInfo, Hint hint) {
         int start = hint.getStartPosition();
         int end = hint.getLength() + hint.getStartPosition();
-        Document document = FXSourceUtils.getDocument(compilationInfo);
+        Document document = FXSourceUtils.getDocument(compilationInfo.getFileObject());
         HighlightsSequence hs = getBag(document).getHighlights(start, end);
         List<AttributeSet> as = new ArrayList<AttributeSet>();
         while (hs.moveNext()) {
