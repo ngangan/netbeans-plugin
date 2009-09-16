@@ -10,6 +10,8 @@ import java.util.List;
 import org.netbeans.api.debugger.jpda.ClassVariable;
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
+import org.netbeans.api.debugger.jpda.LocalVariable;
+import org.netbeans.api.debugger.jpda.This;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TreeModel;
 import org.netbeans.spi.viewmodel.TreeModelFilter;
@@ -43,25 +45,37 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
             int parentChildrenCount = original.getChildrenCount( parent );
             Object[] children = original.getChildren( parent, 0, parentChildrenCount );
             parentChildrenCount = children.length;
-            if( parentChildrenCount == 1 && children[0] instanceof JPDAClassType ) {
-                Object[] ch = original.getChildren( children[0], from, to );
-                List vc = new ArrayList();
-                for( int i = 0; i < ch.length; i++ ) {
-                    Object obj = ch[i];
-//                    System.out.println(" - " + obj );
-                    if( obj instanceof ClassVariable ) {
-                        ClassVariable cv = (ClassVariable)obj;
-//                        vc.add( obj );
-                    } else if( obj instanceof Field ) {
-                        Field f = (Field)obj;
-                        if( f.getName().startsWith( "$" )) {
-                            vc.add( obj );
+            List vc = new ArrayList();
+            for( int j = 0; j < parentChildrenCount; j++ ) {
+                Object child = children[j];
+                if( child instanceof JPDAClassType || child instanceof This ) {
+                    Object[] ch = original.getChildren( child, from, to );
+                    for( int i = 0; i < ch.length; i++ ) {
+                        Object obj = ch[i];
+    //                    System.out.println(" - " + obj );
+                        if( obj instanceof ClassVariable ) {
+                            ClassVariable cv = (ClassVariable)obj;
+    //                        vc.add( obj );
+                        } else if( obj instanceof Field ) {
+                            Field f = (Field)obj;
+                            if( f.getName().startsWith( "$" )) {
+                                vc.add( obj );
+                            }
                         }
-                    } 
 
+                    }
+                } else if( child instanceof LocalVariable ) {
+                    LocalVariable local = (LocalVariable)child;
+                    // Helper Sequences out
+                    if( local.getDeclaredType().startsWith( "com.sun.javafx.runtime." )) continue;
+                    if( local.getName().endsWith( "$ind" )) continue;
+                    if( local.getName().endsWith( "$limit" )) continue;
+                    // Skip all internal jfx$ variables
+                    if( local.getName().startsWith( "jfx$" )) continue;
+                    vc.add( child );
                 }
-                return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
             }
+            return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {
             // Root static class
             Object[] children = original.getChildren( parent, from, to );

@@ -65,7 +65,7 @@ public class JavaFXWatch implements PropertyChangeListener {
         return watch;
     }
 
-    public Variable getVarible() {
+    public Variable getVariable() {
         if( !evaluated )
             evaluate();
         return variable;

@@ -8,10 +8,14 @@ package org.netbeans.modules.javafx.debugger.watchesfiltering;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.Watch;
+import org.netbeans.api.debugger.jpda.ClassVariable;
+import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.JPDADebugger;
 import org.netbeans.spi.debugger.ContextProvider;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -74,7 +78,22 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
             return ch;
         } else if( parent instanceof JavaFXWatch ) {
             JavaFXWatch w = (JavaFXWatch)parent;
-            return original.getChildren( w.getValue(), from, to );
+            // Filter variables
+            Object children[] = original.getChildren( w.getVariable(), from, to );
+            List vc = new ArrayList();
+            for( int i = 0; i < children.length; i++ ) {
+                Object obj = children[i];
+                if( obj instanceof ClassVariable ) {
+                    ClassVariable cv = (ClassVariable)obj;
+//                        vc.add( obj );
+                } else if( obj instanceof Field ) {
+                    Field f = (Field)obj;
+                    if( f.getName().startsWith( "$" )) {
+                        vc.add( obj );
+                    }
+                }
+            }
+            return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {
             return original.getChildren( parent, from, to );
         }
@@ -85,7 +104,8 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
             listener = new DebuggerListener( this, debugger );
         } else if( node instanceof JavaFXWatch ) {
             JavaFXWatch w = (JavaFXWatch)node;
-            return original.getChildrenCount( w.getValue());
+            if( w.getValue() != null )
+                return original.getChildrenCount( w.getVariable());
         }
         return original.getChildrenCount( node );
     }
@@ -95,9 +115,10 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
         if( node == original.getRoot()) {
             il = false;
         } else if( node instanceof JavaFXWatch ) {
-//            JavaFXWatch w = (JavaFXWatch)node;
-//            il = original.isLeaf( w.getVarible());
+            JavaFXWatch w = (JavaFXWatch)node;
             il = false;
+//            if( w.getVariable() != null )
+//                il = original.isLeaf( w.getVariable());
         }
         return il;
     }

@@ -3,10 +3,10 @@
  * and open the template in the editor.
  */
 
-package org.netbeans.modules.javafx.debugger.variablesfiltering;
+package org.netbeans.modules.javafx.debugger.watchesfiltering;
 
+import org.netbeans.modules.javafx.debugger.variablesfiltering.*;
 import org.netbeans.api.debugger.jpda.Field;
-import org.netbeans.api.debugger.jpda.LocalVariable;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TableModel;
 import org.netbeans.spi.viewmodel.TableModelFilter;
@@ -17,9 +17,9 @@ import org.netbeans.spi.debugger.ui.Constants;
  *
  * @author Michal Skvor
  */
-public class JavaFXVariablesTableModelFilter implements TableModelFilter {
+public class JavaFXWatchesTableModelFilter implements TableModelFilter {
 
-    public JavaFXVariablesTableModelFilter() { }
+    public JavaFXWatchesTableModelFilter() { }
 
     /**
      * Returns filterred value to be displayed in column <code>columnID</code>
@@ -43,18 +43,16 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
         
         colValue = original.getValueAt( node, columnID );
         // Type
-        if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnID )) {
+        if( Constants.WATCH_TYPE_COLUMN_ID.equals( columnID )) {
             if( node instanceof Field ) {
+                String value = colValue.toString();
                 if( "int".equals( colValue )) {
                     return "Integer";
                 } else if( "float".equals( colValue )) {
                     return "Number";
                 }
-                String type = ((Field)node).getDeclaredType();
-                return type.replace( '$', '.' );
-            } else if( node instanceof LocalVariable ) {
-                LocalVariable variable = (LocalVariable)node;
-                return variable.getType().replace( '$', '.' );
+
+                return value.replace( '$', '.' );
             }
         }
 
