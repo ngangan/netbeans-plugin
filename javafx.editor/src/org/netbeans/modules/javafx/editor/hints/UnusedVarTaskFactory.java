@@ -40,25 +40,16 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.AssignmentTree;
 import com.sun.javafx.api.tree.CatchTree;
-import com.sun.javafx.api.tree.ConditionalExpressionTree;
-import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.ForExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.InitDefinitionTree;
+import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.javafx.api.tree.WhileLoopTree;
-import com.sun.tools.javafx.tree.JFXBinary;
-import com.sun.tools.javafx.tree.JFXExpression;
 import com.sun.tools.javafx.tree.JFXForExpressionInClause;
-import com.sun.tools.javafx.tree.JFXSelect;
-import com.sun.tools.javafx.tree.JFXSequenceExplicit;
 import com.sun.tools.javafx.tree.JFXVar;
 import java.util.Collection;
 import java.util.HashSet;
@@ -67,12 +58,12 @@ import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
@@ -89,8 +80,6 @@ import org.netbeans.modules.javafx.editor.semantic.SemanticHighlighter;
 import org.netbeans.spi.editor.highlighting.HighlightsSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.netbeans.spi.editor.hints.ErrorDescription;
-import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
-import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -99,12 +88,16 @@ import org.openide.filesystems.FileObject;
  */
 public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
+    private Document document;
+
     public UnusedVarTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
+        this.document = FXSourceUtils.getDocument(file);
+
         return new CancellableTask<CompilationInfo>() {
 
             public void cancel() {
@@ -120,20 +113,11 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     @Override
                     public Void visitVariable(VariableTree node, HintsModel model) {
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-                        if (element != null && node.getInitializer() == null) {
+                        if (element != null && node.getInitializer() == null && element.getSimpleName() != null) {
                             if (element.getKind() == ElementKind.LOCAL_VARIABLE ||
                                     element.getKind() == ElementKind.FIELD) {
                                 varInit.put(element, getCurrentPath().getLeaf());
                                 varNames.put(node, element.getSimpleName().toString());
-                            }
-                        } else if (node.getInitializer() != null) {
-                            if ( node.getInitializer() instanceof JFXSequenceExplicit) {
-                                JFXSequenceExplicit tree = (JFXSequenceExplicit) node.getInitializer();
-                                for (ExpressionTree item : tree.getItemList()) {
-                                   if (item.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER) {
-                                       addToRemove(item);
-                                   }                                   
-                                }
                             }
                         }
 
@@ -141,19 +125,9 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     }
 
                     @Override
-                    public Void visitAssignment(AssignmentTree node, HintsModel model) {
-                        addToRemove(node.getVariable());
-
-                        return super.visitAssignment(node, model);
-                    }
-
-                    @Override
-                    public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel p) {
-                        if (node.getMethodSelect() instanceof JFXSelect) {
-                            Tree tree = ((JFXSelect) node.getMethodSelect()).getExpression();
-                            addToRemove(tree);
-                        }
-                        return super.visitMethodInvocation(node, p);
+                    public Void visitIdentifier(IdentifierTree node, HintsModel p) {
+                        addToRemove(node);
+                        return super.visitIdentifier(node, p);
                     }
 
                     @Override
@@ -171,8 +145,6 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                             if (tree instanceof JFXForExpressionInClause) {
                                 Tree variable = ((JFXForExpressionInClause) tree).getVariable();
                                 addToInit(variable);
-                                Tree iter = ((JFXForExpressionInClause) tree).getSequenceExpression();
-                                addToRemove(iter);
                             }
                         }
 
@@ -185,40 +157,28 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         return super.visitCatch(node, p);
                     }
 
-                    public Void visitConditionalExpression(ConditionalExpressionTree node, HintsModel p) {
 
-//                        if (node.getCondition() instanceof JFXBinary) {
-//                            JFXBinary operand = (JFXBinary) node.getCondition();
-//                             while
-//                        }
-//
-//                        while ()
-//                        ((JFXBinary)node.getCondition()).getLeftOperand();
-//                        node.getFalseExpression();
-//                        node.getTrueExpression();
-                        return super.visitConditionalExpression(node, p);
-                    }
-
-                    @Override
-                    public Void visitWhileLoop(WhileLoopTree node, HintsModel p) {
-                        node.getCondition();
-                        node.getStatement();
-                        return super.visitWhileLoop(node, p);
-                    }
-
-                    private void  addToInit(Tree node) {
+                    private void addToInit(Tree node) {
+                        if (node == null) {
+                            return;
+                        }
                         JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                         Element element = compilationInfo.getTrees().getElement(path);
+                        if (element == null || element.getSimpleName() == null) {
+                            return;
+                        }
                         varInit.put(element, node);
                         varNames.put(node, element.getSimpleName().toString());
                     }
 
                     private void addToRemove(Tree node) {
+                        if (node == null) {
+                            return;
+                        }
                         JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                         Element element = compilationInfo.getTrees().getElement(path);
                         varToRemove.put(element, node);
                     }
-
                 };
 
                 HintsModel model = new HintsModel(compilationInfo);
@@ -226,13 +186,9 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 for (Element element : varInit.keySet()) {
                     Tree tree = varInit.get(element);
                     if (tree instanceof JFXVar) {
-                        //System.out.println(tree);
-                       // System.out.println(" >  bound " + ((JFXVar)varInit.get(element)).isBound());
-                       // System.out.println(" >  bid bound " + ((JFXVar)varInit.get(element)).isBidiBind());
-                       // System.out.println(" >  is Lazy  " + ((JFXVar)varInit.get(element)).isLazy());
-                        if (((JFXVar)varInit.get(element)).isBound()) {
+                        if (((JFXVar) varInit.get(element)).isBound()) {
                             varToRemove.put(element, tree);
-                            varNames.put(tree,element.getSimpleName().toString());
+                            varNames.put(tree, element.getSimpleName().toString());
                         }
                     }
                 }
@@ -240,7 +196,6 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     if (varInit.containsKey(element)) {
                         varInit.remove(element);
                     }
-
                 }
                 for (Tree tree : varInit.values()) {
                     SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
@@ -250,7 +205,6 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         continue;
                     }
                     TreeUtilities tu = compilationInfo.getTreeUtilities();
-                    Document doc = FXSourceUtils.getDocument(file);
                     //TODO this is dumb cancelable, need to be replaced with real one
                     Cancellable cancellable = new Cancellable() {
 
@@ -261,7 +215,7 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         public void cancell() {
                         }
                     };
-                    SafeTokenSequence<JFXTokenId> tokenSequence = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
+                    SafeTokenSequence<JFXTokenId> tokenSequence = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), document, cancellable);
                     while (tokenSequence.moveNext()) {
                         Token token = tokenSequence.token();
                         if (token.toString().equals(varNames.get(tree))) {
@@ -273,33 +227,39 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 }
                 if (model.getHints() != null) {
                     Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-                    for (Hint hint : model.getHints()) {
-                        updateEditor(compilationInfo, hint);
-                        errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+                    for (final Hint hint : model.getHints()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            public void run() {
+                                updateEditor(compilationInfo, hint);
+                            }
+                        });
+                        
+                        //errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
                     }
-                //HintsController.setErrors(FXSourceUtils.getDocument(file), "Non init var", errors); //NOI18N
+                //HintsController.setErrors(document, "Non init var", errors); //NOI18N
                 }
             }
         };
     }
 
-    private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
-        int start = hint.getStartPosition();
-        int end = hint.getLength() + hint.getStartPosition();
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Not init var", Collections.EMPTY_LIST, file, start, end);
-        return ed;
-    }
+//    private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
+//        int start = hint.getStartPosition();
+//        int end = hint.getLength() + hint.getStartPosition();
+//        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Not init var", Collections.EMPTY_LIST, file, start, end);
+//        return ed;
+//    }
 
     private void updateEditor(CompilationInfo compilationInfo, Hint hint) {
         int start = hint.getStartPosition();
         int end = hint.getLength() + hint.getStartPosition();
-        Document document = FXSourceUtils.getDocument(compilationInfo.getFileObject());
+
         HighlightsSequence hs = getBag(document).getHighlights(start, end);
         List<AttributeSet> as = new ArrayList<AttributeSet>();
         while (hs.moveNext()) {
             as.add(hs.getAttributes());
         }
-        as.add(AttributesUtilities.createImmutable(StyleConstants.Underline, Color.GRAY));
+        as.add(AttributesUtilities.createImmutable(StyleConstants.Underline, Color.LIGHT_GRAY));
         AttributeSet[] array = as.toArray(new AttributeSet[as.size()]);
         AttributeSet asfinal = AttributesUtilities.createImmutable(array);
         getBag(document).addHighlight(start, end, asfinal);
