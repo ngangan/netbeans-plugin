@@ -43,6 +43,14 @@ made subject to such option by the copyright holder.
 -->
 
 <filesystem>
+    <folder name="Actions">
+        <folder name="Other">
+            <file name="org-netbeans-modules-javafx-fxd-composer-uistub-GenerateUIStubAction.instance">
+                <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.uistub.GenerateUIStubAction"/>
+            </file>
+        </folder>
+    </folder>
+
     <folder name="Services">
         <!--
         <folder name="Hidden">
@@ -164,8 +172,8 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1000"/>
                     </file>
-                    <file name="GenerateUIStubAction.instance">
-                        <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.uistub.GenerateUIStubAction"/>
+                    <file name="GenerateUIStubAction.shadow">
+                        <attr name="originalFile" stringvalue="Actions/Other/org-netbeans-modules-javafx-fxd-composer-uistub-GenerateUIStubAction.instance"/>
                         <attr name="position" intvalue="1100"/>
                     </file>
                     <file name="Separator4.instance">

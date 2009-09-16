@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    <folder name="Actions">
+        <folder name="Other">
+            <file name="org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.instance"/>
+        </folder>
+    </folder>
+
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fx">
@@ -15,7 +21,8 @@
     <folder name="Menu">
         <folder name="Tools">
             <folder name="PaletteManager">
-                <file name="org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.instance">
+                <file name="org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Other/org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.instance"/>
                     <attr name="position" intvalue="215"/>
                 </file>
             </folder>
