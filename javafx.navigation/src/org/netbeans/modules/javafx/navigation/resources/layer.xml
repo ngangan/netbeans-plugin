@@ -22,7 +22,7 @@
     <folder name="Menu">
         <folder name="Window">
             <folder name="Other">
-                <attr name="position" intvalue="1701"/>
+                <attr name="position" intvalue="1700"/>
                 <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.navigation.Bundle"/>
                 <file name="JavafxdocAction.shadow">
                     <attr name="originalFile" stringvalue="Actions/Window/org-netbeans-modules-javafx-navigation-actions-JavafxdocAction.instance"/>

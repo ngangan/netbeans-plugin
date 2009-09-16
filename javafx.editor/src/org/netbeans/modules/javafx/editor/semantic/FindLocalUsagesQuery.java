@@ -41,18 +41,21 @@
 package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionValueTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import javax.lang.model.element.Element;
 import javax.swing.text.Document;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
@@ -62,55 +65,60 @@ import org.netbeans.api.lexer.Token;
  * @author Jan Lahoda
  */
 public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack<Tree>> {
-    
+
     private CompilationInfo info;
     private Set<Token> usages;
     private Element toFind;
     private Document doc;
-    
-    /** Creates a new instance of FindLocalUsagesQuery */
+    private boolean instantRename;
+
     public FindLocalUsagesQuery() {
+        this(false);
     }
-    
+
+    public FindLocalUsagesQuery(boolean instantRename) {
+        this.instantRename = instantRename;
+    }
+
     public Set<Token> findUsages(Element element, CompilationInfo info, Document doc) {
         this.info = info;
         this.usages = new HashSet<Token>();
         this.toFind = element;
         this.doc = doc;
-        
+
         scan(info.getCompilationUnit(), null);
         return usages;
     }
 
     private void handlePotentialVariable(JavaFXTreePath tree) {
         Element el = info.getTrees().getElement(tree);
-        
+
         if (toFind.equals(el)) {
-            Token t = Utilities.getToken(info, doc, tree);
-            
+            Token<JFXTokenId> t = Utilities.getToken(info, doc, tree);
+
             if (t != null)
                 usages.add(t);
         }
     }
-    
-//    private void handleJavadoc(Element el) {
+
+    private void handleJavadoc(Element el) {
 //        List<Token> tokens = JavadocImports.computeTokensOfReferencedElements(info, el, toFind);
 //        usages.addAll(tokens);
-//    }
-    
+    }
+
     @Override
     public Void visitIdentifier(IdentifierTree tree, Stack<Tree> d) {
         handlePotentialVariable(getCurrentPath());
         super.visitIdentifier(tree, d);
         return null;
     }
-    
+
     @Override
-    public Void visitFunctionDefinition(FunctionDefinitionTree tree, Stack<Tree> d) {
+    public Void visitMethodInvocation(FunctionInvocationTree node, Stack<Tree> p) {
         handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        handleJavadoc(el);
-        super.visitFunctionDefinition(tree, d);
+        Element el = info.getTrees().getElement(getCurrentPath());
+        handleJavadoc(el);
+        super.visitMethodInvocation(node, p);
         return null;
     }
 
@@ -120,34 +128,54 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
         super.visitMemberSelect(node, p);
         return null;
     }
-    
+
     @Override
     public Void visitVariable(VariableTree tree, Stack<Tree> d) {
         handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        if (el != null && el.getKind().isField()) {
-//            handleJavadoc(el);
-//        }
+        Element el = info.getTrees().getElement(getCurrentPath());
+        if (el != null && el.getKind().isField()) {
+            handleJavadoc(el);
+        }
         super.visitVariable(tree, d);
         return null;
     }
-    
+
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree tree, Stack<Tree> d) {
         handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        handleJavadoc(el);
+        Element el = info.getTrees().getElement(getCurrentPath());
+        handleJavadoc(el);
         super.visitClassDeclaration(tree, d);
         return null;
     }
 
     @Override
-    public Void visitFunctionValue(FunctionValueTree tree, Stack<Tree> d) {
+    public Void visitTypeClass(TypeClassTree node, Stack<Tree> p) {
         handlePotentialVariable(getCurrentPath());
-//        Element el = info.getTrees().getElement(getCurrentPath());
-//        handleJavadoc(el);
-        super.visitFunctionValue(tree, d);
+        super.visitTypeClass(node, p);
         return null;
     }
-    
+
+    @Override
+    public Void visitInstantiate(InstantiateTree node, Stack<Tree> p) {
+        if (instantRename) {
+            return super.visitInstantiate(node, p);
+        }
+
+        Element el = info.getTrees().getElement(getCurrentPath());
+
+        if (toFind.equals(el) && node.getIdentifier() != null) {
+            Token<JFXTokenId> t = Utilities.getToken(info, doc, new JavaFXTreePath(getCurrentPath(), node.getIdentifier()));
+
+            if (t != null)
+                usages.add(t);
+
+            return null;
+        }
+
+        if (el != null && toFind.equals(el.getEnclosingElement())) {
+            return null;
+        }
+        return super.visitInstantiate(node, p);
+    }
 }

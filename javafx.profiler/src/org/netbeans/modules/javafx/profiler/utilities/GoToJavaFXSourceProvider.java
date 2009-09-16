@@ -41,28 +41,21 @@ package org.netbeans.modules.javafx.profiler.utilities;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import org.openide.filesystems.FileObject;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
 import org.netbeans.api.javafx.editor.ElementOpen;
-import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
-import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.openide.util.lookup.ServiceProvider;
 
@@ -89,31 +82,35 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
             source.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController controller) throws Exception {
-                    controller.moveToPhase(Phase.ANALYZED);
-                    
-                    final ElementHandle[] eh = new ElementHandle[1];
-                    TypeElement classType = JavaFXProjectUtilities.resolveClassByName(className, controller);
-                    if (methodName == null) {
-                        LOGGER.finest("Trying to go to: " + className);
-                        eh[0] = ElementHandle.create(classType);
-                    } else {
-                        LOGGER.finest("Trying to go to: " + controller.getElements().getBinaryName(classType).toString() + "." + methodName + sig);
+                    try {
+                        controller.moveToPhase(Phase.ANALYZED);
 
-                        for(Element e : ElementFilter.methodsIn(classType.getEnclosedElements())) {
-                            if (e.getKind() == ElementKind.METHOD) {
-                                if (e.getSimpleName().contentEquals(methodName)) {
-                                    eh[0] = ElementHandle.create(e);
+                        final ElementHandle[] eh = new ElementHandle[1];
+                        TypeElement classType = JavaFXProjectUtilities.resolveClassByName(className, controller);
+                        if (methodName == null) {
+                            LOGGER.log(Level.FINEST, "Trying to go to: {0}", className);
+                            eh[0] = ElementHandle.create(classType);
+                        } else {
+                            LOGGER.log(Level.FINEST, "Trying to go to: {0}.{1}", new Object[]{controller.getElements().getBinaryName(classType).toString(), methodName + sig});
+
+                            for(Element e : ElementFilter.methodsIn(classType.getEnclosedElements())) {
+                                if (e.getKind() == ElementKind.METHOD) {
+                                    if (e.getSimpleName().contentEquals(methodName)) {
+                                        eh[0] = ElementHandle.create(e);
+                                        break;
+                                    }
                                 }
                             }
+                            if (eh[0] == null) {
+                                LOGGER.log(Level.FINEST, "Can not locate method {0}.{1} - falling back to top level class", new Object[]{className, methodName + sig});
+                                eh[0] = ElementHandle.create(classType);// fallback to the class
+                            }
                         }
-                        if (eh[0] == null) {
-                            LOGGER.finest("Can not locate method " + className + "." + methodName + sig + " - falling back to top level class");
-                            eh[0] = ElementHandle.create(classType);// fallback to the class
-                        }
+                        Element e = eh[0].resolve(controller);
+                        result.set(ElementOpen.open(controller, e));
+                    } finally {
+                        latch.countDown();
                     }
-                    Element e = eh[0].resolve(controller);
-                    result.set(ElementOpen.open(controller, e));
-                    latch.countDown();
                 }
             }, true);
             latch.await();

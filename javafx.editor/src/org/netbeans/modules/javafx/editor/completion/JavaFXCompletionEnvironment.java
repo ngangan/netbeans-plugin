@@ -139,6 +139,28 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED_") + t.getJavaFXKind() + " inside " + t); // NOI18N
     }
 
+    protected void insideFunctionBlock(List<ExpressionTree> statements) throws IOException {
+        ExpressionTree last = null;
+        for (ExpressionTree stat : statements) {
+            int pos = (int) sourcePositions.getStartPosition(root, stat);
+            if (pos == Diagnostic.NOPOS || offset <= pos) {
+                break;
+            }
+            last = stat;
+        }
+        if (last != null && last.getJavaFXKind() == Tree.JavaFXKind.TRY) {
+            if (((TryTree) last).getFinallyBlock() == null) {
+                addKeyword(CATCH_KEYWORD, null, false);
+                addKeyword(FINALLY_KEYWORD, null, false);
+                if (((TryTree) last).getCatches().size() == 0) {
+                    return;
+                }
+            }
+        }
+        localResult(null);
+        addKeywordsForStatement();
+    }
+
     public int getOffset() {
         return offset;
     }

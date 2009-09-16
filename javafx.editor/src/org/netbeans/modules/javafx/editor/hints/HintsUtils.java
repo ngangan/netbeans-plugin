@@ -6,42 +6,31 @@ package org.netbeans.modules.javafx.editor.hints;
 
 /**
  *
- * @author karol
+ * @author karol harezlak
  */
-import javax.swing.text.Document;
-
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
-import org.openide.cookies.EditorCookie;
-import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
-import org.openide.filesystems.FileObject;
 
 final class HintsUtils {
 
     private HintsUtils() {
     }
 
-    static JavaFXDocument getDocument(FileObject file) {
-        if (file == null || !file.isValid()) {
-            return null;
+     static String getMethodName(String fullMethodName) {
+        String methodName;
+        if (fullMethodName.contains(".")) { //NOI18N
+            int start = fullMethodName.lastIndexOf("."); //NOI18N
+            int end = fullMethodName.length();
+            methodName = fullMethodName.substring(start + 1, end).replace("()", "").trim(); //NOI18N
+        } else {
+            methodName = fullMethodName;
         }
 
-        DataObject dataObject = null;
-        try {
-            dataObject = DataObject.find(file);
-        } catch (DataObjectNotFoundException e) {
-            e.printStackTrace();
-        }
-        EditorCookie ec = dataObject != null ? dataObject.getLookup().lookup(EditorCookie.class) : null;
-        if (ec == null) {
-            return null;
-        }
-        Document document = ec.getDocument();
-        if (document instanceof JavaFXDocument) {
-            return (JavaFXDocument) document;
-        }
+        return methodName;
+    }
 
-        return null;
+    static String getObjectName(String fullMethodName) {
+        int end = fullMethodName.indexOf("."); //NOI18N
+        String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
+        return className;
     }
 
 }

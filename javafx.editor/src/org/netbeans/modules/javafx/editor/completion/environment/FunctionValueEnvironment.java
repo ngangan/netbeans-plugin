@@ -39,18 +39,11 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXFunctionValue;
 import com.sun.tools.javafx.tree.JFXType;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.CATCH_KEYWORD;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.FINALLY_KEYWORD;
 
-import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,26 +71,7 @@ public class FunctionValueEnvironment extends JavaFXCompletionEnvironment<JFXFun
         }
         JFXBlock bl = val.getBodyExpression();
         if (bl != null) {
-            ExpressionTree last = null;
-            for (ExpressionTree stat : bl.getStatements()) {
-                int pos = (int) sourcePositions.getStartPosition(root, stat);
-                if (pos == Diagnostic.NOPOS || offset <= pos) {
-                    break;
-                }
-                last = stat;
-            }
-            if (last != null && last.getJavaFXKind() == Tree.JavaFXKind.TRY) {
-                if (((TryTree) last).getFinallyBlock() == null) {
-                    addKeyword(CATCH_KEYWORD, null, false);
-                    addKeyword(FINALLY_KEYWORD, null, false);
-                    if (((TryTree) last).getCatches().size() == 0) {
-                        return;
-                    }
-                }
-            }
-            path = JavaFXTreePath.getPath(root, bl);
-            localResult(null);
-            addKeywordsForStatement();
+            insideFunctionBlock(bl.getStatements());
         }
     }
 

@@ -42,10 +42,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -56,12 +53,10 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.project.libraries.Library;
-import org.netbeans.api.project.libraries.LibraryManager;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
-import org.openide.filesystems.FileUtil;
-import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
 
 /**
@@ -69,6 +64,21 @@ import org.openide.util.Exceptions;
  * @author answer
  */
 public class JavaFXSourceUtils {
+
+    public static TokenSequence<JFXTokenId> getJavaTokenSequence(final TokenHierarchy hierarchy, final int offset) {
+        if (hierarchy != null) {
+            TokenSequence<?> ts = hierarchy.tokenSequence();
+            while(ts != null && (offset == 0 || ts.moveNext())) {
+                ts.move(offset);
+                if (ts.language() == JFXTokenId.language())
+                    return (TokenSequence<JFXTokenId>)ts;
+                if (!ts.moveNext() && !ts.movePrevious())
+                    return null;
+                ts = ts.embedded();
+            }
+        }
+        return null;
+    }
 
     public static boolean isJavaFXApplet(final FileObject file) {
         if (file == null) {

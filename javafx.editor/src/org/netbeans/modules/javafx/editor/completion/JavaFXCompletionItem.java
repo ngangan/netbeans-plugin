@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -358,17 +358,23 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             this.postfix = postfix;
             this.smartType = smartType;
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {
                 return false;
             }
-            if (!(obj instanceof KeywordItem)) {
+            if (getClass() != obj.getClass()) {
                 return false;
             }
-            KeywordItem ki = (KeywordItem) obj;
-            return ki.kwd.equals(this.kwd) && ki.postfix.equals(this.postfix);
+            final KeywordItem other = (KeywordItem) obj;
+            if ((this.kwd == null) ? (other.kwd != null) : !this.kwd.equals(other.kwd)) {
+                return false;
+            }
+            if ((this.postfix == null) ? (other.postfix != null) : !this.postfix.equals(other.postfix)) {
+                return false;
+            }
+            return true;
         }
 
         @Override

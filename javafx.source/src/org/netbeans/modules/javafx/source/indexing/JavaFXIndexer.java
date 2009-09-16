@@ -6,19 +6,28 @@
 package org.netbeans.modules.javafx.source.indexing;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.TypeSymbol;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javafx.tree.JFXIdent;
 import java.io.IOException;
+import java.util.Stack;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.parsing.api.Snapshot;
@@ -44,7 +53,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     public enum IndexKey {
         PACKAGE_NAME,
         CLASS_FQN, CLASS_NAME_SIMPLE, CLASS_NAME_INSENSITIVE,
-        FUNCTION_DEF, FUNCTION_INV, FIELD_DEF,
+        FUNCTION_DEF, FUNCTION_INV, FIELD_DEF, FIELD_REF,
         TYPE_REF, TYPE_IMPL,
         NOT_INDEXED
     }
@@ -108,7 +117,6 @@ public class JavaFXIndexer extends EmbeddingIndexer {
         IndexDocument document = support.createDocument(indexable);
 
         JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
-            private TypeElement lastSeenClass = null;
             @Override
             public Void visitClassDeclaration(ClassDeclarationTree node, IndexDocument document) {
                 TypeElement type = (TypeElement)fxresult.getTrees().getElement(getCurrentPath());
@@ -127,7 +135,6 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
                     }
                 }
-                lastSeenClass = type;
                 return super.visitClassDeclaration(node, document);
             }
 
@@ -135,11 +142,12 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             public Void visitVariable(VariableTree node, IndexDocument document) {
                 Element e = fxresult.getTrees().getElement(getCurrentPath());
                 if (e != null && e.getKind() == ElementKind.FIELD) { // can handle only fields for now
-                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
+                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
                     if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
                     index(document, IndexKey.FIELD_DEF, indexVal);
+                    
                 }
                 return super.visitVariable(node, document);
             }
@@ -147,10 +155,11 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             @Override
             public Void visitFunctionDefinition(FunctionDefinitionTree node, IndexDocument document) {
                 Element el = fxresult.getTrees().getElement(getCurrentPath());
+                if (el == null) return super.visitFunctionDefinition(node, document);
                 if (el.getKind() == ElementKind.METHOD) {
                     ExecutableElement e = (ExecutableElement)el;
-                    if (!e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
-                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
+                    if (e.getReturnType().getKind() != TypeKind.OTHER && !e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
+                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
                         if (LOG_FINEST) {
                             LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
                         }
@@ -165,7 +174,10 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 Element el = fxresult.getTrees().getElement(getCurrentPath());
                 if (el.getKind() == ElementKind.METHOD) {
                     ExecutableElement e = (ExecutableElement)el;
-                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e)) + IndexingUtilities.INDEX_SEPARATOR + lastSeenClass.getQualifiedName().toString();
+                    ExecutableElement ee = (ExecutableElement)e;
+                    System.err.println("Return type of " + e + " : " + ee.getReturnType());
+                    
+                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
                     if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
@@ -182,6 +194,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             @Override
             public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
                 Element el = fxresult.getTrees().getElement(getCurrentPath());
+                if (el == null) return super.visitTypeClass(node, document);
                 if (el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) {
                     String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(el));
                     if (LOG_FINEST) {
@@ -192,6 +205,30 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 return super.visitTypeClass(node, document);
             }
 
+            @Override
+            public Void visitMemberSelect(MemberSelectTree node, IndexDocument document) {
+                ExpressionTree expression = node.getExpression();
+                if (expression instanceof JFXIdent) {
+                    Name memberName = node.getIdentifier();
+                    Type type = ((JFXIdent)expression).type;
+                    if (type == null) return super.visitMemberSelect(node, document);
+                    TypeSymbol ts = type.asElement();
+                    if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, document);
+                    for(Symbol sy : ts.getEnclosedElements()) {
+                        if (sy.getKind() == ElementKind.FIELD) {
+                            if (sy.getSimpleName().equals(memberName)) {
+                                String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
+                                if (LOG_FINEST) {
+                                    LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                }
+                                index(document, IndexKey.FIELD_REF, indexVal);
+                            }
+                        }
+                    }
+                }
+
+                return super.visitMemberSelect(node, document);
+            }
         };
         visitor.scan(fxresult.getCompilationUnit(), document);
         support.addDocument(document);
