@@ -93,6 +93,7 @@ import org.netbeans.spi.project.ant.AntArtifactProvider;
 import org.netbeans.spi.project.ant.AntBuildExtenderFactory;
 import org.netbeans.spi.project.ant.AntBuildExtenderImplementation;
 import org.netbeans.spi.project.support.LookupProviderSupport;
+import org.netbeans.spi.project.support.ant.AntBasedProjectRegistration;
 import org.netbeans.spi.project.support.ant.AntProjectEvent;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.AntProjectListener;
@@ -131,6 +132,14 @@ import org.w3c.dom.Text;
  * Represents one plain JavaFX project.
  * @author kaktus
  */
+@AntBasedProjectRegistration(
+    type=JavaFXProjectType.TYPE,
+    iconResource="org/netbeans/modules/javafx/project/ui/resources/fx.png",
+    sharedName=JavaFXProjectType.PROJECT_CONFIGURATION_NAME,
+    privateName=JavaFXProjectType.PRIVATE_CONFIGURATION_NAME,
+    sharedNamespace=JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,
+    privateNamespace=JavaFXProjectType.PRIVATE_CONFIGURATION_NAMESPACE
+)
 public final class JavaFXProject implements Project, AntProjectListener {
     private static final Icon JAVAFX_PROJECT_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/project/ui/resources/fx.png")); // NOI18N
     private static final Logger LOG = Logger.getLogger(JavaFXProject.class.getName());
@@ -150,7 +159,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
 
     private AntBuildExtender buildExtender;
 
-    JavaFXProject(AntProjectHelper helper) throws IOException {
+    public JavaFXProject(AntProjectHelper helper) throws IOException {
         this.helper = helper;
         eval = createEvaluator();
         aux = helper.createAuxiliaryConfiguration();
