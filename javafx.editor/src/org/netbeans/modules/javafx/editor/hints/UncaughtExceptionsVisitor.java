@@ -84,7 +84,6 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
             Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(instantType, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
             for (ElementHandle<TypeElement> elementHandle : options) {
                 TypeElement typeElement = elementHandle.resolve(compilationInfo);
-                
                 if (typeElement == null) {
                     continue;
                 }

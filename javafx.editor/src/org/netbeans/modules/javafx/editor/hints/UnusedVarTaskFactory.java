@@ -113,7 +113,7 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     @Override
                     public Void visitVariable(VariableTree node, HintsModel model) {
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-                        if (element != null && node.getInitializer() == null && element.getSimpleName() != null) {
+                        if (element != null && element.getSimpleName() != null) {
                             if (element.getKind() == ElementKind.LOCAL_VARIABLE ||
                                     element.getKind() == ElementKind.FIELD) {
                                 varInit.put(element, getCurrentPath().getLeaf());
