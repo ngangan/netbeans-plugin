@@ -28,6 +28,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl;
 
+import org.netbeans.modules.javafx.refactoring.impl.scanners.RenameScanner;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;

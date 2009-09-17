@@ -57,6 +57,7 @@ import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.ui.RenameRefactoringUI;
+import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.refactoring.api.ui.ExplorerContext;
 import org.netbeans.modules.refactoring.api.ui.RefactoringActionsFactory;
 import org.netbeans.modules.refactoring.spi.ui.ActionsImplementationProvider;
@@ -89,23 +90,34 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         return file != null && file.getMIMEType().equals("text/x-fx");
     }
 
+    volatile private boolean isFindUsages;
+
     @Override
     public void doFindUsages(Lookup lkp) {
-        FileObject fo = lkp.lookup(FileObject.class);
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-        try {
-            jfxs.runUserActionTask(new Task<CompilationController>() {
-                public void run(CompilationController cc) throws Exception {
-                    ClassIndex ci = cc.getClasspathInfo().getClassIndex();
-                    for(TypeElement te : cc.getTopLevelElements()) {
-
-                    for(ElementHandle eh : ci.getElements(ElementHandle.create(te), EnumSet.allOf(ClassIndex.SearchKind.class), EnumSet.allOf(ClassIndex.SearchScope.class))) {
-                        System.out.println(">>> " + eh);
-                    }
-                    }
+        if (isFindUsages) return;
+        
+        Runnable task;
+        EditorCookie ec = lkp.lookup(EditorCookie.class);
+        if (isFromEditor(ec)) {
+            task = new TextComponentTask(ec) {
+                @Override
+                protected RefactoringUI createRefactoringUI(TreePathHandle selectedElement,int startOffset,int endOffset, CompilationInfo info) {
+                    return new WhereUsedQueryUI(selectedElement, info);
                 }
-            }, true);
-        } catch (IOException e) {}
+            };
+        } else {
+            task = new NodeToElementTask(lkp.lookupAll(Node.class)) {
+                protected RefactoringUI createRefactoringUI(TreePathHandle selectedElement, CompilationInfo info) {
+                    return new WhereUsedQueryUI(selectedElement, info);
+                }
+            };
+        }
+        try {
+            isFindUsages = true;
+            task.run();
+        } finally {
+            isFindUsages = false;
+        }
     }
 
     @Override

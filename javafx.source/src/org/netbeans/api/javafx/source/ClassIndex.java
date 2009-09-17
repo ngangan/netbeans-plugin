@@ -423,6 +423,11 @@ final public class ClassIndex {
                         }
                         break;
                     }
+                    case IMPLEMENTORS: {
+                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                            result.add(ir.getFile());
+                        }
+                    }
                     case METHOD_REFERENCES: {
                         for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
                             result.add(ir.getFile());
