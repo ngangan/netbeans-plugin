@@ -332,6 +332,7 @@ public class JFXReformatTask implements ReformatTask {
 
         private Pretty(CompilationInfo info, String text, TokenSequence<JFXTokenId> tokens, JavaFXTreePath path, CodeStyle cs, int startOffset, int endOffset) {
             this.doc = info.getDocument();
+            this.root = path.getCompilationUnit();
             this.fText = text;
             this.sp = info.getTrees().getSourcePositions();
             this.cs = cs;
@@ -364,7 +365,6 @@ public class JFXReformatTask implements ReformatTask {
                 tokens.move((int) sp.getStartPosition(path.getCompilationUnit(), tree));
             }
             tokens.moveNext();
-            this.root = path.getCompilationUnit();
             this.startOffset = startOffset;
             this.endOffset = endOffset;
         }

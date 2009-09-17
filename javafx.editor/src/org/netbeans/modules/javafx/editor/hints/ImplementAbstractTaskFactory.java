@@ -117,11 +117,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
                     @Override
                     public Void visitFunctionDefinition(FunctionDefinitionTree node, HintsModel p) {
-                        
+
                         return super.visitFunctionDefinition(node, p);
                     }
-
-
                 };
 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
@@ -133,7 +131,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         if (typeElement == null) {
                             continue;
                         }
-                        Collection<? extends Element> elements = compilationInfo.getElements().getAllMembers(typeElement);
+                        Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
                         for (Element element : elements) {
                             boolean isAbstract = false;
                             boolean isPublic = false;
@@ -167,6 +165,19 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 }
             }
         };
+    }
+    //TODO Temporary log for issue 148890
+    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
+        Collection<? extends Element> elements = null;
+        try {
+            elements = compilationInfo.getElements().getAllMembers(typeElement);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            System.err.println("* e = " + typeElement);
+            System.err.println("* e.getKind() = " + typeElement.getKind());
+            System.err.println("* e.asType() = " + typeElement.asType());
+        }
+        return elements;
     }
 
     private ErrorDescription getErrorDescription(final FileObject file, final Hint hint, final CompilationInfo compilationInfo, final Tree lastTree) {
