@@ -4,6 +4,11 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import java.util.Collection;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import org.netbeans.api.javafx.source.CompilationInfo;
+
 /**
  *
  * @author karol harezlak
@@ -32,5 +37,7 @@ final class HintsUtils {
         String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
         return className;
     }
+
+     
 
 }

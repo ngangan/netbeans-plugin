@@ -91,7 +91,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                 if (!elementType.equals(instantType)) {
                     break;
                 }
-                Collection<? extends Element> c = compilationInfo.getElements().getAllMembers(typeElement);
+                Collection<? extends Element> c = getAllMembers(typeElement, compilationInfo);
                 for (Element element : c) {
                     if (element instanceof MethodSymbol) {
                         MethodSymbol methodSymbol = (MethodSymbol) element;
@@ -115,6 +115,19 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
             }
         }
         return super.visitMethodInvocation(node, model);
+    }
+    //TODO Temporary log for issue 148890
+    private  Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
+        Collection<? extends Element> elements = null;
+        try {
+            elements = compilationInfo.getElements().getAllMembers(typeElement);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            System.err.println("* e = " + typeElement);
+            System.err.println("* e.getKind() = " + typeElement.getKind());
+            System.err.println("* e.asType() = " + typeElement.asType());
+        }
+        return elements;
     }
 
     @Override
