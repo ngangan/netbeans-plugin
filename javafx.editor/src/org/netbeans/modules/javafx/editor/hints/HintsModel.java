@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
@@ -51,8 +50,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
-
 
 final class HintsModel {
 
@@ -62,26 +61,34 @@ final class HintsModel {
     public HintsModel(CompilationInfo compilationInfo) {
         this.compilationInfo = compilationInfo;
     }
-     public void addHint(Tree tree) {
+
+    public void addHint(Tree tree) {
         addHint(null, tree);
     }
 
-     public void addHint(Tree tree, List<MethodSymbol> abstractMethods) {
-        addHint(tree, abstractMethods, null, null, null, null);
+    public void addHint(Tree tree, List<MethodSymbol> abstractMethods, Element element) {
+        addHint(tree, abstractMethods, null, null, null, null, null);
     }
 
     public void addHint(List<Type> thrownExceptions, Tree tree) {
-        addHint(tree, null, thrownExceptions, null, null, null);
+        addHint(tree, null, thrownExceptions, null, null, null, null);
     }
-    
 
     public void addHint(Tree tree, String varName, Integer start, Integer end) {
-        addHint(tree, null,null,varName, start, end);
+        addHint(tree, null, null, varName, start, end, null);
     }
 
-     private void addHint(Tree tree, List<MethodSymbol> abstractMethods, List<Type> thrownExceptions, String name, Integer start, Integer end) {
+    private void addHint(Tree tree,
+            List<MethodSymbol> abstractMethods,
+            List<Type> thrownExceptions,
+            String name,
+            Integer start,
+            Integer end,
+            Element element
+            ) {
+
         if (unresovedHints == null) {
-            unresovedHints = new HashMap<Tree,Hint>();
+            unresovedHints = new HashMap<Tree, Hint>();
         }
         if (unresovedHints.keySet().contains(tree)) {
             return;
@@ -94,7 +101,7 @@ final class HintsModel {
             end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         }
         int length = end - start;
-        Hint hint = new Hint(thrownExceptions, abstractMethods, tree, length, start, name);
+        Hint hint = new Hint(thrownExceptions, abstractMethods, tree, length, start, name, element);
         unresovedHints.put(tree, hint);
     }
 
@@ -114,7 +121,6 @@ final class HintsModel {
     }
 
     public void addMethod(MethodSymbol method) {
-
     }
 
     public void removeHint(Hint hint) {
@@ -130,10 +136,19 @@ final class HintsModel {
         private int start;
         private List<MethodSymbol> abstractMethods;
         private String name;
+        private Element element;
 
-        private Hint() {}
+        private Hint() {
+        }
 
-        private Hint(List<Type> thrownExceptions, List<MethodSymbol> abstractMethods, Tree tree, int length, int start, String name) {
+        private Hint(List<Type> thrownExceptions,
+                List<MethodSymbol> abstractMethods,
+                Tree tree,
+                int length,
+                int start,
+                String name,
+                Element parentClass) {
+
             if (thrownExceptions != null) {
                 this.exceptions = new ArrayList<Type>(thrownExceptions);
             }
@@ -144,6 +159,7 @@ final class HintsModel {
                 this.abstractMethods = new ArrayList<MethodSymbol>(abstractMethods);
             }
             this.name = name;
+            this.element = parentClass;
         }
 
         private void setCatchTree(Tree catchTree) {
@@ -152,7 +168,7 @@ final class HintsModel {
 
         void addMethod(MethodSymbol method) {
             abstractMethods.add(method);
-        } 
+        }
 
         Tree getTree() {
             return tree;
@@ -189,5 +205,8 @@ final class HintsModel {
             return name;
         }
 
+        Element getElement() {
+            return element;
+        }
     }
 }

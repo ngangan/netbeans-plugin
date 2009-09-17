@@ -116,7 +116,7 @@ class UncaughtExceptionsFix implements Fix {
                 }
             });
         } else {
-            int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getCatchTree());
+            final int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getCatchTree());
             while (iterator.hasNext()) {
                 block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
                         .append("    ").append(exceptionName).append(".printStackTrace();\n") //NOI18N
@@ -125,7 +125,20 @@ class UncaughtExceptionsFix implements Fix {
                     block.append("\n"); //NOI18N
                 }
             }
-            document.insertString(end, block.toString(), null);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        document.insertString(end, block.toString(), null);
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    JTextComponent target = Utilities.getFocusedComponent();
+                    Iterator<Type> iterator = hint.getExceptions().iterator();
+                    while (iterator.hasNext()) {
+                        Imports.addImport(target, iterator.next().toString());
+                    }
+                }
+            });
         }
         return null;
     }

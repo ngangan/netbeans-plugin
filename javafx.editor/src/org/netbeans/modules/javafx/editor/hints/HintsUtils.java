@@ -32,10 +32,12 @@ final class HintsUtils {
         return methodName;
     }
 
-    static String getObjectName(String fullMethodName) {
-        int end = fullMethodName.indexOf("."); //NOI18N
-        String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
-        return className;
+    static String getClassSimpleName(String fqName) {
+        int start = fqName.lastIndexOf(".") + 1; //NOI18N
+        if (start > 0) {
+            fqName = fqName.substring(start); //NOI18N
+        }
+        return fqName;
     }
 
      

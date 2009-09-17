@@ -77,7 +77,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel model) {
         if (node.toString().contains(".")) { //NOI18N
-            instantTypes.add(HintsUtils.getObjectName(node.toString()));
+            instantTypes.add(extractMethodName(node.toString()));
         }
         for (String instantType : instantTypes) {
             //TODO WeakCash for optimization
@@ -142,6 +142,12 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         String typeName = (node.getIdentifier().toString().replace("{}", "").trim()); //NOI18N
         instantTypes.add(typeName);
         return super.visitInstantiate(node, p);
+    }
+
+    private static String extractMethodName(String fullMethodName) {
+        int end = fullMethodName.indexOf("."); //NOI18N
+        String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
+        return className;
     }
 
 }
