@@ -75,7 +75,13 @@ made subject to such option by the copyright holder.
     
     <folder name="Loaders">  
         <folder name="text">
-            <folder name="x-fxd">      
+            <folder name="x-fxd">
+                <folder name="Factories">
+                    <file name="org-netbeans-modules-javafx-fxd-dataloader-fxd-FXDDataLoader.instance">
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.fxd.Bundle"/>
+                    </file>
+                </folder>
+
                 <folder name="Actions">
                     <file name="OpenAction.shadow">
                         <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-OpenAction.instance"/>
@@ -131,6 +137,12 @@ made subject to such option by the copyright holder.
         
         <folder name="multipart">
             <folder name="x-fxz">                
+                <folder name="Factories">
+                    <file name="org-netbeans-modules-javafx-fxd-dataloader-fxz-FXZDataLoader.instance">
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.fxz.Bundle"/>
+                    </file>
+                </folder>
+
                 <folder name="Actions">
                     <file name="OpenAction.shadow">
                         <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-OpenAction.instance"/>
