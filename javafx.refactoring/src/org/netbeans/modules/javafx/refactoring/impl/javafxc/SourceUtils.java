@@ -30,6 +30,7 @@ package org.netbeans.modules.javafx.refactoring.impl.javafxc;
 
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.UnitTree;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,9 +50,15 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.StyleConstants;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
+import org.netbeans.api.editor.mimelookup.MimePath;
+import org.netbeans.api.editor.settings.FontColorSettings;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.source.ClasspathInfo.PathKind;
 import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -65,6 +72,9 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.modules.javafx.project.JavaFXProjectConstants;
 import org.netbeans.api.javafx.source.ClasspathInfoProvider;
+import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
@@ -75,6 +85,7 @@ import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
@@ -84,6 +95,65 @@ import org.openide.util.RequestProcessor;
  */
 final public class SourceUtils {
     public static final String JAVAFX_MIME_TYPE = "text/x-fx"; // NOI18N
+
+    public static String htmlize(String input) {
+        String temp = input.replace("<", "&lt;"); // NOI18N
+        temp = temp.replace(">", "&gt;"); // NOI18N
+        return temp;
+    }
+
+    public static String getHtml(String text) {
+        StringBuffer buf = new StringBuffer();
+        TokenHierarchy tokenH = TokenHierarchy.create(text, JFXTokenId.language());
+        Lookup lookup = MimeLookup.getLookup(MimePath.get(JAVAFX_MIME_TYPE));
+        FontColorSettings settings = lookup.lookup(FontColorSettings.class);
+        TokenSequence tok = tokenH.tokenSequence();
+        while (tok.moveNext()) {
+            Token<JFXTokenId> token = (Token) tok.token();
+            String category = token.id().primaryCategory();
+            if (category == null) {
+                category = "whitespace"; //NOI18N
+            }
+            AttributeSet set = settings.getTokenFontColors(category);
+            buf.append(color(htmlize(token.text().toString()), set));
+        }
+        return buf.toString();
+    }
+
+    private static String color(String string, AttributeSet set) {
+        if (set==null)
+            return string;
+        if (string.trim().length() == 0) {
+            return string.replace(" ", "&nbsp;").replace("\n", "<br>"); //NOI18N
+        }
+        StringBuffer buf = new StringBuffer(string);
+        if (StyleConstants.isBold(set)) {
+            buf.insert(0,"<b>"); //NOI18N
+            buf.append("</b>"); //NOI18N
+        }
+        if (StyleConstants.isItalic(set)) {
+            buf.insert(0,"<i>"); //NOI18N
+            buf.append("</i>"); //NOI18N
+        }
+        if (StyleConstants.isStrikeThrough(set)) {
+            buf.insert(0,"<s>"); // NOI18N
+            buf.append("</s>"); // NOI18N
+        }
+        buf.insert(0,"<font color=" + getHTMLColor(StyleConstants.getForeground(set)) + ">"); //NOI18N
+        buf.append("</font>"); //NOI18N
+        return buf.toString();
+    }
+
+    private static String getHTMLColor(Color c) {
+        String colorR = "0" + Integer.toHexString(c.getRed()); //NOI18N
+        colorR = colorR.substring(colorR.length() - 2);
+        String colorG = "0" + Integer.toHexString(c.getGreen()); //NOI18N
+        colorG = colorG.substring(colorG.length() - 2);
+        String colorB = "0" + Integer.toHexString(c.getBlue()); //NOI18N
+        colorB = colorB.substring(colorB.length() - 2);
+        String html_color = "#" + colorR + colorG + colorB; //NOI18N
+        return html_color;
+    }
 
     public static boolean isJavaFXFile(FileObject f) {
         return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N

@@ -31,6 +31,7 @@ package org.netbeans.modules.javafx.refactoring.impl;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
+import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.RefactoringPluginFactory;
 import org.openide.util.lookup.ServiceProvider;
@@ -44,9 +45,14 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
 
     public RefactoringPlugin createInstance(AbstractRefactoring refactoring) {
         TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
-        if (tph == null ) return null;
-        
+
+        if (refactoring instanceof WhereUsedQuery) {
+            if (tph == null ) return null;
+            return new WhereUsedQueryPlugin((WhereUsedQuery)refactoring);
+        }
+
         if (refactoring instanceof RenameRefactoring) {
+            if (tph == null ) return null;
             return new RenameRefactoringPlugin((RenameRefactoring)refactoring);
         }
 

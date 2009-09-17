@@ -17,9 +17,11 @@ import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import java.io.IOException;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -124,6 +126,19 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     LOG.log(Level.FINEST, "Indexing {0}:", type.getQualifiedName());
                     LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
                     LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
+                }
+
+                List<ExpressionTree> superTypes = new ArrayList<ExpressionTree>();
+                superTypes.addAll(node.getSupertypeList());
+                superTypes.addAll(node.getImplements());
+                superTypes.addAll(node.getMixins());
+
+                for(ExpressionTree et : superTypes) {
+                    TypeElement supr = (TypeElement)fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
+                    if (LOG_FINEST) {
+                        LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
+                    }
+                    index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
                 }
                 index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
                 index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
