@@ -41,20 +41,12 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.CompoundAssignmentTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionValueTree;
-import com.sun.javafx.api.tree.InitDefinitionTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.OnReplaceTree;
 import com.sun.javafx.api.tree.Tree;
 
 
-import com.sun.javafx.api.tree.TriggerTree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.TypeFunctionalTree;
-import com.sun.javafx.api.tree.TypeUnknownTree;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.text.BadLocationException;
@@ -66,6 +58,7 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,12 +79,7 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
-import org.netbeans.spi.editor.hints.ChangeInfo;
-import org.netbeans.spi.editor.hints.ErrorDescription;
-import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
-import org.netbeans.spi.editor.hints.Fix;
-import org.netbeans.spi.editor.hints.HintsController;
-import org.netbeans.spi.editor.hints.Severity;
+import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
@@ -102,6 +90,7 @@ import org.openide.util.Exceptions;
 public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
+    private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
     private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE);
 
     public ImplementAbstractTaskFactory() {
@@ -118,20 +107,27 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 final Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
-                final Map<Element, Collection<MethodSymbol>> overriddenMethods = new HashMap<Element, Collection<MethodSymbol>>();
+                final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
+                final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
 
                 JavaFXTreePathScanner<Void, HintsModel> visitor = new JavaFXTreePathScanner<Void, HintsModel>() {
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, HintsModel p) {
-                        if (node.getExtends() != null) {
+                        List<Tree> extendsList = new ArrayList<Tree>();
+                        //extendsList.addAll(node.getMixins());
+                        //extendsList.addAll(node.getImplements());
+                        //extendsList.addAll(node.getSupertypeList());
+                        extendsList.addAll(node.getExtends());
+                        if (extendsList != null && extendsList.size() != 0) {
                             Element currentClass = compilationInfo.getTrees().getElement(getCurrentPath());
                             if (classTrees.get(currentClass) == null) {
                                 classTrees.put(currentClass, new HashSet<Tree>());
                             }
                             Collection<Tree> extendsSet = classTrees.get(currentClass);
-                            for (Tree extendsTree : node.getExtends()) {
-                                extendsSet.add(extendsTree);
+
+                            for (Tree extend : extendsList) {
+                                extendsSet.add(extend);
                             }
                             classTrees.put(currentClass, extendsSet);
                         }
@@ -139,19 +135,30 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
 
                     @Override
+                    public Void visitInstantiate(InstantiateTree node, HintsModel p) {
+//                        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
+//                        if (element != null && element.getKind() == ElementKind.CLASS) {
+//                            classTrees.put(element, Collections.<Tree>singletonList(node));
+//                        }
+                        return super.visitInstantiate(node, p);
+                    }
+
+                    @Override
                     public Void visitFunctionDefinition(FunctionDefinitionTree node, HintsModel p) {
-                            if (node.toString().contains(" overridefunction ")) {
-                                Element element = compilationInfo.getTrees().getElement(getCurrentPath());
+                        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) {
+                            Element element = compilationInfo.getTrees().getElement(getCurrentPath());
+                            if (element != null) {
                                 Element currentClass = element.getEnclosingElement();
                                 if (element instanceof MethodSymbol) {
-                                    if (overriddenMethods.get(currentClass) == null) {
-                                        overriddenMethods.put(currentClass, new HashSet<MethodSymbol>());
+                                    if (overridenMethods.get(currentClass) == null) {
+                                        overridenMethods.put(currentClass, new ArrayList<MethodSymbol>());
                                     }
-                                    Collection<MethodSymbol> methods = overriddenMethods.get(currentClass);
+                                    List<MethodSymbol> methods = overridenMethods.get(currentClass);
                                     methods.add((MethodSymbol) element);
-                                    overriddenMethods.put(currentClass, methods);
+                                    overridenMethods.put(currentClass, methods);
                                 }
                             }
+                        }
                         return super.visitFunctionDefinition(node, p);
                     }
                 };
@@ -167,27 +174,43 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+
                             for (Element element : elements) {
                                 if (element instanceof MethodSymbol) {
-                                    MethodSymbol methodSymbol = (MethodSymbol) element;
-                                    for (Modifier modifier : methodSymbol.getModifiers()) {
+                                    MethodSymbol method = (MethodSymbol) element;
+                                    for (Modifier modifier : method.getModifiers()) {
                                         if (modifier == Modifier.ABSTRACT) {
-                                            Collection<MethodSymbol> overridenMethodList = overriddenMethods.get(currentClass);
-//                                           if (overridenMethodList == null || overriddenMethods.size() == 0) {
-//                                                continue;
-//                                            }
-//                                            for (MethodSymbol overridenMethodSymbol : overridenMethodList) {
-//                                                if (methodSymbol.overrides(overridenMethodSymbol, overridenMethodSymbol.enclClass(), null, true)){
-//                                                    System.out.println("");
-//                                                }
-//                                            }
-                                            element.getEnclosingElement();
                                             if (abstractMethods.get(currentClass) == null) {
                                                 abstractMethods.put(currentClass, new ArrayList<MethodSymbol>());
                                             }
                                             List<MethodSymbol> methods = abstractMethods.get(currentClass);
-                                            methods.add(methodSymbol);
+                                            Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
+                                            boolean exists = false;
+                                            if (overridenMethodList != null) {
+                                                for (MethodSymbol overridenMethod : overridenMethodList) {
+                                                    try {
+                                                        overridenMethod.getParameters();
+                                                        method.getParameters();
+                                                    } catch (Exception ex) {
+                                                        continue;
+                                                    }
+                                                    if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
+                                                            method.getParameters().size() == overridenMethod.getParameters().size() &&
+                                                            COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
+
+                                                        overridenToAbstract.put(overridenMethod, method);
+                                                        exists = true;
+                                                        break;
+                                                    }
+
+                                                }
+                                            }
+                                            if (exists) {
+                                                break;
+                                            }
+                                            methods.add(method);
                                             abstractMethods.put(currentClass, methods);
+                                            break;
                                         }
                                     }
                                 }
@@ -196,40 +219,63 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
 
-                HintsModel model = new HintsModel(compilationInfo);
+                HintsModel modelFix = new HintsModel(compilationInfo);
+                HintsModel modelOverriden = new HintsModel(compilationInfo);
                 for (Element currentClass : abstractMethods.keySet()) {
                     Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
-                    model.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
-                }
-                if (model.getHints() != null) {
-                    Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-                    for (Hint hint : model.getHints()) {
-                        errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+                    if (abstractMethods.get(currentClass) != null && abstractMethods.get(currentClass).size() != 0) {
+                        modelFix.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
                     }
-                    HintsController.setErrors(FXSourceUtils.getDocument(file), "Non implemented methods", errors); //NOI18N
+                    if (overridenMethods.get(currentClass) != null && overridenMethods.get(currentClass).size() != 0) {
+                        modelOverriden.addHint(currentTree, overridenMethods.get(currentClass), currentClass);
+                    }
                 }
+                addHintsToController(modelFix, compilationInfo, file);
+                addOverridenToController(modelOverriden, file, compilationInfo, overridenToAbstract);
             }
         };
     }
-    //TODO Temporary log for issue 148890
 
-    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
-        Collection<? extends Element> elements = null;
-        try {
-            elements = compilationInfo.getElements().getAllMembers(typeElement);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            System.err.println("* e = " + typeElement);
-            System.err.println("* e.getKind() = " + typeElement.getKind());
-            System.err.println("* e.asType() = " + typeElement.asType());
+    private void addHintsToController(HintsModel model, CompilationInfo compilationInfo, FileObject file) {
+        if (model.getHints() != null) {
+            Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+            for (Hint hint : model.getHints()) {
+                errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+            }
+            HintsController.setErrors(FXSourceUtils.getDocument(file), "Override", errors); //NOI18N
         }
-        return elements;
+    }
+
+    private void addOverridenToController(HintsModel model, FileObject file, CompilationInfo compilationInfo, Map<MethodSymbol, MethodSymbol> overridenToAbstract) {
+        if (model.getHints() != null) {
+            Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+            for (Hint hint : model.getHints()) {
+                errors.addAll(getOverridenDescription(file, hint, compilationInfo, overridenToAbstract)); //NOI18N
+            }
+            HintsController.setErrors(FXSourceUtils.getDocument(file), "Overriden", errors); //NOI18N
+        }
+    }
+
+    private Collection<ErrorDescription> getOverridenDescription(final FileObject file, final Hint hint, CompilationInfo compilationInfo, Map<MethodSymbol, MethodSymbol> overridenToAbstract) {
+        Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+        for (MethodSymbol overridenMethod : hint.getMethods()) {
+            Tree tree = compilationInfo.getTrees().getTree(overridenMethod);
+            SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+            int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+            MethodSymbol abstractMethod = overridenToAbstract.get(overridenMethod);
+            String type = null;
+            if (abstractMethod == null) {
+                type = overridenMethod.getEnclosingElement().toString();
+            } else {
+                type = abstractMethod.getEnclosingElement().toString();
+            }
+            errors.add(ErrorDescriptionFactory.createErrorDescription(Severity.VERIFIER, "Overrides method from class: " + type, file, start, start));
+        }
+        return errors;
     }
 
     private ErrorDescription getErrorDescription(final FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
-        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());
+        int end = hint.getStartPosition() + hint.getLength();
 
         Fix fix = new Fix() {
 
@@ -240,7 +286,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             public ChangeInfo implement() throws Exception {
                 final StringBuilder methods = new StringBuilder();
 
-                for (MethodSymbol methodSymbol : hint.getAbstractMethods()) {
+                for (MethodSymbol methodSymbol : hint.getMethods()) {
                     methods.append(createMethod(methodSymbol));
                 }
                 final Document document = FXSourceUtils.getDocument(file);
@@ -253,10 +299,12 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             document.insertString(positon, methods.toString(), null);
                             JTextComponent target = Utilities.getFocusedComponent();
                             Imports.addImport(target, EXCEPTION);
-                            for (MethodSymbol method : hint.getAbstractMethods()) {
+                            for (MethodSymbol method : hint.getMethods()) {
                                 Imports.addImport(target, method.getReturnType().toString());
                                 for (VarSymbol var : method.getParameters()) {
-                                    Imports.addImport(target, var.asType().toString());
+                                    if (!var.asType().isPrimitive()) {
+                                        Imports.addImport(target, var.asType().toString());
+                                    }
                                 }
                             }
                         } catch (BadLocationException ex) {
@@ -269,31 +317,62 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             }
 
             private String createMethod(MethodSymbol methodSymbol) {
-                StringBuilder method = new StringBuilder("\n");
-                method.append("\toverride ");
+                //StringBuilder method = new StringBuilder("\n");
+                StringBuilder method = new StringBuilder();
+                method.append("\n\toverride ");
                 for (Modifier modifier : methodSymbol.getModifiers()) {
                     switch (modifier) {
                         case PUBLIC:
                             method.append("public ");
+                            break;
+                        case PROTECTED:
+                            method.append("protected ");
+                            break;
+                    }
+                }
+                method.append("function ").append(methodSymbol.getQualifiedName() + " (");
+                //Hack for methodSymbol.getParameters() which somtime throws NPE
+
+                if (methodSymbol.getParameters() != null) {
+                    Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
+                    while (iterator.hasNext()) {
+                        VarSymbol var = iterator.next();
+                        String varType = var.asType().toString();
+//                    if (var.asType().isPrimitive()) {
+//                        if (varType.equals("int")) {
+//                            varType = Integer.class.getSimpleName();
+//                        } else if (varType.equals("long")) {
+//                            varType = Long.class.getSimpleName();
+//                        } else if (varType.equals("byte")) {
+//                            varType = Byte.class.getSimpleName();
+//                        } else if (varType.equals("short")) {
+//                            varType = Short.class.getSimpleName();
+//                        } else if (varType.equals("float")) {
+//                            varType = Float.class.getSimpleName();
+//                        } else if (varType.equals("double")) {
+//                            varType = Double.class.getSimpleName();
+//                        } else if (varType.equals("boolean")) {
+//                            varType = Boolean.class.getSimpleName();
+//                        } else if (varType.equals("char")) {
+//                            varType = Character.class.getSimpleName();
+//                        }
+//                    }
+                        method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType));
+                        if (iterator.hasNext()) {
+                            method.append(", ");
+                        }
                     }
                 }
 
-                method.append("function ").append(methodSymbol.getQualifiedName() + " (");
-                Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
-                while (iterator.hasNext()) {
-                    VarSymbol var = iterator.next();
-                    method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(var.asType().toString()));
-                    if (iterator.hasNext()) {
-                        method.append(", ");
-                    }
-                }
                 String returnType = methodSymbol.getReturnType().toString();
                 if (returnType.equals("void")) {
                     returnType = "Void";
                 } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);
-                } //NOI18N
+                }
                 method.append(")").append(" : ").append(returnType).append(" { \n");
+
+
                 method.append("\t\tthrow new UnsupportedOperationException('Not implemented yet');\n");
                 method.append("\t}\n");
 
@@ -301,7 +380,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             }
         };
 
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Implement all abstract methods", Collections.singletonList(fix), file, start, end);
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Implement all abstract methods", Collections.singletonList(fix), file, hint.getStartPosition(), end);
 
         return ed;
     }
@@ -310,5 +389,32 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         return end;
+    }
+
+    private static class ParamsComparator implements Comparator<List<VarSymbol>> {
+
+        public int compare(List<VarSymbol> methodList, List<VarSymbol> overridenMethod) {
+            for (VarSymbol var : methodList) {
+                VarSymbol overridenVar = overridenMethod.get(methodList.indexOf(var));
+                if (var.asType() != overridenVar.asType()) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+    }
+
+    //TODO Temporary log for issue 148890
+    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
+        Collection<? extends Element> elements = null;
+        try {
+            elements = compilationInfo.getElements().getAllMembers(typeElement);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            System.err.println("* e = " + typeElement);
+            System.err.println("* e.getKind() = " + typeElement.getKind());
+            System.err.println("* e.asType() = " + typeElement.asType());
+        }
+        return elements;
     }
 }

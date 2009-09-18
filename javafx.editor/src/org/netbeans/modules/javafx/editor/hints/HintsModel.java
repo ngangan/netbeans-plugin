@@ -66,8 +66,8 @@ final class HintsModel {
         addHint(null, tree);
     }
 
-    public void addHint(Tree tree, List<MethodSymbol> abstractMethods, Element element) {
-        addHint(tree, abstractMethods, null, null, null, null, null);
+    public void addHint(Tree tree, List<MethodSymbol> methods, Element element) {
+        addHint(tree, methods, null, null, null, null, element);
     }
 
     public void addHint(List<Type> thrownExceptions, Tree tree) {
@@ -79,7 +79,7 @@ final class HintsModel {
     }
 
     private void addHint(Tree tree,
-            List<MethodSymbol> abstractMethods,
+            List<MethodSymbol> methods,
             List<Type> thrownExceptions,
             String name,
             Integer start,
@@ -101,7 +101,7 @@ final class HintsModel {
             end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         }
         int length = end - start;
-        Hint hint = new Hint(thrownExceptions, abstractMethods, tree, length, start, name, element);
+        Hint hint = new Hint(thrownExceptions, methods, tree, length, start, name, element);
         unresovedHints.put(tree, hint);
     }
 
@@ -134,7 +134,7 @@ final class HintsModel {
         private Tree catchTree;
         private int length;
         private int start;
-        private List<MethodSymbol> abstractMethods;
+        private List<MethodSymbol> methods;
         private String name;
         private Element element;
 
@@ -142,7 +142,7 @@ final class HintsModel {
         }
 
         private Hint(List<Type> thrownExceptions,
-                List<MethodSymbol> abstractMethods,
+                List<MethodSymbol> methods,
                 Tree tree,
                 int length,
                 int start,
@@ -155,8 +155,8 @@ final class HintsModel {
             this.tree = tree;
             this.length = length + 1;
             this.start = start;
-            if (abstractMethods != null) {
-                this.abstractMethods = new ArrayList<MethodSymbol>(abstractMethods);
+            if (methods != null) {
+                this.methods = new ArrayList<MethodSymbol>(methods);
             }
             this.name = name;
             this.element = parentClass;
@@ -167,7 +167,7 @@ final class HintsModel {
         }
 
         void addMethod(MethodSymbol method) {
-            abstractMethods.add(method);
+            methods.add(method);
         }
 
         Tree getTree() {
@@ -178,8 +178,8 @@ final class HintsModel {
             return catchTree;
         }
 
-        List<MethodSymbol> getAbstractMethods() {
-            return Collections.unmodifiableList(abstractMethods);
+        List<MethodSymbol> getMethods() {
+            return Collections.unmodifiableList(methods);
         }
 
         Collection<Type> getExceptions() {
