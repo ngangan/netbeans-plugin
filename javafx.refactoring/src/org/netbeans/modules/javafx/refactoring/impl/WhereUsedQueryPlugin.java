@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -53,7 +54,6 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.FindSubclassesScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindUsagesScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
@@ -105,42 +105,55 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
 
         try {
             final Set<FileObject> relevantFiles = new HashSet<FileObject>();
+            final Set<ElementHandle> relevantHandles = new HashSet<ElementHandle>();
 
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
                     ClassIndex ci = cc.getClasspathInfo().getClassIndex();
                     Element e = searchHandle.resolveElement(cc);
-                    if (isFindUsages()) {
-                        collectReferences(ElementHandle.create(e), ci, relevantFiles);
-                    } else if (isFindDirectSubclassesOnly() || isFindSubclasses()) {
-                        collectImplementors(ElementHandle.create(e), ci, relevantFiles);
+                    ElementHandle eh = ElementHandle.create(e);
+                    relevantHandles.add(eh);
+                    collectReferences(ElementHandle.create(e), ci, relevantFiles);
+                    if (isFindDirectSubclassesOnly() || isFindSubclasses()) {
+                        Stack<ElementHandle> processingStack = new Stack();
+                        processingStack.push(eh);
+                        while(!processingStack.empty()) {
+                            ElementHandle currentHandle = processingStack.pop();
+                            for(ElementHandle eh1 : ci.getElements(currentHandle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class))) {
+                                if (!relevantHandles.contains(eh1)) {
+                                    if (isFindSubclasses()) {
+                                        processingStack.push(eh1);
+                                    }
+                                    relevantHandles.add(eh1);
+                                    collectReferences(eh1, ci, relevantFiles);
+                                }
+                            }
+                        }
                     }
                 }
             }, true);
 
             for(FileObject fo : relevantFiles) {
+                if (fo == null) continue; // prevent NPE in case of a corrupted index
                 JavaFXSource src = JavaFXSource.forFileObject(fo);
+                if (src != null) {
+                    src.runUserActionTask(new Task<CompilationController>() {
 
-                src.runUserActionTask(new Task<CompilationController>() {
-
-                    public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, RefactoringElementsBag> scanner = null;
-                        if (isFindUsages()) {
-                            scanner = new FindUsagesScanner(refactoring, searchHandle, cc);
-                        } else if (isFindDirectSubclassesOnly()) {
-                            scanner = new FindSubclassesScanner(refactoring, searchHandle, cc, false);
-                        } else if (isFindSubclasses()) {
-                            scanner = new FindSubclassesScanner(refactoring, searchHandle, cc, true);
+                        public void run(final CompilationController cc) throws Exception {
+                            JavaFXTreePathScanner<Void, RefactoringElementsBag> scanner = null;
+                            for(ElementHandle eh : relevantHandles) {
+                                scanner = new FindUsagesScanner(refactoring, searchHandle, eh, cc);
+                                if (scanner != null) {
+                                    scanner.scan(cc.getCompilationUnit(), elements);
+                                }
+                            }
                         }
-                        if (scanner != null) {
-                            scanner.scan(cc.getCompilationUnit(), elements);
-                        }
-                    }
-                }, true);
+                    }, true);
+                }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            return new Problem(true, e.getLocalizedMessage());
         }
         
         return null;

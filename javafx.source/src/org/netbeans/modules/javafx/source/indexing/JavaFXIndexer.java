@@ -18,7 +18,10 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXFunctionInvocation;
 import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javafx.tree.JFXInstanciate;
+import com.sun.tools.javafx.tree.JFXLiteral;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -155,13 +159,23 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
             @Override
             public Void visitVariable(VariableTree node, IndexDocument document) {
-                Element e = fxresult.getTrees().getElement(getCurrentPath());
+                VariableElement e = (VariableElement)fxresult.getTrees().getElement(getCurrentPath());
                 if (e != null && e.getKind() == ElementKind.FIELD) { // can handle only fields for now
-                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
+                    ElementHandle eh = ElementHandle.create(e);
+                    String indexVal = IndexingUtilities.getIndexValue(eh);
                     if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
                     index(document, IndexKey.FIELD_DEF, indexVal);
+                    indexVal = e.asType().toString();
+                    if (indexVal != null) {
+                        if (LOG_FINEST) {
+                            LOG.log(Level.FINEST, "Indexing variable type reference {0}\n", new String[]{indexVal});
+                        }
+                        index(document, IndexKey.TYPE_REF, indexVal);
+                    } else {
+                        LOG.log(Level.WARNING, "Can not determine variable type for: {0}", node.getInitializer() != null ? node.getInitializer().getJavaFXKind() : node.getJavaFXKind());
+                    }
                     
                 }
                 return super.visitVariable(node, document);
@@ -179,6 +193,15 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                             LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
                         }
                         index(document, IndexKey.FUNCTION_DEF, indexVal);
+                        indexVal = e.asType().toString();
+                        if (indexVal != null) {
+                            if (LOG_FINEST) {
+                                LOG.log(Level.FINEST, "Indexing function def type reference {0}\n", new String[]{indexVal});
+                            }
+                            index(document, IndexKey.TYPE_REF, indexVal);
+                        } else {
+                            LOG.log(Level.WARNING, "Can not determine function def type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                        }
                     }
                 }
                 return super.visitFunctionDefinition(node, document);
@@ -189,21 +212,23 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 Element el = fxresult.getTrees().getElement(getCurrentPath());
                 if (el.getKind() == ElementKind.METHOD) {
                     ExecutableElement e = (ExecutableElement)el;
-                    ExecutableElement ee = (ExecutableElement)e;
-                    System.err.println("Return type of " + e + " : " + ee.getReturnType());
                     
                     String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(e));
                     if (LOG_FINEST) {
                         LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
                     }
                     index(document, IndexKey.FUNCTION_INV, indexVal);
+                    indexVal = e.asType().toString();
+                        if (indexVal != null) {
+                            if (LOG_FINEST) {
+                                LOG.log(Level.FINEST, "Indexing function inv type reference {0}\n", new String[]{indexVal});
+                            }
+                            index(document, IndexKey.TYPE_REF, indexVal);
+                        } else {
+                            LOG.log(Level.WARNING, "Can not determine function inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                        }
                 }
                 return super.visitMethodInvocation(node, document);
-            }
-
-            @Override
-            public Void visitInstantiate(InstantiateTree node, IndexDocument p) {
-                return super.visitInstantiate(node, p);
             }
 
             @Override
