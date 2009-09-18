@@ -137,7 +137,7 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                 throw new IOException();
             }
         } catch (BadLocationException e) {
-            throw new IOException(e);
+            throw new IOException(e.getLocalizedMessage());
         } finally {
             doc.readUnlock();
         }
