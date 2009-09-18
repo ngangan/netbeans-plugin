@@ -44,7 +44,6 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import java.io.IOException;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Position.Bias;
-import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -60,7 +59,6 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.text.DataEditorSupport;
-import org.openide.text.NbDocument;
 import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 
@@ -73,8 +71,8 @@ import org.openide.util.Lookup;
 public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     private PositionBounds bounds;
     private String displayText;
-    volatile private int startPosition;
-    volatile private int endPosition;
+    volatile private int startPosition = -1;
+    volatile private int endPosition = -1;
 
     private DataEditorSupport des;
     private GuardedDocument doc;
@@ -103,14 +101,23 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                 JavaFXTreePath path = handle.resolve(cc);
                 TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
                 tokens.moveStart();
+                int firstPos = -1, lastPos = -1;
                 while (tokens.moveNext()) {
                     Token<JFXTokenId> token = tokens.token();
-
+                    int pos = token.offset(cc.getTokenHierarchy());
+                    if (firstPos == -1) {
+                        firstPos = pos;
+                    }
+                    lastPos = pos + token.length();
                     if (handle.getSimpleName().equals(token.text().toString())) {
-                        startPosition = token.offset(cc.getTokenHierarchy());
+                        startPosition = pos;
                         endPosition = startPosition + token.length();
                         break;
                     }
+                }
+                if (startPosition == -1) {
+                    startPosition = firstPos;
+                    endPosition = lastPos;
                 }
             }
         }, true);
@@ -137,7 +144,9 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                 throw new IOException();
             }
         } catch (BadLocationException e) {
-            throw new IOException(e);
+            IOException ioe = new IOException(e.getLocalizedMessage());
+            ioe.initCause(e);
+            throw ioe;
         } finally {
             doc.readUnlock();
         }

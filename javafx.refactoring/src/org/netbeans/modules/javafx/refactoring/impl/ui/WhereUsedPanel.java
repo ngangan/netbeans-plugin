@@ -40,14 +40,41 @@
  */
 package org.netbeans.modules.javafx.refactoring.impl.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.UIResource;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectInformation;
+import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.javafx.refactoring.RefactoringModule;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
+import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
 
 /**
@@ -56,7 +83,8 @@ import org.openide.util.NbBundle;
  * @author  Tor Norbye
  */
 public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
-
+    private static final int MAX_NAME = 50;
+    
     private final transient TreePathHandle handle;
     private  TreePathHandle newElement;
     private final transient ChangeListener parent;
@@ -78,105 +106,107 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     }
     
     public void initialize() {
-        if (initialized) {
-            return;
+if (initialized) return;
+        JavaFXSource source = JavaFXSource.forFileObject(handle.getFileObject());
+        Project p = FileOwnerQuery.getOwner(handle.getFileObject());
+        final JLabel currentProject;
+        final JLabel allProjects;
+        if (p!=null) {
+            ProjectInformation pi = ProjectUtils.getInformation(FileOwnerQuery.getOwner(handle.getFileObject()));
+            currentProject = new JLabel(pi.getDisplayName(), pi.getIcon(), SwingConstants.LEFT);
+            allProjects = new JLabel(NbBundle.getMessage(WhereUsedPanel.class,"LBL_AllProjects"), pi.getIcon(), SwingConstants.LEFT);
+        } else {
+            currentProject = null;
+            allProjects = null;
         }
-//        JavaFXSource source = JavaFXSource.forFileObject(handle.getFileObject());
-//        try {
-//            ParserManager.parse(Collections.singleton(source), new UserTask() {
-//                /**
-//                 * @todo For method calls, try to figure out the call type with the type analyzer
-//                 */
-//                @Override
-//                public void run(ResultIterator ri) throws Exception {
-//                    RubyParseResult parserResult = AstUtilities.getParseResult(ri.getParserResult());
-//                    String m_isBaseClassText = null;
-//                    final String labelText;
-//                    Set<Modifier> modif = new HashSet<Modifier>();
-//                    // TODO - resolve elements against the current info?
-//                    if (handle.getKind() == ElementKind.METHOD) {
-//                        if (handle.getElement() != null) {
-//                            modif = handle.getElement().getModifiers();
-//                        }
-//                        String methodName = handle.getName();
-//                        String className = getClassName(handle);
-//                        String displayClassName = RubyIndex.UNKNOWN_CLASS.equals(className) ? "&lt;Unknown&gt;" : className;
-//                        labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_MethodUsages", methodName, displayClassName);
-//
-//                        methodDeclaringClass = className;
-//                        // parser result is null for rhtml (fake result)
-//                        IndexedMethod method = parserResult != null
-//                                ? RetoucheUtils.getOverridingMethod(handle, parserResult)
-//                                : RetoucheUtils.getOverridingMethod(handle, ri.getSnapshot().getSource().getFileObject());
-//
-//                        if (method != null) {
-//                            m_isBaseClassText =
-//                                    new MessageFormat(NbBundle.getMessage(WhereUsedPanel.class, "LBL_UsagesOfBaseClass")).format(
-//                                    new Object[]{
-//                                        methodDeclaringSuperClass = method.getIn()
-//                                    });
-//                            newElement = new RubyElementCtx(method);
-//                        }
-//                    } else if (handle.getKind() == ElementKind.CLASS || handle.getKind() == ElementKind.MODULE) {
-//                        labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ClassUsages", handle.getName()); // NOI18N
-//                    } else if (handle.getKind() == ElementKind.CONSTRUCTOR) {
-//                        String methodName = handle.getName();
-//                        String className = getClassName(handle);
-//                        labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ConstructorUsages", methodName, className); // NOI18N
-//                    } else if (handle.getKind() == ElementKind.FIELD) {
-//                        String fieldName = handle.getName();
-//                        String className = getClassName(handle);
-//                        labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_FieldUsages", fieldName, className); // NOI18N
-//                    } else {
-//                        labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_VariableUsages", handle.getName()); // NOI18N
-//                    }
-//
-//                    final Set<Modifier> modifiers = modif;
-//                    final String isBaseClassText = m_isBaseClassText;
-//
-//                    SwingUtilities.invokeLater(new Runnable() {
-//
-//                        public void run() {
-//                            remove(classesPanel);
-//                            remove(methodsPanel);
-//                            // WARNING for now since this feature is not ready yet
-//                            //label.setText(labelText);
-//                            String combinedLabelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_WhereUsedWarningInDevelopment", labelText);
-//                            label.setText(combinedLabelText);
-//                            if (handle.getKind() == ElementKind.METHOD) {
-//                                add(methodsPanel, BorderLayout.CENTER);
-//                                methodsPanel.setVisible(true);
-//                                m_usages.setVisible(!modifiers.contains(Modifier.STATIC));
-//                                // TODO - worry about frozen?
-//                                m_overriders.setVisible(/*!modifiers.contains(Modifier.FINAL) ||*/modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.PRIVATE));
-//                                if (methodDeclaringSuperClass != null) {
-//                                    m_isBaseClass.setVisible(true);
-//                                    m_isBaseClass.setSelected(true);
-//                                    Mnemonics.setLocalizedText(m_isBaseClass, isBaseClassText);
-//                                } else {
-//                                    m_isBaseClass.setVisible(false);
-//                                    m_isBaseClass.setSelected(false);
-//                                }
-//                            } else if ((handle.getKind() == ElementKind.CLASS) || (handle.getKind() == ElementKind.MODULE)) {
-//                                add(classesPanel, BorderLayout.CENTER);
-//                                classesPanel.setVisible(true);
-//                            } else {
-//                                remove(classesPanel);
-//                                remove(methodsPanel);
-//                                c_subclasses.setVisible(false);
-//                                m_usages.setVisible(false);
-//                                c_usages.setVisible(false);
-//                                c_directOnly.setVisible(false);
-//                            }
-//                            validate();
-//                        }
-//                    });
-//                }
-//            });
-//        } catch (ParseException pe) {
-//            throw (RuntimeException) new RuntimeException().initCause(pe);
-//        }
-        initialized = true;
+        Task<CompilationController> task =new Task<CompilationController>() {
+            public void run(CompilationController info) throws Exception {
+                String m_isBaseClassText = null;
+                final String labelText;
+                Set<Modifier> modif = new HashSet<Modifier>();
+
+                final Element element = WhereUsedPanel.this.handle.resolveElement(info);
+                if (element.getKind() == ElementKind.METHOD) {
+                    ExecutableElement method = (ExecutableElement) element;
+                    modif = method.getModifiers();
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_MethodUsages", getHeader(method, info), getSimpleName(method.getEnclosingElement())); // NOI18N
+
+                    methodDeclaringClass = getSimpleName(method.getEnclosingElement());
+                    Collection overridens = getOverriddenMethods(method, info);
+                    if (!overridens.isEmpty()) {
+                        ExecutableElement el = (ExecutableElement) overridens.iterator().next();
+                        assert el!=null;
+                        m_isBaseClassText =
+                                new MessageFormat(NbBundle.getMessage(WhereUsedPanel.class, "LBL_UsagesOfBaseClass")).format(
+                                new Object[] {
+                            methodDeclaringSuperClass = getSimpleName((el).getEnclosingElement())
+                        }
+                        );
+                        newElement = TreePathHandle.create(el, info);
+
+                    }
+                } else if (element.getKind().isClass() || element.getKind().isInterface()) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ClassUsages", element.getSimpleName()); // NOI18N
+                } else if (element.getKind() == ElementKind.CONSTRUCTOR) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ConstructorUsages", getHeader(element,info), getSimpleName(element.getEnclosingElement())); // NOI18N
+                } else if (element.getKind().isField()) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_FieldUsages", element.getSimpleName(), getSimpleName(element.getEnclosingElement())); // NOI18N
+                } else if (element.getKind() == ElementKind.PACKAGE) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_PackageUsages", element.getSimpleName()); // NOI18N
+                } else {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_VariableUsages", element.getSimpleName()); // NOI18N
+                }
+
+                final Set<Modifier> modifiers = modif;
+                final String isBaseClassText = m_isBaseClassText;
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        remove(classesPanel);
+                        remove(methodsPanel);
+                        label.setText(labelText);
+                        if (element instanceof ExecutableElement) {
+                            add(methodsPanel, BorderLayout.CENTER);
+                            methodsPanel.setVisible(true);
+                            m_usages.setVisible(!modifiers.contains(Modifier.STATIC));
+                            m_overriders.setVisible(! (element.getEnclosingElement().getModifiers().contains(Modifier.FINAL) || modifiers.contains(Modifier.FINAL) || modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.PRIVATE)));
+                            if (methodDeclaringSuperClass != null ) {
+                                m_isBaseClass.setVisible(true);
+                                m_isBaseClass.setSelected(true);
+                                Mnemonics.setLocalizedText(m_isBaseClass, isBaseClassText);
+                            } else {
+                                m_isBaseClass.setVisible(false);
+                                m_isBaseClass.setSelected(false);
+                            }
+                        } else if ((element.getKind() == ElementKind.CLASS) || (element.getKind() == ElementKind.INTERFACE)) {
+                            add(classesPanel, BorderLayout.CENTER);
+                            classesPanel.setVisible(true);
+                        } else {
+                            remove(classesPanel);
+                            remove(methodsPanel);
+                            c_subclasses.setVisible(false);
+                            m_usages.setVisible(false);
+                            c_usages.setVisible(false);
+                            c_directOnly.setVisible(false);
+                        }
+                        if (currentProject!=null) {
+                            scope.setModel(new DefaultComboBoxModel(new Object[]{allProjects, currentProject }));
+                            int defaultItem = (Integer) RefactoringModule.getOption("whereUsed.scope", 0); // NOI18N
+                            scope.setSelectedIndex(defaultItem);
+                            scope.setRenderer(new JLabelRenderer());
+                        } else {
+                            scopePanel.setVisible(false);
+                        }
+                        validate();
+                    }
+                });
+            }};
+            try {
+                source.runUserActionTask(task, true);
+            } catch (IOException ioe) {
+                throw (RuntimeException) new RuntimeException().initCause(ioe);
+            }
+            initialized = true;
     }
     
     /** This method is called from within the constructor to
@@ -202,6 +232,9 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
         jPanel3 = new javax.swing.JPanel();
         label = new javax.swing.JLabel();
         searchInComments = new javax.swing.JCheckBox();
+        scopePanel = new javax.swing.JPanel();
+        scopeLabel = new javax.swing.JLabel();
+        scope = new javax.swing.JComboBox();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -321,6 +354,33 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
         searchInComments.getAccessibleContext().setAccessibleDescription(searchInComments.getText());
 
         add(jPanel3, java.awt.BorderLayout.NORTH);
+
+        org.openide.awt.Mnemonics.setLocalizedText(scopeLabel, org.openide.util.NbBundle.getMessage(WhereUsedPanel.class, "LBL_Scope")); // NOI18N
+
+        scope.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                scopeActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout scopePanelLayout = new org.jdesktop.layout.GroupLayout(scopePanel);
+        scopePanel.setLayout(scopePanelLayout);
+        scopePanelLayout.setHorizontalGroup(
+            scopePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(scopePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(scopeLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(scope, 0, 277, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        scopePanelLayout.setVerticalGroup(
+            scopePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(scopeLabel)
+            .add(scope, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, Short.MAX_VALUE)
+        );
+
+        add(scopePanel, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
     private void searchInCommentsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_searchInCommentsItemStateChanged
@@ -342,6 +402,10 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
         parent.stateChanged(null);
     }//GEN-LAST:event_m_usagesActionPerformed
 
+    private void scopeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scopeActionPerformed
+        RefactoringModule.setOption("whereUsed.scope", scope.getSelectedIndex()); // NOI18N
+}//GEN-LAST:event_scopeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JRadioButton c_directOnly;
@@ -356,6 +420,9 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     private javax.swing.JCheckBox m_overriders;
     private javax.swing.JCheckBox m_usages;
     private javax.swing.JPanel methodsPanel;
+    private javax.swing.JComboBox scope;
+    private javax.swing.JLabel scopeLabel;
+    private javax.swing.JPanel scopePanel;
     private javax.swing.JCheckBox searchInComments;
     // End of variables declaration//GEN-END:variables
 
@@ -394,6 +461,62 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
 
     public Component getComponent() {
         return this;
+    }
+
+    private String getSimpleName(Element clazz) {
+        return clazz.getSimpleName().toString();
+        //return NbBundle.getMessage(WhereUsedPanel.class, "LBL_AnonymousClass"); // NOI18N
+    }
+
+    private String getHeader(Element call, CompilationInfo info) {
+        String result = call.toString();
+        if (result.length() > MAX_NAME) {
+            result = result.substring(0,MAX_NAME-1) + "..."; // NOI18N
+        }
+
+        return SourceUtils.htmlize(result);
+    }
+
+    private Collection getOverriddenMethods(ExecutableElement m, CompilationInfo info) {
+        return SourceUtils.getOverridenMethods(m, info);
+    }
+
+    private static class JLabelRenderer extends JLabel implements ListCellRenderer, UIResource {
+        public JLabelRenderer () {
+            setOpaque(true);
+        }
+        public Component getListCellRendererComponent(
+                JList list,
+                Object value,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
+
+            // #89393: GTK needs name to render cell renderer "natively"
+            setName("ComboBox.listRenderer"); // NOI18N
+
+            if ( value != null ) {
+                setText(((JLabel)value).getText());
+                setIcon(((JLabel)value).getIcon());
+            }
+
+            if ( isSelected ) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+
+            return this;
+        }
+
+        // #89393: GTK needs name to render cell renderer "natively"
+        @Override
+        public String getName() {
+            String name = super.getName();
+            return name == null ? "ComboBox.renderer" : name;  // NOI18N
+        }
     }
 }
 

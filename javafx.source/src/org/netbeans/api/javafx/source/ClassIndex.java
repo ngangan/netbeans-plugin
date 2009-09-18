@@ -376,6 +376,12 @@ final public class ClassIndex {
                             }
                         }
                     }
+                    case IMPLEMENTORS: {
+                        String indexingVal = IndexingUtilities.getIndexValue(handle);
+                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                            result.addAll(JavaFXSourceUtils.getClasses(ir.getFile(), handle));
+                        }
+                    }
                 }
             }
         } catch (IOException e) {

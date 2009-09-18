@@ -29,24 +29,16 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.TypeSymbol;
-import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXIdent;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -72,8 +64,12 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
     private CompilationController cc;
 
     public FindUsagesScanner(WhereUsedQuery refactoring, TreePathHandle handle, CompilationController cc) {
+        this(refactoring, handle, ElementHandle.create(handle.resolveElement(cc)), cc);
+    }
+
+    public FindUsagesScanner(WhereUsedQuery refactoring, TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
         this.searchHandle = handle;
-        this.elementHandle = ElementHandle.create(handle.resolveElement(cc));
+        this.elementHandle = elementHandle;
         this.targetName = handle.getSimpleName();
         this.refactoring = refactoring;
         this.cc = cc;
@@ -126,78 +122,55 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
     }
 
     @Override
-    public Void visitImport(ImportTree node, RefactoringElementsBag elements) {
-        switch (elementHandle.getKind()) {
-            case CLASS:
-            case INTERFACE: {
-                String qualName = node.getQualifiedIdentifier().toString();
-                if (qualName.equals(elementHandle.getQualifiedName())) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getQualifiedIdentifier()), cc), Lookups.singleton(searchHandle)));
+    public Void visitVariable(VariableTree node, RefactoringElementsBag elements) {        
+        if (elementHandle.getKind() == ElementKind.FIELD) {
+            Element e = cc.getTrees().getElement(getCurrentPath());
+            if (e.getKind() == ElementKind.FIELD) {
+                ElementHandle eh = ElementHandle.create(e);
+                if (eh != null && elementHandle.equals(eh)) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    return null;
                 }
-                break;
             }
         }
 
-        return super.visitImport(node, elements);
-    }
-
-    @Override
-    public Void visitVariable(VariableTree node, RefactoringElementsBag elements) {
-        Element e = cc.getTrees().getElement(getCurrentPath());
-        if (e.getKind() != ElementKind.FIELD) return super.visitVariable(node, elements);
-
-        ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
-        if (elementHandle.equals(eh)) {
-            elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
-        }
         return super.visitVariable(node, elements);
     }
 
-    @Override
-    public Void visitFunctionDefinition(FunctionDefinitionTree node, RefactoringElementsBag elements) {
-        if (elementHandle.getKind() != ElementKind.METHOD) return super.visitFunctionDefinition(node, elements);
-        Element e = cc.getTrees().getElement(getCurrentPath());
-        ElementHandle eh = ElementHandle.create(e);
 
-        if (elementHandle.equals(eh)) {
-            elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+    volatile private boolean inMemberSelect = false;
+
+    @Override
+    public Void visitMethodInvocation(FunctionInvocationTree node, RefactoringElementsBag elements) { 
+        if (!inMemberSelect) {
+            if (elementHandle.getKind() == ElementKind.METHOD) {
+                ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
+                if (eh != null && elementHandle.equals(eh)) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    return null;
+                }
         }
-        return super.visitFunctionDefinition(node, elements);
-    }
-
-    @Override
-    public Void visitMethodInvocation(FunctionInvocationTree node, RefactoringElementsBag elements) {
-        if (elementHandle.getKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, elements);
-        Element e = cc.getTrees().getElement(getCurrentPath());
-        ExecutableElement ee = (ExecutableElement)e;
-        ElementHandle eh = ElementHandle.create(e);
-
-        if (elementHandle.equals(eh)) {
-            elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
         }
 
         return super.visitMethodInvocation(node, elements);
     }
 
+
     @Override
     public Void visitMemberSelect(MemberSelectTree node, RefactoringElementsBag elements) {
-        if (!node.getIdentifier().contentEquals(targetName)) return super.visitMemberSelect(node, elements);
-
-        ExpressionTree expression = node.getExpression();
-        if (expression instanceof JFXIdent) {
-            Type type = ((JFXIdent)expression).type;
-            if (type == null) return super.visitMemberSelect(node, elements);
-            TypeSymbol ts = type.asElement();
-            if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, elements);
-            for(Symbol sy : ts.getEnclosedElements()) {
-                if (sy.getKind() == ElementKind.FIELD) {
-                    ElementHandle eh = ElementHandle.create(sy);
-                    if (elementHandle.equals(eh)) {
-                        elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
-                    }
+        try {
+            inMemberSelect = true;
+            if (node.getIdentifier().contentEquals(targetName)) {
+                Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()));
+                if (e.asType().toString().equals(elementHandle.getSignatures()[0])) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
                 }
             }
+
+            return super.visitMemberSelect(node, elements);
+        } finally {
+            inMemberSelect = false;
         }
-        return super.visitMemberSelect(node, elements);
     }
+
 }

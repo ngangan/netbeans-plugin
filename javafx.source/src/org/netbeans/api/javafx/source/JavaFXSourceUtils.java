@@ -38,17 +38,23 @@
  */
 package org.netbeans.api.javafx.source;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -214,4 +220,66 @@ public class JavaFXSourceUtils {
         return null;
     }
 
+    public static Collection<ElementHandle<TypeElement>> getMainClasses(FileObject fo) {
+        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        final Collection<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
+        if (jfxs != null) {
+            try {
+                jfxs.runWhenScanFinished(new Task<CompilationController>() {
+
+                    public void run(final CompilationController cc) throws Exception {
+                        new JavaFXTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
+
+                            @Override
+                            public Void visitClassDeclaration(ClassDeclarationTree node, Collection<ElementHandle<TypeElement>> p) {
+                                TypeElement te = (TypeElement) cc.getTrees().getElement(getCurrentPath());
+                                if (te.getNestingKind() == NestingKind.TOP_LEVEL) {
+                                    p.add(ElementHandle.create(te));
+                                }
+                                return super.visitClassDeclaration(node, p);
+                            }
+                        }.scan(cc.getCompilationUnit(), result);
+                    }
+                }, true);
+            } catch (IOException iOException) {
+                Exceptions.printStackTrace(iOException);
+            }
+        }
+        return result;
+    }
+
+    public static Collection<ElementHandle<TypeElement>> getClasses(FileObject fo, final ElementHandle<TypeElement> superTypeHandle) {
+        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        final Collection<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
+        if (jfxs != null) {
+            try {
+                jfxs.runWhenScanFinished(new Task<CompilationController>() {
+
+                    public void run(final CompilationController cc) throws Exception {
+                        final String superTypeQN = superTypeHandle.getQualifiedName();
+                        new JavaFXTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
+
+                            @Override
+                            public Void visitClassDeclaration(ClassDeclarationTree node, Collection<ElementHandle<TypeElement>> p) {
+                                TypeElement te = (TypeElement) cc.getTrees().getElement(getCurrentPath());
+                                if (te.getSuperclass().toString().equals(superTypeQN)) {
+                                    p.add(ElementHandle.create(te));
+                                } else {
+                                    for(TypeMirror tm : te.getInterfaces()) {
+                                        if (tm.toString().equals(superTypeQN)) {
+                                            p.add(ElementHandle.create(te));
+                                        }
+                                    }
+                                }
+                                return super.visitClassDeclaration(node, p);
+                            }
+                        }.scan(cc.getCompilationUnit(), result);
+                    }
+                }, true);
+            } catch (IOException iOException) {
+                Exceptions.printStackTrace(iOException);
+            }
+        }
+        return result;
+    }
 }
