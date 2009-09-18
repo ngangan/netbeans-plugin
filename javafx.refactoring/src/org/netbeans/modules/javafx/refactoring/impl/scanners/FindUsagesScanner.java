@@ -30,7 +30,6 @@ package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
@@ -130,6 +129,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
                 ElementHandle eh = ElementHandle.create(e);
                 if (eh != null && elementHandle.equals(eh)) {
                     elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    return null;
                 }
             }
         }
@@ -138,14 +138,18 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
     }
 
 
+    volatile private boolean inMemberSelect = false;
 
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, RefactoringElementsBag elements) { 
-        if (elementHandle.getKind() == ElementKind.METHOD) {
-            ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
-            if (eh != null && elementHandle.equals(eh)) {
-                elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
-            }
+        if (!inMemberSelect) {
+            if (elementHandle.getKind() == ElementKind.METHOD) {
+                ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
+                if (eh != null && elementHandle.equals(eh)) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    return null;
+                }
+        }
         }
 
         return super.visitMethodInvocation(node, elements);
@@ -154,14 +158,19 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
 
     @Override
     public Void visitMemberSelect(MemberSelectTree node, RefactoringElementsBag elements) {
-        if (node.getIdentifier().contentEquals(targetName)) {
-            Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()));
-            if (e.asType().toString().equals(elementHandle.getSignatures()[0])) {
-                elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+        try {
+            inMemberSelect = true;
+            if (node.getIdentifier().contentEquals(targetName)) {
+                Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()));
+                if (e.asType().toString().equals(elementHandle.getSignatures()[0])) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                }
             }
-        }
 
-        return super.visitMemberSelect(node, elements);
+            return super.visitMemberSelect(node, elements);
+        } finally {
+            inMemberSelect = false;
+        }
     }
 
 }

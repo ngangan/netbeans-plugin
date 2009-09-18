@@ -40,12 +40,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -72,6 +80,8 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.modules.javafx.project.JavaFXProjectConstants;
 import org.netbeans.api.javafx.source.ClasspathInfoProvider;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -212,6 +222,42 @@ final public class SourceUtils {
         } catch (IOException ex) {
             throw (RuntimeException) new RuntimeException().initCause(ex);
         }
+    }
+
+    public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, CompilationInfo info) {
+        return getOverridenMethods(e, ElementUtilities.enclosingTypeElement(e), info);
+    }
+
+    private static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, TypeElement parent, CompilationInfo info) {
+        ArrayList<ExecutableElement> result = new ArrayList<ExecutableElement>();
+
+        TypeMirror sup = parent.getSuperclass();
+        if (sup.getKind() == TypeKind.DECLARED) {
+            TypeElement next = (TypeElement) ((DeclaredType)sup).asElement();
+            ExecutableElement overriden = getMethod(e, next, info);
+                result.addAll(getOverridenMethods(e,next, info));
+            if (overriden!=null) {
+                result.add(overriden);
+            }
+        }
+        for (TypeMirror tm:parent.getInterfaces()) {
+            TypeElement next = (TypeElement) ((DeclaredType)tm).asElement();
+            ExecutableElement overriden2 = getMethod(e, next, info);
+            result.addAll(getOverridenMethods(e,next, info));
+            if (overriden2!=null) {
+                result.add(overriden2);
+            }
+        }
+        return result;
+    }
+
+    private static ExecutableElement getMethod(ExecutableElement method, TypeElement type, CompilationInfo info) {
+        for (ExecutableElement met: ElementFilter.methodsIn(type.getEnclosedElements())){
+            if (info.getElements().overrides(method, met, type)) {
+                return met;
+            }
+        }
+        return null;
     }
 
     public static String getPackageName(FileObject folder) {
