@@ -45,8 +45,6 @@ import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
-
-
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.text.BadLocationException;
@@ -56,6 +54,8 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXIdent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -91,7 +91,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
     private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
-    private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE);
+    private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
     public ImplementAbstractTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -168,6 +168,8 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 for (Element currentClass : classTrees.keySet()) {
                     for (Tree tree : classTrees.get(currentClass)) {
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        Set<ElementHandle<TypeElement>> options1 = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        Set<ElementHandle<TypeElement>> options2 = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
                             if (typeElement == null) {
@@ -202,7 +204,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                                         exists = true;
                                                         break;
                                                     }
-
                                                 }
                                             }
                                             if (exists) {
@@ -300,7 +301,14 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             JTextComponent target = Utilities.getFocusedComponent();
                             Imports.addImport(target, EXCEPTION);
                             for (MethodSymbol method : hint.getMethods()) {
-                                Imports.addImport(target, method.getReturnType().toString());
+                                String returnName =  method.getReturnType().toString();
+                                if (!method.getReturnType().isPrimitive() 
+                                        && !returnName.equals("void")
+                                        && !returnName.equals("Void")) {
+                                    
+                                    Imports.addImport(target, returnName);
+                                }
+                                
                                 for (VarSymbol var : method.getParameters()) {
                                     if (!var.asType().isPrimitive()) {
                                         Imports.addImport(target, var.asType().toString());
@@ -396,7 +404,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         public int compare(List<VarSymbol> methodList, List<VarSymbol> overridenMethod) {
             for (VarSymbol var : methodList) {
                 VarSymbol overridenVar = overridenMethod.get(methodList.indexOf(var));
-                if (var.asType() != overridenVar.asType()) {
+                if (var.asType().toString().equals(overridenVar.asType())) {
                     return -1;
                 }
             }
