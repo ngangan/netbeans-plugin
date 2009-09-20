@@ -54,8 +54,7 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -118,7 +117,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         //extendsList.addAll(node.getMixins());
                         //extendsList.addAll(node.getImplements());
                         //extendsList.addAll(node.getSupertypeList());
-                        extendsList.addAll(node.getExtends());
+                        if (node.getExtends() != null) {
+                            extendsList.addAll(node.getExtends());
+                        }
                         if (extendsList != null && extendsList.size() != 0) {
                             Element currentClass = compilationInfo.getTrees().getElement(getCurrentPath());
                             if (classTrees.get(currentClass) == null) {
@@ -168,8 +169,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 for (Element currentClass : classTrees.keySet()) {
                     for (Tree tree : classTrees.get(currentClass)) {
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                        Set<ElementHandle<TypeElement>> options1 = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                        Set<ElementHandle<TypeElement>> options2 = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
                             if (typeElement == null) {
@@ -219,7 +218,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         }
                     }
                 }
-
                 HintsModel modelFix = new HintsModel(compilationInfo);
                 HintsModel modelOverriden = new HintsModel(compilationInfo);
                 for (Element currentClass : abstractMethods.keySet()) {
@@ -291,7 +289,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     methods.append(createMethod(methodSymbol));
                 }
                 final Document document = FXSourceUtils.getDocument(file);
-
                 final int positon = findPositionAtTheEnd(compilationInfo, hint.getTree());
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -301,18 +298,11 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             JTextComponent target = Utilities.getFocusedComponent();
                             Imports.addImport(target, EXCEPTION);
                             for (MethodSymbol method : hint.getMethods()) {
-                                String returnName =  method.getReturnType().toString();
-                                if (!method.getReturnType().isPrimitive() 
-                                        && !returnName.equals("void")
-                                        && !returnName.equals("Void")) {
-                                    
-                                    Imports.addImport(target, returnName);
-                                }
-                                
+                                System.out.println(method);
+                                addImport(target, method.asType());
                                 for (VarSymbol var : method.getParameters()) {
-                                    if (!var.asType().isPrimitive()) {
-                                        Imports.addImport(target, var.asType().toString());
-                                    }
+                                    System.out.println(var);
+                                    scanImport(target, var.asType());
                                 }
                             }
                         } catch (BadLocationException ex) {
@@ -322,6 +312,32 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 });
 
                 return null;
+            }
+
+            private void scanImport(JTextComponent target, Type type) {
+                if (type.getParameterTypes() != null && type.getParameterTypes().size() != 0) {
+                    for (Type t: type.getParameterTypes()) {
+                        scanImport(target, t);
+                    }
+                }
+                addImport(target, type);
+            }
+
+            private void addImport(JTextComponent target, Type type) {      
+                String returnName = type.toString();
+//                    returnName = returnName.replace("[", "").replace("]", "").trim();
+//                    returnName = returnName.replaceAll("<", "").replaceAll("?", "").replaceAll(">", "").replaceAll("()", "").replaceAll("(", "");
+//                    returnName = returnName.replaceAll(" extends ", "").replaceAll(" E ", "").replaceAll(" T ", "").trim();
+                    int index = returnName.lastIndexOf(")");
+                    if (index > 0) {
+                        String toRemove = returnName.substring(index, returnName.length());
+                        returnName = returnName.replace(toRemove, "");
+                    }
+                if (!type.isPrimitive() && !returnName.equals("void") 
+                        && !returnName.equals("Void")
+                        && returnName.contains(".")) {
+                    Imports.addImport(target, returnName);
+                }
             }
 
             private String createMethod(MethodSymbol methodSymbol) {
@@ -339,58 +355,58 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 method.append("function ").append(methodSymbol.getQualifiedName() + " (");
-                //Hack for methodSymbol.getParameters() which somtime throws NPE
-
                 if (methodSymbol.getParameters() != null) {
                     Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
                     while (iterator.hasNext()) {
                         VarSymbol var = iterator.next();
-                        String varType = var.asType().toString();
-//                    if (var.asType().isPrimitive()) {
-//                        if (varType.equals("int")) {
-//                            varType = Integer.class.getSimpleName();
-//                        } else if (varType.equals("long")) {
-//                            varType = Long.class.getSimpleName();
-//                        } else if (varType.equals("byte")) {
-//                            varType = Byte.class.getSimpleName();
-//                        } else if (varType.equals("short")) {
-//                            varType = Short.class.getSimpleName();
-//                        } else if (varType.equals("float")) {
-//                            varType = Float.class.getSimpleName();
-//                        } else if (varType.equals("double")) {
-//                            varType = Double.class.getSimpleName();
-//                        } else if (varType.equals("boolean")) {
-//                            varType = Boolean.class.getSimpleName();
-//                        } else if (varType.equals("char")) {
-//                            varType = Character.class.getSimpleName();
-//                        }
-//                    }
+                        String varType = getTypeString(var.asType());
                         method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType));
                         if (iterator.hasNext()) {
                             method.append(", ");
                         }
                     }
                 }
-
-                String returnType = methodSymbol.getReturnType().toString();
+                String returnType = getTypeString(methodSymbol.getReturnType());
                 if (returnType.equals("void")) {
                     returnType = "Void";
                 } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);
                 }
                 method.append(")").append(" : ").append(returnType).append(" { \n");
-
-
                 method.append("\t\tthrow new UnsupportedOperationException('Not implemented yet');\n");
                 method.append("\t}\n");
 
                 return method.toString();
             }
         };
-
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Implement all abstract methods", Collections.singletonList(fix), file, hint.getStartPosition(), end);
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Implement all abstract methods", Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
 
         return ed;
+    }
+
+    private String getTypeString(Type type) {
+        String varType = type.toString();
+        if (type.isPrimitive()) {
+            if (varType.equals("int")) {
+                varType = Integer.class.getSimpleName();
+            } else if (varType.equals("long")) {
+                varType = Long.class.getSimpleName();
+            } else if (varType.equals("byte")) {
+                varType = Byte.class.getSimpleName();
+            } else if (varType.equals("short")) {
+                varType = Short.class.getSimpleName();
+            } else if (varType.equals("float")) {
+                varType = Float.class.getSimpleName();
+            } else if (varType.equals("double")) {
+                varType = Double.class.getSimpleName();
+            } else if (varType.equals("boolean")) {
+                varType = Boolean.class.getSimpleName();
+            } else if (varType.equals("char")) {
+                varType = Character.class.getSimpleName();
+            }
+        }
+
+        return varType;
     }
 
     private int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
@@ -404,7 +420,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         public int compare(List<VarSymbol> methodList, List<VarSymbol> overridenMethod) {
             for (VarSymbol var : methodList) {
                 VarSymbol overridenVar = overridenMethod.get(methodList.indexOf(var));
-                if (var.asType().toString().equals(overridenVar.asType())) {
+                if (!var.asType().toString().equals(overridenVar.asType().toString())) {
                     return -1;
                 }
             }
