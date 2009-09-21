@@ -103,6 +103,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
 
             return lineNo + ": " + processDiff(newLine.toString(), origLine.toString());
         } catch (Exception e) {
+            e.printStackTrace();
             return "Renaming";
         }
     }
@@ -230,7 +231,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     private void init() throws IOException {
         DataObject dobj = DataObject.find(handle.getFileObject());
         des = (DataEditorSupport)dobj.getCookie(EditorCookie.class);
-        doc = (GuardedDocument)des.getDocument();
+        doc = (GuardedDocument)des.openDocument();
         lc = dobj.getCookie(LineCookie.class);
         
         JavaFXSource jfxs = JavaFXSource.forFileObject(handle.getFileObject());
@@ -238,30 +239,32 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
 
             public void run(CompilationController cc) throws Exception {
                 JavaFXTreePath path = handle.resolve(cc);
-                switch(handle.getKind()) {
-                    case CLASS_DECLARATION: {
-                        findClassName(path, cc);
-                        break;
-                    }
-                    case IDENTIFIER:
-                    case TYPE_CLASS:
-                    case MEMBER_SELECT: {
-                        findTypeName(path, cc);
-                        break;
-                    }
-                    case VARIABLE:
-                    case METHOD_INVOCATION:
-                    case FUNCTION_DEFINITION: {
-                        findIdentifier(path, cc);
-                        break;
+
+                if (path != null) {
+                    switch(path.getLeaf().getJavaFXKind()) {
+                        case CLASS_DECLARATION: {
+                            findClassName(path, cc);
+                            break;
+                        }
+                        case MEMBER_SELECT:
+                        case COMPILATION_UNIT:
+                        case IDENTIFIER:
+                        case TYPE_CLASS:
+                        case IMPORT: {
+                            findTypeName(path, cc);
+                            break;
+                        }
+                        case VARIABLE:
+                        case METHOD_INVOCATION:
+                        case FUNCTION_DEFINITION: {
+                            findIdentifier(path, cc);
+                            break;
+                        }
                     }
                 }
             }
         }, true);
-        if (startPosition == -1) {
-            System.err.println("*** Can not resolve: " + handle);
-            throw new IOException();
-        }
+        assert startPosition != -1; // start position *MUST* be resolved
     }
 
     private void findClassName(JavaFXTreePath path, CompilationController cc) {
@@ -282,12 +285,14 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     }
 
     private void findTypeName(JavaFXTreePath path, CompilationController cc) {
+        String typeName = path.getLeaf().toString();
+
         TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
         tokens.moveStart();
         while(tokens.moveNext()) {
             final Token<JFXTokenId> currentToken = tokens.token();
             String text = currentToken.text().toString();
-            if (text.equals(oldText)) {
+            if (typeName.equals(oldText) || typeName.startsWith(oldText + ".") || text.equals(oldText)) {
                 startPosition = currentToken.offset(cc.getTokenHierarchy());
                 break;
             }
@@ -297,10 +302,8 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     private void findIdentifier(JavaFXTreePath path, CompilationController cc) {
         TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
         tokens.moveStart();
-        System.err.println("tokens");
         while(tokens.moveNext()) {
             final Token<JFXTokenId> currentToken = tokens.token();
-            System.err.println(currentToken.id() + " > " + currentToken.text());
             if (currentToken.id() == JFXTokenId.IDENTIFIER && currentToken.text().toString().equals(oldText)) {
                 startPosition = currentToken.offset(cc.getTokenHierarchy());
                 break;

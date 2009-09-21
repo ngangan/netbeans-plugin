@@ -109,10 +109,25 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
         dispOldName = oldName;
     }
 
+    public RenameRefactoringUI(FileObject file, TreePathHandle handle, CompilationInfo info) {
+        if (handle!=null) {
+            this.handle = handle;
+            this.refactoring = new RenameRefactoring(Lookups.fixed(file, handle));
+            oldName = handle.resolveElement(info).getSimpleName().toString();
+        } else {
+            this.refactoring = new RenameRefactoring(Lookups.fixed(file));
+            oldName = file.getName();
+        }
+        dispOldName = oldName;
+        ClasspathInfo cpInfo = handle==null?SourceUtils.getClasspathInfoFor(file):SourceUtils.getClasspathInfoFor(handle);
+        refactoring.getContext().add(cpInfo);
+        //this(jmiObject, (FileObject) null, true);
+    }
+
     public RenameRefactoringUI(NonRecursiveFolder file) {
         this.refactoring = new RenameRefactoring(Lookups.singleton(file));
         oldName = SourceUtils.getPackageName(file.getFolder());
-        refactoring.getContext().add(ClasspathInfo.create(file.getFolder()));
+        refactoring.getContext().add(SourceUtils.getClasspathInfoFor(file.getFolder()));
         dispOldName = oldName;
         pkgRename = true;
         //this(jmiObject, (FileObject) null, true);

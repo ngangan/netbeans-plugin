@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,10 +47,8 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
-import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
@@ -162,7 +159,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected void treePathHandleResolved(TreePathHandle handle, CompilationInfo javac) {
-                    ui = new RenameRefactoringUI(handle, javac);
+                    if (renameFile) {
+                        ui = new RenameRefactoringUI(handle.getFileObject(), handle, javac);
+                    } else {
+                        ui = new RenameRefactoringUI(handle, javac);
+                    }
                 }
 
                 @Override
