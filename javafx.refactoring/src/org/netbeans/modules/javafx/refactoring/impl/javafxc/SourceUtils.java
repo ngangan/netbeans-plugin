@@ -43,9 +43,17 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -64,6 +72,9 @@ import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.editor.settings.FontColorSettings;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.classpath.GlobalPathRegistry;
+import org.netbeans.api.java.project.JavaProjectConstants;
+import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.java.source.ClasspathInfo.PathKind;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -89,21 +100,27 @@ import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
+import org.netbeans.modules.parsing.impl.indexing.friendapi.IndexingController;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
 final public class SourceUtils {
+    final private static Logger LOG = Logger.getLogger(SourceUtils.class.getName());
+    final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
+    
     public static final String JAVAFX_MIME_TYPE = "text/x-fx"; // NOI18N
 
     public static String htmlize(String input) {
@@ -169,6 +186,20 @@ final public class SourceUtils {
         return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
     }
 
+    public static boolean isValidPackageName(String name) {
+        if (name.endsWith(".")) //NOI18N
+            return false;
+        if (name.startsWith("."))  //NOI18N
+            return  false;
+        StringTokenizer tokenizer = new StringTokenizer(name, "."); // NOI18N
+        while (tokenizer.hasMoreTokens()) {
+            if (!Utilities.isJavaIdentifier(tokenizer.nextToken())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean isFileInOpenProject(FileObject file) {
         assert file != null;
         Project p = FileOwnerQuery.getOwner(file);
@@ -190,6 +221,13 @@ final public class SourceUtils {
         //workaround for 143542
         Project[] opened = OpenProjects.getDefault().getOpenProjects();
         for (Project pr : opened) {
+            if (fo.isFolder()) {
+                for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
+                    if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
+                        return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
+                    }
+                }
+            }
             for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaFXProjectConstants.SOURCES_TYPE_JAVAFX)) {
                 if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
                     return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
@@ -204,6 +242,16 @@ final public class SourceUtils {
     public static boolean isClasspathRoot(FileObject fo) {
         ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
         return cp != null ? fo.equals(cp.findOwnerRoot(fo)) : false;
+    }
+
+    public static FileObject getClassPathRoot(URL url) throws IOException {
+        FileObject result = URLMapper.findFileObject(url);
+        File f = result != null ? null : FileUtil.normalizeFile(new File(URLDecoder.decode(url.getPath(), "UTF-8"))); //NOI18N
+        while (result==null) {
+            result = FileUtil.toFileObject(f);
+            f = f.getParentFile();
+        }
+        return ClassPath.getClassPath(result, ClassPath.SOURCE).findOwnerRoot(result);
     }
     
     public static ElementKind getElementKind(final TreePathHandle tph) {
@@ -326,6 +374,174 @@ final public class SourceUtils {
         if (!files.isEmpty()) return files.iterator().next();
 
         return null;
+    }
+
+    public static FileObject getFileObject(final TreePathHandle handle) {
+        try {
+            JavaFXSource source = JavaFXSource.forFileObject(handle.getFileObject());
+            assert source!=null:"JavaSource.forFileObject(" + handle.getFileObject().getPath() + ") \n returned null";
+            final FileObject[] result = new FileObject[1];
+
+            source.runUserActionTask(new Task<CompilationController>() {
+
+                public void run(CompilationController cc) throws Exception {
+                    Element e = handle.resolveElement(cc);
+                    if (e == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Can not resolve tree-path handle: ", handle);
+                        }
+                        throw new IOException("Can not resolve TreePathHandle");
+                    }
+                    result[0] = getFile(e, cc.getClasspathInfo());
+                }
+            }, true);
+            return result[0];
+        } catch (IOException ex) {
+            throw (RuntimeException) new RuntimeException().initCause(ex);
+        }
+    }
+
+    public static ClasspathInfo getClasspathInfoFor(FileObject ... files) {
+        return getClasspathInfoFor(true, files);
+    }
+
+    public static ClasspathInfo getClasspathInfoFor(boolean dependencies, FileObject ... files) {
+        return getClasspathInfoFor(dependencies, false, files);
+    }
+
+    public static ClasspathInfo getClasspathInfoFor(boolean dependencies, boolean backSource, FileObject ... files ) {
+        assert files.length >0;
+        Set<URL> dependentRoots = new HashSet();
+        for (FileObject fo: files) {
+            Project p = null;
+            FileObject ownerRoot = null;
+            if (fo != null) {
+                p = FileOwnerQuery.getOwner(fo);
+                ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+                if (cp!=null) {
+                    ownerRoot = cp.findOwnerRoot(fo);
+                }
+            }
+            if (p != null && ownerRoot != null) {
+                URL sourceRoot = URLMapper.findURL(ownerRoot, URLMapper.INTERNAL);
+                if (dependencies) {
+                    dependentRoots.addAll(SourceUtils.getDependentRoots(sourceRoot));
+                } else {
+                    dependentRoots.add(sourceRoot);
+                }
+                for (SourceGroup root:ProjectUtils.getSources(p).getSourceGroups(JavaFXProjectConstants.SOURCES_TYPE_JAVAFX)) {
+                    dependentRoots.add(URLMapper.findURL(root.getRootFolder(), URLMapper.INTERNAL));
+                }
+            } else {
+                for(ClassPath cp: GlobalPathRegistry.getDefault().getPaths(ClassPath.SOURCE)) {
+                    for (FileObject root:cp.getRoots()) {
+                        dependentRoots.add(URLMapper.findURL(root, URLMapper.INTERNAL));
+                    }
+                }
+            }
+        }
+
+        if (backSource) {
+            for (FileObject file : files) {
+                if (file!=null) {
+                    ClassPath source = ClassPath.getClassPath(file, ClassPath.COMPILE);
+                    for (ClassPath.Entry root : source.entries()) {
+                        SourceForBinaryQuery.Result r = SourceForBinaryQuery.findSourceRoots(root.getURL());
+                        for (FileObject root2 : r.getRoots()) {
+                            dependentRoots.add(URLMapper.findURL(root2, URLMapper.INTERNAL));
+                        }
+                    }
+                }
+            }
+        }
+
+        ClassPath rcp = ClassPathSupport.createClassPath(dependentRoots.toArray(new URL[dependentRoots.size()]));
+        ClassPath nullPath = ClassPathSupport.createClassPath(new FileObject[0]);
+        ClassPath boot = files[0]!=null?ClassPath.getClassPath(files[0], ClassPath.BOOT):nullPath;
+        ClassPath compile = files[0]!=null?ClassPath.getClassPath(files[0], ClassPath.COMPILE):nullPath;
+        //When file[0] is a class file, there is no compile cp but execute cp
+        //try to get it
+        if (compile == null) {
+            compile = ClassPath.getClassPath(files[0], ClassPath.EXECUTE);
+        }
+        //If no cp found at all log the file and use nullPath since the ClasspathInfo.create
+        //doesn't accept null compile or boot cp.
+        if (compile == null) {
+            LOG.warning ("No classpath for: " + FileUtil.getFileDisplayName(files[0]) + " " + FileOwnerQuery.getOwner(files[0]));
+            compile = nullPath;
+        }
+        ClasspathInfo cpInfo = ClasspathInfo.create(boot, compile, rcp);
+        return cpInfo;
+    }
+
+    public static ClasspathInfo getClasspathInfoFor(TreePathHandle ... handles) {
+        FileObject[] result = new FileObject[handles.length];
+        int i=0;
+        for (TreePathHandle handle:handles) {
+            FileObject fo = getFileObject(handle);
+            if (i==0 && fo==null) {
+                result = new FileObject[handles.length+1];
+                result[i++] = handle.getFileObject();
+            }
+            result[i++] = fo;
+        }
+        return getClasspathInfoFor(result);
+    }
+
+    /**
+     * Returns the dependent source path roots for given source root.
+     * It returns all the open project source roots which have either
+     * direct or transitive dependency on the given source root.
+     * @param root to find the dependent roots for
+     * @return {@link Set} of {@link URL}s containing at least the
+     * incoming root, never returns null.
+     * @since 0.10
+     */
+    public static Set<URL> getDependentRoots (final URL root) {
+        final Map<URL, List<URL>> deps = IndexingController.getDefault().getRootDependencies();
+        return getDependentRootsImpl (root, deps);
+    }
+
+
+    static Set<URL> getDependentRootsImpl (final URL root, final Map<URL, List<URL>> deps) {
+        //Create inverse dependencies
+        final Map<URL, List<URL>> inverseDeps = new HashMap<URL, List<URL>> ();
+        for (Map.Entry<URL,List<URL>> entry : deps.entrySet()) {
+            final URL u1 = entry.getKey();
+            final List<URL> l1 = entry.getValue();
+            for (URL u2 : l1) {
+                List<URL> l2 = inverseDeps.get(u2);
+                if (l2 == null) {
+                    l2 = new ArrayList<URL>();
+                    inverseDeps.put (u2,l2);
+                }
+                l2.add (u1);
+            }
+        }
+        //Collect dependencies
+        final Set<URL> result = new HashSet<URL>();
+        final LinkedList<URL> todo = new LinkedList<URL> ();
+        todo.add (root);
+        while (!todo.isEmpty()) {
+            final URL u = todo.removeFirst();
+            if (!result.contains(u)) {
+                result.add (u);
+                final List<URL> ideps = inverseDeps.get(u);
+                if (ideps != null) {
+                    todo.addAll (ideps);
+                }
+            }
+        }
+        //Filter non opened projects
+        Set<ClassPath> cps = GlobalPathRegistry.getDefault().getPaths(ClassPath.SOURCE);
+        Set<URL> toRetain = new HashSet<URL>();
+        for (ClassPath cp : cps) {
+            for (ClassPath.Entry e : cp.entries()) {
+                toRetain.add(e.getURL());
+            }
+        }
+        result.retainAll(toRetain);
+        return result;
     }
     
     /**

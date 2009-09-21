@@ -26,7 +26,7 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl;
+package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import org.netbeans.modules.javafx.refactoring.impl.scanners.RenameScanner;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
@@ -53,6 +53,8 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
