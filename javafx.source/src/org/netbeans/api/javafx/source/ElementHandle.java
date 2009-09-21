@@ -51,6 +51,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a handle for {@link Element} which can be kept and later resolved
@@ -88,6 +90,8 @@ import java.util.List;
  * @author Tomas Zezula
  */
 public class ElementHandle<T extends Element> {
+    final private static Logger LOG = Logger.getLogger(ElementHandle.class.getName());
+    final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
 
     private ElementKind kind;
     private String[] signatures;
@@ -302,60 +306,64 @@ public class ElementHandle<T extends Element> {
     public static<T extends Element> ElementHandle<T> create (final T element) throws IllegalArgumentException {
         assert element != null;
         ElementKind kind = element.getKind();
-        String[] signatures;
-        switch (kind) {
-            case PACKAGE:
-                assert element instanceof PackageElement;
-                signatures = new String[]{((PackageElement)element).getQualifiedName().toString()};
-                break;
-            case CLASS:
-            case INTERFACE:
-            case ENUM:
-            case ANNOTATION_TYPE:
-                assert element instanceof TypeElement;
-                signatures = new String[] {encodeClassNameOrArray((TypeElement)element)};
-                break;
-            case METHOD:
-            case CONSTRUCTOR:                
-            case INSTANCE_INIT:
-            case STATIC_INIT:
-                assert element instanceof ExecutableElement;
-                signatures = createExecutableDescriptor((ExecutableElement)element);
-                break;
-            case LOCAL_VARIABLE: // space magic
-            case FIELD:
-            case PARAMETER:
-            case ENUM_CONSTANT:
-                assert element instanceof VariableElement;
-                signatures = createFieldDescriptor((VariableElement)element);
-                break;
+        String[] signatures = null;
+        try {
+            switch (kind) {
+                case PACKAGE:
+                    assert element instanceof PackageElement;
+                    signatures = new String[]{((PackageElement)element).getQualifiedName().toString()};
+                    break;
+                case CLASS:
+                case INTERFACE:
+                case ENUM:
+                case ANNOTATION_TYPE:
+                    assert element instanceof TypeElement;
+                    signatures = new String[] {encodeClassNameOrArray((TypeElement)element)};
+                    break;
+                case METHOD:
+                case CONSTRUCTOR:
+                case INSTANCE_INIT:
+                case STATIC_INIT:
+                    assert element instanceof ExecutableElement;
+                    signatures = createExecutableDescriptor((ExecutableElement)element);
+                    break;
+                case LOCAL_VARIABLE: // space magic
+                case FIELD:
+                case PARAMETER:
+                case ENUM_CONSTANT:
+                    assert element instanceof VariableElement;
+                    signatures = createFieldDescriptor((VariableElement)element);
+                    break;
 
-/*            case TYPE_PARAMETER:
-                assert element instanceof TypeParameterElement;
-                TypeParameterElement tpe = (TypeParameterElement) element;
-                Element ge = tpe.getGenericElement();
-                ElementKind gek = ge.getKind();
-                if (gek.isClass() || gek.isInterface()) {
-                    assert ge instanceof TypeElement;
-                    signatures = new String[2];
-                    signatures[0] = ClassFileUtil.encodeClassNameOrArray((TypeElement)ge);
-                    signatures[1] = tpe.getSimpleName().toString();
-                }
-                else if (gek == ElementKind.METHOD || gek == ElementKind.CONSTRUCTOR) {
-                    assert ge instanceof ExecutableElement;
-                    String[] _sigs = ClassFileUtil.createExecutableDescriptor((ExecutableElement)ge);
-                    signatures = new String[_sigs.length + 1];
-                    System.arraycopy(_sigs, 0, signatures, 0, _sigs.length);
-                    signatures[_sigs.length] = tpe.getSimpleName().toString();
-                }
-                else {
-                    throw new IllegalArgumentException(gek.toString());
-                }
-                break;*/
-            default:
-                throw new IllegalArgumentException(kind.toString());
+    /*            case TYPE_PARAMETER:
+                    assert element instanceof TypeParameterElement;
+                    TypeParameterElement tpe = (TypeParameterElement) element;
+                    Element ge = tpe.getGenericElement();
+                    ElementKind gek = ge.getKind();
+                    if (gek.isClass() || gek.isInterface()) {
+                        assert ge instanceof TypeElement;
+                        signatures = new String[2];
+                        signatures[0] = ClassFileUtil.encodeClassNameOrArray((TypeElement)ge);
+                        signatures[1] = tpe.getSimpleName().toString();
+                    }
+                    else if (gek == ElementKind.METHOD || gek == ElementKind.CONSTRUCTOR) {
+                        assert ge instanceof ExecutableElement;
+                        String[] _sigs = ClassFileUtil.createExecutableDescriptor((ExecutableElement)ge);
+                        signatures = new String[_sigs.length + 1];
+                        System.arraycopy(_sigs, 0, signatures, 0, _sigs.length);
+                        signatures[_sigs.length] = tpe.getSimpleName().toString();
+                    }
+                    else {
+                        throw new IllegalArgumentException(gek.toString());
+                    }
+                    break;*/
+            }
+        } catch (IllegalArgumentException e) {
+            if (DEBUG) {
+                LOG.log(Level.FINEST, null, e);
+            }
         }
-        return new ElementHandle<T> (kind, signatures);
+        return signatures != null ? new ElementHandle<T> (kind, signatures) : null;
     }
 
 
