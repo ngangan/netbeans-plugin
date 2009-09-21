@@ -54,6 +54,7 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.scanners.FindOverridersScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindUsagesScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
@@ -115,7 +116,7 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                     ElementHandle eh = ElementHandle.create(e);
                     relevantHandles.add(eh);
                     collectReferences(ElementHandle.create(e), ci, relevantFiles);
-                    if (isFindDirectSubclassesOnly() || isFindSubclasses()) {
+                    if (isFindDirectSubclassesOnly() || isFindSubclasses() || isFindOverridingMethods()) {
                         Stack<ElementHandle> processingStack = new Stack();
                         processingStack.push(eh);
                         while(!processingStack.empty()) {
@@ -141,11 +142,12 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                     src.runUserActionTask(new Task<CompilationController>() {
 
                         public void run(final CompilationController cc) throws Exception {
-                            JavaFXTreePathScanner<Void, RefactoringElementsBag> scanner = null;
                             for(ElementHandle eh : relevantHandles) {
-                                scanner = new FindUsagesScanner(refactoring, searchHandle, eh, cc);
-                                if (scanner != null) {
-                                    scanner.scan(cc.getCompilationUnit(), elements);
+                                if (isFindOverridingMethods()) {
+                                    new FindOverridersScanner(refactoring, searchHandle, cc).scan(cc.getCompilationUnit(), elements);
+                                }
+                                if (isFindUsages()) {
+                                    new FindUsagesScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
                                 }
                             }
                         }
