@@ -38,9 +38,10 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl;
+package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.JavaFXTreeScanner;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -48,20 +49,27 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindOverridersScanner;
+import org.netbeans.modules.javafx.refactoring.impl.scanners.FindSubclassesScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindUsagesScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.Lookups;
 
 /**
  * Actual implementation of Find Usages query search for Ruby
@@ -114,8 +122,11 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                     ClassIndex ci = cc.getClasspathInfo().getClassIndex();
                     Element e = searchHandle.resolveElement(cc);
                     ElementHandle eh = ElementHandle.create(e);
-                    relevantHandles.add(eh);
-                    collectReferences(ElementHandle.create(e), ci, relevantFiles);
+
+                    if (isFindUsages()) {
+                        relevantHandles.add(eh);
+                        collectReferences(ElementHandle.create(e), ci, relevantFiles);
+                    }
                     if (isFindDirectSubclassesOnly() || isFindSubclasses() || isFindOverridingMethods()) {
                         Stack<ElementHandle> processingStack = new Stack();
                         processingStack.push(eh);
@@ -123,11 +134,16 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                             ElementHandle currentHandle = processingStack.pop();
                             for(ElementHandle eh1 : ci.getElements(currentHandle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class))) {
                                 if (!relevantHandles.contains(eh1)) {
-                                    if (isFindSubclasses()) {
+                                    if (isFindSubclasses() || isFindOverridingMethods()) {
                                         processingStack.push(eh1);
                                     }
                                     relevantHandles.add(eh1);
-                                    collectReferences(eh1, ci, relevantFiles);
+                                    if (isFindOverridingMethods()) {
+                                        collectReferences(eh1, ci, relevantFiles);
+                                    }
+                                    if (isFindSubclasses() || isFindDirectSubclassesOnly()) {
+                                        relevantFiles.add(JavaFXSourceUtils.getFile(eh1, cc.getClasspathInfo()));
+                                    }
                                 }
                             }
                         }
@@ -148,6 +164,9 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                                 }
                                 if (isFindUsages()) {
                                     new FindUsagesScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
+                                }
+                                if (isFindDirectSubclassesOnly() || isFindSubclasses()) {
+                                    new FindSubclassesScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
                                 }
                             }
                         }
