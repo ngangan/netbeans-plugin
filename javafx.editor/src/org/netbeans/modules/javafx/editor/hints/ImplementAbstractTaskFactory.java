@@ -70,6 +70,8 @@ import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
+import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -80,6 +82,8 @@ import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
+import org.openide.text.Annotation;
+import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
 
 /**
@@ -89,6 +93,7 @@ import org.openide.util.Exceptions;
 public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
+    private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
     private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
@@ -100,6 +105,8 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         return new CancellableTask<CompilationInfo>() {
 
+            private final Collection<Annotation> annotationsToRemove = new HashSet<Annotation>();
+
             public void cancel() {
             }
 
@@ -109,12 +116,15 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
 
+                removeAnnotations(file, annotationsToRemove);
                 JavaFXTreePathScanner<Void, HintsModel> visitor = new JavaFXTreePathScanner<Void, HintsModel>() {
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, HintsModel p) {
                         List<Tree> extendsList = new ArrayList<Tree>();
-                        //extendsList.addAll(node.getMixins());
+                        if (node.getMixins() != null) {
+                            extendsList.addAll(node.getMixins());
+                        }
                         //extendsList.addAll(node.getImplements());
                         //extendsList.addAll(node.getSupertypeList());
                         if (node.getExtends() != null) {
@@ -175,7 +185,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
-
                             for (Element element : elements) {
                                 if (element instanceof MethodSymbol) {
                                     MethodSymbol method = (MethodSymbol) element;
@@ -187,14 +196,8 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                             List<MethodSymbol> methods = abstractMethods.get(currentClass);
                                             Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
                                             boolean exists = false;
-                                            if (overridenMethodList != null) {
+                                            if (overridenMethodList != null && overridenMethodList.size() != 0) {
                                                 for (MethodSymbol overridenMethod : overridenMethodList) {
-                                                    try {
-                                                        overridenMethod.getParameters();
-                                                        method.getParameters();
-                                                    } catch (Exception ex) {
-                                                        continue;
-                                                    }
                                                     if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
                                                             method.getParameters().size() == overridenMethod.getParameters().size() &&
                                                             COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
@@ -230,7 +233,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 addHintsToController(modelFix, compilationInfo, file);
-                addOverridenToController(modelOverriden, file, compilationInfo, overridenToAbstract);
+                addOverriddenAnnotations(modelOverriden, file, compilationInfo, overridenToAbstract, annotationsToRemove);
             }
         };
     }
@@ -242,25 +245,47 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
             }
             HintsController.setErrors(FXSourceUtils.getDocument(file), "Override", errors); //NOI18N
+
         }
     }
 
-    private void addOverridenToController(HintsModel model, FileObject file, CompilationInfo compilationInfo, Map<MethodSymbol, MethodSymbol> overridenToAbstract) {
-        if (model.getHints() != null) {
-            Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-            for (Hint hint : model.getHints()) {
-                errors.addAll(getOverridenDescription(file, hint, compilationInfo, overridenToAbstract)); //NOI18N
+    private void removeAnnotations(final FileObject file, final Collection<Annotation> annotationsToRemove) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                final StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+                for (Annotation annotation : annotationsToRemove) {
+                    NbDocument.removeAnnotation(document, annotation);
+                }
             }
-            HintsController.setErrors(FXSourceUtils.getDocument(file), "Overriden", errors); //NOI18N
+        });
+    }
+
+    private void addOverriddenAnnotations(final HintsModel model,
+            final FileObject file,
+            CompilationInfo compilationInfo,
+            Map<MethodSymbol, MethodSymbol> overridenToAbstract,
+            final Collection<Annotation> annotationsToRemove) {
+
+        if (model.getHints() != null) {
+            for (Hint hint : model.getHints()) {
+                resolveOverridenDescription(file, hint, compilationInfo, overridenToAbstract, annotationsToRemove); //NOI18N
+            }
+
         }
     }
 
-    private Collection<ErrorDescription> getOverridenDescription(final FileObject file, final Hint hint, CompilationInfo compilationInfo, Map<MethodSymbol, MethodSymbol> overridenToAbstract) {
-        Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+    private void resolveOverridenDescription(final FileObject file,
+            Hint hint,
+            CompilationInfo compilationInfo,
+            Map<MethodSymbol, MethodSymbol> overridenToAbstract,
+            Collection<Annotation> annotationsToRemove) {
+
+        final Map<Annotation, Integer> annotations = new HashMap<Annotation, Integer>();
         for (MethodSymbol overridenMethod : hint.getMethods()) {
             Tree tree = compilationInfo.getTrees().getTree(overridenMethod);
             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-            int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+            final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
             MethodSymbol abstractMethod = overridenToAbstract.get(overridenMethod);
             String type = null;
             if (abstractMethod == null) {
@@ -268,14 +293,43 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             } else {
                 type = abstractMethod.getEnclosingElement().toString();
             }
-            errors.add(ErrorDescriptionFactory.createErrorDescription(Severity.VERIFIER, "Overrides method from class: " + type, file, start, start));
+            final String finalType = type;
+            Annotation annotation = new Annotation() {
+
+                @Override
+                public String getAnnotationType() {
+                    return ANNOTATION_TYPE;
+                }
+
+                @Override
+                public String getShortDescription() {
+                    return finalType;
+                }
+            };
+            annotations.put(annotation, start);
         }
-        return errors;
+        annotationsToRemove.clear();
+        annotationsToRemove.addAll(annotations.keySet());
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                for (Annotation annotation : annotations.keySet()) {
+
+                    StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+                    final int start = annotations.get(annotation);
+                    Position position = new Position() {
+
+                        public int getOffset() {
+                            return start;
+                        }
+                    };
+                    NbDocument.addAnnotation(document, position, start, annotation);
+                }
+            }
+        });
     }
 
     private ErrorDescription getErrorDescription(final FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
-        int end = hint.getStartPosition() + hint.getLength();
-
         Fix fix = new Fix() {
 
             public String getText() {
@@ -316,26 +370,24 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
             private void scanImport(JTextComponent target, Type type) {
                 if (type.getParameterTypes() != null && type.getParameterTypes().size() != 0) {
-                    for (Type t: type.getParameterTypes()) {
+                    for (Type t : type.getParameterTypes()) {
                         scanImport(target, t);
                     }
                 }
                 addImport(target, type);
             }
 
-            private void addImport(JTextComponent target, Type type) {      
+            private void addImport(JTextComponent target, Type type) {
                 String returnName = type.toString();
 //                    returnName = returnName.replace("[", "").replace("]", "").trim();
 //                    returnName = returnName.replaceAll("<", "").replaceAll("?", "").replaceAll(">", "").replaceAll("()", "").replaceAll("(", "");
 //                    returnName = returnName.replaceAll(" extends ", "").replaceAll(" E ", "").replaceAll(" T ", "").trim();
-                    int index = returnName.lastIndexOf(")");
-                    if (index > 0) {
-                        String toRemove = returnName.substring(index, returnName.length());
-                        returnName = returnName.replace(toRemove, "");
-                    }
-                if (!type.isPrimitive() && !returnName.equals("void") 
-                        && !returnName.equals("Void")
-                        && returnName.contains(".")) {
+                int index = returnName.lastIndexOf(")");
+                if (index > 0) {
+                    String toRemove = returnName.substring(index, returnName.length());
+                    returnName = returnName.replace(toRemove, "");
+                }
+                if (!type.isPrimitive() && !returnName.equals("void") && !returnName.equals("Void") && returnName.contains(".")) {
                     Imports.addImport(target, returnName);
                 }
             }
@@ -380,7 +432,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             }
         };
         ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Implement all abstract methods", Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
-
         return ed;
     }
 

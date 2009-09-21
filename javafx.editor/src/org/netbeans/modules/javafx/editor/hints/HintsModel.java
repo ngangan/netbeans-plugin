@@ -52,29 +52,30 @@ import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.openide.text.Annotation;
 
 final class HintsModel {
 
-    private Map<Tree, HintsModel.Hint> unresovedHints;
+    private Map<Tree, HintsModel.Hint> hints;
     private CompilationInfo compilationInfo;
 
-    public HintsModel(CompilationInfo compilationInfo) {
+    HintsModel(CompilationInfo compilationInfo) {
         this.compilationInfo = compilationInfo;
     }
 
-    public void addHint(Tree tree) {
+    void addHint(Tree tree) {
         addHint(null, tree);
     }
 
-    public void addHint(Tree tree, List<MethodSymbol> methods, Element element) {
+    void addHint(Tree tree, List<MethodSymbol> methods, Element element) {
         addHint(tree, methods, null, null, null, null, element);
     }
 
-    public void addHint(List<Type> thrownExceptions, Tree tree) {
+    void addHint(List<Type> thrownExceptions, Tree tree) {
         addHint(tree, null, thrownExceptions, null, null, null, null);
     }
 
-    public void addHint(Tree tree, String varName, Integer start, Integer end) {
+    void addHint(Tree tree, String varName, Integer start, Integer end) {
         addHint(tree, null, null, varName, start, end, null);
     }
 
@@ -87,10 +88,10 @@ final class HintsModel {
             Element element
             ) {
 
-        if (unresovedHints == null) {
-            unresovedHints = new HashMap<Tree, Hint>();
+        if (hints == null) {
+            hints = new HashMap<Tree, Hint>();
         }
-        if (unresovedHints.keySet().contains(tree)) {
+        if (hints.keySet().contains(tree)) {
             return;
         }
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
@@ -102,29 +103,33 @@ final class HintsModel {
         }
         int length = end - start;
         Hint hint = new Hint(thrownExceptions, methods, tree, length, start, name, element);
-        unresovedHints.put(tree, hint);
+        hints.put(tree, hint);
     }
 
-    public void addCatchTree(Hint hint, Tree catchTree) {
-        assert unresovedHints != null;
-        if (!unresovedHints.values().contains(hint)) {
+    void addCatchTree(Hint hint, Tree catchTree) {
+        assert hints != null;
+        if (!hints.values().contains(hint)) {
             throw new IllegalArgumentException("Hint does not existst in Set of added hints"); //NOI18N
         }
         hint.setCatchTree(catchTree);
     }
 
-    public Collection<Hint> getHints() {
-        if (unresovedHints == null) {
+    Collection<Hint> getHints() {
+        if (hints == null) {
             return Collections.EMPTY_LIST;
         }
-        return Collections.unmodifiableCollection(unresovedHints.values());
+        return Collections.unmodifiableCollection(hints.values());
     }
 
-    public void addMethod(MethodSymbol method) {
+    void removeHint(Hint hint) {
+        hints.remove(hint.getTree());
     }
 
-    public void removeHint(Hint hint) {
-        unresovedHints.remove(hint.getTree());
+    void addAnnoation(Hint hint, Annotation annotation) {
+        if (!hints.values().contains(hint)) {
+            throw new IllegalArgumentException("Hint does not exist"); //NOI18N
+        }
+        hint.setAnnotation(annotation);
     }
 
     static final class Hint {
@@ -137,6 +142,7 @@ final class HintsModel {
         private List<MethodSymbol> methods;
         private String name;
         private Element element;
+        private Annotation annotation;
 
         private Hint() {
         }
@@ -164,6 +170,10 @@ final class HintsModel {
 
         private void setCatchTree(Tree catchTree) {
             this.catchTree = catchTree;
+        }
+
+        private void setAnnotation(Annotation annotation) {
+            this.annotation = annotation;
         }
 
         void addMethod(MethodSymbol method) {
@@ -207,6 +217,10 @@ final class HintsModel {
 
         Element getElement() {
             return element;
+        }
+
+        Annotation getAnnotation() {
+            return annotation;
         }
     }
 }

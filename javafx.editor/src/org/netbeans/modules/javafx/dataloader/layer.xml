@@ -288,6 +288,9 @@ made subject to such option by the copyright holder.
                 </folder>
             </folder>
         </folder>
+         <folder name="AnnotationTypes">
+            <file name="org-netbeans-modules-javafx-editor-hints-overrides.xml" url="overrides-annotation.xml"/>
+        </folder>
     </folder>
 
     <folder name="OptionsDialog">
