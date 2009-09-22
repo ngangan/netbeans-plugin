@@ -29,8 +29,10 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.TypeClassTree;
@@ -83,6 +85,13 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
                 TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
                 if (Pattern.matches(targetName + TYPE_MATCH_PATTERN, te.getSimpleName().toString())) {
                     elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                }
+                for(ExpressionTree et : node.getSupertypeList()) {
+                    JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), et);
+                    te = (TypeElement)cc.getTrees().getElement(path);
+                    if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, te.getQualifiedName().toString())) {
+                        elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(path, cc), Lookups.singleton(searchHandle)));
+                    }
                 }
             }
         }
