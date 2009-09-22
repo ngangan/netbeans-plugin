@@ -34,6 +34,7 @@ import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.TypeClassTree;
@@ -79,6 +80,13 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
                 TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
                 if (Pattern.matches(origSimpleName + TYPE_MATCH_PATTERN, te.getSimpleName().toString())) {
                     p.add(TreePathHandle.create(getCurrentPath(), cc));
+                }
+                for(ExpressionTree et : node.getSupertypeList()) {
+                    JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), et);
+                    te = (TypeElement)cc.getTrees().getElement(path);
+                    if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, te.getQualifiedName().toString())) {
+                        p.add(TreePathHandle.create(path, cc));
+                    }
                 }
             }
         }
