@@ -9,9 +9,11 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
@@ -116,240 +118,262 @@ public class JavaFXIndexer extends EmbeddingIndexer {
         IndexingSupport support;
         try {
             support = IndexingSupport.getInstance(context);
-        } catch (IOException ioe) {
-            LOG.log(Level.WARNING, null, ioe);
-            return;
-        }
-        IndexDocument document = support.createDocument(indexable);
+            IndexDocument document = support.createDocument(indexable);
 
-        JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
-            @Override
-            public Void visitClassDeclaration(ClassDeclarationTree node, IndexDocument document) {
-                Element e = fxresult.getTrees().getElement(getCurrentPath());
-                if (e == null) {
+            JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
+
+                @Override
+                public Void visitImport(ImportTree node, IndexDocument document) {
+                    Tree jfxIdent = node.getQualifiedIdentifier();
+                    if (jfxIdent == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving import statment: {0}", node);
+                        }
+                        return super.visitImport(node, document);
+                    }
+                    String indexVal = jfxIdent.toString();
+                    if (indexVal != null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Indexing import type reference {0}", indexVal);
+                        }
+                        index(document, IndexKey.TYPE_REF, indexVal);
+                    } else {
+                        LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
+                    }
+
+                    return super.visitImport(node, document);
+                }
+
+                @Override
+                public Void visitClassDeclaration(ClassDeclarationTree node, IndexDocument document) {
+                    Element e = fxresult.getTrees().getElement(getCurrentPath());
+                    if (e == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        }
+                        return super.visitClassDeclaration(node, document);
+                    }
+
+                    TypeElement type = (TypeElement)e;
                     if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        LOG.log(Level.FINEST, "Indexing {0}:", type.getQualifiedName());
+                        LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
+                        LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
+                    }
+
+                    for(ExpressionTree et : node.getSupertypeList()) {
+                        TypeElement supr = (TypeElement)fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
+                        if (supr != null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
+                            }
+                            index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
+                            index(document, IndexKey.TYPE_REF, supr.getQualifiedName().toString());
+                        }
+                    }
+                    index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
+                    index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
+                    String fqn = type.getQualifiedName().toString();
+                    index(document, IndexKey.CLASS_FQN, fqn);
+                    if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
+                        int pkgLen = fqn.lastIndexOf(".");
+                        if (pkgLen > -1) {
+                            index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
+                        }
                     }
                     return super.visitClassDeclaration(node, document);
                 }
 
-                TypeElement type = (TypeElement)e;
-                if (DEBUG) {
-                    LOG.log(Level.FINEST, "Indexing {0}:", type.getQualifiedName());
-                    LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
-                    LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
-                }
-
-                List<ExpressionTree> superTypes = new ArrayList<ExpressionTree>();
-                superTypes.addAll(node.getSupertypeList());
-                superTypes.addAll(node.getImplements());
-                superTypes.addAll(node.getMixins());
-
-                for(ExpressionTree et : superTypes) {
-                    TypeElement supr = (TypeElement)fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
-                    }
-                    index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
-                }
-                index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
-                index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
-                String fqn = type.getQualifiedName().toString();
-                index(document, IndexKey.CLASS_FQN, fqn);
-                if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
-                    int pkgLen = fqn.lastIndexOf(".");
-                    if (pkgLen > -1) {
-                        index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
-                    }
-                }
-                return super.visitClassDeclaration(node, document);
-            }
-
-            @Override
-            public Void visitVariable(VariableTree node, IndexDocument document) {
-                VariableElement e = (VariableElement)fxresult.getTrees().getElement(getCurrentPath());
-                if (e == null) {
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error resolving element of {0}", node);
-                    }
-                    return super.visitVariable(node, document);
-                }
-                if (e.getKind() == ElementKind.FIELD) { // can handle only fields for now
-                    ElementHandle eh = ElementHandle.create(e);
-                    if (eh == null) {
+                @Override
+                public Void visitVariable(VariableTree node, IndexDocument document) {
+                    VariableElement e = (VariableElement)fxresult.getTrees().getElement(getCurrentPath());
+                    if (e == null) {
                         if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing variable: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
                         }
                         return super.visitVariable(node, document);
                     }
-                    
-                    String indexVal = IndexingUtilities.getIndexValue(eh);
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal}); // NOI18N
-                    }
-                    index(document, IndexKey.FIELD_DEF, indexVal);
-                    indexVal = e.asType() != null ? e.asType().toString() : null;
-                    if (indexVal != null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Indexing variable type reference {0}\n", new String[]{indexVal}); // NOI18N
-                        }
-                        index(document, IndexKey.TYPE_REF, indexVal);
-                    } else {
-                        LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node.getInitializer());
-                    }
-                    
-                }
-                return super.visitVariable(node, document);
-            }
-
-            @Override
-            public Void visitFunctionDefinition(FunctionDefinitionTree node, IndexDocument document) {
-                Element el = fxresult.getTrees().getElement(getCurrentPath());
-                if (el == null) {
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error resolving element of {0}", node);
-                    }
-                    return super.visitFunctionDefinition(node, document);
-                }
-                if (el.getKind() == ElementKind.METHOD) {
-                    ExecutableElement e = (ExecutableElement)el;
-                    if (e.getReturnType().getKind() != TypeKind.OTHER && !e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
+                    if (e.getKind() == ElementKind.FIELD) { // can handle only fields for now
                         ElementHandle eh = ElementHandle.create(e);
                         if (eh == null) {
                             if (DEBUG) {
-                                LOG.log(Level.FINEST, "Error while processing function definition: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                LOG.log(Level.FINEST, "Error while processing variable: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
                             }
-                            return super.visitFunctionDefinition(node, document);
+                            return super.visitVariable(node, document);
                         }
+
                         String indexVal = IndexingUtilities.getIndexValue(eh);
                         if (DEBUG) {
-                            LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
+                            LOG.log(Level.FINEST, "Indexing variable {0} as {1}\n", new String[]{node.toString(), indexVal}); // NOI18N
                         }
-                        index(document, IndexKey.FUNCTION_DEF, indexVal);
+                        index(document, IndexKey.FIELD_DEF, indexVal);
                         indexVal = e.asType() != null ? e.asType().toString() : null;
                         if (indexVal != null) {
                             if (DEBUG) {
-                                LOG.log(Level.FINEST, "Indexing function def type reference {0}\n", new String[]{indexVal});
+                                LOG.log(Level.FINEST, "Indexing variable type reference {0}\n", new String[]{indexVal}); // NOI18N
+                            }
+                            index(document, IndexKey.TYPE_REF, indexVal);
+                        } else {
+                            LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node.getInitializer());
+                        }
+
+                    }
+                    return super.visitVariable(node, document);
+                }
+
+                @Override
+                public Void visitFunctionDefinition(FunctionDefinitionTree node, IndexDocument document) {
+                    Element el = fxresult.getTrees().getElement(getCurrentPath());
+                    if (el == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        }
+                        return super.visitFunctionDefinition(node, document);
+                    }
+                    if (el.getKind() == ElementKind.METHOD) {
+                        ExecutableElement e = (ExecutableElement)el;
+                        if (e.asType() == null) return super.visitFunctionDefinition(node, document); // workaround for NPE in Symbol$MethodSymbol
+                        if (e.getReturnType() != null && e.getReturnType().getKind() != TypeKind.OTHER && !e.getSimpleName().contentEquals("javafx$run$")) { // skip the synthetic "$javafx$run$" method generated for javafx scripts
+                            ElementHandle eh = ElementHandle.create(e);
+                            if (eh == null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Error while processing function definition: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                }
+                                return super.visitFunctionDefinition(node, document);
+                            }
+                            String indexVal = IndexingUtilities.getIndexValue(eh);
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Indexing function definition {0} as {1}\n", new String[]{node.toString(), indexVal});
+                            }
+                            index(document, IndexKey.FUNCTION_DEF, indexVal);
+                            indexVal = e.asType() != null ? e.asType().toString() : null;
+                            if (indexVal != null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Indexing function def type reference {0}\n", new String[]{indexVal});
+                                }
+                                index(document, IndexKey.TYPE_REF, indexVal);
+                            } else {
+                                LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
+                            }
+                        }
+                    }
+                    return super.visitFunctionDefinition(node, document);
+                }
+
+                @Override
+                public Void visitMethodInvocation(FunctionInvocationTree node, IndexDocument document) {
+                    Element el = fxresult.getTrees().getElement(getCurrentPath());
+                    if (el == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        }
+                        return super.visitMethodInvocation(node, document);
+                    }
+                    if (el.getKind() == ElementKind.METHOD) {
+                        ExecutableElement e = (ExecutableElement)el;
+                        ElementHandle eh = ElementHandle.create(e);
+                        if (eh == null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Error while processing method invocation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            }
+                            return super.visitMethodInvocation(node, document);
+                        }
+                        String indexVal = IndexingUtilities.getIndexValue(eh);
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
+                        }
+                        index(document, IndexKey.FUNCTION_INV, indexVal);
+                        indexVal = e.asType() != null ? e.asType().toString() : null;
+                        if (indexVal != null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Indexing function inv type reference {0}\n", new String[]{indexVal});
+                            }
+                            index(document, IndexKey.TYPE_REF, indexVal);
+                        } else {
+                            LOG.log(Level.FINE, "Can not determine function inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                        }
+                    }
+                    return super.visitMethodInvocation(node, document);
+                }
+
+                @Override
+                public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
+                    Element el = fxresult.getTrees().getElement(getCurrentPath());
+                    if (el == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        }
+                        return super.visitTypeClass(node, document);
+                    }
+                    if (el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) {
+                        ElementHandle eh = ElementHandle.create(el);
+                        if (eh == null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Error while processing type class: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            }
+                            return super.visitTypeClass(node, document);
+                        }
+                        String indexVal = IndexingUtilities.getIndexValue(eh);
+                        if (indexVal != null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Indexing type reference {0} as {1}\n", new String[]{node.toString(), indexVal});
                             }
                             index(document, IndexKey.TYPE_REF, indexVal);
                         } else {
                             LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
                         }
                     }
-                }
-                return super.visitFunctionDefinition(node, document);
-            }
-
-            @Override
-            public Void visitMethodInvocation(FunctionInvocationTree node, IndexDocument document) {
-                Element el = fxresult.getTrees().getElement(getCurrentPath());
-                if (el == null) {
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error resolving element of {0}", node);
-                    }
-                    return super.visitMethodInvocation(node, document);
-                }
-                if (el.getKind() == ElementKind.METHOD) {
-                    ExecutableElement e = (ExecutableElement)el;
-                    ElementHandle eh = ElementHandle.create(e);
-                    if (eh == null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing method invocation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
-                        }
-                        return super.visitMethodInvocation(node, document);
-                    }
-                    String indexVal = IndexingUtilities.getIndexValue(eh);
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
-                    }
-                    index(document, IndexKey.FUNCTION_INV, indexVal);
-                    indexVal = e.asType() != null ? e.asType().toString() : null;
-                    if (indexVal != null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Indexing function inv type reference {0}\n", new String[]{indexVal});
-                        }
-                        index(document, IndexKey.TYPE_REF, indexVal);
-                    } else {
-                        LOG.log(Level.FINE, "Can not determine function inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
-                    }
-                }
-                return super.visitMethodInvocation(node, document);
-            }
-
-            @Override
-            public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
-                Element el = fxresult.getTrees().getElement(getCurrentPath());
-                if (el == null) {
-                    if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error resolving element of {0}", node);
-                    }
                     return super.visitTypeClass(node, document);
                 }
-                if (el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) {
-                    ElementHandle eh = ElementHandle.create(el);
-                    if (eh == null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing type class: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
-                        }
-                        return super.visitTypeClass(node, document);
-                    }
-                    String indexVal = IndexingUtilities.getIndexValue(eh);
-                    if (indexVal != null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Indexing type reference {0} as {1}\n", new String[]{node.toString(), indexVal});
-                        }
-                        index(document, IndexKey.TYPE_REF, indexVal);
-                    } else {
-                        LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
-                    }
-                }
-                return super.visitTypeClass(node, document);
-            }
 
-            @Override
-            public Void visitMemberSelect(MemberSelectTree node, IndexDocument document) {
-                ExpressionTree expression = node.getExpression();
-                if (expression instanceof JFXIdent) {
-                    Name memberName = node.getIdentifier();
-                    Type type = ((JFXIdent)expression).type;
-                    if (type == null) return super.visitMemberSelect(node, document);
-                    TypeSymbol ts = type.asElement();
-                    if (ts == null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                @Override
+                public Void visitMemberSelect(MemberSelectTree node, IndexDocument document) {
+                    ExpressionTree expression = node.getExpression();
+                    if (expression instanceof JFXIdent) {
+                        Name memberName = node.getIdentifier();
+                        Type type = ((JFXIdent)expression).type;
+                        if (type == null) return super.visitMemberSelect(node, document);
+                        TypeSymbol ts = type.asElement();
+                        if (ts == null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                            }
+                            return super.visitMemberSelect(node, document);
                         }
-                        return super.visitMemberSelect(node, document);
-                    }
-                    if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, document);
-                    for(Symbol sy : ts.getEnclosedElements()) {
-                        if (sy.getKind() == ElementKind.FIELD) {
-                            if (sy.getSimpleName().equals(memberName)) {
-                                ElementHandle eh = ElementHandle.create(sy);
-                                if (eh == null) {
-                                    if (DEBUG) {
-                                        LOG.log(Level.FINEST, "Error while processing member select: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                        if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, document);
+                        for(Symbol sy : ts.getEnclosedElements()) {
+                            if (sy.getKind() == ElementKind.FIELD) {
+                                if (sy.getSimpleName().equals(memberName)) {
+                                    ElementHandle eh = ElementHandle.create(sy);
+                                    if (eh == null) {
+                                        if (DEBUG) {
+                                            LOG.log(Level.FINEST, "Error while processing member select: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                        }
+                                        return super.visitMemberSelect(node, document);
                                     }
-                                    return super.visitMemberSelect(node, document);
-                                }
-                                String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
-                                if (indexVal != null) {
-                                    if (DEBUG) {
-                                        LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
+                                    if (indexVal != null) {
+                                        if (DEBUG) {
+                                            LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                        }
+                                        index(document, IndexKey.FIELD_REF, indexVal);
+                                    } else {
+                                        LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
                                     }
-                                    index(document, IndexKey.FIELD_REF, indexVal);
-                                } else {
-                                    LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
                                 }
                             }
                         }
                     }
-                }
 
-                return super.visitMemberSelect(node, document);
-            }
-        };
-        visitor.scan(fxresult.getCompilationUnit(), document);
-        support.addDocument(document);
+                    return super.visitMemberSelect(node, document);
+                }
+            };
+            visitor.scan(fxresult.getCompilationUnit(), document);
+            support.addDocument(document);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Error indexing " + indexable.toString(), e);
+            return;
+        }
     }
 
     private void index(IndexDocument document, IndexKey key, String value) {
