@@ -42,12 +42,8 @@ package org.netbeans.modules.javafx.editor.format;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.tools.javafx.tree.JFXBlock;
-import com.sun.tools.javafx.tree.JFXExpression;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXIfExpression;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JFXVar;
+import com.sun.tools.javafx.tree.*;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -411,7 +407,7 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     endPos = (int) getEndPos(tree);
 
-                    // HACK: javafx sp.getEndPosition() returns position before semicolumn or curly bracket
+                    // HACK: javafx sp.getEndPosition() returns position before semicolon or curly bracket
                     final int _startOffset = doc.getStartPosition().getOffset();
                     final int _endOffset = doc.getEndPosition().getOffset();
                     if (endPos > _startOffset && endPos < _endOffset + 1) {
@@ -786,17 +782,17 @@ public class JFXReformatTask implements ReformatTask {
             }
             accept(JFXTokenId.RPAREN);
 
-            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-            accept(JFXTokenId.COLON);
-            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+            JFXType retType = funcDef.getJFXReturnType();
+            if (retType != null && !(retType instanceof JFXTypeUnknown)) {
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                accept(JFXTokenId.COLON);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
-            FunctionValueTree retType = funcDef.getFunctionValue();
-            if (retType != null) {
                 scan(retType, p);
                 if (indent == old) {
                     indent += continuationIndentSize;
                 }
-                space();
+//                space();
             }
 
             indent = old;
@@ -809,10 +805,9 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO
         @Override
         public Boolean visitFunctionValue(FunctionValueTree node, Void p) {
-            return super.visitFunctionValue(node, p);
+            return true;
         }
 
         @Override
@@ -949,7 +944,13 @@ public class JFXReformatTask implements ReformatTask {
             }
 
             boolean isEmpty = true;
-            for (ExpressionTree stat : node.getStatements()) {
+            final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
+            expressions.addAll(node.getStatements());
+            final ExpressionTree value = node.getValue();
+            if (value != null) {
+                expressions.add(value);
+            }
+            for (ExpressionTree stat : expressions) {
                 if (!isSynthetic((JFXTree) node)) {
                     isEmpty = false;
                     if (node instanceof FakeBlock) {
