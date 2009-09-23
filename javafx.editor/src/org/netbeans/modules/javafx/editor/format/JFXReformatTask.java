@@ -291,11 +291,12 @@ public class JFXReformatTask implements ReformatTask {
 
     private static class Pretty extends JavaFXTreePathScanner<Boolean, Void> {
 
-        private static final String OPERATOR = "operator"; //NOI18N
-        private static final String EMPTY = ""; //NOI18N
-        private static final String SPACE = " "; //NOI18N
-        private static final String ERROR = "<error>"; //NOI18N
-        private static final String SEMI = ";"; //NOI18N
+        private static final String OPERATOR = "operator"; // NOI18N
+        private static final String EMPTY = ""; // NOI18N
+        private static final String SPACE = " "; // NOI18N
+        private static final String ERROR = "<error>"; // NOI18N
+        private static final String SEMI = ";"; // NOI18N
+        private static final String WS_TEMPLATE = "\\s+"; // NOI18N
         private static final int ANY_COUNT = -1;
 
         private final Document doc;
@@ -409,13 +410,20 @@ public class JFXReformatTask implements ReformatTask {
                     endPos = Integer.MAX_VALUE;
                 } else {
                     endPos = (int) getEndPos(tree);
-                    
-                    // HACK: javafx sp.getEndPosition() returns position before semicolumn
-                    if (endPos > doc.getStartPosition().getOffset() && endPos < doc.getEndPosition().getOffset() + 1) {
+
+                    // HACK: javafx sp.getEndPosition() returns position before semicolumn or curly bracket
+                    final int _startOffset = doc.getStartPosition().getOffset();
+                    final int _endOffset = doc.getEndPosition().getOffset();
+                    if (endPos > _startOffset && endPos < _endOffset + 1) {
                         try {
-                            String txt = doc.getText(endPos, 1);
-                            if (SEMI.equals(txt)) {
-                                endPos++;
+                            int i = 0;
+                            String txt = null;
+                            do {
+                                txt = doc.getText(endPos + i, 1);
+                                i++;
+                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
+                            if (SEMI.equals(txt) || RCBRACE.equals(txt)) {
+                                endPos += i;
                             }
                         } catch (BadLocationException ex) {
                         }
@@ -506,7 +514,7 @@ public class JFXReformatTask implements ReformatTask {
 
             int old = indent;
             ModifiersTree mods = node.getModifiers();
-            if (mods != null) {
+            if (hasModifiers(mods)) {
                 if (scan(mods, p)) {
                     indent += continuationIndentSize;
                     if (cs.placeNewLineAfterModifiers()) {
@@ -691,7 +699,7 @@ public class JFXReformatTask implements ReformatTask {
             Tree parent = getCurrentPath().getParentPath().getLeaf();
             boolean insideFor = parent.getJavaFXKind() == JavaFXKind.FOR_EXPRESSION_FOR; // TODO other FOR_EXPRESSIONs ?
             ModifiersTree mods = node.getModifiers();
-            if (mods != null) {
+            if (hasModifiers(mods)) {
                 if (scan(mods, p)) {
                     if (!insideFor) {
                         indent += continuationIndentSize;
@@ -745,7 +753,7 @@ public class JFXReformatTask implements ReformatTask {
             int old = indent;
 
             ModifiersTree mods = funcDef.getModifiers();
-            if (mods != null) {
+            if (hasModifiers(mods)) {
                 if (scan(mods, p)) {
                     indent += continuationIndentSize;
                     if (cs.placeNewLineAfterModifiers()) {
@@ -817,9 +825,10 @@ public class JFXReformatTask implements ReformatTask {
                 if (id != null) {
                     space();
                 }
-                // TODO other modifiers
-                id = accept(JFXTokenId.PRIVATE, JFXTokenId.PROTECTED, JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
-                        JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY, JFXTokenId.AT, JFXTokenId.MIXIN);
+                id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
+                        JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
+                        JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
+                        JFXTokenId.AT, JFXTokenId.MIXIN);
                 if (id == null) {
                     break;
                 }
@@ -2994,6 +3003,11 @@ public class JFXReformatTask implements ReformatTask {
 
         private long getStartPos(Tree node) {
             return sp.getStartPosition(root, node);
+        }
+
+        private static boolean hasModifiers(ModifiersTree mods) {
+            // TODO check flags when it will work
+            return mods != null && !mods.toString().contentEquals("script only (default)"); // NOI18N
         }
 
         private static class FakeBlock extends JFXBlock {
