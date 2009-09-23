@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.AssignmentTree;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.InstantiateTree;
@@ -118,11 +117,10 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 final Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
-
-                removeAnnotations(file, annotationsToRemove);
+                StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+                removeAnnotations(document, annotationsToRemove);
+                annotationsToRemove.clear();
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
-
-
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
@@ -130,8 +128,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         if (node.getMixins() != null) {
                             extendsList.addAll(node.getMixins());
                         }
-                        //extendsList.addAll(node.getImplements());
-                        //extendsList.addAll(node.getSupertypeList());
                         if (node.getExtends() != null) {
                             extendsList.addAll(node.getExtends());
                         }
@@ -148,7 +144,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             classTrees.put(currentClass, extendsSet);
                         }
                         return super.visitClassDeclaration(node, p);
-                        //return null;
                     }
 
                     @Override
@@ -158,7 +153,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 //                            classTrees.put(element, Collections.<Tree>singletonList(node));
 //                        }
                         return super.visitInstantiate(node, p);
-                        //return null;
                     }
 
                     @Override
@@ -178,7 +172,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             }
                         }
                         return super.visitFunctionDefinition(node, p);
-                        //return null;
                     }
                 };
 
@@ -256,20 +249,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
             }
             HintsController.setErrors(FXSourceUtils.getDocument(file), "Override", errors); //NOI18N
-
         }
-    }
-
-    private void removeAnnotations(final FileObject file, final Collection<Annotation> annotationsToRemove) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                final StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
-                for (Annotation annotation : annotationsToRemove) {
-                    NbDocument.removeAnnotation(document, annotation);
-                }
-            }
-        });
     }
 
     private void addOverriddenAnnotations(final HintsModel model,
@@ -282,17 +262,17 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             for (Hint hint : model.getHints()) {
                 resolveOverridenDescription(file, hint, compilationInfo, overridenToAbstract, annotationsToRemove); //NOI18N
             }
-
         }
     }
 
-    private void resolveOverridenDescription(final FileObject file,
+    private synchronized void resolveOverridenDescription(FileObject file,
             Hint hint,
             CompilationInfo compilationInfo,
             Map<MethodSymbol, MethodSymbol> overridenToAbstract,
             Collection<Annotation> annotationsToRemove) {
 
-        final Map<Annotation, Integer> annotations = new HashMap<Annotation, Integer>();
+        Map<Annotation, Integer> annotations = new HashMap<Annotation, Integer>();
+
         for (MethodSymbol overridenMethod : hint.getMethods()) {
             Tree tree = compilationInfo.getTrees().getTree(overridenMethod);
             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
@@ -319,15 +299,14 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             };
             annotations.put(annotation, start);
         }
-        annotationsToRemove.clear();
+        final StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+        final Map<Annotation, Integer> annotationsCopy = new HashMap<Annotation, Integer>(annotations);
         annotationsToRemove.addAll(annotations.keySet());
-        SwingUtilities.invokeLater(new Runnable() {
+        Runnable runnable = new Runnable() {
 
             public void run() {
-                for (Annotation annotation : annotations.keySet()) {
-
-                    StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
-                    final int start = annotations.get(annotation);
+                for (Annotation annotation : annotationsCopy.keySet()) {
+                    final int start = annotationsCopy.get(annotation);
                     Position position = new Position() {
 
                         public int getOffset() {
@@ -337,7 +316,32 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     NbDocument.addAnnotation(document, position, start, annotation);
                 }
             }
-        });
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    private void removeAnnotations(final StyledDocument document, Collection<Annotation> annotationsToRemove) {
+        final Collection<Annotation> annotationsToRemoveCopy = new HashSet<Annotation>(annotationsToRemove);
+        Runnable runnable = new Runnable() {
+
+            public void run() {
+                for (Annotation annotation : annotationsToRemoveCopy) {
+                    NbDocument.removeAnnotation(document, annotation);
+                }
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+        for (Annotation annotation : annotationsToRemove) {
+            NbDocument.removeAnnotation(document, annotation);
+        }
     }
 
     private ErrorDescription getErrorDescription(final FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
