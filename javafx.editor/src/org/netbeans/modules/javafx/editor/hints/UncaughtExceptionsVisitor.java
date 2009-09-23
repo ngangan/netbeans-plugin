@@ -81,6 +81,9 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         }
         for (String instantType : instantTypes) {
             //TODO WeakCash for optimization
+            if (HintsUtils.checkString(instantType)) {
+                continue;
+            }
             Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(instantType, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
             for (ElementHandle<TypeElement> elementHandle : options) {
                 TypeElement typeElement = elementHandle.resolve(compilationInfo);
@@ -105,7 +108,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                         } catch (NullPointerException ex) {
                             System.out.println(ex.getMessage());
                         }
-                         
+
                         if (thrownExceptions == null || thrownExceptions.size() == 0) {
                             continue;
                         }
@@ -117,7 +120,8 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         return super.visitMethodInvocation(node, model);
     }
     //TODO Temporary log for issue 148890
-    private  Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
+
+    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
         Collection<? extends Element> elements = null;
         try {
             elements = compilationInfo.getElements().getAllMembers(typeElement);
@@ -146,8 +150,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
 
     private static String extractMethodName(String fullMethodName) {
         int end = fullMethodName.indexOf("."); //NOI18N
-        String className = fullMethodName.substring(0, end).replace("{}","").replace("()", "").trim(); //NOI18N
+        String className = fullMethodName.substring(0, end).replace("{}", "").replace("()", "").trim(); //NOI18N
         return className;
     }
-
 }

@@ -108,7 +108,7 @@ public class EmptyCatchTaskFactory extends EditorAwareJavaSourceTaskFactory {
     }
 
      private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
-        StringBuilder sb = new StringBuilder(" "); //NOI18N
+       // StringBuilder sb = new StringBuilder(" "); //NOI18N
 //        Iterator<Type> iterator = hint.getExceptions().iterator();
 //        while (iterator.hasNext()) {
 //            sb.append(iterator.next().toString());

@@ -67,6 +67,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
+import org.netbeans.api.editor.settings.EditorStyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
@@ -231,7 +232,7 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         SwingUtilities.invokeLater(new Runnable() {
 
                             public void run() {
-                                updateEditor(compilationInfo, hint);
+                                updateEditor(hint);
                             }
                         });
                         
@@ -250,7 +251,7 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
 //        return ed;
 //    }
 
-    private void updateEditor(CompilationInfo compilationInfo, Hint hint) {
+    private void updateEditor(Hint hint) {
         int start = hint.getStartPosition();
         int end = hint.getLength() + hint.getStartPosition();
 
@@ -259,7 +260,7 @@ public class UnusedVarTaskFactory extends EditorAwareJavaSourceTaskFactory {
         while (hs.moveNext()) {
             as.add(hs.getAttributes());
         }
-        as.add(AttributesUtilities.createImmutable(StyleConstants.Underline, Color.LIGHT_GRAY));
+        as.add(AttributesUtilities.createImmutable(EditorStyleConstants.WaveUnderlineColor, Color.LIGHT_GRAY));
         AttributeSet[] array = as.toArray(new AttributeSet[as.size()]);
         AttributeSet asfinal = AttributesUtilities.createImmutable(array);
         getBag(document).addHighlight(start, end, asfinal);

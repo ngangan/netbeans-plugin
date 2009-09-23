@@ -5,6 +5,7 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import java.util.Collection;
+import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -38,6 +39,10 @@ final class HintsUtils {
             fqName = fqName.substring(start); //NOI18N
         }
         return fqName;
+    }
+
+    static boolean checkString(String name) {
+        return Pattern.compile("[!@#$%^&*(){}\\|:'?/><~`]").matcher(name).find();
     }
 
      

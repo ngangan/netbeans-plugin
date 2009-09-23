@@ -40,6 +40,7 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.AssignmentTree;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.InstantiateTree;
@@ -64,6 +65,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -117,10 +120,12 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
 
                 removeAnnotations(file, annotationsToRemove);
-                JavaFXTreePathScanner<Void, HintsModel> visitor = new JavaFXTreePathScanner<Void, HintsModel>() {
+                JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
+
+
 
                     @Override
-                    public Void visitClassDeclaration(ClassDeclarationTree node, HintsModel p) {
+                    public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
                         List<Tree> extendsList = new ArrayList<Tree>();
                         if (node.getMixins() != null) {
                             extendsList.addAll(node.getMixins());
@@ -143,19 +148,21 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             classTrees.put(currentClass, extendsSet);
                         }
                         return super.visitClassDeclaration(node, p);
+                        //return null;
                     }
 
                     @Override
-                    public Void visitInstantiate(InstantiateTree node, HintsModel p) {
+                    public Void visitInstantiate(InstantiateTree node, Void p) {
 //                        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
 //                        if (element != null && element.getKind() == ElementKind.CLASS) {
 //                            classTrees.put(element, Collections.<Tree>singletonList(node));
 //                        }
                         return super.visitInstantiate(node, p);
+                        //return null;
                     }
 
                     @Override
-                    public Void visitFunctionDefinition(FunctionDefinitionTree node, HintsModel p) {
+                    public Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
                         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) {
                             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                             if (element != null) {
@@ -171,6 +178,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             }
                         }
                         return super.visitFunctionDefinition(node, p);
+                        //return null;
                     }
                 };
 
@@ -178,6 +186,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
                     for (Tree tree : classTrees.get(currentClass)) {
+                        if (HintsUtils.checkString(tree.toString())) {
+                            continue;
+                        }
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
@@ -352,10 +363,8 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             JTextComponent target = Utilities.getFocusedComponent();
                             Imports.addImport(target, EXCEPTION);
                             for (MethodSymbol method : hint.getMethods()) {
-                                System.out.println(method);
                                 addImport(target, method.asType());
                                 for (VarSymbol var : method.getParameters()) {
-                                    System.out.println(var);
                                     scanImport(target, var.asType());
                                 }
                             }
@@ -378,17 +387,17 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             }
 
             private void addImport(JTextComponent target, Type type) {
-                String returnName = type.toString();
-//                    returnName = returnName.replace("[", "").replace("]", "").trim();
-//                    returnName = returnName.replaceAll("<", "").replaceAll("?", "").replaceAll(">", "").replaceAll("()", "").replaceAll("(", "");
-//                    returnName = returnName.replaceAll(" extends ", "").replaceAll(" E ", "").replaceAll(" T ", "").trim();
-                int index = returnName.lastIndexOf(")");
-                if (index > 0) {
-                    String toRemove = returnName.substring(index, returnName.length());
-                    returnName = returnName.replace(toRemove, "");
-                }
-                if (!type.isPrimitive() && !returnName.equals("void") && !returnName.equals("Void") && returnName.contains(".")) {
-                    Imports.addImport(target, returnName);
+                String importName = type.toString();
+                if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) {
+                    importName = removeBetween("()", importName);
+                    importName = removeBetween("<>", importName);
+                    Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName);
+                    if (symbolMatcher.find()) {
+                        importName = symbolMatcher.replaceAll("").trim();
+                    }
+                    if (importName.contains(".") && !importName.equals("java.lang.Object")) {
+                        Imports.addImport(target, importName);
+                    }
                 }
             }
 
@@ -435,6 +444,16 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         return ed;
     }
 
+    private String removeBetween(String symbols, String name) {
+        int firstIndex = name.indexOf(symbols.substring(0, 1));
+        int lastIndex = name.indexOf(symbols.substring(1, 2));
+        if (firstIndex < 0 || lastIndex < 0) {
+            return name;
+        }
+        name = name.replace(name.substring(firstIndex, lastIndex + 1), "");
+        return name;
+    }
+
     private String getTypeString(Type type) {
         String varType = type.toString();
         if (type.isPrimitive()) {
@@ -456,7 +475,13 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 varType = Character.class.getSimpleName();
             }
         }
-
+        if (varType.equals("E") || varType.equals("T")) {
+            varType = "Object";
+        }
+        if (varType.equals("E[]") || varType.equals("T[]")) {
+            varType = "Object[]";
+        }
+        varType = removeBetween("<>", varType);
         return varType;
     }
 
