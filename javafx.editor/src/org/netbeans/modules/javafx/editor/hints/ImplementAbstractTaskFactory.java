@@ -87,6 +87,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.text.Annotation;
 import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -97,7 +98,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
-    private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
     public ImplementAbstractTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -157,7 +158,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
                     @Override
                     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
-                        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) {
+                        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
                             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                             if (element != null) {
                                 Element currentClass = element.getEnclosingElement();
@@ -182,6 +183,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         if (HintsUtils.checkString(tree.toString())) {
                             continue;
                         }
+                        System.out.println("Tree : " + tree);
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
@@ -204,7 +206,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                             Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
                                             boolean exists = false;
                                             if (overridenMethodList != null && overridenMethodList.size() != 0) {
-                                                for (MethodSymbol overridenMethod : overridenMethodList) 
+                                                for (MethodSymbol overridenMethod : overridenMethodList) {
                                                     //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
                                                     try {
                                                         if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
@@ -255,7 +257,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         if (model.getHints() != null) {
             Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
             for (Hint hint : model.getHints()) {
-                errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+                errors.add(getErrorDescription(file, hint, compilationInfo));
             }
             HintsController.setErrors(FXSourceUtils.getDocument(file), "Override", errors); //NOI18N
         }
@@ -357,7 +359,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         Fix fix = new Fix() {
 
             public String getText() {
-                return "Implement all abstract methods"; //NOI18N
+                return NbBundle.getMessage(ImplementAbstractTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"); //NOI18N
             }
 
             public ChangeInfo implement() throws Exception {
@@ -401,59 +403,58 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
             private void addImport(JTextComponent target, Type type) {
                 String importName = type.toString();
-                if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) {
-                    importName = removeBetween("()", importName);
-                    importName = removeBetween("<>", importName);
-                    Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName);
+                if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) { //NOI18N
+                    importName = removeBetween("()", importName); //NOI18N
+                    importName = removeBetween("<>", importName); //NOI18N
+                    Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName); //NOI18N
                     if (symbolMatcher.find()) {
-                        importName = symbolMatcher.replaceAll("").trim();
+                        importName = symbolMatcher.replaceAll("").trim(); //NOI18N
                     }
-                    if (importName.contains(".") && !importName.equals("java.lang.Object")) {
+                    if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
                         Imports.addImport(target, importName);
                     }
                 }
             }
 
             private String createMethod(MethodSymbol methodSymbol) {
-                //StringBuilder method = new StringBuilder("\n");
                 StringBuilder method = new StringBuilder();
-                method.append("\n\toverride ");
+                method.append("\n\toverride "); //NOI18N
                 for (Modifier modifier : methodSymbol.getModifiers()) {
                     switch (modifier) {
                         case PUBLIC:
-                            method.append("public ");
+                            method.append("public "); //NOI18N
                             break;
                         case PROTECTED:
-                            method.append("protected ");
+                            method.append("protected "); //NOI18N
                             break;
                     }
                 }
-                method.append("function ").append(methodSymbol.getQualifiedName() + " (");
+                method.append("function ").append(methodSymbol.getQualifiedName() + " ("); //NOI18N
                 if (methodSymbol.getParameters() != null) {
                     Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
                     while (iterator.hasNext()) {
                         VarSymbol var = iterator.next();
                         String varType = getTypeString(var.asType());
-                        method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType));
+                        method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
                         if (iterator.hasNext()) {
-                            method.append(", ");
+                            method.append(", "); //NOI18N
                         }
                     }
                 }
                 String returnType = getTypeString(methodSymbol.getReturnType());
-                if (returnType.equals("void")) {
-                    returnType = "Void";
+                if (returnType.equals("void")) { //NOI18N
+                    returnType = "Void"; //NOI18N
                 } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);
                 }
-                method.append(")").append(" : ").append(returnType).append(" { \n");
-                method.append("\t\tthrow new UnsupportedOperationException('Not implemented yet');\n");
-                method.append("\t}\n");
+                method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
+                method.append("\t\tthrow new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                method.append("\t}\n"); //NOI18N
 
                 return method.toString();
             }
         };
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Implement all abstract methods", Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(ImplementAbstractTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
         return ed;
     }
 
@@ -470,31 +471,31 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
     private String getTypeString(Type type) {
         String varType = type.toString();
         if (type.isPrimitive()) {
-            if (varType.equals("int")) {
+            if (varType.equals("int")) { //NOI18N
                 varType = Integer.class.getSimpleName();
-            } else if (varType.equals("long")) {
+            } else if (varType.equals("long")) { //NOI18N
                 varType = Long.class.getSimpleName();
-            } else if (varType.equals("byte")) {
+            } else if (varType.equals("byte")) { //NOI18N
                 varType = Byte.class.getSimpleName();
-            } else if (varType.equals("short")) {
+            } else if (varType.equals("short")) { //NOI18N
                 varType = Short.class.getSimpleName();
-            } else if (varType.equals("float")) {
+            } else if (varType.equals("float")) { //NOI18N
                 varType = Float.class.getSimpleName();
-            } else if (varType.equals("double")) {
+            } else if (varType.equals("double")) { //NOI18N
                 varType = Double.class.getSimpleName();
-            } else if (varType.equals("boolean")) {
+            } else if (varType.equals("boolean")) { //NOI18N
                 varType = Boolean.class.getSimpleName();
-            } else if (varType.equals("char")) {
+            } else if (varType.equals("char")) { //NOI18N
                 varType = Character.class.getSimpleName();
             }
         }
-        if (varType.equals("E") || varType.equals("T")) {
-            varType = "Object";
+        if (varType.equals("E") || varType.equals("T")) { //NOI18N
+            varType = "Object"; //NOI18N
         }
-        if (varType.equals("E[]") || varType.equals("T[]")) {
-            varType = "Object[]";
+        if (varType.equals("E[]") || varType.equals("T[]")) { //NOI18N
+            varType = "Object[]"; //NOI18N
         }
-        varType = removeBetween("<>", varType);
+        varType = removeBetween("<>", varType); //NOI18N
         return varType;
     }
 
@@ -524,9 +525,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             elements = compilationInfo.getElements().getAllMembers(typeElement);
         } catch (NullPointerException npe) {
             npe.printStackTrace();
-            System.err.println("* e = " + typeElement);
-            System.err.println("* e.getKind() = " + typeElement.getKind());
-            System.err.println("* e.asType() = " + typeElement.asType());
+            System.err.println("* e = " + typeElement); //NOI18N
+            System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
+            System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
         }
         return elements;
     }

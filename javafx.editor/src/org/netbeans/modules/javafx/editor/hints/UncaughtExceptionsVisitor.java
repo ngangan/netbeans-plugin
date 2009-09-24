@@ -73,7 +73,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         this.classIndex = classIndex;
         instantTypes = new HashSet<String>();
     }
-   
+
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel model) {
         if (node.toString().contains(".")) { //NOI18N
