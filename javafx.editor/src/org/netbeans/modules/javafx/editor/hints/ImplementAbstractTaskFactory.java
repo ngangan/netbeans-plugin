@@ -204,14 +204,20 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                             Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
                                             boolean exists = false;
                                             if (overridenMethodList != null && overridenMethodList.size() != 0) {
-                                                for (MethodSymbol overridenMethod : overridenMethodList) {
-                                                    if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
-                                                            method.getParameters().size() == overridenMethod.getParameters().size() &&
-                                                            COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
+                                                for (MethodSymbol overridenMethod : overridenMethodList) 
+                                                    //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
+                                                    try {
+                                                        if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
+                                                                method.getParameters().size() == overridenMethod.getParameters().size() &&
+                                                                COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
 
-                                                        overridenToAbstract.put(overridenMethod, method);
-                                                        exists = true;
-                                                        break;
+                                                            overridenToAbstract.put(overridenMethod, method);
+                                                            exists = true;
+                                                            break;
+                                                        }
+                                                    } catch (Exception ex) {
+                                                        //ex.printStackTrace();
+                                                        continue;
                                                     }
                                                 }
                                             }
