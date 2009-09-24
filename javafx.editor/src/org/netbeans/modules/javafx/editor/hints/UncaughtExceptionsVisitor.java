@@ -73,29 +73,31 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         this.classIndex = classIndex;
         instantTypes = new HashSet<String>();
     }
-
+   
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel model) {
         if (node.toString().contains(".")) { //NOI18N
             instantTypes.add(extractMethodName(node.toString()));
         }
         for (String instantType : instantTypes) {
-            //TODO WeakCash for optimization
             if (HintsUtils.checkString(instantType)) {
                 continue;
             }
             Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(instantType, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
             for (ElementHandle<TypeElement> elementHandle : options) {
                 TypeElement typeElement = elementHandle.resolve(compilationInfo);
-                if (typeElement == null) {
+                if (typeElement == null || typeElement.getQualifiedName() == null) {
                     continue;
                 }
                 String elementType = HintsUtils.getMethodName(typeElement.getQualifiedName().toString()).trim();
-                if (!elementType.equals(instantType)) {
+                if (elementType == null || !elementType.equals(instantType)) {
                     break;
                 }
-                Collection<? extends Element> c = getAllMembers(typeElement, compilationInfo);
-                for (Element element : c) {
+                Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                if (elements == null) {
+                    continue;
+                }
+                for (Element element : elements) {
                     if (element instanceof MethodSymbol) {
                         MethodSymbol methodSymbol = (MethodSymbol) element;
                         if (!methodSymbol.getSimpleName().toString().equals(HintsUtils.getMethodName(node.toString()))) {

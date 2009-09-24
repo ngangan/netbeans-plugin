@@ -189,6 +189,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                            if (elements == null) {
+                                continue;
+                            }
                             for (Element element : elements) {
                                 if (element instanceof MethodSymbol) {
                                     MethodSymbol method = (MethodSymbol) element;
