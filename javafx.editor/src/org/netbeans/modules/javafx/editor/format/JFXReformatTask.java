@@ -712,9 +712,12 @@ public class JFXReformatTask implements ReformatTask {
             if (indent == old && !insideFor) {
                 indent += continuationIndentSize;
             }
-
-            accept(JFXTokenId.DEF, JFXTokenId.VAR, JFXTokenId.ATTRIBUTE);
-            space();
+            
+            JFXTokenId accepted = accept(JFXTokenId.DEF, JFXTokenId.VAR, JFXTokenId.ATTRIBUTE);
+            // put space if this VAR is not parameter
+            if (accepted != null) {
+                space();
+            }
 
             final Name name = node.getName();
             if (!ERROR.contentEquals(name)) {
@@ -807,6 +810,12 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitFunctionValue(FunctionValueTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
@@ -1744,7 +1753,12 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitBinary(BinaryTree node, Void p) {
             int alignIndent = cs.alignMultilineBinaryOp() ? col : -1;
             scan(node.getLeftOperand(), p);
-            wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, cs.spaceAroundBinaryOps() ? 1 : 0, node.getRightOperand());
+//            spaces(cs.spaceAroundBinaryOps() ? 1 : 0);
+//            accept(JFXTokenId.EQEQ, JFXTokenId.GTEQ, JFXTokenId.LTEQ, JFXTokenId.NOTEQ);
+//            spaces(cs.spaceAroundBinaryOps() ? 1 : 0);
+//            scan(node.getLeftOperand(), p);
+//            wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, cs.spaceAroundBinaryOps() ? 1 : 0, node.getRightOperand());
+            wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, 0, node.getRightOperand());
             return true;
         }
 
