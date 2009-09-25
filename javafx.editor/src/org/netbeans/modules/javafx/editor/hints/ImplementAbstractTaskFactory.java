@@ -45,9 +45,6 @@ import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
-import java.util.Collection;
-import java.util.HashSet;
-import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -55,25 +52,18 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Modifier;
+import javax.lang.model.element.*;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -99,32 +89,38 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-
+    private final AtomicBoolean isOver = new AtomicBoolean(true);
+    private final Map<Document, Collection<Annotation>> annotationsToRemove = new HashMap<Document, Collection<Annotation>>();
+    
     public ImplementAbstractTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
+        
         return new CancellableTask<CompilationInfo>() {
-
-            private final Collection<Annotation> annotationsToRemove = new HashSet<Annotation>();
 
             public void cancel() {
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                if (!isOver.get()) {
+                    return;
+                }
+                StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+                removeAnnotations(document, annotationsToRemove);
+                isOver.getAndSet(false);
                 final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 final Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
-                StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
                 removeAnnotations(document, annotationsToRemove);
                 annotationsToRemove.clear();
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
-                    public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                    public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
                         List<Tree> extendsList = new ArrayList<Tree>();
                         if (node.getMixins() != null) {
                             extendsList.addAll(node.getMixins());
@@ -144,20 +140,20 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             }
                             classTrees.put(currentClass, extendsSet);
                         }
-                        return super.visitClassDeclaration(node, p);
+                        return super.visitClassDeclaration(node, v);
                     }
 
                     @Override
-                    public Void visitInstantiate(InstantiateTree node, Void p) {
+                    public Void visitInstantiate(InstantiateTree node, Void v) {
 //                        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
 //                        if (element != null && element.getKind() == ElementKind.CLASS) {
 //                            classTrees.put(element, Collections.<Tree>singletonList(node));
 //                        }
-                        return super.visitInstantiate(node, p);
+                        return super.visitInstantiate(node, v);
                     }
 
                     @Override
-                    public Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
+                    public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
                         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
                             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                             if (element != null) {
@@ -172,7 +168,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                 }
                             }
                         }
-                        return super.visitFunctionDefinition(node, p);
+                        return super.visitFunctionDefinition(node, v);
                     }
                 };
 
@@ -183,7 +179,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         if (HintsUtils.checkString(tree.toString())) {
                             continue;
                         }
-                        System.out.println("Tree : " + tree);
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(tree.toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
@@ -218,7 +213,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                                             break;
                                                         }
                                                     } catch (Exception ex) {
-                                                        //ex.printStackTrace();
+                                                        ex.printStackTrace();
                                                         continue;
                                                     }
                                                 }
@@ -248,9 +243,11 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 addHintsToController(modelFix, compilationInfo, file);
-                addOverriddenAnnotations(modelOverriden, file, compilationInfo, overridenToAbstract, annotationsToRemove);
+                addOverriddenAnnotations(modelOverriden, file, compilationInfo, overridenToAbstract, document);
+                isOver.getAndSet(true);
             }
         };
+
     }
 
     private void addHintsToController(HintsModel model, CompilationInfo compilationInfo, FileObject file) {
@@ -264,24 +261,23 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
     }
 
     private void addOverriddenAnnotations(final HintsModel model,
-            final FileObject file,
+            FileObject file,
             CompilationInfo compilationInfo,
             Map<MethodSymbol, MethodSymbol> overridenToAbstract,
-            final Collection<Annotation> annotationsToRemove) {
+            Document document) {
 
         if (model.getHints() != null) {
             for (Hint hint : model.getHints()) {
-                resolveOverridenDescription(file, hint, compilationInfo, overridenToAbstract, annotationsToRemove); //NOI18N
+                resolveOverridenDescription(hint, compilationInfo, overridenToAbstract, (StyledDocument) document); //NOI18N
             }
         }
     }
 
-    private synchronized void resolveOverridenDescription(FileObject file,
+    private synchronized void resolveOverridenDescription(
             Hint hint,
             CompilationInfo compilationInfo,
             Map<MethodSymbol, MethodSymbol> overridenToAbstract,
-            Collection<Annotation> annotationsToRemove) {
-
+            final StyledDocument document) {
         Map<Annotation, Integer> annotations = new HashMap<Annotation, Integer>();
 
         for (MethodSymbol overridenMethod : hint.getMethods()) {
@@ -310,9 +306,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             };
             annotations.put(annotation, start);
         }
-        final StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+        //final StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
         final Map<Annotation, Integer> annotationsCopy = new HashMap<Annotation, Integer>(annotations);
-        annotationsToRemove.addAll(annotations.keySet());
+        annotationsToRemove.put(document, annotations.keySet());
         Runnable runnable = new Runnable() {
 
             public void run() {
@@ -326,32 +322,13 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     };
                     NbDocument.addAnnotation(document, position, start, annotation);
                 }
+                annotationsCopy.clear();
             }
         };
         if (SwingUtilities.isEventDispatchThread()) {
             runnable.run();
         } else {
             SwingUtilities.invokeLater(runnable);
-        }
-    }
-
-    private void removeAnnotations(final StyledDocument document, Collection<Annotation> annotationsToRemove) {
-        final Collection<Annotation> annotationsToRemoveCopy = new HashSet<Annotation>(annotationsToRemove);
-        Runnable runnable = new Runnable() {
-
-            public void run() {
-                for (Annotation annotation : annotationsToRemoveCopy) {
-                    NbDocument.removeAnnotation(document, annotation);
-                }
-            }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
-        for (Annotation annotation : annotationsToRemove) {
-            NbDocument.removeAnnotation(document, annotation);
         }
     }
 
@@ -497,6 +474,26 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         }
         varType = removeBetween("<>", varType); //NOI18N
         return varType;
+    }
+
+    private void removeAnnotations(final StyledDocument document, Map<Document, Collection<Annotation>> annotationsToRemove) {
+        if (annotationsToRemove.get(document) == null) {
+            return;
+        }
+        final Collection<Annotation> annotationsToRemoveCopy = new HashSet<Annotation>(annotationsToRemove.get(document));
+        Runnable runnable = new Runnable() {
+
+            public void run() {
+                for (Annotation annotation : annotationsToRemoveCopy) {
+                    NbDocument.removeAnnotation(document, annotation);
+                }
+            }
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
     }
 
     private int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
