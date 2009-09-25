@@ -71,6 +71,7 @@ import org.openide.text.EditorSupport;
 import org.openide.text.PositionRef;                                                                                                                                                                                           
 import org.openide.util.Exceptions;
 import org.openide.util.Parameters;
+import org.netbeans.api.javafx.source.TreeUtilities;
                                                                                                                                                                                                                                
 /**                                                                                                                                                                                                                            
  * Represents a handle for {@link TreePath} which can be kept and later resolved                                                                                                                                               
@@ -229,7 +230,14 @@ public final class TreePathHandle {
                 enclElIsCorrespondingEl = false;
             }
         } while ((element == null || !isSupported(element)) && current != null);
-        return new TreePathHandle(new TreeDelegate(pos, new TreeDelegate.KindPath(treePath), file, ElementHandle.create(element), element.getSimpleName().toString(), enclElIsCorrespondingEl));
+        TreePathHandle tph = new TreePathHandle(new TreeDelegate(pos, new TreeDelegate.KindPath(treePath), file, ElementHandle.create(element), element.getSimpleName().toString(), enclElIsCorrespondingEl));
+
+        JavaFXTreePath resolved = tph.resolve(info);
+        if (!new TreeDelegate.KindPath(treePath).equals(new TreeDelegate.KindPath(resolved))) {
+            System.out.println("break");
+        }
+
+        return tph;
     }
 
     /**                                                                                                                                                                                                                        

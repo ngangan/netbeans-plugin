@@ -83,6 +83,15 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
         return null;
     }
 
+    final public static RenameRefactoringElement create(TreePathHandle handle, String newName, Lookup context) {
+        try {
+            return new RenameRefactoringElement(handle, newName, null, context);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
+        return null;
+    }
+
     private RenameRefactoringElement(TreePathHandle handle, String newName, String oldName, Lookup context) throws IOException {
         this.handle = handle;
         this.newName = newName;
@@ -93,15 +102,13 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
 
     public String getDisplayText() {
         try {
-            int lineNo = Utilities.getLineOffset((BaseDocument)des.getDocument(), startPosition) + 1;
-
             StringBuilder origLine = new StringBuilder();
             int delta = extractLine(startPosition, origLine);
 
             StringBuilder newLine = new StringBuilder(origLine);
             newLine.replace(delta, delta + oldText.length(), newName);
 
-            return lineNo + ": " + processDiff(newLine.toString(), origLine.toString());
+            return processDiff(newLine.toString(), origLine.toString());
         } catch (Exception e) {
             e.printStackTrace();
             return "Renaming";
@@ -239,7 +246,9 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
 
             public void run(CompilationController cc) throws Exception {
                 JavaFXTreePath path = handle.resolve(cc);
-
+                if (oldText == null) {
+                    oldText = cc.getTrees().getElement(path).getSimpleName().toString();
+                }
                 if (path != null) {
                     switch(path.getLeaf().getJavaFXKind()) {
                         case CLASS_DECLARATION: {

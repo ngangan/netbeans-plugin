@@ -40,8 +40,6 @@
  */
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.JavaFXTreeScanner;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -49,7 +47,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -57,7 +54,6 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindOverridersScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindSubclassesScanner;
@@ -67,9 +63,7 @@ import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.Lookups;
 
 /**
  * Actual implementation of Find Usages query search for Ruby

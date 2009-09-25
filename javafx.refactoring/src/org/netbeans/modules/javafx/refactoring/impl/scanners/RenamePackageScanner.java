@@ -44,17 +44,16 @@ import org.netbeans.modules.refactoring.spi.ProgressProvider;
  *
  * @author Jaroslav Bachorik
  */
-public class RenamePackageScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandle>> {
+public class RenamePackageScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
     final private static String TYPE_MATCH_PATTERN = "(\\..+)*(\\[\\])*";
     
     final private String origQualName;
     final private ProgressProvider pp;
-    final private CompilationController cc;
 
     public RenamePackageScanner(String origName, ProgressProvider pp, CompilationController cc) {
+        super(null, cc);
         this.origQualName = origName;
         this.pp = pp;
-        this.cc = cc;
     }
 
     @Override
@@ -62,25 +61,16 @@ public class RenamePackageScanner extends JavaFXTreePathScanner<Void, Set<TreePa
         ExpressionTree packageNameTree = node.getPackageName();
         String packageName = packageNameTree != null ? packageNameTree.toString() : "";
         if (packageName.equals(origQualName)) {
-            JavaFXTreePath packageNameTp = cc.getTrees().getPath(node, node.getPackageName());
-            p.add(TreePathHandle.create(packageNameTp, cc));
+            JavaFXTreePath packageNameTp = getCompilationController().getTrees().getPath(node, node.getPackageName());
+            p.add(TreePathHandle.create(packageNameTp, getCompilationController()));
         }
         return super.visitCompilationUnit(node, p);
     }
 
-//    @Override
-//    public Void visitImport(ImportTree node, Set<TreePathHandle> p) {
-//        String qualName = node.getQualifiedIdentifier().toString();
-//        if (qualName.startsWith(origQualName + ".")) {
-//            p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getQualifiedIdentifier()), cc));
-//        }
-//        return super.visitImport(node, p);
-//    }
-
     @Override
     public Void visitMemberSelect(MemberSelectTree node, Set<TreePathHandle> p) {
         if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, node.getExpression().toString())) {
-            p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()), cc));
+            p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()), getCompilationController()));
         }
         return super.visitMemberSelect(node, p);
     }

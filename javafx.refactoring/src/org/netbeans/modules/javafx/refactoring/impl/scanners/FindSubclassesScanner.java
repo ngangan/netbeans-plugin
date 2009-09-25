@@ -29,16 +29,6 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import java.util.regex.Pattern;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -53,24 +43,20 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jaroslav Bachorik
  */
-public class FindSubclassesScanner extends JavaFXTreePathScanner<Void, RefactoringElementsBag> {
-    private TreePathHandle searchHandle;
+public class FindSubclassesScanner extends BaseRefactoringScanner<Void, RefactoringElementsBag> {
     private ElementHandle elementHandle;
     private String targetName;
     private AbstractRefactoring refactoring;
-
-    private CompilationController cc;
 
     public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle handle, CompilationController cc) {
         this(refactoring, handle, ElementHandle.create(handle.resolveElement(cc)), cc);
     }
 
     public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
-        this.searchHandle = handle;
+        super(handle, cc);
         this.elementHandle = elementHandle;
         this.targetName = elementHandle.getQualifiedName();
         this.refactoring = refactoring;
-        this.cc = cc;
     }
 
     @Override
@@ -78,9 +64,9 @@ public class FindSubclassesScanner extends JavaFXTreePathScanner<Void, Refactori
         switch (elementHandle.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
                 if (targetName.equals(te.getQualifiedName().toString())) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getSearchHandle())));
                 }
             }
         }

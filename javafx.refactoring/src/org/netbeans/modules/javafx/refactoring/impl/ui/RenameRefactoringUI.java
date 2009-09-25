@@ -84,6 +84,8 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
             case CLASS:
             case INTERFACE:
             case FIELD:
+            case LOCAL_VARIABLE:
+            case PARAMETER:
             case METHOD: {
                 oldName = element.getSimpleName().toString();
                 if (oldName.equals(handle.getFileObject().getName())) {

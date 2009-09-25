@@ -329,7 +329,6 @@ public class ElementHandle<T extends Element> {
                     break;
                 case LOCAL_VARIABLE: // space magic
                 case FIELD:
-                case PARAMETER:
                 case ENUM_CONSTANT:
                     assert element instanceof VariableElement;
                     signatures = createFieldDescriptor((VariableElement)element);
@@ -504,7 +503,7 @@ public class ElementHandle<T extends Element> {
 
         if (!(enclosingElement instanceof TypeElement)) {
 	    throw new IllegalArgumentException("Can't handle local variable"); //NOI18N
-	}
+        }
         result[0] = encodeClassNameOrArray((TypeElement) enclosingElement);
         Name n = ve.getSimpleName();
         result[1] = n == null ? "?" : n.toString();

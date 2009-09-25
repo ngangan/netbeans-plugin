@@ -41,19 +41,21 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.SyntheticTree.SynthType;
+import com.sun.source.tree.MethodTree;
+import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.comp.JavafxAttrContext;
 import com.sun.tools.javafx.comp.JavafxEnv;
 import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JFXBreak;
 import com.sun.tools.javafx.tree.JFXContinue;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
@@ -66,10 +68,13 @@ import javax.swing.text.Document;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.SourceVersion;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
 import org.netbeans.modules.parsing.api.Source;
 
@@ -110,13 +115,49 @@ public final class TreeUtilities {
             if (LOGGABLE) log("isSynthetic invoked with null argument"); // NOI18N
             return false;
         }
-        final Tree leaf = path.getLeaf();
-        if (leaf instanceof JFXTree) {
-            JFXTree fxLeaf = (JFXTree)leaf;
-            SynthType type = fxLeaf.getGenType();
-            return SynthType.SYNTHETIC.equals(type);
+        while (path != null) {
+            final Tree leaf = path.getLeaf();
+            if (leaf instanceof JFXTree) {
+                if (isSynthetic(path.getCompilationUnit(), leaf)) {
+                    return true;
+                }
+                path = path.getParentPath();
+            }
         }
         if (LOGGABLE) log("isSynthetic returning false because the leaf is not JFXTree."); // NOI18N
+        return false;
+    }
+
+    public boolean isSynthetic(UnitTree cut, Tree leaf) throws NullPointerException {
+        JCTree tree = (JCTree) leaf;
+
+        if (tree.pos == (-1))
+            return true;
+
+        if (leaf.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
+            //check for synthetic constructor:
+            return (((JFXFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
+        }
+
+//        //check for synthetic superconstructor call:
+//        if (leaf.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
+//            ExpressionStatementTree est = (ExpressionStatementTree) leaf;
+//
+//            if (est.getExpression().getKind() == Kind.METHOD_INVOCATION) {
+//                MethodInvocationTree mit = (MethodInvocationTree) est.getExpression();
+//
+//                if (mit.getMethodSelect().getKind() == Kind.IDENTIFIER) {
+//                    IdentifierTree it = (IdentifierTree) mit.getMethodSelect();
+//
+//                    if ("super".equals(it.getName().toString())) {
+//                        SourcePositions sp = info.getTrees().getSourcePositions();
+//
+//                        return sp.getEndPosition(cut, leaf) == (-1);
+//                    }
+//                }
+//            }
+//        }
+
         return false;
     }
     
@@ -176,7 +217,7 @@ public final class TreeUtilities {
     public JavaFXTreePath pathFor(JavaFXTreePath path, int pos, SourcePositions sourcePositions) {
         if (parserResultImpl == null || path == null || sourcePositions == null)
             throw new IllegalArgumentException();
-        
+
         class Result extends Error {
             JavaFXTreePath path;
             Result(JavaFXTreePath path) {
@@ -192,14 +233,16 @@ public final class TreeUtilities {
                 this.pos = pos;
                 this.sourcePositions = sourcePositions;
             }
-            
+
             @Override
             public Void scan(Tree tree, Void p) {
-                if (tree != null) {
-                    super.scan(tree, p);
+                if (tree != null && 
+                    !tree.toString().equals("\"\"")) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
+                    if (isSynthetic(parserResultImpl.getCompilationUnit(), tree)) return null;
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
                     if (start != -1 && start < pos && end >= pos) {
+                        super.scan(tree, p);
                         JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
                         boolean isSynteticMainBlock = isSynthetic(tp);
                         // we don't want to return the syntetic main block as the result
@@ -297,6 +340,52 @@ public final class TreeUtilities {
             }
         }
         return scope;
+    }
+
+    /**Find span of the {@link VariableTree#getName()} identifier in the source.
+     * Returns starting and ending offset of the name in the source code that was parsed
+     * (ie. {@link CompilationInfo.getText()}, which may differ from the positions in the source
+     * document if it has been already altered.
+     *
+     * @param var variable which name should be searched for
+     * @return the span of the name, or null if cannot be found
+     * @since 0.25
+     */
+    public int[] findNameSpan(VariableTree var) {
+        return findNameSpan(var.getName().toString(), var, JFXTokenId.VAR, JFXTokenId.DEF);
+    }
+
+    /**Find span of the {@link MethodTree#getName()} identifier in the source.
+     * Returns starting and ending offset of the name in the source code that was parsed
+     * (ie. {@link CompilationInfo.getText()}, which may differ from the positions in the source
+     * document if it has been already altered.
+     *
+     * @param method method which name should be searched for
+     * @return the span of the name, or null if cannot be found
+     * @since 0.25
+     */
+    public int[] findNameSpan(FunctionDefinitionTree method) {
+        if (isSynthetic(parserResultImpl.getCompilationUnit(), method)) {
+            return null;
+        }
+        JFXFunctionDefinition jcm = (JFXFunctionDefinition) method;
+        String name = jcm.name.toString();
+////        if (jcm.name == jcm.name.table.names.init) {
+//            JavaFXTreePath path = parserResultImpl.getTrees().getPath(parserResultImpl.getCompilationUnit(), jcm);
+//            if (path == null) {
+//                return null;
+//            }
+//            Element em = parserResultImpl.getTrees().getElement(path);
+//            Element clazz;
+//            if (em == null || (clazz = em.getEnclosingElement()) == null || !clazz.getKind().isClass()) {
+//                return null;
+//            }
+//
+//            name = clazz.getSimpleName().toString();
+////        } else {
+////            name = method.getName().toString();
+////        }
+        return findNameSpan(name, method, JFXTokenId.FUNCTION, JFXTokenId.ABSTRACT);
     }
 
     /**Returns tokens for a given tree.
@@ -506,6 +595,43 @@ public final class TreeUtilities {
         JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
         return JavafxResolve.isStatic(fxEnv);
 //        return Resolve.isStatic(((JavafxcScope) scope).getEnv());
+    }
+
+    private int[] findNameSpan(String name, Tree t, JFXTokenId... allowedTokens) {
+        if (!SourceVersion.isIdentifier(name)) {
+            //names like "<error>", etc.
+            return null;
+        }
+
+        JCTree jcTree = (JCTree) t;
+        int pos = jcTree.pos;
+
+        if (pos < 0)
+            return null;
+
+        Set<JFXTokenId> allowedTokensSet = EnumSet.of(JFXTokenId.WS);
+
+        allowedTokensSet.addAll(Arrays.asList(allowedTokens));
+
+        TokenSequence<JFXTokenId> tokenSequence = parserResultImpl.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+
+        tokenSequence.move(pos);
+
+        boolean wasNext;
+
+        while ((wasNext = tokenSequence.moveNext()) && allowedTokensSet.contains(tokenSequence.token().id()));
+
+        if (wasNext) {
+            if (tokenSequence.token().id() == JFXTokenId.IDENTIFIER &&
+                name.contentEquals(tokenSequence.token().text())) {
+                return new int[] {
+                    tokenSequence.offset(),
+                    tokenSequence.offset() + tokenSequence.token().length()
+                };
+            }
+        }
+
+        return null;
     }
 
     private static void log(String s) {

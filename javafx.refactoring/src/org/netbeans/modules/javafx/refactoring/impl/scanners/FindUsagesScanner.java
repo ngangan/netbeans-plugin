@@ -55,10 +55,9 @@ import org.openide.util.lookup.Lookups;
  *
  * @author Jaroslav Bachorik
  */
-public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringElementsBag> {
+public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringElementsBag> {
     final private static String TYPE_MATCH_PATTERN = "(\\[\\])*";
 
-    private TreePathHandle searchHandle;
     private ElementHandle elementHandle;
     private String targetName;
     private AbstractRefactoring refactoring;
@@ -70,7 +69,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
     }
 
     public FindUsagesScanner(WhereUsedQuery refactoring, TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
-        this.searchHandle = handle;
+        super(handle, cc);
         this.elementHandle = elementHandle;
         this.targetName = handle.getSimpleName();
         this.refactoring = refactoring;
@@ -84,13 +83,13 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
             case INTERFACE: {
                 TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
                 if (Pattern.matches(targetName + TYPE_MATCH_PATTERN, te.getSimpleName().toString())) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
                 }
                 for(ExpressionTree et : node.getSupertypeList()) {
                     JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), et);
                     te = (TypeElement)cc.getTrees().getElement(path);
                     if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, te.getQualifiedName().toString())) {
-                        elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(path, cc), Lookups.singleton(searchHandle)));
+                        elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(path, cc), Lookups.singleton(getSearchHandle())));
                     }
                 }
             }
@@ -106,7 +105,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
                 TypeElement te = (TypeElement)cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, typeName)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), cc), Lookups.singleton(getSearchHandle())));
                 }
                 break;
             }
@@ -122,7 +121,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
                 TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, typeName)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
                 }
                 break;
             }
@@ -137,7 +136,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
             if (e.getKind() == ElementKind.FIELD) {
                 ElementHandle eh = ElementHandle.create(e);
                 if (eh != null && elementHandle.equals(eh)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
                     return null;
                 }
             }
@@ -155,7 +154,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
             if (elementHandle.getKind() == ElementKind.METHOD) {
                 ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
                 if (eh != null && elementHandle.equals(eh)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
                     return null;
                 }
         }
@@ -172,7 +171,7 @@ public class FindUsagesScanner extends JavaFXTreePathScanner<Void, RefactoringEl
             if (node.getIdentifier().contentEquals(targetName)) {
                 Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()));
                 if (e.asType().toString().equals(elementHandle.getSignatures()[0])) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(searchHandle)));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
                 }
             }
 

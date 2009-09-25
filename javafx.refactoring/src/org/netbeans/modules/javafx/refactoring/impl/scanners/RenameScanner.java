@@ -16,7 +16,7 @@
  *  nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
  *  particular file as subject to the "Classpath" exception as provided
  *  by Sun in the GPL Version 2 section of the License file that
- *  accompanied this code. If applicable, add the following below the
+ *  agetCompilationController()ompanied this code. If applicable, add the following below the
  *  License Header, with the fields enclosed by brackets [] replaced by
  *  your own identifying information:
  *  "Portions Copyrighted [year] [name of copyright owner]"
@@ -32,18 +32,22 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javafx.tree.JFXVarScriptInit;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
@@ -58,34 +62,33 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
  *
  * @author Jaroslav Bachorik
  */
-public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandle>> {
+public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
     final private static String TYPE_MATCH_PATTERN = "(\\..+)*(\\[\\])*";
     final private String origSimpleName;
     final private String origQualName;
-    final private ElementHandle origHandle;
-    final private CompilationController cc;
+    final private Element origElement;
 
-    public RenameScanner(ElementHandle origElementHandle, CompilationController cc) {
-        this.origHandle = origElementHandle;
-        this.origSimpleName = origElementHandle.resolve(cc).getSimpleName().toString();
-        this.origQualName = (origHandle.getKind() == ElementKind.CLASS || origHandle.getKind() == ElementKind.INTERFACE) ? origHandle.getQualifiedName() : "";
-        this.cc = cc;
+    public RenameScanner(TreePathHandle searchHandle, CompilationController cc) {
+        super(searchHandle, cc);
+        this.origElement = searchHandle.resolveElement(getCompilationController());
+        this.origSimpleName = origElement.getSimpleName().toString();
+        this.origQualName = (origElement.getKind() == ElementKind.CLASS || origElement.getKind() == ElementKind.INTERFACE) ? ((TypeElement)origElement).getQualifiedName().toString() : "";
     }
 
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, Set<TreePathHandle> p) {
-        switch (origHandle.getKind()) {
+        switch (origElement.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
                 if (Pattern.matches(origSimpleName + TYPE_MATCH_PATTERN, te.getSimpleName().toString())) {
-                    p.add(TreePathHandle.create(getCurrentPath(), cc));
+                    p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                 }
                 for(ExpressionTree et : node.getSupertypeList()) {
                     JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), et);
-                    te = (TypeElement)cc.getTrees().getElement(path);
+                    te = (TypeElement)getCompilationController().getTrees().getElement(path);
                     if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, te.getQualifiedName().toString())) {
-                        p.add(TreePathHandle.create(path, cc));
+                        p.add(TreePathHandle.create(path, getCompilationController()));
                     }
                 }
             }
@@ -95,13 +98,13 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
 
     @Override
     public Void visitInstantiate(InstantiateTree node, Set<TreePathHandle> p) {
-        switch (origHandle.getKind()) {
+        switch (origElement.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, typeName)) {
-                    p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), cc));
+                    p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), getCompilationController()));
                 }
                 break;
             }
@@ -111,13 +114,13 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
 
     @Override
     public Void visitTypeClass(TypeClassTree node, Set<TreePathHandle> p) {
-        switch(origHandle.getKind()) {
+        switch(origElement.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, typeName)) {
-                    p.add(TreePathHandle.create(getCurrentPath(), cc));
+                    p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                 }
                 break;
             }
@@ -127,12 +130,12 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
 
     @Override
     public Void visitImport(ImportTree node, Set<TreePathHandle> p) {
-        switch (origHandle.getKind()) {
+        switch (origElement.getKind()) {
             case CLASS:
             case INTERFACE: {
                 String qualName = node.getQualifiedIdentifier().toString();
                 if (qualName.equals(origQualName)) {
-                    p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getQualifiedIdentifier()), cc));
+                    p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getQualifiedIdentifier()), getCompilationController()));
                 }
                 break;
             }
@@ -143,38 +146,44 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
 
     @Override
     public Void visitVariable(VariableTree node, Set<TreePathHandle> p) {
-        Element e = cc.getTrees().getElement(getCurrentPath());
-        if (e.getKind() != ElementKind.FIELD) return super.visitVariable(node, p);
-        
-        ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
-        if (origHandle.equals(eh)) {
-            p.add(TreePathHandle.create(getCurrentPath(), cc));
+        Element e = getCompilationController().getTrees().getElement(getCurrentPath());
+
+        switch (e.getKind()) {
+            case LOCAL_VARIABLE:
+            case PARAMETER:
+            case FIELD: {
+                if (origElement.equals(e)) {
+                    if (node instanceof JFXVarScriptInit) {
+                        p.add(TreePathHandle.create(JavaFXTreePath.getPath(getCompilationController().getCompilationUnit(), ((JFXVarScriptInit)node).getVar()), getCompilationController()));
+                    } else {
+                        p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
+                    }
+                }
+            }
         }
+        
         return super.visitVariable(node, p);
     }
 
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Set<TreePathHandle> p) {
-        if (origHandle.getKind() != ElementKind.METHOD) return super.visitFunctionDefinition(node, p);
-        Element e = cc.getTrees().getElement(getCurrentPath());
+        if (origElement.getKind() != ElementKind.METHOD) return super.visitFunctionDefinition(node, p);
+        Element e = getCompilationController().getTrees().getElement(getCurrentPath());
         ElementHandle eh = ElementHandle.create(e);
 
-        if (origHandle.equals(eh)) {
-            p.add(TreePathHandle.create(getCurrentPath(), cc));
+        if (origElement.equals(e)) {
+            p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
         }
         return super.visitFunctionDefinition(node, p);
     }
 
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, Set<TreePathHandle> p) {
-        if (origHandle.getKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, p);
-        Element e = cc.getTrees().getElement(getCurrentPath());
+        if (origElement.getKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, p);
+        Element e = getCompilationController().getTrees().getElement(getCurrentPath());
         ExecutableElement ee = (ExecutableElement)e;
-        System.err.println("Return type of " + e + " : " + ee.getReturnType());
-        ElementHandle eh = ElementHandle.create(e);
-
-        if (origHandle.equals(eh)) {
-            p.add(TreePathHandle.create(getCurrentPath(), cc));
+        if (origElement.equals(ee)) {
+            p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
         }
         
         return super.visitMethodInvocation(node, p);
@@ -182,8 +191,6 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
 
     @Override
     public Void visitMemberSelect(MemberSelectTree node, Set<TreePathHandle> p) {
-        if (!node.getIdentifier().contentEquals(origSimpleName)) return super.visitMemberSelect(node, p);
-
         ExpressionTree expression = node.getExpression();
         if (expression instanceof JFXIdent) {
             Type type = ((JFXIdent)expression).type;
@@ -192,9 +199,8 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
             if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, p);
             for(Symbol sy : ts.getEnclosedElements()) {
                 if (sy.getKind() == ElementKind.FIELD) {
-                    ElementHandle eh = ElementHandle.create(sy);
-                    if (origHandle.equals(eh)) {
-                        p.add(TreePathHandle.create(getCurrentPath(), cc));
+                    if (origElement.equals(sy)) {
+                        p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                     }
                 }
             }
@@ -202,5 +208,18 @@ public class RenameScanner extends JavaFXTreePathScanner<Void, Set<TreePathHandl
         return super.visitMemberSelect(node, p);
     }
 
-
+    @Override
+    public Void visitIdentifier(IdentifierTree node, Set<TreePathHandle> p) {
+        switch (origElement.getKind()) {
+            case FIELD:
+            case PARAMETER:
+            case LOCAL_VARIABLE: {
+                if (origSimpleName.equals(node.toString())) {
+                    p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
+                }
+                break;
+            }
+        }
+        return super.visitIdentifier(node, p);
+    }
 }
