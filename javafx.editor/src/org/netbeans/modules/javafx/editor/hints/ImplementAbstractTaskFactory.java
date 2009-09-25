@@ -64,7 +64,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.BadLocationException;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -108,7 +107,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 if (!isOver.get()) {
                     return;
                 }
-                StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
+                StyledDocument document = (StyledDocument) compilationInfo.getDocument();
                 removeAnnotations(document, annotationsToRemove);
                 isOver.getAndSet(false);
                 final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
@@ -242,26 +241,25 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         modelOverriden.addHint(currentTree, overridenMethods.get(currentClass), currentClass);
                     }
                 }
-                addHintsToController(modelFix, compilationInfo, file);
-                addOverriddenAnnotations(modelOverriden, file, compilationInfo, overridenToAbstract, document);
+                addHintsToController(document, modelFix, compilationInfo, file);
+                addOverriddenAnnotations(modelOverriden, compilationInfo, overridenToAbstract, document);
                 isOver.getAndSet(true);
             }
         };
 
     }
 
-    private void addHintsToController(HintsModel model, CompilationInfo compilationInfo, FileObject file) {
+    private void addHintsToController(Document document, HintsModel model, CompilationInfo compilationInfo, FileObject file) {
         if (model.getHints() != null) {
             Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
             for (Hint hint : model.getHints()) {
-                errors.add(getErrorDescription(file, hint, compilationInfo));
+                errors.add(getErrorDescription(document, file, hint, compilationInfo));
             }
-            HintsController.setErrors(FXSourceUtils.getDocument(file), "Override", errors); //NOI18N
+            HintsController.setErrors(document, "Override", errors); //NOI18N
         }
     }
 
     private void addOverriddenAnnotations(final HintsModel model,
-            FileObject file,
             CompilationInfo compilationInfo,
             Map<MethodSymbol, MethodSymbol> overridenToAbstract,
             Document document) {
@@ -306,7 +304,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             };
             annotations.put(annotation, start);
         }
-        //final StyledDocument document = (StyledDocument) FXSourceUtils.getDocument(file);
         final Map<Annotation, Integer> annotationsCopy = new HashMap<Annotation, Integer>(annotations);
         annotationsToRemove.put(document, annotations.keySet());
         Runnable runnable = new Runnable() {
@@ -332,7 +329,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
         }
     }
 
-    private ErrorDescription getErrorDescription(final FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
+    private ErrorDescription getErrorDescription(final Document document, FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
         Fix fix = new Fix() {
 
             public String getText() {
@@ -345,7 +342,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 for (MethodSymbol methodSymbol : hint.getMethods()) {
                     methods.append(createMethod(methodSymbol));
                 }
-                final Document document = FXSourceUtils.getDocument(file);
                 final int positon = findPositionAtTheEnd(compilationInfo, hint.getTree());
                 SwingUtilities.invokeLater(new Runnable() {
 

@@ -58,7 +58,6 @@ import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
@@ -101,7 +100,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     for (Hint hint : model.getHints()) {
                         errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
                     }
-                    HintsController.setErrors(FXSourceUtils.getDocument(file), "Try-Catch", errors); //NOI18N
+                    HintsController.setErrors(compilationInfo.getDocument(), "Try-Catch", errors); //NOI18N
                 }
             }
         };
@@ -116,7 +115,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                 sb.append(", "); //NOI18N
             }
         }
-        Fix fix = new UncaughtExceptionsFix(FXSourceUtils.getDocument(file), hint, compilationInfo);
+        Fix fix = new UncaughtExceptionsFix(compilationInfo.getDocument(), hint, compilationInfo);
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());

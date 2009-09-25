@@ -129,9 +129,9 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
             elements = compilationInfo.getElements().getAllMembers(typeElement);
         } catch (NullPointerException npe) {
             npe.printStackTrace();
-            System.err.println("* e = " + typeElement);
-            System.err.println("* e.getKind() = " + typeElement.getKind());
-            System.err.println("* e.asType() = " + typeElement.asType());
+            System.err.println("* e = " + typeElement); //NOI18N
+            System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
+            System.err.println("* e.asType() = " + typeElement.asType()); //NOi18N
         }
         return elements;
     }
