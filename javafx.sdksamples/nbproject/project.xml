@@ -24,7 +24,7 @@
                         <specification-version>1.11</specification-version>
                     </run-dependency>
                 </dependency>
-                <dependency>
+<!--                <dependency>
                     <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -32,7 +32,7 @@
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
                 </dependency>
-                <dependency>
+-->                <dependency>
                     <code-name-base>org.netbeans.modules.projectapi</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -99,7 +99,9 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>org.netbeans.modules.javafx.sdksamples.api</package>
+            </public-packages>
         </data>
     </configuration>
 </project>
