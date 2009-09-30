@@ -327,6 +327,7 @@ public class ElementHandle<T extends Element> {
                     assert element instanceof ExecutableElement;
                     signatures = createExecutableDescriptor((ExecutableElement)element);
                     break;
+                case PARAMETER:
                 case LOCAL_VARIABLE: // space magic
                 case FIELD:
                 case ENUM_CONSTANT:
@@ -501,8 +502,8 @@ public class ElementHandle<T extends Element> {
         String[] result = new String[3];
         Element enclosingElement = ve.getEnclosingElement();
 
-        if (!(enclosingElement instanceof TypeElement)) {
-	    throw new IllegalArgumentException("Can't handle local variable"); //NOI18N
+        while (!(enclosingElement instanceof TypeElement)) {
+	    enclosingElement = enclosingElement.getEnclosingElement();
         }
         result[0] = encodeClassNameOrArray((TypeElement) enclosingElement);
         Name n = ve.getSimpleName();

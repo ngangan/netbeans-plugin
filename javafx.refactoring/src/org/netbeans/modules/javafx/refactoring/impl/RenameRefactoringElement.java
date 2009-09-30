@@ -42,7 +42,6 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;

@@ -30,7 +30,6 @@ package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
@@ -74,6 +73,4 @@ public class RenamePackageScanner extends BaseRefactoringScanner<Void, Set<TreeP
         }
         return super.visitMemberSelect(node, p);
     }
-
-
 }

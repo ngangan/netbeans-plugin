@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
@@ -40,23 +41,27 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner<R, P>{
     final private TreePathHandle searchHandle;
     final private CompilationController cc;
+    final private SourcePositions positions;
     
     public BaseRefactoringScanner(TreePathHandle searchHandle, CompilationController cc) {
         this.searchHandle = searchHandle;
         this.cc = cc;
+        this.positions = cc.getTrees().getSourcePositions();
     }
 
     @Override
     final public R scan(Tree tree, P p) {
-        if (tree != null && cc.getTreeUtilities().isSynthetic(cc.getCompilationUnit(), tree)) return null; // skip over the synthetic subtrees
+        long start = positions.getStartPosition(getCompilationController().getCompilationUnit(), tree);
+        long end =  positions.getEndPosition(getCompilationController().getCompilationUnit(), tree);
+        if (end == start) return null;
         return super.scan(tree, p);
     }
 
-    protected TreePathHandle getSearchHandle() {
+    final protected TreePathHandle getSearchHandle() {
         return searchHandle;
     }
 
-    protected CompilationController getCompilationController() {
+    final protected CompilationController getCompilationController() {
         return cc;
     }
 }
