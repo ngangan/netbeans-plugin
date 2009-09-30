@@ -239,6 +239,15 @@ final public class SourceUtils {
         //return ClassPath.getClassPath(fo, ClassPath.SOURCE)!=null;
     }
 
+     public static boolean isFromLibrary(Element element, ClasspathInfo info) {
+        FileObject file = getFile(element, info);
+        if (file==null) {
+            //no source for given element. Element is from library
+            return true;
+        }
+        return FileUtil.getArchiveFile(file)!=null;
+    }
+
     public static boolean isClasspathRoot(FileObject fo) {
         ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
         return cp != null ? fo.equals(cp.findOwnerRoot(fo)) : false;

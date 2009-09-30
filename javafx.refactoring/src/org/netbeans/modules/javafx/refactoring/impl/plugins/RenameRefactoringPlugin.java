@@ -50,11 +50,13 @@ import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
@@ -62,7 +64,9 @@ import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 import org.netbeans.modules.refactoring.spi.RefactoringElementImplementation;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 
@@ -171,7 +175,24 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
     }
 
     public Problem preCheck() {
-        return null;
+        final Problem[] problem = new Problem[1];
+        JavaFXSource jfxs = JavaFXSource.forFileObject(treePathHandle.getFileObject());
+        try {
+            jfxs.runWhenScanFinished(new Task<CompilationController>() {
+
+                public void run(CompilationController info) throws Exception {
+                    Element el = treePathHandle.resolveElement(info);
+                    while (el != null && (el.getKind() != ElementKind.CLASS && el.getKind() != ElementKind.INTERFACE)) {
+                        el = el.getEnclosingElement();
+                    }
+                    problem[0] = el != null ? isSourceElement(el, info) : null;
+                }
+            }, true);
+        } catch (IOException e) {
+            return new Problem(true, e.getLocalizedMessage());
+        }
+
+       return problem[0];
     }
 
     public Problem prepare(final RefactoringElementsBag bag) {
@@ -254,8 +275,30 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
     private Problem checkFileNameClash(String newName, FileObject target) {
         for(FileObject fo : target.getParent().getChildren()) {
             if (!fo.equals(target) && newName.equals(fo.getName())) {
-                return new Problem(true, "There already is a " + (fo.isFolder() ? "package" : "file" + " named ") + fo.getName());
+                String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fo.isFolder() ? "MSG_PackageExists" : "MSG_FileExists", fo.getName()); // NOI18N
+                return new Problem(true, msg);
             }
+        }
+        return null;
+    }
+
+    public static final Problem isSourceElement(Element el, CompilationInfo info) {
+        Problem preCheckProblem = null;
+        if (SourceUtils.isFromLibrary(el, info.getClasspathInfo())) { //NOI18N
+            preCheckProblem = new Problem(true, NbBundle.getMessage(
+                    RenameRefactoringPlugin.class, "ERR_CannotRefactorLibraryClass",
+                    el
+                    ));
+            return preCheckProblem;
+        }
+        FileObject file = SourceUtils.getFile(el,info.getClasspathInfo());
+        // RetoucheUtils.isFromLibrary already checked file for null
+        if (!SourceUtils.isFileInOpenProject(file)) {
+            preCheckProblem =new Problem(true, NbBundle.getMessage(
+                    RenameRefactoringPlugin.class,
+                    "ERR_ProjectNotOpened",
+                    FileUtil.getFileDisplayName(file)));
+            return preCheckProblem;
         }
         return null;
     }
