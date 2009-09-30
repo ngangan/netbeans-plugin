@@ -191,7 +191,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
         ExecutableElement e = (ExecutableElement)getCompilationController().getTrees().getElement(getCurrentPath());
         ElementHandle eh = ElementHandle.create(e);
 
-        if (eh != null && (eh.equals(origHandle))) {
+        if (eh != null && (eh.equals(origHandle) || getCompilationController().getElements().overrides(e, (ExecutableElement)origHandle.resolve(getCompilationController()), (TypeElement)e.getEnclosingElement()))) {
             p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
             return null;
         }
