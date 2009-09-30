@@ -51,6 +51,7 @@ import com.sun.tools.javafx.comp.JavafxAttrContext;
 import com.sun.tools.javafx.comp.JavafxEnv;
 import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JFXBreak;
+import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXContinue;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXTree;
@@ -139,6 +140,9 @@ public final class TreeUtilities {
             return (((JFXFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
         }
 
+        SourcePositions sp = parserResultImpl.getTrees().getSourcePositions();
+        return sp.getStartPosition(cut, leaf) == sp.getEndPosition(cut, leaf);
+
 //        //check for synthetic superconstructor call:
 //        if (leaf.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
 //            ExpressionStatementTree est = (ExpressionStatementTree) leaf;
@@ -158,7 +162,7 @@ public final class TreeUtilities {
 //            }
 //        }
 
-        return false;
+//        return false;
     }
     
     /**Returns list of comments attached to a given tree. Can return either
@@ -202,19 +206,19 @@ public final class TreeUtilities {
 //        return Collections.unmodifiableList(comments);
 //    }
     
-    public JavaFXTreePath pathFor(int pos) {
+    public JavaFXTreePath pathFor(long pos) {
         return pathFor(new JavaFXTreePath(parserResultImpl.getCompilationUnit()), pos);
     }
 
     /*XXX: dbalek
      */
-    public JavaFXTreePath pathFor(JavaFXTreePath path, int pos) {
+    public JavaFXTreePath pathFor(JavaFXTreePath path, long pos) {
         return pathFor(path, pos, parserResultImpl.getTrees().getSourcePositions());
     }
 
     /*XXX: dbalek
      */
-    public JavaFXTreePath pathFor(JavaFXTreePath path, int pos, SourcePositions sourcePositions) {
+    public JavaFXTreePath pathFor(JavaFXTreePath path, long pos, SourcePositions sourcePositions) {
         if (parserResultImpl == null || path == null || sourcePositions == null)
             throw new IllegalArgumentException();
 
@@ -226,25 +230,60 @@ public final class TreeUtilities {
         }
         
         class PathFinder extends JavaFXTreePathScanner<Void,Void> {
-            private int pos;
+            private long pos;
             private SourcePositions sourcePositions;
             
-            private PathFinder(int pos, SourcePositions sourcePositions) {
+            private PathFinder(long pos, SourcePositions sourcePositions) {
                 this.pos = pos;
                 this.sourcePositions = sourcePositions;
+            }
+
+            @Override
+            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                long[] span = findNameSpan(node);
+
+                if (span != null && span[0] <= pos && pos <= span[1]) {
+                    throw new Result(getCurrentPath());
+                }
+                
+                return super.visitClassDeclaration(node, p);
+            }
+
+            @Override
+            public Void visitVariable(VariableTree node, Void p) {
+                long[] span = findNameSpan(node);
+
+                if (span != null && span[0] <= pos && pos <= span[1]) {
+                    throw new Result(getCurrentPath());
+                }
+
+                return super.visitVariable(node, p);
+            }
+
+            @Override
+            public Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
+                long[] span = findNameSpan(node);
+
+                if (span != null && span[0] <= pos && pos <= span[1]) {
+                    throw new Result(getCurrentPath());
+                }
+
+                return super.visitFunctionDefinition(node, p);
             }
 
             @Override
             public Void scan(Tree tree, Void p) {
                 if (tree != null && 
                     !tree.toString().equals("\"\"")) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
-                    if (isSynthetic(parserResultImpl.getCompilationUnit(), tree)) return null;
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
-                    if (start != -1 && start < pos && end >= pos) {
-                        super.scan(tree, p);
+                    
+                    if (start == end) return null; // don't go this way; all subtrees are synthetic although they might not be flagged so
+
+                    super.scan(tree, p);
+                    if (start != -1 && start <= pos && end >= pos && tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS) {
                         JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
-                        boolean isSynteticMainBlock = isSynthetic(tp);
+                        boolean isSynteticMainBlock = isSynthetic(tp.getCompilationUnit(), tp.getLeaf());
                         // we don't want to return the syntetic main block as the result
                         if (tree.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
                             JavaFXTreePath parentPath = tp.getParentPath();
@@ -351,7 +390,8 @@ public final class TreeUtilities {
      * @return the span of the name, or null if cannot be found
      * @since 0.25
      */
-    public int[] findNameSpan(VariableTree var) {
+    public long[] findNameSpan(VariableTree var) {
+        if (var == null || var.getName() == null) return null;
         return findNameSpan(var.getName().toString(), var, JFXTokenId.VAR, JFXTokenId.DEF);
     }
 
@@ -364,28 +404,21 @@ public final class TreeUtilities {
      * @return the span of the name, or null if cannot be found
      * @since 0.25
      */
-    public int[] findNameSpan(FunctionDefinitionTree method) {
-        if (isSynthetic(parserResultImpl.getCompilationUnit(), method)) {
+    public long[] findNameSpan(FunctionDefinitionTree method) {
+        if (method == null || isSynthetic(parserResultImpl.getCompilationUnit(), method)) {
             return null;
         }
         JFXFunctionDefinition jcm = (JFXFunctionDefinition) method;
         String name = jcm.name.toString();
-////        if (jcm.name == jcm.name.table.names.init) {
-//            JavaFXTreePath path = parserResultImpl.getTrees().getPath(parserResultImpl.getCompilationUnit(), jcm);
-//            if (path == null) {
-//                return null;
-//            }
-//            Element em = parserResultImpl.getTrees().getElement(path);
-//            Element clazz;
-//            if (em == null || (clazz = em.getEnclosingElement()) == null || !clazz.getKind().isClass()) {
-//                return null;
-//            }
-//
-//            name = clazz.getSimpleName().toString();
-////        } else {
-////            name = method.getName().toString();
-////        }
-        return findNameSpan(name, method, JFXTokenId.FUNCTION, JFXTokenId.ABSTRACT);
+        return findNameSpan(name, method, JFXTokenId.FUNCTION);
+    }
+
+    public long[] findNameSpan(ClassDeclarationTree clazz) {
+        if (clazz == null || clazz.getSimpleName() == null) return null;
+
+        String name = clazz.getSimpleName().toString();
+
+        return findNameSpan(name, clazz, JFXTokenId.CLASS, JFXTokenId.MIXIN);
     }
 
     /**Returns tokens for a given tree.
@@ -597,7 +630,7 @@ public final class TreeUtilities {
 //        return Resolve.isStatic(((JavafxcScope) scope).getEnv());
     }
 
-    private int[] findNameSpan(String name, Tree t, JFXTokenId... allowedTokens) {
+    private long[] findNameSpan(String name, Tree t, JFXTokenId... allowedTokens) {
         if (!SourceVersion.isIdentifier(name)) {
             //names like "<error>", etc.
             return null;
@@ -609,7 +642,13 @@ public final class TreeUtilities {
         if (pos < 0)
             return null;
 
-        Set<JFXTokenId> allowedTokensSet = EnumSet.of(JFXTokenId.WS);
+        Set<JFXTokenId> allowedTokensSet = EnumSet.of(
+                JFXTokenId.WS,
+                JFXTokenId.PRIVATE,
+                JFXTokenId.PROTECTED,
+                JFXTokenId.PUBLIC,
+                JFXTokenId.ABSTRACT,
+                JFXTokenId.STATIC);
 
         allowedTokensSet.addAll(Arrays.asList(allowedTokens));
 
@@ -624,7 +663,7 @@ public final class TreeUtilities {
         if (wasNext) {
             if (tokenSequence.token().id() == JFXTokenId.IDENTIFIER &&
                 name.contentEquals(tokenSequence.token().text())) {
-                return new int[] {
+                return new long[] {
                     tokenSequence.offset(),
                     tokenSequence.offset() + tokenSequence.token().length()
                 };

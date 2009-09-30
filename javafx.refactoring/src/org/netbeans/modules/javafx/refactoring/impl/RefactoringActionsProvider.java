@@ -28,6 +28,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
@@ -136,10 +137,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                         LOGGER.log(Level.INFO, "doRename: " + selectedElement, new NullPointerException("selected")); // NOI18N
                         return null;
                     }
-                    if (selected.getKind() == ElementKind.CONSTRUCTOR) {
-                        selected = selected.getEnclosingElement();
-                        selectedElement = TreePathHandle.create(info.getTrees().getPath(selected), info);
-                    }
+//                    if (selected.getKind() == ElementKind.CONSTRUCTOR) {
+//                        selected = selected.getEnclosingElement();
+//                        selectedElement = TreePathHandle.create(info.getTrees().getPath(selected), info);
+//                    }
                     if (selected.getKind() == ElementKind.PACKAGE) {
                         NonRecursiveFolder folder = new NonRecursiveFolder() {
                             public FileObject getFolder() {
@@ -343,7 +344,8 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                     selectedElement = JavaFXTreePath.getPath(cc.getCompilationUnit(), decls.get(0));
                 }
             }
-            ui = createRefactoringUI(TreePathHandle.create(selectedElement, cc), start, end, cc);
+            
+            ui = createRefactoringUI(TreePathHandle.create(caret, selectedElement, cc), start, end, cc);
         }
 
         public final void run() {

@@ -142,8 +142,11 @@ if (initialized) return;
                             methodDeclaringSuperClass = getSimpleName((el).getEnclosingElement())
                         }
                         );
-                        newElement = TreePathHandle.create(el, info);
+                        newElement = TreePathHandle.create(handle.getSrcPos(), el, info);
 
+//                        TreePathHandle tph = TreePathHandle.create(element, info);
+//                        Element el1 = tph.resolveElement(info);
+//                        System.out.println("bum");
                     }
                 } else if (element.getKind().isClass() || element.getKind().isInterface()) {
                     labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ClassUsages", element.getSimpleName()); // NOI18N

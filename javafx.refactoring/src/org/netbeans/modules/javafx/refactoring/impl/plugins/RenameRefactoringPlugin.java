@@ -185,16 +185,18 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
         try {
             final Set<FileObject> refFos = new HashSet<FileObject>();
             refFos.add(treePathHandle.getFileObject());
+            final ElementHandle[] handle = new ElementHandle[1];
+
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(final CompilationController cc) throws Exception {
                     final ClassIndex ci = cc.getClasspathInfo().getClassIndex();
                     Element el = treePathHandle.resolveElement(cc);
-                    ElementHandle eh = ElementHandle.create(el);
+                    handle[0] = ElementHandle.create(el);
                     switch(el.getKind()) {
                         case CLASS:
                         case INTERFACE: {
-                            refFos.addAll(ci.getResources(eh, EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
+                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
                             if (((TypeElement)el).getNestingKind() == NestingKind.TOP_LEVEL) {
                                 new JavaFXTreePathScanner<Void, Void>() {
 
@@ -212,11 +214,11 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
                             break;
                         }
                         case FIELD: {
-                            refFos.addAll(ci.getResources(eh, EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
                             break;
                         }
                         case METHOD: {
-                            refFos.addAll(ci.getResources(eh, EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
                             break;
                         }
                     }
@@ -229,7 +231,7 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, cc);
+                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle.getSimpleName(), handle[0], cc);
                         scanner.scan(cc.getCompilationUnit(), references);
                     }
                 }, true);
@@ -240,7 +242,7 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
                 if (refImpl != null) {
                     bag.add(refactoring, refImpl);
                 } else {
-                    return new Problem(true, "Internal error");
+                    // ignore
                 }
             }
         } catch (IOException e) {

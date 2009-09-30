@@ -140,8 +140,7 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                 displayText = SourceUtils.getHtml(doc.getText(sta, en - sta + 1));
                 bounds = new PositionBounds(des.createPositionRef(startPosition, Bias.Forward), des.createPositionRef(endPosition, Bias.Forward));
             } else {
-                System.err.println("*** Can not resolve: " + handle);
-                throw new IOException();
+                throw new IOException("*** Can not resolve: " + handle); // NOI18N
             }
         } catch (BadLocationException e) {
             IOException ioe = new IOException(e.getLocalizedMessage());
