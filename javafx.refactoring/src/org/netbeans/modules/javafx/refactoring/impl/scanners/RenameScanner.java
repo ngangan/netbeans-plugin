@@ -95,14 +95,12 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
                 TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
                 if (Pattern.matches(origSimpleName + TYPE_MATCH_PATTERN, te.getSimpleName().toString())) {
                     p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                    return null;
                 }
                 for(ExpressionTree et : node.getSupertypeList()) {
                     JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), et);
                     te = (TypeElement)getCompilationController().getTrees().getElement(path);
                     if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, te.getQualifiedName().toString())) {
                         p.add(TreePathHandle.create(path, getCompilationController()));
-                        return null;
                     }
                 }
                 break;
