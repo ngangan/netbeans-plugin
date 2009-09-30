@@ -46,6 +46,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
@@ -56,6 +57,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
+import javax.swing.text.Position;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -64,6 +66,7 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.openide.filesystems.FileObject;
 import org.openide.text.Annotation;
 import org.openide.text.NbDocument;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -73,7 +76,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
-    private final Map<Document, Collection<Annotation>> annotations = new WeakHashMap<Document, Collection<Annotation>>();
+    private final Map<Document, Collection<OverriddeAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddeAnnotation>>();
 
     public OverridenTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -91,13 +94,36 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 }
             }
         };
+        runRunnable(remove);
+    }
 
+    private void addOverriden(CompilationInfo compilationInfo) {
+
+        final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
+
+        Runnable add = new Runnable() {
+
+            public void run() {
+                for (OverriddeAnnotation annotation : annotations.get(document)) {
+                    Position position = null;
+                    try {
+                        position = document.createPosition(annotation.getPosition());
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    NbDocument.addAnnotation(document,position, annotation.getPosition(), annotation);
+                }
+            }
+        };
+        runRunnable(add);
+    }
+
+    private void runRunnable (Runnable task) {
         if (SwingUtilities.isEventDispatchThread()) {
-            remove.run();
+            task.run();
         } else {
-            SwingUtilities.invokeLater(remove);
+            SwingUtilities.invokeLater(task);
         }
-
     }
 
     @Override
@@ -137,6 +163,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
+                removeOverriden(compilationInfo);
                 if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
                     return;
                 }
@@ -169,9 +196,9 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                                 overriddens.add(overriden);
                             }
                         }
-                        Collection<Annotation> annotationsForDocument = null;
+                        Collection<OverriddeAnnotation> annotationsForDocument = null;
                         if (overriddens.size() > 0) {
-                            annotationsForDocument = new HashSet<Annotation>();
+                            annotationsForDocument = new HashSet<OverriddeAnnotation>();
                         }
                         for (Element overriden : overriddens) {
                             if (overriden == null) {
@@ -180,11 +207,11 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                             Tree tree = compilationInfo.getTrees().getTree(overriden);
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                            Annotation annotation = new OverriddeAnnotation(start);
-                            annotationsForDocument.add(annotation);
+                            annotationsForDocument.add(new OverriddeAnnotation(start));
                             //NbDocument.addAnnotation((StyledDocument) compilationInfo.getDocument(), compilationInfo.getDocument().createPosition(start), start, annotation);
                         }
                         annotations.put(compilationInfo.getDocument(), annotationsForDocument);
+                        addOverriden(compilationInfo);
                     }
                     if (breakIt) {
                         break;
@@ -193,6 +220,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
             }
         };
     }
+
 
     private Element checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {
         for (ExecutableElement override : elementsToCheck) {
