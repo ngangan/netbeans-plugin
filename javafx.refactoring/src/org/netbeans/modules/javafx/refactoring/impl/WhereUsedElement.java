@@ -99,25 +99,27 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
 
             public void run(CompilationController cc) throws Exception {
                 JavaFXTreePath path = handle.resolve(cc);
-                TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
-                tokens.moveStart();
-                int firstPos = -1, lastPos = -1;
-                while (tokens.moveNext()) {
-                    Token<JFXTokenId> token = tokens.token();
-                    int pos = token.offset(cc.getTokenHierarchy());
-                    if (firstPos == -1) {
-                        firstPos = pos;
+                if (path != null) {
+                    TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
+                    tokens.moveStart();
+                    int firstPos = -1, lastPos = -1;
+                    while (tokens.moveNext()) {
+                        Token<JFXTokenId> token = tokens.token();
+                        int pos = token.offset(cc.getTokenHierarchy());
+                        if (firstPos == -1) {
+                            firstPos = pos;
+                        }
+                        lastPos = pos + token.length();
+                        if (handle.getSimpleName().equals(token.text().toString())) {
+                            startPosition = pos;
+                            endPosition = startPosition + token.length();
+                            break;
+                        }
                     }
-                    lastPos = pos + token.length();
-                    if (handle.getSimpleName().equals(token.text().toString())) {
-                        startPosition = pos;
-                        endPosition = startPosition + token.length();
-                        break;
+                    if (startPosition == -1) {
+                        startPosition = firstPos;
+                        endPosition = lastPos;
                     }
-                }
-                if (startPosition == -1) {
-                    startPosition = firstPos;
-                    endPosition = lastPos;
                 }
             }
         }, true);

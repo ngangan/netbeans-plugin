@@ -34,9 +34,14 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javafx.tree.JFXInstanciate;
+import com.sun.tools.javafx.tree.JFXSelect;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.openide.filesystems.FileObject;
@@ -47,6 +52,9 @@ import org.openide.filesystems.FileUtil;
  * @author Jaroslav Bachorik
  */
 final public class TreePathHandle {
+    final private static Logger LOG = Logger.getLogger(TreePathHandle.class.getName());
+    final private static boolean DEBUG = LOG.isLoggable(Level.FINE);
+
     private static class KindPath {
         private ArrayList<Tree.JavaFXKind> kindPath = new ArrayList();
 
@@ -57,10 +65,12 @@ final public class TreePathHandle {
             }
         }
 
+        @Override
         public int hashCode() {
             return kindPath.hashCode();
         }
 
+        @Override
         public boolean equals(Object object) {
             if (object instanceof KindPath) {
                 return kindPath.equals(((KindPath) object).kindPath);
@@ -80,12 +90,17 @@ final public class TreePathHandle {
     private Tree.JavaFXKind kind;
 
     private TreePathHandle(long pos, JavaFXTreePath path, CompilationInfo cc) {
+        path = findSupportedPath(path);
         kindPath = new KindPath(path);
         kind = path.getLeaf().getJavaFXKind();
         
         position = pos;
 
-        displayName = cc.getTrees().getElement(path).getSimpleName().toString();
+        if (path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.INSTANTIATE_NEW) {
+            displayName = ((JFXInstanciate)path.getLeaf()).getIdentifierSym().name.toString();
+        } else {
+            displayName = cc.getTrees().getElement(path).getSimpleName().toString();
+        }
 
         URI srcUri = cc.getCompilationUnit().getSourceFile().toUri();
         fileObject = FileUtil.toFileObject(new File(srcUri));
@@ -105,16 +120,21 @@ final public class TreePathHandle {
     }
 
     public JavaFXTreePath resolve(CompilationInfo cc) {
-        JavaFXTreePath result = cc.getTreeUtilities().pathFor(position);
-        JavaFXTreePath intermediary = result;
-        while (intermediary != null && intermediary.getLeaf().getJavaFXKind() != kind) {
-            intermediary = intermediary.getParentPath();
-        }
-        if (intermediary != null) {
-            result = intermediary;
-        }
+        JavaFXTreePath result = findSupportedPath(cc.getTreeUtilities().pathFor(position));
+
+        KindPath newKindPath = new KindPath(result);
         if (!kindPath.equals(new KindPath(result))) {
-            assert false;
+            if (DEBUG) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Error resolving tree path at position ").append(position).append(" (src=").append(fileObject.getPath()).append(")\n"); // NOI18N
+                sb.append("Expected kind path: "); // NOI18N
+                dumpKindPath(kindPath, sb);
+                sb.append("\n"); // NOI18N
+                sb.append("Obtained kind path: "); // NOI18N
+                dumpKindPath(newKindPath, sb);
+                sb.append("\n"); // NOI18N
+            }
+            return null;
         }
 
         return result;
@@ -122,6 +142,12 @@ final public class TreePathHandle {
 
     public Element resolveElement(CompilationInfo cc) {
         JavaFXTreePath path = resolve(cc);
+        if (path == null) return null;
+        
+        if ((path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER || path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) && path.getParentPath().getLeaf().getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT) { // package identifier
+           Element e = cc.getTrees().getElement(path.getParentPath());
+           return e;
+        }
         return cc.getTrees().getElement(path);
     }
 
@@ -166,6 +192,41 @@ final public class TreePathHandle {
 
     @Override
     public String toString() {
-        return displayName + "[" + kind + "]@" + position;
+        return displayName + "[" + kind + "]@" + position; // NOI18N
+    }
+    
+    private void dumpKindPath(KindPath kindPath, StringBuilder sb) {
+        boolean firstEntry = true;
+        for (Tree.JavaFXKind aKind : kindPath.getList()) {
+            if (!firstEntry) {
+                sb.append("->"); // NOI18N
+            }
+            sb.append(aKind.toString());
+        }
+    }
+
+    private boolean isSupported(JavaFXTreePath path) {
+        switch (path.getLeaf().getJavaFXKind()) {
+            case COMPILATION_UNIT:
+            case CLASS_DECLARATION:
+            case TYPE_CLASS:
+            case METHOD_INVOCATION:
+            case FUNCTION_DEFINITION:
+            case INIT_DEFINITION:
+            case INSTANTIATE_NEW:
+            case VARIABLE: {
+                return true;
+            }
+            default: {
+                return false;
+            }
+        }
+    }
+
+    private JavaFXTreePath findSupportedPath(JavaFXTreePath initPath) {
+        while (initPath != null && !isSupported(initPath)) {
+            initPath = initPath.getParentPath();
+        }
+        return initPath;
     }
 }

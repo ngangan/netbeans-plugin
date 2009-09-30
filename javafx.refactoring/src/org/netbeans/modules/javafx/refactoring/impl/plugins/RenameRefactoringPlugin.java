@@ -238,7 +238,7 @@ public class RenameRefactoringPlugin implements RefactoringPlugin {
             }
 
             for(TreePathHandle tph : references) {
-                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(tph, refactoring.getNewName(), new ProxyLookup(l, Lookups.singleton(contextMap.get(tph.getFileObject()))));
+                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(tph, refactoring.getNewName(), treePathHandle.getSimpleName(), new ProxyLookup(l, Lookups.singleton(contextMap.get(tph.getFileObject()))));
                 if (refImpl != null) {
                     bag.add(refactoring, refImpl);
                 } else {

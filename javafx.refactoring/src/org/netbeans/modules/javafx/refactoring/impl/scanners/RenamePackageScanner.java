@@ -70,6 +70,7 @@ public class RenamePackageScanner extends BaseRefactoringScanner<Void, Set<TreeP
     public Void visitMemberSelect(MemberSelectTree node, Set<TreePathHandle> p) {
         if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, node.getExpression().toString())) {
             p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()), getCompilationController()));
+            return null;
         }
         return super.visitMemberSelect(node, p);
     }

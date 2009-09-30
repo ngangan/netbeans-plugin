@@ -36,19 +36,15 @@ import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXVarScriptInit;
-import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
@@ -57,7 +53,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 
 /**
@@ -72,7 +67,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
     private ElementHandle origHandle;
 
     public RenameScanner(String simpleName, String qualName, ElementKind origKind, CompilationController cc) {
-        super(null, cc);
+        super(cc);
         this.origKind = origKind;
         this.origQualName = qualName;
         this.origSimpleName = simpleName;

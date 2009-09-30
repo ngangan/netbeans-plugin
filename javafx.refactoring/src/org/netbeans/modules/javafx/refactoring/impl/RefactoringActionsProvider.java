@@ -137,10 +137,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                         LOGGER.log(Level.INFO, "doRename: " + selectedElement, new NullPointerException("selected")); // NOI18N
                         return null;
                     }
-//                    if (selected.getKind() == ElementKind.CONSTRUCTOR) {
-//                        selected = selected.getEnclosingElement();
-//                        selectedElement = TreePathHandle.create(info.getTrees().getPath(selected), info);
-//                    }
                     if (selected.getKind() == ElementKind.PACKAGE) {
                         NonRecursiveFolder folder = new NonRecursiveFolder() {
                             public FileObject getFolder() {
@@ -337,15 +333,18 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         public void run(CompilationController cc) throws Exception {
             JavaFXTreePath selectedElement = null;
             selectedElement = cc.getTreeUtilities().pathFor(caret);
+            TreePathHandle searchHandle = null;
             //workaround for issue 89064
             if (selectedElement.getLeaf().getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT) {
                 List<? extends Tree> decls = cc.getCompilationUnit().getTypeDecls();
                 if (!decls.isEmpty()) {
-                    selectedElement = JavaFXTreePath.getPath(cc.getCompilationUnit(), decls.get(0));
+                    searchHandle = TreePathHandle.create(JavaFXTreePath.getPath(cc.getCompilationUnit(), decls.get(0)), cc);
                 }
             }
-            
-            ui = createRefactoringUI(TreePathHandle.create(caret, selectedElement, cc), start, end, cc);
+            if (searchHandle == null) {
+                searchHandle = TreePathHandle.create(caret, selectedElement, cc);
+            }
+            ui = createRefactoringUI(searchHandle, start, end, cc);
         }
 
         public final void run() {

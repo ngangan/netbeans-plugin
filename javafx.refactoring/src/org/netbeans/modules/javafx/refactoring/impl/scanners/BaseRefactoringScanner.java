@@ -49,6 +49,11 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
         this.positions = cc.getTrees().getSourcePositions();
     }
 
+    public BaseRefactoringScanner(CompilationController cc) {
+        this(null, cc);
+    }
+
+
     @Override
     final public R scan(Tree tree, P p) {
         long start = positions.getStartPosition(getCompilationController().getCompilationUnit(), tree);

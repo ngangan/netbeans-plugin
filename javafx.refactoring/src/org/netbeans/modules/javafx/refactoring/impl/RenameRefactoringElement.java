@@ -84,7 +84,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
 
     final public static RenameRefactoringElement create(TreePathHandle handle, String newName, Lookup context) {
         try {
-            return new RenameRefactoringElement(handle, newName, null, context);
+            return new RenameRefactoringElement(handle, newName, handle.getSimpleName(), context);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, null, e);
         }
@@ -245,9 +245,6 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
 
             public void run(CompilationController cc) throws Exception {
                 JavaFXTreePath path = handle.resolve(cc);
-                if (oldText == null) {
-                    oldText = cc.getTrees().getElement(path).getSimpleName().toString();
-                }
                 if (path != null) {
                     switch(path.getLeaf().getJavaFXKind()) {
                         case CLASS_DECLARATION: {
@@ -258,6 +255,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                         case COMPILATION_UNIT:
                         case IDENTIFIER:
                         case TYPE_CLASS:
+                        case INSTANTIATE_NEW:
                         case IMPORT: {
                             findTypeName(path, cc);
                             break;
@@ -281,11 +279,12 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
         boolean foundClass = false;
         while(tokens.moveNext()) {
             final Token<JFXTokenId> currentToken = tokens.token();
+            String text = currentToken.text().toString();
             if (currentToken.id() == JFXTokenId.CLASS) {
                 foundClass = true;
                 continue;
             }
-            if (foundClass && currentToken.id() == JFXTokenId.IDENTIFIER) {
+            if (foundClass && currentToken.id() == JFXTokenId.IDENTIFIER && text.equals(oldText)) {
                 startPosition = currentToken.offset(cc.getTokenHierarchy());
                 break;
             }
