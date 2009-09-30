@@ -90,7 +90,7 @@ final public class TreePathHandle {
     private Tree.JavaFXKind kind;
 
     private TreePathHandle(long pos, JavaFXTreePath path, CompilationInfo cc) {
-        path = findSupportedPath(path);
+        path = findSupportedPath(path, cc);
         kindPath = new KindPath(path);
         kind = path.getLeaf().getJavaFXKind();
         
@@ -120,7 +120,7 @@ final public class TreePathHandle {
     }
 
     public JavaFXTreePath resolve(CompilationInfo cc) {
-        JavaFXTreePath result = findSupportedPath(cc.getTreeUtilities().pathFor(position));
+        JavaFXTreePath result = findSupportedPath(cc.getTreeUtilities().pathFor(position), cc);
 
         KindPath newKindPath = new KindPath(result);
         if (!kindPath.equals(new KindPath(result))) {
@@ -206,6 +206,7 @@ final public class TreePathHandle {
     }
 
     private boolean isSupported(JavaFXTreePath path) {
+
         switch (path.getLeaf().getJavaFXKind()) {
             case COMPILATION_UNIT:
             case CLASS_DECLARATION:
@@ -223,8 +224,8 @@ final public class TreePathHandle {
         }
     }
 
-    private JavaFXTreePath findSupportedPath(JavaFXTreePath initPath) {
-        while (initPath != null && !isSupported(initPath)) {
+    private JavaFXTreePath findSupportedPath(JavaFXTreePath initPath, CompilationInfo cc) {
+        while (initPath != null && cc.getTrees().getElement(initPath) == null) {
             initPath = initPath.getParentPath();
         }
         return initPath;
