@@ -85,20 +85,14 @@ class UncaughtExceptionsFix implements Fix {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         Iterator<Type> iterator = hint.getExceptions().iterator();
         final StringBuilder block = new StringBuilder();
+        final String space = calculateSpace(hint.getStartPosition());
         if (hint.getCatchTree() == null) {
             String method = document.getText(hint.getStartPosition(), hint.getLength());
-            block.append("try {\n    ") //NOI18N
-                    .append(method).append("\n}"); //NOI18N
+            block.append("try {\n") //NOI18N
+                    .append(space).append("\t").append(method)//.append("\n") //NOI18N
+                    .append(space).append("}"); //NOI18N
 
-            while (iterator.hasNext()) {
-                //TODO Unique ex var name
-                block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
-                        .append("    ").append(exceptionName).append(".printStackTrace();\n") //NOI18N
-                        .append("}"); //NOI18N
-                if (!iterator.hasNext()) {
-                    block.append("\n"); //NOI18N
-                }
-            }
+            addCatch(iterator, block, exceptionName, space);
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -117,14 +111,7 @@ class UncaughtExceptionsFix implements Fix {
             });
         } else {
             final int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getCatchTree());
-            while (iterator.hasNext()) {
-                block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
-                        .append("    ").append(exceptionName).append(".printStackTrace();\n") //NOI18N
-                        .append("}"); //NOI18N
-                if (!iterator.hasNext()) {
-                    block.append("\n"); //NOI18N
-                }
-            }
+            addCatch(iterator, block, exceptionName, space);
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {
@@ -142,4 +129,42 @@ class UncaughtExceptionsFix implements Fix {
         }
         return null;
     }
+
+     private void  addCatch(Iterator<Type> iterator, StringBuilder block, String exceptionName, String space) {
+        while (iterator.hasNext()) {
+                //TODO Unique ex var name
+                block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
+                        .append(space).append("\t").append(exceptionName).append(".printStackTrace();\n") //NOI18N
+                        .append(space).append("}"); //NOI18N
+                if (!iterator.hasNext()) {
+                    block.append("\n"); //NOI18N
+                }
+            }
+    }
+    //TODO Should be replaced with proper formating ASAP
+     private  String calculateSpace(int startPosition) {
+        String text = null;
+        try {
+            text = document.getText(document.getStartPosition().getOffset(), startPosition);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+            return "";
+        }
+        int lastIndex = -1;
+        if (text != null && text.length() > 1) {
+            lastIndex = text.lastIndexOf("\n"); //NOI18N
+        }
+        int charNumber = -1;
+        if (lastIndex > 0) {
+            charNumber = text.length() - lastIndex;
+        }
+        if (charNumber <= 0) {
+            return null;
+        }
+        StringBuilder space = new StringBuilder(charNumber - 1);
+        for (int i = 0 ; i < charNumber - 1 ; i++) {
+            space.append(" "); //NOI18M
+        }
+        return space.toString();
+     }
 }
