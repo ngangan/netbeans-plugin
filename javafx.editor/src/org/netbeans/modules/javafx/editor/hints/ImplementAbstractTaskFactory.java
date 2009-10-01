@@ -324,7 +324,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 method.append("function ").append(methodSymbol.getQualifiedName() + " ("); //NOI18N
-                if (methodSymbol.getParameters() != null) {
+                //TODO Work around for NPE which is thrown by methodSymbol.getParameters();
+                try {
+                    if (methodSymbol.getParameters() != null) {
                     Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
                     while (iterator.hasNext()) {
                         VarSymbol var = iterator.next();
@@ -335,8 +337,17 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         }
                     }
                 }
-                String returnType = getTypeString(methodSymbol.getReturnType());
-                if (returnType.equals("void")) { //NOI18N
+                } catch (NullPointerException npe) {
+                    System.out.println("getParameters throws NPE!!"); //NOI18N
+                }
+                //TODO Work around for methodSymbol.getReturnType() which throws NPE!
+                String returnType = null;
+                try {
+                    returnType = getTypeString(methodSymbol.getReturnType());
+                } catch (NullPointerException npe) {
+                    System.out.println("getReturnType throws NPE!!"); //NOI18N
+                }
+                if (returnType == null || returnType.equals("void")) { //NOI18N
                     returnType = "Void"; //NOI18N
                 } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);

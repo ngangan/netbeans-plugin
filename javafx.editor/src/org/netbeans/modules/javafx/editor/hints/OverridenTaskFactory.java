@@ -213,7 +213,9 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
     }
 
     private Element checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {
+        System.out.println("Overriden "+overridden  + " " + overridden.getClass());
         for (ExecutableElement override : elementsToCheck) {
+            System.out.println("Overrid "+override + " " + override.getClass());
             TypeElement type = ElementUtilities.enclosingTypeElement(overridden);
             if (compilationInfo.getElements().overrides(override, overridden, type)) {
                 return override;
