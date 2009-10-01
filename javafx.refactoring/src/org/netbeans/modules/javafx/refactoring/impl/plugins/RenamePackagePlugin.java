@@ -343,7 +343,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         for(final FileObject fo : a) {
             try {
                 JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                jfxs.runWhenScanFinished(new Task<CompilationController>() {
+                jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(CompilationController cc) throws Exception {
                         for (String pkgName : packages) {

@@ -93,6 +93,7 @@ import org.netbeans.modules.javafx.project.JavaFXProjectConstants;
 import org.netbeans.api.javafx.source.ClasspathInfoProvider;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementUtilities;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -281,6 +282,27 @@ final public class SourceUtils {
         }
     }
 
+    public static Collection<ExecutableElement> getOverridingMethods(ExecutableElement e, CompilationInfo info) {
+        Collection<ExecutableElement> result = new ArrayList();
+        TypeElement parentType = (TypeElement) e.getEnclosingElement();
+        //XXX: Fixme IMPLEMENTORS_RECURSIVE were removed
+        Set<? extends ElementHandle> subTypes = info.getClasspathInfo().getClassIndex().getElements(ElementHandle.create(parentType), EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
+        for (ElementHandle<TypeElement> subTypeHandle: subTypes){
+            TypeElement type = subTypeHandle.resolve(info);
+            if (type == null) {
+                // #120577: log info to find out what is going wrong
+                FileObject file = getFile(subTypeHandle, info.getClasspathInfo());
+                throw new NullPointerException("#120577: Cannot resolve " + subTypeHandle + "; file: " + file);
+            }
+            for (ExecutableElement method: ElementFilter.methodsIn(type.getEnclosedElements())) {
+                if (info.getElements().overrides(method, e, type)) {
+                    result.add(method);
+                }
+            }
+        }
+        return result;
+    }
+
     public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, CompilationInfo info) {
         return getOverridenMethods(e, ElementUtilities.enclosingTypeElement(e), info);
     }
@@ -377,9 +399,13 @@ final public class SourceUtils {
     }
 
     public static FileObject getFile(Element element, ClasspathInfo cpInfo) {
+        return getFile(ElementHandle.create(element), cpInfo);
+    }
+
+    public static FileObject getFile(ElementHandle handle, ClasspathInfo cpInfo) {
         ClassIndex ci = cpInfo.getClassIndex();
 
-        Set<FileObject> files = ci.getResources(ElementHandle.create(element), EnumSet.of(ClassIndex.SearchKind.TYPE_DEFS), EnumSet.of(ClassIndex.SearchScope.SOURCE));
+        Set<FileObject> files = ci.getResources(handle, EnumSet.of(ClassIndex.SearchKind.TYPE_DEFS), EnumSet.of(ClassIndex.SearchScope.SOURCE));
         if (!files.isEmpty()) return files.iterator().next();
 
         return null;
@@ -629,6 +655,21 @@ final public class SourceUtils {
             runnable.run();
             return false;
         }
+    }
+
+    public static String getQualifiedName(final TreePathHandle tph) {
+        Collection<ElementHandle<TypeElement>> mainClasses = JavaFXSourceUtils.getMainClasses(tph.getFileObject());
+        if (mainClasses != null && !mainClasses.isEmpty()) {
+            return mainClasses.iterator().next().getQualifiedName();
+        }
+        return "";
+    }
+
+    public static boolean typeExist(TreePathHandle tph, String fqn) {
+        for(ElementHandle<TypeElement> typeHandle : JavaFXSourceUtils.getClasses(tph.getFileObject())) {
+            if (typeHandle.getQualifiedName().equals(fqn)) return true;
+        }
+        return false;
     }
 
     private static String getString(String key) {

@@ -206,6 +206,8 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitMemberSelect(MemberSelectTree node, Set<TreePathHandle> p) {
+        if (!node.getIdentifier().contentEquals(origSimpleName)) return super.visitMemberSelect(node, p);
+        
         ExpressionTree expression = node.getExpression();
         if (expression instanceof JFXIdent) {
             Type type = ((JFXIdent)expression).type;
@@ -215,7 +217,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
             for(Symbol sy : ts.getEnclosedElements()) {
                 if (sy.getKind() == ElementKind.FIELD) {
                     if (origHandle != null && origHandle.equals(ElementHandle.create(sy))) {
-                        p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), expression), getCompilationController()));
+                        p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                         return null;
                     }
                 }
