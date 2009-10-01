@@ -724,7 +724,7 @@ public class JFXReformatTask implements ReformatTask {
             }
 
             final Name name = node.getName();
-            if (!ERROR.contentEquals(name)) {
+            if (name != null && !ERROR.contentEquals(name)) {
                 accept(JFXTokenId.IDENTIFIER);
             }
             spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
