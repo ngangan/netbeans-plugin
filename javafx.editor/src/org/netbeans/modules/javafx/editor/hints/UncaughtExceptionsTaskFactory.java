@@ -58,6 +58,7 @@ import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
@@ -100,7 +101,10 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     for (Hint hint : model.getHints()) {
                         errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
                     }
-                    HintsController.setErrors(compilationInfo.getDocument(), "Try-Catch", errors); //NOI18N
+                    final Document document = compilationInfo.getDocument();
+                    if (document != null) {
+                        HintsController.setErrors(compilationInfo.getDocument(), "Try-Catch", errors); //NOI18N
+                    }
                 }
             }
         };

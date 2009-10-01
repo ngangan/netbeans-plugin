@@ -46,6 +46,8 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ElementUtilities;
@@ -84,16 +86,14 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private void updateAnnotationsOverriden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
         final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-        final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) ==  null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
+        final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) == null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
         final Collection<OverriddeAnnotation> addedAnnotationsCopy = new HashSet<OverriddeAnnotation>(addedAnnotations);
-        
+
         Runnable update = new Runnable() {
 
             public void run() {
-                System.out.println("START");
                 if (annotationsToRemoveCopy != null) {
                     for (Annotation annotation : annotationsToRemoveCopy) {
-                        System.out.println("Annotation removed " + annotation);
                         NbDocument.removeAnnotation(document, annotation);
                     }
                 }
@@ -104,10 +104,8 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    System.out.println("Annotation added " + annotation);
                     NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
                 }
-                System.out.println("END");
             }
         };
         runRunnable(update);
@@ -132,18 +130,19 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
 
-                final Element[] mainClassElement = new Element[1];
-                final Collection<Tree> supertypes = new HashSet<Tree>();
-                final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
+                final Map<Element, Collection<? extends Tree>> classes = new HashMap<Element, Collection<? extends Tree>>();
+                final Map<Element, Collection<ExecutableElement>> existingMethods = new HashMap<Element, Collection<ExecutableElement>>();
                 final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
-                        mainClassElement[0] = compilationInfo.getTrees().getElement(getCurrentPath());
-                        supertypes.addAll(node.getSupertypeList());
-                        supertypes.add(node);
+                        Collection<? extends Tree> superTypes = node.getSupertypeList();
+                        if (superTypes != null || superTypes.size() != 0) {
+                            Element classElement = compilationInfo.getTrees().getElement(getCurrentPath());
+                            classes.put(classElement, superTypes);
+                        }
                         return super.visitClassDeclaration(node, v);
                     }
 
@@ -152,7 +151,13 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                         if (element != null && element instanceof ExecutableElement) {
                             if (node.getModifiers().toString().contains(" override")) { //NOI18N
-                                existingMethods.add((ExecutableElement) element);
+                                Element classElement = element.getEnclosingElement();
+                                Collection<ExecutableElement> methods = existingMethods.get(classElement);
+                                if (methods == null) {
+                                    methods = new ArrayList<ExecutableElement>();
+                                }
+                                methods.add((ExecutableElement) element);
+                                existingMethods.put(classElement, methods);
                             }
                         }
 
@@ -160,65 +165,111 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
+                Collection<Element> classesKeys = new HashSet<Element>(existingMethods.keySet());
 
-                if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
+                for (Element classElement : classesKeys) {
+                    if (existingMethods.size() == 0 ||
+                            !isAnnon(classElement) &&
+                            HintsUtils.checkString(classElement.getSimpleName().toString())) {
+                        updateAnnotationsOverriden(compilationInfo, addedAnotations);
+                        existingMethods.remove(classElement);
+                    }
+                }
+                if (existingMethods.size() == 0) {
+                    updateAnnotationsOverriden(compilationInfo, addedAnotations);
                     return;
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                boolean breakIt = false;
-                for (Tree mixin : supertypes) {
-                    JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
-                    Element mixinElement = compilationInfo.getTrees().getElement(path);
-                    if (mixinElement == null) {
+                for (Element mainClassElement : classes.keySet()) {
+                    Collection<? extends Tree> superTypes = classes.get(mainClassElement);
+                    if (superTypes == null) {
                         continue;
                     }
-                    String mixinName = mixinElement.getSimpleName().toString();
-                    if (HintsUtils.checkString(mixinName)) {
+                    Collection<ExecutableElement> methods = existingMethods.get(mainClassElement);
+                    if (methods == null) {
                         continue;
                     }
-                    Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(mixinName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                    for (ElementHandle<TypeElement> elementHandle : options) {
-                        TypeElement typeElement = elementHandle.resolve(compilationInfo);
-                        if (typeElement == null) {
+                    for (Tree superTree : superTypes) {
+                        JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
+                        Element superTypeElement = compilationInfo.getTrees().getElement(superPath);
+                        if (superTypeElement == null) {
                             continue;
                         }
-                        Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
-                        if (elements == null) {
+                        String superTypeName = superTypeElement.getSimpleName().toString();
+                        if (HintsUtils.checkString(superTypeName)) {
                             continue;
                         }
-                        Collection<Element> overriddens = new HashSet<Element>();
-                        for (Element element : elements) {
-                            if (element instanceof ExecutableElement) {
-                                Element overriden = checkIfOveridden(compilationInfo, existingMethods, (ExecutableElement) element);
-                                overriddens.add(overriden);
-                            }
-                        }
-                        for (Element overriden : overriddens) {
-                            if (overriden == null) {
+                        Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(superTypeName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        for (ElementHandle<TypeElement> elementHandle : options) {
+                            TypeElement typeElement = elementHandle.resolve(compilationInfo);
+                            if (typeElement == null) {
                                 continue;
                             }
-                            Tree tree = compilationInfo.getTrees().getTree(overriden);
-                            SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                            int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                            addedAnotations.add(new OverriddeAnnotation(start));
+                            Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                            if (elements == null) {
+                                continue;
+                            }
+                            Collection<Element> overriddens = new HashSet<Element>();
+                            for (Element element : elements) {
+                                if (element instanceof ExecutableElement) {
+                                    Element overridden = checkIfOveridden(compilationInfo, methods, (ExecutableElement) element);
+                                    if (overridden != null) {
+                                        overriddens.add(overridden);
+                                    }
+                                }
+                            }
+                            for (Element overriden : overriddens) {
+                                Tree tree = compilationInfo.getTrees().getTree(overriden);
+                                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                                int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+                                addedAnotations.add(new OverriddeAnnotation(start));
+                            }
                         }
+
                     }
-                    if (breakIt) {
-                        break;
-                    }
+                    updateAnnotationsOverriden(compilationInfo, addedAnotations);
                 }
-                updateAnnotationsOverriden(compilationInfo, addedAnotations);
             }
         };
     }
 
+    private boolean isAnnon(Element element) {
+        if (!(element instanceof JavafxClassSymbol)) {
+            return false;
+        }
+        JavafxClassSymbol classSymbol = ((JavafxClassSymbol) element);
+        classSymbol.getSuperTypes();
+        if (!classSymbol.isLocal()) {
+            return false;
+        }
+        String name = element.toString();
+        int lastIndex = name.lastIndexOf("$"); //NOI18N
+        if (lastIndex < 0) {
+            return false;
+        }
+        if (!name.substring(lastIndex).contains("anon")) { //NOI18N
+            return false;
+        }
+        return true;
+    }
+
     private Element checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {
-        System.out.println("Overriden "+overridden  + " " + overridden.getClass());
+        String overrridenName = overridden.getSimpleName().toString();
         for (ExecutableElement override : elementsToCheck) {
-            System.out.println("Overrid "+override + " " + override.getClass());
-            TypeElement type = ElementUtilities.enclosingTypeElement(overridden);
-            if (compilationInfo.getElements().overrides(override, overridden, type)) {
-                return override;
+            if (!overridden.getSimpleName().toString().equals(overrridenName)) {
+                continue;
+            }
+            TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overridden);
+            if (typeOverridden == null) {
+                continue;
+            }
+            //TODO Workaround for java.lang.NullPointerException at com.sun.tools.javac.code.Types$DefaultTypeVisitor.visit(Types.java:3183)
+            try {
+                if (compilationInfo.getElements().overrides(override, overridden, typeOverridden)) {
+                    return override;
+                }
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
             }
         }
         return null;
