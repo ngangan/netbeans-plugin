@@ -82,43 +82,39 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
-    private void removeOverriden(CompilationInfo compilationInfo) {
-
+    private void updateAnnotationsOverriden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
         final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-
-        Runnable remove = new Runnable() {
+        final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) ==  null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
+        final Collection<OverriddeAnnotation> addedAnnotationsCopy = new HashSet<OverriddeAnnotation>(addedAnnotations);
+        
+        Runnable update = new Runnable() {
 
             public void run() {
-                for (Annotation annotation : annotations.get(document)) {
-                    NbDocument.removeAnnotation(document, annotation);
+                System.out.println("START");
+                if (annotationsToRemoveCopy != null) {
+                    for (Annotation annotation : annotationsToRemoveCopy) {
+                        System.out.println("Annotation removed " + annotation);
+                        NbDocument.removeAnnotation(document, annotation);
+                    }
                 }
-            }
-        };
-        runRunnable(remove);
-    }
-
-    private void addOverriden(CompilationInfo compilationInfo) {
-
-        final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-
-        Runnable add = new Runnable() {
-
-            public void run() {
-                for (OverriddeAnnotation annotation : annotations.get(document)) {
+                for (OverriddeAnnotation annotation : addedAnnotationsCopy) {
                     Position position = null;
                     try {
                         position = document.createPosition(annotation.getPosition());
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    NbDocument.addAnnotation(document,position, annotation.getPosition(), annotation);
+                    System.out.println("Annotation added " + annotation);
+                    NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
                 }
+                System.out.println("END");
             }
         };
-        runRunnable(add);
+        runRunnable(update);
+        annotations.put(document, addedAnnotations);
     }
 
-    private void runRunnable (Runnable task) {
+    private void runRunnable(Runnable task) {
         if (SwingUtilities.isEventDispatchThread()) {
             task.run();
         } else {
@@ -139,6 +135,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 final Element[] mainClassElement = new Element[1];
                 final Collection<Tree> supertypes = new HashSet<Tree>();
                 final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
+                final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -163,7 +160,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
-                removeOverriden(compilationInfo);
+
                 if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
                     return;
                 }
@@ -196,10 +193,6 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                                 overriddens.add(overriden);
                             }
                         }
-                        Collection<OverriddeAnnotation> annotationsForDocument = null;
-                        if (overriddens.size() > 0) {
-                            annotationsForDocument = new HashSet<OverriddeAnnotation>();
-                        }
                         for (Element overriden : overriddens) {
                             if (overriden == null) {
                                 continue;
@@ -207,20 +200,17 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                             Tree tree = compilationInfo.getTrees().getTree(overriden);
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                            annotationsForDocument.add(new OverriddeAnnotation(start));
-                            //NbDocument.addAnnotation((StyledDocument) compilationInfo.getDocument(), compilationInfo.getDocument().createPosition(start), start, annotation);
+                            addedAnotations.add(new OverriddeAnnotation(start));
                         }
-                        annotations.put(compilationInfo.getDocument(), annotationsForDocument);
-                        addOverriden(compilationInfo);
                     }
                     if (breakIt) {
                         break;
                     }
                 }
+                updateAnnotationsOverriden(compilationInfo, addedAnotations);
             }
         };
     }
-
 
     private Element checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {
         for (ExecutableElement override : elementsToCheck) {
@@ -246,6 +236,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
     }
 
     private static class OverriddeAnnotation extends Annotation {
+
         private int positon;
 
         public OverriddeAnnotation(int position) {
