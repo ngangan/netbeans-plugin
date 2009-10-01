@@ -285,7 +285,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                     scanImport(target, var.asType());
                                 }
                             }
-                        } catch (BadLocationException ex) {
+                        } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     }
@@ -304,6 +304,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             }
 
             private void addImport(JTextComponent target, Type type) {
+                if (type == null) {
+                    return;
+                }
                 String importName = type.toString();
                 if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) { //NOI18N
                     importName = removeBetween("()", importName); //NOI18N

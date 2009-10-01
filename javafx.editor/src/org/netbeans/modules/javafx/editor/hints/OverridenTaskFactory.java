@@ -268,7 +268,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 if (compilationInfo.getElements().overrides(override, overridden, typeOverridden)) {
                     return override;
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception npe) {
                 npe.printStackTrace();
             }
         }
