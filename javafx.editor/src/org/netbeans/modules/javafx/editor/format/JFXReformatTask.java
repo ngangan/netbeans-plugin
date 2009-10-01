@@ -400,6 +400,10 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean scan(Tree tree, Void p) {
+            if (tree == null) {
+                return false;
+            }
+            
             int lastEndPos = endPos;
             if (tree != null && tree.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
                 if (tree instanceof FakeBlock) {
@@ -1951,43 +1955,43 @@ public class JFXReformatTask implements ReformatTask {
         // TODO
         @Override
         public Boolean visitSequenceDelete(SequenceDeleteTree node, Void p) {
-            return super.visitSequenceDelete(node, p);
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceEmpty(SequenceEmptyTree node, Void p) {
-            return super.visitSequenceEmpty(node, p);
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
-            return super.visitSequenceExplicit(node, p);
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceIndexed(SequenceIndexedTree node, Void p) {
-            return super.visitSequenceIndexed(node, p);
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceInsert(SequenceInsertTree node, Void p) {
-            return super.visitSequenceInsert(node, p);
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceRange(SequenceRangeTree node, Void p) {
-            return super.visitSequenceRange(node, p);
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceSlice(SequenceSliceTree node, Void p) {
-            return super.visitSequenceSlice(node, p);
+            return true;
         }
 
         @Override
