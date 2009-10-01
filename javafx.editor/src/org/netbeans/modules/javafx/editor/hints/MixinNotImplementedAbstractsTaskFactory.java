@@ -97,8 +97,13 @@ public class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSour
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
+                        try {
+                            mixins.addAll(node.getMixins());
+                        } catch (NullPointerException npe) {
+                            npe.printStackTrace();
+                        }
                         mainClassElement[0] = compilationInfo.getTrees().getElement(getCurrentPath());
-                        mixins.addAll(node.getMixins());
+
                         return super.visitClassDeclaration(node, v);
                     }
 
@@ -115,6 +120,9 @@ public class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSour
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
+                if (mixins.size() == 0) {
+                    return;
+                }
                 if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
                     return;
                 }
@@ -153,7 +161,9 @@ public class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSour
                             final Document document = compilationInfo.getDocument();
                             String hintText = NbBundle.getMessage(ImplementAbstractTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"); //NOI18N
                             ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
-                            HintsController.setErrors(document, hintText, Collections.singleton(errorDescription));
+                            if (document != null) {
+                                HintsController.setErrors(document, hintText, Collections.singleton(errorDescription));
+                            }
                             breakIt = true;
                             break;
                         }

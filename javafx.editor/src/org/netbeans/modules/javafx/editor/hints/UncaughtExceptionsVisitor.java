@@ -108,7 +108,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                         try {
                             thrownExceptions = methodSymbol.getThrownTypes();
                         } catch (NullPointerException ex) {
-                            System.out.println(ex.getMessage());
+                            ex.printStackTrace();
                         }
 
                         if (thrownExceptions == null || thrownExceptions.size() == 0) {

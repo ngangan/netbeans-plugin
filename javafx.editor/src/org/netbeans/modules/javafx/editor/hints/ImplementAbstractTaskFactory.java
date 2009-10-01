@@ -87,14 +87,14 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private final AtomicBoolean isOver = new AtomicBoolean(true);
     //private final Map<Document, Collection<Annotation>> annotationsToRemove = new HashMap<Document, Collection<Annotation>>();
-    
+
     public ImplementAbstractTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        
+
         return new CancellableTask<CompilationInfo>() {
 
             public void cancel() {
@@ -228,9 +228,15 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 }
                 HintsModel modelFix = new HintsModel(compilationInfo);
                 for (Element currentClass : abstractMethods.keySet()) {
-                    Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
-                    if (abstractMethods.get(currentClass) != null && abstractMethods.get(currentClass).size() != 0) {
-                        modelFix.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
+                    //TODO Hack for java.lang.NullPointerException at com.sun.tools.javafx.api.JavafxcTrees.getTree(JavafxcTrees.java:121)
+                    try {
+                        Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
+                        if (abstractMethods.get(currentClass) != null && abstractMethods.get(currentClass).size() != 0) {
+                            modelFix.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
+                        }
+                    } catch (NullPointerException npe) {
+                        npe.printStackTrace();
+                        continue;
                     }
                 }
                 addHintsToController(document, modelFix, compilationInfo, file);
@@ -246,7 +252,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             for (Hint hint : model.getHints()) {
                 errors.add(getErrorDescription(document, file, hint, compilationInfo));
             }
-            HintsController.setErrors(document, "Override", errors); //NOI18N
+            if (document != null) {
+                HintsController.setErrors(document, "Override", errors); //NOI18N
+            }
         }
     }
 
@@ -278,7 +286,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                 }
                             }
                         } catch (BadLocationException ex) {
-                            Exceptions.printStackTrace(ex);
+                            ex.printStackTrace();
                         }
                     }
                 });
@@ -327,25 +335,25 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 //TODO Work around for NPE which is thrown by methodSymbol.getParameters();
                 try {
                     if (methodSymbol.getParameters() != null) {
-                    Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
-                    while (iterator.hasNext()) {
-                        VarSymbol var = iterator.next();
-                        String varType = getTypeString(var.asType());
-                        method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
-                        if (iterator.hasNext()) {
-                            method.append(", "); //NOI18N
+                        Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
+                        while (iterator.hasNext()) {
+                            VarSymbol var = iterator.next();
+                            String varType = getTypeString(var.asType());
+                            method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
+                            if (iterator.hasNext()) {
+                                method.append(", "); //NOI18N
+                            }
                         }
                     }
-                }
                 } catch (NullPointerException npe) {
-                    System.out.println("getParameters throws NPE!!"); //NOI18N
+                    npe.printStackTrace();
                 }
                 //TODO Work around for methodSymbol.getReturnType() which throws NPE!
                 String returnType = null;
                 try {
                     returnType = getTypeString(methodSymbol.getReturnType());
                 } catch (NullPointerException npe) {
-                    System.out.println("getReturnType throws NPE!!"); //NOI18N
+                    npe.printStackTrace();
                 }
                 if (returnType == null || returnType.equals("void")) { //NOI18N
                     returnType = "Void"; //NOI18N
