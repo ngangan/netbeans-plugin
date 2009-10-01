@@ -95,7 +95,7 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
         }
 
         JavaFXSource jfxs = JavaFXSource.forFileObject(handle.getFileObject());
-        jfxs.runWhenScanFinished(new Task<CompilationController>() {
+        jfxs.runUserActionTask(new Task<CompilationController>() {
 
             public void run(CompilationController cc) throws Exception {
                 JavaFXTreePath path = handle.resolve(cc);

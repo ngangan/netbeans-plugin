@@ -225,7 +225,7 @@ public class JavaFXSourceUtils {
         final Collection<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
         if (jfxs != null) {
             try {
-                jfxs.runWhenScanFinished(new Task<CompilationController>() {
+                jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
                         new JavaFXTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
@@ -248,28 +248,36 @@ public class JavaFXSourceUtils {
         return result;
     }
 
+    public static Collection<ElementHandle<TypeElement>> getClasses(FileObject fo) {
+        return getClasses(fo, null);
+    }
+
     public static Collection<ElementHandle<TypeElement>> getClasses(FileObject fo, final ElementHandle<TypeElement> superTypeHandle) {
         JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
         final Collection<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
         if (jfxs != null) {
             try {
-                jfxs.runWhenScanFinished(new Task<CompilationController>() {
+                jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        final String superTypeQN = superTypeHandle.getQualifiedName();
+                        final String superTypeQN = superTypeHandle != null ? superTypeHandle.getQualifiedName() : null;
                         new JavaFXTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
 
                             @Override
                             public Void visitClassDeclaration(ClassDeclarationTree node, Collection<ElementHandle<TypeElement>> p) {
                                 TypeElement te = (TypeElement) cc.getTrees().getElement(getCurrentPath());
-                                if (te.getSuperclass().toString().equals(superTypeQN)) {
-                                    p.add(ElementHandle.create(te));
-                                } else {
-                                    for(TypeMirror tm : te.getInterfaces()) {
-                                        if (tm.toString().equals(superTypeQN)) {
-                                            p.add(ElementHandle.create(te));
+                                if (superTypeQN != null) {
+                                    if (te.getSuperclass().toString().equals(superTypeQN)) {
+                                        p.add(ElementHandle.create(te));
+                                    } else {
+                                        for(TypeMirror tm : te.getInterfaces()) {
+                                            if (tm.toString().equals(superTypeQN)) {
+                                                p.add(ElementHandle.create(te));
+                                            }
                                         }
                                     }
+                                } else {
+                                    p.add(ElementHandle.create(te));
                                 }
                                 return super.visitClassDeclaration(node, p);
                             }

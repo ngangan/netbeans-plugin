@@ -41,7 +41,6 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javadoc.Doc;
-import com.sun.javafx.api.JavafxcTask;
 import com.sun.source.tree.Scope;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Source;
@@ -57,17 +56,19 @@ import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javafx.api.JavafxcScope;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafxdoc.DocEnv;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
@@ -91,6 +92,18 @@ public final class ElementUtilities {
         this.ctx = parserResultImpl.getJavafxcTaskImpl().getContext();
 //        this.delegate = ElementsService.instance(ctx);
     }
+
+    public boolean alreadyDefinedIn(CharSequence name, ExecutableElement method, TypeElement enclClass) {
+        ElementHandle origHandle = ElementHandle.create(method);
+        String sigs[] = origHandle.getSignatures();
+        origHandle = new ElementHandle(origHandle.getKind(), new String[]{sigs[0], name.toString(), sigs[2]});
+        for(Element e : ElementFilter.methodsIn(enclClass.getEnclosedElements())) {
+            if (origHandle.equals(ElementHandle.create(e))) {
+                return true;
+            }
+        }
+        return false;
+     }
 
     /**
      * Returns the type element within which this member or constructor
