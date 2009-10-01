@@ -161,14 +161,17 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
                     }
 
-                    for(ExpressionTree et : node.getSupertypeList()) {
-                        TypeElement supr = (TypeElement)fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
-                        if (supr != null) {
-                            if (DEBUG) {
-                                LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
+                    List<ExpressionTree> superTypes = node.getSupertypeList();
+                    if (superTypes != null) {
+                        for(ExpressionTree et : superTypes) {
+                            TypeElement supr = (TypeElement)fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
+                            if (supr != null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
+                                }
+                                index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
+                                index(document, IndexKey.TYPE_REF, supr.getQualifiedName().toString());
                             }
-                            index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
-                            index(document, IndexKey.TYPE_REF, supr.getQualifiedName().toString());
                         }
                     }
                     index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
