@@ -10,9 +10,9 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
@@ -20,12 +20,8 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXFunctionInvocation;
 import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXInstanciate;
-import com.sun.tools.javafx.tree.JFXLiteral;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
@@ -188,8 +184,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 }
 
                 @Override
-                public Void visitVariable(VariableTree node, IndexDocument document) {
-                    VariableElement e = (VariableElement)fxresult.getTrees().getElement(getCurrentPath());
+                public Void visitVariable(VariableTree node, IndexDocument document) {                    VariableElement e = (VariableElement)fxresult.getTrees().getElement(getCurrentPath());
                     if (e == null) {
                         if (DEBUG) {
                             LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -370,7 +365,40 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
                     return super.visitMemberSelect(node, document);
                 }
+
+                @Override
+                public Void visitObjectLiteralPart(ObjectLiteralPartTree node, IndexDocument document) {
+                    Element el = fxresult.getTrees().getElement(getCurrentPath());
+                    if (el == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        }
+                        return super.visitObjectLiteralPart(node, document);
+                    }
+                    switch (el.getKind()) {
+                        case FIELD: {
+                            ElementHandle eh = ElementHandle.create(el);
+                            if (eh == null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Error while processing object literal part: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                }
+                                return super.visitObjectLiteralPart(node, document);
+                            }
+                            String indexVal = IndexingUtilities.getIndexValue(eh);
+                            if (indexVal != null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                }
+                                index(document, IndexKey.FIELD_REF, indexVal);
+                            } else {
+                                LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
+                            }
+                        }
+                    }
+                    return super.visitObjectLiteralPart(node, document);
+                }
             };
+//            if (!fxresult.getDiagnostics().isEmpty()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
         } catch (Exception e) {

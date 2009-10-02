@@ -28,10 +28,14 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 
 /**
@@ -40,19 +44,26 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
  */
 abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner<R, P>{
     final private TreePathHandle searchHandle;
+    final private ElementHandle origHandle;
+    final private ElementKind origKind;
     final private CompilationController cc;
     final private SourcePositions positions;
     
-    public BaseRefactoringScanner(TreePathHandle searchHandle, CompilationController cc) {
+    public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
         this.searchHandle = searchHandle;
+        this.origHandle = handle;
+        this.origKind = handle != null ? handle.getKind() : null;
         this.cc = cc;
         this.positions = cc.getTrees().getSourcePositions();
+    }
+
+    public BaseRefactoringScanner(TreePathHandle searchHandle, CompilationController cc) {
+        this(searchHandle, searchHandle != null ? ElementHandle.create(searchHandle.resolveElement(cc)) : null, cc);
     }
 
     public BaseRefactoringScanner(CompilationController cc) {
         this(null, cc);
     }
-
 
     @Override
     final public R scan(Tree tree, P p) {
@@ -62,11 +73,34 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
         return super.scan(tree, p);
     }
 
-    final protected TreePathHandle getSearchHandle() {
+    final protected TreePathHandle getTreePathHandle() {
         return searchHandle;
+    }
+
+    final protected ElementHandle getElementHandle() {
+        return origHandle;
+    }
+
+    final protected ElementKind getElementKind() {
+        return origKind;
     }
 
     final protected CompilationController getCompilationController() {
         return cc;
+    }
+
+    final protected boolean isSameElement() {
+        return isSameElement(getCurrentPath());
+    }
+
+    final protected boolean isSameElement(JavaFXTreePath path) {
+        Element el = getCompilationController().getTrees().getElement(path);
+        if (el != null) {
+            if (origHandle.getKind() == el.getKind()) {
+                ElementHandle eh = ElementHandle.create(el);
+                return origHandle.equals(eh);
+            }
+        }
+        return false;
     }
 }

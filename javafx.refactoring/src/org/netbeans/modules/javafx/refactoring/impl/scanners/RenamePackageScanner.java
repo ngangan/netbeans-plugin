@@ -50,7 +50,7 @@ public class RenamePackageScanner extends BaseRefactoringScanner<Void, Set<TreeP
     final private ProgressProvider pp;
 
     public RenamePackageScanner(String origName, ProgressProvider pp, CompilationController cc) {
-        super(null, cc);
+        super(cc);
         this.origQualName = origName;
         this.pp = pp;
     }

@@ -16,7 +16,7 @@
  *  nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
  *  particular file as subject to the "Classpath" exception as provided
  *  by Sun in the GPL Version 2 section of the License file that
- *  accompanied this code. If applicable, add the following below the
+ *  agetCompilationController()ompanied this code. If applicable, add the following below the
  *  License Header, with the fields enclosed by brackets [] replaced by
  *  your own identifying information:
  *  "Portions Copyrighted [year] [name of copyright owner]"
@@ -31,14 +31,19 @@ package org.netbeans.modules.javafx.refactoring.impl.scanners;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.TypeSymbol;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXIdent;
 import java.util.regex.Pattern;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -61,8 +66,6 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
     private String targetName;
     private AbstractRefactoring refactoring;
 
-    private CompilationController cc;
-
     public FindUsagesScanner(WhereUsedQuery refactoring, TreePathHandle handle, CompilationController cc) {
         this(refactoring, handle, ElementHandle.create(handle.resolveElement(cc)), cc);
     }
@@ -72,7 +75,6 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
         this.elementHandle = elementHandle;
         this.targetName = handle.getSimpleName();
         this.refactoring = refactoring;
-        this.cc = cc;
     }
 
     @Override
@@ -80,15 +82,15 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
         switch (elementHandle.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
                 if (Pattern.matches(targetName + TYPE_MATCH_PATTERN, te.getSimpleName().toString())) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
                 }
                 for(ExpressionTree et : node.getSupertypeList()) {
                     JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), et);
-                    te = (TypeElement)cc.getTrees().getElement(path);
+                    te = (TypeElement)getCompilationController().getTrees().getElement(path);
                     if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, te.getQualifiedName().toString())) {
-                        elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(path, cc), Lookups.singleton(getSearchHandle())));
+                        elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(path, getCompilationController()), Lookups.singleton(getTreePathHandle())));
                     }
                 }
             }
@@ -101,10 +103,10 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
         switch (elementHandle.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, typeName)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), cc), Lookups.singleton(getSearchHandle())));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), getCompilationController()), Lookups.singleton(getTreePathHandle())));
                 }
                 break;
             }
@@ -117,10 +119,10 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
         switch(elementHandle.getKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(elementHandle.getQualifiedName() + TYPE_MATCH_PATTERN, typeName)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
                 }
                 break;
             }
@@ -130,12 +132,12 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
 
     @Override
     public Void visitVariable(VariableTree node, RefactoringElementsBag elements) {        
-        if (elementHandle.getKind() == ElementKind.FIELD) {
-            Element e = cc.getTrees().getElement(getCurrentPath());
-            if (e.getKind() == ElementKind.FIELD) {
-                ElementHandle eh = ElementHandle.create(e);
-                if (eh != null && elementHandle.equals(eh)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
+        switch (elementHandle.getKind()) {
+            case FIELD:
+            case LOCAL_VARIABLE:
+            case PARAMETER: {
+                if (isSameElement()) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
                     return null;
                 }
             }
@@ -144,19 +146,13 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
         return super.visitVariable(node, elements);
     }
 
-
-    volatile private boolean inMemberSelect = false;
-
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, RefactoringElementsBag elements) { 
-        if (!inMemberSelect) {
-            if (elementHandle.getKind() == ElementKind.METHOD) {
-                ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
-                if (eh != null && elementHandle.equals(eh)) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
-                    return null;
-                }
-        }
+        if (elementHandle.getKind() == ElementKind.METHOD) {
+            if (isSameElement()) {
+                elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
+                return null;
+            }
         }
 
         return super.visitMethodInvocation(node, elements);
@@ -165,19 +161,47 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
 
     @Override
     public Void visitMemberSelect(MemberSelectTree node, RefactoringElementsBag elements) {
-        try {
-            inMemberSelect = true;
-            if (node.getIdentifier().contentEquals(targetName)) {
-                Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()));
-                if (e.asType().toString().equals(elementHandle.getSignatures()[0])) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), cc), Lookups.singleton(getSearchHandle())));
+        if (node.getIdentifier().contentEquals(targetName)) {
+            ExpressionTree expression = node.getExpression();
+            if (expression instanceof JFXIdent) {
+                Type type = ((JFXIdent)expression).type;
+                if (type == null) return super.visitMemberSelect(node, elements);
+                TypeSymbol ts = type.asElement();
+                if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, elements);
+                for(Symbol sy : ts.getEnclosedElements()) {
+                    if (sy.getKind() == ElementKind.FIELD) {
+                        if (elementHandle != null && elementHandle.equals(ElementHandle.create(sy))) {
+                            elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
+                            return null;
+                        }
+                    }
                 }
             }
-
-            return super.visitMemberSelect(node, elements);
-        } finally {
-            inMemberSelect = false;
         }
+        return super.visitMemberSelect(node, elements);
     }
 
+    @Override
+    public Void visitIdentifier(IdentifierTree node, RefactoringElementsBag elements) {
+        switch (elementHandle.getKind()) {
+            case FIELD:
+            case PARAMETER:
+            case LOCAL_VARIABLE: {
+                if (isSameElement()) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
+                    return null;
+                }
+                break;
+            }
+        }
+        return super.visitIdentifier(node, elements);
+    }
+
+    @Override
+    public Void visitObjectLiteralPart(ObjectLiteralPartTree node, RefactoringElementsBag elements) {
+        if (isSameElement()) {
+            elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
+        }
+        return super.visitObjectLiteralPart(node, elements);
+    }
 }

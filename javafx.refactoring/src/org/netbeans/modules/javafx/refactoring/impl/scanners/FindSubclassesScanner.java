@@ -29,7 +29,6 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
@@ -44,29 +43,27 @@ import org.openide.util.lookup.Lookups;
  * @author Jaroslav Bachorik
  */
 public class FindSubclassesScanner extends BaseRefactoringScanner<Void, RefactoringElementsBag> {
-    private ElementHandle elementHandle;
-    private String targetName;
     private AbstractRefactoring refactoring;
 
-    public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle handle, CompilationController cc) {
-        this(refactoring, handle, ElementHandle.create(handle.resolveElement(cc)), cc);
+    public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, CompilationController cc) {
+        super(searchHandle, cc);
+        this.refactoring = refactoring;
     }
 
-    public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
-        super(handle, cc);
-        this.elementHandle = elementHandle;
-        this.targetName = elementHandle.getQualifiedName();
+    public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
+        super(searchHandle, handle, cc);
         this.refactoring = refactoring;
     }
 
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, RefactoringElementsBag elements) {
-        switch (elementHandle.getKind()) {
+        switch (getElementKind()) {
             case CLASS:
             case INTERFACE: {
-                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
-                if (targetName.equals(te.getQualifiedName().toString())) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getSearchHandle())));
+                if (isSameElement()) {
+//                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
+//                if (targetName.equals(te.getQualifiedName().toString())) {
+                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
                 }
             }
         }

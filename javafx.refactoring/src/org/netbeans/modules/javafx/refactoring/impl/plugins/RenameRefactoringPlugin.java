@@ -51,9 +51,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.util.ElementFilter;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
@@ -386,7 +384,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle.getSimpleName(), handle[0], cc);
+                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, cc);
                         scanner.scan(cc.getCompilationUnit(), references);
                     }
                 }, true);

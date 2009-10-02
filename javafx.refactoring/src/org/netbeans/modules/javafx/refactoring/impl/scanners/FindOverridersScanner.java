@@ -48,29 +48,29 @@ import org.openide.util.lookup.Lookups;
  * @author Jaroslav Bachorik
  */
 public class FindOverridersScanner extends BaseRefactoringScanner<Void, RefactoringElementsBag> {
-    private ElementHandle elementHandle;
     private ExecutableElement methodElement;
     private AbstractRefactoring refactoring;
 
-    public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle handle, CompilationController cc) {
-        this(refactoring, handle, ElementHandle.create(handle.resolveElement(cc)), cc);
+    public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, CompilationController cc) {
+        super(searchHandle, cc);
+        this.methodElement = (ExecutableElement)searchHandle.resolveElement(cc);
+        this.refactoring = refactoring;
     }
 
-    public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
-        super(handle, cc);
-        this.elementHandle = elementHandle;
-        this.methodElement = (ExecutableElement)elementHandle.resolve(cc);
+    public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
+        super(searchHandle, handle, cc);
+        this.methodElement = (ExecutableElement)handle.resolve(cc);
         this.refactoring = refactoring;
     }
 
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, RefactoringElementsBag elements) {
-        if (elementHandle.getKind() == ElementKind.METHOD) {
+        if (getElementKind() == ElementKind.METHOD) {
             ExecutableElement element = (ExecutableElement)getCompilationController().getTrees().getElement(getCurrentPath());
 
             Collection<ExecutableElement> methods = SourceUtils.getOverridenMethods(element, getCompilationController());
             if (methods.contains(methodElement)) {
-                elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getSearchHandle())));
+                elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
             }
         }
         return super.visitFunctionDefinition(node, elements);

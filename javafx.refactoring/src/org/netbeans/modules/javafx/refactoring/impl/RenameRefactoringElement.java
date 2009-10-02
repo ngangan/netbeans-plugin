@@ -261,6 +261,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                             break;
                         }
                         case VARIABLE:
+                        case OBJECT_LITERAL_PART:
                         case METHOD_INVOCATION:
                         case FUNCTION_DEFINITION: {
                             findIdentifier(path, cc);

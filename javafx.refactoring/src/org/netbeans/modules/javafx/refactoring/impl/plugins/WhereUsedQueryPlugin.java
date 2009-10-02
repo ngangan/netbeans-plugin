@@ -117,6 +117,8 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                     Element e = searchHandle.resolveElement(cc);
                     ElementHandle eh = ElementHandle.create(e);
 
+                    relevantFiles.add(searchHandle.getFileObject());
+
                     if (isFindUsages()) {
                         relevantHandles.add(eh);
                         collectReferences(ElementHandle.create(e), ci, relevantFiles);
@@ -154,7 +156,7 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
                         public void run(final CompilationController cc) throws Exception {
                             for(ElementHandle eh : relevantHandles) {
                                 if (isFindOverridingMethods()) {
-                                    new FindOverridersScanner(refactoring, searchHandle, cc).scan(cc.getCompilationUnit(), elements);
+                                    new FindOverridersScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
                                 }
                                 if (isFindUsages()) {
                                     new FindUsagesScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);

@@ -149,6 +149,7 @@ public class ElementHandle<T extends Element> {
      * @param handle to be checked
      * @return true if the handles resolve into the same {@link Element}s
      * in the same {@link javax.tools.JavaCompiler} task.
+     * @deprecated Use {@linkplain ElementHandle#equals(java.lang.Object) } instead
      */
     public boolean signatureEquals (final ElementHandle<? extends Element> handle) {
          if (!isSameKind (this.kind, handle.kind) || this.signatures.length != handle.signatures.length) {

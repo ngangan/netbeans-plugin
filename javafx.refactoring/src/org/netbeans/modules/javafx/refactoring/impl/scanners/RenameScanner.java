@@ -37,6 +37,7 @@ import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
@@ -63,20 +64,18 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
     final private static String TYPE_MATCH_PATTERN = "(\\..+)*(\\[\\])*";
     final private String origSimpleName;
     final private String origQualName;
-    final private ElementKind origKind;
-    private ElementHandle origHandle;
 
-    public RenameScanner(String simpleName, String qualName, ElementKind origKind, CompilationController cc) {
-        super(cc);
-        this.origKind = origKind;
-        this.origQualName = qualName;
-        this.origSimpleName = simpleName;
+
+    public RenameScanner(TreePathHandle searchHandle, CompilationController cc) {
+        super(searchHandle, cc);
+        this.origSimpleName = searchHandle.getSimpleName();
+        ElementHandle eh = ElementHandle.create(searchHandle.resolveElement(cc));
+        this.origQualName = (eh.getKind() == ElementKind.CLASS || eh.getKind() == ElementKind.INTERFACE || eh.getKind() == ElementKind.OTHER) ? eh.getQualifiedName() : "";
     }
 
-    public RenameScanner(String simpleName, ElementHandle handle, CompilationController cc) {
-        this(simpleName, (handle.getKind() == ElementKind.CLASS || handle.getKind() == ElementKind.INTERFACE) ? handle.getQualifiedName().toString() : "", handle.getKind(), cc);
-        this.origHandle = handle;
-    }
+//    public RenameScanner(String simpleName, ElementHandle handle, CompilationController cc) {
+//        this(simpleName, (handle.getKind() == ElementKind.CLASS || handle.getKind() == ElementKind.INTERFACE) ? handle.getQualifiedName().toString() : "", handle.getKind(), cc);
+//    }
 
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, Set<TreePathHandle> p) {
@@ -84,7 +83,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
         if (namePos == null) return super.visitClassDeclaration(node, p); // the name is not in the source => synthetically generated class declaration
 
-        switch (origKind) {
+        switch (getElementKind()) {
             case CLASS:
             case INTERFACE: {
                 TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
@@ -106,7 +105,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitInstantiate(InstantiateTree node, Set<TreePathHandle> p) {
-        switch (origKind) {
+        switch (getElementKind()) {
             case CLASS:
             case INTERFACE: {
                 TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
@@ -123,7 +122,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitTypeClass(TypeClassTree node, Set<TreePathHandle> p) {
-        switch(origKind) {
+        switch(getElementKind()) {
             case CLASS:
             case INTERFACE: {
                 TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
@@ -140,7 +139,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitImport(ImportTree node, Set<TreePathHandle> p) {
-        switch (origKind) {
+        switch (getElementKind()) {
             case CLASS:
             case INTERFACE: {
                 String qualName = node.getQualifiedIdentifier().toString();
@@ -163,7 +162,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
             case LOCAL_VARIABLE:
             case PARAMETER:
             case FIELD: {
-                if (node.getName().contentEquals(origSimpleName)) {
+                if (isSameElement()) {
                     if (node instanceof JFXVarScriptInit) {
                         p.add(TreePathHandle.create(JavaFXTreePath.getPath(getCompilationController().getCompilationUnit(), ((JFXVarScriptInit)node).getVar()), getCompilationController()));
                     } else {
@@ -180,11 +179,11 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Set<TreePathHandle> p) {
-        if (origKind != ElementKind.METHOD) return super.visitFunctionDefinition(node, p);
+        if (getElementKind() != ElementKind.METHOD) return super.visitFunctionDefinition(node, p);
         ExecutableElement e = (ExecutableElement)getCompilationController().getTrees().getElement(getCurrentPath());
         ElementHandle eh = ElementHandle.create(e);
 
-        if (eh != null && (eh.equals(origHandle) || getCompilationController().getElements().overrides(e, (ExecutableElement)origHandle.resolve(getCompilationController()), (TypeElement)e.getEnclosingElement()))) {
+        if (eh != null && (eh.equals(getElementHandle()) || getCompilationController().getElements().overrides(e, (ExecutableElement)getElementHandle().resolve(getCompilationController()), (TypeElement)e.getEnclosingElement()))) {
             p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
             return null;
         }
@@ -193,10 +192,8 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitMethodInvocation(FunctionInvocationTree node, Set<TreePathHandle> p) {
-        if (origKind != ElementKind.METHOD) return super.visitMethodInvocation(node, p);
-        Element e = getCompilationController().getTrees().getElement(getCurrentPath());
-        ExecutableElement ee = (ExecutableElement)e;
-        if (origHandle != null && origHandle.equals(ElementHandle.create(ee))) {
+        if (getElementKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, p);
+        if (isSameElement()) {
             p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
             return null;
         }
@@ -216,7 +213,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
             if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, p);
             for(Symbol sy : ts.getEnclosedElements()) {
                 if (sy.getKind() == ElementKind.FIELD) {
-                    if (origHandle != null && origHandle.equals(ElementHandle.create(sy))) {
+                    if (getElementHandle() != null && getElementHandle().equals(ElementHandle.create(sy))) {
                         p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                         return null;
                     }
@@ -228,11 +225,11 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitIdentifier(IdentifierTree node, Set<TreePathHandle> p) {
-        switch (origKind) {
+        switch (getElementKind()) {
             case FIELD:
             case PARAMETER:
             case LOCAL_VARIABLE: {
-                if (node.getName().contentEquals(origSimpleName)) {
+                if (isSameElement()) {
                     p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                     return null;
                 }
@@ -241,4 +238,20 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
         }
         return super.visitIdentifier(node, p);
     }
+
+    @Override
+    public Void visitObjectLiteralPart(ObjectLiteralPartTree node, Set<TreePathHandle> p) {
+        switch (getElementKind()) {
+            case FIELD:
+            case PARAMETER:
+            case LOCAL_VARIABLE: {
+                if (isSameElement()) {
+                    p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
+                }
+            }
+        }
+        return super.visitObjectLiteralPart(node, p);
+    }
+
+
 }
