@@ -73,10 +73,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
         this.origQualName = (eh.getKind() == ElementKind.CLASS || eh.getKind() == ElementKind.INTERFACE || eh.getKind() == ElementKind.OTHER) ? eh.getQualifiedName() : "";
     }
 
-//    public RenameScanner(String simpleName, ElementHandle handle, CompilationController cc) {
-//        this(simpleName, (handle.getKind() == ElementKind.CLASS || handle.getKind() == ElementKind.INTERFACE) ? handle.getQualifiedName().toString() : "", handle.getKind(), cc);
-//    }
-
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, Set<TreePathHandle> p) {
         long[] namePos = getCompilationController().getTreeUtilities().findNameSpan(node);
@@ -185,7 +181,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
         if (eh != null && (eh.equals(getElementHandle()) || getCompilationController().getElements().overrides(e, (ExecutableElement)getElementHandle().resolve(getCompilationController()), (TypeElement)e.getEnclosingElement()))) {
             p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-            return null;
         }
         return super.visitFunctionDefinition(node, p);
     }
