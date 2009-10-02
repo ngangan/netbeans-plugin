@@ -33,6 +33,7 @@ import org.netbeans.modules.editor.indent.spi.Context;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import java.util.NoSuchElementException;
+import org.openide.util.NbBundle;
 
 /**
  * Iterates lines in
@@ -132,7 +133,7 @@ class DocumentLinesIterator implements LineIterator<Element> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Read_only_interator")); // NOI18N
+        throw new UnsupportedOperationException(NbBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle").getString("Read_only_interator")); // NOI18N
     }
 
 }

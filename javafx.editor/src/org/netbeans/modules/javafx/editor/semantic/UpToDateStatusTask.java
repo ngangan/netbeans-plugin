@@ -79,6 +79,7 @@ import org.netbeans.api.lexer.Token;
 import org.openide.cookies.LineCookie;
 import org.openide.loaders.DataObject;
 import org.openide.text.Line;
+import org.openide.util.NbBundle;
 /**
  *
  * @author David Strupl
@@ -192,7 +193,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                     continue;
                 } catch (BadLocationException ex) {
                     if (LOGGABLE) {
-                        LOGGER.log(Level.INFO, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex); // NOI18N
+                        LOGGER.log(Level.INFO, NbBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex); // NOI18N
                     }
                 } catch (IOException e) {
                     throw new IllegalStateException(e);

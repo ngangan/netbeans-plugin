@@ -65,7 +65,6 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.NbBundle;
 
 import javax.lang.model.element.*;
 import static javax.lang.model.element.Modifier.*;
@@ -84,6 +83,7 @@ import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -136,7 +136,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
      * This method should be overriden in subclasses
      */
     protected void inside(T t) throws IOException {
-        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED_") + t.getJavaFXKind() + " inside " + t); // NOI18N
+        if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED_") + t.getJavaFXKind() + " inside " + t); // NOI18N
     }
 
     protected void insideFunctionBlock(List<ExpressionTree> statements) throws IOException {
@@ -238,7 +238,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 return;
             }
         }
-        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED:_insideExpression_") + exPath.getLeaf()); // NOI18N
+        if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED:_insideExpression_") + exPath.getLeaf()); // NOI18N
 
     }
 
@@ -614,7 +614,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected List<DeclaredType> getSubtypesOf(DeclaredType baseType) {
-        if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED:_getSubtypesOf_") + baseType); // NOI18N
+        if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("NOT_IMPLEMENTED:_getSubtypesOf_") + baseType); // NOI18N
         return Collections.emptyList();
     }
 

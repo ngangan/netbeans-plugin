@@ -54,6 +54,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import java.util.Arrays;
 import java.util.List;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -379,7 +380,7 @@ final class BracketCompletion {
     private static int tokenBalance(BaseDocument doc, boolean handleSpecialBracesToken, TokenId... pairs) {
         if (pairs == null || pairs.length == 0) return 0;
         if (pairs.length % 2 != 0)
-            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
+            throw new IllegalArgumentException(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
 
         final List<TokenId> ids = Arrays.asList(pairs);
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);

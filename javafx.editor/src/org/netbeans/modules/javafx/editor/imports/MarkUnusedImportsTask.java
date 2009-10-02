@@ -43,6 +43,7 @@ import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -53,7 +54,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
     private final WeakReference<FileObject> file;
     private final AtomicBoolean canceled = new AtomicBoolean(false);
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle"); // NOI18N
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle"); // NOI18N
 
     MarkUnusedImportsTask(FileObject file) {
         assert file != null : "File cannot be null!"; // NOI18N

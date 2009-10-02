@@ -53,6 +53,7 @@ import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -80,7 +81,7 @@ public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
                 return;
             }
             // TODO:
-            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
+            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
         } else { // t.getParameter() may be null for CATCH - see #163767
             // Possibly show all exception classes
         }

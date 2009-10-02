@@ -65,6 +65,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.openide.util.NbBundle;
 
 /**
  * Implementation of tree path scanner to work with actual AST to provide formating.
@@ -86,7 +87,7 @@ class Visitor extends JavaFXTreePathScanner<Queue<Adjustment>, Queue<Adjustment>
     private static final String STRING_ZERO_LENGTH = ""; // NOI18N
     private boolean disableContinuosIndent;
     private boolean isOrphanObjectLiterar;
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle"); // NOI18N
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/format/Bundle"); // NOI18N
     private static final String REFORMAT_FAILED_BUNDLE_KEY = "Reformat_failed._";  // NOI18N
 
 

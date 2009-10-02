@@ -50,6 +50,7 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  * seq[x | condition]
@@ -109,12 +110,12 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
         }
         if (LOGGABLE) log("  afterPipe: " + afterPipe); // NOI18N
         if (afterPipe) {
-            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_")); // NOI18N
+            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_")); // NOI18N
             return;
         }
         if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier); // NOI18N
         if (afterIdentifier) {
-            if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after")); // NOI18N
+            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after")); // NOI18N
             return;
         } 
     }

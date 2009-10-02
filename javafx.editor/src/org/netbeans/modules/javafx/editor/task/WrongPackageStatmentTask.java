@@ -61,13 +61,14 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.openide.util.NbBundle;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
 class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/task/Bundle"); // NOI18N
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/task/Bundle"); // NOI18N
     private static final String WRONG_PROJECT = "wrong-project"; // NOI18N
     private static final String WRONG_PACKAGE = "wrong-package"; // NOI18N
     private static final String EDITOR_WRONG_PROJECT = "Editor.wrongProject"; // NOI18N
