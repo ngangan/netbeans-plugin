@@ -42,7 +42,9 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -52,7 +54,9 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -63,7 +67,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
-import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -73,7 +76,6 @@ import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -110,6 +112,8 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 final Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
+                final Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
+
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
@@ -143,6 +147,17 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
 
                     @Override
+                    public Void visitImport(ImportTree node, Void p) {
+                        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
+                        Element element = compilationInfo.getTrees().getElement(path);
+                        if (element instanceof JavafxClassSymbol) {
+                            imports.add((JavafxClassSymbol) element);
+                        }
+
+                        return super.visitImport(node, p);
+                    }
+
+                    @Override
                     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
                         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
                             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
@@ -168,7 +183,9 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     for (Tree tree : classTrees.get(currentClass)) {
                         String className = null;
                         if (tree instanceof JFXClassDeclaration) {
+                            ((JFXClassDeclaration) tree).getName();
                             className = ((JFXClassDeclaration) tree).getSimpleName().toString();
+
                         } else if (HintsUtils.checkString(tree.toString())) {
                             continue;
                         } else {
@@ -178,6 +195,23 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
                             if (typeElement == null) {
+                                continue;
+                            }
+                            boolean classUsed = false;
+                            for (JavafxClassSymbol importElement : imports) {
+                                if (typeElement instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
+                                    JavafxClassSymbol classTypeElement  = (JavafxClassSymbol) typeElement;
+                                    JavafxClassSymbol currentClassSymbol  = (JavafxClassSymbol) currentClass;
+                                    if (currentClassSymbol.location().equals(importElement.location())) {
+                                        classUsed = true;
+                                        break;
+                                    } else if (classTypeElement.getQualifiedName().equals(importElement.getQualifiedName())) {
+                                        classUsed = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!classUsed) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);

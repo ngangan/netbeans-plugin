@@ -46,11 +46,7 @@ import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -66,7 +62,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
     private CompilationInfo compilationInfo;
     private ClassIndex classIndex;
     private Set<String> instantTypes;
-    private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE);
+    private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
     UncaughtExceptionsVisitor(CompilationInfo compilationInfo, ClassIndex classIndex) {
         this.compilationInfo = compilationInfo;
@@ -97,10 +93,12 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                 if (elements == null) {
                     continue;
                 }
+                Element currentElement = compilationInfo.getTrees().getElement(getCurrentPath());
+                String methodName = currentElement.getSimpleName().toString();
                 for (Element element : elements) {
                     if (element instanceof MethodSymbol) {
                         MethodSymbol methodSymbol = (MethodSymbol) element;
-                        if (!methodSymbol.getSimpleName().toString().equals(HintsUtils.getMethodName(node.toString()))) {
+                        if (!methodSymbol.getSimpleName().toString().equals(methodName)) {
                             continue;
                         }
                         List<Type> thrownExceptions = null;

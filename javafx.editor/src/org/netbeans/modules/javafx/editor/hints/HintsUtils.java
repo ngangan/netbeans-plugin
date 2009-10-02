@@ -26,7 +26,7 @@ final class HintsUtils {
             methodName = fullMethodName;
         }
 
-        return methodName;
+        return methodName.trim();
     }
 
     static String getClassSimpleName(String fqName) {
