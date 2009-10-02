@@ -138,7 +138,6 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
             case PARAMETER: {
                 if (isSameElement()) {
                     elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
-                    return null;
                 }
             }
         }
@@ -151,7 +150,6 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
         if (elementHandle.getKind() == ElementKind.METHOD) {
             if (isSameElement()) {
                 elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
-                return null;
             }
         }
 
@@ -189,7 +187,6 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
             case LOCAL_VARIABLE: {
                 if (isSameElement()) {
                     elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
-                    return null;
                 }
                 break;
             }

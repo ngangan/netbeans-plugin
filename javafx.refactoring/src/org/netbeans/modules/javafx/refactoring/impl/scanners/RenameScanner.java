@@ -113,7 +113,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, typeName)) {
                     p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()), getCompilationController()));
-                    return null;
                 }
                 break;
             }
@@ -130,7 +129,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
                 String typeName = te.getQualifiedName().toString();
                 if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, typeName)) {
                     p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getClassName()), getCompilationController()));
-                    return null;
                 }
                 break;
             }
@@ -169,7 +167,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
                     } else {
                         p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                     }
-                    return null;
                 }
                 break;
             }
@@ -195,7 +192,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
         if (getElementKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, p);
         if (isSameElement()) {
             p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-            return null;
         }
         
         return super.visitMethodInvocation(node, p);
@@ -231,7 +227,6 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
             case LOCAL_VARIABLE: {
                 if (isSameElement()) {
                     p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                    return null;
                 }
                 break;
             }
