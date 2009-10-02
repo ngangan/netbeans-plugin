@@ -87,9 +87,9 @@ class UncaughtExceptionsFix implements Fix {
         final StringBuilder block = new StringBuilder();
         final String space = calculateSpace(hint.getStartPosition());
         if (hint.getCatchTree() == null) {
-            String method = document.getText(hint.getStartPosition(), hint.getLength());
-            block.append("try {\n") //NOI18N
-                    .append(space).append("\t").append(method)//.append("\n") //NOI18N
+            String method = document.getText(hint.getStartPosition() - space.length(), hint.getLength() + space.length()).trim();
+            block.append(space).append("try {\n") //NOI18N
+                    .append(space).append("\t").append(method).append("\n") //NOI18N
                     .append(space).append("}"); //NOI18N
 
             addCatch(iterator, block, exceptionName, space);
@@ -97,8 +97,8 @@ class UncaughtExceptionsFix implements Fix {
 
                 public void run() {
                     try {
-                        document.remove(hint.getStartPosition(), hint.getLength());
-                        document.insertString(hint.getStartPosition(), block.toString(), null);
+                        document.remove(hint.getStartPosition() - space.length(), hint.getLength() + space.length());
+                        document.insertString(hint.getStartPosition() - space.length(), block.toString(),  null);
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
