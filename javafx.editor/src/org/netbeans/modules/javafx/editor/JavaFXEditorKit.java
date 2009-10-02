@@ -143,7 +143,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             b.setAction(this);
 //            b.setEnabled(Bridge.isStarted());
             b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
-            b.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("preview_toolbar")); // NOI18N
+            b.setText(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("preview_toolbar")); // NOI18N
             return b;
         }
 

@@ -32,6 +32,7 @@ import javax.swing.text.Document;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.NbBundle;
 
 /**
  * 
@@ -579,7 +580,7 @@ public final class FXSourceUtils {
 
     public static boolean isJavaFXClass(final Element element, final CompilationInfo compilationInfo) {
         if (element == null || compilationInfo == null) {
-            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/api/javafx/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isJavaFXClass")); // NOI18N
+            throw new IllegalArgumentException(NbBundle.getBundle("org/netbeans/api/javafx/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isJavaFXClass")); // NOI18N
         }
         return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
     }

@@ -33,8 +33,8 @@ import org.netbeans.modules.editor.indent.spi.ReformatTask;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.format.CompilerIndependentJFXReformatTask;
 import org.netbeans.modules.javafx.editor.format.JFXReformatTask;
+import org.openide.util.NbBundle;
 
 /**
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
@@ -49,7 +49,7 @@ public class ReformatTaskFactory implements ReformatTask.Factory{
      * @return reformatting task or null if the factory cannot handle the given context.
      */
     public ReformatTask createTask(Context context) {
-        if (log.isLoggable(Level.FINE)) log.fine(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
+        if (log.isLoggable(Level.FINE)) log.fine(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
         return new JFXReformatTask(context); // TODO enable reformatting
 //        return new CompilerIndependentJFXReformatTask(context);
     }

@@ -1214,7 +1214,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
                     public void run(final CompilationController controller) throws IOException {
                         if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                            if (LOGGABLE) log (java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged.")); // NOI18N
+                            if (LOGGABLE) log (NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged.")); // NOI18N
                             return;
                         }
                         final TypeElement eleme = (type != null) ? (TypeElement)type.asElement() : elem;

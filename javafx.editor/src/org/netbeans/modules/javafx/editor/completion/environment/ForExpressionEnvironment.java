@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -118,9 +119,9 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
             if (afterLParen) {
                 if (prefix != null && prefix.length() > 0) {
                     // ok the user has already typed something
-                    if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
+                    if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
                 } else {
-                    if (LOGGABLE) log(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
+                    if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
                 }
             }
         }

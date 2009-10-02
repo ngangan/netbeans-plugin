@@ -63,7 +63,7 @@ final class ImportResolverImpl {
     private final Object LOCK = new Object();
     private static Logger log = Logger.getLogger(ImportResolverImpl.class.getName());
     private static final TypesComparator TYPES_COMPARATOR = new TypesComparator();
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle");
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle");
     private CompilationInfo ci;
     private int caret;
 

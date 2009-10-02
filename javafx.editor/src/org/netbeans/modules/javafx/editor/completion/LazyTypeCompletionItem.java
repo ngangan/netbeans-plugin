@@ -59,6 +59,7 @@ import java.awt.event.KeyEvent;
 import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -114,7 +115,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                                 e = handle.resolve(controller);
                             } catch (Exception ex) {
                                 if (LOGGABLE) {
-                                    logger.log(Level.FINE, java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex); // NOI18N
+                                    logger.log(Level.FINE, NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex); // NOI18N
                                 }
                             }
                             if (e != null) {
