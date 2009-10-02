@@ -38,13 +38,18 @@ import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.javafx.api.tree.TriggerTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXExpression;
 import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javafx.tree.JFXInstanciate;
+import com.sun.tools.javafx.tree.JFXOverrideClassVar;
 import com.sun.tools.javafx.tree.JFXVarScriptInit;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -247,6 +252,4 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
         }
         return super.visitObjectLiteralPart(node, p);
     }
-
-
 }

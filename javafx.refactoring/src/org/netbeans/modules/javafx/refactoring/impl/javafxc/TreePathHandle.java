@@ -34,6 +34,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.io.File;
 import java.net.URI;
@@ -225,6 +226,12 @@ final public class TreePathHandle {
     private JavaFXTreePath findSupportedPath(JavaFXTreePath initPath, CompilationInfo cc) {
         while (initPath != null && cc.getTrees().getElement(initPath) == null) {
             initPath = initPath.getParentPath();
+        }
+        if (initPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
+            // this stinks; synthetic method resolves to an element, nevertheless
+            if (((JFXFunctionDefinition)initPath.getLeaf()).getName().contentEquals("javafx$run$")) {  // NOI18N
+                initPath = initPath.getParentPath();
+            }
         }
         return initPath;
     }
