@@ -421,7 +421,9 @@ public class JFXReformatTask implements ReformatTask {
                             do {
                                 txt = doc.getText(endPos + i, 1);
                                 i++;
-                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
+                            // HACK: compiler eats braces
+//                            } while ((txt.matches(WS_TEMPLATE) || (tree instanceof JFXLiteral && txt.matches("\\)"))) && i < _endOffset - _startOffset); // NOI18N
+                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
                             if (SEMI.equals(txt) || RCBRACE.equals(txt)) {
                                 endPos += i;
                             }
@@ -727,10 +729,14 @@ public class JFXReformatTask implements ReformatTask {
             if (name != null && !ERROR.contentEquals(name)) {
                 accept(JFXTokenId.IDENTIFIER);
             }
-            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-            accept(JFXTokenId.COLON);
-            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-            scan(node.getType(), p);
+
+            final Tree type = node.getType();
+            if (type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                accept(JFXTokenId.COLON);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                scan(type, p);
+            }
 
             ExpressionTree init = node.getInitializer();
             if (init != null) {
@@ -790,7 +796,7 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.RPAREN);
 
             JFXType retType = funcDef.getJFXReturnType();
-            if (retType != null && !(retType instanceof JFXTypeUnknown)) {
+            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
@@ -976,7 +982,8 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
-            if (isEmpty || templateEdit) {
+//            if (isEmpty || templateEdit) {
+            if (templateEdit) {
                 newline();
             }
             if (node instanceof FakeBlock) {
