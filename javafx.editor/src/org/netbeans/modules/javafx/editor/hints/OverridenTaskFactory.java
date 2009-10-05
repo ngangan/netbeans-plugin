@@ -40,6 +40,7 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
@@ -152,7 +153,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
-                    Collection<? extends Tree> superTypes = classTrees.get(currentClass);
+                    Collection<Tree> superTypes = classTrees.get(currentClass);
                     if (superTypes == null) {
                         continue;
                     }
@@ -160,7 +161,8 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     if (methods == null) {
                         continue;
                     }
-
+                    Tree currentClassTree = compilationInfo.getTrees().getTree(currentClass);
+                    superTypes.add(currentClassTree);
                     for (Tree superTree : superTypes) {
                         JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
                         Element superTypeElement = compilationInfo.getTrees().getElement(superPath);
@@ -178,7 +180,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, imports, currentClass)) {
+                            if (!HintsUtils.isClassUsed(typeElement, imports, currentClass) && currentClass != superTypeElement) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);

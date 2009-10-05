@@ -94,6 +94,9 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
                     continue;
                 }
                 Element currentElement = compilationInfo.getTrees().getElement(getCurrentPath());
+                if (currentElement == null || currentElement.getSimpleName() == null) {
+                    continue;
+                }
                 String methodName = currentElement.getSimpleName().toString();
                 for (Element element : elements) {
                     if (element instanceof MethodSymbol) {
