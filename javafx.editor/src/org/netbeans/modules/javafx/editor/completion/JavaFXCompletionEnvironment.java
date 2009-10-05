@@ -892,7 +892,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     if (parSize == 0) {
                         ret.add(Collections.<String>singletonList(NbBundle.getMessage(JavaFXCompletionProvider.class, "JCP-no-parameters"))); // NOI18N
                     } else {
-                        ExecutableType eType = (ExecutableType)asMemberOf(e, type, types);
+                        TypeMirror tm = asMemberOf(e, type, types);
+                        if (!(tm instanceof ExecutableType)) continue; // error type, #173250
+                        ExecutableType eType = (ExecutableType)tm;
                         if (LOGGABLE) log("  eType == " + eType); // NOI18N
                         Iterator<? extends TypeMirror> parIt = eType.getParameterTypes().iterator();
                         TypeMirror param = null;
