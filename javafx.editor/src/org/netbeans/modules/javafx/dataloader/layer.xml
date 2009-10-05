@@ -252,10 +252,10 @@ made subject to such option by the copyright holder.
                         <attr name="position" intvalue="1200"/>
                     </file>
 
-<!--                    <file name="format">
+                    <file name="format">
                         <attr name="position" intvalue="1490"/>
                     </file>
--->
+
                     <file name="fix-imports">
                         <attr name="position" intvalue="1500"/>
                     </file>

@@ -107,7 +107,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new JavaFXGoToSourceAction(),
                 new JavaFXGotoHelpAction(),
                 JavaFXImports.getInstance(),
-                new JavaFXFormatAction(),
+//                new JavaFXFormatAction(),
                 new JavaFXInsertBreakAction()
         };
         return TextAction.augmentList(superActions, javafxActions);
@@ -451,12 +451,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
     // TODO do it trough new annotation registration
 //    @EditorActionRegistration(name = BaseKit.formatAction, mimeType = FX_MIME_TYPE)
-    private static class JavaFXFormatAction extends FormatAction {
-        public JavaFXFormatAction() {
-            putValue(Action.NAME, BaseKit.formatAction);
-            setEnabled(false);
-        }
-    }
+//    private static class JavaFXFormatAction extends FormatAction {
+//        public JavaFXFormatAction() {
+//            putValue(Action.NAME, BaseKit.formatAction);
+//            setEnabled(false);
+//        }
+//    }
 
     private static class JavaFXGotoHelpAction extends BaseAction {
 
