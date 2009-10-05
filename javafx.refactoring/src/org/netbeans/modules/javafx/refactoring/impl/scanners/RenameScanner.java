@@ -72,9 +72,13 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
 
     public RenameScanner(TreePathHandle searchHandle, CompilationController cc) {
-        super(searchHandle, cc);
+        this(searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
+    }
+
+    public RenameScanner(TreePathHandle searchHandle, ElementHandle elementHandle, CompilationController cc) {
+        super(searchHandle, elementHandle, cc);
         this.origSimpleName = searchHandle.getSimpleName();
-        ElementHandle eh = ElementHandle.create(searchHandle.resolveElement(cc));
+        ElementHandle eh = elementHandle;
         this.origQualName = (eh.getKind() == ElementKind.CLASS || eh.getKind() == ElementKind.INTERFACE || eh.getKind() == ElementKind.OTHER) ? eh.getQualifiedName() : "";
     }
 

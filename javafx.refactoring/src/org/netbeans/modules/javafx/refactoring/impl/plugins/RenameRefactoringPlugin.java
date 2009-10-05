@@ -384,7 +384,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, cc);
+                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, handle[0], cc);
                         scanner.scan(cc.getCompilationUnit(), references);
                     }
                 }, true);

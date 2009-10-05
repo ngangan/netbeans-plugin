@@ -71,7 +71,7 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, RefactoringE
     }
 
     public FindUsagesScanner(WhereUsedQuery refactoring, TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
-        super(handle, cc);
+        super(handle, elementHandle, cc);
         this.elementHandle = elementHandle;
         this.targetName = handle.getSimpleName();
         this.refactoring = refactoring;
