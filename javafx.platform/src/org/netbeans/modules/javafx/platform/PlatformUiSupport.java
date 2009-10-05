@@ -176,7 +176,7 @@ public final class PlatformUiSupport {
     public static final class PlatformKey implements Comparable {
 
         private String name;
-        private JavaPlatform platform;
+        private JavaPlatform platform = null;
 
         /**
          * Create a PlatformKey for a broken platform.

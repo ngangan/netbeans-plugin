@@ -268,7 +268,7 @@ public class JFXReformatTask implements ReformatTask {
     }
 
     public ExtraLock reformatLock() {
-        return null;
+        return JavaFXReformatExtraLock.getInstance();
     }
 
     private JavaFXTreePath getCommonPath(final int offset) {
