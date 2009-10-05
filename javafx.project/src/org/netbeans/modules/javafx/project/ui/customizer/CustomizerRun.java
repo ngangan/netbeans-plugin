@@ -322,6 +322,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         mainPanel.add(jButtonMainClass, gridBagConstraints);
         jButtonMainClass.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerRun.class).getString("AD_jButtonMainClass")); // NOI18N
 
+        jLabelArguments.setLabelFor(jTextArguments);
         org.openide.awt.Mnemonics.setLocalizedText(jLabelArguments, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustRun_Arguments")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -408,6 +409,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         extPanel.add(jRadioButton4, gridBagConstraints);
 
+        deviceLabel.setLabelFor(deviceCombo);
         org.openide.awt.Mnemonics.setLocalizedText(deviceLabel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_MobileDevice")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -445,6 +447,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.insets = new java.awt.Insets(5, 12, 0, 0);
         extPanel.add(installCheckBox1, gridBagConstraints);
 
+        jvmLabel.setLabelFor(jvmText);
         org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizerRun_JVMArgs")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
