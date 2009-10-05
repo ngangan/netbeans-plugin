@@ -41,15 +41,14 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
@@ -91,6 +90,9 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
         Runnable update = new Runnable() {
 
             public void run() {
+                if (document == null) {
+                    return;
+                }
                 if (annotationsToRemoveCopy != null) {
                     for (Annotation annotation : annotationsToRemoveCopy) {
                         NbDocument.removeAnnotation(document, annotation);
@@ -129,65 +131,38 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
 
-                final Map<Element, Collection<? extends Tree>> classes = new HashMap<Element, Collection<? extends Tree>>();
-                final Map<Element, Collection<ExecutableElement>> existingMethods = new HashMap<Element, Collection<ExecutableElement>>();
-                final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
+                Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
+                Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
+                Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
+                Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
+                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+                Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
 
-                JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
-
-                    @Override
-                    public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
-                        Collection<? extends Tree> superTypes = node.getSupertypeList();
-                        if (superTypes != null || superTypes.size() != 0) {
-                            Element classElement = compilationInfo.getTrees().getElement(getCurrentPath());
-                            classes.put(classElement, superTypes);
-                        }
-                        return super.visitClassDeclaration(node, v);
-                    }
-
-                    @Override
-                    public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
-                        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-                        if (element != null && element instanceof ExecutableElement) {
-                            if (node.getModifiers().toString().contains(" override")) { //NOI18N
-                                Element classElement = element.getEnclosingElement();
-                                Collection<ExecutableElement> methods = existingMethods.get(classElement);
-                                if (methods == null) {
-                                    methods = new ArrayList<ExecutableElement>();
-                                }
-                                methods.add((ExecutableElement) element);
-                                existingMethods.put(classElement, methods);
-                            }
-                        }
-
-                        return super.visitFunctionDefinition(node, v);
-                    }
-                };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
-                Collection<Element> classesKeys = new HashSet<Element>(existingMethods.keySet());
-
                 for (Element classElement : classesKeys) {
-                    if (existingMethods.size() == 0 ||
+                    if (overridenMethods.size() == 0 ||
                             !isAnnon(classElement) &&
                             HintsUtils.checkString(classElement.getSimpleName().toString())) {
                         updateAnnotationsOverriden(compilationInfo, addedAnotations);
-                        existingMethods.remove(classElement);
+                        overridenMethods.remove(classElement);
                     }
                 }
-                if (existingMethods.size() == 0) {
+                if (overridenMethods.size() == 0) {
                     updateAnnotationsOverriden(compilationInfo, addedAnotations);
                     return;
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                for (Element mainClassElement : classes.keySet()) {
-                    Collection<? extends Tree> superTypes = classes.get(mainClassElement);
+                for (Element currentClass : classTrees.keySet()) {
+                    Collection<Tree> superTypes = classTrees.get(currentClass);
                     if (superTypes == null) {
                         continue;
                     }
-                    Collection<ExecutableElement> methods = existingMethods.get(mainClassElement);
+                    Collection<MethodSymbol> methods = overridenMethods.get(currentClass);
                     if (methods == null) {
                         continue;
                     }
+                    Tree currentClassTree = compilationInfo.getTrees().getTree(currentClass);
+                    superTypes.add(currentClassTree);
                     for (Tree superTree : superTypes) {
                         JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
                         Element superTypeElement = compilationInfo.getTrees().getElement(superPath);
@@ -198,30 +173,31 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         if (HintsUtils.checkString(superTypeName)) {
                             continue;
                         }
+
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(superTypeName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
                             TypeElement typeElement = elementHandle.resolve(compilationInfo);
                             if (typeElement == null) {
                                 continue;
                             }
+                            if (!HintsUtils.isClassUsed(typeElement, imports, currentClass) && currentClass != superTypeElement) {
+                                continue;
+                            }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
                             if (elements == null) {
                                 continue;
                             }
-                            Collection<Element> overriddens = new HashSet<Element>();
+                            //Collection<MethodSymbol> overriddens = new HashSet<MethodSymbol>();
                             for (Element element : elements) {
                                 if (element instanceof ExecutableElement) {
-                                    Element overridden = checkIfOveridden(compilationInfo, methods, (ExecutableElement) element);
+                                    MethodSymbol overridden = checkIfOveridden(methods, (MethodSymbol) element);
                                     if (overridden != null) {
-                                        overriddens.add(overridden);
+                                        Tree tree = compilationInfo.getTrees().getTree(overridden);
+                                        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                                        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+                                        addedAnotations.add(new OverriddeAnnotation(start, element.getEnclosingElement()));
                                     }
                                 }
-                            }
-                            for (Element overriden : overriddens) {
-                                Tree tree = compilationInfo.getTrees().getTree(overriden);
-                                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                                int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                                addedAnotations.add(new OverriddeAnnotation(start));
                             }
                         }
 
@@ -252,26 +228,30 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
         return true;
     }
 
-    private Element checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {
-        String overrridenName = overridden.getSimpleName().toString();
-        for (ExecutableElement override : elementsToCheck) {
-            if (!overridden.getSimpleName().toString().equals(overrridenName)) {
-                continue;
-            }
-            TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overridden);
-            if (typeOverridden == null) {
-                continue;
-            }
-            //TODO Workaround for java.lang.NullPointerException at com.sun.tools.javac.code.Types$DefaultTypeVisitor.visit(Types.java:3183)
-            try {
-                if (compilationInfo.getElements().overrides(override, overridden, typeOverridden)) {
-                    return override;
-                }
-            } catch (Exception npe) {
-                npe.printStackTrace();
-            }
-        }
-        return null;
+    private MethodSymbol checkIfOveridden(Collection<MethodSymbol> elementsToCheck, MethodSymbol overridden) {
+        //String overrridenName = overridden.getSimpleName().toString();
+//        for (ExecutableElement override : elementsToCheck) {
+////            if (!overridden.getSimpleName().toString().equals(overrridenName)) {
+////                continue;
+////            }
+////            TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overridden);
+////            if (typeOverridden == null) {
+////                continue;
+////            }
+//            //TODO Workaround for java.lang.NullPointerException at com.sun.tools.javac.code.Types$DefaultTypeVisitor.visit(Types.java:3183)
+////            try {
+////                if (compilationInfo.getElements().overrides(override, overridden, typeOverridden)) {
+////                    return override;
+////                }
+////            } catch (Exception npe) {
+////                npe.printStackTrace();
+////            }
+//
+//
+//        }
+        // Work around for a problem with mixin compilationInfo.getElements().overrides(override, overridden, typeOverridden) which does not work with mixin
+        return HintsUtils.isOverriden(elementsToCheck, overridden);
+
     }
 
     private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
@@ -290,9 +270,14 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
     private static class OverriddeAnnotation extends Annotation {
 
         private int positon;
+        private String superClassFQN;
 
-        public OverriddeAnnotation(int position) {
+        public OverriddeAnnotation(int position, Element element) {
             this.positon = position;
+            if (element instanceof JavafxClassSymbol) {
+                JavafxClassSymbol superClassSymbol = (JavafxClassSymbol) element;
+                superClassFQN = superClassSymbol.getQualifiedName().toString();
+            }
         }
 
         @Override
@@ -302,7 +287,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
         @Override
         public String getShortDescription() {
-            return "Overriden";
+            return "Overrides: " + superClassFQN; //NOI18N
         }
 
         int getPosition() {

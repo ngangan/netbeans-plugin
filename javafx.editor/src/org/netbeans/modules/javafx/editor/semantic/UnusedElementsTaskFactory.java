@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.CatchTree;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.ContinueTree;
 import com.sun.javafx.api.tree.ForExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
@@ -63,6 +64,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
@@ -110,6 +113,7 @@ public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory 
 
 
                 JavaFXTreePathScanner<Void, Void> varVisitor = new JavaFXTreePathScanner<Void, Void>() {
+
                     boolean parentClass = true;
 
                     @Override
@@ -122,7 +126,7 @@ public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory 
                         } else {
                             parentClass = false;
                         }
-                        
+
                         return super.visitClassDeclaration(node, v);
                     }
 
@@ -138,10 +142,12 @@ public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory 
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
                         if (element != null && element.getSimpleName() != null) {
-                            if (element.getKind() == ElementKind.LOCAL_VARIABLE ||
-                                modifiers.size() == 0 ||
-                                modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
-                                addToInit(node);
+                            if (!isPackage(node.getModifiers().toString())) {
+                                if (element.getKind() == ElementKind.LOCAL_VARIABLE ||
+                                        modifiers.size() == 0 ||
+                                        modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                                    addToInit(node);
+                                }
                             }
                         }
 
@@ -162,10 +168,14 @@ public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory 
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
                         if (element != null && element.getSimpleName() != null) {
-                            if (modifiers.size() == 0 ||
-                                modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
-                                addToInit(node);
+                            //TODO Hack for package modifiers which does not provide info about package
+                            if (!isPackage(node.getModifiers().toString())) {
+                                if (modifiers.size() == 0 ||
+                                        modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                                    addToInit(node);
+                                }
                             }
+
                         }
                         return super.visitFunctionDefinition(node, v);
                     }
@@ -194,6 +204,16 @@ public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory 
                         addToRemove(node);
 
                         return super.visitMethodInvocation(node, v);
+                    }
+
+                    private boolean isPackage(String modifiers) {
+                        Pattern pattern = Pattern.compile("package"); //NOI18N
+                            Matcher matcher = pattern.matcher(modifiers);
+                            if (matcher.find()) {
+                                return true;
+                            }
+
+                        return false;
                     }
 
                     private void addToInit(Tree node) {
@@ -273,6 +293,7 @@ public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory 
                 }
             }
         };
+
     }
 
     private Runnable updateEditor(final int start, final int end) {
