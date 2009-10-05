@@ -147,7 +147,9 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                         RequestProcessor.getDefault().execute(new Runnable() {
                                             public void run() {
                                                 ByteArrayOutputStream err = new ByteArrayOutputStream();
-                                                InputStream in = pr.getErrorStream();
+                                                Process p = pr;
+                                                if (p == null) return;
+                                                InputStream in = p.getErrorStream();
                                                 try {
                                                     final byte[] BUFFER = new byte[4096];
                                                     int len;
