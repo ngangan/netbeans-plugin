@@ -67,6 +67,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
+import org.openide.nodes.FilterNode;
 import org.openide.nodes.Node;
 import org.openide.text.CloneableEditorSupport;
 import org.openide.util.Lookup;
@@ -120,8 +121,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
-        DataNode target = lkp.lookup(DataNode.class);
-        return target != null && SourceUtils.isJavaFXFile(target.getDataObject().getPrimaryFile());
+        Node target = lkp.lookup(Node.class);
+
+        DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        return dobj != null && SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
 
     @Override
