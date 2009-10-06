@@ -25,7 +25,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  *
  * @author karol harezlak
  */
-class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
+final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     private CompilationInfo compilationInfo;
     private Map<Element, Collection<Tree>> classTrees;
