@@ -100,9 +100,8 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         if (tph!=null) {
             treePathHandle = tph;
         } else {
-            JavaFXSource source = JavaFXSource.forFileObject(rename.getRefactoringSource().lookup(FileObject.class));
             try {
-                source.runUserActionTask(new Task<CompilationController>() {
+                getSource().runUserActionTask(new Task<CompilationController>() {
                     public void cancel() {
                     }
 
@@ -130,7 +129,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
     }
 
     @Override
-    protected JavaFXSource getSource() {
+    protected JavaFXSource prepareSource() {
         return JavaFXSource.forFileObject(treePathHandle.getFileObject());
     }
 
@@ -205,23 +204,20 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
         if (kind.isClass() && !((TypeElement) element).getNestingKind().isNested()) {
             if (doCheckName) {
-                String oldfqn = SourceUtils.getQualifiedName(treePathHandle);
-                String newFqn = oldfqn.substring(0, oldfqn.lastIndexOf(oldName));
+                Set<FileObject> typeDefFOs = getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+                FileObject typeDefFO = typeDefFOs.iterator().next();
 
-                String pkgname = oldfqn;
-                int i = pkgname.indexOf('.');
-                if (i>=0)
-                    pkgname = pkgname.substring(0,i);
-                else
-                    pkgname = "";
+                String oldFqn = ElementHandle.create(treePathHandle.resolveElement(info)).getQualifiedName();
+                int pkgDelimitIndex = oldFqn.lastIndexOf(oldName);
+                String pkgname = oldFqn.substring(0, pkgDelimitIndex > 0 ? pkgDelimitIndex - 1 : 0);
+                String newFqn = pkgname + "." + newName;
 
-                FileObject fo = treePathHandle.getFileObject();
-                if (SourceUtils.typeExist(treePathHandle, newFqn)) {
+                if (!getClassIndex().getDeclaredTypes(newFqn, ClassIndex.NameKind.EXACT, EnumSet.allOf(SearchScope.class)).isEmpty()) {
                     String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ClassClash", new Object[] {newName, pkgname});
                     fastCheckProblem = createProblem(fastCheckProblem, true, msg);
                     return fastCheckProblem;
                 }
-                FileObject parentFolder = fo.getParent();
+                FileObject parentFolder = typeDefFO.getParent();
                 Enumeration enumeration = parentFolder.getFolders(false);
                 while (enumeration.hasMoreElements()) {
                     FileObject subfolder = (FileObject) enumeration.nextElement();
@@ -384,7 +380,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, cc);
+                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, handle[0], cc);
                         scanner.scan(cc.getCompilationUnit(), references);
                     }
                 }, true);

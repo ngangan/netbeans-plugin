@@ -57,6 +57,7 @@ public final class JavaFXParserTask extends UserTask {
     @Override
     public void run(ResultIterator resultIterator) throws Exception {
         result = (JavaFXParserResult) resultIterator.getParserResult();
+        assert result != null;
     }
 
     public ClasspathInfo classpathInfo() {
@@ -64,6 +65,7 @@ public final class JavaFXParserTask extends UserTask {
     }
 
     public JavaFXParserResult result() {
+        assert result != null;
         return result;
     }
 

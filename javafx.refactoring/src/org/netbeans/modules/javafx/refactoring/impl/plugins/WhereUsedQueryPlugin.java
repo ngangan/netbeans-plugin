@@ -49,6 +49,7 @@ import java.util.Stack;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
@@ -74,7 +75,7 @@ import org.openide.util.NbBundle;
  * 
  * @author  Jaroslav Bachorik
  */
-public class WhereUsedQueryPlugin implements RefactoringPlugin {
+public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     private final WhereUsedQuery refactoring;
     private final TreePathHandle searchHandle;
 //    private Set<IndexedClass> subclasses;
@@ -94,7 +95,7 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
     }
     
     @Override
-    public Problem preCheck() {
+    public Problem preCheck(CompilationInfo cc) {
         if (!searchHandle.getFileObject().isValid()) {
             return new Problem(true, NbBundle.getMessage(WhereUsedQueryPlugin.class, "DSC_ElNotAvail")); // NOI18N
         }
@@ -104,16 +105,13 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
     
     //@Override
     public Problem prepare(final RefactoringElementsBag elements) {
-        JavaFXSource jfxs = JavaFXSource.forFileObject(searchHandle.getFileObject());
-
         try {
             final Set<FileObject> relevantFiles = new HashSet<FileObject>();
             final Set<ElementHandle> relevantHandles = new HashSet<ElementHandle>();
 
-            jfxs.runUserActionTask(new Task<CompilationController>() {
+            getSource().runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
-                    ClassIndex ci = cc.getClasspathInfo().getClassIndex();
                     Element e = searchHandle.resolveElement(cc);
                     ElementHandle eh = ElementHandle.create(e);
 
@@ -121,21 +119,21 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
 
                     if (isFindUsages()) {
                         relevantHandles.add(eh);
-                        collectReferences(ElementHandle.create(e), ci, relevantFiles);
+                        collectReferences(ElementHandle.create(e), relevantFiles);
                     }
                     if (isFindDirectSubclassesOnly() || isFindSubclasses() || isFindOverridingMethods()) {
                         Stack<ElementHandle> processingStack = new Stack();
                         processingStack.push(eh);
                         while(!processingStack.empty()) {
                             ElementHandle currentHandle = processingStack.pop();
-                            for(ElementHandle eh1 : ci.getElements(currentHandle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class))) {
+                            for(ElementHandle eh1 : getClassIndex().getElements(currentHandle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class))) {
                                 if (!relevantHandles.contains(eh1)) {
                                     if (isFindSubclasses() || isFindOverridingMethods()) {
                                         processingStack.push(eh1);
                                     }
                                     relevantHandles.add(eh1);
                                     if (isFindOverridingMethods()) {
-                                        collectReferences(eh1, ci, relevantFiles);
+                                        collectReferences(eh1, relevantFiles);
                                     }
                                     if (isFindSubclasses() || isFindDirectSubclassesOnly()) {
                                         relevantFiles.add(JavaFXSourceUtils.getFile(eh1, cc.getClasspathInfo()));
@@ -176,7 +174,7 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
         return null;
     }
     
-    public Problem fastCheckParameters() {
+    public Problem fastCheckParameters(CompilationInfo cc) {
         if (targetName == null) {
             return new Problem(true, "Cannot determine target name. Please file a bug with detailed information on how to reproduce (preferably including the current source file and the cursor position)");
         }
@@ -186,31 +184,36 @@ public class WhereUsedQueryPlugin implements RefactoringPlugin {
         return null;
     }
     
-    public Problem checkParameters() {
+    public Problem checkParameters(CompilationInfo cc) {
         return null;
     }
 
-    private void collectReferences(ElementHandle handle, ClassIndex ci, Set<FileObject> references) {
+    @Override
+    protected JavaFXSource prepareSource() {
+        return JavaFXSource.forFileObject(searchHandle.getFileObject());
+    }
+
+    private void collectReferences(ElementHandle handle, Set<FileObject> references) {
         switch (handle.getKind()) {
             case CLASS: {
-                references.addAll(ci.getResources(handle, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                references.addAll(getClassIndex().getResources(handle, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
                 break;
             }
             case METHOD: {
-                references.addAll(ci.getResources(handle, EnumSet.of(ClassIndex.SearchKind.METHOD_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                references.addAll(getClassIndex().getResources(handle, EnumSet.of(ClassIndex.SearchKind.METHOD_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
                 break;
             }
             case FIELD: {
-                references.addAll(ci.getResources(handle, EnumSet.of(ClassIndex.SearchKind.FIELD_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                references.addAll(getClassIndex().getResources(handle, EnumSet.of(ClassIndex.SearchKind.FIELD_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
                 break;
             }
         }
     }
 
-    private void collectImplementors(ElementHandle handle, ClassIndex ci, Set<FileObject> implementors) {
+    private void collectImplementors(ElementHandle handle, Set<FileObject> implementors) {
         switch (handle.getKind()) {
             case CLASS: {
-                implementors.addAll(ci.getResources(handle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                implementors.addAll(getClassIndex().getResources(handle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
                 break;
             }
         }

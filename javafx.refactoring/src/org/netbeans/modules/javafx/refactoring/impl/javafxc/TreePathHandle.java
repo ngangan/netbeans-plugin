@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -88,17 +89,20 @@ final public class TreePathHandle {
     private FileObject fileObject;
     private Tree.JavaFXKind kind;
 
-    private TreePathHandle(long pos, JavaFXTreePath path, CompilationInfo cc) {
+    private TreePathHandle(long pos, JavaFXTreePath path, CompilationInfo cc) throws InstantiationException {
+        position = pos;
         path = findSupportedPath(path, cc);
+        if (path == null) throw new InstantiationException();
+        
         kindPath = new KindPath(path);
         kind = path.getLeaf().getJavaFXKind();
-        
-        position = pos;
 
         if (path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.INSTANTIATE_NEW) {
             displayName = ((JFXInstanciate)path.getLeaf()).getIdentifierSym().name.toString();
         } else {
-            displayName = cc.getTrees().getElement(path).getSimpleName().toString();
+            Name n = cc.getTrees().getElement(path).getSimpleName();
+            if (n == null) throw new InstantiationException();
+            displayName = n.toString();
         }
 
         URI srcUri = cc.getCompilationUnit().getSourceFile().toUri();
@@ -111,11 +115,19 @@ final public class TreePathHandle {
     }
 
     static public TreePathHandle create(long srcPos, JavaFXTreePath path, CompilationInfo cc) {
-        return new TreePathHandle(srcPos, path, cc);
+        try {
+            return new TreePathHandle(srcPos, path, cc);
+        } catch (InstantiationException e) {
+            return null;
+        }
     }
 
     public static TreePathHandle create(long srcPos, Element element, CompilationInfo cc) {
-        return new TreePathHandle(srcPos, cc.getTrees().getPath(element), cc);
+        try {
+            return new TreePathHandle(srcPos, cc.getTrees().getPath(element), cc);
+        } catch (InstantiationException e) {
+            return null;
+        }
     }
 
     public JavaFXTreePath resolve(CompilationInfo cc) {
@@ -224,7 +236,9 @@ final public class TreePathHandle {
     }
 
     private JavaFXTreePath findSupportedPath(JavaFXTreePath initPath, CompilationInfo cc) {
-        while (initPath != null && cc.getTrees().getElement(initPath) == null) {
+        while (initPath != null) {
+            Element e = cc.getTrees().getElement(initPath);
+            if (e != null && e.getSimpleName() != null) break;
             initPath = initPath.getParentPath();
         }
         if (initPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {

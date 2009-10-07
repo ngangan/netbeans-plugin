@@ -40,25 +40,20 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
+import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.*;
@@ -76,6 +71,7 @@ import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -85,9 +81,8 @@ import org.openide.util.NbBundle;
 public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
-    private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-    private final AtomicBoolean isOver = new AtomicBoolean(true);
+    // private final AtomicBoolean isOver = new AtomicBoolean(true);
     //private final Map<Document, Collection<Annotation>> annotationsToRemove = new HashMap<Document, Collection<Annotation>>();
 
     public ImplementAbstractTaskFactory() {
@@ -103,93 +98,34 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                if (!isOver.get()) {
-                    return;
-                }
                 StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-                isOver.getAndSet(false);
-                final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
-                final Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
-                final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
-                final Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
-                final Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
+                Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
+                Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
+                Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
+                Map<Element, Tree> positions = new HashMap<Element, Tree>();
 
-                JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
+                Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
 
-                    @Override
-                    public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
-                        List<Tree> extendsList = new ArrayList<Tree>();
-                        if (node.getSupertypeList() != null) {
-                            extendsList.addAll(node.getSupertypeList());
-                        }
-                        if (extendsList != null && extendsList.size() != 0) {
-                            Element currentClass = compilationInfo.getTrees().getElement(getCurrentPath());
-                            if (classTrees.get(currentClass) == null) {
-                                classTrees.put(currentClass, new HashSet<Tree>());
-                            }
-                            Collection<Tree> extendsSet = classTrees.get(currentClass);
-
-                            for (Tree extend : extendsList) {
-                                extendsSet.add(extend);
-                            }
-                            classTrees.put(currentClass, extendsSet);
-                        }
-                        return super.visitClassDeclaration(node, v);
-                    }
-
-                    @Override
-                    public Void visitInstantiate(InstantiateTree node, Void v) {
-//                        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-//                        if (element != null && element.getKind() == ElementKind.CLASS) {
-//                            classTrees.put(element, Collections.<Tree>singletonList(node));
-//                        }
-                        return super.visitInstantiate(node, v);
-                    }
-
-                    @Override
-                    public Void visitImport(ImportTree node, Void p) {
-                        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
-                        Element element = compilationInfo.getTrees().getElement(path);
-                        if (element instanceof JavafxClassSymbol) {
-                            imports.add((JavafxClassSymbol) element);
-                        }
-
-                        return super.visitImport(node, p);
-                    }
-
-                    @Override
-                    public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
-                        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
-                            Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-                            if (element != null) {
-                                Element currentClass = element.getEnclosingElement();
-                                if (element instanceof MethodSymbol) {
-                                    if (overridenMethods.get(currentClass) == null) {
-                                        overridenMethods.put(currentClass, new ArrayList<MethodSymbol>());
-                                    }
-                                    List<MethodSymbol> methods = overridenMethods.get(currentClass);
-                                    methods.add((MethodSymbol) element);
-                                    overridenMethods.put(currentClass, methods);
-                                }
-                            }
-                        }
-                        return super.visitFunctionDefinition(node, v);
-                    }
-                };
+                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, positions);
 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
+
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
-                    for (Tree tree : classTrees.get(currentClass)) {
+                    List<MethodSymbol> methods = null;
+                    if (methods == null) {
+                        methods = new ArrayList<MethodSymbol>();
+                    }
+                    abstractMethods.put(currentClass, methods);
+                    for (Tree superTypeTree : classTrees.get(currentClass)) {
                         String className = null;
-                        if (tree instanceof JFXClassDeclaration) {
-                            ((JFXClassDeclaration) tree).getName();
-                            className = ((JFXClassDeclaration) tree).getSimpleName().toString();
-
-                        } else if (HintsUtils.checkString(tree.toString())) {
+                        if (superTypeTree instanceof JFXClassDeclaration) {
+                            ((JFXClassDeclaration) superTypeTree).getName();
+                            className = ((JFXClassDeclaration) superTypeTree).getSimpleName().toString();
+                        } else if (HintsUtils.checkString(superTypeTree.toString())) {
                             continue;
                         } else {
-                            className = HintsUtils.getClassSimpleName(tree.toString());
+                            className = HintsUtils.getClassSimpleName(superTypeTree.toString());
                         }
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
@@ -197,21 +133,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                             if (typeElement == null) {
                                 continue;
                             }
-                            boolean classUsed = false;
-                            for (JavafxClassSymbol importElement : imports) {
-                                if (typeElement instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
-                                    JavafxClassSymbol classTypeElement  = (JavafxClassSymbol) typeElement;
-                                    JavafxClassSymbol currentClassSymbol  = (JavafxClassSymbol) currentClass;
-                                    if (currentClassSymbol.location().equals(importElement.location())) {
-                                        classUsed = true;
-                                        break;
-                                    } else if (classTypeElement.getQualifiedName().equals(importElement.getQualifiedName())) {
-                                        classUsed = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!classUsed) {
+                            if (!HintsUtils.isClassUsed(typeElement, imports, currentClass)) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
@@ -222,38 +144,21 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                 if (element instanceof MethodSymbol) {
                                     MethodSymbol method = (MethodSymbol) element;
                                     for (Modifier modifier : method.getModifiers()) {
-                                        if (modifier == Modifier.ABSTRACT) {
-                                            if (abstractMethods.get(currentClass) == null) {
-                                                abstractMethods.put(currentClass, new ArrayList<MethodSymbol>());
-                                            }
-                                            List<MethodSymbol> methods = abstractMethods.get(currentClass);
-                                            Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
-                                            boolean exists = false;
-                                            if (overridenMethodList != null && overridenMethodList.size() != 0) {
-                                                for (MethodSymbol overridenMethod : overridenMethodList) {
-                                                    //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
-                                                    try {
-                                                        if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
-                                                                method.getParameters().size() == overridenMethod.getParameters().size() &&
-                                                                COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
+                                        if (modifier != Modifier.ABSTRACT) {
+                                            continue;
+                                        }
+                                        if (abstractMethods.get(currentClass) == null) {
+                                            abstractMethods.put(currentClass, new ArrayList<MethodSymbol>());
+                                        }
+                                        Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
+                                        MethodSymbol overridenMethod = HintsUtils.isOverriden(overridenMethodList, method);
 
-                                                            overridenToAbstract.put(overridenMethod, method);
-                                                            exists = true;
-                                                            break;
-                                                        }
-                                                    } catch (Exception ex) {
-                                                        ex.printStackTrace();
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-                                            if (exists) {
-                                                break;
-                                            }
+                                        if (overridenMethod == null) {
                                             methods.add(method);
                                             abstractMethods.put(currentClass, methods);
                                             break;
                                         }
+
                                     }
                                 }
                             }
@@ -261,10 +166,15 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 HintsModel modelFix = new HintsModel(compilationInfo);
+
                 for (Element currentClass : abstractMethods.keySet()) {
                     //TODO Hack for java.lang.NullPointerException at com.sun.tools.javafx.api.JavafxcTrees.getTree(JavafxcTrees.java:121)
                     try {
                         Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
+                        //In case that class does not have tree
+                        if (currentTree == null) {
+                            currentTree = positions.get(currentClass);
+                        }
                         if (abstractMethods.get(currentClass) != null && abstractMethods.get(currentClass).size() != 0) {
                             modelFix.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
                         }
@@ -274,7 +184,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 addHintsToController(document, modelFix, compilationInfo, file);
-                isOver.getAndSet(true);
             }
         };
 
@@ -451,25 +360,12 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
     private int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
-        return end;
-    }
-
-    private static class ParamsComparator implements Comparator<List<VarSymbol>> {
-
-        public int compare(List<VarSymbol> methodList, List<VarSymbol> overridenMethod) {
-            for (VarSymbol var : methodList) {
-                VarSymbol overridenVar = overridenMethod.get(methodList.indexOf(var));
-                if (!var.asType().toString().equals(overridenVar.asType().toString())) {
-                    return -1;
-                }
-            }
-            return 0;
-        }
+        int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
+        return endTree;
     }
 
     //TODO Temporary log for issue 148890
-    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
+    Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
         Collection<? extends Element> elements = null;
         try {
             elements = compilationInfo.getElements().getAllMembers(typeElement);

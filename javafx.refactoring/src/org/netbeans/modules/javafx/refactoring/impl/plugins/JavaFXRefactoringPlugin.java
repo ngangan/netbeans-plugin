@@ -29,13 +29,19 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import java.io.IOException;
+import java.util.Collection;
+import org.netbeans.api.javafx.source.ClassIndex;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
+import org.openide.filesystems.FileObject;
 
 /**
  *
@@ -45,6 +51,12 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
     private static interface CheckRunner {
         Problem check(CompilationInfo info);
     }
+
+    final private Object sourceInitLock = new Object();
+    // @GuardedBy sourceInitLock
+    volatile private JavaFXSource source = null;
+    // @GuardedBy sourceInitLock
+    volatile private ClassIndex classIndex = null;
 
     final public Problem preCheck() {
         return runCheck(new CheckRunner() {
@@ -73,10 +85,39 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
         });
     }
 
-    abstract protected JavaFXSource getSource();
+    /**
+     * Will take care of providing a correct {@linkplain JavaFXSource} for 
+     * the element being refactored
+     * @return Returns an initialized {@linkplain JavaFXSource} instance
+     */
+    abstract protected JavaFXSource prepareSource();
     abstract protected Problem preCheck(CompilationInfo info);
     abstract protected Problem checkParameters(CompilationInfo info);
     abstract protected Problem fastCheckParameters(CompilationInfo info);
+
+    /**
+     * Cached {@linkplain ClassIndex} instance corresponding to the
+     * {@linkplain JavaFXSource} instance of the element to be refactored<br>
+     * It is much faster than obtaining the class index from the same 
+     * {@linkplain ClasspathInfo} repeatedly
+     * @return Returns the initialized instance of {@linkplain ClassIndex}
+     */
+    final protected ClassIndex getClassIndex() {
+        initSource();
+        return classIndex;
+    }
+
+    /**
+     * Cached {@linkplain JavaFXSource} instance representing the source of
+     * the element to be refactored<br>
+     * This is more efficient than creating the instance for the same source
+     * file repeatedly.
+     * @return Returns the initialized instance of {@linkplain JavaFXSource}
+     */
+    final protected JavaFXSource getSource() {
+        initSource();
+        return source;
+    }
 
     protected static final Problem createProblem(Problem result, boolean isFatal, String message) {
         Problem problem = new Problem(isFatal, message);
@@ -100,10 +141,10 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
 
     private Problem runCheck(final CheckRunner runner) {
         final Problem[] problem = new Problem[1];
-        JavaFXSource jfxs = getSource();
-
+        initSource();
+        
         try {
-            jfxs.runUserActionTask(new Task<CompilationController>() {
+            source.runUserActionTask(new Task<CompilationController>() {
                 public void run(CompilationController cc) throws Exception {
                     problem[0] = runner.check(cc);
                 }
@@ -113,4 +154,15 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
         }
         return problem[0];
     }
+
+    private void initSource() {
+        synchronized(sourceInitLock) {
+            if (source == null) {
+                source = prepareSource();
+                classIndex = source.getClasspathInfo().getClassIndex();
+            }
+        }
+    }
+
+
 }

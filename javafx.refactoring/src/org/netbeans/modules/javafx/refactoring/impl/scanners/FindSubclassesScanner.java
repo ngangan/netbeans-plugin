@@ -46,8 +46,7 @@ public class FindSubclassesScanner extends BaseRefactoringScanner<Void, Refactor
     private AbstractRefactoring refactoring;
 
     public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, CompilationController cc) {
-        super(searchHandle, cc);
-        this.refactoring = refactoring;
+        this(refactoring, searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
     }
 
     public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {

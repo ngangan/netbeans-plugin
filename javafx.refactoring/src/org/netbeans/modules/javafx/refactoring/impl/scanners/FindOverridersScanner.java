@@ -52,9 +52,7 @@ public class FindOverridersScanner extends BaseRefactoringScanner<Void, Refactor
     private AbstractRefactoring refactoring;
 
     public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, CompilationController cc) {
-        super(searchHandle, cc);
-        this.methodElement = (ExecutableElement)searchHandle.resolveElement(cc);
-        this.refactoring = refactoring;
+        this(refactoring, searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
     }
 
     public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {

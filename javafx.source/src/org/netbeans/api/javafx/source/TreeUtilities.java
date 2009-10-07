@@ -51,7 +51,6 @@ import com.sun.tools.javafx.comp.JavafxAttrContext;
 import com.sun.tools.javafx.comp.JavafxEnv;
 import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JFXBreak;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXContinue;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXTree;
@@ -392,7 +391,7 @@ public final class TreeUtilities {
      */
     public long[] findNameSpan(VariableTree var) {
         if (var == null || var.getName() == null) return null;
-        return findNameSpan(var.getName().toString(), var, JFXTokenId.VAR, JFXTokenId.DEF);
+        return findNameSpan(var.getName().toString(), var, JFXTokenId.VAR, JFXTokenId.DEF, JFXTokenId.PUBLIC_INIT, JFXTokenId.PUBLIC_READ);
     }
 
     /**Find span of the {@link MethodTree#getName()} identifier in the source.
@@ -410,7 +409,7 @@ public final class TreeUtilities {
         }
         JFXFunctionDefinition jcm = (JFXFunctionDefinition) method;
         String name = jcm.name.toString();
-        return findNameSpan(name, method, JFXTokenId.FUNCTION);
+        return findNameSpan(name, method, JFXTokenId.ABSTRACT, JFXTokenId.BOUND, JFXTokenId.OVERRIDE, JFXTokenId.FUNCTION);
     }
 
     public long[] findNameSpan(ClassDeclarationTree clazz) {
@@ -418,7 +417,7 @@ public final class TreeUtilities {
 
         String name = clazz.getSimpleName().toString();
 
-        return findNameSpan(name, clazz, JFXTokenId.CLASS, JFXTokenId.MIXIN);
+        return findNameSpan(name, clazz, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
     }
 
     /**Returns tokens for a given tree.
@@ -646,8 +645,8 @@ public final class TreeUtilities {
                 JFXTokenId.WS,
                 JFXTokenId.PRIVATE,
                 JFXTokenId.PROTECTED,
+                JFXTokenId.PACKAGE,
                 JFXTokenId.PUBLIC,
-                JFXTokenId.ABSTRACT,
                 JFXTokenId.STATIC);
 
         allowedTokensSet.addAll(Arrays.asList(allowedTokens));

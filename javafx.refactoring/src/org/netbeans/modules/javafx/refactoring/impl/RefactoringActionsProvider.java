@@ -32,6 +32,8 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXExpression;
+import com.sun.tools.javafx.tree.JFXModifiers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,6 +69,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
+import org.openide.nodes.FilterNode;
 import org.openide.nodes.Node;
 import org.openide.text.CloneableEditorSupport;
 import org.openide.util.Lookup;
@@ -100,12 +103,14 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             task = new TextComponentTask(ec) {
                 @Override
                 protected RefactoringUI createRefactoringUI(TreePathHandle selectedElement,int startOffset,int endOffset, CompilationInfo info) {
+                    if (selectedElement == null) return null;
                     return new WhereUsedQueryUI(selectedElement, info);
                 }
             };
         } else {
             task = new NodeToElementTask(lkp.lookupAll(Node.class)) {
                 protected RefactoringUI createRefactoringUI(TreePathHandle selectedElement, CompilationInfo info) {
+                    if (selectedElement == null) return null;
                     return new WhereUsedQueryUI(selectedElement, info);
                 }
             };
@@ -120,8 +125,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
-        DataNode target = lkp.lookup(DataNode.class);
-        return target != null && SourceUtils.isJavaFXFile(target.getDataObject().getPrimaryFile());
+        Node target = lkp.lookup(Node.class);
+
+        DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        return dobj != null && SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
 
     @Override
@@ -435,11 +442,15 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 }
                 if (e.getSimpleName().toString().equals(info.getFileObject().getName())) {
                     TreePathHandle representedObject = TreePathHandle.create(JavaFXTreePath.getPath(unit,t),info);
-                    sameNameHandles.add(representedObject);
+                    if (representedObject != null) {
+                        sameNameHandles.add(representedObject);
+                    }
                 }
                 if (e.getModifiers().contains(Modifier.PUBLIC)) {
                     TreePathHandle representedObject = TreePathHandle.create(JavaFXTreePath.getPath(unit,t),info);
-                    publicHandles.add(representedObject);
+                    if (representedObject != null) {
+                        publicHandles.add(representedObject);
+                    }
                 }
             }
             if (!publicHandles.isEmpty()) {

@@ -19,9 +19,9 @@ import javafx.scene.text.Font;
 
 Stage {
     title: "Application title"
-    width: 250
-    height: 80
     scene: Scene {
+        width: 250
+        height: 80
         content: [
             Text {
                 font : Font {
