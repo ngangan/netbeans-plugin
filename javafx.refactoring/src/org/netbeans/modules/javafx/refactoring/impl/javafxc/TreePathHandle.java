@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -88,17 +89,20 @@ final public class TreePathHandle {
     private FileObject fileObject;
     private Tree.JavaFXKind kind;
 
-    private TreePathHandle(long pos, JavaFXTreePath path, CompilationInfo cc) {
+    private TreePathHandle(long pos, JavaFXTreePath path, CompilationInfo cc) throws InstantiationException {
+        position = pos;
         path = findSupportedPath(path, cc);
+        if (path == null) throw new InstantiationException();
+        
         kindPath = new KindPath(path);
         kind = path.getLeaf().getJavaFXKind();
-        
-        position = pos;
 
         if (path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.INSTANTIATE_NEW) {
             displayName = ((JFXInstanciate)path.getLeaf()).getIdentifierSym().name.toString();
         } else {
-            displayName = cc.getTrees().getElement(path).getSimpleName().toString();
+            Name n = cc.getTrees().getElement(path).getSimpleName();
+            if (n == null) throw new InstantiationException();
+            displayName = n.toString();
         }
 
         URI srcUri = cc.getCompilationUnit().getSourceFile().toUri();
@@ -111,11 +115,19 @@ final public class TreePathHandle {
     }
 
     static public TreePathHandle create(long srcPos, JavaFXTreePath path, CompilationInfo cc) {
-        return new TreePathHandle(srcPos, path, cc);
+        try {
+            return new TreePathHandle(srcPos, path, cc);
+        } catch (InstantiationException e) {
+            return null;
+        }
     }
 
     public static TreePathHandle create(long srcPos, Element element, CompilationInfo cc) {
-        return new TreePathHandle(srcPos, cc.getTrees().getPath(element), cc);
+        try {
+            return new TreePathHandle(srcPos, cc.getTrees().getPath(element), cc);
+        } catch (InstantiationException e) {
+            return null;
+        }
     }
 
     public JavaFXTreePath resolve(CompilationInfo cc) {
@@ -231,6 +243,29 @@ final public class TreePathHandle {
             // this stinks; synthetic method resolves to an element, nevertheless
             if (((JFXFunctionDefinition)initPath.getLeaf()).getName().contentEquals("javafx$run$")) {  // NOI18N
                 initPath = initPath.getParentPath();
+            }
+        }
+        /* Check for the synthetic class that gets generated if there is no class in a file
+         * with the same name as the file
+         * The class will be generated as the top-level one with only compilation unit as its parent
+         */
+        if (initPath != null && initPath.getParentPath() != null && initPath.getParentPath().getParentPath() == null) {
+            long startPos = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), initPath.getLeaf());
+            long endPos = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), initPath.getLeaf());
+
+            // somehow, there is no relationship between a tree and its parent regarding positions
+            // we need to check that the parent tree actually contains the position we are looking for
+            if (startPos > position || endPos < position) {
+                return null;
+            }
+
+            // some magic to determine the synthetic class
+            // basically, it shares the positions with the compilation unit
+            startPos -= cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), initPath.getParentPath().getLeaf());
+            endPos -= cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), initPath.getParentPath().getLeaf());
+
+            if (startPos == 0 && endPos == 0) {
+                return null;
             }
         }
         return initPath;

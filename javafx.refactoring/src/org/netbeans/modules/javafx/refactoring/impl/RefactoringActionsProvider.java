@@ -32,6 +32,8 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXExpression;
+import com.sun.tools.javafx.tree.JFXModifiers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,6 +103,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             task = new TextComponentTask(ec) {
                 @Override
                 protected RefactoringUI createRefactoringUI(TreePathHandle selectedElement,int startOffset,int endOffset, CompilationInfo info) {
+                    if (selectedElement == null) return null;
                     return new WhereUsedQueryUI(selectedElement, info);
                 }
             };
