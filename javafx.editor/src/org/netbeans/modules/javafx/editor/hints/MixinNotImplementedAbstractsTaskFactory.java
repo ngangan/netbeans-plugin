@@ -71,7 +71,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 

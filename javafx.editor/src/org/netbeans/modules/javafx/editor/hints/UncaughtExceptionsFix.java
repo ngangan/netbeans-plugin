@@ -60,7 +60,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-class UncaughtExceptionsFix implements Fix {
+final class UncaughtExceptionsFix implements Fix {
 
     private Document document;
     private Hint hint;
