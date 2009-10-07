@@ -10,7 +10,6 @@ import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.util.ArrayList;
@@ -31,15 +30,27 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
     private Map<Element, Collection<Tree>> classTrees;
     private Map<Element, List<MethodSymbol>> overridenMethods;
     private Collection<JavafxClassSymbol> imports;
+    private final Map<Element, Tree> positions;
 
     public OverrideVisitor(CompilationInfo compilationInfo,
-                            Map<Element, Collection<Tree>> classTrees,
-                            Map<Element, List<MethodSymbol>> overridenMethods,
-                            Collection<JavafxClassSymbol> imports) {
+            Map<Element, Collection<Tree>> classTrees,
+            Map<Element, List<MethodSymbol>> overridenMethods,
+            Collection<JavafxClassSymbol> imports,
+            Map<Element, Tree> positions) {
+
         this.compilationInfo = compilationInfo;
         this.classTrees = classTrees;
         this.overridenMethods = overridenMethods;
         this.imports = imports;
+        this.positions = positions;
+    }
+
+    public OverrideVisitor(CompilationInfo compilationInfo,
+            Map<Element, Collection<Tree>> classTrees,
+            Map<Element, List<MethodSymbol>> overridenMethods,
+            Collection<JavafxClassSymbol> imports) {
+
+        this(compilationInfo, classTrees, overridenMethods, imports, null);
     }
 
     @Override
@@ -51,14 +62,11 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
         }
         extendsList.addAll(node.getSupertypeList());
         classTrees.put(currentClass, extendsList);
+        if (positions != null) {
+            positions.put(currentClass, node);
+        }
 
         return super.visitClassDeclaration(node, v);
-    }
-
-    @Override
-    public Void visitVariable(VariableTree node, Void p) {
-        //addOverriden(node);
-        return super.visitVariable(node, p);
     }
 
     @Override
@@ -72,14 +80,27 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
         return super.visitImport(node, p);
     }
 
+//    @Override
+//    public Void visitInstantiate(InstantiateTree node, Void p) {
+//        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getIdentifier());
+//        Element currentClass = compilationInfo.getTrees().getElement(path);
+//        if (currentClass instanceof JavafxClassSymbol) {
+//            Collection<Tree> extendsList = classTrees.get(currentClass);
+//            if (extendsList == null) {
+//                extendsList = new HashSet<Tree>();
+//            }
+//            extendsList.add(node.getIdentifier());
+//            classTrees.put(currentClass, extendsList);
+//            if (positions != null) {
+//                positions.put(currentClass, node);
+//            }
+//        }
+//        return super.visitInstantiate(node, p);
+//    }
+
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
-        addOverriden(node);
-        return super.visitFunctionDefinition(node, v);
-    }
-
-    private void addOverriden(Tree node) {
-        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
+         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
             if (element != null) {
                 Element currentClass = element.getEnclosingElement();
@@ -93,5 +114,7 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
                 }
             }
         }
+        return super.visitFunctionDefinition(node, v);
     }
+
 }

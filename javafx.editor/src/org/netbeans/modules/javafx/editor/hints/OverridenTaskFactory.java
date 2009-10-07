@@ -102,7 +102,7 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                     try {
                         position = document.createPosition(annotation.getPosition());
                     } catch (BadLocationException ex) {
-                        Exceptions.printStackTrace(ex);
+                        ex.printStackTrace();
                     }
                     NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
                 }
@@ -129,12 +129,11 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-
                 Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
                 Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
-                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, null);
                 Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
@@ -201,8 +200,8 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         }
 
                     }
-                    updateAnnotationsOverriden(compilationInfo, addedAnotations);
                 }
+                updateAnnotationsOverriden(compilationInfo, addedAnotations);
             }
         };
     }
@@ -292,5 +291,12 @@ public class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
         int getPosition() {
             return positon;
         }
+
+        @Override
+        public String toString() {
+            return superClassFQN +" " + positon;
+        }
+
+
     }
 }

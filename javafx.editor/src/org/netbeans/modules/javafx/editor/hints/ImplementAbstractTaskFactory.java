@@ -42,17 +42,18 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
+import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.*;
@@ -70,6 +71,7 @@ import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -80,7 +82,7 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-    private final AtomicBoolean isOver = new AtomicBoolean(true);
+    // private final AtomicBoolean isOver = new AtomicBoolean(true);
     //private final Map<Document, Collection<Annotation>> annotationsToRemove = new HashMap<Document, Collection<Annotation>>();
 
     public ImplementAbstractTaskFactory() {
@@ -100,15 +102,21 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                 Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
-                Map<MethodSymbol, MethodSymbol> overridenToAbstract = new HashMap<MethodSymbol, MethodSymbol>();
+                Map<Element, Tree> positions = new HashMap<Element, Tree>();
+
                 Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
 
-                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, positions);
 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
 
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
+                    List<MethodSymbol> methods = null;
+                    if (methods == null) {
+                        methods = new ArrayList<MethodSymbol>();
+                    }
+                    abstractMethods.put(currentClass, methods);
                     for (Tree superTypeTree : classTrees.get(currentClass)) {
                         String className = null;
                         if (superTypeTree instanceof JFXClassDeclaration) {
@@ -142,16 +150,15 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                                         if (abstractMethods.get(currentClass) == null) {
                                             abstractMethods.put(currentClass, new ArrayList<MethodSymbol>());
                                         }
-                                        List<MethodSymbol> methods = abstractMethods.get(currentClass);
                                         Collection<MethodSymbol> overridenMethodList = overridenMethods.get(currentClass);
                                         MethodSymbol overridenMethod = HintsUtils.isOverriden(overridenMethodList, method);
-                                        if (overridenMethod != null) {
-                                            overridenToAbstract.put(overridenMethod, method);
-                                        } else {
+
+                                        if (overridenMethod == null) {
                                             methods.add(method);
                                             abstractMethods.put(currentClass, methods);
+                                            break;
                                         }
-                                        break;
+
                                     }
                                 }
                             }
@@ -159,10 +166,15 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 HintsModel modelFix = new HintsModel(compilationInfo);
+
                 for (Element currentClass : abstractMethods.keySet()) {
                     //TODO Hack for java.lang.NullPointerException at com.sun.tools.javafx.api.JavafxcTrees.getTree(JavafxcTrees.java:121)
                     try {
                         Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
+                        //In case that class does not have tree
+                        if (currentTree == null) {
+                            currentTree = positions.get(currentClass);
+                        }
                         if (abstractMethods.get(currentClass) != null && abstractMethods.get(currentClass).size() != 0) {
                             modelFix.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
                         }
@@ -172,7 +184,6 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
                     }
                 }
                 addHintsToController(document, modelFix, compilationInfo, file);
-                isOver.getAndSet(true);
             }
         };
 
@@ -349,8 +360,8 @@ public class ImplementAbstractTaskFactory extends EditorAwareJavaSourceTaskFacto
 
     private int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
-        return end;
+        int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
+        return endTree;
     }
 
     //TODO Temporary log for issue 148890
