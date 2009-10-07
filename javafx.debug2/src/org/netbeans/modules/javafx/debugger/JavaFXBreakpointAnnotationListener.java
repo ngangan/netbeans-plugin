@@ -41,7 +41,7 @@ public class JavaFXBreakpointAnnotationListener extends DebuggerManagerAdapter {
         if(( !propertyName.equals( JavaFXLineBreakpoint.PROP_ENABLED )) &&
            ( !propertyName.equals( JavaFXLineBreakpoint.PROP_LINE_NUMBER ))) return;
 
-        JavaFXLineBreakpoint b = (JavaFXLineBreakpoint)e.getSource ();
+        JavaFXLineBreakpoint b = (JavaFXLineBreakpoint)e.getSource();
         annotate( b );
     }
 
@@ -66,8 +66,10 @@ public class JavaFXBreakpointAnnotationListener extends DebuggerManagerAdapter {
     @Override
     public void breakpointRemoved( Breakpoint b ) {
         if( b instanceof JavaFXLineBreakpoint ) {
-            ((JavaFXLineBreakpoint) b).removePropertyChangeListener( this );
-            removeAnnotation((JavaFXLineBreakpoint) b);
+            JavaFXLineBreakpoint bb = (JavaFXLineBreakpoint)b;
+            bb.removePropertyChangeListener( this );
+            bb.removeLineBreakpoint();
+            removeAnnotation( bb );
         }
     }
 

@@ -156,6 +156,11 @@ public class JavaFXLineBreakpoint extends Breakpoint {
         firePropertyChange( PROP_ENABLED, Boolean.FALSE, Boolean.TRUE );
     }
 
+    public void removeLineBreakpoint() {
+        DebuggerManager d = DebuggerManager.getDebuggerManager();
+        d.removeBreakpoint( javalb );
+    }
+
     /**
      * Sets name of class to stop on.
      *

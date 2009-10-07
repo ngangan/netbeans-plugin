@@ -36,7 +36,13 @@ public class JavaFXVariablesNodeModelFilter implements ExtendedNodeModelFilter {
 
         // Skip first $
         dn = original.getDisplayName( node );
-        if( dn.startsWith( "$" )) dn = dn.substring( 1 );
+        if( dn.startsWith( "$" )) { dn = dn.substring( 1 );
+            if( dn.contains( "$" )) {
+                int index = dn.lastIndexOf( "$" );
+                if( index + 1 < dn.length())
+                    dn = dn.substring( index + 1, dn.length());
+            }
+        }
         return dn;
     }
 

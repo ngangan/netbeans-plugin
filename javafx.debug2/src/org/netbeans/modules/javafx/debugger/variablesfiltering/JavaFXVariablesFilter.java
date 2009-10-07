@@ -117,6 +117,12 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
     public boolean isLeaf( TreeModel original, Object node ) throws UnknownTypeException {
         boolean il;
 
+        if( node instanceof Field ) {
+            Field f = (Field)node;
+            if( "java.lang.String".equals( f.getType())) {
+                return true;
+            }
+        }
         il = original.isLeaf( node );
 
         return il;

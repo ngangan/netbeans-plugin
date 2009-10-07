@@ -37,7 +37,7 @@ public class JavaFXToggleActionProvider extends ActionsProviderSupport implement
         debugger = (JPDADebugger) contextProvider.lookupFirst
                 (null, JPDADebugger.class);
         debugger.addPropertyChangeListener( JPDADebugger.PROP_STATE, this );
-//        Context.addPropertyChangeListener (this);
+        Context.addPropertyChangeListener( this );
     }
     
     @Override

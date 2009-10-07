@@ -49,6 +49,8 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
                     return "Integer";
                 } else if( "float".equals( colValue )) {
                     return "Number";
+                } else if( "String".equals( colValue )) {
+                    return "String";
                 }
                 String type = ((Field)node).getDeclaredType();
                 return type.replace( '$', '.' );
