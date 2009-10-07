@@ -30,27 +30,16 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
     private Map<Element, Collection<Tree>> classTrees;
     private Map<Element, List<MethodSymbol>> overridenMethods;
     private Collection<JavafxClassSymbol> imports;
-    private final Map<Element, Tree> positions;
-
-    public OverrideVisitor(CompilationInfo compilationInfo,
-            Map<Element, Collection<Tree>> classTrees,
-            Map<Element, List<MethodSymbol>> overridenMethods,
-            Collection<JavafxClassSymbol> imports,
-            Map<Element, Tree> positions) {
-
-        this.compilationInfo = compilationInfo;
-        this.classTrees = classTrees;
-        this.overridenMethods = overridenMethods;
-        this.imports = imports;
-        this.positions = positions;
-    }
 
     public OverrideVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
             Map<Element, List<MethodSymbol>> overridenMethods,
             Collection<JavafxClassSymbol> imports) {
 
-        this(compilationInfo, classTrees, overridenMethods, imports, null);
+        this.compilationInfo = compilationInfo;
+        this.classTrees = classTrees;
+        this.overridenMethods = overridenMethods;
+        this.imports = imports;
     }
 
     @Override
@@ -62,10 +51,6 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
         }
         extendsList.addAll(node.getSupertypeList());
         classTrees.put(currentClass, extendsList);
-        if (positions != null) {
-            positions.put(currentClass, node);
-        }
-
         return super.visitClassDeclaration(node, v);
     }
 

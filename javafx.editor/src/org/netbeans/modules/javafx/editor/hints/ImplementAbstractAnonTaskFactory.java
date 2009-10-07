@@ -53,27 +53,31 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  *
  * @author karol harezlak
  */
-public final class ImplementAbstractTaskFactory extends AbstractOverrideTask {
+public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask {
 
     @Override
     protected Tree getTree(CompilationInfo compilationInfo, Element currentClass, Map<Element, Tree> position) {
-        return compilationInfo.getTrees().getTree(currentClass);
+        Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
+        if (currentTree == null) {
+            currentTree = position.get(currentClass);
+        }
+        return currentTree;
     }
 
     @Override
     protected int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
+        int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree) - 1;
         return endTree;
     }
 
     @Override
     protected JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo, Map<Element, Collection<Tree>> classTrees, Map<Element, List<MethodSymbol>> overridenMethods, Collection<JavafxClassSymbol> imports, Map<Element, Tree> position) {
-        return new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+        return new OverrideAnnonVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
     }
 
     @Override
     protected String getHintsControllerString() {
-        return "Override"; //NOI18N
+        return "AnonOverride"; //NOI18N
     }
 }

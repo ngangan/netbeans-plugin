@@ -139,7 +139,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
             for (Tree node_ : nodes) {
                 for (Hint hint : hints) {
                     if (hint.getTree() == node_) {
-                        Collection<Type> hintTypes = new ArrayList(hint.getExceptions());
+                        Collection<Type> hintTypes = new ArrayList<Type>(hint.getExceptions());
                         for (Type hintType : hintTypes) {
                             //TODO JavaFXTypeClass does not provide full class name, it should use full class names not simple names
                             for (CatchTree catchType : node.getCatches()) {

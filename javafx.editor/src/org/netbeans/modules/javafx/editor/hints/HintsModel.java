@@ -105,7 +105,7 @@ final class HintsModel {
         Hint hint = new Hint(thrownExceptions, methods, tree, length, start, name, element);
         hints.put(tree, hint);
     }
-
+   
     void addCatchTree(Hint hint, Tree catchTree) {
         assert hints != null;
         if (!hints.values().contains(hint)) {
@@ -113,7 +113,8 @@ final class HintsModel {
         }
         hint.setCatchTree(catchTree);
     }
-
+    
+    @SuppressWarnings("unchecked") //NOI18N
     Collection<Hint> getHints() {
         if (hints == null) {
             return Collections.EMPTY_LIST;

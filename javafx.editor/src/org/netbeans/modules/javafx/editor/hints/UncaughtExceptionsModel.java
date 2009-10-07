@@ -85,7 +85,7 @@ final class UncaughtExceptionsModel {
         }
         hint.setCatchTree(catchTree);
     }
-
+    @SuppressWarnings("unchecked") //NOI18N
     public Collection<Hint> getThrowHints() {
         if (unresovedHints == null) {
             return Collections.EMPTY_LIST;
