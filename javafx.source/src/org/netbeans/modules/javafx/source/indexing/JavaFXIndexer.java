@@ -10,6 +10,7 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
@@ -160,13 +161,16 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     List<ExpressionTree> superTypes = node.getSupertypeList();
                     if (superTypes != null) {
                         for(ExpressionTree et : superTypes) {
-                            TypeElement supr = (TypeElement)fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
-                            if (supr != null) {
-                                if (DEBUG) {
-                                    LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
+                            JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), et);
+                            if (tp != null) {
+                                TypeElement supr = (TypeElement)fxresult.getTrees().getElement(tp);
+                                if (supr != null) {
+                                    if (DEBUG) {
+                                        LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
+                                    }
+                                    index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
+                                    index(document, IndexKey.TYPE_REF, supr.getQualifiedName().toString());
                                 }
-                                index(document, IndexKey.TYPE_IMPL, supr.getQualifiedName().toString());
-                                index(document, IndexKey.TYPE_REF, supr.getQualifiedName().toString());
                             }
                         }
                     }
