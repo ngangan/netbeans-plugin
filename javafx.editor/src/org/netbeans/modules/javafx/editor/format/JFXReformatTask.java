@@ -421,10 +421,10 @@ public class JFXReformatTask implements ReformatTask {
                             do {
                                 txt = doc.getText(endPos + i, 1);
                                 i++;
-                            // HACK: compiler eats braces
-//                            } while ((txt.matches(WS_TEMPLATE) || (tree instanceof JFXLiteral && txt.matches("\\)"))) && i < _endOffset - _startOffset); // NOI18N
+                            // HACK: compiler eats braces, nice parser optimization
                             } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
-                            if (SEMI.equals(txt) || RCBRACE.equals(txt)) {
+//                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
+                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
                                 endPos += i;
                             }
                         } catch (BadLocationException ex) {
@@ -1762,14 +1762,17 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitBinary(BinaryTree node, Void p) {
-            int alignIndent = cs.alignMultilineBinaryOp() ? col : -1;
+            // Parenthised tree could be skipped by nice jfx parser optimization
+            boolean wraped = tokens.token().id() == JFXTokenId.LPAREN;
+            if (wraped) {
+                accept(JFXTokenId.LPAREN);
+            }
             scan(node.getLeftOperand(), p);
-//            spaces(cs.spaceAroundBinaryOps() ? 1 : 0);
-//            accept(JFXTokenId.EQEQ, JFXTokenId.GTEQ, JFXTokenId.LTEQ, JFXTokenId.NOTEQ);
-//            spaces(cs.spaceAroundBinaryOps() ? 1 : 0);
-//            scan(node.getLeftOperand(), p);
-//            wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, cs.spaceAroundBinaryOps() ? 1 : 0, node.getRightOperand());
-            wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, 0, node.getRightOperand());
+            int alignIndent = cs.alignMultilineBinaryOp() ? col : -1;
+            wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, cs.spaceAroundBinaryOps() ? 1 : 0, node.getRightOperand());
+            if (wraped) {
+                accept(JFXTokenId.RPAREN);
+            }
             return true;
         }
 
@@ -1792,6 +1795,7 @@ public class JFXReformatTask implements ReformatTask {
                     (redundantIfBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(ifExpr) || endOffset < getEndPos(node)))) {
                 redundantIfBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
             }
+
             boolean prevblock = wrapStatement(cs.wrapIfStatement(), redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
             if (falseExpr != null) {
                 if (cs.placeElseOnNewLine() || !prevblock) {
@@ -2789,6 +2793,7 @@ public class JFXReformatTask implements ReformatTask {
                 return true;
             }
             if (tree.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                // check this elimination
                 if (bracesGenerationStyle == CodeStyle.BracesGenerationStyle.ELIMINATE) {
                     Iterator<? extends ExpressionTree> stats = ((BlockExpressionTree) tree).getStatements().iterator();
                     if (stats.hasNext()) {
