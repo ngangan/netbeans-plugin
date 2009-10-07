@@ -433,7 +433,14 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
             try {
-                return endPos < 0 ? false : tokens.offset() <= endPos ? super.scan(tree, p) : true;
+                if (endPos < 0) {
+                    return false;
+                }
+                if (tokens.offset() <= endPos) {
+                    final Boolean scan = super.scan(tree, p);
+                    return scan != null ? scan : false;
+                }
+                return true;
             } finally {
                 endPos = lastEndPos;
             }
