@@ -110,6 +110,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         } else {
             task = new NodeToElementTask(lkp.lookupAll(Node.class)) {
                 protected RefactoringUI createRefactoringUI(TreePathHandle selectedElement, CompilationInfo info) {
+                    if (selectedElement == null) return null;
                     return new WhereUsedQueryUI(selectedElement, info);
                 }
             };
@@ -441,11 +442,15 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 }
                 if (e.getSimpleName().toString().equals(info.getFileObject().getName())) {
                     TreePathHandle representedObject = TreePathHandle.create(JavaFXTreePath.getPath(unit,t),info);
-                    sameNameHandles.add(representedObject);
+                    if (representedObject != null) {
+                        sameNameHandles.add(representedObject);
+                    }
                 }
                 if (e.getModifiers().contains(Modifier.PUBLIC)) {
                     TreePathHandle representedObject = TreePathHandle.create(JavaFXTreePath.getPath(unit,t),info);
-                    publicHandles.add(representedObject);
+                    if (representedObject != null) {
+                        publicHandles.add(representedObject);
+                    }
                 }
             }
             if (!publicHandles.isEmpty()) {

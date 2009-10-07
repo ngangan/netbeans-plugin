@@ -236,36 +236,15 @@ final public class TreePathHandle {
     }
 
     private JavaFXTreePath findSupportedPath(JavaFXTreePath initPath, CompilationInfo cc) {
-        while (initPath != null && cc.getTrees().getElement(initPath) == null) {
+        while (initPath != null) {
+            Element e = cc.getTrees().getElement(initPath);
+            if (e != null && e.getSimpleName() != null) break;
             initPath = initPath.getParentPath();
         }
         if (initPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
             // this stinks; synthetic method resolves to an element, nevertheless
             if (((JFXFunctionDefinition)initPath.getLeaf()).getName().contentEquals("javafx$run$")) {  // NOI18N
                 initPath = initPath.getParentPath();
-            }
-        }
-        /* Check for the synthetic class that gets generated if there is no class in a file
-         * with the same name as the file
-         * The class will be generated as the top-level one with only compilation unit as its parent
-         */
-        if (initPath != null && initPath.getParentPath() != null && initPath.getParentPath().getParentPath() == null) {
-            long startPos = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), initPath.getLeaf());
-            long endPos = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), initPath.getLeaf());
-
-            // somehow, there is no relationship between a tree and its parent regarding positions
-            // we need to check that the parent tree actually contains the position we are looking for
-            if (startPos > position || endPos < position) {
-                return null;
-            }
-
-            // some magic to determine the synthetic class
-            // basically, it shares the positions with the compilation unit
-            startPos -= cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), initPath.getParentPath().getLeaf());
-            endPos -= cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), initPath.getParentPath().getLeaf());
-
-            if (startPos == 0 && endPos == 0) {
-                return null;
             }
         }
         return initPath;
