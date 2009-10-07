@@ -134,7 +134,11 @@ final public class ClassIndex {
          * For example all these names NPE, NulPoEx, NULLPOInter leads to NullPointerException returned.
          * @since 0.28.0
          */
-        CAMEL_CASE_INSENSITIVE
+        CAMEL_CASE_INSENSITIVE,
+        /**
+         * The name parameter is the exact declared type FQN
+         */
+        EXACT
     };
 
     /**
@@ -259,6 +263,10 @@ final public class ClassIndex {
                 break;
             case REGEXP:
                 queryKind = QuerySupport.Kind.REGEXP;
+                break;
+            case EXACT:
+                indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
+                queryKind = QuerySupport.Kind.EXACT;
                 break;
             default:
                 queryKind = QuerySupport.Kind.EXACT;
@@ -687,6 +695,6 @@ final public class ClassIndex {
     }
 
     private static org.netbeans.api.java.source.ClassIndex.NameKind toJavaNameKind(NameKind kind) {
-        return org.netbeans.api.java.source.ClassIndex.NameKind.valueOf(kind.name());
+        return kind == NameKind.EXACT ? org.netbeans.api.java.source.ClassIndex.NameKind.SIMPLE_NAME : org.netbeans.api.java.source.ClassIndex.NameKind.valueOf(kind.name());
     }
 }
