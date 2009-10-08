@@ -34,6 +34,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
@@ -45,6 +46,7 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner<R, P>{
     final private TreePathHandle searchHandle;
     final private ElementHandle origHandle;
+    final private Element origElement;
     final private ElementKind origKind;
     final private CompilationController cc;
     final private SourcePositions positions;
@@ -52,6 +54,7 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
     public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
         this.searchHandle = searchHandle;
         this.origHandle = handle;
+        this.origElement = handle.resolve(cc);
         this.origKind = handle != null ? handle.getKind() : null;
         this.cc = cc;
         this.positions = cc.getTrees().getSourcePositions();
@@ -92,11 +95,8 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
     final protected boolean isSameElement(JavaFXTreePath path) {
         Element el = getCompilationController().getTrees().getElement(path);
         if (el != null) {
-            if (origHandle.getKind() == el.getKind()) {
-                ElementHandle eh = ElementHandle.create(el);
-                return origHandle.equals(eh);
+            return el == origElement;
             }
-        }
         return false;
     }
 }
