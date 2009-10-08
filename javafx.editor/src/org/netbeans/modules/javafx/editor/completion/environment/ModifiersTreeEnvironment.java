@@ -97,11 +97,13 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
         JavaFXTreePath grandParentPath = parentPath.getParentPath();
         Tree grandParent = grandParentPath != null ? grandParentPath.getLeaf() : null;
         if (parent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+            addAccessModifiers(m);
             addClassModifiers(m);
         } else if (parent.getJavaFXKind() != Tree.JavaFXKind.VARIABLE || grandParent == null || grandParent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-            addMemberModifiers(m, false);
+            addAccessModifiers(m);
+            addVarAccessModifiers(m);
         } else if (parent.getJavaFXKind() == Tree.JavaFXKind.VARIABLE && grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
-            addMemberModifiers(m, true);
+            // no access modifiers for local variables within a function
         } else {
             localResult(null);
             addKeywordsForStatement();

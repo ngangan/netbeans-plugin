@@ -1011,30 +1011,32 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addKeywordsForClassBody() {
-        for (String kw : CLASS_BODY_KEYWORDS) {
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
-            }
-        }
+        if (LOGGABLE) log("addKeywordsForClassBody"); // NOI18N
+        addKeyword(ABSTRACT_KEYWORD, SPACE, false);
+        addKeyword(OVERRIDE_KEYWORD, SPACE, false);
+        addAccessModifiers(null);
+        addVarAccessModifiers(null);
+        addKeyword(INIT_KEYWORD, SPACE, false);
+        addKeyword(POSTINIT_KEYWORD, SPACE, false);
+        addKeyword(VAR_KEYWORD, SPACE, false);
+        addKeyword(DEF_KEYWORD, SPACE, false);
+        addKeyword(FUNCTION_KEYWORD, SPACE, false);
     }
 
     @SuppressWarnings("fallthrough")
     protected void addKeywordsForStatement() {
         if (LOGGABLE) log("addKeywordsForStatement"); // NOI18N
-        for (String kw : STATEMENT_KEYWORDS) {
-            String postfix = " ("; // NOI18N
-            if (TRY_KEYWORD.equals(kw)) {
-                postfix = " {"; // NOI18N
-            }
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, postfix, query.anchorOffset, false));
-            }
-        }
-        for (String kw : STATEMENT_SPACE_KEYWORDS) {
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
-            }
-        }
+        addKeyword(FOR_KEYWORD, " (", false); // NOI18N
+        addKeyword(IF_KEYWORD, " (", false); // NOI18N
+        addKeyword(WHILE_KEYWORD, " (", false); // NOI18N
+        addKeyword(TRY_KEYWORD, " {", false); // NOI18N
+        addKeyword(INSERT_KEYWORD, SPACE, false);
+        addKeyword(DELETE_KEYWORD, SPACE, false);
+// TODO: remove the following two?
+//        addKeyword(NEW_KEYWORD, SPACE, false);
+//        addKeyword(REVERSE_KEYWORD, SPACE, false);
+        addKeyword(THROW_KEYWORD, SPACE, false);
+        addKeyword(VAR_KEYWORD, SPACE, false);
         if (JavaFXCompletionProvider.startsWith(RETURN_KEYWORD, prefix)) {
             JavaFXTreePath mth = JavaFXCompletionProvider.getPathElementOfKind(Tree.JavaFXKind.FUNCTION_DEFINITION, path);
             if (LOGGABLE) log("   mth == " + mth); // NOI18N
@@ -1055,15 +1057,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 case FOR_EXPRESSION_IN_CLAUSE:
                 case FOR_EXPRESSION_FOR:
                 case WHILE_LOOP:
-                    if (JavaFXCompletionProvider.startsWith(CONTINUE_KEYWORD, prefix)) {
-                        addResult(JavaFXCompletionItem.createKeywordItem(CONTINUE_KEYWORD, SEMI, query.anchorOffset, false));
-                    }
-
-/*
-                case SWITCH:
-                    if (JavaFXCompletionProvider.startsWith(BREAK_KEYWORD, prefix)) {
-                        addResult(JavaFXCompletionItem.createKeywordItem(BREAK_KEYWORD, SEMI, query.anchorOffset, false));
-                    }
+                    addKeyword(BREAK_KEYWORD, SEMI, false);
+                    addKeyword(CONTINUE_KEYWORD, SEMI, false);
+                    break;
+/*                case SWITCH:
+                    addKeyword(BREAK_KEYWORD, SEMI, false);
                     break;*/
             }
             tp = tp.getParentPath();
@@ -1071,59 +1069,57 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     }
 
     protected void addValueKeywords() {
-        if (JavaFXCompletionProvider.startsWith(FALSE_KEYWORD, prefix)) {
-            addResult(JavaFXCompletionItem.createKeywordItem(FALSE_KEYWORD, null, query.anchorOffset, false));
+        if (LOGGABLE) log("addValueKeywords"); // NOI18N
+        // TODO: add conditions when each of these can occur
+        addKeyword(FALSE_KEYWORD, null, false);
+        addKeyword(TRUE_KEYWORD, null, false);
+        addKeyword(NULL_KEYWORD, null, false);
+        addKeyword(NEW_KEYWORD, SPACE, false);
+        addKeyword(BIND_KEYWORD, SPACE, false);
+    }
+
+    protected void addAccessModifiers(Set<Modifier> modifiers) {
+        if (LOGGABLE) log("addAccessModifiers"); // NOI18N
+        if (modifiers == null || (
+                !modifiers.contains(PUBLIC) &&
+                !modifiers.contains(PRIVATE) &&
+                //!modifiers.contains(PACKAGE) &&
+                //TODO: 'package' keyword would be difficult to find since it's not in modifiers
+                !modifiers.contains(PROTECTED))) {
+            addKeyword(PUBLIC_KEYWORD, SPACE, false);
+            addKeyword(PACKAGE_KEYWORD, SPACE, false);
+            addKeyword(PROTECTED_KEYWORD, SPACE, false);
         }
-        if (JavaFXCompletionProvider.startsWith(TRUE_KEYWORD, prefix)) {
-            addResult(JavaFXCompletionItem.createKeywordItem(TRUE_KEYWORD, null, query.anchorOffset, false));
+    }
+
+    protected void addVarAccessModifiers(Set<Modifier> modifiers) {
+        if (LOGGABLE) log("addVarAccessModifiers"); // NOI18N
+        if (modifiers == null || (
+                //!modifiers.contains(PUBLIC_READ) &&
+                //!modifiers.contains(PUBLIC_INIT) &&
+                //TODO: 'public-read' and 'public-init' keywords are not in modifiers
+                true)) {
+            addKeyword(PUBLIC_READ_KEYWORD, SPACE, false);
+            addKeyword(PUBLIC_INIT_KEYWORD, SPACE, false);
         }
-        if (JavaFXCompletionProvider.startsWith(NULL_KEYWORD, prefix)) {
-            addResult(JavaFXCompletionItem.createKeywordItem(NULL_KEYWORD, null, query.anchorOffset, false));
+    }
+
+    protected void addFunctionModifiers(Set<Modifier> modifiers) {
+        if (LOGGABLE) log("addFunctionAccessModifiers"); // NOI18N
+        if (modifiers == null || (
+                !modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT))) {
+            addKeyword(ABSTRACT_KEYWORD, SPACE, false);
         }
-        if (JavaFXCompletionProvider.startsWith(NEW_KEYWORD, prefix)) {
-            addResult(JavaFXCompletionItem.createKeywordItem(NEW_KEYWORD, SPACE, query.anchorOffset, false));
-        }
-        if (JavaFXCompletionProvider.startsWith(BIND_KEYWORD, prefix)) {
-            addResult(JavaFXCompletionItem.createKeywordItem(BIND_KEYWORD, SPACE, query.anchorOffset, false));
-        }
+        addKeyword(BOUND_KEYWORD, SPACE, false);
+        addKeyword(OVERRIDE_KEYWORD, SPACE, false);
     }
 
     protected void addClassModifiers(Set<Modifier> modifiers) {
-        List<String> kws = new ArrayList<String>();
-        if (!modifiers.contains(PUBLIC) && !modifiers.contains(PRIVATE)) {
-            kws.add(PUBLIC_KEYWORD);
-        }
-        if (!modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT)) {
-            kws.add(ABSTRACT_KEYWORD);
-        }
-        kws.add(CLASS_KEYWORD);
-        for (String kw : kws) {
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
-            }
-        }
-    }
-
-    protected void addMemberModifiers(Set<Modifier> modifiers, boolean isLocal) {
-        if (LOGGABLE) log("addMemberModifiers"); // NOI18N
-        List<String> kws = new ArrayList<String>();
-        if (isLocal) {
-            // TODO:
-        } else {
-            kws.add(PUBLIC_KEYWORD);
-            kws.add(PROTECTED_KEYWORD);
-            kws.add(PACKAGE_KEYWORD);
-            kws.add(PUBLIC_INIT_KEYWORD);
-            kws.add(PUBLIC_READ_KEYWORD);
-            // TODO: check this:
-            if (!modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT)) {
-                kws.add(ABSTRACT_KEYWORD);
-            }
-        }
-        for (String kw : kws) {
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
-            }
+        if (LOGGABLE) log("addClassModifiers"); // NOI18N
+        addAccessModifiers(modifiers);
+        if (modifiers == null || (
+                !modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT))) {
+            addKeyword(ABSTRACT_KEYWORD, SPACE, false);
         }
     }
 
