@@ -39,6 +39,10 @@
 
 package org.netbeans.api.javafx.source;
 
+import com.sun.javafx.api.tree.JavaFXTreeScanner;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TypeClassTree;
+import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.jvm.Target;
@@ -94,13 +98,19 @@ public class ElementHandle<T extends Element> {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
 
     private ElementKind kind;
+    private ElementHandle scope;
     private String[] signatures;
 
     public ElementHandle(final ElementKind kind, String[] signatures) {
+        this(kind, signatures, null);
+    }
+
+    private ElementHandle(final ElementKind kind, String[] signatures, ElementHandle scope) {
         assert kind != null;
         assert signatures != null;
         this.kind = kind;
         this.signatures = signatures;
+        this.scope = scope;
     }
 
     /**
@@ -114,7 +124,7 @@ public class ElementHandle<T extends Element> {
     public T resolve (final CompilationInfo compilationInfo) {
         if (compilationInfo == null) throw new IllegalArgumentException();
         assert compilationInfo.impl() != null;
-        return resolveImpl (compilationInfo.impl().getJavafxcTaskImpl());
+        return resolveImpl (compilationInfo);
     }
 
     public ElementKind getKind() {
@@ -167,12 +177,13 @@ public class ElementHandle<T extends Element> {
         return k1 == k2 || (k1 == ElementKind.OTHER && k2.isClass()) || (k2 == ElementKind.OTHER && k1.isClass());
     }
     
-    private T resolveImpl (final JavafxcTaskImpl jt) {
-        switch (this.kind) {            
+    private T resolveImpl (final CompilationInfo ci) {
+        JavafxcTaskImpl jt = ci.impl().getJavafxcTaskImpl();
+        switch (this.kind) {
             case PACKAGE:
                 assert signatures.length == 1;
                 @SuppressWarnings("unchecked")
-                T pe = (T) jt.getElements().getPackageElement(signatures[0]);
+                T pe = (T) ci.getElements().getPackageElement(signatures[0]);
                 return pe;
             case CLASS:
             case INTERFACE:
@@ -248,6 +259,39 @@ public class ElementHandle<T extends Element> {
                 }
                 break;
             }
+            case PARAMETER:
+            case LOCAL_VARIABLE: {
+                assert signatures.length == 3;
+                assert scope != null;
+
+                Element scopeElement = scope.resolveImpl(ci);
+                Tree scopeTree = ci.getTrees().getTree(scopeElement);
+                final Object[] resolved = new Object[1];
+                new JavaFXTreeScanner() {
+
+                @Override
+                public Object visitTypeClass(TypeClassTree node, Object p) {
+                    return super.visitTypeClass(node, p);
+                }
+
+                @Override
+                public Object visitVariable(VariableTree node, Object p) {
+                    Element e = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), node));
+                    if (e != null) {
+                        String[] sigs = createFieldDescriptor((VariableElement)e);
+                        if (Arrays.equals(sigs, signatures)) {
+                            resolved[0] = e;
+                            return null;
+                        }
+                    }
+                    return super.visitVariable(node, p);
+                }
+
+
+                }.scan(scopeTree, null);
+                return (T)resolved[0];
+
+            }
 /*            case TYPE_PARAMETER:
             {
                 if (signatures.length == 2) {
@@ -308,6 +352,7 @@ public class ElementHandle<T extends Element> {
         assert element != null;
         ElementKind kind = element.getKind();
         String[] signatures = null;
+        ElementHandle scope = null;
         try {
             switch (kind) {
                 case PACKAGE:
@@ -329,7 +374,12 @@ public class ElementHandle<T extends Element> {
                     signatures = createExecutableDescriptor((ExecutableElement)element);
                     break;
                 case PARAMETER:
-                case LOCAL_VARIABLE: // space magic
+                case LOCAL_VARIABLE: {
+                    assert element instanceof VariableElement;
+                    signatures = createFieldDescriptor((VariableElement)element);
+                    scope = calculateScope(element);
+                    break;
+                }
                 case FIELD:
                 case ENUM_CONSTANT:
                     assert element instanceof VariableElement;
@@ -364,9 +414,18 @@ public class ElementHandle<T extends Element> {
                 LOG.log(Level.FINEST, null, e);
             }
         }
-        return signatures != null ? new ElementHandle<T> (kind, signatures) : null;
+        return signatures != null ? new ElementHandle<T> (kind, signatures, scope) : null;
     }
 
+    private static ElementHandle calculateScope(Element e) {
+        Element enclosing = e.getEnclosingElement();
+        
+        while (enclosing != null && (enclosing.getKind() == ElementKind.LOCAL_VARIABLE || enclosing.getKind() == ElementKind.PARAMETER ||
+                enclosing.getSimpleName().contentEquals("javafx$run$") || ((Symbol)enclosing).type == null)) {
+            enclosing = enclosing.getEnclosingElement();
+        }
+        return enclosing != null ? ElementHandle.create(enclosing) : null;
+    }
 
     private static String encodeClassNameOrArray(TypeElement td) {
         assert td != null;
