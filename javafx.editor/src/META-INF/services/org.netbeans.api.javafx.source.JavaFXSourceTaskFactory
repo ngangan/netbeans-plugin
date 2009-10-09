@@ -10,4 +10,5 @@ org.netbeans.modules.javafx.editor.hints.ImplementAbstractTaskFactory
 org.netbeans.modules.javafx.editor.hints.ImplementAbstractAnonTaskFactory
 org.netbeans.modules.javafx.editor.hints.MixinNotImplementedAbstractsTaskFactory
 org.netbeans.modules.javafx.editor.hints.OverridenTaskFactory
+org.netbeans.modules.javafx.editor.hints.AddImportTaskFactory
 #org.netbeans.modules.javafx.preview.JavaFXSourcePreviewTaskFactory
