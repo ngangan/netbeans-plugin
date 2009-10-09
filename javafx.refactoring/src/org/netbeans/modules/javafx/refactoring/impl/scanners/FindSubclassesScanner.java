@@ -29,43 +29,36 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import java.util.Set;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
-import org.netbeans.modules.refactoring.api.AbstractRefactoring;
-import org.netbeans.modules.refactoring.api.WhereUsedQuery;
-import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class FindSubclassesScanner extends BaseRefactoringScanner<Void, RefactoringElementsBag> {
-    private AbstractRefactoring refactoring;
-
-    public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, CompilationController cc) {
-        this(refactoring, searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
+public class FindSubclassesScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
+    public FindSubclassesScanner(TreePathHandle searchHandle, CompilationController cc) {
+        this(searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
     }
 
-    public FindSubclassesScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
+    public FindSubclassesScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
         super(searchHandle, handle, cc);
-        this.refactoring = refactoring;
     }
 
     @Override
-    public Void visitClassDeclaration(ClassDeclarationTree node, RefactoringElementsBag elements) {
+    public Void visitClassDeclaration(ClassDeclarationTree node, Set<TreePathHandle> handles) {
         switch (getElementKind()) {
             case CLASS:
             case INTERFACE: {
                 if (isSameElement()) {
 //                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
 //                if (targetName.equals(te.getQualifiedName().toString())) {
-                    elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
+                    handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
                 }
             }
         }
-        return super.visitClassDeclaration(node, elements);
+        return super.visitClassDeclaration(node, handles);
     }
 }

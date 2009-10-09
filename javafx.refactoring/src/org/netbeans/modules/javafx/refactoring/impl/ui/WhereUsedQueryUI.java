@@ -126,6 +126,7 @@ public class WhereUsedQueryUI implements RefactoringUI {
 
         query.putValue(WhereUsedQueryConstants.FIND_OVERRIDING_METHODS,panel.isMethodOverriders());
         query.putValue(WhereUsedQuery.FIND_REFERENCES,panel.isMethodFindUsages());
+        query.putValue(WhereUsedQueryConstants.SEARCH_FROM_BASECLASS, panel.isMethodFromBaseClass());
     }
     
     private void setForClass() {

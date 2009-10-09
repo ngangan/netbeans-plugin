@@ -29,48 +29,38 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import java.util.Collection;
+import java.util.Set;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
-import org.netbeans.modules.refactoring.api.AbstractRefactoring;
-import org.netbeans.modules.refactoring.api.WhereUsedQuery;
-import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.openide.util.lookup.Lookups;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class FindOverridersScanner extends BaseRefactoringScanner<Void, RefactoringElementsBag> {
+public class FindOverridersScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
     private ExecutableElement methodElement;
-    private AbstractRefactoring refactoring;
 
-    public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, CompilationController cc) {
-        this(refactoring, searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
+    public FindOverridersScanner(TreePathHandle searchHandle, CompilationController cc) {
+        this(searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
     }
 
-    public FindOverridersScanner(WhereUsedQuery refactoring, TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
+    public FindOverridersScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
         super(searchHandle, handle, cc);
         this.methodElement = (ExecutableElement)handle.resolve(cc);
-        this.refactoring = refactoring;
     }
 
     @Override
-    public Void visitFunctionDefinition(FunctionDefinitionTree node, RefactoringElementsBag elements) {
+    public Void visitFunctionDefinition(FunctionDefinitionTree node, Set<TreePathHandle> handles) {
         if (getElementKind() == ElementKind.METHOD) {
-            ExecutableElement element = (ExecutableElement)getCompilationController().getTrees().getElement(getCurrentPath());
-
-            Collection<ExecutableElement> methods = SourceUtils.getOverridenMethods(element, getCompilationController());
-            if (methods.contains(methodElement)) {
-                elements.add(refactoring, WhereUsedElement.create(TreePathHandle.create(getCurrentPath(), getCompilationController()), Lookups.singleton(getTreePathHandle())));
+            if (isSameElement()) {
+                handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
             }
         }
-        return super.visitFunctionDefinition(node, elements);
+        return super.visitFunctionDefinition(node, handles);
     }
 }
