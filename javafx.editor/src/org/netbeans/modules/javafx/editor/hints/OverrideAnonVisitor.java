@@ -27,7 +27,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  *
  * @author karol harezlak
  */
-final class OverrideAnnonVisitor extends JavaFXTreePathScanner<Void, Void> {
+final class OverrideAnonVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     private CompilationInfo compilationInfo;
     private Map<Element, Collection<Tree>> classTrees;
@@ -35,7 +35,7 @@ final class OverrideAnnonVisitor extends JavaFXTreePathScanner<Void, Void> {
     private Collection<JavafxClassSymbol> imports;
     Map<Element, Tree> position;
 
-    public OverrideAnnonVisitor(CompilationInfo compilationInfo,
+    public OverrideAnonVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
             Map<Element, List<MethodSymbol>> overridenMethods,
             Collection<JavafxClassSymbol> imports,

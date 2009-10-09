@@ -47,7 +47,10 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.util.*;
 import javax.lang.model.element.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -57,9 +60,9 @@ public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask
 
     @Override
     protected Tree getTree(CompilationInfo compilationInfo, Element currentClass, Map<Element, Tree> position) {
-        Tree currentTree = compilationInfo.getTrees().getTree(currentClass);
-        if (currentTree == null) {
-            currentTree = position.get(currentClass);
+        Tree currentTree = position.get(currentClass);
+        if (findPositionAtTheEnd(compilationInfo, currentTree) < 0) {
+            return null;
         }
         return currentTree;
     }
@@ -67,13 +70,33 @@ public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask
     @Override
     protected int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree) - 1;
-        return endTree;
+        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
+        int length = end - start;
+        if (start < 0 || end < 0) {
+            return -1;
+        }
+        Document document = compilationInfo.getDocument();
+        if (document == null) {
+            return -1;
+        }
+        try {
+            String text = document.getText(start, length);
+            int index = text.indexOf("{"); //NOI18N
+            if (index > 0 ) {
+                return start + index + 1;
+            } else {
+                return -1;
+            }
+        } catch (BadLocationException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return -1;
     }
 
     @Override
     protected JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo, Map<Element, Collection<Tree>> classTrees, Map<Element, List<MethodSymbol>> overridenMethods, Collection<JavafxClassSymbol> imports, Map<Element, Tree> position) {
-        return new OverrideAnnonVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
+        return new OverrideAnonVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
     }
 
     @Override

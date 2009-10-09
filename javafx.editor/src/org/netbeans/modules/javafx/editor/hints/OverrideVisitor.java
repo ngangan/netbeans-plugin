@@ -65,24 +65,6 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
         return super.visitImport(node, p);
     }
 
-//    @Override
-//    public Void visitInstantiate(InstantiateTree node, Void p) {
-//        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getIdentifier());
-//        Element currentClass = compilationInfo.getTrees().getElement(path);
-//        if (currentClass instanceof JavafxClassSymbol) {
-//            Collection<Tree> extendsList = classTrees.get(currentClass);
-//            if (extendsList == null) {
-//                extendsList = new HashSet<Tree>();
-//            }
-//            extendsList.add(node.getIdentifier());
-//            classTrees.put(currentClass, extendsList);
-//            if (positions != null) {
-//                positions.put(currentClass, node);
-//            }
-//        }
-//        return super.visitInstantiate(node, p);
-//    }
-
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
          if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N

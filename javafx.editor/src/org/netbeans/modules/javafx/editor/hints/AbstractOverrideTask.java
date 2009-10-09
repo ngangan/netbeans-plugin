@@ -40,6 +40,8 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -105,17 +107,45 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 StyledDocument document = (StyledDocument) compilationInfo.getDocument();
+                if (document != null) {
+                    HintsController.setErrors(document, getHintsControllerString(), Collections.EMPTY_LIST); //NOI18N
+                }
+                if (!compilationInfo.isErrors()) {
+                    //TODO Work around for javafx compiler for Mixin abstract class
+                    final Boolean[] mixin = new Boolean[1];
+                    mixin[0] = false;
+                    new JavaFXTreePathScanner<Void, Void>() {
+
+                        @Override
+                        public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
+                            try {
+                                if (node.getMixins() != null && node.getMixins().size() > 0) {
+                                    mixin[0] = true;
+                                }
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+
+                            return super.visitClassDeclaration(node, v);
+                        }
+
+                        @Override
+                        public Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
+                            return super.visitFunctionDefinition(node, p);
+                        }
+                    }.scan(compilationInfo.getCompilationUnit(), null);
+                    if (!mixin[0]) {
+                        return;
+                    }
+                }
                 Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, Tree> position = new Hashtable<Element, Tree>();
-
                 Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
 
                 JavaFXTreePathScanner<Void, Void> visitor = getVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
-
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
-
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
                     List<MethodSymbol> methods = null;
@@ -139,7 +169,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, imports, currentClass)) {
+                            if (!HintsUtils.isClassUsed(typeElement, currentClass, imports)) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
@@ -201,9 +231,9 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             for (Hint hint : model.getHints()) {
                 errors.add(getErrorDescription(document, file, hint, compilationInfo));
             }
-            if (document != null) {
+            if (document != null || errors.size() < 0) {
                 HintsController.setErrors(document, getHintsControllerString(), errors); //NOI18N
-                }
+            }
         }
     }
 
@@ -212,7 +242,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
             public String getText() {
                 return NbBundle.getMessage(AbstractOverrideTask.class, "TITLE_IMPLEMENT_ABSTRACT"); //NOI18N
-                }
+            }
 
             public ChangeInfo implement() throws Exception {
                 final StringBuilder methods = new StringBuilder();
@@ -221,6 +251,9 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                     methods.append(createMethod(methodSymbol));
                 }
                 final int positon = findPositionAtTheEnd(compilationInfo, hint.getTree());
+                if (positon < 0) {
+                    return null;
+                }
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
@@ -319,6 +352,9 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 return method.toString();
             }
         };
+        if (hint.getStartPosition() < 0) {
+            return null;
+        }
         ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(AbstractOverrideTask.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
         return ed;
     }

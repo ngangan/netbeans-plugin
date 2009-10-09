@@ -46,7 +46,6 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
-import javax.swing.text.BadLocationException;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -55,9 +54,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
-import javax.swing.text.Document;
-import javax.swing.text.Position;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -177,7 +174,7 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, imports, currentClass) && currentClass != superTypeElement) {
+                            if (!HintsUtils.isClassUsed(currentClass, typeElement, imports)) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);

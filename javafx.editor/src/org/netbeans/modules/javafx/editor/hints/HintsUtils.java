@@ -38,23 +38,25 @@ final class HintsUtils {
     static String getClassSimpleName(String fqName) {
         int start = fqName.lastIndexOf(".") + 1; //NOI18N
         if (start > 0) {
-            fqName = fqName.substring(start); //NOI18N
+            fqName = fqName.substring(start);
         }
+        fqName = fqName.replace("{", "").replace("}", ""); //NOI18N
         return fqName;
     }
 
     static boolean checkString(String name) {
-        return Pattern.compile("[!@#$%^&*(){}\\|:'?/><~`]").matcher(name).find();
+        return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element element, Collection<JavafxClassSymbol> imports, Element currentClass) {
-        for (JavafxClassSymbol importElement : imports) {
-            if (element instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
-                JavafxClassSymbol classTypeElement = (JavafxClassSymbol) element;
-                JavafxClassSymbol currentClassSymbol = (JavafxClassSymbol) currentClass;
+    static boolean isClassUsed(Element currentClass, Element element, Collection<JavafxClassSymbol> imports) {
+        if (element instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
+            JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) element;
+            JavafxClassSymbol currentClassSymbol = (JavafxClassSymbol) currentClass;
+            if (currentClassSymbol.location().length() == 0 || currentClassSymbol.location().equals(elementClassSymbol.location())) {
+                return true;
+            }
+            for (JavafxClassSymbol importElement : imports) {
                 if (currentClassSymbol.location().equals(importElement.location())) {
-                    return true;
-                } else if (classTypeElement == importElement) {
                     return true;
                 }
             }
@@ -69,9 +71,7 @@ final class HintsUtils {
             for (MethodSymbol overridenMethod : overridenMethodList) {
                 //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
                 try {
-                    if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) &&
-                            method.getParameters().size() == overridenMethod.getParameters().size() &&
-                            COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
+                    if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) && method.getParameters().size() == overridenMethod.getParameters().size() && COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
                         return overridenMethod;
                     }
                 } catch (Exception ex) {

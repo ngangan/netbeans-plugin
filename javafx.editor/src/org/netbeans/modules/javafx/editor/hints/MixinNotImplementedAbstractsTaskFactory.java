@@ -74,6 +74,7 @@ import org.openide.util.NbBundle;
 public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private static final String HINTS_IDENT = "abstractmixinjavafx"; //NOI18N
 
     public MixinNotImplementedAbstractsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -92,6 +93,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 final Element[] mainClassElement = new Element[1];
                 final Collection<Tree> mixins = new HashSet<Tree>();
                 final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
+                final Document document = compilationInfo.getDocument();
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -120,6 +122,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
+                HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
                 if (mixins.size() == 0) {
                     return;
                 }
@@ -158,11 +161,10 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                         if (toOverrides.values().contains(Boolean.FALSE)) {
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), mixin);
-                            final Document document = compilationInfo.getDocument();
-                            String hintText = NbBundle.getMessage(ImplementAbstractTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"); //NOI18N
+                            String hintText = " javafxapplication8.NewJavaFXClass1 is not abstract and does not override abstract method karol() in javafxapplication8.NewJavaFXClass$Mixin"; //NOI18N
                             ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
                             if (document != null) {
-                                HintsController.setErrors(document, hintText, Collections.singleton(errorDescription));
+                                HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
                             }
                             breakIt = true;
                             break;
