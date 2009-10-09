@@ -235,7 +235,7 @@ public class JavaProject extends Project {
 
 
         new JButtonOperator(newProject, "Finish").push();
-        newProject.waitClosed();
+        //newProject.waitClosed();
         
         try {
             Thread.sleep(TIME_WAIT);
