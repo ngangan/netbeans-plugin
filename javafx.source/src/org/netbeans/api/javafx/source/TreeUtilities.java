@@ -42,10 +42,10 @@ package org.netbeans.api.javafx.source;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Flags;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.mjavac.code.Flags;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.mjavac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.comp.JavafxAttrContext;
 import com.sun.tools.javafx.comp.JavafxEnv;
