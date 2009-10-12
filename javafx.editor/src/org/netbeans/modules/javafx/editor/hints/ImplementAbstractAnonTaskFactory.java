@@ -89,7 +89,7 @@ public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask
                 return -1;
             }
         } catch (BadLocationException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
         }
         return -1;
     }

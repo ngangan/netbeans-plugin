@@ -67,13 +67,13 @@ import org.openide.text.NbDocument;
  *
  * @author karol harezlak
  */
-public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class MarkOverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private final Map<Document, Collection<OverriddeAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddeAnnotation>>();
 
-    public OverridenTaskFactory() {
+    public MarkOverridenTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
@@ -129,7 +129,7 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
                 Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
-                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, true);
                 Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);

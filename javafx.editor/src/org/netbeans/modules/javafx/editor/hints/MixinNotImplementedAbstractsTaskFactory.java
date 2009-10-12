@@ -65,7 +65,6 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
-import org.openide.util.NbBundle;
 
 /**
  *

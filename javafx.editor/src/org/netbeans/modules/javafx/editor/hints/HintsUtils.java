@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
  *
@@ -82,6 +84,40 @@ final class HintsUtils {
         }
 
         return null;
+    }
+    //TODO Should be replaced with proper formating ASAP
+
+    static String calculateSpace(int startPosition, Document document) {
+        String text = null;
+        try {
+            text = document.getText(document.getStartPosition().getOffset(), startPosition);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+            return "";
+        }
+        int lastIndex = -1;
+        if (text != null && text.length() > 1) {
+            lastIndex = text.lastIndexOf("\n"); //NOI18N
+        }
+        int charNumber = -1;
+
+        if (lastIndex > 0) {
+            int varIndex = 0;
+            String line = text.substring(lastIndex, startPosition);
+            if (line.contains("var")) { //NOI18N
+                varIndex = line.indexOf("var"); //NOI18N
+            }
+            charNumber = text.length() - lastIndex - varIndex;
+
+        }
+        if (charNumber <= 0) {
+            return null;
+        }
+        StringBuilder space = new StringBuilder(charNumber - 1);
+        for (int i = 0; i < charNumber - 1; i++) {
+            space.append(" "); //NOI18M
+        }
+        return space.toString();
     }
 
     private static class ParamsComparator implements Comparator<List<VarSymbol>> {

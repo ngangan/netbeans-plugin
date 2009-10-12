@@ -85,7 +85,7 @@ final class UncaughtExceptionsFix implements Fix {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         Iterator<Type> iterator = hint.getExceptions().iterator();
         final StringBuilder block = new StringBuilder();
-        final String space = calculateSpace(hint.getStartPosition());
+        final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
         if (hint.getCatchTree() == null) {
             String method = document.getText(hint.getStartPosition() - space.length(), hint.getLength() + space.length()).trim();
             block.append(space).append("try {\n") //NOI18N
@@ -141,30 +141,5 @@ final class UncaughtExceptionsFix implements Fix {
                 }
             }
     }
-    //TODO Should be replaced with proper formating ASAP
-     private  String calculateSpace(int startPosition) {
-        String text = null;
-        try {
-            text = document.getText(document.getStartPosition().getOffset(), startPosition);
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-            return "";
-        }
-        int lastIndex = -1;
-        if (text != null && text.length() > 1) {
-            lastIndex = text.lastIndexOf("\n"); //NOI18N
-        }
-        int charNumber = -1;
-        if (lastIndex > 0) {
-            charNumber = text.length() - lastIndex;
-        }
-        if (charNumber <= 0) {
-            return null;
-        }
-        StringBuilder space = new StringBuilder(charNumber - 1);
-        for (int i = 0 ; i < charNumber - 1 ; i++) {
-            space.append(" "); //NOI18M
-        }
-        return space.toString();
-     }
+   
 }
