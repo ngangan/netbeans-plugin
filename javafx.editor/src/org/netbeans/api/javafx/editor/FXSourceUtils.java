@@ -1,11 +1,11 @@
 package org.netbeans.api.javafx.editor;
 
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.MethodType;
-import com.sun.tools.javac.code.TypeTags;
-import com.sun.tools.javac.util.List;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
+import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.mjavac.code.Type.MethodType;
+import com.sun.tools.mjavac.code.TypeTags;
+import com.sun.tools.mjavac.util.List;
 import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
 import org.netbeans.api.java.classpath.ClassPath;

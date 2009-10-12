@@ -42,7 +42,7 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 
