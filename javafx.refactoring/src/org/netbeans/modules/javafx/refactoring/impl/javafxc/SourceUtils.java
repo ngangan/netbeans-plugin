@@ -131,6 +131,10 @@ final public class SourceUtils {
     }
 
     public static String getHtml(String text) {
+        return getHtml(text, -1);
+    }
+
+    public static String getHtml(String text, int hilite) {
         StringBuffer buf = new StringBuffer();
         TokenHierarchy tokenH = TokenHierarchy.create(text, JFXTokenId.language());
         Lookup lookup = MimeLookup.getLookup(MimePath.get(JAVAFX_MIME_TYPE));
@@ -143,7 +147,12 @@ final public class SourceUtils {
                 category = "whitespace"; //NOI18N
             }
             AttributeSet set = settings.getTokenFontColors(category);
-            buf.append(color(htmlize(token.text().toString()), set));
+            String htmlized = color(htmlize(token.text().toString()), set);
+            if (hilite == tok.offset()) {
+                buf.append("<b>").append(htmlized).append("</b>"); // NOI18N
+            } else {
+                buf.append(htmlized);
+            }
         }
         return buf.toString();
     }
