@@ -56,7 +56,6 @@ import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
-import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
@@ -281,7 +280,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
                 }
                 JavaFXParserResult parserResult = JavaFXParserResult.create(source, null);
                 final CompilationController compilationController = CompilationController.create(parserResult);
-                compilationController.runUserActionTask(new CancellableTask<CompilationController>(){
+                compilationController.runWhenScanFinished(new CancellableTask<CompilationController>(){
                     public void cancel() {
                     }
 

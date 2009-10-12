@@ -46,6 +46,9 @@ import java.lang.ref.SoftReference;
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.logging.Logger;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.RequestProcessor;
 
 /**
  * Algorithm:
@@ -103,37 +106,43 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
      */
     public void fixImports(final Document document, JTextComponent target) {
         Runnable runnable = prepareTask(document, target);
-        SwingUtilities.invokeLater(runnable);
+        RequestProcessor.getDefault().post(runnable);
     }
 
     private Runnable prepareTask(final Document document, final JTextComponent target) {
         return new Runnable() {
+            private ProgressHandle wHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(JavaFXImports.class, "MSG_Wait")); // NOI18N
             public void run() {
+                wHandle.start();
                 final JavaFXSource s = JavaFXSource.forDocument(document);
                 try {
-                    s.runUserActionTask(new Task<CompilationController>() {
+                    s.runWhenScanFinished(new Task<CompilationController>() {
                         public void run(CompilationController cc) throws Exception {
-                            final JavaFXSource.Phase phase = cc.toPhase(JavaFXSource.Phase.ANALYZED);
-                            if (phase.lessThan(JavaFXSource.Phase.ANALYZED)) {
-                                logger.warning("We did not reach required phase. Leaving without fix"); // NOI18N
-                                return;
-                            }
                             final FileObject source = getFileObject(document);
                             if (source == null) {
                                 throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
                             }
-                            ClassIndex index = ClasspathInfo.create(source).getClassIndex();
+                            ClassIndex index = cc.getClasspathInfo().getClassIndex();
                             ImportsWalker iw = new ImportsWalker(cc, index);
                             ImportsModel imn = new ImportsModel();
                             iw.scan(cc.getCompilationUnit(), imn);
                             ImportResolverImpl ir = ImportResolverImpl.create(cc, target);
+                            if (wHandle != null) {
+                                wHandle.finish();
+                                wHandle = null;
+                            }
                             ir.resolve(imn);
                         }
 
-                    }, false);
+                    }, true);
                 } catch (IOException e) {
                     throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e); // NOI18N
+                } finally {
+                    if (wHandle != null) {
+                        wHandle.finish();
+                    }
                 }
+
             }
         };
     }

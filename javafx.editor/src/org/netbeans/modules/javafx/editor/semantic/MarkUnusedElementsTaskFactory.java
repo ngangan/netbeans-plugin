@@ -88,11 +88,11 @@ import org.openide.filesystems.FileObject;
  *
  * @author karol harezlak
  */
-public class UnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class MarkUnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private Document document;
 
-    public UnusedElementsTaskFactory() {
+    public MarkUnusedElementsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 

@@ -154,15 +154,15 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
     }
 
     private void addKeywordsForCU(UnitTree ut) {
-        List<String> kws = new ArrayList<String>();
-        kws.add(ABSTRACT_KEYWORD);
-        kws.add(CLASS_KEYWORD);
-        kws.add(VAR_KEYWORD);
-        kws.add(DEF_KEYWORD);
-        kws.add(FUNCTION_KEYWORD);
-        kws.add(PUBLIC_KEYWORD);
-        kws.add(IMPORT_KEYWORD);
-        kws.add(MIXIN_KEYWORD);
+        addAccessModifiers(null);
+        addVarAccessModifiers(null);
+        addFunctionModifiers(null);
+        addClassModifiers(null);
+        addKeyword(CLASS_KEYWORD, SPACE, false);
+        addKeyword(VAR_KEYWORD, SPACE, false);
+        addKeyword(DEF_KEYWORD, SPACE, false);
+        addKeyword(FUNCTION_KEYWORD, SPACE, false);
+        addKeyword(IMPORT_KEYWORD, SPACE, false);
         boolean beforeAnyClass = true;
         for (Tree t : root.getTypeDecls()) {
             if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
@@ -180,12 +180,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
             }
             Tree pd = root.getPackageName();
             if ((pd != null && offset <= sourcePositions.getStartPosition(root, root)) || (pd == null && (firstImport == null || sourcePositions.getStartPosition(root, firstImport) >= offset))) {
-                kws.add(PACKAGE_KEYWORD);
-            }
-        }
-        for (String kw : kws) {
-            if (JavaFXCompletionProvider.startsWith(kw, prefix)) {
-                addResult(JavaFXCompletionItem.createKeywordItem(kw, SPACE, query.anchorOffset, false));
+                addKeyword(PACKAGE_KEYWORD, SPACE, false);
             }
         }
     }

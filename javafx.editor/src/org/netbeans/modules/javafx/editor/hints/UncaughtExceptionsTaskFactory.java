@@ -74,6 +74,8 @@ import org.openide.util.NbBundle;
  */
 public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
+    private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
+
     public UncaughtExceptionsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
@@ -91,6 +93,10 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                 if (file == null) {
                     throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
                 }
+                final Document document = compilationInfo.getDocument();
+                if (document != null) {
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
+                    }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo, classIndex);
                 HintsModel model = new HintsModel(compilationInfo);
@@ -101,9 +107,8 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     for (Hint hint : model.getHints()) {
                         errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
                     }
-                    final Document document = compilationInfo.getDocument();
                     if (document != null) {
-                        HintsController.setErrors(compilationInfo.getDocument(), "Try-Catch", errors); //NOI18N
+                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); //NOI18N
                     }
                 }
             }
@@ -139,7 +144,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
             for (Tree node_ : nodes) {
                 for (Hint hint : hints) {
                     if (hint.getTree() == node_) {
-                        Collection<Type> hintTypes = new ArrayList(hint.getExceptions());
+                        Collection<Type> hintTypes = new ArrayList<Type>(hint.getExceptions());
                         for (Type hintType : hintTypes) {
                             //TODO JavaFXTypeClass does not provide full class name, it should use full class names not simple names
                             for (CatchTree catchType : node.getCatches()) {

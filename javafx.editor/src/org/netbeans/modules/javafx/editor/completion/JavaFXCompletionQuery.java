@@ -91,6 +91,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String AND_KEYWORD = "and"; // NOI18N
     public static final String AS_KEYWORD = "as"; // NOI18N
     public static final String ASSERT_KEYWORD = "assert"; // NOI18N
+    public static final String AT_KEYWORD = "at"; // NOI18N
+    public static final String ATTRIBUTE_KEYWORD = "attribute"; // NOI18N
     public static final String BEFORE_KEYWORD = "before"; // NOI18N
     public static final String BIND_KEYWORD = "bind"; // NOI18N
     public static final String BOUND_KEYWORD = "bound"; // NOI18N
@@ -98,8 +100,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String CATCH_KEYWORD = "catch"; // NOI18N
     public static final String CLASS_KEYWORD = "class"; // NOI18N
     public static final String CONTINUE_KEYWORD = "continue"; // NOI18N
-    public static final String DELETE_KEYWORD = "delete"; // NOI18N
     public static final String DEF_KEYWORD = "def"; // NOI18N
+    public static final String DELETE_KEYWORD = "delete"; // NOI18N
     public static final String ELSE_KEYWORD = "else"; // NOI18N
     public static final String EXCLUSIVE_KEYWORD = "exclusive"; // NOI18N
     public static final String EXTENDS_KEYWORD = "extends"; // NOI18N
@@ -112,16 +114,15 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String IF_KEYWORD = "if"; // NOI18N
     public static final String IMPORT_KEYWORD = "import"; // NOI18N
     public static final String INDEXOF_KEYWORD = "indexof"; // NOI18N
-    public static final String INIT_KEYWORD = "init"; // NOI18N
     public static final String IN_KEYWORD = "in"; // NOI18N
+    public static final String INIT_KEYWORD = "init"; // NOI18N
     public static final String INSERT_KEYWORD = "insert"; // NOI18N
     public static final String INSTANCEOF_KEYWORD = "instanceof"; // NOI18N
     public static final String INTO_KEYWORD = "into"; // NOI18N
     public static final String INVERSE_KEYWORD = "inverse"; // NOI18N
     public static final String LAST_KEYWORD = "last"; // NOI18N
     public static final String LAZY_KEYWORD = "lazy"; // NOI18N
-    public static final String LET_KEYWORD = "let"; // NOI18N
-    public static final String MIXIN_KEYWORD = "mixin"; // NOI18N
+    public static final String MOD_KEYWORD = "mod"; // NOI18N
     public static final String NEW_KEYWORD = "new"; // NOI18N
     public static final String NOT_KEYWORD = "not"; // NOI18N
     public static final String NULL_KEYWORD = "null"; // NOI18N
@@ -130,6 +131,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String OVERRIDE_KEYWORD = "override"; // NOI18N
     public static final String PACKAGE_KEYWORD = "package"; // NOI18N
     public static final String POSTINIT_KEYWORD = "postinit"; // NOI18N
+    public static final String PRIVATE_KEYWORD = "private"; // NOI18N
     public static final String PROTECTED_KEYWORD = "protected"; // NOI18N
     public static final String PUBLIC_KEYWORD = "public"; // NOI18N
     public static final String PUBLIC_INIT_KEYWORD = "public-init"; // NOI18N
@@ -138,12 +140,13 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String RETURN_KEYWORD = "return"; // NOI18N
     public static final String REVERSE_KEYWORD = "reverse"; // NOI18N
     public static final String SIZEOF_KEYWORD = "sizeof"; // NOI18N
+    public static final String STATIC_KEYWORD = "static"; // NOI18N
     public static final String STEP_KEYWORD = "step"; // NOI18N
     public static final String SUPER_KEYWORD = "super"; // NOI18N
     public static final String THEN_KEYWORD = "then"; // NOI18N
     public static final String THIS_KEYWORD = "this"; // NOI18N
     public static final String THROW_KEYWORD = "throw"; // NOI18N
-    public static final String TRANSIENT_KEYWORD = "transient"; // NOI18N
+    public static final String TRIGGER_KEYWORD = "trigger"; // NOI18N
     public static final String TRUE_KEYWORD = "true"; // NOI18N
     public static final String TRY_KEYWORD = "try"; // NOI18N
     public static final String TWEEN_KEYWORD = "tween"; // NOI18N
@@ -152,30 +155,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     public static final String WHERE_KEYWORD = "where"; // NOI18N
     public static final String WHILE_KEYWORD = "while"; // NOI18N
     public static final String WITH_KEYWORD = "with"; // NOI18N
-
-    public static final String[] STATEMENT_KEYWORDS = new String[]{
-        FOR_KEYWORD,
-        IF_KEYWORD,
-        TRY_KEYWORD,
-        WHILE_KEYWORD
-    };
-    public static final String[] STATEMENT_SPACE_KEYWORDS = new String[]{
-        INSERT_KEYWORD,
-        NEW_KEYWORD,
-        REVERSE_KEYWORD,
-        THROW_KEYWORD,
-        VAR_KEYWORD
-    };
-    public static final String[] CLASS_BODY_KEYWORDS = new String[]{
-        ABSTRACT_KEYWORD,
-        DEF_KEYWORD,
-        FUNCTION_KEYWORD,
-        INIT_KEYWORD,
-        POSTINIT_KEYWORD,
-        PUBLIC_KEYWORD, PROTECTED_KEYWORD, PACKAGE_KEYWORD, PUBLIC_INIT_KEYWORD, PUBLIC_READ_KEYWORD,
-        OVERRIDE_KEYWORD,
-        VAR_KEYWORD
-    };
 
     static Pattern camelCasePattern = Pattern.compile("(?:\\p{javaUpperCase}(?:\\p{javaLowerCase}|\\p{Digit}|\\.|\\$)*){2,}"); // NOI18N
 

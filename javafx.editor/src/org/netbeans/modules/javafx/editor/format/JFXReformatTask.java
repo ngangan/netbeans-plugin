@@ -52,6 +52,7 @@ import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.java.source.CodeStyle;
+import org.netbeans.api.java.source.CodeStyle.WrapStyle;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -411,25 +412,24 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     endPos = (int) getEndPos(tree);
 
-                    // HACK: javafx sp.getEndPosition() returns position before semicolon or curly bracket
-                    final int _startOffset = doc.getStartPosition().getOffset();
-                    final int _endOffset = doc.getEndPosition().getOffset();
-                    if (endPos > _startOffset && endPos < _endOffset + 1) {
-                        try {
-                            int i = 0;
-                            String txt = null;
-                            do {
-                                txt = doc.getText(endPos + i, 1);
-                                i++;
-                            // HACK: compiler eats braces, nice parser optimization
-                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
-//                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
-                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
-                                endPos += i;
-                            }
-                        } catch (BadLocationException ex) {
-                        }
-                    }
+//                    final int _startOffset = doc.getStartPosition().getOffset();
+//                    final int _endOffset = doc.getEndPosition().getOffset();
+//                    if (endPos > _startOffset && endPos < _endOffset + 1) {
+//                        try {
+//                            int i = 0;
+//                            String txt = null;
+//                            do {
+//                                txt = doc.getText(endPos + i, 1);
+//                                i++;
+//                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
+//                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
+////                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
+//                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
+////                                endPos += i;
+//                            }
+//                        } catch (BadLocationException ex) {
+//                        }
+//                    }
                 }
             }
             try {
@@ -1812,9 +1812,23 @@ public class JFXReformatTask implements ReformatTask {
                 redundantIfBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
             }
 
-            boolean prevblock = wrapStatement(cs.wrapIfStatement(), redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
+            boolean insideVar = false;
+            JavaFXTreePath parentPath = getCurrentPath().getParentPath();
+            Tree leaf = parentPath.getLeaf();
+            while (leaf.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
+                if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE) {
+                    insideVar = true;
+                    break;
+                }
+                parentPath = parentPath.getParentPath();
+                leaf = parentPath.getLeaf();
+            }
+
+            // TODO make cs.wrapIfExpression
+            final WrapStyle wrapIfStatement = insideVar ? WrapStyle.WRAP_NEVER : cs.wrapIfStatement();
+            boolean prevblock = wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
             if (falseExpr != null) {
-                if (cs.placeElseOnNewLine() || !prevblock) {
+                if (!insideVar && (cs.placeElseOnNewLine() || !prevblock)) {
                     newline();
                 } else {
                     spaces(cs.spaceBeforeElse() ? 1 : 0);
@@ -1829,7 +1843,7 @@ public class JFXReformatTask implements ReformatTask {
                     if (redundantIfBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(ifExpr) || endOffset < getEndPos(ifExpr))) {
                         redundantIfBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
                     }
-                    wrapStatement(cs.wrapIfStatement(), redundantIfBraces, cs.spaceBeforeElseLeftBrace() ? 1 : 0, falseExpr);
+                    wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeElseLeftBrace() ? 1 : 0, falseExpr);
 //                }
                 indent = old;
             }
@@ -2058,7 +2072,7 @@ public class JFXReformatTask implements ReformatTask {
             StringBuilder lastWSToken = new StringBuilder(); // TODO do not use text var, use this builder.subSequence
             int after = 0;
             do {
-                if (tokens.offset() >= endPos) {
+                if (isTokenOutOfTree()) {
                     if (lastWSToken.length() != 0) {
                         lastBlankLines = 0;
                         lastBlankLinesTokenIndex = tokens.index() - 1;
@@ -2199,6 +2213,12 @@ public class JFXReformatTask implements ReformatTask {
             return null;
         }
 
+        // TODO uncomment it after missing semi-colon and missing parenthisis fixes in parser
+        private boolean isTokenOutOfTree() {
+//            return tokens.offset() >= endPos;
+            return false;
+        }
+
         private void space() {
             spaces(1);
         }
@@ -2214,7 +2234,7 @@ public class JFXReformatTask implements ReformatTask {
             StringBuilder lastWSToken = new StringBuilder(); // TODO do not use text var, use this builder.subSequence
             int after = 0;
             do {
-                if (tokens.offset() >= endPos) {
+                if (isTokenOutOfTree()) {
                     return;
                 }
                 switch (tokens.token().id()) {
@@ -2422,7 +2442,7 @@ public class JFXReformatTask implements ReformatTask {
             StringBuilder lastToken = new StringBuilder(); // TODO do not use text var, use this builder.subSequence
             int after = 0;
             do {
-                if (tokens.offset() >= endPos) {
+                if (isTokenOutOfTree()) {
                     return;
                 }
                 switch (tokens.token().id()) {
@@ -2839,13 +2859,14 @@ public class JFXReformatTask implements ReformatTask {
                 scan(tree, null);
                 return true;
             }
-            if (bracesGenerationStyle == CodeStyle.BracesGenerationStyle.GENERATE) {
-                scan(new FakeBlock(tree), null);
-                return true;
-            }
+            // TODO generate braces if parent is function or class
+//            if (bracesGenerationStyle == CodeStyle.BracesGenerationStyle.GENERATE) {
+//                scan(new FakeBlock(tree), null);
+//                return true;
+//            }
             int old = indent;
             indent += indentSize;
-            int ret = wrapTree(wrapStyle, -1, spacesCnt, tree);
+            wrapTree(wrapStyle, -1, spacesCnt, tree);
             indent = old;
             return false;
         }
