@@ -226,7 +226,15 @@ public final class TapPanel extends javax.swing.JPanel {
 
         int pos = orientation == UP ? getHeight() - 1 : 0;
         int dir = orientation == UP ? -1 : 1;
-        g.setColor(armed ? c.darker() : UIManager.getColor("controlShadow")); //NOI18N
+        Color color;
+        if (c != null) {
+            color = armed ? c.darker() : UIManager.getColor("controlShadow"); //NOI18N
+        } else {
+            color = UIManager.getColor("controlShadow"); //NOI18N
+        }
+        if (color != null) {
+            g.setColor(color);
+        }
         g.drawLine(0, pos, w, pos);
         pos += dir;
 
