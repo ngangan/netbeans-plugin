@@ -1155,20 +1155,24 @@ public class JFXReformatTask implements ReformatTask {
                     tokens.moveNext();
                 }
             }
-
-            accept(JFXTokenId.NEW);
-            space();
+            final JFXTokenId accepted = accept(JFXTokenId.NEW);
+            // JFXC-3545
+            final boolean isNewKeyWordUsed = accepted != null;
+            if (isNewKeyWordUsed) {
+                space();
+            }
 
             scan(node.getIdentifier(), p);
             spaces(cs.spaceBeforeMethodCallParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
+            accept(isNewKeyWordUsed ? JFXTokenId.LPAREN : JFXTokenId.LBRACE);
             List<? extends ExpressionTree> args = node.getArguments();
             if (args != null && !args.isEmpty()) {
                 spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                 wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
                 spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
             }
-            accept(JFXTokenId.RPAREN);
+            accept(isNewKeyWordUsed ? JFXTokenId.RPAREN : JFXTokenId.RBRACE);
+            
             ClassDeclarationTree body = node.getClassBody();
             if (body != null) {
                 int old = indent;
