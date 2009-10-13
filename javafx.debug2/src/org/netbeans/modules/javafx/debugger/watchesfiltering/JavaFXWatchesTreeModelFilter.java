@@ -34,7 +34,6 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
     private DebuggerListener listener;
 
     public JavaFXWatchesTreeModelFilter() {
-        System.out.println(" - - - - - - - ");
         debugger = null;
     }
 
@@ -104,7 +103,7 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
             listener = new DebuggerListener( this, debugger );
         } else if( node instanceof JavaFXWatch ) {
             JavaFXWatch w = (JavaFXWatch)node;
-            if( w.getValue() != null )
+            if( w.getValue() != null && w.getVariable() != null )
                 return original.getChildrenCount( w.getVariable());
         }
         return original.getChildrenCount( node );
