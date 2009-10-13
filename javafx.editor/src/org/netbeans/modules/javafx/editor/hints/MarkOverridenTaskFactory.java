@@ -46,6 +46,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXImport;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -128,7 +129,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaSourceTaskFac
                 Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
-                Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
+                Collection<JFXImport> imports = new HashSet<JFXImport>();
                 JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, true);
                 Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
 

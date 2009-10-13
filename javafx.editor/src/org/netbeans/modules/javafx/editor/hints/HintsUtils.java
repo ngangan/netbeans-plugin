@@ -7,9 +7,9 @@ package org.netbeans.modules.javafx.editor.hints;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import com.sun.tools.javafx.tree.JFXImport;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.swing.text.BadLocationException;
@@ -50,15 +50,17 @@ final class HintsUtils {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element currentClass, Element element, Collection<JavafxClassSymbol> imports) {
+    static boolean isClassUsed(Element currentClass, Element element, Collection<JFXImport> imports) {
         if (element instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
             JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) element;
             JavafxClassSymbol currentClassSymbol = (JavafxClassSymbol) currentClass;
             if (currentClassSymbol.location().length() == 0 || currentClassSymbol.location().equals(elementClassSymbol.location())) {
                 return true;
             }
-            for (JavafxClassSymbol importElement : imports) {
-                if (currentClassSymbol.location().equals(importElement.location())) {
+
+            for (JFXImport importTree : imports) {
+                String importLocation = importTree.toString().substring(0, importTree.toString().lastIndexOf(".")).replace("import ", ""); //NOI18N
+                if (currentClassSymbol.location().equals(importLocation)) {
                     return true;
                 }
             }
@@ -104,16 +106,17 @@ final class HintsUtils {
         if (lastIndex > 0) {
             int varIndex = 0;
             String line = text.substring(lastIndex, startPosition);
-            if (line.contains("var")) { //NOI18N
-                varIndex = line.indexOf("var"); //NOI18N
+            Pattern pattern = Pattern.compile("[a-z]"); //NOI18N
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                varIndex = matcher.start(); //NOI18N
             }
-            charNumber = text.length() - lastIndex - varIndex;
-
+            charNumber = varIndex - 1;
         }
-        if (charNumber <= 0) {
-            return null;
+        if (charNumber < 0) {
+            return ""; //NOI18N
         }
-        StringBuilder space = new StringBuilder(charNumber - 1);
+        StringBuilder space = new StringBuilder(charNumber);
         for (int i = 0; i < charNumber - 1; i++) {
             space.append(" "); //NOI18M
         }

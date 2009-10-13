@@ -92,13 +92,12 @@ public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
                 if (compilationInfo.getDocument() != null) {
-                HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                 }
                 if (compilationInfo.getDiagnostics().size() == 0) {
                     return;
                 }
                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    diagnostic.getCode();
                     if (diagnostic.getKind() != Diagnostic.Kind.ERROR || !ERROR.equals(diagnostic.getCode())) {
                         continue;
                     }
@@ -147,9 +146,9 @@ public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
                         }
                     }
                     if (listFQN.size() == 0) {
-                        return;
+                        continue;
                     }
-                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT,"" , listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
+                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);

@@ -44,19 +44,20 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import javax.lang.model.element.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.openide.util.Exceptions;
 
 /**
  *
  * @author karol harezlak
  */
 public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask {
+
+    private static final String HINT_IDENT = "anonoverridejavafx"; //NOI18N
 
     @Override
     protected Tree getTree(CompilationInfo compilationInfo, Element currentClass, Map<Element, Tree> position) {
@@ -95,12 +96,12 @@ public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask
     }
 
     @Override
-    protected JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo, Map<Element, Collection<Tree>> classTrees, Map<Element, List<MethodSymbol>> overridenMethods, Collection<JavafxClassSymbol> imports, Map<Element, Tree> position) {
+    protected JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo, Map<Element, Collection<Tree>> classTrees, Map<Element, List<MethodSymbol>> overridenMethods, Collection<JFXImport> imports, Map<Element, Tree> position) {
         return new OverrideAnonVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
     }
 
     @Override
     protected String getHintsControllerString() {
-        return "AnonOverride"; //NOI18N
+        return HINT_IDENT;
     }
 }

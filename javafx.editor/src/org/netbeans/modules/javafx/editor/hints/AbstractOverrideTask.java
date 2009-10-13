@@ -50,8 +50,8 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,7 +89,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
     protected abstract JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
             Map<Element, List<MethodSymbol>> overridenMethods,
-            Collection<JavafxClassSymbol> imports,
+            Collection<JFXImport> imports,
             Map<Element, Tree> position);
 
     protected abstract Tree getTree(CompilationInfo compilationInfo, Element currentClass, Map<Element, Tree> position);
@@ -111,6 +111,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 if (document != null) {
                     HintsController.setErrors(document, getHintsControllerString(), Collections.EMPTY_LIST); //NOI18N
                 }
+
                 if (!compilationInfo.isErrors()) {
                     //TODO Work around for javafx compiler for Mixin abstract class
                     final Boolean[] mixin = new Boolean[1];
@@ -143,7 +144,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, Tree> position = new Hashtable<Element, Tree>();
-                Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
+                Collection<JFXImport> imports = new HashSet<JFXImport>();
 
                 JavaFXTreePathScanner<Void, Void> visitor = getVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
@@ -246,6 +247,9 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             }
 
             public ChangeInfo implement() throws Exception {
+                if (document != null) {
+                    HintsController.setErrors(document, getHintsControllerString(), Collections.EMPTY_LIST);
+                }
                 final StringBuilder methods = new StringBuilder();
                 final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
 

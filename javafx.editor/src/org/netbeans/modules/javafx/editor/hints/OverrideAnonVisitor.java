@@ -15,6 +15,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXImport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,13 +33,13 @@ final class OverrideAnonVisitor extends JavaFXTreePathScanner<Void, Void> {
     private CompilationInfo compilationInfo;
     private Map<Element, Collection<Tree>> classTrees;
     private Map<Element, List<MethodSymbol>> overridenMethods;
-    private Collection<JavafxClassSymbol> imports;
+    private Collection<JFXImport> imports;
     Map<Element, Tree> position;
 
     public OverrideAnonVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
             Map<Element, List<MethodSymbol>> overridenMethods,
-            Collection<JavafxClassSymbol> imports,
+            Collection<JFXImport> imports,
             Map<Element, Tree> position) {
 
         this.compilationInfo = compilationInfo;
@@ -50,10 +51,8 @@ final class OverrideAnonVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     @Override
     public Void visitImport(ImportTree node, Void p) {
-        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
-        Element element = compilationInfo.getTrees().getElement(path);
-        if (element instanceof JavafxClassSymbol) {
-            imports.add((JavafxClassSymbol) element);
+        if (node instanceof JFXImport) {
+            imports.add((JFXImport) node);
         }
 
         return super.visitImport(node, p);
