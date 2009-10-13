@@ -19,7 +19,8 @@ import org.netbeans.api.javafx.source.ElementHandle;
  * @author Jaroslav Bachorik
  */
 final public class IndexingUtilities {
-    final public static String INDEX_SEPARATOR = "#";
+    final public static String INDEX_SEPARATOR = "#"; // NOI18N
+    final public static String DEFAULT_PACKAGE = "<default>"; // NOI18N
     @SuppressWarnings(value="unchecked")
     public static String getIndexValue(ElementHandle<? extends Element> eeh) {
         switch (eeh.getKind()) {
