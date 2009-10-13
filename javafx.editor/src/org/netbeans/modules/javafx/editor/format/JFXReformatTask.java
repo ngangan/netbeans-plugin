@@ -412,25 +412,24 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     endPos = (int) getEndPos(tree);
 
-                    final int _startOffset = doc.getStartPosition().getOffset();
-                    final int _endOffset = doc.getEndPosition().getOffset();
-                    if (endPos > _startOffset && endPos < _endOffset + 1) {
-                        try {
-                            int i = 0;
-                            String txt = null;
-                            do {
-                                txt = doc.getText(endPos + i, 1);
-                                i++;
-                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
+//                    final int _startOffset = doc.getStartPosition().getOffset();
+//                    final int _endOffset = doc.getEndPosition().getOffset();
+//                    if (endPos > _startOffset && endPos < _endOffset + 1) {
+//                        try {
+//                            int i = 0;
+//                            String txt = null;
+//                            do {
+//                                txt = doc.getText(endPos + i, 1);
+//                                i++;
+//                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
 //                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
-                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
-                            if (SEMI.equals(txt)) {
+////                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
 //                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
-                                endPos += i;
-                            }
-                        } catch (BadLocationException ex) {
-                        }
-                    }
+////                                endPos += i;
+//                            }
+//                        } catch (BadLocationException ex) {
+//                        }
+//                    }
                 }
             }
             try {
