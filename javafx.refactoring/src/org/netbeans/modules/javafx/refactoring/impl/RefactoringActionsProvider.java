@@ -131,6 +131,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
+        if (!isRefactoringEnabled()) return false;
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
@@ -221,6 +222,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canMove(Lookup lkp) {
+        if (!isRefactoringEnabled()) return false;
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -700,5 +702,9 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             return null;
         }
         return pt[1];
+    }
+
+    private static boolean isRefactoringEnabled() {
+        return Boolean.getBoolean("javafx.refactoring");
     }
 }

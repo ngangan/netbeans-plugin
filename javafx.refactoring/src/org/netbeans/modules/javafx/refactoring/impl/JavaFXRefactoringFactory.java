@@ -53,6 +53,9 @@ import org.openide.util.lookup.ServiceProvider;
 public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
 
     public RefactoringPlugin createInstance(AbstractRefactoring refactoring) {
+        // disable javafx refactoring for NB6.8 Beta
+        if (!Boolean.getBoolean("javafx.refactoring")) return null;
+
         Lookup look = refactoring.getRefactoringSource();
         FileObject file = look.lookup(FileObject.class);
         NonRecursiveFolder folder = look.lookup(NonRecursiveFolder.class);
