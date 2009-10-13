@@ -86,28 +86,41 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
                         controller.moveToPhase(Phase.ANALYZED);
 
                         final ElementHandle[] eh = new ElementHandle[1];
-                        TypeElement classType = JavaFXProjectUtilities.resolveClassByName(className, controller);
-                        if (methodName == null) {
-                            LOGGER.log(Level.FINEST, "Trying to go to: {0}", className);
-                            eh[0] = ElementHandle.create(classType);
-                        } else {
-                            LOGGER.log(Level.FINEST, "Trying to go to: {0}.{1}", new Object[]{controller.getElements().getBinaryName(classType).toString(), methodName + sig});
-
-                            for(Element e : ElementFilter.methodsIn(classType.getEnclosedElements())) {
-                                if (e.getKind() == ElementKind.METHOD) {
-                                    if (e.getSimpleName().contentEquals(methodName)) {
-                                        eh[0] = ElementHandle.create(e);
-                                        break;
-                                    }
-                                }
-                            }
-                            if (eh[0] == null) {
-                                LOGGER.log(Level.FINEST, "Can not locate method {0}.{1} - falling back to top level class", new Object[]{className, methodName + sig});
-                                eh[0] = ElementHandle.create(classType);// fallback to the class
+                        String classTypeName = className;
+                        TypeElement classType = null;
+                        while (classTypeName.length() > 0 && (classType = JavaFXProjectUtilities.resolveClassByName(classTypeName, controller)) == null) {
+                            int anonSep = classTypeName.lastIndexOf("$");
+                            if (anonSep > -1) {
+                                classTypeName = classTypeName.substring(0, anonSep);
+                            } else {
+                                break;
                             }
                         }
-                        Element e = eh[0].resolve(controller);
-                        result.set(ElementOpen.open(controller, e));
+                        if (classType != null) {
+                            if (methodName == null) {
+                                LOGGER.log(Level.FINEST, "Trying to go to: {0}", className);
+                                eh[0] = ElementHandle.create(classType);
+                            } else {
+                                LOGGER.log(Level.FINEST, "Trying to go to: {0}.{1}", new Object[]{controller.getElements().getBinaryName(classType).toString(), methodName + sig});
+
+                                for(Element e : ElementFilter.methodsIn(classType.getEnclosedElements())) {
+                                    if (e.getKind() == ElementKind.METHOD) {
+                                        if (e.getSimpleName().contentEquals(methodName)) {
+                                            eh[0] = ElementHandle.create(e);
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (eh[0] == null) {
+                                    LOGGER.log(Level.FINEST, "Can not locate method {0}.{1} - falling back to top level class", new Object[]{className, methodName + sig});
+                                    eh[0] = ElementHandle.create(classType);// fallback to the class
+                                }
+                            }
+                            Element e = eh[0].resolve(controller);
+                            result.set(ElementOpen.open(controller, e));
+                        } else {
+                            result.set(false);
+                        }
                     } finally {
                         latch.countDown();
                     }
