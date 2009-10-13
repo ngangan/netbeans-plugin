@@ -80,9 +80,10 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private static final String tab = "    "; //NOI18N
 
     public AbstractOverrideTask() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.ABOVE_NORMAL);
     }
 
     protected abstract JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo,
@@ -246,9 +247,13 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
             public ChangeInfo implement() throws Exception {
                 final StringBuilder methods = new StringBuilder();
+                final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
 
                 for (MethodSymbol methodSymbol : hint.getMethods()) {
-                    methods.append(createMethod(methodSymbol));
+                    methods.append(createMethod(methodSymbol, space));
+                }
+                if (methods.toString().length() > 0) {
+                    methods.append(space);
                 }
                 final int positon = findPositionAtTheEnd(compilationInfo, hint.getTree());
                 if (positon < 0) {
@@ -296,16 +301,16 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                     Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName); //NOI18N
                     if (symbolMatcher.find()) {
                         importName = symbolMatcher.replaceAll("").trim(); //NOI18N
-                        }
+                    }
                     if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
                         Imports.addImport(target, importName);
                     }
                 }
             }
 
-            private String createMethod(MethodSymbol methodSymbol) {
+            private String createMethod(MethodSymbol methodSymbol, String space) {
                 StringBuilder method = new StringBuilder();
-                method.append("\n\toverride "); //NOI18N
+                method.append("\n").append(space).append(tab).append("override "); //NOI18N
                 for (Modifier modifier : methodSymbol.getModifiers()) {
                     switch (modifier) {
                         case PUBLIC:
@@ -327,7 +332,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                             method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
                             if (iterator.hasNext()) {
                                 method.append(", "); //NOI18N
-                                }
+                            }
                         }
                     }
                 } catch (NullPointerException npe) {
@@ -342,12 +347,12 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 }
                 if (returnType == null || returnType.equals("void")) { //NOI18N
                     returnType = "Void"; //NOI18N
-                    } else {
+                } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);
                 }
                 method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
-                method.append("\t\tthrow new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                method.append("\t}\n"); //NOI18N
+                method.append(space).append(tab).append(tab).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                method.append(space).append(tab).append("}\n"); //NOI18N
 
                 return method.toString();
             }
@@ -374,28 +379,25 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
         if (type.isPrimitive()) {
             if (varType.equals("int")) { //NOI18N
                 varType = Integer.class.getSimpleName();
-            } else if (varType.equals("long")) { //NOI18N
-                varType = Long.class.getSimpleName();
-            } else if (varType.equals("byte")) { //NOI18N
-                varType = Byte.class.getSimpleName();
-            } else if (varType.equals("short")) { //NOI18N
-                varType = Short.class.getSimpleName();
-            } else if (varType.equals("float")) { //NOI18N
-                varType = Float.class.getSimpleName();
-            } else if (varType.equals("double")) { //NOI18N
-                varType = Double.class.getSimpleName();
-            } else if (varType.equals("boolean")) { //NOI18N
-                varType = Boolean.class.getSimpleName();
+            } else if (varType.equals("long") //NOI18N
+                    || varType.equals("byte") //NOI18N
+                    || varType.equals("short") //NOI18N
+                    || varType.equals("float") //NOI18N
+                    || varType.equals("double")) { //NOI18N
+
+                varType = "Number"; //NOI18N
             } else if (varType.equals("char")) { //NOI18N
                 varType = Character.class.getSimpleName();
+            } else if (varType.equals("boolean")) { //NOI18N
+                return Boolean.class.getSimpleName();
             }
         }
         if (varType.equals("E") || varType.equals("T")) { //NOI18N
             varType = "Object"; //NOI18N
-            }
+        }
         if (varType.equals("E[]") || varType.equals("T[]")) { //NOI18N
             varType = "Object[]"; //NOI18N
-            }
+        }
         varType = removeBetween("<>", varType); //NOI18N
         return varType;
     }
@@ -416,7 +418,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             System.err.println("* e = " + typeElement); //NOI18N
             System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
             System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
-            }
+        }
         return elements;
     }
 }

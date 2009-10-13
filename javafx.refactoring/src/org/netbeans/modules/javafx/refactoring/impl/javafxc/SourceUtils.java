@@ -131,6 +131,10 @@ final public class SourceUtils {
     }
 
     public static String getHtml(String text) {
+        return getHtml(text, -1);
+    }
+
+    public static String getHtml(String text, int hilite) {
         StringBuffer buf = new StringBuffer();
         TokenHierarchy tokenH = TokenHierarchy.create(text, JFXTokenId.language());
         Lookup lookup = MimeLookup.getLookup(MimePath.get(JAVAFX_MIME_TYPE));
@@ -143,7 +147,12 @@ final public class SourceUtils {
                 category = "whitespace"; //NOI18N
             }
             AttributeSet set = settings.getTokenFontColors(category);
-            buf.append(color(htmlize(token.text().toString()), set));
+            String htmlized = color(htmlize(token.text().toString()), set);
+            if (hilite == tok.offset()) {
+                buf.append("<b>").append(htmlized).append("</b>"); // NOI18N
+            } else {
+                buf.append(htmlized);
+            }
         }
         return buf.toString();
     }
@@ -201,6 +210,13 @@ final public class SourceUtils {
         return true;
     }
 
+    public static boolean isElementInOpenProject(FileObject f) {
+        if (f==null)
+            return false;
+        Project p = FileOwnerQuery.getOwner(f);
+        return isOpenProject(p);
+    }
+
     public static boolean isFileInOpenProject(FileObject file) {
         assert file != null;
         Project p = FileOwnerQuery.getOwner(file);
@@ -222,6 +238,7 @@ final public class SourceUtils {
         //workaround for 143542
         Project[] opened = OpenProjects.getDefault().getOpenProjects();
         for (Project pr : opened) {
+            System.err.println(pr);
             if (fo.isFolder()) {
                 for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
                     if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
@@ -229,6 +246,14 @@ final public class SourceUtils {
                     }
                 }
             }
+            // a story of interest ...
+            // for some reason, right now (as of 209/10/12) javafx sources are references as "java sources"
+            for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
+                if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
+                    return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
+                }
+            }
+            // ---
             for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaFXProjectConstants.SOURCES_TYPE_JAVAFX)) {
                 if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
                     return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;

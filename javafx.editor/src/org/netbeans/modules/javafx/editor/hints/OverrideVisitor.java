@@ -30,6 +30,7 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
     private Map<Element, Collection<Tree>> classTrees;
     private Map<Element, List<MethodSymbol>> overridenMethods;
     private Collection<JavafxClassSymbol> imports;
+    private boolean includeAnon = false;
 
     public OverrideVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
@@ -42,16 +43,34 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
         this.imports = imports;
     }
 
+    public OverrideVisitor(CompilationInfo compilationInfo,
+            Map<Element, Collection<Tree>> classTrees,
+            Map<Element, List<MethodSymbol>> overridenMethods,
+            Collection<JavafxClassSymbol> imports,
+            boolean incudeAnon) {
+
+        this(compilationInfo, classTrees, overridenMethods, imports);
+        this.includeAnon = incudeAnon;
+    }
+
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
         Element currentClass = compilationInfo.getTrees().getElement(getCurrentPath());
-        Collection<Tree> extendsList = classTrees.get(currentClass);
-        if (extendsList == null) {
-            extendsList = new HashSet<Tree>();
+        if (!includeAnon && currentClass != null && !currentClass.toString().contains("$anon")) { //NOI18N
+            collectClasses(currentClass, node);
+        } else {
+            collectClasses(currentClass, node);
         }
-        extendsList.addAll(node.getSupertypeList());
-        classTrees.put(currentClass, extendsList);
         return super.visitClassDeclaration(node, v);
+    }
+
+    private void collectClasses(Element currentClass, ClassDeclarationTree node) {
+        Collection<Tree> extendsList = classTrees.get(currentClass);
+            if (extendsList == null) {
+                extendsList = new HashSet<Tree>();
+            }
+            extendsList.addAll(node.getSupertypeList());
+            classTrees.put(currentClass, extendsList);
     }
 
     @Override
@@ -67,11 +86,12 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
-         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
+        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
             if (element != null) {
                 Element currentClass = element.getEnclosingElement();
                 if (element instanceof MethodSymbol) {
+                    Tree tree = compilationInfo.getTrees().getTree(currentClass);
                     if (overridenMethods.get(currentClass) == null) {
                         overridenMethods.put(currentClass, new ArrayList<MethodSymbol>());
                     }
@@ -83,5 +103,4 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
         }
         return super.visitFunctionDefinition(node, v);
     }
-
 }

@@ -54,7 +54,6 @@ import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
-import org.openide.filesystems.FileObject;
 
 /**
  *

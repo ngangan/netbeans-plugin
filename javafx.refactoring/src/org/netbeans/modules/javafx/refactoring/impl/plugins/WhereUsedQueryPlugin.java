@@ -40,13 +40,17 @@
  */
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import com.sun.javafx.api.tree.JavaFXTreeScanner;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -54,7 +58,9 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindOverridersScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindSubclassesScanner;
@@ -62,9 +68,10 @@ import org.netbeans.modules.javafx.refactoring.impl.scanners.FindUsagesScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.Lookups;
 
 /**
  * Actual implementation of Find Usages query search for Ruby
@@ -106,72 +113,147 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     //@Override
     public Problem prepare(final RefactoringElementsBag elements) {
         try {
-            final Set<FileObject> relevantFiles = new HashSet<FileObject>();
-            final Set<ElementHandle> relevantHandles = new HashSet<ElementHandle>();
+            final Set<TreePathHandle> usageHandles = new HashSet<TreePathHandle>();
 
             getSource().runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
                     Element e = searchHandle.resolveElement(cc);
-                    ElementHandle eh = ElementHandle.create(e);
-
-                    relevantFiles.add(searchHandle.getFileObject());
-
-                    if (isFindUsages()) {
-                        relevantHandles.add(eh);
-                        collectReferences(ElementHandle.create(e), relevantFiles);
-                    }
-                    if (isFindDirectSubclassesOnly() || isFindSubclasses() || isFindOverridingMethods()) {
-                        Stack<ElementHandle> processingStack = new Stack();
-                        processingStack.push(eh);
-                        while(!processingStack.empty()) {
-                            ElementHandle currentHandle = processingStack.pop();
-                            for(ElementHandle eh1 : getClassIndex().getElements(currentHandle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class))) {
-                                if (!relevantHandles.contains(eh1)) {
-                                    if (isFindSubclasses() || isFindOverridingMethods()) {
-                                        processingStack.push(eh1);
-                                    }
-                                    relevantHandles.add(eh1);
-                                    if (isFindOverridingMethods()) {
-                                        collectReferences(eh1, relevantFiles);
-                                    }
-                                    if (isFindSubclasses() || isFindDirectSubclassesOnly()) {
-                                        relevantFiles.add(JavaFXSourceUtils.getFile(eh1, cc.getClasspathInfo()));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    collectUsages(e, cc, usageHandles);
+                    collectOverridingMethods(e, cc, usageHandles);
+                    collectSubclasses(e, cc, usageHandles);
                 }
             }, true);
-
-            for(FileObject fo : relevantFiles) {
-                if (fo == null) continue; // prevent NPE in case of a corrupted index
-                JavaFXSource src = JavaFXSource.forFileObject(fo);
-                if (src != null) {
-                    src.runUserActionTask(new Task<CompilationController>() {
-
-                        public void run(final CompilationController cc) throws Exception {
-                            for(ElementHandle eh : relevantHandles) {
-                                if (isFindOverridingMethods()) {
-                                    new FindOverridersScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
-                                }
-                                if (isFindUsages()) {
-                                    new FindUsagesScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
-                                }
-                                if (isFindDirectSubclassesOnly() || isFindSubclasses()) {
-                                    new FindSubclassesScanner(refactoring, searchHandle, eh, cc).scan(cc.getCompilationUnit(), elements);
-                                }
-                            }
-                        }
-                    }, true);
-                }
+            Lookup lkp = Lookups.singleton(searchHandle);
+            for(TreePathHandle handle : usageHandles) {
+                elements.add(refactoring, WhereUsedElement.create(handle, lkp));
             }
-        } catch (IOException e) {
-            return new Problem(true, e.getLocalizedMessage());
+        } catch (IOException ex) {
+            return new Problem(true, ex.getLocalizedMessage());
         }
         
         return null;
+    }
+
+    private void collectUsages(Element e, CompilationController cc, final Set<TreePathHandle> handles) {
+        if (!isFindUsages()) return;
+
+        Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
+        Set<FileObject> processingFiles = new HashSet<FileObject>();
+        
+        ElementHandle handle = ElementHandle.create(e);
+        processingHandles.add(handle);
+        collectReferences(handle, processingFiles);
+
+        if (isSearchFromBaseClass()) {
+            for(ExecutableElement overriden : SourceUtils.getOverridenMethods((ExecutableElement)e, cc)) {
+                handle = ElementHandle.create(overriden);
+                if (!processingHandles.contains(handle)) {
+                    processingHandles.add(handle);
+                    collectReferences(handle, processingFiles);
+                }
+            }
+        }
+        
+        for(FileObject file : processingFiles) {
+            JavaFXSource jfxs = JavaFXSource.forFileObject(file);
+            if (jfxs != null) {
+                for(final ElementHandle eh : processingHandles) {
+                    try {
+                        jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                                public void run(CompilationController cc) throws Exception {
+                         new FindUsagesScanner(searchHandle, eh, cc).scan(cc.getCompilationUnit(), handles);
+                                }
+                            }, true);
+                    } catch (IOException ex) {
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectOverridingMethods(Element e, CompilationController cc, final Set<TreePathHandle> handles) {
+        if (!isFindOverridingMethods()) return;
+        if (e.getKind() != ElementKind.METHOD) return;
+
+        Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
+        Set<FileObject> processingFiles = new HashSet<FileObject>();
+
+        if (isSearchFromBaseClass()) {
+            e = SourceUtils.getOverridenMethods((ExecutableElement)e, cc).iterator().next();
+        }
+
+        Stack<ExecutableElement> stack = new Stack<ExecutableElement>();
+        stack.addAll(SourceUtils.getOverridingMethods(((ExecutableElement)e), cc));
+        while (!stack.isEmpty()) {
+            ExecutableElement method = stack.pop();
+            ElementHandle handle = ElementHandle.create(method);
+            if (!processingHandles.contains(handle)) {
+                processingHandles.add(handle);
+                processingFiles.add(JavaFXSourceUtils.getFile(handle, cc.getClasspathInfo()));
+                stack.addAll(SourceUtils.getOverridingMethods(method, cc));
+            }
+        }
+
+        for(FileObject file : processingFiles) {
+            JavaFXSource jfxs = JavaFXSource.forFileObject(file);
+            if (jfxs != null) {
+                for(final ElementHandle eh : processingHandles) {
+                    try {
+                        jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                                public void run(CompilationController cc) throws Exception {
+                         new FindOverridersScanner(searchHandle, eh, cc).scan(cc.getCompilationUnit(), handles);
+                                }
+                            }, true);
+                    } catch (IOException ex) {
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void collectSubclasses(Element e, CompilationController cc, final Set<TreePathHandle> handles) {
+        if (!isFindDirectSubclassesOnly() && !isFindSubclasses()) return;
+
+        Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
+        Set<FileObject> processingFiles = new HashSet<FileObject>();
+
+        Stack<ElementHandle> stack = new Stack();
+        stack.push(ElementHandle.create(e));
+        while(!stack.empty()) {
+            ElementHandle currentHandle = stack.pop();
+            for(ElementHandle eh : getClassIndex().getElements(currentHandle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class))) {
+                if (!processingHandles.contains(eh)) {
+                    if (!isFindDirectSubclassesOnly()) {
+                        stack.push(eh);
+                    }
+                    processingHandles.add(eh);
+                    processingFiles.add(JavaFXSourceUtils.getFile(eh, cc.getClasspathInfo()));
+                }
+            }
+        }
+
+        for(FileObject file : processingFiles) {
+            JavaFXSource jfxs = JavaFXSource.forFileObject(file);
+            if (jfxs != null) {
+                for(final ElementHandle eh : processingHandles) {
+                    try {
+                        jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                                public void run(CompilationController cc) throws Exception {
+                         new FindSubclassesScanner(searchHandle, eh, cc).scan(cc.getCompilationUnit(), handles);
+                                }
+                            }, true);
+                    } catch (IOException ex) {
+
+                    }
+                }
+            }
+        }
     }
     
     public Problem fastCheckParameters(CompilationInfo cc) {
@@ -241,7 +323,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     }
 
     private boolean isSearchFromBaseClass() {
-        return false;
+        return refactoring.getBooleanValue(WhereUsedQueryConstants.SEARCH_FROM_BASECLASS);
     }
 
     private boolean isSearchInComments() {

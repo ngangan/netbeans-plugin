@@ -418,6 +418,8 @@ public class ElementHandle<T extends Element> {
     }
 
     private static ElementHandle calculateScope(Element e) {
+        if (e.getKind() != ElementKind.LOCAL_VARIABLE && e.getKind() != ElementKind.PARAMETER) return null;
+        
         Element enclosing = e.getEnclosingElement();
         
         while (enclosing != null && (enclosing.getKind() == ElementKind.LOCAL_VARIABLE || enclosing.getKind() == ElementKind.PARAMETER ||

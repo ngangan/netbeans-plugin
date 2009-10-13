@@ -113,17 +113,19 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
 
     @Override
     public Void visitVariable(VariableTree node, Set<TreePathHandle> p) {
-        Element e = getCompilationController().getTrees().getElement(getCurrentPath());
-
-        switch (e.getKind()) {
+        switch (getElementKind()) {
+            case FIELD:
             case LOCAL_VARIABLE:
-            case PARAMETER:
-            case FIELD: {
-                if (isSameElement()) {
-                    if (node instanceof JFXVarScriptInit) {
-                        p.add(TreePathHandle.create(JavaFXTreePath.getPath(getCompilationController().getCompilationUnit(), ((JFXVarScriptInit)node).getVar()), getCompilationController()));
-                    } else {
-                        p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
+            case PARAMETER: {
+                Element e = getCompilationController().getTrees().getElement(getCurrentPath());
+
+                if (getElementKind() == e.getKind()) {
+                    if (isSameElement()) {
+                        if (node instanceof JFXVarScriptInit) {
+                            p.add(TreePathHandle.create(JavaFXTreePath.getPath(getCompilationController().getCompilationUnit(), ((JFXVarScriptInit)node).getVar()), getCompilationController()));
+                        } else {
+                            p.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
+                        }
                     }
                 }
                 break;

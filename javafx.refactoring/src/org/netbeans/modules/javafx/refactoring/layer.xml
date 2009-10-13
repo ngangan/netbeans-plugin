@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
 <filesystem>
+    <attr name="Loaders\text\x-fx\Actions\SaveAsTemplateAction.shadow\position" intvalue="900"/>
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fx">
@@ -27,9 +28,9 @@
                 </file>
                 <file name="RefactoringWhereUsed.shadow">
                     <attr name="originalFile" stringvalue="Actions/Refactoring/RefactoringWhereUsed.instance"/>
-                    <attr name="position" intvalue="1160"/>
+                    <attr name="position" intvalue="1150"/>
                 </file>
-            </folder>
+                </folder>
         </folder>
     </folder>
 
