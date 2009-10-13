@@ -412,24 +412,25 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     endPos = (int) getEndPos(tree);
 
-//                    final int _startOffset = doc.getStartPosition().getOffset();
-//                    final int _endOffset = doc.getEndPosition().getOffset();
-//                    if (endPos > _startOffset && endPos < _endOffset + 1) {
-//                        try {
-//                            int i = 0;
-//                            String txt = null;
-//                            do {
-//                                txt = doc.getText(endPos + i, 1);
-//                                i++;
-//                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
+                    final int _startOffset = doc.getStartPosition().getOffset();
+                    final int _endOffset = doc.getEndPosition().getOffset();
+                    if (endPos > _startOffset && endPos < _endOffset + 1) {
+                        try {
+                            int i = 0;
+                            String txt = null;
+                            do {
+                                txt = doc.getText(endPos + i, 1);
+                                i++;
+                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
 //                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
-////                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
+                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
+                            if (SEMI.equals(txt)) {
 //                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
-////                                endPos += i;
-//                            }
-//                        } catch (BadLocationException ex) {
-//                        }
-//                    }
+                                endPos += i;
+                            }
+                        } catch (BadLocationException ex) {
+                        }
+                    }
                 }
             }
             try {
@@ -978,7 +979,7 @@ public class JFXReformatTask implements ReformatTask {
                     break;
             }
 
-            boolean isEmpty = true;
+//            boolean isEmpty = true;
             final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
             expressions.addAll(node.getStatements());
             final ExpressionTree value = node.getValue();
@@ -987,7 +988,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             for (ExpressionTree stat : expressions) {
                 if (!isSynthetic((JFXTree) node)) {
-                    isEmpty = false;
+//                    isEmpty = false;
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
                         col = indent;
@@ -1183,12 +1184,15 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitReturn(ReturnTree node, Void p) {
-            accept(JFXTokenId.RETURN);
+            // there is a compiler bug with dissappearing return keyword from the tree
+            JFXTokenId accepted = accept(JFXTokenId.RETURN);
             int old = indent;
             indent += continuationIndentSize;
             ExpressionTree exp = node.getExpression();
             if (exp != null) {
-                space();
+                if (accepted != null) {
+                    space();
+                }
                 scan(exp, p);
             }
             accept(JFXTokenId.SEMI);
