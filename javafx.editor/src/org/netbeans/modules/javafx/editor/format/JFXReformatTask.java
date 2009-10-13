@@ -978,7 +978,7 @@ public class JFXReformatTask implements ReformatTask {
                     break;
             }
 
-            boolean isEmpty = true;
+//            boolean isEmpty = true;
             final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
             expressions.addAll(node.getStatements());
             final ExpressionTree value = node.getValue();
@@ -987,7 +987,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             for (ExpressionTree stat : expressions) {
                 if (!isSynthetic((JFXTree) node)) {
-                    isEmpty = false;
+//                    isEmpty = false;
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
                         col = indent;
@@ -1183,12 +1183,15 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitReturn(ReturnTree node, Void p) {
-            accept(JFXTokenId.RETURN);
+            // there is a compiler bug with dissappearing return keyword from the tree
+            JFXTokenId accepted = accept(JFXTokenId.RETURN);
             int old = indent;
             indent += continuationIndentSize;
             ExpressionTree exp = node.getExpression();
             if (exp != null) {
-                space();
+                if (accepted != null) {
+                    space();
+                }
                 scan(exp, p);
             }
             accept(JFXTokenId.SEMI);

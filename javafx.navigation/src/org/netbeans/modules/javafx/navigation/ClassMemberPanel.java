@@ -76,7 +76,10 @@ public class ClassMemberPanel implements NavigatorPanel {
 
     public void panelDeactivated() {
         getClassMemberPanelUI().showWaitNode(); // To clear the ui
-        ClassMemberNavigatorJavaFXSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
+        final ClassMemberNavigatorJavaFXSourceFactory instance = ClassMemberNavigatorJavaFXSourceFactory.getInstance();
+        if (instance != null) {
+            instance.setLookup(Lookup.EMPTY, null);
+        }
         INSTANCE = null;
     }
 

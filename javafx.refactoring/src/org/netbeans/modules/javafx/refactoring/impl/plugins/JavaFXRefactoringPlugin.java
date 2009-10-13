@@ -29,19 +29,15 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import java.io.IOException;
-import java.util.Collection;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
-import org.openide.filesystems.FileObject;
 
 /**
  *
@@ -119,6 +115,10 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
         return source;
     }
 
+    protected ClassIndex prepareIndex() {
+        return null;
+    }
+
     protected static final Problem createProblem(Problem result, boolean isFatal, String message) {
         Problem problem = new Problem(isFatal, message);
         if (result == null) {
@@ -159,7 +159,8 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
         synchronized(sourceInitLock) {
             if (source == null) {
                 source = prepareSource();
-                classIndex = source.getClasspathInfo().getClassIndex();
+                classIndex = prepareIndex();
+                classIndex = (classIndex == null) ? (source != null ? source.getClasspathInfo().getClassIndex() : null) : null;
             }
         }
     }

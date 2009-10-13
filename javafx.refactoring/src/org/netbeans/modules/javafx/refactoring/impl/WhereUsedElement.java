@@ -139,7 +139,7 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                     en++;
                 }
 
-                displayText = SourceUtils.getHtml(doc.getText(sta, en - sta + 1));
+                displayText = SourceUtils.getHtml(doc.getText(sta, en - sta + 1), startPosition - sta);
                 bounds = new PositionBounds(des.createPositionRef(startPosition, Bias.Forward), des.createPositionRef(endPosition, Bias.Forward));
             } else {
                 throw new IOException("*** Can not resolve: " + handle); // NOI18N

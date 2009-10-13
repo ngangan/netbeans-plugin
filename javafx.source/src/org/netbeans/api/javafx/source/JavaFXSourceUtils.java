@@ -173,6 +173,22 @@ public class JavaFXSourceUtils {
         return (TypeElement) element.getEnclosingElement(); // Wrong
     }
 
+    public static TypeElement getOutermostEnclosingTypeElement( Element element ) {
+
+	Element ec =  getEnclosingTypeElement( element );
+	if (ec == null) {
+	    ec = element;
+	}
+
+	while( ec.getEnclosingElement().getKind().isClass() ||
+	       ec.getEnclosingElement().getKind().isInterface() ) {
+
+	    ec = ec.getEnclosingElement();
+	}
+
+	return (TypeElement)ec;
+    }
+
     public static FileObject getFile(Element element, final ClasspathInfo cpInfo) {
         final ElementHandle<? extends Element> handle = ElementHandle.create(element);
         return getFile(handle, cpInfo);
