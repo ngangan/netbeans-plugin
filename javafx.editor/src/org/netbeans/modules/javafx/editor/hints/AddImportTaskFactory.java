@@ -170,7 +170,7 @@ public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
         public ChangeInfo implement() throws Exception {
             JTextComponent target = Utilities.getFocusedComponent();
-            Imports.addImport(target, fqn); //NOI18N
+            Imports.addImport(target, fqn);
             return null;
         }
     }
