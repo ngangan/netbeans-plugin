@@ -145,6 +145,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, Tree> position = new Hashtable<Element, Tree>();
                 Collection<JFXImport> imports = new HashSet<JFXImport>();
+                HintsModel modelFix = new HintsModel(compilationInfo);
 
                 JavaFXTreePathScanner<Void, Void> visitor = getVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
@@ -157,10 +158,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                     abstractMethods.put(currentClass, methods);
                     for (Tree superTypeTree : classTrees.get(currentClass)) {
                         String className = null;
-                        if (superTypeTree instanceof JFXClassDeclaration) {
-                            ((JFXClassDeclaration) superTypeTree).getName();
-                            className = ((JFXClassDeclaration) superTypeTree).getSimpleName().toString();
-                        } else if (HintsUtils.checkString(superTypeTree.toString())) {
+                        if (HintsUtils.checkString(superTypeTree.toString())) {
                             continue;
                         } else {
                             className = HintsUtils.getClassSimpleName(superTypeTree.toString());
@@ -171,7 +169,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, currentClass, imports)) {
+                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet())) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
@@ -203,8 +201,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                         }
                     }
                 }
-                HintsModel modelFix = new HintsModel(compilationInfo);
-
+             
                 for (Element currentClass : abstractMethods.keySet()) {
                     //TODO Hack for java.lang.NullPointerException at com.sun.tools.javafx.api.JavafxcTrees.getTree(JavafxcTrees.java:121)
                     try {

@@ -65,6 +65,7 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -160,7 +161,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                         if (toOverrides.values().contains(Boolean.FALSE)) {
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), mixin);
-                            String hintText = " javafxapplication8.NewJavaFXClass1 is not abstract and does not override abstract method karol() in javafxapplication8.NewJavaFXClass$Mixin"; //NOI18N
+                            String hintText = NbBundle.getMessage(MixinNotImplementedAbstractsTaskFactory.class, "TITLE_MIXIN_ABSTRACT"); //NOI18N
                             ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
                             if (document != null) {
                                 HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
@@ -175,7 +176,6 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 }
             }
         };
-
     }
 
     private boolean checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {

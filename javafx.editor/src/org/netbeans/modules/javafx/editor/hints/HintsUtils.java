@@ -4,6 +4,7 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import org.netbeans.api.javafx.source.CompilationInfo;
 
 /**
  *
@@ -50,18 +52,40 @@ final class HintsUtils {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element currentClass, Element element, Collection<JFXImport> imports) {
-        if (element instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
-            JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) element;
-            JavafxClassSymbol currentClassSymbol = (JavafxClassSymbol) currentClass;
-            if (currentClassSymbol.location().length() == 0 || currentClassSymbol.location().equals(elementClassSymbol.location())) {
-                return true;
-            }
+    static boolean isClassUsed(Element foundElement,
+            Collection<JFXImport> imports,
+            CompilationInfo compilationInfo,
+            Collection<Element> allClasses) {
 
+        //Check if there are in the same package
+        if (foundElement instanceof JavafxClassSymbol) {
+            JavafxClassSymbol foundElementClassSymbol = (JavafxClassSymbol) foundElement;
+            //Check is classes are int the same script
+            for (Element elementClass : allClasses) {
+                if (elementClass instanceof JavafxClassSymbol) {
+                    JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) elementClass;
+                    if (elementClassSymbol.location().equals(foundElementClassSymbol.location())) {
+                        return true;
+                    }
+                }
+
+            }
+            //Check imports
             for (JFXImport importTree : imports) {
-                String importLocation = importTree.toString().substring(0, importTree.toString().lastIndexOf(".")).replace("import ", ""); //NOI18N
-                if (currentClassSymbol.location().equals(importLocation)) {
-                    return true;
+                if (importTree.toString().contains(".*")) { //NOI18N
+                    String importLocation = importTree.toString().substring(0, importTree.toString().lastIndexOf(".")).replace("import ", ""); //NOI18N
+                    if (foundElementClassSymbol.location().equals(importLocation)) {
+                        return true;
+                    }
+                } else {
+                    JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), importTree.getQualifiedIdentifier());
+                    Element importElement = compilationInfo.getTrees().getElement(path);
+                    if (importElement instanceof JavafxClassSymbol || importElement != null) {
+                        JavafxClassSymbol importElementSymbol = (JavafxClassSymbol) importElement;
+                        if (foundElementClassSymbol.getQualifiedName().toString().equals(importElementSymbol.getQualifiedName().toString())) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -88,7 +112,6 @@ final class HintsUtils {
         return null;
     }
     //TODO Should be replaced with proper formating ASAP
-
     static String calculateSpace(int startPosition, Document document) {
         String text = null;
         try {

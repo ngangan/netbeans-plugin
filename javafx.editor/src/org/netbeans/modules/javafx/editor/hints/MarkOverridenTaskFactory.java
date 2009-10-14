@@ -175,7 +175,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaSourceTaskFac
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(currentClass, typeElement, imports)) {
+                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet())) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);

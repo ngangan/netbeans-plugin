@@ -66,7 +66,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private final static EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private final static String HINTS_IDENT = "addimportjavafx"; //NOI18N
