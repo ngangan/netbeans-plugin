@@ -103,9 +103,6 @@ class Publisher implements Runnable {
                     }
                 }
                 if (newImports.length() > 0) {
-                    if (offset > 0) {
-                        newImports.insert(0, '\n');
-                    }
                     offsetDiff += newImports.toString().length();
                     doc.insertString(offset, newImports.toString(), null);
                 }
