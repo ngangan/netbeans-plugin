@@ -104,61 +104,61 @@
     <target name="zip-clusters" depends="build">
       <mkdir dir="build/clusters"/>
       <jar destfile="build/clusters/common.jar" compress="true" level="9">
-        <fileset dir="build/netbeans/javafx2">
+        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
           <exclude name="javafx-sdk/**"/>
           <exclude name="**/*-mac.*"/>
           <exclude name="**/*-sol.*"/>
           <exclude name="**/*-win.*"/>
           <exclude name="**/*-lin.*"/>
-        </fileset>
+        </zipfileset>
       </jar>    
       <jar destfile="build/clusters/windows.jar" compress="true" level="9">
-        <fileset dir="build/netbeans/javafx2">
+        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-win.*"/>
-        </fileset>
-        <fileset dir="javafx.sdk.win/release"/>
+        </zipfileset>
+        <zipfileset dir="javafx.sdk.win/release" prefix="javafx2"/>
       </jar>    
       <jar destfile="build/clusters/linux.jar" compress="true" level="9">
-        <fileset dir="build/netbeans/javafx2">
+        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-lin.*"/>
-        </fileset>
-        <zipfileset dir="javafx.sdk.lin/release" filemode="755">
-          <include name="javafx2/javafx-sdk/bin/*"/>
-          <include name="javafx2/javafx-sdk/emulator/bin/*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.lin/release">
-          <exclude name="javafx2/javafx-sdk/bin/*"/>
-          <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+        <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx2">
+          <include name="javafx-sdk/bin/*"/>
+          <include name="javafx-sdk/emulator/bin/*"/>
+        </zipfileset>
+        <zipfileset dir="javafx.sdk.lin/release" prefix="javafx2">
+          <exclude name="javafx-sdk/bin/*"/>
+          <exclude name="javafx-sdk/emulator/bin/*"/>
         </zipfileset>
       </jar>
       <jar destfile="build/clusters/solaris.jar" compress="true" level="9">
-        <fileset dir="build/netbeans/javafx2">
+        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-sol.*"/>
-        </fileset>
-        <zipfileset dir="javafx.sdk.sol/release" filemode="755">
-          <include name="javafx2/javafx-sdk/bin/*"/>
-          <include name="javafx2/javafx-sdk/emulator/bin/*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.sol/release">
-          <exclude name="javafx2/javafx-sdk/bin/*"/>
-          <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+        <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx2">
+          <include name="javafx-sdk/bin/*"/>
+          <include name="javafx-sdk/emulator/bin/*"/>
+        </zipfileset>
+        <zipfileset dir="javafx.sdk.sol/release" prefix="javafx2">
+          <exclude name="javafx-sdk/bin/*"/>
+          <exclude name="javafx-sdk/emulator/bin/*"/>
         </zipfileset>
       </jar>
       <jar destfile="build/clusters/mac.jar" compress="true" level="9">
-        <fileset dir="build/netbeans/javafx2">
+        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-mac.*"/>
-        </fileset>
-        <zipfileset dir="javafx.sdk.mac/release" filemode="755">
-          <include name="javafx2/javafx-sdk/bin/*"/>
-          <include name="javafx2/javafx-sdk/emulator/bin/*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.mac/release">
-          <exclude name="javafx2/javafx-sdk/bin/*"/>
-          <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+        <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx2">
+          <include name="javafx-sdk/bin/*"/>
+          <include name="javafx-sdk/emulator/bin/*"/>
+        </zipfileset>
+        <zipfileset dir="javafx.sdk.mac/release" prefix="javafx2">
+          <exclude name="javafx-sdk/bin/*"/>
+          <exclude name="javafx-sdk/emulator/bin/*"/>
         </zipfileset>
       </jar>
     </target>
