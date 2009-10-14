@@ -355,27 +355,40 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                             return super.visitMemberSelect(node, document);
                         }
                         if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, document);
-                        for(Symbol sy : ts.getEnclosedElements()) {
-                            if (sy.getKind() == ElementKind.FIELD) {
-                                if (sy.getSimpleName().equals(memberName)) {
-                                    ElementHandle eh = ElementHandle.create(sy);
-                                    if (eh == null) {
-                                        if (DEBUG) {
-                                            LOG.log(Level.FINEST, "Error while processing member select: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                        /**
+                         * Workaround for NPEs thrown from the javac when calling ts.getEnclosedElements()
+                         * The NPE is the result of the source not being compilable
+                         *
+                         * Unfortunately, we can not check for compilation errors before indexing because due to http://javafx-jira.kenai.com/browse/JFXC-3468
+                         * many compilable sources are falsly marked as non-compilable
+                         *
+                         * Just ignore the exception - nothing else to do than may be log it
+                         */
+                        try {
+                            for(Symbol sy : ts.getEnclosedElements()) {
+                                if (sy.getKind() == ElementKind.FIELD) {
+                                    if (sy.getSimpleName().equals(memberName)) {
+                                        ElementHandle eh = ElementHandle.create(sy);
+                                        if (eh == null) {
+                                            if (DEBUG) {
+                                                LOG.log(Level.FINEST, "Error while processing member select: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                            }
+                                            return super.visitMemberSelect(node, document);
                                         }
-                                        return super.visitMemberSelect(node, document);
-                                    }
-                                    String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
-                                    if (indexVal != null) {
-                                        if (DEBUG) {
-                                            LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
+                                        if (indexVal != null) {
+                                            if (DEBUG) {
+                                                LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                            }
+                                            index(document, IndexKey.FIELD_REF, indexVal);
+                                        } else {
+                                            LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
                                         }
-                                        index(document, IndexKey.FIELD_REF, indexVal);
-                                    } else {
-                                        LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
                                     }
                                 }
                             }
+                        } catch (NullPointerException e) {
+                            LOG.log(Level.INFO, "Trying to index non-compilable file {0}. Giving up.", indexable.getRelativePath());
                         }
                     }
 
