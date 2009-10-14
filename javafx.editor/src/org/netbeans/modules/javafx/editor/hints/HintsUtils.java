@@ -4,8 +4,8 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.util.Collection;
 import java.util.Comparator;
@@ -69,7 +69,7 @@ final class HintsUtils {
 
         if (overridenMethodList != null && overridenMethodList.size() != 0) {
             for (MethodSymbol overridenMethod : overridenMethodList) {
-                //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
+                //TODO Work around to avoid NPE at com.sun.tools.mjavac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
                 try {
                     if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) && method.getParameters().size() == overridenMethod.getParameters().size() && COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
                         return overridenMethod;

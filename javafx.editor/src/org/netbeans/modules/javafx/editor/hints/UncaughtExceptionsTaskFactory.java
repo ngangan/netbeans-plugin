@@ -54,7 +54,7 @@ import org.netbeans.spi.editor.hints.HintsController;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TryTree;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

@@ -44,7 +44,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
@@ -232,7 +232,7 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
 ////            if (typeOverridden == null) {
 ////                continue;
 ////            }
-//            //TODO Workaround for java.lang.NullPointerException at com.sun.tools.javac.code.Types$DefaultTypeVisitor.visit(Types.java:3183)
+//            //TODO Workaround for java.lang.NullPointerException at com.sun.tools.mjavac.code.Types$DefaultTypeVisitor.visit(Types.java:3183)
 ////            try {
 ////                if (compilationInfo.getElements().overrides(override, overridden, typeOverridden)) {
 ////                    return override;
