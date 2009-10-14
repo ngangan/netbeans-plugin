@@ -247,7 +247,7 @@ final public class SourceUtils {
                 }
             }
             // a story of interest ...
-            // for some reason, right now (as of 209/10/12) javafx sources are references as "java sources"
+            // for some reason, right now (as of 2009/10/12) javafx sources are references as "java sources"
             for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
                 if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
                     return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
