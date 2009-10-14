@@ -19,7 +19,7 @@
     </target>
 
     <target name="-calculate-netbeans-url" unless="netbeans.binaries.url" depends="-copy-local-netbeans">
-        <get src="${netbeans.base.url}" dest="netbeans.html" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.base.url}" dest="netbeans.html" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
         <loadfile srcfile="netbeans.html" property="netbeans.binaries.url">
             <filterchain>
                 <tokenfilter>
@@ -41,11 +41,11 @@
     <target name="get-netbeans" unless="local-netbeans-is-available" depends="-calculate-netbeans-url">
         <parallel failonany="true">
             <sequential>        
-                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
                 <unzip src="netbeans.zip" dest="build"/>
             </sequential>
             <sequential>
-                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
                 <unzip src="testdist.zip" dest="build/testdist"/>
             </sequential>
         </parallel>
@@ -63,25 +63,26 @@
         <delete dir="build"/>
         <mkdir dir="build"/>
         <property name="use.timestamp" value="true"/>
+        <property name="offline" value="false"/>
         <parallel failonany="true">
             <sequential>
 	        <antcall target="get-netbeans"/>
             </sequential>
             <sequential>
                 <mkdir dir="javafx.sdk.win/external"/>
-                <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
             </sequential>   
             <sequential>
                 <mkdir dir="javafx.sdk.mac/external"/>
-                <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
             </sequential>   
             <sequential>
                 <mkdir dir="javafx.sdk.lin/external"/>
-                <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
             </sequential>   
             <sequential>
                 <mkdir dir="javafx.sdk.sol/external"/>
-                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true"/>
+                <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
             </sequential>
         </parallel>    
     </target>
