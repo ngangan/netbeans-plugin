@@ -50,7 +50,6 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -61,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
+import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -80,7 +80,10 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-    private static final String tab = "    "; //NOI18N
+    private static final String TAB = "    "; //NOI18N
+    private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
+    private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
+   
 
     public AbstractOverrideTask() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.ABOVE_NORMAL);
@@ -97,6 +100,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
     protected abstract int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree);
 
     protected abstract String getHintsControllerString();
+
 
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
@@ -136,7 +140,19 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                             return super.visitFunctionDefinition(node, p);
                         }
                     }.scan(compilationInfo.getCompilationUnit(), null);
+
                     if (!mixin[0]) {
+                        return;
+                    }
+                } else {
+                    boolean onlyAbstractError = true;
+                    for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                        if (!diagnostic.getCode().equals(ERROR_CODE1) && !diagnostic.getCode().equals(ERROR_CODE2)) {
+                            onlyAbstractError = false;
+                            break;
+                        }
+                    }
+                    if (!onlyAbstractError) {
                         return;
                     }
                 }
@@ -201,7 +217,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                         }
                     }
                 }
-             
+
                 for (Element currentClass : abstractMethods.keySet()) {
                     //TODO Hack for java.lang.NullPointerException at com.sun.tools.javafx.api.JavafxcTrees.getTree(JavafxcTrees.java:121)
                     try {
@@ -311,7 +327,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
             private String createMethod(MethodSymbol methodSymbol, String space) {
                 StringBuilder method = new StringBuilder();
-                method.append("\n").append(space).append(tab).append("override "); //NOI18N
+                method.append("\n").append(space).append(TAB).append("override "); //NOI18N
                 for (Modifier modifier : methodSymbol.getModifiers()) {
                     switch (modifier) {
                         case PUBLIC:
@@ -352,8 +368,8 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                     returnType = HintsUtils.getClassSimpleName(returnType);
                 }
                 method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
-                method.append(space).append(tab).append(tab).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                method.append(space).append(tab).append("}\n"); //NOI18N
+                method.append(space).append(TAB).append(TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                method.append(space).append(TAB).append("}\n"); //NOI18N
 
                 return method.toString();
             }

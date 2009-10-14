@@ -70,7 +70,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
 
     private final static EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private final static String HINTS_IDENT = "addimportjavafx"; //NOI18N
-    private final static String ERROR = "compiler.err.cant.resolve.location";//NOI18N
+    private final static String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
+    private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
 
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -89,16 +90,20 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
                 if (file == null) {
                     throw new IllegalArgumentException();
                 }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
                 if (compilationInfo.getDocument() != null) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                 }
                 if (compilationInfo.getDiagnostics().size() == 0) {
                     return;
                 }
+                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+                List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (diagnostic.getKind() != Diagnostic.Kind.ERROR || !ERROR.equals(diagnostic.getCode())) {
+                    boolean onlyAbstractError = false;
+                    if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
+                        onlyAbstractError = true;
+                    }
+                    if (!onlyAbstractError) {
                         continue;
                     }
                     final Collection<String> imports = new HashSet<String>();

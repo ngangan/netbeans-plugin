@@ -132,9 +132,12 @@ final class HintsUtils {
             Pattern pattern = Pattern.compile("[a-z]"); //NOI18N
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
-                varIndex = matcher.start(); //NOI18N
+                varIndex = matcher.start();
+                charNumber = varIndex - 1;
+            } else {
+                charNumber = line.length();
             }
-            charNumber = varIndex - 1;
+            
         }
         if (charNumber < 0) {
             return ""; //NOI18N
