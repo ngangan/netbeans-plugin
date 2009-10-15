@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.debugger.breakpoints;
 
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.Properties;
+import org.netbeans.modules.javafx.debugger.utils.Utils;
 
 /**
  *
@@ -25,6 +26,9 @@ public class JavaFXBreakpointsReader implements Properties.Reader {
             if( url == null || url.trim().length() == 0 ) {
                 return null;
             }
+            // Check if file exists
+            if( Utils.getFXPath( url ) == null ) return null;
+
             b = JavaFXLineBreakpoint.create( url,
                 properties.getInt( JavaFXLineBreakpoint.PROP_LINE_NUMBER, 1 )
             );

@@ -5,6 +5,7 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
@@ -52,14 +53,19 @@ final class HintsUtils {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element foundElement,
+    static boolean isClassUsed( Element foundElement,
             Collection<JFXImport> imports,
             CompilationInfo compilationInfo,
-            Collection<Element> allClasses) {
+            Collection<Element> allClasses,
+            Element superElement) {
 
         //Check if there are in the same package
-        if (foundElement instanceof JavafxClassSymbol) {
+        if (foundElement instanceof JavafxClassSymbol && superElement instanceof JavafxClassSymbol) {
             JavafxClassSymbol foundElementClassSymbol = (JavafxClassSymbol) foundElement;
+            JavafxClassSymbol superElementClassSymbol = (JavafxClassSymbol) superElement;
+            if (superElementClassSymbol.getQualifiedName().equals(foundElementClassSymbol.getQualifiedName())) {
+                return true;
+            }
             //Check is classes are int the same script
             for (Element elementClass : allClasses) {
                 if (elementClass instanceof JavafxClassSymbol) {

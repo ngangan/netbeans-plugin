@@ -101,7 +101,9 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
                     } catch (BadLocationException ex) {
                         ex.printStackTrace();
                     }
-                    NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
+                    if (document != null) {
+                        NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
+                    }
                 }
             }
         };
@@ -160,11 +162,11 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
                     superTypes.add(currentClassTree);
                     for (Tree superTree : superTypes) {
                         JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
-                        Element superTypeElement = compilationInfo.getTrees().getElement(superPath);
-                        if (superTypeElement == null) {
+                        Element superElement = compilationInfo.getTrees().getElement(superPath);
+                        if (superElement == null) {
                             continue;
                         }
-                        String superTypeName = superTypeElement.getSimpleName().toString();
+                        String superTypeName = superElement.getSimpleName().toString();
                         if (HintsUtils.checkString(superTypeName)) {
                             continue;
                         }
@@ -175,7 +177,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet())) {
+                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superElement)) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);

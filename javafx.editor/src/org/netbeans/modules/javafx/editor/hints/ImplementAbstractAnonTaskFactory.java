@@ -78,7 +78,7 @@ public final class ImplementAbstractAnonTaskFactory extends AbstractOverrideTask
             return -1;
         }
         Document document = compilationInfo.getDocument();
-        if (document == null) {
+        if (document == null && (start+length > document.getLength())) {
             return -1;
         }
         try {

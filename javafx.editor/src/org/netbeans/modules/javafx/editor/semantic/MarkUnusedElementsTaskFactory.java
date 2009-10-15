@@ -51,6 +51,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXForExpressionInClause;
 import com.sun.tools.javafx.tree.JFXVar;
@@ -61,6 +62,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -118,9 +120,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
-                        if (!parentClass &&
-                                modifiers.size() == 0 ||
-                                modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                        if (!parentClass
+                                && modifiers.size() == 0
+                                || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
                             addToInit(node);
                         } else {
                             parentClass = false;
@@ -142,9 +144,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
                         if (element != null && element.getSimpleName() != null) {
                             if (!isPackage(node.getModifiers().toString())) {
-                                if (element.getKind() == ElementKind.LOCAL_VARIABLE ||
-                                        modifiers.size() == 0 ||
-                                        modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                                if (element.getKind() == ElementKind.LOCAL_VARIABLE
+                                        || modifiers.size() == 0
+                                        || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
                                     addToInit(node);
                                 }
                             }
@@ -169,8 +171,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (element != null && element.getSimpleName() != null) {
                             //TODO Hack for package modifiers which does not provide info about package
                             if (!isPackage(node.getModifiers().toString())) {
-                                if (modifiers.size() == 0 ||
-                                        modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                                if (modifiers.size() == 0
+                                        || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
                                     addToInit(node);
                                 }
                             }
@@ -207,10 +209,10 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     private boolean isPackage(String modifiers) {
                         Pattern pattern = Pattern.compile("package"); //NOI18N
-                            Matcher matcher = pattern.matcher(modifiers);
-                            if (matcher.find()) {
-                                return true;
-                            }
+                        Matcher matcher = pattern.matcher(modifiers);
+                        if (matcher.find()) {
+                            return true;
+                        }
 
                         return false;
                     }
@@ -253,8 +255,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         varInit.remove(element);
                     }
                 }
+                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                Collection<Position> positions = new HashSet<Position>(varInit.size());
                 for (Tree tree : varInit.values()) {
-                    SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                     long start = sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
                     if (start < 0 || end < 0) {
@@ -282,38 +285,59 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             end = start + token.length();
                         }
                     }
-                    int startCopy = (int) start;
-                    int endCopy = (int) end;
-                    if (SwingUtilities.isEventDispatchThread()) {
-                        updateEditor(startCopy, endCopy).run();
-                    } else {
-                        SwingUtilities.invokeLater(updateEditor(startCopy, endCopy));
-                    }
+                    positions.add(new Position((int) start, (int) end));
+                }
+                if (SwingUtilities.isEventDispatchThread()) {
+                    updateEditor(positions).run();
+                } else {
+                    SwingUtilities.invokeLater(updateEditor(positions));
                 }
             }
         };
-
     }
 
-    private Runnable updateEditor(final int start, final int end) {
+    private Runnable updateEditor(final Collection<Position> positions) {
         return new Runnable() {
 
             public void run() {
-                OffsetsBag bag = (OffsetsBag) document.getProperty(SemanticHighlighter.class);
-                if (bag == null) {
-                    bag = new OffsetsBag(document);
-                    document.putProperty(SemanticHighlighter.class, bag);
+                for (Position position : positions) {
+                    OffsetsBag bag = (OffsetsBag) document.getProperty(SemanticHighlighter.class);
+                    if (bag == null) {
+                        bag = new OffsetsBag(document);
+                        document.putProperty(SemanticHighlighter.class, bag);
+                    }
+                    HighlightsSequence highlightsSequence = bag.getHighlights(position.getStart(), position.getEnd());
+                    List<AttributeSet> attributeSet = new ArrayList<AttributeSet>();
+                    while (highlightsSequence.moveNext()) {
+                        attributeSet.add(highlightsSequence.getAttributes());
+                    }
+                    attributeSet.add(AttributesUtilities.createImmutable(EditorStyleConstants.WaveUnderlineColor, Color.LIGHT_GRAY));
+                    AttributeSet[] array = attributeSet.toArray(new AttributeSet[attributeSet.size()]);
+                    AttributeSet asfinal = AttributesUtilities.createImmutable(array);
+                    bag.addHighlight(position.start, position.getEnd(), asfinal);
                 }
-                HighlightsSequence highlightsSequence = bag.getHighlights(start, end);
-                List<AttributeSet> attributeSet = new ArrayList<AttributeSet>();
-                while (highlightsSequence.moveNext()) {
-                    attributeSet.add(highlightsSequence.getAttributes());
-                }
-                attributeSet.add(AttributesUtilities.createImmutable(EditorStyleConstants.WaveUnderlineColor, Color.LIGHT_GRAY));
-                AttributeSet[] array = attributeSet.toArray(new AttributeSet[attributeSet.size()]);
-                AttributeSet asfinal = AttributesUtilities.createImmutable(array);
-                bag.addHighlight(start, end, asfinal);
             }
         };
     }
+
+    private class Position {
+
+        private int start;
+        private int end;
+
+        Position(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        int getStart() {
+            return start;
+        }
+
+        int getEnd() {
+            return end;
+        }
+    }
 }
+
+
