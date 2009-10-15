@@ -65,12 +65,14 @@ final class UncaughtExceptionsFix implements Fix {
     private Document document;
     private Hint hint;
     private CompilationInfo compilationInfo;
+    private static final String TAB = "    "; //NOI18N
 
     public UncaughtExceptionsFix(Document document, Hint hint, CompilationInfo compilationInfo) {
         assert document != null;
         this.document = document;
         this.hint = hint;
         this.compilationInfo = compilationInfo;
+
     }
 
     @Override
@@ -85,11 +87,11 @@ final class UncaughtExceptionsFix implements Fix {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         Iterator<Type> iterator = hint.getExceptions().iterator();
         final StringBuilder block = new StringBuilder();
-        final String space = calculateSpace(hint.getStartPosition());
+        final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
         if (hint.getCatchTree() == null) {
             String method = document.getText(hint.getStartPosition() - space.length(), hint.getLength() + space.length()).trim();
             block.append(space).append("try {\n") //NOI18N
-                    .append(space).append("\t").append(method).append("\n") //NOI18N
+                    .append(space).append(TAB).append(method).append("\n") //NOI18N
                     .append(space).append("}"); //NOI18N
 
             addCatch(iterator, block, exceptionName, space);
@@ -134,37 +136,12 @@ final class UncaughtExceptionsFix implements Fix {
         while (iterator.hasNext()) {
                 //TODO Unique ex var name
                 block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
-                        .append(space).append("\t").append(exceptionName).append(".printStackTrace();\n") //NOI18N
+                        .append(space).append(TAB).append(exceptionName).append(".printStackTrace();\n") //NOI18N
                         .append(space).append("}"); //NOI18N
                 if (!iterator.hasNext()) {
                     block.append("\n"); //NOI18N
                 }
             }
     }
-    //TODO Should be replaced with proper formating ASAP
-     private  String calculateSpace(int startPosition) {
-        String text = null;
-        try {
-            text = document.getText(document.getStartPosition().getOffset(), startPosition);
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-            return "";
-        }
-        int lastIndex = -1;
-        if (text != null && text.length() > 1) {
-            lastIndex = text.lastIndexOf("\n"); //NOI18N
-        }
-        int charNumber = -1;
-        if (lastIndex > 0) {
-            charNumber = text.length() - lastIndex;
-        }
-        if (charNumber <= 0) {
-            return null;
-        }
-        StringBuilder space = new StringBuilder(charNumber - 1);
-        for (int i = 0 ; i < charNumber - 1 ; i++) {
-            space.append(" "); //NOI18M
-        }
-        return space.toString();
-     }
+   
 }

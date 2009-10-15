@@ -100,7 +100,9 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
                         try {
-                            mixins.addAll(node.getMixins());
+                            if (node.getMixins() != null) {
+                                mixins.addAll(node.getMixins());
+                            }
                         } catch (NullPointerException npe) {
                             npe.printStackTrace();
                         }
@@ -123,7 +125,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
-                if (mixins.size() == 0) {
+                if (mixins.isEmpty()) {
                     return;
                 }
                 if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
@@ -161,7 +163,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                         if (toOverrides.values().contains(Boolean.FALSE)) {
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), mixin);
-                            String hintText = " javafxapplication8.NewJavaFXClass1 is not abstract and does not override abstract method karol() in javafxapplication8.NewJavaFXClass$Mixin"; //NOI18N
+                            String hintText = NbBundle.getMessage(MixinNotImplementedAbstractsTaskFactory.class, "TITLE_MIXIN_ABSTRACT"); //NOI18N
                             ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
                             if (document != null) {
                                 HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
@@ -176,7 +178,6 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 }
             }
         };
-
     }
 
     private boolean checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {

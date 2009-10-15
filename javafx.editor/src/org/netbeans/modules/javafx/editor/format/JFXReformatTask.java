@@ -978,7 +978,7 @@ public class JFXReformatTask implements ReformatTask {
                     break;
             }
 
-            boolean isEmpty = true;
+//            boolean isEmpty = true;
             final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
             expressions.addAll(node.getStatements());
             final ExpressionTree value = node.getValue();
@@ -987,7 +987,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             for (ExpressionTree stat : expressions) {
                 if (!isSynthetic((JFXTree) node)) {
-                    isEmpty = false;
+//                    isEmpty = false;
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
                         col = indent;
@@ -1155,20 +1155,24 @@ public class JFXReformatTask implements ReformatTask {
                     tokens.moveNext();
                 }
             }
-
-            accept(JFXTokenId.NEW);
-            space();
+            final JFXTokenId accepted = accept(JFXTokenId.NEW);
+            // JFXC-3545
+            final boolean isNewKeyWordUsed = accepted != null;
+            if (isNewKeyWordUsed) {
+                space();
+            }
 
             scan(node.getIdentifier(), p);
             spaces(cs.spaceBeforeMethodCallParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
+            accept(isNewKeyWordUsed ? JFXTokenId.LPAREN : JFXTokenId.LBRACE);
             List<? extends ExpressionTree> args = node.getArguments();
             if (args != null && !args.isEmpty()) {
                 spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                 wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
                 spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
             }
-            accept(JFXTokenId.RPAREN);
+            accept(isNewKeyWordUsed ? JFXTokenId.RPAREN : JFXTokenId.RBRACE);
+            
             ClassDeclarationTree body = node.getClassBody();
             if (body != null) {
                 int old = indent;
@@ -1183,12 +1187,15 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitReturn(ReturnTree node, Void p) {
-            accept(JFXTokenId.RETURN);
+            // there is a compiler bug with dissappearing return keyword from the tree
+            JFXTokenId accepted = accept(JFXTokenId.RETURN);
             int old = indent;
             indent += continuationIndentSize;
             ExpressionTree exp = node.getExpression();
             if (exp != null) {
-                space();
+                if (accepted != null) {
+                    space();
+                }
                 scan(exp, p);
             }
             accept(JFXTokenId.SEMI);

@@ -50,16 +50,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -92,19 +95,22 @@ public class JavaFXPackageNode extends ContainerNode {
 
                     public void run(CompilationController controller)
                              throws Exception {
-                        if (JavaFXSource.Phase.PARSED.compareTo(controller.toPhase(JavaFXSource.Phase.PARSED))<=0) {
+                        String pkgName = parent.getName();
+                        if (pkgName.equals(DEFAULT_NAME)) {
+                            pkgName = "";
+                        }
+                        PackageElement pelem = controller.getElements().getPackageElement(pkgName);
 
-                            PackageElement pelem = controller.getElements().getPackageElement(parent.getName());
-
-                            if (pelem != null) {
-                                for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
-                                    if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
-                                        nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
-                                    }
+                        if (pelem != null) {
+                            List<? extends Element> ee = pelem.getEnclosedElements();
+                            for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
+                                System.err.println(type);
+                                if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
+                                    nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
                                 }
-                            } else {
-                                LOGGER.log(Level.FINEST, "Package name {0} resulted into a NULL element", parent.getName()); // NOI18N
                             }
+                        } else {
+                            LOGGER.log(Level.FINEST, "Package name {0} resulted into a NULL element", parent.getName()); // NOI18N
                         }
                     }
                 }, true);

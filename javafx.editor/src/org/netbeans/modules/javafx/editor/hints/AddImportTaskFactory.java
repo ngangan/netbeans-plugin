@@ -66,11 +66,12 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private final static EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private final static String HINTS_IDENT = "addimportjavafx"; //NOI18N
-    private final static String ERROR = "compiler.err.cant.resolve.location";//NOI18N
+    private final static String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
+    private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
 
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -89,17 +90,20 @@ public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
                 if (file == null) {
                     throw new IllegalArgumentException();
                 }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
                 if (compilationInfo.getDocument() != null) {
-                HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                 }
-                if (compilationInfo.getDiagnostics().size() == 0) {
+                if (!compilationInfo.isErrors()) {
                     return;
                 }
+                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+                List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    diagnostic.getCode();
-                    if (diagnostic.getKind() != Diagnostic.Kind.ERROR || !ERROR.equals(diagnostic.getCode())) {
+                    boolean onlyAbstractError = false;
+                    if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
+                        onlyAbstractError = true;
+                    }
+                    if (!onlyAbstractError) {
                         continue;
                     }
                     final Collection<String> imports = new HashSet<String>();
@@ -146,10 +150,10 @@ public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
                             listFQN.add(new FixImport(potentialFqn));
                         }
                     }
-                    if (listFQN.size() == 0) {
-                        return;
+                    if (listFQN.isEmpty()) {
+                        continue;
                     }
-                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT,"" , listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
+                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
@@ -171,7 +175,7 @@ public class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
         public ChangeInfo implement() throws Exception {
             JTextComponent target = Utilities.getFocusedComponent();
-            Imports.addImport(target, fqn); //NOI18N
+            Imports.addImport(target, fqn);
             return null;
         }
     }

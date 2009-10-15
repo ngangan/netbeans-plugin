@@ -310,7 +310,13 @@ final public class ClassIndex {
             for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), prefix, QuerySupport.Kind.PREFIX, JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
                 String pkgName = ir.getValue(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString()); // only one package name per indexed document
                 if (pkgName.startsWith(prefix)) {
-                    result.add(pkgName);
+                    if (directOnly) {
+                        if (pkgName.indexOf(".", prefix.length()) == -1) {
+                            result.add(pkgName);
+                        }
+                    } else {
+                        result.add(pkgName);
+                    }
                 }
             }
         } catch (IOException e) {

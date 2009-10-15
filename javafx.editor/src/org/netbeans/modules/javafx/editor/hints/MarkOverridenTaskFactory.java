@@ -46,6 +46,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXImport;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -67,13 +68,13 @@ import org.openide.text.NbDocument;
  *
  * @author karol harezlak
  */
-public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class MarkOverridenTaskFactory extends EditorAwareJavaSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private final Map<Document, Collection<OverriddeAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddeAnnotation>>();
 
-    public OverridenTaskFactory() {
+    public MarkOverridenTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
@@ -100,7 +101,9 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
                     } catch (BadLocationException ex) {
                         ex.printStackTrace();
                     }
-                    NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
+                    if (document != null) {
+                        NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
+                    }
                 }
             }
         };
@@ -128,8 +131,8 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
                 Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
-                Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
-                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+                Collection<JFXImport> imports = new HashSet<JFXImport>();
+                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, true);
                 Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
@@ -159,11 +162,11 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
                     superTypes.add(currentClassTree);
                     for (Tree superTree : superTypes) {
                         JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
-                        Element superTypeElement = compilationInfo.getTrees().getElement(superPath);
-                        if (superTypeElement == null) {
+                        Element superElement = compilationInfo.getTrees().getElement(superPath);
+                        if (superElement == null) {
                             continue;
                         }
-                        String superTypeName = superTypeElement.getSimpleName().toString();
+                        String superTypeName = superElement.getSimpleName().toString();
                         if (HintsUtils.checkString(superTypeName)) {
                             continue;
                         }
@@ -174,7 +177,7 @@ public final class OverridenTaskFactory extends EditorAwareJavaSourceTaskFactory
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(currentClass, typeElement, imports)) {
+                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superElement)) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);

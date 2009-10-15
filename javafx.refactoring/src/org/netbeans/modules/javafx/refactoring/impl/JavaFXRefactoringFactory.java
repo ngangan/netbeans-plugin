@@ -34,7 +34,9 @@ import org.netbeans.modules.javafx.refactoring.impl.plugins.RenameRefactoringPlu
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
+import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
@@ -51,6 +53,9 @@ import org.openide.util.lookup.ServiceProvider;
 public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
 
     public RefactoringPlugin createInstance(AbstractRefactoring refactoring) {
+        // disable javafx refactoring for NB6.8 Beta
+        if (!Boolean.getBoolean("javafx.refactoring")) return null;
+
         Lookup look = refactoring.getRefactoringSource();
         FileObject file = look.lookup(FileObject.class);
         NonRecursiveFolder folder = look.lookup(NonRecursiveFolder.class);
@@ -74,7 +79,25 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
             }
         }
 
+        if (refactoring instanceof MoveRefactoring) {
+            if (checkMove(refactoring.getRefactoringSource())) {
+                return new MoveRefactoringPlugin((MoveRefactoring) refactoring);
+            }
+        }
+
         return null;
+    }
+
+    private boolean checkMove(Lookup refactoringSource) {
+        for (FileObject f:refactoringSource.lookupAll(FileObject.class)) {
+            if (SourceUtils.isJavaFXFile(f)) {
+                return true;
+            }
+            if (f.isFolder()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

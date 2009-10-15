@@ -94,6 +94,9 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                     throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
                 }
                 final Document document = compilationInfo.getDocument();
+                if (compilationInfo.getDiagnostics() != null && compilationInfo.getDiagnostics().size() > 0) {
+                    return;
+                }
                 if (document != null) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
                     }

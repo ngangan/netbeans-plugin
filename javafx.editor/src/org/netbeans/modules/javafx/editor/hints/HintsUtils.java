@@ -4,14 +4,19 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import com.sun.tools.javafx.tree.JFXImport;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import org.netbeans.api.javafx.source.CompilationInfo;
 
 /**
  *
@@ -48,16 +53,45 @@ final class HintsUtils {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element currentClass, Element element, Collection<JavafxClassSymbol> imports) {
-        if (element instanceof JavafxClassSymbol && currentClass instanceof JavafxClassSymbol) {
-            JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) element;
-            JavafxClassSymbol currentClassSymbol = (JavafxClassSymbol) currentClass;
-            if (currentClassSymbol.location().length() == 0 || currentClassSymbol.location().equals(elementClassSymbol.location())) {
+    static boolean isClassUsed( Element foundElement,
+            Collection<JFXImport> imports,
+            CompilationInfo compilationInfo,
+            Collection<Element> allClasses,
+            Element superElement) {
+
+        //Check if there are in the same package
+        if (foundElement instanceof JavafxClassSymbol && superElement instanceof JavafxClassSymbol) {
+            JavafxClassSymbol foundElementClassSymbol = (JavafxClassSymbol) foundElement;
+            JavafxClassSymbol superElementClassSymbol = (JavafxClassSymbol) superElement;
+            if (superElementClassSymbol.getQualifiedName().equals(foundElementClassSymbol.getQualifiedName())) {
                 return true;
             }
-            for (JavafxClassSymbol importElement : imports) {
-                if (currentClassSymbol.location().equals(importElement.location())) {
-                    return true;
+            //Check is classes are int the same script
+            for (Element elementClass : allClasses) {
+                if (elementClass instanceof JavafxClassSymbol) {
+                    JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) elementClass;
+                    if (elementClassSymbol.location().equals(foundElementClassSymbol.location())) {
+                        return true;
+                    }
+                }
+
+            }
+            //Check imports
+            for (JFXImport importTree : imports) {
+                if (importTree.toString().contains(".*")) { //NOI18N
+                    String importLocation = importTree.toString().substring(0, importTree.toString().lastIndexOf(".")).replace("import ", ""); //NOI18N
+                    if (foundElementClassSymbol.location().equals(importLocation)) {
+                        return true;
+                    }
+                } else {
+                    JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), importTree.getQualifiedIdentifier());
+                    Element importElement = compilationInfo.getTrees().getElement(path);
+                    if (importElement instanceof JavafxClassSymbol || importElement != null) {
+                        JavafxClassSymbol importElementSymbol = (JavafxClassSymbol) importElement;
+                        if (foundElementClassSymbol.getQualifiedName().toString().equals(importElementSymbol.getQualifiedName().toString())) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -82,6 +116,43 @@ final class HintsUtils {
         }
 
         return null;
+    }
+    //TODO Should be replaced with proper formating ASAP
+    static String calculateSpace(int startPosition, Document document) {
+        String text = null;
+        try {
+            text = document.getText(document.getStartPosition().getOffset(), startPosition);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+            return "";
+        }
+        int lastIndex = -1;
+        if (text != null && text.length() > 1) {
+            lastIndex = text.lastIndexOf("\n"); //NOI18N
+        }
+        int charNumber = -1;
+
+        if (lastIndex > 0) {
+            int varIndex = 0;
+            String line = text.substring(lastIndex, startPosition);
+            Pattern pattern = Pattern.compile("[a-z]"); //NOI18N
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                varIndex = matcher.start();
+                charNumber = varIndex - 1;
+            } else {
+                charNumber = line.length();
+            }
+            
+        }
+        if (charNumber < 0) {
+            return ""; //NOI18N
+        }
+        StringBuilder space = new StringBuilder(charNumber);
+        for (int i = 0; i < charNumber - 1; i++) {
+            space.append(" "); //NOI18M
+        }
+        return space.toString();
     }
 
     private static class ParamsComparator implements Comparator<List<VarSymbol>> {

@@ -41,7 +41,7 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -50,8 +50,7 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,6 +60,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
+import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -80,15 +80,18 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private static final String TAB = "    "; //NOI18N
+    private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
+    private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
 
     public AbstractOverrideTask() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
     }
 
     protected abstract JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
             Map<Element, List<MethodSymbol>> overridenMethods,
-            Collection<JavafxClassSymbol> imports,
+            Collection<JFXImport> imports,
             Map<Element, Tree> position);
 
     protected abstract Tree getTree(CompilationInfo compilationInfo, Element currentClass, Map<Element, Tree> position);
@@ -110,39 +113,41 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 if (document != null) {
                     HintsController.setErrors(document, getHintsControllerString(), Collections.EMPTY_LIST); //NOI18N
                 }
-                if (!compilationInfo.isErrors()) {
-                    //TODO Work around for javafx compiler for Mixin abstract class
-                    final Boolean[] mixin = new Boolean[1];
-                    mixin[0] = false;
-                    new JavaFXTreePathScanner<Void, Void>() {
 
-                        @Override
-                        public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
-                            try {
-                                if (node.getMixins() != null && node.getMixins().size() > 0) {
-                                    mixin[0] = true;
-                                }
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
+                final Collection<Boolean> mixinMain = new HashSet<Boolean>();
+                final Collection<Boolean> mixinExtends = new HashSet<Boolean>();
+                new JavaFXTreePathScanner<Void, Void>() {
 
-                            return super.visitClassDeclaration(node, v);
+                    @Override
+                    public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
+                        if (node.getModifiers().toString().contains("mixin")) { //NOI18N
+                            mixinMain.add(Boolean.TRUE);
                         }
-
-                        @Override
-                        public Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
-                            return super.visitFunctionDefinition(node, p);
+                        if (node.getMixins() != null && !node.getMixins().isEmpty()) {
+                            mixinExtends.add(Boolean.TRUE);
                         }
-                    }.scan(compilationInfo.getCompilationUnit(), null);
-                    if (!mixin[0]) {
-                        return;
+                        return super.visitClassDeclaration(node, v);
                     }
+                }.scan(compilationInfo.getCompilationUnit(), null);
+
+                boolean execute = false;
+                for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                    if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
+                        execute = true;
+                    }
+                }
+                if (!mixinMain.contains(Boolean.TRUE) && !execute && mixinExtends.isEmpty()) {
+                    return;
+                }
+                if (mixinExtends.isEmpty() && !compilationInfo.isErrors()) {
+                    return;
                 }
                 Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
                 Map<Element, List<MethodSymbol>> abstractMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
                 Map<Element, Tree> position = new Hashtable<Element, Tree>();
-                Collection<JavafxClassSymbol> imports = new HashSet<JavafxClassSymbol>();
+                Collection<JFXImport> imports = new HashSet<JFXImport>();
+                HintsModel modelFix = new HintsModel(compilationInfo);
 
                 JavaFXTreePathScanner<Void, Void> visitor = getVisitor(compilationInfo, classTrees, overridenMethods, imports, position);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
@@ -153,15 +158,12 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                         methods = new ArrayList<MethodSymbol>();
                     }
                     abstractMethods.put(currentClass, methods);
-                    for (Tree superTypeTree : classTrees.get(currentClass)) {
+                    for (Tree superTree : classTrees.get(currentClass)) {
                         String className = null;
-                        if (superTypeTree instanceof JFXClassDeclaration) {
-                            ((JFXClassDeclaration) superTypeTree).getName();
-                            className = ((JFXClassDeclaration) superTypeTree).getSimpleName().toString();
-                        } else if (HintsUtils.checkString(superTypeTree.toString())) {
+                        if (HintsUtils.checkString(superTree.toString())) {
                             continue;
                         } else {
-                            className = HintsUtils.getClassSimpleName(superTypeTree.toString());
+                            className = HintsUtils.getClassSimpleName(superTree.toString());
                         }
                         Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
@@ -169,7 +171,9 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, currentClass, imports)) {
+                            JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
+                            Element superTreeElement = compilationInfo.getTrees().getElement(superPath);
+                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superTreeElement)) {
                                 continue;
                             }
                             Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
@@ -201,7 +205,6 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                         }
                     }
                 }
-                HintsModel modelFix = new HintsModel(compilationInfo);
 
                 for (Element currentClass : abstractMethods.keySet()) {
                     //TODO Hack for java.lang.NullPointerException at com.sun.tools.javafx.api.JavafxcTrees.getTree(JavafxcTrees.java:121)
@@ -211,7 +214,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                         if (currentClass == null) {
                             return;
                         }
-                        if (abstractMethods.get(currentClass) != null && abstractMethods.get(currentClass).size() != 0) {
+                        if (abstractMethods.get(currentClass) != null && !abstractMethods.get(currentClass).isEmpty()) {
                             modelFix.addHint(currentTree, abstractMethods.get(currentClass), currentClass);
                         }
                     } catch (NullPointerException npe) {
@@ -222,7 +225,6 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 addHintsToController(document, modelFix, compilationInfo, file);
             }
         };
-
     }
 
     private void addHintsToController(Document document, HintsModel model, CompilationInfo compilationInfo, FileObject file) {
@@ -231,7 +233,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             for (Hint hint : model.getHints()) {
                 errors.add(getErrorDescription(document, file, hint, compilationInfo));
             }
-            if (document != null || errors.size() < 0) {
+            if (document != null || !errors.isEmpty()) {
                 HintsController.setErrors(document, getHintsControllerString(), errors); //NOI18N
             }
         }
@@ -245,10 +247,17 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             }
 
             public ChangeInfo implement() throws Exception {
+                if (document != null) {
+                    HintsController.setErrors(document, getHintsControllerString(), Collections.EMPTY_LIST);
+                }
                 final StringBuilder methods = new StringBuilder();
+                final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
 
                 for (MethodSymbol methodSymbol : hint.getMethods()) {
-                    methods.append(createMethod(methodSymbol));
+                    methods.append(createMethod(methodSymbol, space));
+                }
+                if (methods.toString().length() > 0) {
+                    methods.append(space);
                 }
                 final int positon = findPositionAtTheEnd(compilationInfo, hint.getTree());
                 if (positon < 0) {
@@ -260,6 +269,9 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                         try {
                             document.insertString(positon, methods.toString(), null);
                             JTextComponent target = Utilities.getFocusedComponent();
+                            if (target == null) {
+                                return;
+                            }
                             Imports.addImport(target, EXCEPTION);
                             for (MethodSymbol method : hint.getMethods()) {
                                 addImport(target, method.asType());
@@ -277,7 +289,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             }
 
             private void scanImport(JTextComponent target, Type type) {
-                if (type.getParameterTypes() != null && type.getParameterTypes().size() != 0) {
+                if (type.getParameterTypes() != null && !type.getParameterTypes().isEmpty()) {
                     for (Type t : type.getParameterTypes()) {
                         scanImport(target, t);
                     }
@@ -296,16 +308,16 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                     Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName); //NOI18N
                     if (symbolMatcher.find()) {
                         importName = symbolMatcher.replaceAll("").trim(); //NOI18N
-                        }
+                    }
                     if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
                         Imports.addImport(target, importName);
                     }
                 }
             }
 
-            private String createMethod(MethodSymbol methodSymbol) {
+            private String createMethod(MethodSymbol methodSymbol, String space) {
                 StringBuilder method = new StringBuilder();
-                method.append("\n\toverride "); //NOI18N
+                method.append("\n").append(space).append(TAB).append("override "); //NOI18N
                 for (Modifier modifier : methodSymbol.getModifiers()) {
                     switch (modifier) {
                         case PUBLIC:
@@ -327,7 +339,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                             method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
                             if (iterator.hasNext()) {
                                 method.append(", "); //NOI18N
-                                }
+                            }
                         }
                     }
                 } catch (NullPointerException npe) {
@@ -342,12 +354,12 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
                 }
                 if (returnType == null || returnType.equals("void")) { //NOI18N
                     returnType = "Void"; //NOI18N
-                    } else {
+                } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);
                 }
                 method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
-                method.append("\t\tthrow new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                method.append("\t}\n"); //NOI18N
+                method.append(space).append(TAB).append(TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                method.append(space).append(TAB).append("}\n"); //NOI18N
 
                 return method.toString();
             }
@@ -374,28 +386,25 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
         if (type.isPrimitive()) {
             if (varType.equals("int")) { //NOI18N
                 varType = Integer.class.getSimpleName();
-            } else if (varType.equals("long")) { //NOI18N
-                varType = Long.class.getSimpleName();
-            } else if (varType.equals("byte")) { //NOI18N
-                varType = Byte.class.getSimpleName();
-            } else if (varType.equals("short")) { //NOI18N
-                varType = Short.class.getSimpleName();
-            } else if (varType.equals("float")) { //NOI18N
-                varType = Float.class.getSimpleName();
-            } else if (varType.equals("double")) { //NOI18N
-                varType = Double.class.getSimpleName();
-            } else if (varType.equals("boolean")) { //NOI18N
-                varType = Boolean.class.getSimpleName();
+            } else if (varType.equals("long") //NOI18N
+                    || varType.equals("byte") //NOI18N
+                    || varType.equals("short") //NOI18N
+                    || varType.equals("float") //NOI18N
+                    || varType.equals("double")) { //NOI18N
+
+                varType = "Number"; //NOI18N
             } else if (varType.equals("char")) { //NOI18N
                 varType = Character.class.getSimpleName();
+            } else if (varType.equals("boolean")) { //NOI18N
+                return Boolean.class.getSimpleName();
             }
         }
         if (varType.equals("E") || varType.equals("T")) { //NOI18N
             varType = "Object"; //NOI18N
-            }
+        }
         if (varType.equals("E[]") || varType.equals("T[]")) { //NOI18N
             varType = "Object[]"; //NOI18N
-            }
+        }
         varType = removeBetween("<>", varType); //NOI18N
         return varType;
     }
@@ -416,7 +425,7 @@ abstract class AbstractOverrideTask extends EditorAwareJavaSourceTaskFactory {
             System.err.println("* e = " + typeElement); //NOI18N
             System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
             System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
-            }
+        }
         return elements;
     }
 }
