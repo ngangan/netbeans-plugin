@@ -44,14 +44,14 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.CaretAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.CaretAwareJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author Jan Lahoda
  */
-public class MarkOccurrencesHighlighterFactory extends CaretAwareJavaSourceTaskFactory {
+public class MarkOccurrencesHighlighterFactory extends CaretAwareJavaFXSourceTaskFactory {
 
     public MarkOccurrencesHighlighterFactory() {
         super(Phase.ANALYZED, Priority.LOW, "*"); // NOI18N

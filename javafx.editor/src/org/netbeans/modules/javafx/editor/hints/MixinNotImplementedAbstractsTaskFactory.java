@@ -48,7 +48,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
 import javax.lang.model.element.Element;
@@ -71,7 +71,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String HINTS_IDENT = "abstractmixinjavafx"; //NOI18N

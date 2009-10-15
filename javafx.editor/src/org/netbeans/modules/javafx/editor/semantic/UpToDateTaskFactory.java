@@ -43,14 +43,14 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author David Strupl
  */
-public class UpToDateTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class UpToDateTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     public UpToDateTaskFactory() {
         super(Phase.ANALYZED, Priority.NORMAL);

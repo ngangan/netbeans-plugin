@@ -44,7 +44,7 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.LookupBasedJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.LookupBasedJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
@@ -53,7 +53,7 @@ import org.openide.util.Lookup;
  * @author Jan Lahoda, Petr Hrebejk
  * @author Anton Chechel - javafx modifications
  */
-public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaSourceTaskFactory {
+public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaFXSourceTaskFactory {
     
     private static ClassMemberNavigatorJavaFXSourceFactory instance;
 

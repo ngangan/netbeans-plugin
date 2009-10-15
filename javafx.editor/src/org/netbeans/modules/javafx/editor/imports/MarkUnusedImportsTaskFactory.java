@@ -30,14 +30,14 @@ package org.netbeans.modules.javafx.editor.imports;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
-public class MarkUnusedImportsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class MarkUnusedImportsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     public MarkUnusedImportsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);

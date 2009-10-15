@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -41,7 +41,6 @@
 package org.netbeans.api.javafx.source.support;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,43 +53,44 @@ import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
 import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;
-//import org.netbeans.api.javafx.source.SourceUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.util.RequestProcessor;
 
-/**A {@link JavaSourceTaskFactorySupport} that registers tasks to all files that are
- * opened in the editor and are visible. This factory also listens on the caret on
+/**A {@link JavaFXSourceTaskFactorySupport} that registers tasks to all files that are
+ * opened in the editor and are visible. This factory also listens on the selection in
  * opened and visible JTextComponents and reschedules the tasks as necessary.
  *
- * The tasks may access current caret position using {@link #getLastPosition} method.
+ * The tasks may access current selection span using {@link #getLastSelection} method.
+ *
+ * @since 0.15
  * 
  * @author Jan Lahoda
  */
-public abstract class CaretAwareJavaSourceTaskFactory extends JavaFXSourceTaskFactory {
+public abstract class SelectionAwareJavaFXSourceTaskFactory extends JavaFXSourceTaskFactory {
     
     private static final int DEFAULT_RESCHEDULE_TIMEOUT = 300;
-    private static final RequestProcessor WORKER = new RequestProcessor("CaretAwareJavaSourceTaskFactory worker"); // NOI18N
+    private static final RequestProcessor WORKER = new RequestProcessor("SelectionAwareJavaSourceTaskFactory worker"); // NOI18N
     
     private int timeout;
     private String[] supportedMimeTypes;
     
-    /**Construct the CaretAwareJavaSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the SelectionAwareJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      */
-    public CaretAwareJavaSourceTaskFactory(Phase phase, Priority priority) {
-        this(phase, priority, (String[]) null);
+    public SelectionAwareJavaFXSourceTaskFactory(Phase phase, Priority priority) {
+        this(phase, priority, (String []) null);
     }
     
-    /**Construct the CaretAwareJavaSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the SelectionAwareJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      * @param supportedMimeTypes a list of mime types on which the tasks created by this factory should be run
-     * @since 0.21
+     * @since 0.22
      */
-    public CaretAwareJavaSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
+    public SelectionAwareJavaFXSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
         super(phase, priority);
         //XXX: weak, or something like this:
         OpenedEditors.getDefault().addChangeListener(new ChangeListenerImpl());
@@ -105,31 +105,35 @@ public abstract class CaretAwareJavaSourceTaskFactory extends JavaFXSourceTaskFa
         return files;
     }
 
-    private Map<JTextComponent, ComponentListener> component2Listener = new HashMap<JTextComponent, ComponentListener>();
-    private static Map<FileObject, Integer> file2LastPosition = new WeakHashMap<FileObject, Integer>();
+    private Map<JTextComponent, ComponentListener> component2Listener = new HashMap<JTextComponent, SelectionAwareJavaFXSourceTaskFactory.ComponentListener>();
+    private static Map<FileObject, Integer> file2SelectionStartPosition = new WeakHashMap<FileObject, Integer>();
+    private static Map<FileObject, Integer> file2SelectionEndPosition = new WeakHashMap<FileObject, Integer>();
     
-    /**Returns current caret position in current {@link JTextComponent} for a given file.
+    /**Returns current selection span in current {@link JTextComponent} for a given file.
      *
      * @param file file from which the position should be found
-     * @return caret position in the current {@link JTextComponent} for a given file.
+     * @return selection span in the current {@link JTextComponent} for a given file.
+     *         <code>null</code> if no selection available so far.
      */
-    public synchronized static int getLastPosition(FileObject file) {
+    public synchronized static int[] getLastSelection(FileObject file) {
         if (file == null) {
             throw new NullPointerException("Cannot pass null file!"); // NOI18N
         }
         
-        Integer position = file2LastPosition.get(file);
+        Integer startPosition = file2SelectionStartPosition.get(file);
+        Integer endPosition = file2SelectionEndPosition.get(file);
         
-        if (position == null) {
+        if (startPosition == null || endPosition == null) {
             //no position set yet:
-            return 0;
+            return null;
         }
         
-        return position;    
+        return new int[] {startPosition, endPosition};
     }
     
-    synchronized static void setLastPosition(FileObject file, int position) {
-       file2LastPosition.put(file, position);
+    private synchronized static void setLastSelection(FileObject file, int startPosition, int endPosition) {
+        file2SelectionStartPosition.put(file, startPosition);
+        file2SelectionEndPosition.put(file, endPosition);
     }
     
     private class ChangeListenerImpl implements ChangeListener {
@@ -152,7 +156,7 @@ public abstract class CaretAwareJavaSourceTaskFactory extends JavaFXSourceTaskFa
                 component2Listener.put(c, l);
                 
                 //TODO: are we in AWT Thread?:
-                setLastPosition(OpenedEditors.getFileObject(c), c.getCaretPosition());
+                setLastSelection(OpenedEditors.getFileObject(c), c.getSelectionStart(), c.getSelectionEnd());
             }
             
             fileObjectsChanged();
@@ -165,14 +169,13 @@ public abstract class CaretAwareJavaSourceTaskFactory extends JavaFXSourceTaskFa
         private JTextComponent component;
         private final RequestProcessor.Task rescheduleTask;
         
-        public ComponentListener(JTextComponent component) {
+        public ComponentListener(final JTextComponent component) {
             this.component = component;
             rescheduleTask = WORKER.create(new Runnable() {
                 public void run() {
                     FileObject file = OpenedEditors.getFileObject(ComponentListener.this.component);
                     
                     if (file != null) {
-                        setLastPosition(file, ComponentListener.this.component.getCaretPosition());
                         reschedule(file);
                     }
                 }
@@ -183,7 +186,7 @@ public abstract class CaretAwareJavaSourceTaskFactory extends JavaFXSourceTaskFa
             FileObject file = OpenedEditors.getFileObject(component);
             
             if (file != null) {
-                setLastPosition(file, component.getCaretPosition());
+                setLastSelection(OpenedEditors.getFileObject(component), component.getSelectionStart(), component.getSelectionEnd());
                 rescheduleTask.schedule(timeout);
             }
         }

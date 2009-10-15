@@ -55,7 +55,7 @@ import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXForExpressionInClause;
 import com.sun.tools.javafx.tree.JFXVar;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ import org.openide.filesystems.FileObject;
  *
  * @author karol harezlak
  */
-public class MarkUnusedElementsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private Document document;
 

@@ -48,7 +48,7 @@ import java.util.HashSet;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
 import com.sun.javafx.api.tree.SourcePositions;
@@ -72,7 +72,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
 
