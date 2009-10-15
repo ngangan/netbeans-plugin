@@ -100,7 +100,9 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
                         try {
-                            mixins.addAll(node.getMixins());
+                            if (node.getMixins() != null) {
+                                mixins.addAll(node.getMixins());
+                            }
                         } catch (NullPointerException npe) {
                             npe.printStackTrace();
                         }
@@ -123,7 +125,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
-                if (mixins.size() == 0) {
+                if (mixins.isEmpty()) {
                     return;
                 }
                 if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {

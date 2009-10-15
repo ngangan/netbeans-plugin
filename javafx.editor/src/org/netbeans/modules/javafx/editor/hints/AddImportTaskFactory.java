@@ -93,7 +93,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
                 if (compilationInfo.getDocument() != null) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                 }
-                if (compilationInfo.getDiagnostics().size() == 0) {
+                if (!compilationInfo.isErrors()) {
                     return;
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
@@ -150,7 +150,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
                             listFQN.add(new FixImport(potentialFqn));
                         }
                     }
-                    if (listFQN.size() == 0) {
+                    if (listFQN.isEmpty()) {
                         continue;
                     }
                     ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
