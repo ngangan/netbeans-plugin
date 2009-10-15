@@ -373,6 +373,9 @@ public final class JavaFXParser extends Parser {
         //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
         options.add("-XDdisableStringFolding"); //NOI18N
 
+        // required for code formatting (and completion I believe), see JFXC-3528
+        options.add("-XDpreserveTrees"); //NOI18N
+
         diagnosticListener = new DiagnosticListenerImpl();
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));
         Context context = task.getContext();
