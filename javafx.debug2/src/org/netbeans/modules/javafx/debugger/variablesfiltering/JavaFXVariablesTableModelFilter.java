@@ -77,8 +77,9 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
      * @return true if variable on given position is read only
      */
     public boolean isReadOnly( TableModel original, Object node, String columnID ) throws UnknownTypeException {
-        boolean ro = original.isReadOnly(node, columnID);
-        return ro;
+        //boolean ro = original.isReadOnly(node, columnID);
+        //return ro;
+        return true;
     }
 
     /**
@@ -96,7 +97,7 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
      *          <code>original.setValueAt (...)</code> method call only!
      */
     public void setValueAt( TableModel original, Object node, String columnID, Object value ) throws UnknownTypeException {
-        original.setValueAt( node, columnID, value );
+        //original.setValueAt( node, columnID, value );
     }
 
     public void addModelListener(ModelListener l) {
