@@ -294,6 +294,7 @@ public class JFXReformatTask implements ReformatTask {
         private static final String ERROR = "<error>"; // NOI18N
         private static final String SEMI = ";"; // NOI18N
         private static final String WS_TEMPLATE = "\\s+"; // NOI18N
+        private static final String MAGIC_FUNCTION = "javafx$run$"; //NOI18N
         private static final int ANY_COUNT = -1;
 
         private final Document doc;
@@ -752,6 +753,10 @@ public class JFXReformatTask implements ReformatTask {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
+                    accept(JFXTokenId.FUNCTION);
+                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+                }
                 scan(type, p);
             }
 
@@ -799,6 +804,7 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.FUNCTION);
             space();
 
+            boolean magicFunc = MAGIC_FUNCTION.contentEquals(funcDef.getName());
             if (!ERROR.contentEquals(funcDef.getName())) {
                 accept(JFXTokenId.IDENTIFIER);
             }
@@ -809,7 +815,7 @@ public class JFXReformatTask implements ReformatTask {
             spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
             accept(JFXTokenId.LPAREN);
             List<? extends JFXVar> params = funcDef.getParams();
-            if (params != null && !params.isEmpty()) {
+            if (params != null && !params.isEmpty() && !magicFunc) {
                 spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
                 wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
                 spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0);
@@ -817,7 +823,7 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.RPAREN);
 
             JFXType retType = funcDef.getJFXReturnType();
-            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN && !magicFunc) {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
@@ -1600,7 +1606,13 @@ public class JFXReformatTask implements ReformatTask {
         // TODO check it
         @Override
         public Boolean visitTypeFunctional(TypeFunctionalTree node, Void p) {
-            return super.visitTypeFunctional(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
         // TODO check it
@@ -3085,11 +3097,16 @@ public class JFXReformatTask implements ReformatTask {
             return sp.getStartPosition(root, node);
         }
 
+        // TODO check flags when it will work
+        // TODO create issue for compiler
         private static boolean hasModifiers(ModifiersTree mods) {
-            // TODO check flags when it will work
-            // TODO create issue for compiler
-            String pattern = "script only (default)"; // NOI18N
-            return mods != null && mods.toString().indexOf(pattern) == -1;
+            if (mods == null) {
+                return false;
+            }
+            final String pattern1 = "synthetic"; // NOI18N
+            final String pattern2 = "script only (default)"; // NOI18N
+            final String modsStr = mods.toString();
+            return modsStr.indexOf(pattern1) == -1 && modsStr.indexOf(pattern2) == -1;
         }
 
         private static class FakeBlock extends JFXBlock {
