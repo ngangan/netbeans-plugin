@@ -45,6 +45,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.*;
@@ -72,6 +73,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private final static String HINTS_IDENT = "addimportjavafx"; //NOI18N
     private final static String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
     private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
+    private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -83,10 +85,12 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
 
             @Override
             public void cancel() {
+                cancel.set(true);
             }
 
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                cancel.set(false);
                 if (file == null) {
                     throw new IllegalArgumentException();
                 }
@@ -96,9 +100,16 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                 if (!compilationInfo.isErrors()) {
                     return;
                 }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
+                final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+                final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
+                final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+                final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
+
                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                    if (cancel.get()) {
+                        return;
+                    }
                     boolean onlyAbstractError = false;
                     if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
                         onlyAbstractError = true;
@@ -135,7 +146,11 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         return;
                     }
                     potentialFqn = HintsUtils.getClassSimpleName(potentialFqn);
-                    Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                    Collection<ElementHandle<TypeElement>> options = optionsCache.get(potentialFqn);
+                    if (options == null) {
+                        options = options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        optionsCache.put(potentialFqn, options);
+                    }
                     List<Fix> listFQN = new ArrayList<Fix>();
                     boolean exists = false;
                     for (ElementHandle<TypeElement> elementHandle : options) {

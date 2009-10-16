@@ -51,6 +51,7 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -73,6 +74,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private final Map<Document, Collection<OverriddeAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddeAnnotation>>();
+    private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MarkOverridenTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -125,16 +127,21 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
         return new CancellableTask<CompilationInfo>() {
 
             public void cancel() {
+                cancel.set(true);
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
-                Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
-                Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
-                Collection<JFXImport> imports = new HashSet<JFXImport>();
-                JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, true);
-                Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
-
+                cancel.set(false);
+                final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
+                final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
+                final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
+                final Collection<JFXImport> imports = new HashSet<JFXImport>();
+                final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, true);
+                final Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
+                final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+                final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
+                final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+                
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 for (Element classElement : classesKeys) {
                     if (overridenMethods.size() == 0 ||
@@ -148,14 +155,26 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
                     updateAnnotationsOverriden(compilationInfo, addedAnotations);
                     return;
                 }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
+                    if (cancel.get()) {
+                        return;
+                    }
                     Collection<Tree> superTypes = classTrees.get(currentClass);
                     if (superTypes == null) {
                         continue;
                     }
                     Collection<MethodSymbol> methods = overridenMethods.get(currentClass);
                     if (methods == null) {
+                        continue;
+                    }
+                    boolean isCurrentClass = false;
+                    for (MethodSymbol method : methods) {
+                        if (method.owner == currentClass) {
+                            isCurrentClass = true;
+                        }
+                    }
+                    if (!isCurrentClass) {
                         continue;
                     }
                     Tree currentClassTree = compilationInfo.getTrees().getTree(currentClass);
@@ -166,21 +185,37 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
                         if (superElement == null) {
                             continue;
                         }
-                        String superTypeName = superElement.getSimpleName().toString();
-                        if (HintsUtils.checkString(superTypeName)) {
+                        String className = null;
+                        if (HintsUtils.checkString(superTree.toString())) {
+                            continue;
+                        } else {
+                            className = HintsUtils.getClassSimpleName(superTree.toString());
+                        }
+                        Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
+                        if (options == null) {
+                             options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                             optionsCache.put(className, options);
+                        }
+                        if (options == null) {
                             continue;
                         }
-
-                        Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(superTypeName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         for (ElementHandle<TypeElement> elementHandle : options) {
-                            TypeElement typeElement = elementHandle.resolve(compilationInfo);
+                            TypeElement typeElement = typeElementCash.get(elementHandle);
+                            if (typeElement == null) {
+                                typeElement = elementHandle.resolve(compilationInfo);
+                                typeElementCash.put(elementHandle, typeElement);
+                            }
                             if (typeElement == null) {
                                 continue;
                             }
                             if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superElement)) {
                                 continue;
                             }
-                            Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                            Collection<? extends Element> elements = elementsCash.get(typeElement);
+                            if (elements == null) {
+                                elements = getAllMembers(typeElement, compilationInfo);
+                                elementsCash.put(typeElement, elements);
+                            }
                             if (elements == null) {
                                 continue;
                             }

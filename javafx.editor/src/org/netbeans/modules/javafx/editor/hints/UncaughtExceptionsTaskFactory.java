@@ -46,8 +46,6 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
@@ -100,8 +98,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 if (document != null) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
                     }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo, classIndex);
+                UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
                 HintsModel model = new HintsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);

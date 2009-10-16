@@ -51,7 +51,6 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TryTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXForExpressionInClause;
 import com.sun.tools.javafx.tree.JFXVar;

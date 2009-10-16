@@ -5,7 +5,6 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
@@ -46,7 +45,7 @@ final class HintsUtils {
             fqName = fqName.substring(start);
         }
         fqName = fqName.replace("{", "").replace("}", ""); //NOI18N
-        return fqName;
+        return fqName.trim();
     }
 
     static boolean checkString(String name) {
