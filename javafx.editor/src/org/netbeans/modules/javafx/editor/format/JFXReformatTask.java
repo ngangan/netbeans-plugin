@@ -541,16 +541,17 @@ public class JFXReformatTask implements ReformatTask {
                     accept(JFXTokenId.IDENTIFIER);
                 }
 
-                List<? extends ExpressionTree> exts = node.getImplements();
+                List<? extends ExpressionTree> exts = node.getExtends();
                 if (exts != null && !exts.isEmpty()) {
                     wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
                     wrapList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, exts); // TODO cs.alignMultilineExtends()
                 }
-                List<? extends ExpressionTree> impls = node.getImplements();
-                if (impls != null && !impls.isEmpty()) {
-                    wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
-                    wrapList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, impls);
-                }
+                // no implements AFAIK
+//                List<? extends ExpressionTree> impls = node.getImplements();
+//                if (impls != null && !impls.isEmpty()) {
+//                    wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
+//                    wrapList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, impls);
+//                }
                 indent = old;
 
                 CodeStyle.BracePlacement bracePlacement = cs.getClassDeclBracePlacement();
@@ -789,6 +790,10 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     blankLines();
                 }
+            }
+            final JFXTokenId accepted = accept(JFXTokenId.OVERRIDE);
+            if (accepted != null) {
+                space();
             }
 
             accept(JFXTokenId.FUNCTION);
