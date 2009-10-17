@@ -96,7 +96,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
     }
 
-
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
 
@@ -135,9 +134,9 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 final HintsModel modelFix = new HintsModel(compilationInfo);
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-//                     if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
-//                        continue;
-//                    }
+                    if (!isValidError(diagnostic.getCode())) {
+                        continue;
+                    }
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
                     Tree superTree = compilationInfo.getTreeUtilities().parseExpression("", (int) diagnostic.getStartPosition());
@@ -234,12 +233,17 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 }
                 addHintsToController(document, modelFix, compilationInfo, file);
             }
-
-           
         };
     }
 
-     private  int findPosition(CompilationInfo compilationInfo, Tree tree) {
+    private boolean isValidError(String errorCode) {
+        if (errorCode.equals(ERROR_CODE1) || errorCode.equals(ERROR_CODE2)) {
+            return true;
+        }
+        return false;
+    }
+
+    private int findPosition(CompilationInfo compilationInfo, Tree tree) {
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
         Document document = compilationInfo.getDocument();
@@ -247,7 +251,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         try {
             String text = document.getText(0, document.getLength()).substring(start, document.getLength());
             int index = text.indexOf("{"); //NOI18N
-            if (index > 0 ) {
+            if (index > 0) {
                 return start + index + 1;
             } else {
                 return -1;
@@ -259,199 +263,198 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return -1;
     }
 
-      private void addHintsToController(Document document, HintsModel model, CompilationInfo compilationInfo, FileObject file) {
-                if (model.getHints() != null) {
-                    Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-                    for (Hint hint : model.getHints()) {
-                        errors.add(getErrorDescription(document, file, hint, compilationInfo));
-                    }
-                    if (document != null || !errors.isEmpty()) {
-                        HintsController.setErrors(document, HINT_IDENT, errors); //NOI18N
-                    }
-                }
+    private void addHintsToController(Document document, HintsModel model, CompilationInfo compilationInfo, FileObject file) {
+        if (model.getHints() != null) {
+            Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+            for (Hint hint : model.getHints()) {
+                errors.add(getErrorDescription(document, file, hint, compilationInfo));
+            }
+            if (document != null || !errors.isEmpty()) {
+                HintsController.setErrors(document, HINT_IDENT, errors); //NOI18N
+            }
+        }
+    }
+
+    private ErrorDescription getErrorDescription(final Document document, FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
+        Fix fix = new Fix() {
+
+            public String getText() {
+                return NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"); //NOI18N
             }
 
-            private ErrorDescription getErrorDescription(final Document document, FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
-                Fix fix = new Fix() {
+            public ChangeInfo implement() throws Exception {
+                final StringBuilder methods = new StringBuilder();
+                final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
 
-                    public String getText() {
-                        return NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"); //NOI18N
-                    }
-
-                    public ChangeInfo implement() throws Exception {
-                        final StringBuilder methods = new StringBuilder();
-                        final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
-
-                        for (MethodSymbol methodSymbol : hint.getMethods()) {
-                            methods.append(createMethod(methodSymbol, space));
-                        }
-                        if (methods.toString().length() > 0) {
-                            methods.append(space);
-                        }
-                        final int positon = findPosition(compilationInfo, hint.getTree());
-                        if (positon < 0) {
-                            return null;
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            public void run() {
-                                try {
-                                    document.insertString(positon, methods.toString(), null);
-                                    JTextComponent target = Utilities.getFocusedComponent();
-                                    if (target == null) {
-                                        return;
-                                    }
-                                    Imports.addImport(target, EXCEPTION);
-                                    for (MethodSymbol method : hint.getMethods()) {
-                                        addImport(target, method.asType());
-                                        for (VarSymbol var : method.getParameters()) {
-                                            scanImport(target, var.asType());
-                                        }
-                                    }
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        });
-
-                        return null;
-                    }
-
-                    private void scanImport(JTextComponent target, Type type) {
-                        if (type.getParameterTypes() != null && !type.getParameterTypes().isEmpty()) {
-                            for (Type t : type.getParameterTypes()) {
-                                scanImport(target, t);
-                            }
-                        }
-                        addImport(target, type);
-                    }
-
-                    private void addImport(JTextComponent target, Type type) {
-                        if (type == null) {
-                            return;
-                        }
-                        String importName = type.toString();
-                        if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) { //NOI18N
-                            importName = removeBetween("()", importName); //NOI18N
-                            importName = removeBetween("<>", importName); //NOI18N
-                            Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName); //NOI18N
-                            if (symbolMatcher.find()) {
-                                importName = symbolMatcher.replaceAll("").trim(); //NOI18N
-                            }
-                            if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
-                                Imports.addImport(target, importName);
-                            }
-                        }
-                    }
-
-                    private String createMethod(MethodSymbol methodSymbol, String space) {
-                        StringBuilder method = new StringBuilder();
-                        method.append("\n").append(space).append(TAB).append("override "); //NOI18N
-                        for (Modifier modifier : methodSymbol.getModifiers()) {
-                            switch (modifier) {
-                                case PUBLIC:
-                                    method.append("public "); //NOI18N
-                                    break;
-                                case PROTECTED:
-                                    method.append("protected "); //NOI18N
-                                    break;
-                            }
-                        }
-                        method.append("function ").append(methodSymbol.getQualifiedName() + " ("); //NOI18N
-                        //TODO Work around for NPE which is thrown by methodSymbol.getParameters();
-                        try {
-                            if (methodSymbol.getParameters() != null) {
-                                Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
-                                while (iterator.hasNext()) {
-                                    VarSymbol var = iterator.next();
-                                    String varType = getTypeString(var.asType());
-                                    method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
-                                    if (iterator.hasNext()) {
-                                        method.append(", "); //NOI18N
-                                    }
-                                }
-                            }
-                        } catch (NullPointerException npe) {
-                            npe.printStackTrace();
-                        }
-                        //TODO Work around for methodSymbol.getReturnType() which throws NPE!
-                        String returnType = null;
-                        try {
-                            returnType = getTypeString(methodSymbol.getReturnType());
-                        } catch (NullPointerException npe) {
-                            npe.printStackTrace();
-                        }
-                        if (returnType == null || returnType.equals("void")) { //NOI18N
-                            returnType = "Void"; //NOI18N
-                        } else {
-                            returnType = HintsUtils.getClassSimpleName(returnType);
-                        }
-                        method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
-                        method.append(space).append(TAB).append(TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                        method.append(space).append(TAB).append("}\n"); //NOI18N
-
-                        return method.toString();
-                    }
-                };
-                if (hint.getStartPosition() < 0) {
+                for (MethodSymbol methodSymbol : hint.getMethods()) {
+                    methods.append(createMethod(methodSymbol, space));
+                }
+                if (methods.toString().length() > 0) {
+                    methods.append(space);
+                }
+                final int positon = findPosition(compilationInfo, hint.getTree());
+                if (positon < 0) {
                     return null;
                 }
-                ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
-                return ed;
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        try {
+                            document.insertString(positon, methods.toString(), null);
+                            JTextComponent target = Utilities.getFocusedComponent();
+                            if (target == null) {
+                                return;
+                            }
+                            Imports.addImport(target, EXCEPTION);
+                            for (MethodSymbol method : hint.getMethods()) {
+                                addImport(target, method.asType());
+                                for (VarSymbol var : method.getParameters()) {
+                                    scanImport(target, var.asType());
+                                }
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+
+                return null;
             }
 
-            private String removeBetween(String symbols, String name) {
-                int firstIndex = name.indexOf(symbols.substring(0, 1));
-                int lastIndex = name.indexOf(symbols.substring(1, 2));
-                if (firstIndex < 0 || lastIndex < 0) {
-                    return name;
-                }
-                name = name.replace(name.substring(firstIndex, lastIndex + 1), "");
-                return name;
-            }
-
-            private String getTypeString(Type type) {
-                String varType = type.toString();
-                if (type.isPrimitive()) {
-                    if (varType.equals("int")) { //NOI18N
-                        varType = Integer.class.getSimpleName();
-                    } else if (varType.equals("long") //NOI18N
-                            || varType.equals("byte") //NOI18N
-                            || varType.equals("short") //NOI18N
-                            || varType.equals("float") //NOI18N
-                            || varType.equals("double")) { //NOI18N
-
-                        varType = "Number"; //NOI18N
-                    } else if (varType.equals("char")) { //NOI18N
-                        varType = Character.class.getSimpleName();
-                    } else if (varType.equals("boolean")) { //NOI18N
-                        return Boolean.class.getSimpleName();
+            private void scanImport(JTextComponent target, Type type) {
+                if (type.getParameterTypes() != null && !type.getParameterTypes().isEmpty()) {
+                    for (Type t : type.getParameterTypes()) {
+                        scanImport(target, t);
                     }
                 }
-                if (varType.equals("E") || varType.equals("T")) { //NOI18N
-                    varType = "Object"; //NOI18N
-                }
-                if (varType.equals("E[]") || varType.equals("T[]")) { //NOI18N
-                    varType = "Object[]"; //NOI18N
-                }
-                varType = removeBetween("<>", varType); //NOI18N
-                return varType;
+                addImport(target, type);
             }
 
-            //TODO Temporary log for issue 148890
-            Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
-                Collection<? extends Element> elements = null;
+            private void addImport(JTextComponent target, Type type) {
+                if (type == null) {
+                    return;
+                }
+                String importName = type.toString();
+                if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) { //NOI18N
+                    importName = removeBetween("()", importName); //NOI18N
+                    importName = removeBetween("<>", importName); //NOI18N
+                    Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName); //NOI18N
+                    if (symbolMatcher.find()) {
+                        importName = symbolMatcher.replaceAll("").trim(); //NOI18N
+                    }
+                    if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
+                        Imports.addImport(target, importName);
+                    }
+                }
+            }
+
+            private String createMethod(MethodSymbol methodSymbol, String space) {
+                StringBuilder method = new StringBuilder();
+                method.append("\n").append(space).append(TAB).append("override "); //NOI18N
+                for (Modifier modifier : methodSymbol.getModifiers()) {
+                    switch (modifier) {
+                        case PUBLIC:
+                            method.append("public "); //NOI18N
+                            break;
+                        case PROTECTED:
+                            method.append("protected "); //NOI18N
+                            break;
+                    }
+                }
+                method.append("function ").append(methodSymbol.getQualifiedName() + " ("); //NOI18N
+                //TODO Work around for NPE which is thrown by methodSymbol.getParameters();
                 try {
-                    elements = compilationInfo.getElements().getAllMembers(typeElement);
+                    if (methodSymbol.getParameters() != null) {
+                        Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
+                        while (iterator.hasNext()) {
+                            VarSymbol var = iterator.next();
+                            String varType = getTypeString(var.asType());
+                            method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
+                            if (iterator.hasNext()) {
+                                method.append(", "); //NOI18N
+                            }
+                        }
+                    }
                 } catch (NullPointerException npe) {
                     npe.printStackTrace();
-                    System.err.println("* e = " + typeElement); //NOI18N
-                    System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
-                    System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
                 }
-                return elements;
-            }
+                //TODO Work around for methodSymbol.getReturnType() which throws NPE!
+                String returnType = null;
+                try {
+                    returnType = getTypeString(methodSymbol.getReturnType());
+                } catch (NullPointerException npe) {
+                    npe.printStackTrace();
+                }
+                if (returnType == null || returnType.equals("void")) { //NOI18N
+                    returnType = "Void"; //NOI18N
+                } else {
+                    returnType = HintsUtils.getClassSimpleName(returnType);
+                }
+                method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
+                method.append(space).append(TAB).append(TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                method.append(space).append(TAB).append("}\n"); //NOI18N
 
+                return method.toString();
+            }
+        };
+        if (hint.getStartPosition() < 0) {
+            return null;
+        }
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
+        return ed;
+    }
+
+    private String removeBetween(String symbols, String name) {
+        int firstIndex = name.indexOf(symbols.substring(0, 1));
+        int lastIndex = name.indexOf(symbols.substring(1, 2));
+        if (firstIndex < 0 || lastIndex < 0) {
+            return name;
+        }
+        name = name.replace(name.substring(firstIndex, lastIndex + 1), "");
+        return name;
+    }
+
+    private String getTypeString(Type type) {
+        String varType = type.toString();
+        if (type.isPrimitive()) {
+            if (varType.equals("int")) { //NOI18N
+                varType = Integer.class.getSimpleName();
+            } else if (varType.equals("long") //NOI18N
+                    || varType.equals("byte") //NOI18N
+                    || varType.equals("short") //NOI18N
+                    || varType.equals("float") //NOI18N
+                    || varType.equals("double")) { //NOI18N
+
+                varType = "Number"; //NOI18N
+            } else if (varType.equals("char")) { //NOI18N
+                varType = Character.class.getSimpleName();
+            } else if (varType.equals("boolean")) { //NOI18N
+                return Boolean.class.getSimpleName();
+            }
+        }
+        if (varType.equals("E") || varType.equals("T")) { //NOI18N
+            varType = "Object"; //NOI18N
+        }
+        if (varType.equals("E[]") || varType.equals("T[]")) { //NOI18N
+            varType = "Object[]"; //NOI18N
+        }
+        varType = removeBetween("<>", varType); //NOI18N
+        return varType;
+    }
+
+    //TODO Temporary log for issue 148890
+    Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
+        Collection<? extends Element> elements = null;
+        try {
+            elements = compilationInfo.getElements().getAllMembers(typeElement);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            System.err.println("* e = " + typeElement); //NOI18N
+            System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
+            System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
+        }
+        return elements;
+    }
 }
 
 
