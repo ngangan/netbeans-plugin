@@ -89,7 +89,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String TAB = "    "; //NOI18N
     private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
-    private static final String HINT_IDENT = "anonoverridejavafx"; //NOI18N
+    private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public OverrideAllTaskFactory() {
@@ -108,10 +108,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
                 final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-
-                if (document != null) {
-                    HintsController.setErrors(document, HINT_IDENT, Collections.EMPTY_LIST); //NOI18N
-                }
 
                 final Collection<Boolean> mixinMain = new HashSet<Boolean>();
                 final Collection<Boolean> mixinExtends = new HashSet<Boolean>();
@@ -135,7 +131,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (!isValidError(diagnostic.getCode())) {
-                        continue;
+                        break;
                     }
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
@@ -146,14 +142,12 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
                         className = classSymbol.getSimpleName().toString();
                     } else if (superTree instanceof JFXInstanciate) {
-                        //className = HintsUtils.getClassSimpleName(superTree.toString());
                         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                         final Tree[] tree = new Tree[1];
                         JavaFXTreePathScanner<Void, Void> scaner = new JavaFXTreePathScanner<Void, Void>() {
 
                             @Override
                             public Void visitInstantiate(InstantiateTree node, Void p) {
-
                                 int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
                                 if (diagnostic.getStartPosition() == position) {
                                     tree[0] = node;
@@ -167,21 +161,22 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                             superTree = tree[0];
                             className = HintsUtils.getClassSimpleName(superTree.toString());
                         }
-                        //compilationInfo.getTreeUtilities().parseExpression("NewClass", (int) diagnostic.getStartPosition());
+                    }
+                    if (findPosition(compilationInfo, superTree) < 0) {
+                        continue;
                     }
                     if (className != null) {
-                        final Collection<MethodSymbol> overridenMethods = new HashSet<MethodSymbol>();
+                        final Collection<MethodSymbol> overriddenMethods = new HashSet<MethodSymbol>();
                         final Collection<JFXImport> imports = new HashSet<JFXImport>();
                         final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
 
-                        JavaFXTreePathScanner<Void, Void> visitor = new OverrideAnonVisitor(compilationInfo, overridenMethods, imports);
+                        JavaFXTreePathScanner<Void, Void> visitor = new OverrideAllVisitor(compilationInfo, overriddenMethods, imports);
                         try {
                             superTree.accept(visitor, null);
                         } catch (NullPointerException ex) {
                             ex.printStackTrace();
                             continue;
                         }
-
                         Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
                         if (options == null) {
                             options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
@@ -196,9 +191,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                             if (typeElement == null) {
                                 continue;
                             }
-//                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superTreeElement)) {
-//                                continue;
-//                            }
                             Collection<? extends Element> elements = elementsCash.get(typeElement);
                             if (elements == null) {
                                 elements = elements = getAllMembers(typeElement, compilationInfo);
@@ -211,8 +203,8 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                                         if (modifier != Modifier.ABSTRACT) {
                                             continue;
                                         }
-                                        MethodSymbol overridenMethod = HintsUtils.isOverriden(overridenMethods, method);
-                                        if (overridenMethod == null) {
+                                        MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method);
+                                        if (overriddenMethod == null) {
                                             abstractMethods.add(method);
                                             break;
                                         }
@@ -221,15 +213,10 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                                 }
                             }
                         }
-
                         if (!abstractMethods.isEmpty()) {
                             modelFix.addHint(superTree, abstractMethods);
                         }
                     }
-
-                    //}
-
-
                 }
                 addHintsToController(document, modelFix, compilationInfo, file);
             }
@@ -247,7 +234,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
         Document document = compilationInfo.getDocument();
-
         try {
             String text = document.getText(0, document.getLength()).substring(start, document.getLength());
             int index = text.indexOf("{"); //NOI18N
@@ -272,6 +258,11 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             if (document != null || !errors.isEmpty()) {
                 HintsController.setErrors(document, HINT_IDENT, errors); //NOI18N
             }
+        } else {
+            if (document != null) {
+                HintsController.setErrors(document, HINT_IDENT, Collections.EMPTY_LIST); //NOI18N
+            }
+
         }
     }
 
@@ -285,7 +276,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             public ChangeInfo implement() throws Exception {
                 final StringBuilder methods = new StringBuilder();
                 final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
-
                 for (MethodSymbol methodSymbol : hint.getMethods()) {
                     methods.append(createMethod(methodSymbol, space));
                 }

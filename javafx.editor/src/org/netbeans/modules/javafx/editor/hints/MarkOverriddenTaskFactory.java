@@ -69,18 +69,18 @@ import org.openide.text.NbDocument;
  *
  * @author karol harezlak
  */
-public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private final Map<Document, Collection<OverriddeAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddeAnnotation>>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
-    public MarkOverridenTaskFactory() {
+    public MarkOverriddenTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
-    private void updateAnnotationsOverriden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
+    private void updateAnnotationsoverridden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
         final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
         final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) == null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
         final Collection<OverriddeAnnotation> addedAnnotationsCopy = new HashSet<OverriddeAnnotation>(addedAnnotations);
@@ -133,26 +133,26 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
                 final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
-                final Map<Element, List<MethodSymbol>> overridenMethods = new HashMap<Element, List<MethodSymbol>>();
+                final Map<Element, List<MethodSymbol>> overriddenMethods = new HashMap<Element, List<MethodSymbol>>();
                 final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
                 final Collection<JFXImport> imports = new HashSet<JFXImport>();
-                final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports, true);
-                final Collection<Element> classesKeys = new HashSet<Element>(overridenMethods.keySet());
+                final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overriddenMethods, imports, true);
+                final Collection<Element> classesKeys = new HashSet<Element>(overriddenMethods.keySet());
                 final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
                 final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
                 final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
                 
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 for (Element classElement : classesKeys) {
-                    if (overridenMethods.size() == 0 ||
+                    if (overriddenMethods.size() == 0 ||
                             !isAnnon(classElement) &&
                             HintsUtils.checkString(classElement.getSimpleName().toString())) {
-                        updateAnnotationsOverriden(compilationInfo, addedAnotations);
-                        overridenMethods.remove(classElement);
+                        updateAnnotationsoverridden(compilationInfo, addedAnotations);
+                        overriddenMethods.remove(classElement);
                     }
                 }
-                if (overridenMethods.size() == 0) {
-                    updateAnnotationsOverriden(compilationInfo, addedAnotations);
+                if (overriddenMethods.size() == 0) {
+                    updateAnnotationsoverridden(compilationInfo, addedAnotations);
                     return;
                 }
                 final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
@@ -164,7 +164,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
                     if (superTypes == null) {
                         continue;
                     }
-                    Collection<MethodSymbol> methods = overridenMethods.get(currentClass);
+                    Collection<MethodSymbol> methods = overriddenMethods.get(currentClass);
                     if (methods == null) {
                         continue;
                     }
@@ -235,7 +235,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
 
                     }
                 }
-                updateAnnotationsOverriden(compilationInfo, addedAnotations);
+                updateAnnotationsoverridden(compilationInfo, addedAnotations);
             }
         };
     }
@@ -282,7 +282,7 @@ public final class MarkOverridenTaskFactory extends EditorAwareJavaFXSourceTaskF
 //
 //        }
         // Work around for a problem with mixin compilationInfo.getElements().overrides(override, overridden, typeOverridden) which does not work with mixin
-        return HintsUtils.isOverriden(elementsToCheck, overridden);
+        return HintsUtils.isOverridden(elementsToCheck, overridden);
 
     }
 

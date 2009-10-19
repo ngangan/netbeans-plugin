@@ -94,15 +94,14 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                 if (file == null) {
                     throw new IllegalArgumentException();
                 }
-                if (compilationInfo.getDocument() != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
-                }
+                
                 if (!compilationInfo.isErrors()) {
+                    if (compilationInfo.getDocument() != null) {
+                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
+                    }
                     return;
                 }
                 final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-                final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
-                final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
                 final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
 

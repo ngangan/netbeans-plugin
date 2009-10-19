@@ -93,23 +93,21 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 }
                 final Document document = compilationInfo.getDocument();
                 if (compilationInfo.getDiagnostics() != null && compilationInfo.getDiagnostics().size() > 0) {
+                    if (document != null) {
+                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
+                    }
                     return;
                 }
-                if (document != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
-                    }
                 UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
                 HintsModel model = new HintsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
-                if (model.getHints() != null) {
-                    Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-                    for (Hint hint : model.getHints()) {
-                        errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
-                    }
-                    if (document != null) {
-                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); //NOI18N
-                    }
+                Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+                for (Hint hint : model.getHints()) {
+                    errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+                }
+                if (document != null) {
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); //NOI18N
                 }
             }
         };

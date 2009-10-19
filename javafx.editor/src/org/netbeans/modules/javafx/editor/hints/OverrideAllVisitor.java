@@ -20,18 +20,18 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  *
  * @author karol harezlak
  */
-final class OverrideAnonVisitor extends JavaFXTreePathScanner<Void, Void> {
+final class OverrideAllVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     private CompilationInfo compilationInfo;
-    private Collection<MethodSymbol> overridenMethods;
+    private Collection<MethodSymbol> overriddenMethods;
     private Collection<JFXImport> imports;
 
-    public OverrideAnonVisitor(CompilationInfo compilationInfo,
-            Collection<MethodSymbol> overridenMethods,
+    public OverrideAllVisitor(CompilationInfo compilationInfo,
+            Collection<MethodSymbol> overriddenMethods,
             Collection<JFXImport> imports) {
 
         this.compilationInfo = compilationInfo;
-        this.overridenMethods = overridenMethods;
+        this.overriddenMethods = overriddenMethods;
         this.imports = imports;
     }
 
@@ -61,7 +61,7 @@ final class OverrideAnonVisitor extends JavaFXTreePathScanner<Void, Void> {
         if (element != null && element.getEnclosingElement() instanceof JavafxClassSymbol) {
             if (element instanceof MethodSymbol) {
                 MethodSymbol methodSymbol = (MethodSymbol) element;
-                overridenMethods.add(methodSymbol);
+                overriddenMethods.add(methodSymbol);
             }
         }
 

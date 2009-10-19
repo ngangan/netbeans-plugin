@@ -100,6 +100,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
                 final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
                 final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+                ErrorDescription errorDescription = null;
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -130,11 +131,10 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
-                HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
-                if (mixins.isEmpty()) {
-                    return;
-                }
-                if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
+                if (mixins.isEmpty() || HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
+                    if (document != null) {
+                        HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
+                    }
                     return;
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
@@ -185,10 +185,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), mixin);
                             String hintText = NbBundle.getMessage(MixinNotImplementedAbstractsTaskFactory.class, "TITLE_MIXIN_ABSTRACT"); //NOI18N
-                            ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
-                            if (document != null) {
-                                HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
-                            }
+                            errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
                             breakIt = true;
                             break;
                         }
@@ -196,6 +193,11 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     if (breakIt) {
                         break;
                     }
+                }
+                if (document != null && errorDescription != null) {
+                    HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
+                } else  if (document != null) {
+                    HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
                 }
             }
         };
