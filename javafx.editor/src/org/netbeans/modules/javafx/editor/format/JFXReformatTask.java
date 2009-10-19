@@ -618,7 +618,12 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : node.getClassMembers()) {
-                if (!isSynthetic((JFXTree) member)) {
+                boolean magicFunc = false;
+                if (member instanceof JFXFunctionDefinition) {
+                    String name = ((JFXFunctionDefinition) member).getName().toString();
+                    magicFunc = MAGIC_FUNCTION.contentEquals(name);
+                }
+                if (magicFunc || !isSynthetic((JFXTree) member)) {
                     switch (member.getJavaFXKind()) {
                         case VARIABLE:
                             boolean bool = tokens.moveNext();
@@ -781,65 +786,68 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
             JFXFunctionDefinition funcDef = (JFXFunctionDefinition) node;
-            int old = indent;
-
-            ModifiersTree mods = funcDef.getModifiers();
-            if (hasModifiers(mods)) {
-                if (scan(mods, p)) {
-                    indent += continuationIndentSize;
-                    if (cs.placeNewLineAfterModifiers()) {
-                        newline();
-                    } else {
-                        space();
-                    }
-                } else {
-                    blankLines();
-                }
-            }
-            final JFXTokenId accepted = accept(JFXTokenId.OVERRIDE);
-            if (accepted != null) {
-                space();
-            }
-
-            accept(JFXTokenId.FUNCTION);
-            space();
-
             boolean magicFunc = MAGIC_FUNCTION.contentEquals(funcDef.getName());
-            if (!ERROR.contentEquals(funcDef.getName())) {
-                accept(JFXTokenId.IDENTIFIER);
-            }
 
-            if (indent == old) {
-                indent += continuationIndentSize;
-            }
-            spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
-            List<? extends JFXVar> params = funcDef.getParams();
-            if (params != null && !params.isEmpty() && !magicFunc) {
-                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
-                wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
-                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0);
-            }
-            accept(JFXTokenId.RPAREN);
+            if (!magicFunc) {
+                int old = indent;
+                ModifiersTree mods = funcDef.getModifiers();
+                if (hasModifiers(mods)) {
+                    if (scan(mods, p)) {
+                        indent += continuationIndentSize;
+                        if (cs.placeNewLineAfterModifiers()) {
+                            newline();
+                        } else {
+                            space();
+                        }
+                    } else {
+                        blankLines();
+                    }
+                }
+                final JFXTokenId accepted = accept(JFXTokenId.OVERRIDE);
+                if (accepted != null) {
+                    space();
+                }
 
-            JFXType retType = funcDef.getJFXReturnType();
-            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN && !magicFunc) {
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-                accept(JFXTokenId.COLON);
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                accept(JFXTokenId.FUNCTION);
+                space();
 
-                scan(retType, p);
+                if (!ERROR.contentEquals(funcDef.getName())) {
+                    accept(JFXTokenId.IDENTIFIER);
+                }
+
                 if (indent == old) {
                     indent += continuationIndentSize;
                 }
-//                space();
-            }
+                spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+                accept(JFXTokenId.LPAREN);
+                List<? extends JFXVar> params = funcDef.getParams();
+                if (params != null && !params.isEmpty()) {
+                    spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
+                    wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
+                    spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0);
+                }
+                accept(JFXTokenId.RPAREN);
 
-            indent = old;
+                JFXType retType = funcDef.getJFXReturnType();
+                if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                    accept(JFXTokenId.COLON);
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+
+                    scan(retType, p);
+                    if (indent == old) {
+                        indent += continuationIndentSize;
+                    }
+//                space();
+                }
+
+                indent = old;
+            }
+            
             JFXBlock body = funcDef.getBodyExpression();
             if (body != null) {
                 scan(body, p);
-            } else {
+            } else if (!magicFunc) {
                 accept(JFXTokenId.SEMI);
             }
             return true;
@@ -885,110 +893,121 @@ public class JFXReformatTask implements ReformatTask {
             }
             CodeStyle.BracePlacement bracePlacement;
             boolean spaceBeforeLeftBrace = false;
-            switch (getCurrentPath().getParentPath().getLeaf().getJavaFXKind()) {
-                case CLASS_DECLARATION:
-                    bracePlacement = cs.getOtherBracePlacement();
-                    if (node.isStatic()) {
-                        spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
-                    }
-                    break;
-                case FUNCTION_DEFINITION:
-                    bracePlacement = cs.getMethodDeclBracePlacement();
-                    spaceBeforeLeftBrace = cs.spaceBeforeMethodDeclLeftBrace();
-                    break;
-                case TRY:
-                    bracePlacement = cs.getOtherBracePlacement();
-                    if (((TryTree) getCurrentPath().getParentPath().getLeaf()).getBlock() == node) {
-                        spaceBeforeLeftBrace = cs.spaceBeforeTryLeftBrace();
-                    } else {
-                        spaceBeforeLeftBrace = cs.spaceBeforeFinallyLeftBrace();
-                    }
-                    break;
-                case CATCH:
-                    bracePlacement = cs.getOtherBracePlacement();
-                    spaceBeforeLeftBrace = cs.spaceBeforeCatchLeftBrace();
-                    break;
-                case WHILE_LOOP:
-                    bracePlacement = cs.getOtherBracePlacement();
-                    spaceBeforeLeftBrace = cs.spaceBeforeWhileLeftBrace();
-                    break;
-                case FOR_EXPRESSION_FOR:
-                case FOR_EXPRESSION_IN_CLAUSE: // TODO check it
-                case FOR_EXPRESSION_PREDICATE: // TODO check it
-                    bracePlacement = cs.getOtherBracePlacement();
-                    spaceBeforeLeftBrace = cs.spaceBeforeForLeftBrace();
-                    break;
-                case CONDITIONAL_EXPRESSION:
-                    bracePlacement = cs.getOtherBracePlacement();
-                    if (((JFXIfExpression) getCurrentPath().getParentPath().getLeaf()).getTrueExpression() == node) {
-                        spaceBeforeLeftBrace = cs.spaceBeforeIfLeftBrace();
-                    } else {
-                        spaceBeforeLeftBrace = cs.spaceBeforeElseLeftBrace();
-                    }
-                    break;
-                default:
-                    bracePlacement = cs.getOtherBracePlacement();
-                    break;
+
+            Tree parentTree = getCurrentPath().getParentPath().getLeaf();
+            boolean magicFunc = false;
+            if (parentTree instanceof JFXFunctionDefinition) {
+                String name = ((JFXFunctionDefinition) parentTree).getName().toString();
+                magicFunc = MAGIC_FUNCTION.contentEquals(name);
             }
 
-            int old = indent;
-            int halfIndent = indent;
-            switch (bracePlacement) {
-                case SAME_LINE:
-                    spaces(spaceBeforeLeftBrace ? 1 : 0);
-                    if (node instanceof FakeBlock) {
-                        appendToDiff(LCBRACE);
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        lastBlankLinesDiff = null;
-                    } else {
-                        accept(JFXTokenId.LBRACE);
-                    }
-                    indent += indentSize;
-                    break;
-                case NEW_LINE:
-                    newline();
-                    if (node instanceof FakeBlock) {
-                        indent += indentSize;
-                        appendToDiff(LCBRACE);
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        lastBlankLinesDiff = null;
-                    } else {
-                        accept(JFXTokenId.LBRACE);
-                        indent += indentSize;
-                    }
-                    break;
-                case NEW_LINE_HALF_INDENTED:
-                    indent += (indentSize >> 1);
-                    halfIndent = indent;
-                    newline();
-                    if (node instanceof FakeBlock) {
-                        indent = old + indentSize;
-                        appendToDiff(LCBRACE);
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        lastBlankLinesDiff = null;
-                    } else {
-                        accept(JFXTokenId.LBRACE);
-                        indent = old + indentSize;
-                    }
-                    break;
-                case NEW_LINE_INDENTED:
-                    indent += indentSize;
-                    halfIndent = indent;
-                    newline();
-                    if (node instanceof FakeBlock) {
-                        appendToDiff(LCBRACE);
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        lastBlankLinesDiff = null;
-                    } else {
-                        accept(JFXTokenId.LBRACE);
-                    }
-                    break;
-            }
+            int halfIndent = 0;
+            int old = 0;
+            if (!magicFunc) {
+                switch (parentTree.getJavaFXKind()) {
+                    case CLASS_DECLARATION:
+                        bracePlacement = cs.getOtherBracePlacement();
+                        if (node.isStatic()) {
+                            spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
+                        }
+                        break;
+                    case FUNCTION_DEFINITION:
+                        bracePlacement = cs.getMethodDeclBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeMethodDeclLeftBrace();
+                        break;
+                    case TRY:
+                        bracePlacement = cs.getOtherBracePlacement();
+                        if (((TryTree) parentTree).getBlock() == node) {
+                            spaceBeforeLeftBrace = cs.spaceBeforeTryLeftBrace();
+                        } else {
+                            spaceBeforeLeftBrace = cs.spaceBeforeFinallyLeftBrace();
+                        }
+                        break;
+                    case CATCH:
+                        bracePlacement = cs.getOtherBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeCatchLeftBrace();
+                        break;
+                    case WHILE_LOOP:
+                        bracePlacement = cs.getOtherBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeWhileLeftBrace();
+                        break;
+                    case FOR_EXPRESSION_FOR:
+                    case FOR_EXPRESSION_IN_CLAUSE: // TODO check it
+                    case FOR_EXPRESSION_PREDICATE: // TODO check it
+                        bracePlacement = cs.getOtherBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeForLeftBrace();
+                        break;
+                    case CONDITIONAL_EXPRESSION:
+                        bracePlacement = cs.getOtherBracePlacement();
+                        if (((JFXIfExpression) parentTree).getTrueExpression() == node) {
+                            spaceBeforeLeftBrace = cs.spaceBeforeIfLeftBrace();
+                        } else {
+                            spaceBeforeLeftBrace = cs.spaceBeforeElseLeftBrace();
+                        }
+                        break;
+                    default:
+                        bracePlacement = cs.getOtherBracePlacement();
+                        break;
+                }
 
+                old = indent;
+                halfIndent = indent;
+                switch (bracePlacement) {
+                    case SAME_LINE:
+                        spaces(spaceBeforeLeftBrace ? 1 : 0);
+                        if (node instanceof FakeBlock) {
+                            appendToDiff(LCBRACE);
+                            lastBlankLines = -1;
+                            lastBlankLinesTokenIndex = -1;
+                            lastBlankLinesDiff = null;
+                        } else {
+                            accept(JFXTokenId.LBRACE);
+                        }
+                        indent += indentSize;
+                        break;
+                    case NEW_LINE:
+                        newline();
+                        if (node instanceof FakeBlock) {
+                            indent += indentSize;
+                            appendToDiff(LCBRACE);
+                            lastBlankLines = -1;
+                            lastBlankLinesTokenIndex = -1;
+                            lastBlankLinesDiff = null;
+                        } else {
+                            accept(JFXTokenId.LBRACE);
+                            indent += indentSize;
+                        }
+                        break;
+                    case NEW_LINE_HALF_INDENTED:
+                        indent += (indentSize >> 1);
+                        halfIndent = indent;
+                        newline();
+                        if (node instanceof FakeBlock) {
+                            indent = old + indentSize;
+                            appendToDiff(LCBRACE);
+                            lastBlankLines = -1;
+                            lastBlankLinesTokenIndex = -1;
+                            lastBlankLinesDiff = null;
+                        } else {
+                            accept(JFXTokenId.LBRACE);
+                            indent = old + indentSize;
+                        }
+                        break;
+                    case NEW_LINE_INDENTED:
+                        indent += indentSize;
+                        halfIndent = indent;
+                        newline();
+                        if (node instanceof FakeBlock) {
+                            appendToDiff(LCBRACE);
+                            lastBlankLines = -1;
+                            lastBlankLinesTokenIndex = -1;
+                            lastBlankLinesDiff = null;
+                        } else {
+                            accept(JFXTokenId.LBRACE);
+                        }
+                        break;
+                }
+            }
 //            boolean isEmpty = true;
             final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
             expressions.addAll(node.getStatements());
@@ -997,7 +1016,7 @@ public class JFXReformatTask implements ReformatTask {
                 expressions.add(value);
             }
             for (ExpressionTree stat : expressions) {
-                if (!isSynthetic((JFXTree) node)) {
+                if (magicFunc || !isSynthetic((JFXTree) node)) {
 //                    isEmpty = false;
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
@@ -1049,40 +1068,42 @@ public class JFXReformatTask implements ReformatTask {
                 lastBlankLinesTokenIndex = -1;
                 lastBlankLinesDiff = null;
             } else {
-                blankLines();
-                indent = halfIndent;
-                Diff diff = diffs.isEmpty() ? null : diffs.getFirst();
-                if (diff != null && diff.end == tokens.offset()) {
-                    if (diff.text != null) {
-                        int idx = diff.text.lastIndexOf(NEWLINE);
-                        if (idx < 0) {
-                            diff.text = getIndent();
-                        } else {
-                            diff.text = diff.text.substring(0, idx + 1) + getIndent();
-                        }
+                if (!magicFunc) {
+                    blankLines();
+                    indent = halfIndent;
+                    Diff diff = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (diff != null && diff.end == tokens.offset()) {
+                        if (diff.text != null) {
+                            int idx = diff.text.lastIndexOf(NEWLINE);
+                            if (idx < 0) {
+                                diff.text = getIndent();
+                            } else {
+                                diff.text = diff.text.substring(0, idx + 1) + getIndent();
+                            }
 
-                    }
-                    String spaces = diff.text != null ? diff.text : getIndent();
-                    if (spaces.equals(fText.substring(diff.start, diff.end))) {
-                        diffs.removeFirst();
-                    }
-                } else if (tokens.movePrevious()) {
-                    if (tokens.token().id() == JFXTokenId.WS) {
-                        String text = tokens.token().text().toString();
-                        int idx = text.lastIndexOf(NEWLINE);
-                        if (idx >= 0) {
-                            text = text.substring(idx + 1);
-                            String ind = getIndent();
-                            if (!ind.equals(text)) {
-                                addDiff(new Diff(tokens.offset() + idx + 1, tokens.offset() + tokens.token().length(), ind));
+                        }
+                        String spaces = diff.text != null ? diff.text : getIndent();
+                        if (spaces.equals(fText.substring(diff.start, diff.end))) {
+                            diffs.removeFirst();
+                        }
+                    } else if (tokens.movePrevious()) {
+                        if (tokens.token().id() == JFXTokenId.WS) {
+                            String text = tokens.token().text().toString();
+                            int idx = text.lastIndexOf(NEWLINE);
+                            if (idx >= 0) {
+                                text = text.substring(idx + 1);
+                                String ind = getIndent();
+                                if (!ind.equals(text)) {
+                                    addDiff(new Diff(tokens.offset() + idx + 1, tokens.offset() + tokens.token().length(), ind));
+                                }
                             }
                         }
+                        tokens.moveNext();
                     }
-                    tokens.moveNext();
+                    accept(JFXTokenId.RBRACE);
                 }
-                accept(JFXTokenId.RBRACE);
+                indent = old;
             }
-            indent = old;
             return true;
         }
 
@@ -1182,17 +1203,25 @@ public class JFXReformatTask implements ReformatTask {
                 wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
                 spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
             }
-            accept(isNewKeyWordUsed ? JFXTokenId.RPAREN : JFXTokenId.RBRACE);
-            
-            ClassDeclarationTree body = node.getClassBody();
-            if (body != null) {
-                int old = indent;
-                if (!indented) {
-                    indent -= continuationIndentSize;
+            if (isNewKeyWordUsed) {
+                accept(JFXTokenId.RPAREN);
+                ClassDeclarationTree body = node.getClassBody();
+                if (body != null) {
+                    int old = indent;
+                    if (!indented) {
+                        indent -= continuationIndentSize;
+                    }
+                    scan(body, p);
+                    indent = old;
                 }
-                scan(body, p);
-                indent = old;
+            } else {
+                List<ObjectLiteralPartTree> literalParts = node.getLiteralParts();
+                if (literalParts != null && !literalParts.isEmpty()) {
+                    // TODO wrap literals
+                }
+                accept(JFXTokenId.LBRACE);
             }
+            
             return true;
         }
 
