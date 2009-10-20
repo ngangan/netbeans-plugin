@@ -25,13 +25,11 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
 import org.netbeans.modules.javafx.editor.format.CompilerIndependentJFXIndentTask;
-import org.netbeans.modules.javafx.editor.format.JFXIndentTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -39,8 +37,10 @@ import java.util.logging.Level;
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  * @todo documentation
  */
-public class IndentTaskFactory implements IndentTask.Factory{
+public class IndentTaskFactory implements IndentTask.Factory {
+
     private static Logger log = Logger.getLogger(IndentTaskFactory.class.getName());
+
     /**
      * Create reformatting task.
      *
@@ -48,8 +48,9 @@ public class IndentTaskFactory implements IndentTask.Factory{
      * @return reformatting task or null if the factory cannot handle the given context.
      */
     public IndentTask createTask(Context context) {
-        if (log.isLoggable(Level.FINE)) log.fine("Creating reformat factory"); // NOI18N
-//        return new JFXIndentTask(context);
+        if (log.isLoggable(Level.FINE)) {
+            log.fine("Creating reformat factory"); // NOI18N
+        }
         return new CompilerIndependentJFXIndentTask(context);
     }
 }

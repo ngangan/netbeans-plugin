@@ -45,21 +45,26 @@ final class HintsUtils {
             fqName = fqName.substring(start);
         }
         fqName = fqName.replace("{", "").replace("}", ""); //NOI18N
-        return fqName;
+        return fqName.trim();
     }
 
     static boolean checkString(String name) {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element foundElement,
+    static boolean isClassUsed( Element foundElement,
             Collection<JFXImport> imports,
             CompilationInfo compilationInfo,
-            Collection<Element> allClasses) {
+            Collection<Element> allClasses,
+            Element superElement) {
 
         //Check if there are in the same package
-        if (foundElement instanceof JavafxClassSymbol) {
+        if (foundElement instanceof JavafxClassSymbol && superElement instanceof JavafxClassSymbol) {
             JavafxClassSymbol foundElementClassSymbol = (JavafxClassSymbol) foundElement;
+            JavafxClassSymbol superElementClassSymbol = (JavafxClassSymbol) superElement;
+            if (superElementClassSymbol.getQualifiedName().equals(foundElementClassSymbol.getQualifiedName())) {
+                return true;
+            }
             //Check is classes are int the same script
             for (Element elementClass : allClasses) {
                 if (elementClass instanceof JavafxClassSymbol) {
@@ -93,14 +98,14 @@ final class HintsUtils {
     }
     private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
 
-    static MethodSymbol isOverriden(Collection<MethodSymbol> overridenMethodList, MethodSymbol method) {
+    static MethodSymbol isOverridden(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method) {
 
-        if (overridenMethodList != null && overridenMethodList.size() != 0) {
-            for (MethodSymbol overridenMethod : overridenMethodList) {
+        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
+            for (MethodSymbol overriddenMethod : overriddenMethodList) {
                 //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
                 try {
-                    if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) && method.getParameters().size() == overridenMethod.getParameters().size() && COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
-                        return overridenMethod;
+                    if (method.getQualifiedName().equals(overriddenMethod.getQualifiedName()) && method.getParameters().size() == overriddenMethod.getParameters().size() && COMPARATOR.compare(method.getParameters(), overriddenMethod.getParameters()) == 0) {
+                        return overriddenMethod;
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -151,10 +156,10 @@ final class HintsUtils {
 
     private static class ParamsComparator implements Comparator<List<VarSymbol>> {
 
-        public int compare(List<VarSymbol> methodList, List<VarSymbol> overridenMethod) {
+        public int compare(List<VarSymbol> methodList, List<VarSymbol> overriddenMethod) {
             for (VarSymbol var : methodList) {
-                VarSymbol overridenVar = overridenMethod.get(methodList.indexOf(var));
-                if (!var.asType().toString().equals(overridenVar.asType().toString())) {
+                VarSymbol overriddenVar = overriddenMethod.get(methodList.indexOf(var));
+                if (!var.asType().toString().equals(overriddenVar.asType().toString())) {
                     return -1;
                 }
             }

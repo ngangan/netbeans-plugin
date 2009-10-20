@@ -78,7 +78,7 @@ public class ElementNavigatorProviderImpl implements NavigatorPanel {
         manager.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (ExplorerManager.PROP_SELECTED_NODES.equals(evt.getPropertyName())) {
-                    TreeNavigatorProviderImpl.setHighlights(ElementNavigatorJavaSourceFactory.getInstance().getFile(), manager);
+                    TreeNavigatorProviderImpl.setHighlights(ElementNavigatorJavaFXSourceFactory.getInstance().getFile(), manager);
                 }
             }
         });
@@ -121,11 +121,11 @@ public class ElementNavigatorProviderImpl implements NavigatorPanel {
     }
 
     public void panelActivated(Lookup context) {
-        ElementNavigatorJavaSourceFactory.getInstance().setLookup(context, new TaskImpl());
+        ElementNavigatorJavaFXSourceFactory.getInstance().setLookup(context, new TaskImpl());
     }
 
     public void panelDeactivated() {
-        ElementNavigatorJavaSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
+        ElementNavigatorJavaFXSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
     }
     
     private final class TaskImpl implements CancellableTask<CompilationInfo> {

@@ -5,18 +5,21 @@
 
 package org.netbeans.modules.javafx.debugger.breakpoints;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDABreakpoint;
 import org.netbeans.api.debugger.jpda.LineBreakpoint;
+import org.netbeans.api.debugger.jpda.event.JPDABreakpointEvent;
+import org.netbeans.api.debugger.jpda.event.JPDABreakpointListener;
 import org.netbeans.modules.javafx.debugger.utils.Utils;
 
 /**
  *
  * @author Michal Skvor
  */
-public class JavaFXLineBreakpoint extends Breakpoint {
-
+public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeListener {
     private LineBreakpoint javalb;
 
     private boolean enabled = true;
@@ -58,6 +61,7 @@ public class JavaFXLineBreakpoint extends Breakpoint {
         javalb.setHidden( true );
         javalb.setPrintText( printText );
 //        javalb.setCondition( "true" );
+//        javalb.addPropertyChangeListener( this );
 
         String context = Utils.getContextPath( url );
 
@@ -69,8 +73,13 @@ public class JavaFXLineBreakpoint extends Breakpoint {
 
         DebuggerManager d = DebuggerManager.getDebuggerManager();
         d.addBreakpoint( javalb );
+        this.url = url;
+        this.lineNumber = lineNumber;
     }
 
+    public LineBreakpoint getLineBreakpoint() {
+        return javalb;
+    }
     /**
      * Creates a new breakpoint for given parameters.
      *
@@ -259,4 +268,11 @@ public class JavaFXLineBreakpoint extends Breakpoint {
         firePropertyChange( PROP_PRINT_TEXT, old, printText );
     }
 
+    public void propertyChange(PropertyChangeEvent evt) {
+        if( Breakpoint.PROP_VALIDITY.equals( evt.getPropertyName())) {
+            System.err.println("Validity");
+        }
+        System.err.println("Line breakpoint change - " +
+                evt.getPropertyName() + " = " + evt.getNewValue() + "," + evt.getSource());
+    }
 }

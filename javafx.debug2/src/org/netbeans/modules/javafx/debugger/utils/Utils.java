@@ -86,6 +86,7 @@ public class Utils {
     public static String getFXPath( String url ) {
         FileObject fo = getFileObjectFromUrl( url );
         String fxRelativePath = null;
+        if( fo == null ) return null;
         Project project = FileOwnerQuery.getOwner( fo );
 
         Sources s = ProjectUtils.getSources( project );

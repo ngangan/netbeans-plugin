@@ -48,9 +48,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
-import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.openide.text.Annotation;
 
@@ -67,32 +66,31 @@ final class HintsModel {
         addHint(null, tree);
     }
 
-    void addHint(Tree tree, List<MethodSymbol> methods, Element element) {
-        addHint(tree, methods, null, null, null, null, element);
+    void addHint(Tree tree, Collection<MethodSymbol> methods) {
+        addHint(tree, methods, null, null, null, null);
     }
 
-    void addHint(List<Type> thrownExceptions, Tree tree) {
-        addHint(tree, null, thrownExceptions, null, null, null, null);
+    Hint addHint(Collection<Type> thrownExceptions, Tree tree) {
+        return addHint(tree, null, thrownExceptions, null, null, null);
     }
 
     void addHint(Tree tree, String varName, Integer start, Integer end) {
-        addHint(tree, null, null, varName, start, end, null);
+        addHint(tree, null, null, varName, start, end);
     }
 
-    private void addHint(Tree tree,
-            List<MethodSymbol> methods,
-            List<Type> thrownExceptions,
+    private Hint addHint(Tree tree,
+            Collection<MethodSymbol> methods,
+            Collection<Type> thrownExceptions,
             String name,
             Integer start,
-            Integer end,
-            Element element
+            Integer end
             ) {
 
         if (hints == null) {
             hints = new HashMap<Tree, Hint>();
         }
         if (hints.keySet().contains(tree)) {
-            return;
+            return hints.get(tree);
         }
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         if (start == null) {
@@ -102,8 +100,9 @@ final class HintsModel {
             end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         }
         int length = end - start;
-        Hint hint = new Hint(thrownExceptions, methods, tree, length, start, name, element);
+        Hint hint = new Hint(thrownExceptions, methods, tree, length, start, name);
         hints.put(tree, hint);
+        return hint;
     }
    
     void addCatchTree(Hint hint, Tree catchTree) {
@@ -135,26 +134,24 @@ final class HintsModel {
 
     static final class Hint {
 
-        private List<Type> exceptions = new ArrayList<Type>();
+        private Collection<Type> exceptions = new HashSet<Type>();
         private Tree tree;
         private Tree catchTree;
         private int length;
         private int start;
-        private List<MethodSymbol> methods;
+        private Collection<MethodSymbol> methods;
         private String name;
-        private Element element;
         private Annotation annotation;
 
         private Hint() {
         }
 
-        private Hint(List<Type> thrownExceptions,
-                List<MethodSymbol> methods,
+        private Hint(Collection<Type> thrownExceptions,
+                Collection<MethodSymbol> methods,
                 Tree tree,
                 int length,
                 int start,
-                String name,
-                Element parentClass) {
+                String name) {
 
             if (thrownExceptions != null) {
                 this.exceptions = new ArrayList<Type>(thrownExceptions);
@@ -166,7 +163,6 @@ final class HintsModel {
                 this.methods = new ArrayList<MethodSymbol>(methods);
             }
             this.name = name;
-            this.element = parentClass;
         }
 
         private void setCatchTree(Tree catchTree) {
@@ -189,15 +185,15 @@ final class HintsModel {
             return catchTree;
         }
 
-        List<MethodSymbol> getMethods() {
-            return Collections.unmodifiableList(methods);
+        Collection<MethodSymbol> getMethods() {
+            return Collections.unmodifiableCollection(methods);
         }
 
         Collection<Type> getExceptions() {
             if (exceptions == null) {
                 return null;
             }
-            return Collections.unmodifiableList(exceptions);
+            return Collections.unmodifiableCollection(exceptions);
         }
 
         void removeException(Type type) {
@@ -214,10 +210,6 @@ final class HintsModel {
 
         String getName() {
             return name;
-        }
-
-        Element getElement() {
-            return element;
         }
 
         Annotation getAnnotation() {

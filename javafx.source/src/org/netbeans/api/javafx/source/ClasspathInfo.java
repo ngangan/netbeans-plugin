@@ -70,8 +70,8 @@ public class ClasspathInfo {
     private static final ClassPath EMPTY_PATH = ClassPathSupport.createClassPath(new URL[0]);
     
     private ClassPath bootPath;
-    private ClassPath compilePath;
-    private ClassPath srcPath;
+    private ClassPath compilePath, compilePathOrig;
+    private ClassPath srcPath, srcPathOrig;
 
     private JavaFileManager fileManager;
     private ClassIndex usagesQuery;
@@ -81,52 +81,16 @@ public class ClasspathInfo {
 
     public static ClasspathInfo create(FileObject fo) {
         ClassPath bootPath = ClassPath.getClassPath(fo, ClassPath.BOOT);
+        ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
+        ClassPath srcPath = ClassPath.getClassPath(fo, ClassPath.SOURCE);
         if (bootPath == null) {
             //javac requires at least java.lang
             bootPath = JavaFXPlatform.getDefaultFXPlatform().getBootstrapLibraries();
         }
 
-        List<URL> srcUrls = new ArrayList<URL>();
-        List<URL> clsUrls = new ArrayList<URL>();
-
-        ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
-        if (compilePath != null) {
-            for(ClassPath.Entry entry : compilePath.entries()) {
-                Result2 rslt = SourceForBinaryQuery.findSourceRoots2(entry.getURL());
-                if (rslt.preferSources()) {
-                    for(FileObject root : rslt.getRoots()) {
-                        try {
-                            srcUrls.add(root.getURL());
-                        } catch (FileStateInvalidException ex) {
-                            Exceptions.printStackTrace(ex);
-                        }
-                    }
-                } else {
-                    clsUrls.add(entry.getURL());
-                }
-            }
-        }
-
-        ClassPath srcPath = ClassPath.getClassPath(fo, ClassPath.SOURCE);
-        if (srcPath != null) {
-            for(ClassPath.Entry entry : ClassPath.getClassPath(fo, ClassPath.SOURCE).entries()) {
-                srcUrls.add(entry.getURL());
-            }
-        }
-
-        if (clsUrls.isEmpty()) {
-            compilePath = EMPTY_PATH;
-        } else {
-            compilePath = ClassPathSupport.createClassPath(clsUrls.toArray(new URL[clsUrls.size()]));
-        }
-
-        if (srcUrls.isEmpty()) {
-            srcPath = EMPTY_PATH;
-        } else {
-            srcPath = ClassPathSupport.createClassPath(srcUrls.toArray(new URL[srcUrls.size()]));
-        }
+        ClasspathInfo instance = new ClasspathInfo(bootPath, compilePath, srcPath);
         
-        return create(bootPath, compilePath, srcPath);
+        return instance;
     }
 
     public static ClasspathInfo create(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
@@ -135,13 +99,14 @@ public class ClasspathInfo {
 
     private ClasspathInfo(ClassPath bootPath, ClassPath compilePath, ClassPath srcPath) {
         this.bootPath = bootPath;
-        this.compilePath = compilePath;
-        this.srcPath = srcPath;
+        this.compilePath = this.compilePathOrig = compilePath;
+        this.srcPath = this.srcPathOrig = srcPath;
 
-        this.cpListener = new ClassPathListener ();
-    	this.bootPath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.bootPath));
-    	this.compilePath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.compilePath));
-    	this.srcPath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.srcPath));
+
+        this.cpListener = new ClassPathListener();
+        this.bootPath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.bootPath));
+    	this.compilePathOrig.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.compilePath));
+    	this.srcPathOrig.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.srcPath));
     }
 
     public ClassPath getClassPath(PathKind pathKind) {
@@ -202,6 +167,7 @@ public class ClasspathInfo {
      */
     synchronized JavaFileManager getFileManager(JavafxcTool tool) {
         if (fileManager == null) {
+            recalculateClassPaths();
             /*            List<URL> userJavaClasses = null;
             try {
             userJavaClasses = getSymbolsForPath(srcPath);
@@ -267,6 +233,47 @@ public class ClasspathInfo {
                 }
                 ((ChangeListener) listeners[i + 1]).stateChanged(e);
             }
+        }
+    }
+
+    synchronized private void recalculateClassPaths() {
+        List<URL> srcUrls = new ArrayList<URL>();
+        List<URL> clsUrls = new ArrayList<URL>();
+
+        if (compilePathOrig != null) {
+            for(ClassPath.Entry entry : compilePathOrig.entries()) {
+                Result2 rslt = SourceForBinaryQuery.findSourceRoots2(entry.getURL());
+                if (rslt.preferSources()) {
+                    for(FileObject root : rslt.getRoots()) {
+                        try {
+                            srcUrls.add(root.getURL());
+                        } catch (FileStateInvalidException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
+                } else {
+                    clsUrls.add(entry.getURL());
+                }
+            }
+        }
+
+
+        if (srcPathOrig != null) {
+            for(ClassPath.Entry entry : srcPathOrig.entries()) {
+                srcUrls.add(entry.getURL());
+            }
+        }
+
+        if (clsUrls.isEmpty()) {
+            compilePath = EMPTY_PATH;
+        } else {
+            compilePath = ClassPathSupport.createClassPath(clsUrls.toArray(new URL[clsUrls.size()]));
+        }
+
+        if (srcUrls.isEmpty()) {
+            srcPath = EMPTY_PATH;
+        } else {
+            srcPath = ClassPathSupport.createClassPath(srcUrls.toArray(new URL[srcUrls.size()]));
         }
     }
     

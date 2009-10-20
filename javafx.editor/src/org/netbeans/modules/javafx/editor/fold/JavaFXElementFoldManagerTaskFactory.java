@@ -42,17 +42,16 @@ package org.netbeans.modules.javafx.editor.fold;
 
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author Jan Lahoda
  */
-public class JavaFXElementFoldManagerTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class JavaFXElementFoldManagerTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     /** Creates a new instance of JavaFXElementFoldManagerTaskFactory */
     public JavaFXElementFoldManagerTaskFactory() {

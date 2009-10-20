@@ -181,8 +181,6 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         String fqn = type.getQualifiedName().toString();
                         index(document, IndexKey.CLASS_FQN, fqn);
                         if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
-                            Element pkg = e.getEnclosingElement();
-                            assert pkg.getEnclosedElements().size() > 0;
                             int pkgLen = fqn.lastIndexOf(".");
                             if (pkgLen > -1) {
                                 index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
