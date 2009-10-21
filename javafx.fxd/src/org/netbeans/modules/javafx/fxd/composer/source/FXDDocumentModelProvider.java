@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
        
+import com.sun.javafx.tools.fxd.FXDReference;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +93,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
     public static synchronized FXDNode getRoot() {
         return s_root;
     }*/
-    
+
     public synchronized void updateModel(final DocumentModelModificationTransaction trans, final DocumentModel model, final DocumentChange[] changes) throws DocumentModelException, DocumentModelTransactionCancelledException {
         //DocumentModelUtils.dumpElementStructure( model.getRootElement());
         
@@ -114,7 +115,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             FXDParser fxdParser = new FXDParser(docReader, new ContentHandler() {
                 private boolean m_isLastNode = true;
 
-                public Object startNode(String typeName, int startOff) {
+                public Object startNode(String typeName, int startOff, boolean isExtension) {
                     return new NodeBuilder(typeName, startOff);
                 }
 
@@ -133,6 +134,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                            throw new FXDException(e);
                        }
                     }
+                    // TODO parse value. This will allow to handle functions and references
                     deb.addAttribute( name, value, startOff, endOff);
                 }
 
@@ -174,6 +176,18 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     //NodeArrayBuilder nab = (NodeArrayBuilder) node;
                     m_isLastNode = false;
                 }
+
+                public void parsingStarted(FXDParser parser) {
+                    // do nothing. we do not need parser onstance
+                }
+
+                public FXDReference createReference(String str) throws FXDException {
+                    // TODO: should implement?
+                    // implementation is necessary if we parse attribute or array element value.
+                    // But we use them as they come.
+                    return null;
+                }
+
             });
 
             showStatusText(dObj, " Parsing text..."); // NOI18N

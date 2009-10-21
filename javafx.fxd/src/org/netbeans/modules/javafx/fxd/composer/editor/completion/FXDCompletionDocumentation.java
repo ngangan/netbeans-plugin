@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -38,40 +38,59 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader.fxd;
 
-import java.io.IOException;
-import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObjectExistsException;
-import org.openide.loaders.MultiDataObject;
-import org.openide.loaders.UniFileLoader;
-import org.openide.util.NbBundle;
+package org.netbeans.modules.javafx.fxd.composer.editor.completion;
 
-public final class FXDDataLoader extends UniFileLoader {
-    public static final String REQUIRED_MIME = "text/x-fxd";   //NOI18N
-    private static final long serialVersionUID = 2L;
+import java.net.URL;
+import javax.swing.Action;
+import javax.swing.text.BadLocationException;
+import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.spi.editor.completion.CompletionDocumentation;
+import org.openide.util.Exceptions;
 
-    public FXDDataLoader() {
-        super("org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataObject");  //NOI18N
+/**
+ *
+ * @author avk
+ */
+public class FXDCompletionDocumentation implements CompletionDocumentation{
+
+    private FXDCompletionItem m_item;
+    private StringBuilder sb;
+
+    public FXDCompletionDocumentation(FXDCompletionItem item) {
+        m_item = item;
     }
 
-    @Override
-    protected String defaultDisplayName() {
-        return NbBundle.getMessage(FXDDataLoader.class, "LBL_FXD_loader_name");  //NOI18N
+    public String getText() {
+        sb = new StringBuilder("Information about " + m_item.getDisplayText());
+
+        String descr = getSchemaElementDescription();
+        if (descr != null){
+            sb.append("<p>");
+            sb.append(descr);
+        }
+        return sb.toString();
     }
 
-    @Override
-    protected void initialize() {
-        super.initialize();
-        getExtensions().addMimeType(REQUIRED_MIME);
+    private String getSchemaElementDescription(){
+        if(m_item.getSchemaElement() != null ){
+            if ( m_item.getSchemaElement().description != null ){
+                return m_item.getSchemaElement().description;
+            }
+        }
+        return null;
     }
 
-    protected MultiDataObject createMultiObject(FileObject primaryFile) throws DataObjectExistsException, IOException {
-        return new FXDDataObject(primaryFile, this);
+    public URL getURL() {
+        return null;
     }
 
-    @Override
-    protected String actionsContext() {
-        return "Loaders/" + REQUIRED_MIME + "/Actions";   //NOI18N
+    public CompletionDocumentation resolveLink(String arg0) {
+        return null;
     }
+
+    public Action getGotoSourceAction() {
+        return null;
+    }
+
 }

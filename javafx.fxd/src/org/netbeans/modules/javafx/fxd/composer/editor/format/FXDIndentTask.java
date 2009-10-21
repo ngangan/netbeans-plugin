@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -38,40 +38,48 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader.fxd;
 
-import java.io.IOException;
-import org.openide.filesystems.FileObject;
-import org.openide.loaders.DataObjectExistsException;
-import org.openide.loaders.MultiDataObject;
-import org.openide.loaders.UniFileLoader;
-import org.openide.util.NbBundle;
+package org.netbeans.modules.javafx.fxd.composer.editor.format;
 
-public final class FXDDataLoader extends UniFileLoader {
-    public static final String REQUIRED_MIME = "text/x-fxd";   //NOI18N
-    private static final long serialVersionUID = 2L;
+import java.util.List;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import org.netbeans.modules.editor.indent.spi.Context;
+import org.netbeans.modules.editor.indent.spi.ExtraLock;
+import org.netbeans.modules.editor.indent.spi.IndentTask;
 
-    public FXDDataLoader() {
-        super("org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataObject");  //NOI18N
+/**
+ *
+ * @author Andrey Korostelev
+ */
+public class FXDIndentTask implements IndentTask {
+
+    private final Context context;
+
+    public FXDIndentTask(Context context) {
+        this.context = context;
     }
 
-    @Override
-    protected String defaultDisplayName() {
-        return NbBundle.getMessage(FXDDataLoader.class, "LBL_FXD_loader_name");  //NOI18N
+    public void reindent() throws BadLocationException {
+        Document document = context.document();
+        List<Context.Region> regions = context.indentRegions();
+        if (regions.size() == 0) {
+            indentLine(document, context.startOffset());
+        } else {
+            for (Context.Region region : regions) {
+                indentLine(document, region.getStartOffset());
+            }
+        }
     }
 
-    @Override
-    protected void initialize() {
-        super.initialize();
-        getExtensions().addMimeType(REQUIRED_MIME);
+    // todo process case when there are line comment after {[
+    private void indentLine(Document document, int startOffset) throws BadLocationException {
+        int indent = FormatterUtilities.calculateLineIndent(document, startOffset);
+        context.modifyIndent(context.lineStartOffset(startOffset), indent);
     }
 
-    protected MultiDataObject createMultiObject(FileObject primaryFile) throws DataObjectExistsException, IOException {
-        return new FXDDataObject(primaryFile, this);
+    public ExtraLock indentLock() {
+        return null;
     }
 
-    @Override
-    protected String actionsContext() {
-        return "Loaders/" + REQUIRED_MIME + "/Actions";   //NOI18N
-    }
 }

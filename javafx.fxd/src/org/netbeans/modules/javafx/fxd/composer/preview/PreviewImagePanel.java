@@ -4,8 +4,8 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import com.sun.javafx.geom.AffineTransform;
 import com.sun.javafx.geom.Bounds2D;
+import com.sun.javafx.geom.transform.Affine2D;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -25,6 +25,7 @@ import com.sun.scenario.scenegraph.JSGPanel;
 import com.sun.javafx.sg.PGNode;
 
 import com.sun.javafx.tools.fxd.*;
+import com.sun.javafx.tools.fxd.loader.Profile;
 import com.sun.scenario.scenegraph.SGGroup;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
@@ -46,7 +47,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private final Color         m_defaultBackground;
     private       JSGPanel      m_sgPanel = null;
     private       int           m_changeTickerCopy = -1;
-    private       TargetProfile m_previewProfileCopy = null;
+    private       Profile m_previewProfileCopy = null;
     private       String        m_selectedEntryCopy = null;
         
     PreviewImagePanel(final FXZDataObject dObj) {
@@ -80,7 +81,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
         if (  fxzArchive != null) {
             final int tickerCopy = fxzArchive.getChangeTicker();
-            final TargetProfile profileCopy = m_dObj.getDataModel().getPreviewProfile();
+            final Profile profileCopy = m_dObj.getDataModel().getPreviewProfile();
             final String  selectedEntryCopy = m_dObj.getDataModel().getSelectedEntry();
             if ( tickerCopy != m_changeTickerCopy || 
                  profileCopy != m_previewProfileCopy ||
@@ -220,17 +221,17 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 //
 //            m_sgPanel.invalidate();
 
-//            AffineTransform at = new AffineTransform();
+//            Affine2D at = new Affine2D();
 //            at.scale( zoom, zoom);
 
 //            at.translate(-bounds.getX(), -bounds.getY());
 //            fxNode.setTransform(at);
-            AffineTransform at = new AffineTransform();
+            Affine2D at = new Affine2D();
             at.scale( zoom, zoom);
             node.setTransformMatrix(at);
 
             m_sgPanel.invalidate();
-            if (m_sgPanel.getParent() != null) {
+            if (m_sgPanel.getParent() != null){
                 m_sgPanel.getParent().validate();
             }
         }

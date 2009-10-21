@@ -456,7 +456,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
 
-    @Override
+    //@Override
     public FXDRootElement getRoot( final String entryName) {
         FXDFileModel model = getFileModel(entryName);
         if (model != null){
@@ -465,7 +465,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         return null;
     }
 
-    @Override
+    //@Override
     public FXDRootElement getRoot( String entryName, ProgressNotifier notifier) {
         if ( entryName == null) {
             entryName = MAIN_CONTENT;
