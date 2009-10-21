@@ -587,7 +587,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             SourceGroup g = (SourceGroup) value;
             super.getListCellRendererComponent(list, g == null ? g : g.getDisplayName(), index, isSelected, cellHasFocus);
-            setIcon(g.getIcon(false));
+            if (g != null) setIcon(g.getIcon(false));
             return this;
         }
         
