@@ -6,6 +6,7 @@
     <description>Builds the module suite javafx.</description>
     <import file="nbproject/build-impl.xml"/>
 
+    <property name="onlycurrplat" value="false"/>
     <!-- Determine current OS -->
     <condition property="isWin">
       <or>
@@ -116,7 +117,6 @@
         <mkdir dir="build"/>
         <property name="use.timestamp" value="true"/>
         <property name="offline" value="false"/>
-        <property name="onlycurrplat" value="false"/>
 
         <parallel failonany="true">
           <sequential>
