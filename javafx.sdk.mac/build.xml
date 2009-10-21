@@ -6,7 +6,14 @@
     <description>Builds, tests, and runs the project org.netbeans.modules.javafx.sdk.mac.</description>
     <import file="nbproject/build-impl.xml"/>
 
-    <target name="init-release-external" depends="basic-init">
+    <condition property="isMacOSX">
+      <or>
+        <isfalse value="${onlycurrplat}"/>
+        <os family="mac"/>
+      </or>
+    </condition>
+
+    <target name="init-release-external" depends="basic-init" if="isMacOSX">
       <property name="build.config" value="daily"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
@@ -15,7 +22,7 @@
       <delete dir="release" quiet="true"/>
       <unzip src="external/javafx_sdk-macosx.zip" dest="release/javafx-sdk">
         <regexpmapper from="^(javafx-sdk[^/]*/)?(.*)$" to="\2"/>
-      </unzip>  
+      </unzip>
     </target>
 
     <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
