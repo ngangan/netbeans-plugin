@@ -9,6 +9,7 @@
             <friend-packages>
                 <friend>org.netbeans.modules.javafx.composer.runtime.proxy</friend>
                 <friend>org.netbeans.modules.javafx.composer.design</friend>
+                <friend>org.netbeans.modules.javafx.fxd</friend>
                 <package>com.sun.embeddedswing</package>
                 <subpackages>com.sun.javafx</subpackages>
                 <subpackages>com.sun.media.jmc</subpackages>
@@ -25,6 +26,10 @@
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/shared/fxdtools.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/fxdloader.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/fxdloader.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-common.jar</runtime-relative-path>
