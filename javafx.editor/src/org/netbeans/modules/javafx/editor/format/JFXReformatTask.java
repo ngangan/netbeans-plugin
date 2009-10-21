@@ -1195,7 +1195,7 @@ public class JFXReformatTask implements ReformatTask {
             }
 
             scan(node.getIdentifier(), p);
-            spaces(cs.spaceBeforeMethodCallParen() ? 1 : 0);
+            spaces(!isNewKeyWordUsed || cs.spaceBeforeMethodCallParen() ? 1 : 0);
             accept(isNewKeyWordUsed ? JFXTokenId.LPAREN : JFXTokenId.LBRACE);
             List<? extends ExpressionTree> args = node.getArguments();
             if (args != null && !args.isEmpty()) {
@@ -1217,7 +1217,9 @@ public class JFXReformatTask implements ReformatTask {
             } else {
                 List<ObjectLiteralPartTree> literalParts = node.getLiteralParts();
                 if (literalParts != null && !literalParts.isEmpty()) {
-                    // TODO wrap literals
+                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
+                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), true, literalParts);
+                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
                 }
                 accept(JFXTokenId.LBRACE);
             }
@@ -1340,12 +1342,25 @@ public class JFXReformatTask implements ReformatTask {
         // TODO javafx for loop
         @Override
         public Boolean visitForExpression(ForExpressionTree node, Void p) {
-            return super.visitForExpression(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
+        // TODO javafx for loop
         @Override
         public Boolean visitForExpressionInClause(ForExpressionInClauseTree node, Void p) {
-            return super.visitForExpressionInClause(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
 //        @Override
@@ -2002,25 +2017,48 @@ public class JFXReformatTask implements ReformatTask {
         // TODO
         @Override
         public Boolean visitObjectLiteralPart(ObjectLiteralPartTree node, Void p) {
-            return super.visitObjectLiteralPart(node, p);
+            accept(JFXTokenId.IDENTIFIER);
+            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+            accept(JFXTokenId.COLON);
+            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+            scan(node.getExpression(), p);
+            return true;
         }
 
         // TODO on replace
         @Override
         public Boolean visitOnReplace(OnReplaceTree node, Void p) {
-            return super.visitOnReplace(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
         // TODO on replace
         @Override
         public Boolean visitTrigger(TriggerTree node, Void p) {
-            return super.visitTrigger(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
         // TODO
         @Override
         public Boolean visitStringExpression(StringExpressionTree node, Void p) {
-            return super.visitStringExpression(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
         // TODO check it
@@ -2035,6 +2073,7 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
+        // TODO check it
         @Override
         public Boolean visitLiteral(LiteralTree node, Void p) {
             do {
@@ -2049,42 +2088,84 @@ public class JFXReformatTask implements ReformatTask {
         // TODO
         @Override
         public Boolean visitSequenceDelete(SequenceDeleteTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceEmpty(SequenceEmptyTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceIndexed(SequenceIndexedTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceInsert(SequenceInsertTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceRange(SequenceRangeTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
         // TODO
         @Override
         public Boolean visitSequenceSlice(SequenceSliceTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
             return true;
         }
 
@@ -2956,6 +3037,50 @@ public class JFXReformatTask implements ReformatTask {
                     accept(JFXTokenId.COMMA);
                 }
             }
+        }
+
+        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, boolean prependSpace, List<? extends ObjectLiteralPartTree> trees) {
+            boolean first = true;
+            int alignIndent = -1;
+            int old = indent;
+            indent += indentSize;
+            for (Iterator<? extends ObjectLiteralPartTree> it = trees.iterator(); it.hasNext();) {
+                ObjectLiteralPartTree part = it.next();
+                if (part.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                    scan(part, null);
+                } else if (first) {
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (prependSpace) {
+                        spaces(indent, true);
+                    }
+                    if (align) {
+                        alignIndent = col;
+                    }
+                    scan(part, null);
+                    if (wrapStyle != CodeStyle.WrapStyle.WRAP_NEVER && col > rightMargin && c > indent && (wrapDepth == 0 || c <= rightMargin)) {
+                        rollback(index, c, d);
+                        newline();
+                        scan(part, null);
+                    }
+                } else {
+                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, part);
+                }
+                first = false;
+
+                boolean isDelimiter = false;
+                if (tokens.moveNext()) {
+                    JFXTokenId id = tokens.token().id();
+                    isDelimiter = (id == JFXTokenId.COMMA || id == JFXTokenId.SEMI);
+                    tokens.movePrevious();
+                }
+                if (isDelimiter) {
+                    spaces(cs.spaceBeforeComma() ? 1 : 0);
+                    accept(JFXTokenId.COMMA, JFXTokenId.SEMI);
+                }
+            }
+            indent = old;
         }
 
         private void indentComment() {
