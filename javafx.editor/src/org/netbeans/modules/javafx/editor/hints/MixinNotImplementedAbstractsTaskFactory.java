@@ -85,8 +85,22 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
 
+        final Collection<Tree> mixins = new HashSet<Tree>();
+        final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
+        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+        final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
+        final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+
         return new CancellableTask<CompilationInfo>() {
 
+            private void clear() {
+                mixins.clear();
+                existingMethods.clear();
+                optionsCache.clear();
+                typeElementCash.clear();
+                elementsCash.clear();
+            }
+            
             public void cancel() {
                 cancel.set(true);
             }
@@ -94,12 +108,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
                 final Element[] mainClassElement = new Element[1];
-                final Collection<Tree> mixins = new HashSet<Tree>();
-                final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
                 final Document document = compilationInfo.getDocument();
-                final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-                final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
-                final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
                 ErrorDescription errorDescription = null;
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
@@ -135,12 +144,14 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     if (document != null) {
                         HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
                     }
+                    clear();
                     return;
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 boolean breakIt = false;
                 for (Tree mixin : mixins) {
                     if (cancel.get()) {
+                        clear();
                         return;
                     }
                     JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
@@ -196,9 +207,10 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 }
                 if (document != null && errorDescription != null) {
                     HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
-                } else  if (document != null) {
+                } else if (document != null) {
                     HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
                 }
+                clear();
             }
         };
     }

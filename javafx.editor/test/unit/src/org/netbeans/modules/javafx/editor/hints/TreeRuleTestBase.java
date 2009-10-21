@@ -171,22 +171,22 @@ public abstract class TreeRuleTestBase extends NbTestCase {
 //    protected String performFixTest(String fileName, String code, String errorDescriptionToString, String fixDebugString, String golden) throws Exception {
 //        int[] offset = new int[1];
 //
-//        code = org.netbeans.modules.java.hints.TestUtilities.detectOffsets(code, offset);
+//        //code = org.netbeans.modules.java.hints.TestUtilities.detectOffsets(code, offset);
 //
 //        return performFixTest(fileName, code, offset[0], errorDescriptionToString, fixDebugString, golden);
 //    }
 //
-    protected String performFixTest(String fileName, String code, int pos, String errorDescriptionToString, String fixDebugString, String golden) throws Exception {
-        return performFixTest(fileName, code, pos, errorDescriptionToString, fixDebugString, fileName, golden);
-    }
+//    protected String performFixTest(String fileName, String code, int pos, String errorDescriptionToString, String fixDebugString, String golden) throws Exception {
+//        return performFixTest(fileName, code, pos, errorDescriptionToString, fixDebugString, fileName, golden);
+//    }
 
-    protected String performFixTest(String fileName, String code, String errorDescriptionToString, String fixDebugString, String goldenFileName, String golden) throws Exception {
-        int[] offset = new int[1];
-
-        //code = org.netbeans.modules.java.hints.TestUtilities.detectOffsets(code, offset);
-
-        return performFixTest(fileName, code, offset[0], errorDescriptionToString, fixDebugString, goldenFileName, golden);
-    }
+//    protected String performFixTest(String fileName, String code, String errorDescriptionToString, String fixDebugString, String goldenFileName, String golden) throws Exception {
+//        int[] offset = new int[1];
+//
+//        //code = org.netbeans.modules.java.hints.TestUtilities.detectOffsets(code, offset);
+//
+//        return performFixTest(fileName, code, offset[0], errorDescriptionToString, fixDebugString, goldenFileName, golden);
+//    }
 
     protected String performFixTest(String fileName, String code, int pos, String errorDescriptionToString, String fixDebugString, String goldenFileName, String golden) throws Exception {
         prepareTest(fileName, code);
@@ -276,18 +276,18 @@ public abstract class TreeRuleTestBase extends NbTestCase {
 //        }
 //    }
 
-    public void testNoHintsForSimpleInitialize() throws Exception {
-
-        String before = "package test; class Test {" +
-            " { java.lang.System.out.println(); } " +
-            "}\n";
-
-        for (int i = 0; i < before.length(); i++) {
-            LOG.info("testing position " + i + " at " + before.charAt(i));
-            clearWorkDir();
-            performAnalysisTest("test/Test.java", before, i);
-        }
-    }
+//    public void testNoHintsForSimpleInitialize() throws Exception {
+//
+//        String before = "package test; class Test {" +
+//            " { java.lang.System.out.println(); } " +
+//            "}\n";
+//
+//        for (int i = 0; i < before.length(); i++) {
+//            LOG.info("testing position " + i + " at " + before.charAt(i));
+//            clearWorkDir();
+//            performAnalysisTest("test/Test.java", before, i);
+//        }
+//    }
 
 //    public void testIssue113933() throws Exception {
 //

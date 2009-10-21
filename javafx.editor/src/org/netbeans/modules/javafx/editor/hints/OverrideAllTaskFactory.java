@@ -91,6 +91,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
+    
 
     public OverrideAllTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -98,6 +99,12 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
+
+        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+        final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
+        final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+        final Collection<Boolean> mixinMain = new HashSet<Boolean>();
+        final Collection<Boolean> mixinExtends = new HashSet<Boolean>();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -108,9 +115,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
                 final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-
-                final Collection<Boolean> mixinMain = new HashSet<Boolean>();
-                final Collection<Boolean> mixinExtends = new HashSet<Boolean>();
                 new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
@@ -124,14 +128,11 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         return super.visitClassDeclaration(node, v);
                     }
                 }.scan(compilationInfo.getCompilationUnit(), null);
-                final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-                final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
-                final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
-                final HintsModel modelFix = new HintsModel(compilationInfo);
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+                final HintsModel modelFix = new HintsModel(compilationInfo);
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (!isValidError(diagnostic.getCode())) {
-                        break;
+                    if (!isValidError(diagnostic.getCode()) || cancel.get()) {
+                        continue;
                     }
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
@@ -171,12 +172,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
 
                         JavaFXTreePathScanner<Void, Void> visitor = new OverrideAllVisitor(compilationInfo, overriddenMethods, imports);
-                        try {
-                            superTree.accept(visitor, null);
-                        } catch (NullPointerException ex) {
-                            ex.printStackTrace();
-                            continue;
-                        }
+                        visitor.scan(compilationInfo.getCompilationUnit(), null);
                         Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
                         if (options == null) {
                             options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
@@ -203,7 +199,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                                         if (modifier != Modifier.ABSTRACT) {
                                             continue;
                                         }
-                                        MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method);
+                                        MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method, compilationInfo);
                                         if (overriddenMethod == null) {
                                             abstractMethods.add(method);
                                             break;
@@ -219,6 +215,15 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     }
                 }
                 addHintsToController(document, modelFix, compilationInfo, file);
+                clear();
+            }
+
+            private void clear() {
+                optionsCache.clear();
+                typeElementCash.clear();
+                elementsCash.clear();
+                mixinExtends.clear();
+                mixinMain.clear();
             }
         };
     }

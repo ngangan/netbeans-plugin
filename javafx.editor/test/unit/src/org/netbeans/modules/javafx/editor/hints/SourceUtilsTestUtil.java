@@ -63,7 +63,6 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.Task;
-import org.netbeans.junit.NbTestCase;
 import org.netbeans.modules.java.source.usages.IndexUtil;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.parsing.impl.indexing.Util;
@@ -76,8 +75,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
-import org.openide.filesystems.LocalFileSystem;
-import org.openide.filesystems.MIMEResolver;
 import org.openide.filesystems.MultiFileSystem;
 import org.openide.filesystems.Repository;
 import org.openide.filesystems.URLMapper;
@@ -91,22 +88,14 @@ import org.netbeans.modules.javafx.dataloader.JavaFXDataLoader;
 import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 
-/**
- *
- * @author Jan Lahoda
- */
 public final class SourceUtilsTestUtil extends ProxyLookup {
     
     private static SourceUtilsTestUtil DEFAULT_LOOKUP = null;
     
     public SourceUtilsTestUtil() {
-//        Assert.assertNull(DEFAULT_LOOKUP);
         DEFAULT_LOOKUP = this;
     }
     
-    /**
-     * Set the global default lookup with some fixed instances including META-INF/services/*.
-     */
     /**
      * Set the global default lookup with some fixed instances including META-INF/services/*.
      */
@@ -141,8 +130,6 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
         
         SourceUtilsTestUtil.setLookup(extraLookupContent, SourceUtilsTestUtil.class.getClassLoader());
         
-        //SourceUtilsTestUtil2.disableLocks();
-
         if (Util.allMimeTypes == null) {
             Util.allMimeTypes = new HashSet<String>();
         }
@@ -184,13 +171,6 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
         file2SourceLevel.put(file, level);
     }
 
-    /**This method assures that all java classes under sourceRoot are compiled,
-     * and the caches are created for them.
-     */
-    public static void compileRecursively(FileObject sourceRoot) throws Exception {
-        IndexingManager.getDefault().refreshIndexAndWait(sourceRoot.getURL(), null);
-    }
-
     private static List<URL> bootClassPath;
 
     private static Logger log = Logger.getLogger(SourceUtilsTestUtil.class.getName());
@@ -221,7 +201,6 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
                 
                 bootClassPath = urls;
             } catch (FileStateInvalidException e) {
-//                ErrorManager.getDefault().notify(e);
                 if (log.isLoggable(Level.SEVERE))
                     log.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -306,10 +285,10 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
     }
 
     public static class TestSourceLevelQueryImplementation implements SourceLevelQueryImplementation {
-        
+
         public String getSourceLevel(FileObject javaFile) {
             String level = file2SourceLevel.get(javaFile);
-            
+
             if (level == null) {
                 if (javaFile.isFolder()) {
                     for (FileObject data : file2SourceLevel.keySet()) {
@@ -319,10 +298,10 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
                     }
                 }
                 return "1.5";
-            } else
+            } else {
                 return level;
+            }
         }
-        
     }
 
     /**Copied from org.netbeans.api.project.
@@ -330,26 +309,26 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
      * Will be in /tmp or whatever, and will be empty.
      * If you just need a java.io.File use clearWorkDir + getWorkDir.
      */
-    public static FileObject makeScratchDir(NbTestCase test) throws IOException {
-        test.clearWorkDir();
-        File root = test.getWorkDir();
-        assert root.isDirectory() && root.list().length == 0;
-        FileObject fo = FileUtil.toFileObject(root);
-        if (fo != null) {
-            // Presumably using masterfs.
-            return fo;
-        } else {
-            // For the benefit of those not using masterfs.
-            LocalFileSystem lfs = new LocalFileSystem();
-            try {
-                lfs.setRootDirectory(root);
-            } catch (PropertyVetoException e) {
-                assert false : e;
-            }
-            Repository.getDefault().addFileSystem(lfs);
-            return lfs.getRoot();
-        }
-    }
+//    public static FileObject makeScratchDir(NbTestCase test) throws IOException {
+//        test.clearWorkDir();
+//        File root = test.getWorkDir();
+//        assert root.isDirectory() && root.list().length == 0;
+//        FileObject fo = FileUtil.toFileObject(root);
+//        if (fo != null) {
+//            // Presumably using masterfs.
+//            return fo;
+//        } else {
+//            // For the benefit of those not using masterfs.
+//            LocalFileSystem lfs = new LocalFileSystem();
+//            try {
+//                lfs.setRootDirectory(root);
+//            } catch (PropertyVetoException e) {
+//                assert false : e;
+//            }
+//            Repository.getDefault().addFileSystem(lfs);
+//            return lfs.getRoot();
+//        }
+//    }
     
 //    public static JavacTask getJavacTaskFor(CompilationInfo info) {
 //        return info.impl.getJavacTask();
@@ -369,7 +348,6 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
         return bt.info;
     }
     
-    
     private static class DeadlockTask implements Task<CompilationController> {
         
         private final Phase phase;
@@ -381,14 +359,14 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
         }
         
         public void run( CompilationController info ) {
-//            try {
-                //info.toPhase(this.phase);
+            try {
+                info.toPhase(this.phase);
                 this.info = info;
-//            } catch (IOException ioe) {
-////                ErrorManager.getDefault().notify(ioe);
-//                if (log.isLoggable(Level.SEVERE))
-//                    log.log(Level.SEVERE, ioe.getMessage(), ioe);
-//            }
+            } catch (IOException ioe) {
+//                ErrorManager.getDefault().notify(ioe);
+                if (log.isLoggable(Level.SEVERE))
+                    log.log(Level.SEVERE, ioe.getMessage(), ioe);
+            }
         }                
         
     }
@@ -405,7 +383,7 @@ public final class SourceUtilsTestUtil extends ProxyLookup {
 
             return Lookup.EMPTY;
         }
-        
+
     }
 
 }

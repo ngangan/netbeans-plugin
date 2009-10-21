@@ -13,9 +13,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementUtilities;
 
 /**
  *
@@ -52,7 +54,7 @@ final class HintsUtils {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed( Element foundElement,
+    static boolean isClassUsed(Element foundElement,
             Collection<JFXImport> imports,
             CompilationInfo compilationInfo,
             Collection<Element> allClasses,
@@ -96,20 +98,35 @@ final class HintsUtils {
         }
         return false;
     }
-    private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
 
-    static MethodSymbol isOverridden(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method) {
-
+    static MethodSymbol isOverridden(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
         if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
             for (MethodSymbol overriddenMethod : overriddenMethodList) {
-                //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
-                try {
-                    if (method.getQualifiedName().equals(overriddenMethod.getQualifiedName()) && method.getParameters().size() == overriddenMethod.getParameters().size() && COMPARATOR.compare(method.getParameters(), overriddenMethod.getParameters()) == 0) {
-                        return overriddenMethod;
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                String overrriddenName = overriddenMethod.getSimpleName().toString();
+                if (!method.getSimpleName().toString().equals(overrriddenName)) {
                     continue;
+                }
+                TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
+                if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                    return overriddenMethod;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static MethodSymbol isAlreadyDefined(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
+        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
+            for (MethodSymbol overriddenMethod : overriddenMethodList) {
+                String overrriddenName = overriddenMethod.getSimpleName().toString();
+                if (!method.getSimpleName().toString().equals(overrriddenName)) {
+                    continue;
+                }
+                TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
+                if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)
+                        || compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                    return overriddenMethod;
                 }
             }
         }
@@ -117,6 +134,7 @@ final class HintsUtils {
         return null;
     }
     //TODO Should be replaced with proper formating ASAP
+
     static String calculateSpace(int startPosition, Document document) {
         String text = null;
         try {
@@ -142,7 +160,7 @@ final class HintsUtils {
             } else {
                 charNumber = line.length();
             }
-            
+
         }
         if (charNumber < 0) {
             return ""; //NOI18N

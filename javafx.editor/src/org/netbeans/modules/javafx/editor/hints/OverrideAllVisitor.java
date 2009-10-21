@@ -34,17 +34,6 @@ final class OverrideAllVisitor extends JavaFXTreePathScanner<Void, Void> {
         this.overriddenMethods = overriddenMethods;
         this.imports = imports;
     }
-
-    @Override
-    public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-        return null;
-    }
-
-    @Override
-    public Void visitInstantiate(InstantiateTree node, Void p) {
-        return null;
-    }
-
     
     @Override
     public Void visitImport(ImportTree node, Void p) {

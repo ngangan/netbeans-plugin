@@ -75,12 +75,16 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
 
+
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
+        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+        final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
+
         return new CancellableTask<CompilationInfo>() {
 
             @Override
@@ -91,24 +95,22 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
+                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 if (file == null) {
                     throw new IllegalArgumentException();
                 }
-                
                 if (!compilationInfo.isErrors()) {
                     if (compilationInfo.getDocument() != null) {
                         HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     }
+                    clear();
                     return;
                 }
-                final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
-
                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (cancel.get()) {
-                        return;
+                        break;
                     }
+
                     boolean onlyAbstractError = false;
                     if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
                         onlyAbstractError = true;
@@ -147,7 +149,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     potentialFqn = HintsUtils.getClassSimpleName(potentialFqn);
                     Collection<ElementHandle<TypeElement>> options = optionsCache.get(potentialFqn);
                     if (options == null) {
-                        options = options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         optionsCache.put(potentialFqn, options);
                     }
                     List<Fix> listFQN = new ArrayList<Fix>();
@@ -171,6 +173,12 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
+                clear();
+            }
+
+            private void clear() {
+                optionsCache.clear();
+                errors.clear();
             }
         };
     }

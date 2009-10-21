@@ -98,8 +98,8 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     }
                     return;
                 }
-                UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
-                HintsModel model = new HintsModel(compilationInfo);
+                final UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
+                final HintsModel model = new HintsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
                 Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();

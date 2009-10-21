@@ -48,25 +48,29 @@ import java.util.List;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 
-/**
- *
- * @author Jan Lahodacgazeta.pl
- */
-public class AddOverrideAnnotationTest extends TreeRuleTestBase {
+
+public class OverrideAllTaskFactoryTest extends TreeRuleTestBase {
     
-    public AddOverrideAnnotationTest(String testName) {
+    public OverrideAllTaskFactoryTest(String testName) {
         super(testName);
     }
     
     public void testDoNothingForVoidReturnType() throws Exception {
-        performAnalysisTest("test/Main.fx", "package test; var namesKey;", 1);
+        //performAnalysisTest("test/TestMain.fx", "package test; public class TestMain{} class Test extends AbstractTest{} abstract class AbstractTest { abstract function method();}", 1);
     }
 
     @Override
     protected List<ErrorDescription> computeErrors(CompilationInfo info, JavaFXTreePath path) {
-        //throw new UnsupportedOperationException("Not supported yet.");
+        info.getDiagnostics();
+        try {
+            OverrideAllTaskFactory instance  = new OverrideAllTaskFactory();
+            instance.createTask(info.getFileObject()).run(info);
+            //instance.getHintsPositions();
+            // System.out.println("Error numbers "+instance.getHintsPositions().size());
+        } catch (Exception ex) {
+            System.out.println();
+        }
+
         return Collections.EMPTY_LIST;
     }
-
-    
 }
