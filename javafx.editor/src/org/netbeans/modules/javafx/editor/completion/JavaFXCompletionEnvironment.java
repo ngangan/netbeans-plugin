@@ -1032,9 +1032,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(TRY_KEYWORD, " {", false); // NOI18N
         addKeyword(INSERT_KEYWORD, SPACE, false);
         addKeyword(DELETE_KEYWORD, SPACE, false);
-// TODO: remove the following two?
-//        addKeyword(NEW_KEYWORD, SPACE, false);
-//        addKeyword(REVERSE_KEYWORD, SPACE, false);
+        addKeyword(NEW_KEYWORD, SPACE, false);
+        addKeyword(REVERSE_KEYWORD, SPACE, false);
         addKeyword(THROW_KEYWORD, SPACE, false);
         addKeyword(VAR_KEYWORD, SPACE, false);
         if (JavaFXCompletionProvider.startsWith(RETURN_KEYWORD, prefix)) {
