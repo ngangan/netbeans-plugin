@@ -106,6 +106,9 @@ final class HintsUtils {
                 if (!method.getSimpleName().toString().equals(overrriddenName)) {
                     continue;
                 }
+                if (method.getEnclosingElement() != overriddenMethod.getEnclosingElement()) {
+                    continue;
+                }
                 TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
                 if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
                     return overriddenMethod;
@@ -124,9 +127,13 @@ final class HintsUtils {
                     continue;
                 }
                 TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
-                if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)
-                        || compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
-                    return overriddenMethod;
+                try {
+                    if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)
+                            || compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                        return overriddenMethod;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         }

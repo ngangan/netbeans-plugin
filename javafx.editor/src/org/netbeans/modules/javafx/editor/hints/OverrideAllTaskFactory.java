@@ -199,6 +199,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                                         if (modifier != Modifier.ABSTRACT) {
                                             continue;
                                         }
+
                                         MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method, compilationInfo);
                                         if (overriddenMethod == null) {
                                             abstractMethods.add(method);

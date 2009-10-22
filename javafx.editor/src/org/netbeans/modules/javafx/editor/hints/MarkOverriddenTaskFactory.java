@@ -46,6 +46,7 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXImport;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
@@ -103,14 +104,14 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                     } catch (BadLocationException ex) {
                         ex.printStackTrace();
                     }
-                    if (document != null) {
+                    if (document != null && position != null) {
                         NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
                     }
                 }
+                annotations.put(document, addedAnnotationsCopy);
             }
         };
         runRunnable(update);
-        annotations.put(document, addedAnnotations);
     }
 
     private void runRunnable(Runnable task) {
@@ -178,11 +179,13 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                     Tree currentClassTree = compilationInfo.getTrees().getTree(currentClass);
                     superTypes.add(currentClassTree);
                     for (Tree superTree : superTypes) {
-                        JavaFXTreePath superPath = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), superTree);
-                        Element superElement = compilationInfo.getTrees().getElement(superPath);
+                        if (superTree == null) {
+                            continue;
+                        }
+
                         String className = null;
-                        if (superElement instanceof JavafxClassSymbol) {
-                            className = ((JavafxClassSymbol) superElement).getSimpleName().toString();
+                        if (superTree instanceof JFXClassDeclaration) {
+                            className = ((JFXClassDeclaration) superTree).getSimpleName().toString();
                         } else {
                             className = HintsUtils.getClassSimpleName(superTree.toString());
                         }
@@ -206,9 +209,9 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                             if (typeElement == null) {
                                 continue;
                             }
-                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superElement)) {
-                                continue;
-                            }
+//                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superElement)) {
+//                                continue;
+//                            }
                             Collection<? extends Element> elements = elementsCash.get(typeElement);
                             if (elements == null) {
                                 elements = getAllMembers(typeElement, compilationInfo);
@@ -238,9 +241,9 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
             }
 
             private void clear() {
+                addedAnotations.clear();
                 classTrees.clear();
                 overriddenMethods.clear();
-                addedAnotations.clear();
                 imports.clear();
                 classesKeys.clear();
                 optionsCache.clear();
