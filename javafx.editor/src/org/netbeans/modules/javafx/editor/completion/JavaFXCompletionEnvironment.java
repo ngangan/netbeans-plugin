@@ -1118,7 +1118,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("addClassModifiers"); // NOI18N
         addAccessModifiers(modifiers);
         if (modifiers == null || (
-                !modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT))) {
+                //!modifiers.contains(MIXIN) &&
+                //TODO: 'mixin' keywords are not in modifiers
+                !modifiers.contains(FINAL) &&
+                !modifiers.contains(ABSTRACT))) {
+            addKeyword(MIXIN_KEYWORD, SPACE, false);
             addKeyword(ABSTRACT_KEYWORD, SPACE, false);
         }
     }
