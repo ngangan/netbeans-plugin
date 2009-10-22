@@ -46,7 +46,7 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.CaretAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.CaretAwareJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -54,7 +54,7 @@ import org.openide.filesystems.FileObject;
  *
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  */
-public class CaretListeningFactory extends CaretAwareJavaSourceTaskFactory {
+public class CaretListeningFactory extends CaretAwareJavaFXSourceTaskFactory {
     
     private static CaretListeningFactory INSTANCE;
 

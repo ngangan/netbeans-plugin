@@ -127,6 +127,11 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
     }
 
     @Override
+    protected boolean asynchronousOpen() {
+        return false;
+    }
+
+    @Override
     protected Task reloadDocument() {
         final FXZDataObject fxzDO = getFXZDataObject();
         fxzDO.getDataModel().getFXDContainer().setDirty();

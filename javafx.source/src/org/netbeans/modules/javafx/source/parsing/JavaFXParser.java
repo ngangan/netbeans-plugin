@@ -125,13 +125,11 @@ public final class JavaFXParser extends Parser {
 
     @Override
     public void parse(Snapshot snapshot, Task task, SourceModificationEvent event) {
-        assert (snapshot != null) : "Null snapshot";
         this.snapshot = snapshot;
         cancelled.set(false);
-        assert (snapshot == snapshot());
         // Init classpath if not inited yet
         classpathInfo = getTaskClasspathInfo(task);
-        if (classpathInfo == null) {
+        if (snapshot != null && classpathInfo == null) {
             classpathInfo = ClasspathInfo.create(fileObject());
         }
         if (LOG.isLoggable(Level.FINE)) {
@@ -144,24 +142,26 @@ public final class JavaFXParser extends Parser {
     public Result getResult(Task task) throws ParseException {
         assert (task != null);
         JavaFXParserResultImpl impl = new JavaFXParserResultImpl(this);
-        ClasspathInfo taskClasspathInfo = getTaskClasspathInfo(task);
-        if (taskClasspathInfo != null && !taskClasspathInfo.equals(classpathInfo)) {
-            // Force init of reparse
-            parse(snapshot, task, null);
-        }
-        CompilationPhase requestedPhase = CompilationPhase.ANALYZED;
-        if (task instanceof JavaFXSourceCancelableTask) {
-            JavaFXSourceCancelableTask cTask = (JavaFXSourceCancelableTask) task;
-            requestedPhase = cTask.getPhase();
-        }
-        if (currentPhase.lessThan(requestedPhase)) {
-            try {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("getResult() moves to phase: " + requestedPhase);
+        if (snapshot != null) {
+            ClasspathInfo taskClasspathInfo = getTaskClasspathInfo(task);
+            if (taskClasspathInfo != null && !taskClasspathInfo.equals(classpathInfo)) {
+                // Force init of reparse
+                parse(snapshot, task, null);
+            }
+            CompilationPhase requestedPhase = CompilationPhase.ANALYZED;
+            if (task instanceof JavaFXSourceCancelableTask) {
+                JavaFXSourceCancelableTask cTask = (JavaFXSourceCancelableTask) task;
+                requestedPhase = cTask.getPhase();
+            }
+            if (currentPhase.lessThan(requestedPhase)) {
+                try {
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.fine("getResult() moves to phase: " + requestedPhase);
+                    }
+                    toPhase(requestedPhase);
+                } catch (IOException e) {
+                    throw new ParseException("Parser error", e);
                 }
-                toPhase(requestedPhase);
-            } catch (IOException e) {
-                throw new ParseException("Parser error", e);
             }
         }
         return ApiSourcePackageAccessor.get().createResult(impl);
@@ -372,6 +372,9 @@ public final class JavaFXParser extends Parser {
         List<String> options = new ArrayList<String>();
         //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
         options.add("-XDdisableStringFolding"); //NOI18N
+
+        // required for code formatting (and completion I believe), see JFXC-3528
+        options.add("-XDpreserveTrees"); //NOI18N
 
         diagnosticListener = new DiagnosticListenerImpl();
         JavafxcTaskImpl task = (JavafxcTaskImpl)tool.getTask(null, fileManager, diagnosticListener, options, Collections.singleton(jfo));

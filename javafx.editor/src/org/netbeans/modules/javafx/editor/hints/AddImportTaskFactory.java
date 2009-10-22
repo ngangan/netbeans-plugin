@@ -45,11 +45,11 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.*;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -57,6 +57,7 @@ import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.editor.Utilities;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
@@ -66,11 +67,14 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private final static EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private final static String HINTS_IDENT = "addimportjavafx"; //NOI18N
-    private final static String ERROR = "compiler.err.cant.resolve.location";//NOI18N
+    private final static String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
+    private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
+    private final AtomicBoolean cancel = new AtomicBoolean();
+
 
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -78,27 +82,40 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
+        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+        final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
+
         return new CancellableTask<CompilationInfo>() {
 
             @Override
             public void cancel() {
+                cancel.set(true);
             }
 
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                cancel.set(false);
+                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 if (file == null) {
                     throw new IllegalArgumentException();
                 }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
-                if (compilationInfo.getDocument() != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
-                }
-                if (compilationInfo.getDiagnostics().size() == 0) {
+                if (!compilationInfo.isErrors()) {
+                    if (compilationInfo.getDocument() != null) {
+                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
+                    }
+                    clear();
                     return;
                 }
                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (diagnostic.getKind() != Diagnostic.Kind.ERROR || !ERROR.equals(diagnostic.getCode())) {
+                    if (cancel.get()) {
+                        break;
+                    }
+
+                    boolean onlyAbstractError = false;
+                    if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
+                        onlyAbstractError = true;
+                    }
+                    if (!onlyAbstractError) {
                         continue;
                     }
                     final Collection<String> imports = new HashSet<String>();
@@ -130,7 +147,11 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
                         return;
                     }
                     potentialFqn = HintsUtils.getClassSimpleName(potentialFqn);
-                    Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                    Collection<ElementHandle<TypeElement>> options = optionsCache.get(potentialFqn);
+                    if (options == null) {
+                        options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        optionsCache.put(potentialFqn, options);
+                    }
                     List<Fix> listFQN = new ArrayList<Fix>();
                     boolean exists = false;
                     for (ElementHandle<TypeElement> elementHandle : options) {
@@ -145,13 +166,19 @@ public final class AddImportTaskFactory extends EditorAwareJavaSourceTaskFactory
                             listFQN.add(new FixImport(potentialFqn));
                         }
                     }
-                    if (listFQN.size() == 0) {
+                    if (listFQN.isEmpty()) {
                         continue;
                     }
                     ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
+                clear();
+            }
+
+            private void clear() {
+                optionsCache.clear();
+                errors.clear();
             }
         };
     }

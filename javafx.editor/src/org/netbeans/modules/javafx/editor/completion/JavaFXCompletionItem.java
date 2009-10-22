@@ -292,13 +292,6 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
         }
 
-        // TODO this should be tested, if something will not work, comment this block
-        try {
-            String tx = doc.getText(0, doc.getLength());
-            len = FXSourceUtils.getSubstitutionLenght(tx, offset, len);
-        } catch (BadLocationException e) {
-        }
-
         // Update the text
         final int length = len;
         doc.runAtomic (new Runnable () {
@@ -468,13 +461,6 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 sb.append("[${PAR"); //NOI18N
                 sb.append(cnt++);
                 sb.append(" instanceof=\"int\" default=\"\"}]"); //NOI18N                
-            }
-
-            // TODO this should be tested, if something will not work, comment this block
-            try {
-                String tx = doc.getText(0, doc.getLength());
-                len = FXSourceUtils.getSubstitutionLenght(tx, offset, len);
-            } catch (BadLocationException e) {
             }
 
             final int length = len;
@@ -955,13 +941,6 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     }
                 }
 
-                // TODO this should be tested, if something will not work, comment this block
-                try {
-                    String tx = doc.getText(0, doc.getLength());
-                    len = FXSourceUtils.getSubstitutionLenght(tx, offset, len);
-                } catch (BadLocationException e) {
-                }
-
                 final int length = len;
                 doc.runAtomic (new Runnable () {
                     public void run () {
@@ -1239,18 +1218,11 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                             asTemplate = true;
                         }
 
-                        int finalLen2 = finalLen;
-                        try {
-                            String tx = doc.getText(0, doc.getLength());
-                            finalLen2 = FXSourceUtils.getSubstitutionLenght(tx, offset, finalLen);
-                        } catch (BadLocationException e) {
-                        }
-                        
                         if (asTemplate) {
                             if (insideNew)
                                 sb.append("${cursor completionInvoke}"); //NOI18N
-                            if (finalLen2 > 0) {
-                                final int finalLen3 = finalLen2;
+                            if (finalLen > 0) {
+                                final int finalLen3 = finalLen;
                                 doc.runAtomic (new Runnable () {
                                     public void run () {
                                         try {
@@ -1266,7 +1238,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                 ctm.createTemporary(sb.append(text).toString()).insert(c);
                         } else {
                             // Update the text
-                            final int finalLen3 = finalLen2;
+                            final int finalLen3 = finalLen;
                             doc.runAtomic (new Runnable () {
                                 public void run () {
                                     try {

@@ -65,7 +65,7 @@ final class UncaughtExceptionsFix implements Fix {
     private Document document;
     private Hint hint;
     private CompilationInfo compilationInfo;
-    private static final String tab = "    "; //NOI18N
+    private static final String TAB = "    "; //NOI18N
 
     public UncaughtExceptionsFix(Document document, Hint hint, CompilationInfo compilationInfo) {
         assert document != null;
@@ -91,7 +91,7 @@ final class UncaughtExceptionsFix implements Fix {
         if (hint.getCatchTree() == null) {
             String method = document.getText(hint.getStartPosition() - space.length(), hint.getLength() + space.length()).trim();
             block.append(space).append("try {\n") //NOI18N
-                    .append(space).append(tab).append(method).append("\n") //NOI18N
+                    .append(space).append(TAB).append(method).append("\n") //NOI18N
                     .append(space).append("}"); //NOI18N
 
             addCatch(iterator, block, exceptionName, space);
@@ -136,7 +136,7 @@ final class UncaughtExceptionsFix implements Fix {
         while (iterator.hasNext()) {
                 //TODO Unique ex var name
                 block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
-                        .append(space).append(tab).append(exceptionName).append(".printStackTrace();\n") //NOI18N
+                        .append(space).append(TAB).append(exceptionName).append(".printStackTrace();\n") //NOI18N
                         .append(space).append("}"); //NOI18N
                 if (!iterator.hasNext()) {
                     block.append("\n"); //NOI18N
