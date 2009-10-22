@@ -34,6 +34,8 @@ import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -46,7 +48,13 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
     private static final class NodeBuilder {
         private final String             m_typeName;
         private final int                m_startOffset;
+        /** map with node's attributes */
         private final Map<String,String> m_attributes = new HashMap<String, String>();
+        /** map with child attributes that have Node or List with Nodes as value.
+         * Is used to check if child nodes should be removed from the model. 
+         * The only possible way because ContentHandler doesn't give relations between nodes.
+         */
+        private final Map<String, Object> m_childNodes = new HashMap<String, Object>();
         
         private NodeBuilder( String typeName, int startOff) {
             m_typeName = typeName;
@@ -67,13 +75,30 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             trans.addDocumentElement( m_typeName, FXDFileModel.FXD_NODE, m_attributes, m_startOffset, endOffset);
         }
 
-        public boolean isEqual(final AttributeSet attrs) {
+        /**
+         * checks if DocumentElement type and name are equal to current node
+         * @param de
+         * @return
+         */
+        public boolean isEqual(final DocumentElement de) {
+            assert de != null;
+            return FXDFileModel.FXD_NODE.equals(de.getType())
+                    && m_typeName.equals(de.getName());
+        }
+
+        /**
+         * Checks if given AttributeSet describes the same list of attributes as
+         * current node contain.
+         * @param attrs
+         * @return
+         */
+        public boolean areAttributesEqual(final AttributeSet attrs) {
             assert attrs != null;
             if ( attrs.getAttributeCount() == m_attributes.size()) {
                 for (Entry<String, String> entry : m_attributes.entrySet()) {
                     String value1 = entry.getValue();
                     Object value2 = attrs.getAttribute(entry.getKey());
-                    
+
                     if ( value1 != value2) {
                         if ( value1 == null || !value1.equals(value2)) {
                             return false;
@@ -84,6 +109,51 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             }
             return false;
         }
+
+        @Override
+        public String toString() {
+            return "NodeBuilder [name="+m_typeName+" startOff="+m_startOffset+"]";
+        }
+
+        /**
+         * returns map with attributes that contain Node or List of Nodes as value.
+         * @return Map with pairs (name,value).
+         */
+        protected Map<String, Object> getChildNodesMap(){
+            return m_childNodes;
+        }
+
+        /**
+         * adds Node or List with nodes to the map with child Nodes.
+         * Do not add attributes that has primitive value or array of primitives as value.
+         * @param name - name of the attribute that has given Node or
+         * List of Nodes as value.
+         * @param value Node or List of Nodes
+         */
+        protected void addNodeToChildrenMap(String name, Object value) {
+            if (!m_childNodes.containsKey(name)) {
+                m_childNodes.put(name, value);
+            }
+        }
+
+        protected boolean hasNodeInAttrValue(String nodeName) {
+            Object attrNodeName = getChildNodesMap().get(nodeName);
+            // attr is not present in updated node or it's type is changed to array.
+            if ((attrNodeName == null || !(attrNodeName instanceof String))) {
+                return false;
+            }
+            return true;
+        }
+
+        protected List<String> getNodesNamesFromAttrValue(String nodeName) {
+            Object nodesList = getChildNodesMap().get(nodeName);
+            if (nodesList != null && nodesList instanceof List) {
+                return (List<String>) nodesList;
+            } else {
+                return new ArrayList<String>();
+            }
+        }
+
     }
     
     public static final String PROP_PARSE_ERROR = "parse-error"; // NOI18N
@@ -93,8 +163,10 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
     public static synchronized FXDNode getRoot() {
         return s_root;
     }*/
-
-    public synchronized void updateModel(final DocumentModelModificationTransaction trans, final DocumentModel model, final DocumentChange[] changes) throws DocumentModelException, DocumentModelTransactionCancelledException {
+    
+    public synchronized void updateModel(final DocumentModelModificationTransaction trans, 
+            final DocumentModel model, final DocumentChange[] changes)
+            throws DocumentModelException, DocumentModelTransactionCancelledException {
         //DocumentModelUtils.dumpElementStructure( model.getRootElement());
         
         BaseDocument doc = (BaseDocument) model.getDocument();
@@ -113,13 +185,17 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     
         try {
             FXDParser fxdParser = new FXDParser(docReader, new ContentHandler() {
+                /** is last processed element was node or not (then array) */
                 private boolean m_isLastNode = true;
+                /** last processed element - Node or List with Nodes*/
+                private Object  m_lastElem = null;
 
                 public Object startNode(String typeName, int startOff, boolean isExtension) {
                     return new NodeBuilder(typeName, startOff);
                 }
 
-                public void attribute(Object node, String name, String value, int startOff, int endOff) throws FXDException {
+                public void attribute(Object node, String name, String value,
+                        int startOff, int endOff) throws FXDException {
                     NodeBuilder deb = (NodeBuilder) node;
                     if ( value == null) {
                         try {
@@ -130,6 +206,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                                 //System.err.println(String.format("Adding array attribute %s <%d, %d>", name, startOff, endOff));
                                 trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE_ARRAY, NO_ATTRS, startOff, endOff);
                             }
+                            deb.addNodeToChildrenMap(name, m_lastElem);
+                            m_lastElem = null;
                        } catch( Exception e) {
                            throw new FXDException(e);
                        }
@@ -143,11 +221,12 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     NodeBuilder deb = (NodeBuilder) node;
                     DocumentElement de = model.getLeafElementForOffset(deb.m_startOffset);
                     try {
-                        if ( de != model.getRootElement() && FXDFileModel.FXD_NODE.equals(de.getType())) {
-                            if ( !deb.isEqual(de.getAttributes())) {
+                        if ( de != model.getRootElement() && deb.isEqual(de)) {
+                            if ( !deb.areAttributesEqual(de.getAttributes())) {
                                 //System.err.println("Attributes changes for " + deb.m_typeName);
                                 trans.updateDocumentElementAttribs(de, deb.getAttributeMap());
                             }
+                            synchRemovedChildNodes(deb, de);
                         } else {
                             deb.build(trans, endOff);
                         }
@@ -155,25 +234,55 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                         throw new FXDException(e);
                     }
                     m_isLastNode = true;
+                    m_lastElem = deb.m_typeName;
+                }
+
+                private void synchRemovedChildNodes(NodeBuilder deb, DocumentElement de)
+                        throws DocumentModelTransactionCancelledException {
+                    List<DocumentElement> deChildren = de.getChildren();
+                    for (DocumentElement deChild : deChildren) {
+                        if (FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(deChild.getType())) {
+                            synchArrayOfChildNodes(deb, de);
+                        } else if (FXDFileModel.FXD_ATTRIBUTE.equals(deChild.getType())) {
+                            if (!deb.hasNodeInAttrValue(deChild.getName())) {
+                                trans.removeDocumentElement(deChild, true);
+                            }
+                        }
+                    }
+                }
+
+                private void synchArrayOfChildNodes(NodeBuilder deb, DocumentElement de) 
+                        throws DocumentModelTransactionCancelledException {
+                    List<String> nodeNamesList = deb.getNodesNamesFromAttrValue(de.getName());
+                    for (DocumentElement child : de.getChildren()) {
+                        if (FXDFileModel.FXD_NODE.equals(child.getType())) {
+                            if (!nodeNamesList.contains(child.getName())) {
+                                trans.removeDocumentElement(child, true);
+                            }
+                        }
+                    }
                 }
 
                 public Object startNodeArray(int startOff) {
                     //System.err.println("Array started");
-                    return null;
+                    return new ArrayList<String>();
                 }
 
-                public void arrayElement(Object node, String value, int startOff, int endOff) throws FXDException {
+                public void arrayElement(Object array, String value, int startOff, int endOff) throws FXDException {
                     if ( value != null) {
                         try {
                             trans.addDocumentElement(value, FXDFileModel.FXD_ARRAY_ELEM, NO_ATTRS, startOff, endOff);
                         } catch (Exception ex) {
                             throw new FXDException( ex);
                         }
+                    } else {
+                        ((List)array).add(m_lastElem);
+                        m_lastElem = null;
                     }
                 }
 
-                public void endNodeArray(Object node, int endOff) {
-                    //NodeArrayBuilder nab = (NodeArrayBuilder) node;
+                public void endNodeArray(Object array, int endOff) {
+                    m_lastElem = array;
                     m_isLastNode = false;
                 }
 
