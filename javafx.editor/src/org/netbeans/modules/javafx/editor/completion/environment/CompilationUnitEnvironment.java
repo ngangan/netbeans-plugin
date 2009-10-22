@@ -155,7 +155,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
 
     private void addKeywordsForCU(UnitTree ut) {
         addAccessModifiers(null);
-        addVarAccessModifiers(null);
+        addVarAccessModifiers(null, true);
         addFunctionModifiers(null);
         addClassModifiers(null);
         addKeyword(CLASS_KEYWORD, SPACE, false);

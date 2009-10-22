@@ -1015,7 +1015,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(ABSTRACT_KEYWORD, SPACE, false);
         addKeyword(OVERRIDE_KEYWORD, SPACE, false);
         addAccessModifiers(null);
-        addVarAccessModifiers(null);
+        addVarAccessModifiers(null, false);
         addKeyword(INIT_KEYWORD, SPACE, false);
         addKeyword(POSTINIT_KEYWORD, SPACE, false);
         addKeyword(VAR_KEYWORD, SPACE, false);
@@ -1091,7 +1091,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected void addVarAccessModifiers(Set<Modifier> modifiers) {
+    protected void addVarAccessModifiers(Set<Modifier> modifiers, boolean isOnScriptLevel) {
         if (LOGGABLE) log("addVarAccessModifiers"); // NOI18N
         if (modifiers == null || (
                 //!modifiers.contains(PUBLIC_READ) &&
@@ -1099,7 +1099,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 //TODO: 'public-read' and 'public-init' keywords are not in modifiers
                 true)) {
             addKeyword(PUBLIC_READ_KEYWORD, SPACE, false);
-            addKeyword(PUBLIC_INIT_KEYWORD, SPACE, false);
+            if (!isOnScriptLevel) {
+                addKeyword(PUBLIC_INIT_KEYWORD, SPACE, false);
+            }
         }
     }
 
