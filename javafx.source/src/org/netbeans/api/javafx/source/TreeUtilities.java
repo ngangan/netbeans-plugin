@@ -41,6 +41,7 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javafx.api.tree.*;
+import com.sun.javafx.api.tree.SyntheticTree.SynthType;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
@@ -115,14 +116,11 @@ public final class TreeUtilities {
             if (LOGGABLE) log("isSynthetic invoked with null argument"); // NOI18N
             return false;
         }
-        while (path != null) {
-            final Tree leaf = path.getLeaf();
-            if (leaf instanceof JFXTree) {
-                if (isSynthetic(path.getCompilationUnit(), leaf)) {
-                    return true;
-                }
-                path = path.getParentPath();
-            }
+        final Tree leaf = path.getLeaf();
+        if (leaf instanceof JFXTree) {
+            JFXTree fxLeaf = (JFXTree)leaf;
+            SynthType type = fxLeaf.getGenType();
+            return SynthType.SYNTHETIC.equals(type);
         }
         if (LOGGABLE) log("isSynthetic returning false because the leaf is not JFXTree."); // NOI18N
         return false;
