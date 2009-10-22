@@ -6,6 +6,8 @@
     <description>Builds the module suite javafx.</description>
     <import file="nbproject/build-impl.xml"/>
 
+    <property name="nbroot" location="."/>
+
     <property name="onlycurrplat" value="false"/>
     <!-- Determine current OS -->
     <condition property="isWin">
@@ -228,6 +230,31 @@
       <antcall target="jar-linux" />
       <antcall target="jar-solaris" />
       <antcall target="jar-macosx" />
+    </target>
+
+    <target name="runtests" description="Run JavaFX tests">
+      <subant buildpath="javafx.editor:javafx.lexer"
+          target="test"
+          inheritall="false"
+          inheritrefs="false">
+        <property name="continue.after.failing.tests" value="true"/>
+      </subant>
+    </target>
+
+    <target name="runtests-report" depends="runtests"
+      description="Run JavaFX tests and generates test report">
+      <!-- Collects JUnit results -->
+      <property name="javafx.test.results" location="${nbroot}/build/test/results" />
+      <property name="module.results" value="build/test/unit/results/TEST-*.xml" />
+      <mkdir dir="${javafx.test.results}"/>
+      <junitreport todir="${javafx.test.results}">
+        <fileset dir="${nbroot}">
+          <include name="javafx.editor/${module.results}"/>
+          <include name="javafx.lexer/${module.results}"/>
+        </fileset>
+        <report format="frames" todir="${javafx.test.results}"/>
+      </junitreport>
+      <echo message="Unit Test Results: ${nbroot}/build/test/results/index.html"/>
     </target>
 
 </project>
