@@ -1,6 +1,8 @@
 abstract
+bound
 class
 def
+delete
 for
 function
 if
@@ -8,8 +10,11 @@ import
 insert
 mixin
 new
+override
 package
+protected
 public
+public-read
 return
 reverse
 throw

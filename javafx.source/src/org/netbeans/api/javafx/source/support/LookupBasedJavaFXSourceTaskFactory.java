@@ -57,7 +57,7 @@ import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 
-/**A {@link JavaSourceTaskFactorySupport} that registers tasks to all files that are
+/**A {@link JavaFXSourceTaskFactorySupport} that registers tasks to all files that are
  * found in the given {@link Lookup}.
  *
  * This factory searches for {@link FileObject}, {@link DataObject} and {@link Node}
@@ -66,7 +66,7 @@ import org.openide.util.LookupListener;
  *
  * @author Jan Lahoda
  */
-public abstract class LookupBasedJavaSourceTaskFactory extends JavaFXSourceTaskFactory {
+public abstract class LookupBasedJavaFXSourceTaskFactory extends JavaFXSourceTaskFactory {
 
     private Result<FileObject> fileObjectResult;
     private Result<DataObject> dataObjectResult;
@@ -77,22 +77,22 @@ public abstract class LookupBasedJavaSourceTaskFactory extends JavaFXSourceTaskF
     
     private String[] supportedMimeTypes;
 
-    /**Construct the LookupBasedJavaSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the LookupBasedJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      */
-    public LookupBasedJavaSourceTaskFactory(Phase phase, Priority priority) {
+    public LookupBasedJavaFXSourceTaskFactory(Phase phase, Priority priority) {
         this(phase, priority, (String[]) null);
     }
     
-    /**Construct the LookupBasedJavaSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the LookupBasedJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      * @since 0.21
      */
-    public LookupBasedJavaSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
+    public LookupBasedJavaFXSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
         super(phase, priority);
         currentFiles = Collections.emptyList();
         listener = new LookupListenerImpl();

@@ -40,18 +40,21 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.AssignmentTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.BlockExpressionTree;
+import com.sun.javafx.api.tree.CatchTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TryTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javafx.code.JavafxVarSymbol;
+import com.sun.tools.javafx.tree.JFXFunctionInvocation;
 import java.util.*;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 
 /**
  *
@@ -60,108 +63,72 @@ import org.netbeans.api.javafx.source.ElementHandle;
 final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsModel> {
 
     private CompilationInfo compilationInfo;
-    private ClassIndex classIndex;
-    private Set<String> instantTypes;
-    private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
-    UncaughtExceptionsVisitor(CompilationInfo compilationInfo, ClassIndex classIndex) {
+    UncaughtExceptionsVisitor(CompilationInfo compilationInfo) {
         this.compilationInfo = compilationInfo;
-        this.classIndex = classIndex;
-        instantTypes = new HashSet<String>();
     }
 
     @Override
-    public Void visitMethodInvocation(FunctionInvocationTree node, HintsModel model) {
-        if (node.toString().contains(".")) { //NOI18N
-            instantTypes.add(extractMethodClassName(node.toString()));
+    public Void visitBlockExpression(BlockExpressionTree node, HintsModel model) {
+        List<ExpressionTree> statements = new ArrayList<ExpressionTree>(node.getStatements());
+        statements.add(node.getValue());
+        Map<Tree, Collection<Type>> throwsMap = getThrowns(statements);
+        for (Tree statement : throwsMap.keySet()) {
+            model.addHint(throwsMap.get(statement), statement);
         }
-        for (String instantType : instantTypes) {
-            if (HintsUtils.checkString(instantType)) {
-                continue;
-            }
-            Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(instantType, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-            for (ElementHandle<TypeElement> elementHandle : options) {
-                TypeElement typeElement = elementHandle.resolve(compilationInfo);
-                if (typeElement == null || typeElement.getQualifiedName() == null) {
-                    continue;
-                }
-                String elementType = HintsUtils.getMethodName(typeElement.getQualifiedName().toString()).trim();
-                if (elementType == null || !elementType.equals(instantType)) {
-                    break;
-                }
-                Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
-                if (elements == null) {
-                    continue;
-                }
-                Element currentElement = compilationInfo.getTrees().getElement(getCurrentPath());
-                if (currentElement == null || currentElement.getSimpleName() == null) {
-                    continue;
-                }
-                String methodName = currentElement.getSimpleName().toString();
-                for (Element element : elements) {
-                    if (element instanceof MethodSymbol) {
-                        MethodSymbol methodSymbol = (MethodSymbol) element;
-                        if (!methodSymbol.getSimpleName().toString().equals(methodName)) {
-                            continue;
-                        }
-                        List<Type> thrownExceptions = null;
-                        //Hack for JAVAC ISSUE - methodSymbol.getThrownTypes() throws null pointer exception
-                        try {
-                            thrownExceptions = methodSymbol.getThrownTypes();
-                        } catch (NullPointerException ex) {
-                            ex.printStackTrace();
-                        }
 
-                        if (thrownExceptions == null || thrownExceptions.size() == 0) {
-                            continue;
-                        }
-                        model.addHint(thrownExceptions, node);
+        return super.visitBlockExpression(node, model);
+    }
+
+    @Override
+    public Void visitTry(TryTree node, HintsModel model) {
+        List<ExpressionTree> statements = new ArrayList<ExpressionTree>(node.getBlock().getStatements());
+        statements.add(node.getBlock().getValue());
+        Map<Tree, Collection<Type>> throwsMap = getThrowns(statements);
+        Map<Tree, Tree> catchMap = new HashMap<Tree, Tree>();
+
+        for (CatchTree catchTree : node.getCatches()) {
+            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), catchTree.getParameter());
+            Element catchVarElement = compilationInfo.getTrees().getElement(path);
+            Type catchType = ((JavafxVarSymbol) catchVarElement).asType();
+            for (Tree statement : throwsMap.keySet()) {
+                Collection<Type> throwsList = new HashSet(throwsMap.get(statement));
+                for (Type type : throwsMap.get(statement)) {
+                    if (type == catchType) {
+                        throwsList.remove(type);
                     }
                 }
+                throwsMap.put(statement, throwsList);
+                catchMap.put(statement, catchTree);
             }
         }
-        return super.visitMethodInvocation(node, model);
-    }
-    //TODO Temporary log for issue 148890
-
-    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
-        Collection<? extends Element> elements = null;
-        try {
-            elements = compilationInfo.getElements().getAllMembers(typeElement);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            System.err.println("* e = " + typeElement); //NOI18N
-            System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
-            System.err.println("* e.asType() = " + typeElement.asType()); //NOi18N
+        for (Tree statement : throwsMap.keySet()) {
+            Hint hint = model.addHint(throwsMap.get(statement), statement);
+            model.addCatchTree(hint, catchMap.get(statement));
         }
-        return elements;
+        return super.visitTry(node, model);
     }
 
-    @Override
-    public Void visitAssignment(AssignmentTree node, HintsModel p) {
-        String typeName = (node.getExpression().toString().replace("{}", "").trim()); //NOI18N
-        instantTypes.add(typeName);
-        return super.visitAssignment(node, p);
-    }
-
-    @Override
-    public Void visitInstantiate(InstantiateTree node, HintsModel p) {
-        String typeName = (node.getIdentifier().toString().replace("{}", "").trim()); //NOI18N
-        instantTypes.add(typeName);
-        return super.visitInstantiate(node, p);
-    }
-
-    private static String extractMethodClassName(String fullMethodName) {
-        int last = fullMethodName.lastIndexOf("."); //NOI18N
-        if (last < 0) {
-            return fullMethodName;
+    private Map<Tree, Collection<Type>> getThrowns(List<ExpressionTree> statements) {
+        if (statements.isEmpty()) {
+            return Collections.EMPTY_MAP;
         }
-        String fqn = fullMethodName.substring(0, last);
-        int fqnLast = fqn.lastIndexOf("."); //NOi18N
-        if (fqnLast > 0) {
-            fqn = fqn.substring(fqnLast + 1, fqn.length());
+        Map<Tree, Collection<Type>> throwsMap = new HashMap<Tree, Collection<Type>>();
+        for (ExpressionTree statement : statements) {
+            if (!(statement instanceof JFXFunctionInvocation)) {
+                continue;
+            }
+            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), statement);
+            Element element = compilationInfo.getTrees().getElement(path);
+            if (!(element instanceof MethodSymbol)) {
+                continue;
+            }
+            List<Type> throwsList = ((MethodSymbol) element).getThrownTypes();
+            if (throwsList == null || throwsList.isEmpty()) {
+                continue;
+            }
+            throwsMap.put(statement, throwsList);
         }
-        String className = fqn.replace("{}", "").replace("()", "").trim(); //NOI18N
-        return className;
+        return throwsMap;
     }
 }

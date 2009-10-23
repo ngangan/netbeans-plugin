@@ -5,7 +5,6 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
@@ -14,9 +13,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementUtilities;
 
 /**
  *
@@ -46,14 +47,14 @@ final class HintsUtils {
             fqName = fqName.substring(start);
         }
         fqName = fqName.replace("{", "").replace("}", ""); //NOI18N
-        return fqName;
+        return fqName.trim();
     }
 
     static boolean checkString(String name) {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed( Element foundElement,
+    static boolean isClassUsed(Element foundElement,
             Collection<JFXImport> imports,
             CompilationInfo compilationInfo,
             Collection<Element> allClasses,
@@ -97,20 +98,42 @@ final class HintsUtils {
         }
         return false;
     }
-    private static final Comparator<List<VarSymbol>> COMPARATOR = new ParamsComparator();
 
-    static MethodSymbol isOverriden(Collection<MethodSymbol> overridenMethodList, MethodSymbol method) {
+    static MethodSymbol isOverridden(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
+        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
+            for (MethodSymbol overriddenMethod : overriddenMethodList) {
+                String overrriddenName = overriddenMethod.getSimpleName().toString();
+                if (!method.getSimpleName().toString().equals(overrriddenName)) {
+                    continue;
+                }
+                if (method.getEnclosingElement() != overriddenMethod.getEnclosingElement()) {
+                    continue;
+                }
+                TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
+                if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                    return overriddenMethod;
+                }
+            }
+        }
 
-        if (overridenMethodList != null && overridenMethodList.size() != 0) {
-            for (MethodSymbol overridenMethod : overridenMethodList) {
-                //TODO Work around to avoid NPE at com.sun.tools.javac.code.Symbol$MethodSymbol.params(Symbol.java:1201)!
+        return null;
+    }
+
+    static MethodSymbol isAlreadyDefined(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
+        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
+            for (MethodSymbol overriddenMethod : overriddenMethodList) {
+                String overrriddenName = overriddenMethod.getSimpleName().toString();
+                if (!method.getSimpleName().toString().equals(overrriddenName)) {
+                    continue;
+                }
+                TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
                 try {
-                    if (method.getQualifiedName().equals(overridenMethod.getQualifiedName()) && method.getParameters().size() == overridenMethod.getParameters().size() && COMPARATOR.compare(method.getParameters(), overridenMethod.getParameters()) == 0) {
-                        return overridenMethod;
+                    if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)
+                            || compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                        return overriddenMethod;
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    continue;
                 }
             }
         }
@@ -118,6 +141,7 @@ final class HintsUtils {
         return null;
     }
     //TODO Should be replaced with proper formating ASAP
+
     static String calculateSpace(int startPosition, Document document) {
         String text = null;
         try {
@@ -143,7 +167,7 @@ final class HintsUtils {
             } else {
                 charNumber = line.length();
             }
-            
+
         }
         if (charNumber < 0) {
             return ""; //NOI18N
@@ -157,10 +181,10 @@ final class HintsUtils {
 
     private static class ParamsComparator implements Comparator<List<VarSymbol>> {
 
-        public int compare(List<VarSymbol> methodList, List<VarSymbol> overridenMethod) {
+        public int compare(List<VarSymbol> methodList, List<VarSymbol> overriddenMethod) {
             for (VarSymbol var : methodList) {
-                VarSymbol overridenVar = overridenMethod.get(methodList.indexOf(var));
-                if (!var.asType().toString().equals(overridenVar.asType().toString())) {
+                VarSymbol overriddenVar = overriddenMethod.get(methodList.indexOf(var));
+                if (!var.asType().toString().equals(overriddenVar.asType().toString())) {
                     return -1;
                 }
             }

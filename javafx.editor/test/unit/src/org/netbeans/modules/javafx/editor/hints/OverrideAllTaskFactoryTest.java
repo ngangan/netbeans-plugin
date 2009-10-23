@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -40,44 +40,37 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javafx.tree.JFXImport;
-import java.util.*;
-import javax.lang.model.element.*;
+
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import java.util.Collections;
+import java.util.List;
+
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.spi.editor.hints.ErrorDescription;
 
-/**
- *
- * @author karol harezlak
- */
-public final class ImplementAbstractTaskFactory extends AbstractOverrideTask {
 
-    private static final String HINT_IDENT = "overridejavafx"; //NOI18N
-
-    @Override
-    protected Tree getTree(CompilationInfo compilationInfo, Element currentClass, Map<Element, Tree> position) {
-        return compilationInfo.getTrees().getTree(currentClass);
+public class OverrideAllTaskFactoryTest extends TreeRuleTestBase {
+    
+    public OverrideAllTaskFactoryTest(String testName) {
+        super(testName);
+    }
+    
+    public void testDoNothingForVoidReturnType() throws Exception {
+        //performAnalysisTest("test/TestMain.fx", "package test; public class TestMain{} class Test extends AbstractTest{} abstract class AbstractTest { abstract function method();}", 1);
     }
 
     @Override
-    protected int findPositionAtTheEnd(CompilationInfo compilationInfo, Tree tree) {
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
-        return endTree;
-    }
+    protected List<ErrorDescription> computeErrors(CompilationInfo info, JavaFXTreePath path) {
+        info.getDiagnostics();
+        try {
+            OverrideAllTaskFactory instance  = new OverrideAllTaskFactory();
+            instance.createTask(info.getFileObject()).run(info);
+            //instance.getHintsPositions();
+            // System.out.println("Error numbers "+instance.getHintsPositions().size());
+        } catch (Exception ex) {
+            System.out.println();
+        }
 
-    @Override
-    protected JavaFXTreePathScanner<Void, Void> getVisitor(CompilationInfo compilationInfo, Map<Element, Collection<Tree>> classTrees, Map<Element, List<MethodSymbol>> overridenMethods, Collection<JFXImport> imports, Map<Element, Tree> position) {
-        return new OverrideVisitor(compilationInfo, classTrees, overridenMethods, imports);
+        return Collections.EMPTY_LIST;
     }
-
-    @Override
-    protected String getHintsControllerString() {
-        return HINT_IDENT;
-    }
-
-   
 }

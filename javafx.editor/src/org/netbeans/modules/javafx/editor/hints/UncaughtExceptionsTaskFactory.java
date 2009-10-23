@@ -46,9 +46,7 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
 import com.sun.javafx.api.tree.SourcePositions;
@@ -72,12 +70,12 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
 
     public UncaughtExceptionsTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
     }
 
     @Override
@@ -95,24 +93,21 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaSourceTaskFact
                 }
                 final Document document = compilationInfo.getDocument();
                 if (compilationInfo.getDiagnostics() != null && compilationInfo.getDiagnostics().size() > 0) {
+                    if (document != null) {
+                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
+                    }
                     return;
                 }
-                if (document != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
-                    }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo, classIndex);
-                HintsModel model = new HintsModel(compilationInfo);
+                final UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
+                final HintsModel model = new HintsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
-                if (model.getHints() != null) {
-                    Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-                    for (Hint hint : model.getHints()) {
-                        errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
-                    }
-                    if (document != null) {
-                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); //NOI18N
-                    }
+                Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
+                for (Hint hint : model.getHints()) {
+                    errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+                }
+                if (document != null) {
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); //NOI18N
                 }
             }
         };

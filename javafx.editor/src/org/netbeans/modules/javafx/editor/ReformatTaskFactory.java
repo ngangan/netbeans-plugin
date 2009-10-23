@@ -25,7 +25,6 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
@@ -40,8 +39,10 @@ import org.openide.util.NbBundle;
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  * @todo documentation
  */
-public class ReformatTaskFactory implements ReformatTask.Factory{
+public class ReformatTaskFactory implements ReformatTask.Factory {
+
     private static Logger log = Logger.getLogger(ReformatTaskFactory.class.getName());
+
     /**
      * Create reformatting task.
      *
@@ -49,8 +50,9 @@ public class ReformatTaskFactory implements ReformatTask.Factory{
      * @return reformatting task or null if the factory cannot handle the given context.
      */
     public ReformatTask createTask(Context context) {
-        if (log.isLoggable(Level.FINE)) log.fine(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
-        return new JFXReformatTask(context); // TODO enable reformatting
-//        return new CompilerIndependentJFXReformatTask(context);
+        if (log.isLoggable(Level.FINE)) {
+            log.fine(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
+        }
+        return new JFXReformatTask(context);
     }
 }

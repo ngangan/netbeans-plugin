@@ -48,7 +48,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSource.Priority;
 import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;
-import org.netbeans.api.javafx.source.support.LookupBasedJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.LookupBasedJavaFXSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
@@ -56,7 +56,7 @@ import org.openide.util.Lookup;
  *
  * @author Jan Lahoda
  */
-public final class TreeNavigatorJavaFXSourceFactory extends LookupBasedJavaSourceTaskFactory {
+public final class TreeNavigatorJavaFXSourceFactory extends LookupBasedJavaFXSourceTaskFactory {
     
     private CancellableTask<CompilationInfo> task;
     

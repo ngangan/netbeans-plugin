@@ -1015,7 +1015,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(ABSTRACT_KEYWORD, SPACE, false);
         addKeyword(OVERRIDE_KEYWORD, SPACE, false);
         addAccessModifiers(null);
-        addVarAccessModifiers(null);
+        addVarAccessModifiers(null, false);
         addKeyword(INIT_KEYWORD, SPACE, false);
         addKeyword(POSTINIT_KEYWORD, SPACE, false);
         addKeyword(VAR_KEYWORD, SPACE, false);
@@ -1032,9 +1032,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(TRY_KEYWORD, " {", false); // NOI18N
         addKeyword(INSERT_KEYWORD, SPACE, false);
         addKeyword(DELETE_KEYWORD, SPACE, false);
-// TODO: remove the following two?
-//        addKeyword(NEW_KEYWORD, SPACE, false);
-//        addKeyword(REVERSE_KEYWORD, SPACE, false);
+        addKeyword(NEW_KEYWORD, SPACE, false);
+        addKeyword(REVERSE_KEYWORD, SPACE, false);
         addKeyword(THROW_KEYWORD, SPACE, false);
         addKeyword(VAR_KEYWORD, SPACE, false);
         if (JavaFXCompletionProvider.startsWith(RETURN_KEYWORD, prefix)) {
@@ -1092,7 +1091,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
     }
 
-    protected void addVarAccessModifiers(Set<Modifier> modifiers) {
+    protected void addVarAccessModifiers(Set<Modifier> modifiers, boolean isOnScriptLevel) {
         if (LOGGABLE) log("addVarAccessModifiers"); // NOI18N
         if (modifiers == null || (
                 //!modifiers.contains(PUBLIC_READ) &&
@@ -1100,7 +1099,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 //TODO: 'public-read' and 'public-init' keywords are not in modifiers
                 true)) {
             addKeyword(PUBLIC_READ_KEYWORD, SPACE, false);
-            addKeyword(PUBLIC_INIT_KEYWORD, SPACE, false);
+            if (!isOnScriptLevel) {
+                addKeyword(PUBLIC_INIT_KEYWORD, SPACE, false);
+            }
         }
     }
 
@@ -1118,7 +1119,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         if (LOGGABLE) log("addClassModifiers"); // NOI18N
         addAccessModifiers(modifiers);
         if (modifiers == null || (
-                !modifiers.contains(FINAL) && !modifiers.contains(ABSTRACT))) {
+                //!modifiers.contains(MIXIN) &&
+                //TODO: 'mixin' keywords are not in modifiers
+                !modifiers.contains(FINAL) &&
+                !modifiers.contains(ABSTRACT))) {
+            addKeyword(MIXIN_KEYWORD, SPACE, false);
             addKeyword(ABSTRACT_KEYWORD, SPACE, false);
         }
     }

@@ -40,32 +40,19 @@
 package org.netbeans.api.javafx.source;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import javax.swing.text.Document;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.lexer.Language;
-import org.openide.cookies.EditorCookie;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.loaders.DataObject;
 
 /**
  *
  * @author alex
  */
-public class PathFinderTest {
-    public PathFinderTest() {
+public class PathFinderTest extends SourceTestBase {
+    public PathFinderTest(String testName) {
+        super(testName);
     }
     
-    @org.junit.Test
-    public void pathForTest() throws Exception {
-        File f = File.createTempFile("Test", ".fx");
-        toFile(f,
+    public void testPathFor() throws Exception {
+        testInsideSourceTask(
                 "/* Top comment */\n" +
                 "\n" +
                 "import javafx.ui.*;\n" +
@@ -75,19 +62,8 @@ public class PathFinderTest {
                 "  title: \"Hello World F3\"\n" +
                 "  content: Label{\n"+
                 "      text:\"Hello World\"\n}"+
-                "}"
-        );
-        FileObject fo = FileUtil.toFileObject(f);
-        JavaFXSource src = JavaFXSource.forFileObject(fo);
-        System.err.println("src=" + src);
-        DataObject dobj = DataObject.find(fo);
-        EditorCookie ec = dobj.getCookie(EditorCookie.class);
-        Document doc = ec.openDocument();
-        doc.putProperty(Language.class, JFXTokenId.language());
-
-        src.runWhenScanFinished(new CancellableTask<CompilationController>() {
-            public void cancel() {
-                }
+                "}",
+          new Task<CompilationController>() {
             public void run(CompilationController controller) throws Exception {
                 if (controller.toPhase(Phase.ANALYZED).compareTo(Phase.ANALYZED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
                     throw new Exception(
@@ -95,21 +71,14 @@ public class PathFinderTest {
                                 "\nDiagnostics = "/*+ci.getDiagnostics()*/+
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                 }
-                int currentOffset = 80;
+                int currentOffset = 73;
                 JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(currentOffset);
                 Tree tree = currentPath.getLeaf();
-                System.out.println("Tree is: "+ tree.toString());
+                System.err.println("Tree is: "+ tree);
+                assertNotNull(tree);
+                // offset 73 falls in the middle of the "title:"
+                assertEquals(Tree.JavaFXKind.OBJECT_LITERAL_PART, tree.getJavaFXKind());
             }
-        }, true);
-        
+        });
     }
-
-    private void toFile(File f, String s) throws  Exception {
-        OutputStream os = new FileOutputStream(f);
-        Writer w = new OutputStreamWriter(os);
-        w.write(s);
-        w.close();
-        os.close();
-    }
-    
 }

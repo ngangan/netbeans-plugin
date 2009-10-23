@@ -48,9 +48,10 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaSourceTaskFactory;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -71,10 +72,11 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaSourceTaskFactory {
+public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String HINTS_IDENT = "abstractmixinjavafx"; //NOI18N
+    private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MixinNotImplementedAbstractsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -83,17 +85,31 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
 
+        final Collection<Tree> mixins = new HashSet<Tree>();
+        final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
+        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+        final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
+        final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+
         return new CancellableTask<CompilationInfo>() {
 
+            private void clear() {
+                mixins.clear();
+                existingMethods.clear();
+                optionsCache.clear();
+                typeElementCash.clear();
+                elementsCash.clear();
+            }
+            
             public void cancel() {
+                cancel.set(true);
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-
+                cancel.set(false);
                 final Element[] mainClassElement = new Element[1];
-                final Collection<Tree> mixins = new HashSet<Tree>();
-                final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
                 final Document document = compilationInfo.getDocument();
+                ErrorDescription errorDescription = null;
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -124,16 +140,20 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     }
                 };
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
-                HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
-                if (mixins.isEmpty()) {
-                    return;
-                }
-                if (HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
+                if (mixins.isEmpty() || HintsUtils.checkString(mainClassElement[0].getSimpleName().toString())) {
+                    if (document != null) {
+                        HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
+                    }
+                    clear();
                     return;
                 }
                 ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 boolean breakIt = false;
                 for (Tree mixin : mixins) {
+                    if (cancel.get()) {
+                        clear();
+                        return;
+                    }
                     JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
                     Element mixinElement = compilationInfo.getTrees().getElement(path);
                     if (mixinElement == null) {
@@ -143,13 +163,25 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     if (HintsUtils.checkString(mixinName)) {
                         continue;
                     }
-                    Set<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(mixinName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                    Collection<ElementHandle<TypeElement>> options = optionsCache.get(mixinName);
+                    if (options == null) {
+                        options = classIndex.getDeclaredTypes(mixinName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        optionsCache.put(mixinName, options);
+                    }
                     for (ElementHandle<TypeElement> elementHandle : options) {
-                        TypeElement typeElement = elementHandle.resolve(compilationInfo);
+                        TypeElement typeElement = typeElementCash.get(elementHandle);
+                        if (typeElement == null) {
+                            typeElement = elementHandle.resolve(compilationInfo);
+                            typeElementCash.put(elementHandle, typeElement);
+                        }
                         if (typeElement == null) {
                             continue;
                         }
-                        Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                        Collection<? extends Element> elements = elementsCash.get(typeElement);
+                        if (elements == null) {
+                            elements = getAllMembers(typeElement, compilationInfo);
+                            elementsCash.put(typeElement, elements);
+                        }
                         if (elements == null) {
                             continue;
                         }
@@ -164,10 +196,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), mixin);
                             String hintText = NbBundle.getMessage(MixinNotImplementedAbstractsTaskFactory.class, "TITLE_MIXIN_ABSTRACT"); //NOI18N
-                            ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
-                            if (document != null) {
-                                HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
-                            }
+                            errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
                             breakIt = true;
                             break;
                         }
@@ -176,6 +205,12 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                         break;
                     }
                 }
+                if (document != null && errorDescription != null) {
+                    HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
+                } else if (document != null) {
+                    HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
+                }
+                clear();
             }
         };
     }

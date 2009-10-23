@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,38 +31,51 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
+ *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.api.javafx.source;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
-import org.openide.filesystems.FileObject;
+import static org.junit.Assert.*;
 
 /**
  *
- * @author Anton Chechel
+ * @author nenik
  */
-public class JavaFXSourceHighlightingTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class TreeUtilitiesTest extends SourceTestBase {
 
-    public JavaFXSourceHighlightingTaskFactory() {
-        super(Phase.ANALYZED, Priority.NORMAL);
-    }
-    
-    @Override
-    protected CancellableTask<CompilationInfo> createTask(FileObject file) {
-        return new SemanticHighlighter(file);
+    public TreeUtilitiesTest(String testName) {
+        super(testName);
     }
 
-    final void rescheduleImpl(FileObject file) throws IllegalArgumentException {
-        reschedule(file);
+    public void testIsSynthetic() throws Exception {
+        System.out.println("isSynthetic");
+        testInsideSourceTask(
+                "import javafx.scene.shape.Circle;\n" +
+                "Circle {\n" +
+                "}",
+          new Task<CompilationController>() {
+            public void run(CompilationController controller) throws Exception {
+                if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                    throw new Exception("Unable to resolve");
+                }
+
+                JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(42);
+                assertFalse( "Tree " + currentPath.getLeaf() + " should not be synthetic.",
+                        controller.getTreeUtilities().isSynthetic(currentPath));
+
+                Tree tree = currentPath.getLeaf();
+                System.err.println("Tree is: "+ tree);
+
+                boolean result = controller.getTreeUtilities().isSynthetic(currentPath);
+                assertFalse(result);
+            }
+        });
     }
-    
 }

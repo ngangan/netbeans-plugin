@@ -27,28 +27,28 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     private CompilationInfo compilationInfo;
     private Map<Element, Collection<Tree>> classTrees;
-    private Map<Element, List<MethodSymbol>> overridenMethods;
+    private Map<Element, List<MethodSymbol>> overriddenMethods;
     private Collection<JFXImport> imports;
     private boolean includeAnon = false;
 
     public OverrideVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
-            Map<Element, List<MethodSymbol>> overridenMethods,
+            Map<Element, List<MethodSymbol>> overriddenMethods,
             Collection<JFXImport> imports) {
 
         this.compilationInfo = compilationInfo;
         this.classTrees = classTrees;
-        this.overridenMethods = overridenMethods;
+        this.overriddenMethods = overriddenMethods;
         this.imports = imports;
     }
 
     public OverrideVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
-            Map<Element, List<MethodSymbol>> overridenMethods,
+            Map<Element, List<MethodSymbol>> overriddenMethods,
             Collection<JFXImport> imports,
             boolean incudeAnon) {
 
-        this(compilationInfo, classTrees, overridenMethods, imports);
+        this(compilationInfo, classTrees, overriddenMethods, imports);
         this.includeAnon = incudeAnon;
     }
 
@@ -89,12 +89,12 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
                 Element currentClass = element.getEnclosingElement();
                 if (element instanceof MethodSymbol) {
                     Tree tree = compilationInfo.getTrees().getTree(currentClass);
-                    if (overridenMethods.get(currentClass) == null) {
-                        overridenMethods.put(currentClass, new ArrayList<MethodSymbol>());
+                    if (overriddenMethods.get(currentClass) == null) {
+                        overriddenMethods.put(currentClass, new ArrayList<MethodSymbol>());
                     }
-                    List<MethodSymbol> methods = overridenMethods.get(currentClass);
+                    List<MethodSymbol> methods = overriddenMethods.get(currentClass);
                     methods.add((MethodSymbol) element);
-                    overridenMethods.put(currentClass, methods);
+                    overriddenMethods.put(currentClass, methods);
                 }
             }
         }
