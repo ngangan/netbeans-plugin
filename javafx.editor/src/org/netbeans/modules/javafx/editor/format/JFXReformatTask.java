@@ -1174,6 +1174,7 @@ public class JFXReformatTask implements ReformatTask {
         // Java NewClassTree --> InstantiateTree
         @Override
         public Boolean visitInstantiate(InstantiateTree node, Void p) {
+            // TODO  remove indented, it was used for "class.new Nested()" expression
             boolean indented = false;
             if (col == indent) {
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
@@ -1196,15 +1197,17 @@ public class JFXReformatTask implements ReformatTask {
 
             scan(node.getIdentifier(), p);
             spaces(!isNewKeyWordUsed || cs.spaceBeforeMethodCallParen() ? 1 : 0);
-            accept(isNewKeyWordUsed ? JFXTokenId.LPAREN : JFXTokenId.LBRACE);
-            List<? extends ExpressionTree> args = node.getArguments();
-            if (args != null && !args.isEmpty()) {
-                spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
-                wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
-                spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
-            }
+
             if (isNewKeyWordUsed) {
+                accept(JFXTokenId.LPAREN);
+                List<? extends ExpressionTree> args = node.getArguments();
+                if (args != null && !args.isEmpty()) {
+                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
+                    wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
+                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
+                }
                 accept(JFXTokenId.RPAREN);
+
                 ClassDeclarationTree body = node.getClassBody();
                 if (body != null) {
                     int old = indent;
@@ -1215,11 +1218,19 @@ public class JFXReformatTask implements ReformatTask {
                     indent = old;
                 }
             } else {
+                accept(JFXTokenId.LBRACE);
                 List<ObjectLiteralPartTree> literalParts = node.getLiteralParts();
                 if (literalParts != null && !literalParts.isEmpty()) {
+                    // need to increase indent before any spaces
+                    int old = indent;
+                    indent += indentSize;
+                    // TODO control this from editor settings
+//                    newline();
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
-                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), true, literalParts);
+                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), literalParts);
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
+//                    newline();
+                    indent = old;
                 }
                 accept(JFXTokenId.LBRACE);
             }
@@ -3039,11 +3050,9 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, boolean prependSpace, List<? extends ObjectLiteralPartTree> trees) {
+        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, List<? extends ObjectLiteralPartTree> trees) {
             boolean first = true;
             int alignIndent = -1;
-            int old = indent;
-            indent += indentSize;
             for (Iterator<? extends ObjectLiteralPartTree> it = trees.iterator(); it.hasNext();) {
                 ObjectLiteralPartTree part = it.next();
                 if (part.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
@@ -3052,9 +3061,6 @@ public class JFXReformatTask implements ReformatTask {
                     int index = tokens.index();
                     int c = col;
                     Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (prependSpace) {
-                        spaces(indent, true);
-                    }
                     if (align) {
                         alignIndent = col;
                     }
@@ -3079,8 +3085,11 @@ public class JFXReformatTask implements ReformatTask {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
                     accept(JFXTokenId.COMMA, JFXTokenId.SEMI);
                 }
+                // TODO control this from editor settings
+//                if (it.hasNext()) {
+//                    newline();
+//                }
             }
-            indent = old;
         }
 
         private void indentComment() {
