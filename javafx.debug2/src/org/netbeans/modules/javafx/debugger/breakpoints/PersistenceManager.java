@@ -108,10 +108,12 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
 
     public void breakpointRemoved( Breakpoint breakpoint ) {
         if( breakpoint instanceof JavaFXLineBreakpoint ) {
+            JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint)breakpoint;
             Properties p = Properties.getDefault().getProperties( "debugger" ).
                 getProperties( DebuggerManager.PROP_BREAKPOINTS );
             p.setArray( JAVAFX_PROPERTY, getBreakpoints());
             breakpoint.removePropertyChangeListener( this );
+            lb.removeLineBreakpoint();
         }
     }
     public void watchAdded( Watch watch ) {

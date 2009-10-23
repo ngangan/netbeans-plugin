@@ -5,12 +5,14 @@
 
 package org.netbeans.modules.javafx.debugger.actions;
 
-import org.netbeans.modules.javafx.debugger.JavaFXBreakpointAnnotationListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 import org.netbeans.api.debugger.ActionsManager;
+import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDADebugger;
 import org.netbeans.modules.javafx.debugger.Context;
@@ -19,6 +21,8 @@ import org.netbeans.spi.debugger.ActionsProvider;
 import org.netbeans.spi.debugger.ActionsProviderSupport;
 import org.netbeans.spi.debugger.ContextProvider;
 import org.netbeans.spi.debugger.ui.EditorContextDispatcher;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.URLMapper;
 
 /**
  *
@@ -30,7 +34,8 @@ public class JavaFXToggleActionProvider extends ActionsProviderSupport implement
     private JPDADebugger debugger;
 
     public JavaFXToggleActionProvider() {
-        setEnabled( ActionsManager.ACTION_TOGGLE_BREAKPOINT, true );
+        propertyChange( null );
+        Context.addPropertyChangeListener( this );
     }
 
     public JavaFXToggleActionProvider( ContextProvider contextProvider ) {
@@ -50,13 +55,28 @@ public class JavaFXToggleActionProvider extends ActionsProviderSupport implement
         if (url == null) return;
 
         // 2) find and remove existing line breakpoint
-        JavaFXLineBreakpoint lb = getJavaFXBreakpointAnnotationListener().findBreakpoint( url, ln );
+        JavaFXLineBreakpoint lb = findBreakpoint( url, ln );
         if (lb != null) {
-            d.removeBreakpoint(lb);
+            d.removeBreakpoint( lb );
             return;
         }
         lb = JavaFXLineBreakpoint.create( url, ln );
         d.addBreakpoint( lb );
+    }
+
+    static JavaFXLineBreakpoint findBreakpoint( String url, int lineNumber ) {
+        Breakpoint[] breakpoints = DebuggerManager.getDebuggerManager().getBreakpoints();
+        for( int i = 0; i < breakpoints.length; i++ ) {
+            if( !( breakpoints[i] instanceof JavaFXLineBreakpoint )) {
+                continue;
+            }
+            JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint) breakpoints[i];
+            if( !lb.getURL().equals( url )) continue;
+            if( lb.getLineNumber() == lineNumber ) {
+                return lb;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -65,15 +85,15 @@ public class JavaFXToggleActionProvider extends ActionsProviderSupport implement
     }
 
     public void propertyChange( PropertyChangeEvent evt ) {
-        setEnabled( ActionsManager.ACTION_TOGGLE_BREAKPOINT, true );
-    }
-
-    private JavaFXBreakpointAnnotationListener javafxBreakpointAnnotationListener;
-    private JavaFXBreakpointAnnotationListener getJavaFXBreakpointAnnotationListener () {
-        if( javafxBreakpointAnnotationListener == null )
-            javafxBreakpointAnnotationListener = (JavaFXBreakpointAnnotationListener)
-                DebuggerManager.getDebuggerManager().lookupFirst( null, JavaFXBreakpointAnnotationListener.class );
-        return javafxBreakpointAnnotationListener;
-    }
-
+        String url = EditorContextDispatcher.getDefault().getCurrentURLAsString();
+        FileObject fo;
+        try {
+            fo = URLMapper.findFileObject(new URL(url));
+        } catch (MalformedURLException muex) {
+            fo = null;
+        }
+        setEnabled( ActionsManager.ACTION_TOGGLE_BREAKPOINT,
+            (EditorContextDispatcher.getDefault().getCurrentLineNumber () >= 0) &&
+            (fo != null && "text/x-fx".equals(fo.getMIMEType())));    
+    }    
 }
