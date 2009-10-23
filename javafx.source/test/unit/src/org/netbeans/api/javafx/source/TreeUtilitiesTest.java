@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,53 +31,50 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
+ *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
 package org.netbeans.api.javafx.source;
+
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import static org.junit.Assert.*;
 
 /**
  *
- * @author alex
+ * @author nenik
  */
-public class PathFinderTest extends SourceTestBase {
-    public PathFinderTest(String testName) {
+public class TreeUtilitiesTest extends SourceTestBase {
+
+    public TreeUtilitiesTest(String testName) {
         super(testName);
     }
-    
-    public void testPathFor() throws Exception {
+
+    public void testIsSynthetic() throws Exception {
+        System.out.println("isSynthetic");
         testInsideSourceTask(
-                "/* Top comment */\n" +
-                "\n" +
-                "import javafx.ui.*;\n" +
-                "/** @author nemo */\n" +
-                "\n" +
-                "Frame {\n" +
-                "  title: \"Hello World F3\"\n" +
-                "  content: Label{\n"+
-                "      text:\"Hello World\"\n}"+
+                "import javafx.scene.shape.Circle;\n" +
+                "Circle {\n" +
                 "}",
           new Task<CompilationController>() {
             public void run(CompilationController controller) throws Exception {
-                if (controller.toPhase(Phase.ANALYZED).compareTo(Phase.ANALYZED) < 0) {//TODO: ELEMENTS_RESOLVED may be sufficient
-                    throw new Exception(
-                                "Unable to resolve "+controller.getCompilationUnit().getSourceFile()+" to phase "+Phase.ANALYZED+", current phase = "+controller.getPhase()+
-                                "\nDiagnostics = "/*+ci.getDiagnostics()*/+
-                                "\nFree memory = "+Runtime.getRuntime().freeMemory());
+                if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                    throw new Exception("Unable to resolve");
                 }
-                int currentOffset = 73;
-                JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(currentOffset);
+
+                JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(42);
+                assertFalse( "Tree " + currentPath.getLeaf() + " should not be synthetic.",
+                        controller.getTreeUtilities().isSynthetic(currentPath));
+
                 Tree tree = currentPath.getLeaf();
                 System.err.println("Tree is: "+ tree);
-                assertNotNull(tree);
-                // offset 73 falls in the middle of the "title:"
-                assertEquals(Tree.JavaFXKind.OBJECT_LITERAL_PART, tree.getJavaFXKind());
+
+                boolean result = controller.getTreeUtilities().isSynthetic(currentPath);
+                assertFalse(result);
             }
         });
     }

@@ -41,6 +41,7 @@ package org.netbeans.api.javafx.source;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.VariableTree;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -59,46 +60,27 @@ import org.openide.loaders.DataObject;
  *
  * @author alex
  */
-public class ParseExpressionTest {
-    public ParseExpressionTest() {
+public class ParseExpressionTest extends SourceTestBase {
+    public ParseExpressionTest(String testName) {
+        super(testName);
     }
     
     @org.junit.Test
-    public void pathForTest() throws Exception {
-        File f = File.createTempFile("Test", ".fx");
-        toFile(f,
+    public void testParseExpression() throws Exception {
+        testInsideSourceTask(
                 "class FFF {\n" +
                 "attribute fff : Integer = 10;\n" +
                 "function g() {\n" +
-                "}\n" + 
-                "}"
-        );
-        FileObject fo = FileUtil.toFileObject(f);
-        JavaFXSource src = JavaFXSource.forFileObject(fo);
-        System.err.println("src=" + src);
-        DataObject dobj = DataObject.find(fo);
-        EditorCookie ec = dobj.getCookie(EditorCookie.class);
-        Document doc = ec.openDocument();
-        doc.putProperty(Language.class, JFXTokenId.language());
-
-        src.runWhenScanFinished(new CancellableTask<CompilationController>() {
-            public void cancel() {
-                }
+                "}\n" +
+                "}",
+          new Task<CompilationController>() {
             public void run(CompilationController controller) throws Exception {
                 controller.toPhase(Phase.PARSED);
                 ExpressionTree e = controller.getTreeUtilities().parseExpression("fff + 5", 52);
+                // XXX: Evaluate the result correctly
                 System.out.println("Tree is: "+ e);
             }
-        }, true);
+        });
         
-    }
-
-    private void toFile(File f, String s) throws  Exception {
-        OutputStream os = new FileOutputStream(f);
-        Writer w = new OutputStreamWriter(os);
-        w.write(s);
-        w.close();
-        os.close();
-    }
-    
+    }    
 }
