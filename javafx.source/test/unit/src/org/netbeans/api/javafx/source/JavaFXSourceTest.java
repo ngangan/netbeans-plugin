@@ -39,41 +39,20 @@
 
 package org.netbeans.api.javafx.source;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import org.junit.Test;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author nenik
  */
-public class JavaFXSourceTest {
+public class JavaFXSourceTest extends SourceTestBase {
 
-    public JavaFXSourceTest() {
+    public JavaFXSourceTest(String testName) {
+        super(testName);
     }
 
-    @org.junit.BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @org.junit.AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-/*    @org.junit.Test
-    public void forFileObject() {
-    }
-*/
     @org.junit.Test
-    public void runUserActionTask() throws Exception {
-        File f = File.createTempFile("Test", ".fx");
-        toFile(f,
+    public void testRunUserActionTask() throws Exception {
+        testInsideSourceTask(
                 "/* Top comment */\n" +
                 "\n" +
                 "import javafx.ui.Frame;\n" +
@@ -81,23 +60,13 @@ public class JavaFXSourceTest {
                 "\n" +
                 "Frame {\n" +
                 "  title: \"Hello World F3\"\n" +
-                "}"
-        );
-        FileObject fo = FileUtil.toFileObject(f);
-        JavaFXSource src = JavaFXSource.forFileObject(fo);
-        System.err.println("src=" + src);
-        src.runUserActionTask(new Task<CompilationController>() {
-            public void run(CompilationController controller) throws Exception {
-                controller.toPhase(JavaFXSource.Phase.PARSED);
+                "}",
+            new Task<CompilationController>() {
+                public void run(CompilationController controller) throws Exception {
+                    JavaFXSource.Phase p = controller.toPhase(JavaFXSource.Phase.PARSED);
+                    assertFalse(p.lessThan(JavaFXSource.Phase.PARSED));
+                }
             }
-        }, true);
-    }
-
-    private void toFile(File f, String s) throws  Exception {
-        OutputStream os = new FileOutputStream(f);
-        Writer w = new OutputStreamWriter(os);
-        w.write(s);
-        w.close();
-        os.close();
+        );
     }
 }
