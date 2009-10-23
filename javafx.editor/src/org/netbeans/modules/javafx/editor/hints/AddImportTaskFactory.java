@@ -41,9 +41,13 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
+import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
@@ -75,7 +79,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
 
-
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
@@ -106,7 +109,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     clear();
                     return;
                 }
-                for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (cancel.get()) {
                         break;
                     }
@@ -126,23 +129,46 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                             node.getQualifiedIdentifier();
                             JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
                             Element element = compilationInfo.getTrees().getElement(path);
-                            if (element instanceof JavafxClassSymbol) {
-                                JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
+                            if (element instanceof ClassSymbol) {
+                                ClassSymbol classSymbol = (ClassSymbol) element;
                                 imports.add(classSymbol.getQualifiedName().toString());
                             }
 
                             return super.visitImport(node, p);
                         }
                     }.scan(compilationInfo.getCompilationUnit(), null);
-                    final int start = (int) diagnostic.getStartPosition();
-                    int end = (int) diagnostic.getEndPosition();
-                    int length = end - start;
+                    JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
+                    Element element = compilationInfo.getTrees().getElement(path);
+                    Tree superTree = compilationInfo.getTreeUtilities().parseExpression("", (int) diagnostic.getStartPosition());
+
                     String potentialFqn = null;
-                    try {
-                        potentialFqn = compilationInfo.getDocument().getText(start, length);
-                    } catch (BadLocationException ex) {
-                        ex.printStackTrace();
+                    if (element != null && element instanceof ClassSymbol) {
+                        ClassSymbol classSymbol = (ClassSymbol) element;
+                        potentialFqn = classSymbol.getSimpleName().toString();
+                    } else if (superTree instanceof JFXInstanciate) {
+                        final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                        final Tree[] tree = new Tree[1];
+                        JavaFXTreePathScanner<Void, Void> scaner = new JavaFXTreePathScanner<Void, Void>() {
+
+                            @Override
+                            public Void visitInstantiate(InstantiateTree node, Void p) {
+                                int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
+                                if (diagnostic.getStartPosition() == position) {
+                                    tree[0] = node;
+                                    return null;
+                                }
+                                return super.visitInstantiate(node, p);
+                            }
+                        };
+                        scaner.scan(compilationInfo.getCompilationUnit(), null);
+                        if (tree[0] != null) {
+                            superTree = tree[0];
+                            potentialFqn = HintsUtils.getClassSimpleName(superTree.toString());
+                        }
                     }
+//                    if (findPosition(compilationInfo, superTree) < 0) {
+//                        continue;
+//                    }
                     if (potentialFqn == null || potentialFqn.length() == 0) {
                         return;
                     }
@@ -169,7 +195,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     if (listFQN.isEmpty()) {
                         continue;
                     }
-                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), start, end);//NOI18N
+                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);

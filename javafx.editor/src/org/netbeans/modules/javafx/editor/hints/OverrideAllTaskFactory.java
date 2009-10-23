@@ -46,13 +46,13 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXImport;
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
@@ -139,8 +139,8 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     Tree superTree = compilationInfo.getTreeUtilities().parseExpression("", (int) diagnostic.getStartPosition());
 
                     String className = null;
-                    if (element != null && element instanceof JavafxClassSymbol) {
-                        JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
+                    if (element != null && element instanceof ClassSymbol) {
+                        ClassSymbol classSymbol = (ClassSymbol) element;
                         className = classSymbol.getSimpleName().toString();
                     } else if (superTree instanceof JFXInstanciate) {
                         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();

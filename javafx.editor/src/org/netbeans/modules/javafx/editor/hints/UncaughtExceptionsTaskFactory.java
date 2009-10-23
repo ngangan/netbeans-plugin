@@ -75,7 +75,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
     private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
 
     public UncaughtExceptionsTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
     }
 
     @Override
