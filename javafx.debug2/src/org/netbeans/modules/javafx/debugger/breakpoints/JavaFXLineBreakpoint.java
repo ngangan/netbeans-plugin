@@ -61,7 +61,7 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
         javalb.setHidden( true );
         javalb.setPrintText( printText );
 //        javalb.setCondition( "true" );
-//        javalb.addPropertyChangeListener( this );
+        javalb.addPropertyChangeListener( this );
 
         String context = Utils.getContextPath( url );
 
@@ -179,8 +179,13 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
         if(( url == this.url ) ||
              (( url != null ) && ( this.url != null ) && url.equals( this.url ))
         ) return;
-        String old = url;
+        String old = this.url;
         this.url = url;
+        if( javalb != null ) {
+            javalb.setSourceName( Utils.getFXName( url ));
+            javalb.setSourcePath( Utils.getFXPath( url ));
+            javalb.setPreferredClassName( Utils.getFXClassName( url, lineNumber ) + "*" ); // HACK: Add all class files
+        }
         firePropertyChange( PROP_URL, old, url );
     }
 
@@ -274,5 +279,8 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
         }
         System.err.println("Line breakpoint change - " +
                 evt.getPropertyName() + " = " + evt.getNewValue() + "," + evt.getSource());
+        if( LineBreakpoint.PROP_URL.equals( evt.getPropertyName())) {
+                this.setURL((String) evt.getNewValue());
+        }
     }
 }
