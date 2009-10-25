@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -38,7 +38,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.editor.completion;
 
 public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
@@ -47,20 +46,19 @@ public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
         super(testName);
     }
 
-    public void testOnlyPackageFile() throws Exception {
-        performTest("OnlyPackage", 0, null, "topLevelKeywords.pass");
+    public void testPackages() throws Exception {
+        checkCompletion("Model", "package ^javafxapplication2;", "packages.pass");
     }
 
-    public void testPackages() throws Exception {
-        performTest("Model", 8, null, "packages.pass");
+    public void testOnlyPackageFile() throws Exception {
+        checkCompletion("OnlyPackage", "^package abcd;", "topLevelKeywords.pass");
     }
 
     public void testColorRGBParams() throws Exception {
-        performTest("Color", 75, null, "colorRGBParams.pass");
+        checkCompletion("Color", "var c = Color.rgb(^50, 100, 150);", "colorRGBParams.pass");
     }
 
     public void testConstructorsArgs() throws Exception {
-        performTest("Model", 156, null, "constructorArgs.pass");
+        checkCompletion("Model", "var velorex = Car {^id: \"vlrx1234\"", "constructorArgs.pass");
     }
-
 }
