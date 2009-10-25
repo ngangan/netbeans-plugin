@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -57,14 +58,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
 import javax.swing.JEditorPane;
 import javax.swing.text.Document;
 import junit.framework.Assert;
 
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.source.gen.WhitespaceIgnoringDiff;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -224,14 +223,51 @@ public class CompletionTestBase extends JavaFXTestBase {
         return this.bootPath;
     }
 
-    protected void performTest(String source, int caretPos, String textToInsert, String goldenFileName) throws Exception {
-        performTest(source, caretPos, textToInsert, goldenFileName, null, null);
+    /**
+     * Return the offset of the given position, indicated by ^ in the line
+     * fragment from the fuller text
+     */
+    private static int getCaretOffset(String text, String caretLine) {
+        return getCaretOffsetInternal(text, caretLine);
     }
 
-    protected void performTest(String source, int caretPos, String textToInsert, String goldenFileName, String toPerformItemRE, String goldenFileName2) throws Exception {
+    /**
+     * Like <code>getCaretOffset</code>, but the returned
+     * <code>CaretLineOffset</code> contains also the modified
+     * <code>caretLine</code> param.
+
+     * @param text
+     * @param caretLine
+     * @return offset
+     */
+    private static int getCaretOffsetInternal(String text, String caretLine) {
+        int caretDelta = caretLine.indexOf('^');
+        assertTrue(caretDelta != -1);
+        caretLine = caretLine.substring(0, caretDelta) + caretLine.substring(caretDelta + 1);
+        int lineOffset = text.indexOf(caretLine);
+        assertTrue("No occurrence of caretLine " + caretLine + " in text '" + text + "'", lineOffset != -1);
+        return lineOffset + caretDelta;
+    }
+
+    /** Copy-pasted from APISupport. */
+    protected static String slurp(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            FileUtil.copy(is, baos);
+            return baos.toString("UTF-8");
+        } finally {
+            is.close();
+        }
+    }
+
+    protected void checkCompletion(final String source, final String caretLine, final String goldenFileName) throws Exception {
         File testSource = new File(getWorkDir(), "test/Test.fx");
         testSource.getParentFile().mkdirs();
-        copyToWorkDir(new File(getDataDir(), "org/netbeans/modules/javafx/editor/completion/data/" + source + ".fx"), testSource);
+        File sourceFile = new File(getDataDir(), "org/netbeans/modules/javafx/editor/completion/data/" + source + ".fx");
+        String sourceText = slurp(sourceFile);
+        int caretPos = getCaretOffset(sourceText, caretLine);
+        copyToWorkDir(sourceFile, testSource);
         FileObject testSourceFO = FileUtil.toFileObject(testSource);
         assertNotNull(testSourceFO);
         DataObject testSourceDO = DataObject.find(testSourceFO);
@@ -242,12 +278,9 @@ public class CompletionTestBase extends JavaFXTestBase {
         assertNotNull(doc);
         doc.putProperty(Language.class, JFXTokenId.language());
         doc.putProperty("mimeType", "text/x-fx");
-        int textToInsertLength = textToInsert != null ? textToInsert.length() : 0;
-        if (textToInsertLength > 0)
-            doc.insertString(caretPos, textToInsert, null);
         JavaFXSource s = JavaFXSource.forDocument(doc);
         Set<? extends CompletionItem> items0 = JavaFXCompletionProvider.query(
-                s, CompletionProvider.COMPLETION_QUERY_TYPE, caretPos + textToInsertLength, caretPos + textToInsertLength);
+                s, CompletionProvider.COMPLETION_QUERY_TYPE, caretPos, caretPos);
         List<? extends CompletionItem> items = new ArrayList<CompletionItem>(items0);
         Collections.sort(items, CompletionItemComparator.BY_PRIORITY);
 
@@ -267,35 +300,6 @@ public class CompletionTestBase extends JavaFXTestBase {
         String message = "The files:\n  " + goldenFile.getAbsolutePath() + "\n  " +
                 output.getAbsolutePath() + "\nshould have the same content.";
         assertFile(message, output, goldenFile, diffFile);
-
-        if (toPerformItemRE != null) {
-            assertNotNull(goldenFileName2);
-
-            Pattern p = Pattern.compile(toPerformItemRE);
-            CompletionItem item = null;
-            for (CompletionItem i : items) {
-                if (p.matcher(i.toString()).find()) {
-                    item = i;
-                    break;
-                }
-            }
-            assertNotNull(item);
-
-            JEditorPane editor = new JEditorPane();
-            editor.setDocument(doc);
-            editor.setCaretPosition(caretPos + textToInsertLength);
-            item.defaultAction(editor);
-
-            File output2 = new File(getWorkDir(), getName() + ".out2");
-            Writer out2 = new FileWriter(output2);
-            out2.write(doc.getText(0, doc.getLength()));
-            out2.close();
-
-            File goldenFile2 = new File(getDataDir(), "/goldenfiles/org/netbeans/modules/javafx/editor/completion/JavaFXCompletionProviderTest/" + goldenFileName2);
-            File diffFile2 = new File(getWorkDir(), getName() + ".diff2");
-
-            assertFile(output2, goldenFile2, diffFile2, new WhitespaceIgnoringDiff());
-        }
 
         LifecycleManager.getDefault().saveAll();
     }
