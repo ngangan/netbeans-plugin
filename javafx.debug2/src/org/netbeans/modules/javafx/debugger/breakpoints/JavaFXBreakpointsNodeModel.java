@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.debugger.breakpoints;
 
 import org.netbeans.modules.javafx.debugger.Context;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.openide.util.NbBundle;
 
 import org.netbeans.spi.viewmodel.NodeModel;
@@ -16,6 +17,7 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="BreakpointsView", types={ org.netbeans.spi.viewmodel.NodeModel.class } )
 public class JavaFXBreakpointsNodeModel implements NodeModel {
 
     public static final String LINE_BREAKPOINT =

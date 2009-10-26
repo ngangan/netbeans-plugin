@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.debugger.variablesfiltering;
 
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.LocalVariable;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TableModel;
 import org.netbeans.spi.viewmodel.TableModelFilter;
@@ -17,6 +18,7 @@ import org.netbeans.spi.debugger.ui.Constants;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={org.netbeans.spi.viewmodel.TableModelFilter.class} )
 public class JavaFXVariablesTableModelFilter implements TableModelFilter {
 
     public JavaFXVariablesTableModelFilter() { }

@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.spi.debugger.ContextProvider;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ExtendedNodeModel;
 import org.netbeans.spi.viewmodel.ExtendedNodeModelFilter;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.NodeModel;
+import org.netbeans.spi.viewmodel.NodeModelFilter;
 import org.netbeans.spi.viewmodel.UnknownTypeException;
 import org.openide.util.RequestProcessor;
 import org.openide.util.datatransfer.PasteType;
@@ -23,10 +25,13 @@ import org.openide.util.datatransfer.PasteType;
  *
  * @author Michal Skvor
  */
-public class JavaFXWatchesNodeModelFilter implements ExtendedNodeModelFilter {
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.NodeModelFilter.class } )
+public class JavaFXWatchesNodeModelFilter implements NodeModelFilter {
 
     private RequestProcessor evaluationRP;
     private final Collection<ModelListener> modelListeners = new HashSet<ModelListener>();
+
+    public JavaFXWatchesNodeModelFilter() {}
 
     public JavaFXWatchesNodeModelFilter( ContextProvider lookupProvider ) {
         evaluationRP = lookupProvider.lookupFirst( null, RequestProcessor.class );

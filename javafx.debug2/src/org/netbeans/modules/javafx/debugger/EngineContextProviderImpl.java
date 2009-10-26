@@ -13,6 +13,7 @@ import org.netbeans.spi.debugger.jpda.SourcePathProvider;
  *
  * @author Michal Skvor
  */
+@SourcePathProvider.Registration(path="")
 public class EngineContextProviderImpl extends SourcePathProvider {
 
     private static final Logger LOGGER = Logger.getLogger( EngineContextProviderImpl.class.getName());

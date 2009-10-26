@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.Watch;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.Models;
 import org.netbeans.spi.viewmodel.NodeActionsProvider;
@@ -25,6 +26,7 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.NodeActionsProvider.class } )
 public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
 
     private static final Action NEW_WATCH_ACTION = new AbstractAction(
