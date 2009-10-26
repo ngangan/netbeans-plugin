@@ -53,6 +53,7 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javafx.tree.JFXImport;
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
@@ -411,8 +412,9 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     }
 
     private String getTypeString(Type type) {
-        String varType = type.toString();
+        String varType = null;
         if (type.isPrimitive()) {
+            varType = type.tsym.name.toString();
             if (varType.equals("int")) { //NOI18N
                 varType = Integer.class.getSimpleName();
             } else if (varType.equals("long") //NOI18N
@@ -427,6 +429,10 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             } else if (varType.equals("boolean")) { //NOI18N
                 return Boolean.class.getSimpleName();
             }
+        } else if (type instanceof ClassType) {
+            varType = ((ClassType) type).tsym.getQualifiedName().toString();
+        } else {
+            varType = type.toString();
         }
         if (varType.equals("E") || varType.equals("T")) { //NOI18N
             varType = "Object"; //NOI18N
@@ -435,6 +441,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             varType = "Object[]"; //NOI18N
         }
         varType = removeBetween("<>", varType); //NOI18N
+
         return varType;
     }
 
