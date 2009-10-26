@@ -41,10 +41,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
-import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
-import com.sun.javafx.tools.fxd.schema.model.Property;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import org.netbeans.api.lexer.Token;
@@ -54,7 +50,6 @@ import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionI
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -114,7 +109,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
         resultSet.addItem(new FXDCompletionItem("NODE PREV = " + prev + ", NEXT = " + next, caretOffset));
         LOG.warning("NODE PREV = " + prev + ", NEXT = " + next);
 
-        if (prev == FXDTokenId.LBRACE){
+        if (prev == FXDTokenId.LBRACE || prev == FXDTokenId.COMMA){
             if (next == FXDTokenId.IDENTIFIER_ATTR) {
                 // move ts to next non-white token. DO NOT REMOVE
                 TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
@@ -128,8 +123,6 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             } else {
                 fillItemsWithNodeAttrs(resultSet, el, caretOffset, null);
             }
-        } else if (prev == FXDTokenId.COMMA){
-            fillItemsWithNodeAttrs(resultSet, el, caretOffset, null);
         } else if (prev == FXDTokenId.IDENTIFIER_ATTR && next == FXDTokenId.COLON){
             Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
@@ -141,6 +134,19 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             }
         } else if (prev == FXDTokenId.COLON){
             // TODO: attr default value
+        } else if (next == FXDTokenId.COMMA || next == FXDTokenId.RBRACE){
+            if (prev == FXDTokenId.IDENTIFIER){
+                TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+                FXDTokenId prevPrev = getPrevNonWhiteID(el, ts.offset(), ts);
+                if (prevPrev == FXDTokenId.COLON){
+                    // TODO: attr value
+                } else {
+                    // at the end of id before , or }
+                    processAttrId(resultSet, el, caretOffset, ts);
+                }
+            } else {
+                // TODO: attr default value
+            }
         }
 
     }
