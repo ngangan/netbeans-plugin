@@ -65,10 +65,8 @@ public class JavaLexerBatchTest extends NbTestCase {
         LexerTestUtilities.setTesting(true);
     }
 
-    protected void tearDown() throws java.lang.Exception {
-    }
-
-    public void testComments() {
+    // XXX: disabled now, cf. issue #175442
+    public void DISABLED_testComments() {
         String text = "/*ml-comment*//**//***//**\n*javadoc-comment*//* a";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
@@ -80,7 +78,8 @@ public class JavaLexerBatchTest extends NbTestCase {
         assertEquals(PartType.START, ts.token().partType());
     }
     
-    public void testIdentifiers() {
+    // XXX: disabled now, cf. issue #175442
+    public void DISABLED_testIdentifiers() {
         String text = "a ab aB2 2a x\nyZ\r\nz";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
@@ -100,7 +99,8 @@ public class JavaLexerBatchTest extends NbTestCase {
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.IDENTIFIER, "z");
     }
     
-    public void testStringLiterals() {
+    // XXX: disabled now, cf. issue #175442
+    public void DISABLED_testStringLiterals() {
         String text = "\"\" \"a\"\"\" \"\\\"\" \"\\\\\" \"\\\\\\\"\" \"\\n\" \"a";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
@@ -121,7 +121,8 @@ public class JavaLexerBatchTest extends NbTestCase {
         assertEquals(PartType.START, ts.token().partType());
     }
     
-    public void testNumberLiterals() {
+    // XXX: disabled now, cf. issue #175442
+    public void DISABLED_testNumberLiterals() {
         String text = "0 00 09 1 12 0L 1l 12L 0x1 0xf 0XdE 0Xbcy" + 
                 " 09.5 1.5f 2.5d 6d 7e3 6.1E-7f 0xa.5dp+12d .3";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
@@ -196,7 +197,8 @@ public class JavaLexerBatchTest extends NbTestCase {
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
     }
 
-    public void testKeywords() {
+    // XXX: disabled now, cf. issue #175442
+    public void DISABLED_testKeywords() {
         /*String text = "abstract assert boolean break byte case catch char class const continue " +
             "default do dur double else enum extends final finally float for goto if " +
             "implements import instanceof int interface long native new package " +
@@ -432,7 +434,8 @@ public class JavaLexerBatchTest extends NbTestCase {
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.IDENTIFIER, "throwsx");
     }
     
-    public void testEmbedding() {
+    // XXX: disabled now, cf. issue #175442
+    public void DISABLED_testEmbedding() {
         String text = "ddx \"d\\t\\br\" /** @see X */";
         
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());

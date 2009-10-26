@@ -78,7 +78,8 @@ public class FormattingTest extends NbTestCase {
         // TODO
     }
 
-    public void testVariable() throws Exception {
+    // XXX: disabled now, cf. issue #175439
+    public void DISABLED_testVariable() throws Exception {
         // TODO move initialization part to separate method
         testFile = new File(getWorkDir(), "Test.fx");
         TestUtilities.copyStringToFile(testFile,
