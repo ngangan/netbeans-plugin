@@ -271,7 +271,7 @@ public final class TreeUtilities {
             @Override
             public Void scan(Tree tree, Void p) {
                 if (tree != null && 
-                    !tree.toString().equals("\"\"")) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
+                    !treeToStr(tree).equals("\"\"")) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
                     
@@ -318,6 +318,16 @@ public final class TreeUtilities {
                     }
                 }
                 return null;
+            }
+
+            // workaround for NPE in compiler for visiting "var fun1:(:Object):Integer;" expression
+            // TODO remove it in SoMa
+            private String treeToStr(Tree tree) {
+                try {
+                    return tree.toString();
+                } catch (Exception e) {
+                }
+                return "<error>"; // NOI18N
             }
         }
         

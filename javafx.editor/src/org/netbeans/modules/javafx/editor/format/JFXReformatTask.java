@@ -1667,15 +1667,25 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitTypeFunctional(TypeFunctionalTree node, Void p) {
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
+            accept(JFXTokenId.LPAREN);
+            List<? extends TypeTree> params = node.getParameters();
+            if (params != null && !params.isEmpty()) {
+                // TODO introduce cs.spaceWithingFunctionalType
+//                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
+                wrapFunctionalParamList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), params);
+                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0);
+            }
+            accept(JFXTokenId.RPAREN);
+            TypeTree retType = node.getReturnType();
+            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                accept(JFXTokenId.COLON);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+
+                scan(retType, p);
+            }
             return true;
         }
 
@@ -1898,7 +1908,6 @@ public class JFXReformatTask implements ReformatTask {
             return super.visitMissingExpression(node, p);
         }
 
-        // TODO
         @Override
         public Boolean visitObjectLiteralPart(ObjectLiteralPartTree node, Void p) {
             accept(JFXTokenId.IDENTIFIER);
@@ -2921,6 +2930,41 @@ public class JFXReformatTask implements ReformatTask {
                     }
                 } else {
                     wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, impl);
+                }
+                first = false;
+                if (it.hasNext()) {
+                    spaces(cs.spaceBeforeComma() ? 1 : 0);
+                    accept(JFXTokenId.COMMA);
+                }
+            }
+        }
+
+        private void wrapFunctionalParamList(CodeStyle.WrapStyle wrapStyle, boolean align, List<? extends TypeTree> trees) {
+            boolean first = true;
+            int alignIndent = -1;
+            for (Iterator<? extends TypeTree> it = trees.iterator(); it.hasNext();) {
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                accept(JFXTokenId.COLON);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+
+                TypeTree param = it.next();
+                if (param.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                    scan(param, null);
+                } else if (first) {
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (align) {
+                        alignIndent = col;
+                    }
+                    scan(param, null);
+                    if (wrapStyle != CodeStyle.WrapStyle.WRAP_NEVER && col > rightMargin && c > indent && (wrapDepth == 0 || c <= rightMargin)) {
+                        rollback(index, c, d);
+                        newline();
+                        scan(param, null);
+                    }
+                } else {
+                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, param);
                 }
                 first = false;
                 if (it.hasNext()) {
