@@ -8,11 +8,13 @@ package org.netbeans.modules.javafx.debugger.breakpoints;
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.Properties;
 import org.netbeans.modules.javafx.debugger.utils.Utils;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 
 /**
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( types={ org.netbeans.api.debugger.Properties.Reader.class })
 public class JavaFXBreakpointsReader implements Properties.Reader {
 
     public String[] getSupportedClassNames() {

@@ -12,6 +12,7 @@ import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.api.debugger.jpda.LocalVariable;
 import org.netbeans.api.debugger.jpda.This;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TreeModel;
 import org.netbeans.spi.viewmodel.TreeModelFilter;
@@ -21,6 +22,7 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TreeModelFilter.class } )
 public class JavaFXVariablesFilter implements TreeModelFilter {
 
     /** Creates new JavaFXVariablesFilter instance */
@@ -74,6 +76,10 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     if( local.getName().startsWith( "jfx$" )) continue;
                     vc.add( child );
                 }
+            }
+            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
+            for( Object o : vvv ) {
+                System.out.println(" - " + o );
             }
             return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {

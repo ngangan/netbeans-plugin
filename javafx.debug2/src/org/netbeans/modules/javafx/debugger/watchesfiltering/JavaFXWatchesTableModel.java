@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.debugger.watchesfiltering;
 
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TableModel;
 import org.netbeans.spi.viewmodel.UnknownTypeException;
@@ -14,6 +15,7 @@ import org.netbeans.spi.debugger.ui.Constants;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.TableModel.class } )
 public class JavaFXWatchesTableModel implements TableModel {
 
     public JavaFXWatchesTableModel() {}

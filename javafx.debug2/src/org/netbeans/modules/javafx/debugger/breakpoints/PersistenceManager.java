@@ -51,6 +51,7 @@ import org.netbeans.api.debugger.LazyDebuggerManagerListener;
 import org.netbeans.api.debugger.Properties;
 import org.netbeans.api.debugger.Session;
 import org.netbeans.api.debugger.Watch;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 
 /**
  * Listens on DebuggerManager and:
@@ -60,6 +61,7 @@ import org.netbeans.api.debugger.Watch;
  *
  * @author Libor Kotouc
  */
+@DebuggerServiceRegistration( types={ org.netbeans.api.debugger.LazyDebuggerManagerListener.class } )
 public class PersistenceManager implements LazyDebuggerManagerListener {
     
     private static final String JAVAFX_PROPERTY = "JavaFX";
