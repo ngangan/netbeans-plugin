@@ -70,7 +70,7 @@ import org.netbeans.modules.editor.indent.spi.ReformatTask;
  * This code based on org.netbeans.modules.java.source.save.Reformatter written by Dusan Balek.
  *
  * @see org.netbeans.modules.java.source.save.Reformatter
- * @see http://openjfx.java.sun.com/current-build/doc/reference/JavaFXReference.html
+ * @see http://openjfx.java.sun.com/job/openjfx-compiler-nightly/lastSuccessfulBuild/artifact/dist/doc/reference/JavaFXReference.html
  * @author Anton Chechel
  */
 public class JFXReformatTask implements ReformatTask {
@@ -715,9 +715,7 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        // TODO declarative way
-        // TODO on replace
-        // TOOD sequence
+        // TODO binding
         @Override
         public Boolean visitVariable(VariableTree node, Void p) {
             int old = indent;
@@ -765,8 +763,8 @@ public class JFXReformatTask implements ReformatTask {
                 scan(type, p);
             }
 
-            ExpressionTree init = node.getInitializer();
-            if (init != null) {
+            ExpressionTree initTree = node.getInitializer();
+            if (initTree != null) {
                 int alignIndent = -1;
                 if (cs.alignMultilineAssignment()) {
                     alignIndent = col;
@@ -776,13 +774,21 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                 accept(JFXTokenId.EQ);
-                wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, init);
+                wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, initTree);
             }
+
+            OnReplaceTree onReplaceTree = node.getOnReplaceTree();
+            if (onReplaceTree != null) {
+                // TODO introduce cs.wrapOnReplace and invoke wrapTree
+                scan(onReplaceTree, p);
+            }
+
             accept(JFXTokenId.SEMI);
             indent = old;
             return true;
         }
 
+        // TODO isInitialized Built-In Function
         @Override
         public Boolean visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
             JFXFunctionDefinition funcDef = (JFXFunctionDefinition) node;
@@ -853,6 +859,7 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
+        // TODO scan functionValue
         @Override
         public Boolean visitFunctionValue(FunctionValueTree node, Void p) {
             do {
@@ -1641,7 +1648,7 @@ public class JFXReformatTask implements ReformatTask {
             return super.visitTypeAny(node, p);
         }
 
-        // TODO sequences
+        // whether this been invoked at all?
         @Override
         public Boolean visitTypeArray(TypeArrayTree node, Void p) {
             boolean ret = scan(node.getElementType(), p);
@@ -1664,6 +1671,10 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitTypeClass(TypeClassTree node, Void p) {
             accept(JFXTokenId.IDENTIFIER);
+            // sequence type
+            accept(JFXTokenId.LBRACKET);
+            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+            accept(JFXTokenId.RBRACKET);
             return true;
         }
 
@@ -1918,15 +1929,30 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO on replace
         @Override
         public Boolean visitOnReplace(OnReplaceTree node, Void p) {
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
+            accept(JFXTokenId.ON);
+            space();
+            accept(JFXTokenId.REPLACE);
+            space();
+            VariableTree oldValue = node.getOldValue();
+            if (oldValue != null) {
+                scan(oldValue, p);
+                boolean hasInitializer = false;
+                if (tokens.moveNext()) {
+                    hasInitializer = tokens.token().id() == JFXTokenId.EQ;
+                    tokens.movePrevious();
+                }
+                if (hasInitializer) {
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+                    accept(JFXTokenId.EQ);
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+                    if (accept(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
+                        space();
+                    }
+                }
+            }
+            scan(node.getBody(), p);
             return true;
         }
 
