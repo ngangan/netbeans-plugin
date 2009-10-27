@@ -44,7 +44,6 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
 import com.sun.javafx.tools.fxd.schema.model.Enumeration;
-import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
 import com.sun.javafx.tools.fxd.schema.model.Property;
 import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
 import java.util.ArrayList;
@@ -80,14 +79,16 @@ public abstract class AbstractCompletionProvider {
         String type = el.getType();
         if (FXDFileModel.FXD_NODE.equals(type)) {
             provider = new NodeCompletionProvider();
-        } else if (FXDFileModel.FXD_ATTRIBUTE.equals(type)) {
-            provider = new AttributeCompletionProvider();
         } else if (FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
             provider = new AttributeArrayCompletionProvider();
-        } else if (FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
-            provider = new ArrayElemCompletionProvider();
         } else if (FXDFileModel.DOCUMENT_ROOT_ELEMENT_TYPE.equals(type)) {
             provider = new RootElemCompletionProvider();
+        } else if (FXDFileModel.FXD_ATTRIBUTE.equals(type)) {
+            // is not used
+            provider = new AttributeCompletionProvider();
+        } else if (FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
+            // is not used
+            provider = new ArrayElemCompletionProvider();
         }
 
         if (provider != null){

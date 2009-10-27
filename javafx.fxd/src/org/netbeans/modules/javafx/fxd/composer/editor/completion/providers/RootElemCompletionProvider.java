@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
-import java.util.logging.Logger;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
@@ -53,8 +52,6 @@ import org.netbeans.spi.editor.completion.CompletionResultSet;
  * @author avk
  */
 public class RootElemCompletionProvider extends AbstractCompletionProvider {
-
-    private static final Logger LOG = Logger.getLogger(RootElemCompletionProvider.class.getName());
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
