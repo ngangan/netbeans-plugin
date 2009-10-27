@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
@@ -55,6 +54,10 @@ public class RootElemCompletionProvider extends AbstractCompletionProvider {
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
-        resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
+        // TODO: suggest items.
+        // default item is now 'FXD', that is not obviously described in schema,
+        //  but is equal to schema root node.
+        // Not sure it is final schema implementation => do not spend time for now.
+        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
     }
 }
