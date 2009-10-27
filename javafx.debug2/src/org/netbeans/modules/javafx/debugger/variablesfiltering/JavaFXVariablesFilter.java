@@ -103,21 +103,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
     }
 
     public int getChildrenCount(TreeModel original, Object node) throws UnknownTypeException {
-        int countVisible = 0;
-
-        // For root
-        if (node.equals( original.getRoot())) {
-            countVisible = original.getChildrenCount( node );
-            Object[] children = original.getChildren( node, 0, countVisible );
-            countVisible = children.length;
-            if( countVisible == 1 && children[0] instanceof JPDAClassType ) {
-                return original.getChildrenCount( children[0] );
-            }
-        } else {
-            countVisible = original.getChildrenCount( node );
-        }
-
-        return countVisible;
+        return Integer.MAX_VALUE;
     }
 
     public boolean isLeaf( TreeModel original, Object node ) throws UnknownTypeException {
