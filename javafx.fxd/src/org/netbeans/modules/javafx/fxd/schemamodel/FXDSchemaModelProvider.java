@@ -43,14 +43,10 @@ package org.netbeans.modules.javafx.fxd.schemamodel;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
 import com.sun.javafx.tools.fxd.schema.model.FXDSchema;
 import com.sun.javafx.tools.fxd.schema.model.FXDSchemaException;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URL;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
 
 /**
@@ -59,7 +55,7 @@ import org.openide.util.Exceptions;
  */
 public class FXDSchemaModelProvider {
 
-    public static final String FXD_SCHEMA_FILE = "/com/sun/javafx/tools/fxd/schema/fxd-schema.fxd"; //NOI18N
+    public static final String FXD_SCHEMA_FILE = "/com/sun/javafx/tools/fxd/schema/fxd-schema.fxdl"; //NOI18N
 
     private static FXDSchema m_schema;
 
