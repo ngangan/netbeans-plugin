@@ -46,6 +46,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
@@ -74,7 +75,6 @@ import org.openide.util.NbBundle;
  */
 public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
-    private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String HINTS_IDENT = "abstractmixinjavafx"; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
 
@@ -87,20 +87,9 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
 
         final Collection<Tree> mixins = new HashSet<Tree>();
         final Collection<ExecutableElement> existingMethods = new HashSet<ExecutableElement>();
-        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-        final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
-        final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
 
         return new CancellableTask<CompilationInfo>() {
 
-            private void clear() {
-                mixins.clear();
-                existingMethods.clear();
-                optionsCache.clear();
-                typeElementCash.clear();
-                elementsCash.clear();
-            }
-            
             public void cancel() {
                 cancel.set(true);
             }
@@ -109,7 +98,6 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 cancel.set(false);
                 final Element[] mainClassElement = new Element[1];
                 final Document document = compilationInfo.getDocument();
-                ErrorDescription errorDescription = null;
 
                 JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -147,8 +135,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     clear();
                     return;
                 }
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                boolean breakIt = false;
+                Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (Tree mixin : mixins) {
                     if (cancel.get()) {
                         clear();
@@ -156,61 +143,35 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     }
                     JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
                     Element mixinElement = compilationInfo.getTrees().getElement(path);
-                    if (mixinElement == null) {
+                    if (mixinElement == null || !(mixinElement instanceof JavafxClassSymbol)) {
                         continue;
                     }
-                    String mixinName = mixinElement.getSimpleName().toString();
-                    if (HintsUtils.checkString(mixinName)) {
-                        continue;
-                    }
-                    Collection<ElementHandle<TypeElement>> options = optionsCache.get(mixinName);
-                    if (options == null) {
-                        options = classIndex.getDeclaredTypes(mixinName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                        optionsCache.put(mixinName, options);
-                    }
-                    for (ElementHandle<TypeElement> elementHandle : options) {
-                        TypeElement typeElement = typeElementCash.get(elementHandle);
-                        if (typeElement == null) {
-                            typeElement = elementHandle.resolve(compilationInfo);
-                            typeElementCash.put(elementHandle, typeElement);
-                        }
-                        if (typeElement == null) {
-                            continue;
-                        }
-                        Collection<? extends Element> elements = elementsCash.get(typeElement);
-                        if (elements == null) {
-                            elements = getAllMembers(typeElement, compilationInfo);
-                            elementsCash.put(typeElement, elements);
-                        }
-                        if (elements == null) {
-                            continue;
-                        }
-                        Map<Element, Boolean> toOverrides = new HashMap<Element, Boolean>();
-                        for (Element element : elements) {
-                            if (element instanceof ExecutableElement && element.getModifiers().contains(Modifier.ABSTRACT)) {
-                                boolean isOverride = checkIfOveridden(compilationInfo, existingMethods, (ExecutableElement) element);
-                                toOverrides.put(element, isOverride);
-                            }
+                    JavafxClassSymbol classSymbol = (JavafxClassSymbol) mixinElement;
+                    Map<Element, Boolean> toOverrides = new HashMap<Element, Boolean>();
+                    for (Element element : classSymbol.getEnclosedElements()) {
+                        if (element instanceof ExecutableElement && element.getModifiers().contains(Modifier.ABSTRACT)) {
+                            boolean isOverride = checkIfOveridden(compilationInfo, existingMethods, (ExecutableElement) element);
+                            toOverrides.put(element, isOverride);
                         }
                         if (toOverrides.values().contains(Boolean.FALSE)) {
                             SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                             final int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), mixin);
                             String hintText = NbBundle.getMessage(MixinNotImplementedAbstractsTaskFactory.class, "TITLE_MIXIN_ABSTRACT"); //NOI18N
-                            errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
-                            breakIt = true;
+                            ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.ERROR, hintText, compilationInfo.getFileObject(), start, start);
+                            errorDescriptions.add(errorDescription);
                             break;
                         }
                     }
-                    if (breakIt) {
-                        break;
-                    }
                 }
-                if (document != null && errorDescription != null) {
-                    HintsController.setErrors(document, HINTS_IDENT, Collections.singleton(errorDescription));
-                } else if (document != null) {
-                    HintsController.setErrors(document, HINTS_IDENT, Collections.EMPTY_LIST);
+                if (document != null) {
+                    HintsController.setErrors(document, HINTS_IDENT, errorDescriptions);
                 }
                 clear();
+            }
+
+            private void clear() {
+                mixins.clear();
+                existingMethods.clear();
             }
         };
     }
@@ -225,16 +186,4 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
         return false;
     }
 
-    private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
-        Collection<? extends Element> elements = null;
-        try {
-            elements = compilationInfo.getElements().getAllMembers(typeElement);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            System.err.println("* e = " + typeElement); //NOI18N
-            System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
-            System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
-        }
-        return elements;
-    }
 }

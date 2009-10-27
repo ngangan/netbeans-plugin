@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -104,8 +103,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
         final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
         final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
-        final Collection<Boolean> mixinMain = new HashSet<Boolean>();
-        final Collection<Boolean> mixinExtends = new HashSet<Boolean>();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -115,22 +112,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
-                final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-                new JavaFXTreePathScanner<Void, Void>() {
-
-                    @Override
-                    public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
-                        if (node.getModifiers().toString().contains("mixin")) { //NOI18N
-                            mixinMain.add(Boolean.TRUE);
-                        }
-                        if (node.getMixins() != null && !node.getMixins().isEmpty()) {
-                            mixinExtends.add(Boolean.TRUE);
-                        }
-                        return super.visitClassDeclaration(node, v);
-                    }
-                }.scan(compilationInfo.getCompilationUnit(), null);
-                ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                final HintsModel modelFix = new HintsModel(compilationInfo);
+                HintsModel modelFix = null;
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (!isValidError(diagnostic.getCode()) || cancel.get()) {
                         continue;
@@ -175,6 +157,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         visitor.scan(compilationInfo.getCompilationUnit(), null);
                         Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
                         if (options == null) {
+                            ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                             options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                             optionsCache.put(className, options);
                         }
@@ -211,11 +194,14 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                             }
                         }
                         if (!abstractMethods.isEmpty()) {
+                            if (modelFix == null) {
+                                modelFix = new HintsModel(compilationInfo);
+                            }
                             modelFix.addHint(superTree, abstractMethods);
                         }
                     }
                 }
-                addHintsToController(document, modelFix, compilationInfo, file);
+                addHintsToController(modelFix, compilationInfo, file);
                 clear();
             }
 
@@ -223,8 +209,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 optionsCache.clear();
                 typeElementCash.clear();
                 elementsCash.clear();
-                mixinExtends.clear();
-                mixinMain.clear();
             }
         };
     }
@@ -255,8 +239,9 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return -1;
     }
 
-    private void addHintsToController(Document document, HintsModel model, CompilationInfo compilationInfo, FileObject file) {
-        if (model.getHints() != null) {
+    private void addHintsToController(HintsModel model, CompilationInfo compilationInfo, FileObject file) {
+        Document document = compilationInfo.getDocument();
+        if (model != null && model.getHints() != null) {
             Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
             for (Hint hint : model.getHints()) {
                 errors.add(getErrorDescription(document, file, hint, compilationInfo));
