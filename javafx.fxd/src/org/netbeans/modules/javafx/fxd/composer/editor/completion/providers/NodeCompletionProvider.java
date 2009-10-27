@@ -102,11 +102,11 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
     private void processNodeBody(final CompletionResultSet resultSet,
             DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
         // TODO: non-array attributes should be processed here.
-        resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + " > ATTRIBUTE ]", caretOffset));
+        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + " > ATTRIBUTE ]", caretOffset));
 
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
-        resultSet.addItem(new FXDCompletionItem("NODE PREV = " + prev + ", NEXT = " + next, caretOffset));
+        //resultSet.addItem(new FXDCompletionItem("NODE PREV = " + prev + ", NEXT = " + next, caretOffset));
         LOG.warning("NODE PREV = " + prev + ", NEXT = " + next);
 
         if (prev == FXDTokenId.LBRACE || prev == FXDTokenId.COMMA){
@@ -133,19 +133,21 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
                 // nothing to suggest?
             }
         } else if (prev == FXDTokenId.COLON){
-            // TODO: attr default value
+            // attr value completion
+            processAttrValue(resultSet, el, caretOffset);
         } else if (next == FXDTokenId.COMMA || next == FXDTokenId.RBRACE){
             if (prev == FXDTokenId.IDENTIFIER){
                 TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
                 FXDTokenId prevPrev = getPrevNonWhiteID(el, ts.offset(), ts);
                 if (prevPrev == FXDTokenId.COLON){
-                    // TODO: attr value
+                    // TODO: started attr value completion (identifier)
                 } else {
                     // at the end of id before , or }
                     processAttrId(resultSet, el, caretOffset, ts);
                 }
             } else {
-                // TODO: attr default value
+                // started attr value (not identifier).
+                // do not complete numbers, strings, etc.
             }
         }
 

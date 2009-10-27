@@ -41,23 +41,10 @@
 
 package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
-import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
-import com.sun.javafx.tools.fxd.schema.model.Element;
-import com.sun.javafx.tools.fxd.schema.model.Enumeration;
-import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
-import com.sun.javafx.tools.fxd.schema.model.Property;
-import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
-import com.sun.javafx.tools.fxd.schema.model.Type;
-import com.sun.javafx.tools.fxd.schema.model.Value;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Logger;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionQuery;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
@@ -72,7 +59,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
-        resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
+        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
 
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
@@ -107,7 +94,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
         } else if (next != FXDTokenId.UNKNOWN) {
             // between { and }, but not before error
             //suggest possible attribute_array values
-            processAttrArrayElements(resultSet, el, caretOffset);
+            processAttrValue(resultSet, el, caretOffset);
         }
     }
 
@@ -119,71 +106,6 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
             return;
         }
         fillItemsWithNodeAttrs(resultSet, parent, caretOffset, nameStart);
-    }
-
-    private void processAttrArrayElements(final CompletionResultSet resultSet,
-            DocumentElement el, int caretOffset){
-
-        AbstractSchemaElement parentEl = getParentSchemaElementsForDE(el);
-        if (parentEl == null){
-            return;
-        }
-        Property prop = findElementPropertyByName(parentEl, el.getName());
-        fillItemsForProperty(resultSet, prop, caretOffset);
-    }
-
-    private void fillItemsForProperty(CompletionResultSet resultSet,
-            Property prop, int caretOffset) {
-        Type propType = prop.type;
-        if (propType instanceof Element){
-            Element elem = (Element)propType;
-            List<Element> successors = new ArrayList<Element>();
-            collectSuccessors(successors, elem);
-            for (Element e : successors){
-                resultSet.addItem(new FXDCompletionItem(e, caretOffset));
-            }
-        } else if (propType instanceof Enumeration){
-            Enumeration enumn = (Enumeration)propType;
-            Value[] values = enumn.values;
-            for (Value value : values){
-                resultSet.addItem(new FXDCompletionItem(value, caretOffset));
-            }
-        } else if (propType instanceof PrimitiveType){
-            PrimitiveType primType = (PrimitiveType)propType;
-            resultSet.addItem(new FXDCompletionItem(primType, caretOffset));
-        }
-    }
-
-    private void collectSuccessors(final List<Element> successors, final Element elem) {
-        if(!elem.isAbstract()){
-            successors.add(elem);
-        }
-        if (!elem.isExtended()){
-            return;
-        }
-        FXDCompletionQuery.getFXDSchema().visit(new SchemaVisitor() {
-
-            public void visitSchemaElement(AbstractSchemaElement ae) {
-                if (ae instanceof Element) {
-                    Element child = (Element) ae;
-                    if (isExtendedBy(elem, child)) {
-                        collectSuccessors(successors, child);
-                    }
-                }
-            }
-
-            private boolean isExtendedBy(Element parent, Element child) {
-                if (child.extendsElement != null) {
-                    for (int i = 0; i < child.extendsElement.length; i++) {
-                        if (child.extendsElement[i].id.equals(parent.id)) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-        
     }
 
 }

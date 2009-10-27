@@ -43,7 +43,9 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**
@@ -54,5 +56,19 @@ public class ArrayElemCompletionProvider extends AbstractCompletionProvider {
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
+        resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
+        FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
+        FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
+        //resultSet.addItem(new FXDCompletionItem("NODE PREV = " + prev + ", NEXT = " + next, caretOffset));
+        if (prev == null || prev == FXDTokenId.COMMA){
+            TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
+            if (caretOffset <= ts.offset() ) {
+                processAttrValue(resultSet, el, caretOffset);
+            } else if (next == FXDTokenId.IDENTIFIER){
+                // TODO complete identifier
+            }
+            // do not complete numbers, strings etc.
+        }
+
     }
 }

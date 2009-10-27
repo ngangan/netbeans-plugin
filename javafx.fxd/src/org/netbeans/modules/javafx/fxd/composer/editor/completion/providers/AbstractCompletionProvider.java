@@ -44,8 +44,11 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
 import com.sun.javafx.tools.fxd.schema.model.Enumeration;
+import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
 import com.sun.javafx.tools.fxd.schema.model.Property;
 import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
+import com.sun.javafx.tools.fxd.schema.model.Type;
+import com.sun.javafx.tools.fxd.schema.model.Value;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -297,6 +300,71 @@ public abstract class AbstractCompletionProvider {
                 }
             }
         }
+    }
+
+    protected void processAttrValue(final CompletionResultSet resultSet,
+            DocumentElement el, int caretOffset){
+
+        AbstractSchemaElement parentEl = getParentSchemaElementsForDE(el);
+        if (parentEl == null){
+            return;
+        }
+        Property prop = findElementPropertyByName(parentEl, el.getName());
+        fillItemsForProperty(resultSet, prop, caretOffset);
+    }
+
+    private void fillItemsForProperty(CompletionResultSet resultSet,
+            Property prop, int caretOffset) {
+        Type propType = prop.type;
+        if (propType instanceof Element) {
+            Element elem = (Element) propType;
+            List<Element> successors = new ArrayList<Element>();
+            collectSuccessors(successors, elem);
+            for (Element e : successors) {
+                resultSet.addItem(new FXDCompletionItem(e, caretOffset));
+            }
+        } else if (propType instanceof Enumeration) {
+            Enumeration enumn = (Enumeration) propType;
+            Value[] values = enumn.values;
+            for (Value value : values) {
+                resultSet.addItem(new FXDCompletionItem(value, caretOffset));
+            }
+        } else if (propType instanceof PrimitiveType) {
+            //PrimitiveType primType = (PrimitiveType)propType;
+            //resultSet.addItem(new FXDCompletionItem(primType, caretOffset));
+        }
+    }
+
+    private void collectSuccessors(final List<Element> successors, final Element elem) {
+        if (!elem.isAbstract()) {
+            successors.add(elem);
+        }
+        if (!elem.isExtended()) {
+            return;
+        }
+        FXDCompletionQuery.getFXDSchema().visit(new SchemaVisitor() {
+
+            public void visitSchemaElement(AbstractSchemaElement ae) {
+                if (ae instanceof Element) {
+                    Element child = (Element) ae;
+                    if (isExtendedBy(elem, child)) {
+                        collectSuccessors(successors, child);
+                    }
+                }
+            }
+
+            private boolean isExtendedBy(Element parent, Element child) {
+                if (child.extendsElement != null) {
+                    for (int i = 0; i < child.extendsElement.length; i++) {
+                        if (child.extendsElement[i].id.equals(parent.id)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        });
+
     }
 
     private String getSchemaIdByDocElem(DocumentElement el) {
