@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -42,14 +42,12 @@
 package org.netbeans.modules.javafx.lexer;
 
 import java.io.File;
-import java.io.FileReader;
-import java.nio.CharBuffer;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.junit.NbTestCase;
 import org.netbeans.lib.lexer.test.LexerTestUtilities;
+import org.netbeans.modules.javafx.platform.JavaFXTestBase;
 
 /**
  * Test how many flyweight tokens gets created over a typical java source
@@ -57,7 +55,7 @@ import org.netbeans.lib.lexer.test.LexerTestUtilities;
  *
  * @author mmetelka
  */
-public class JavaFlyTokensTest extends NbTestCase {
+public class JavaFlyTokensTest extends JavaFXTestBase {
     
     public JavaFlyTokensTest(String testName) {
         super(testName);
@@ -71,23 +69,18 @@ public class JavaFlyTokensTest extends NbTestCase {
 
     public void testDummy() throws Exception {
     }
-
+    
     // XXX: disabled now, cf. issue #175440
     public void DISABLED_test() throws Exception {
         File testJComponentFile = new File(getDataDir().getPath().replace("%20", " ") + "/code.fx.txt");
-        FileReader r = new FileReader(testJComponentFile);
-        int fileLen = (int)testJComponentFile.length();
-        CharBuffer cb = CharBuffer.allocate(fileLen);
-        r.read(cb);
-        cb.rewind();
-        String text = cb.toString();
+        String text = slurp(testJComponentFile);
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
         
         System.out.println("Flyweight tokens: " + LexerTestUtilities.flyweightTokenCount(ts)
                 + "\nTotal tokens: " + ts.tokenCount()
                 + "\nFlyweight text length: " + LexerTestUtilities.flyweightTextLength(ts)
-                + "\nTotal text length: " + fileLen
+                + "\nTotal text length: " + text.length()
                 + "\nDistribution: " + LexerTestUtilities.flyweightDistribution(ts)
         );
 

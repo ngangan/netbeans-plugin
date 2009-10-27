@@ -41,7 +41,13 @@
 
 package org.netbeans.modules.javafx.platform;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import org.netbeans.junit.NbTestCase;
+import org.openide.filesystems.FileUtil;
 
 public class JavaFXTestBase extends NbTestCase {
 
@@ -55,4 +61,15 @@ public class JavaFXTestBase extends NbTestCase {
         System.setProperty("netbeans.user", getWorkDir().getAbsolutePath());
     }
 
+    /** Copy-pasted from APISupport. */
+    public static String slurp(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            FileUtil.copy(is, baos);
+            return baos.toString("UTF-8");
+        } finally {
+            is.close();
+        }
+    }
 }
