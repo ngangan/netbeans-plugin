@@ -137,8 +137,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     }
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
-                    Tree superTree = compilationInfo.getTreeUtilities().parseExpression("", (int) diagnostic.getStartPosition());
-
+                    Tree superTree = compilationInfo.getTreeUtilities().pathFor(diagnostic.getStartPosition()).getLeaf();
                     String className = null;
                     if (element != null && element instanceof ClassSymbol) {
                         ClassSymbol classSymbol = (ClassSymbol) element;
