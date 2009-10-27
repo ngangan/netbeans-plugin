@@ -87,9 +87,8 @@ public class FXDReformatTask implements ReformatTask {
                     for (Context.Region region : regions) {
                         int startOffset = region.getStartOffset();
                         int endOffset = region.getEndOffset();
-                        ts.move(startOffset);
                         Formatter formatter = new Formatter(context);
-                        formatter.scan(adjustments, startOffset, endOffset);
+                        formatter.scan(adjustments, startOffset, endOffset, ts);
                     }
                     applyAdjustments(adjustments);
                 } catch( BadLocationException e ) {
@@ -129,16 +128,18 @@ public class FXDReformatTask implements ReformatTask {
             m_docIndent = IndentUtils.indentLevelSize(m_baseDoc);
         }
 
-        protected void scan(Queue<Adjustment> adjustments, int startOffset, int endOffset) throws BadLocationException{
+        protected void scan(Queue<Adjustment> adjustments, int startOffset, 
+                int endOffset, TokenSequence<FXDTokenId> ts) throws BadLocationException {
             m_adjustments = adjustments;
             m_startOffset = startOffset;
             m_endOffset = endOffset;
-            m_ts = BracketCompletion.getTokenSequence(m_baseDoc, m_startOffset);
+            m_ts = ts;
             m_currIndent = initialIndent();
             process();
         }
 
         private void process() throws BadLocationException{
+            m_ts.move(m_startOffset);
             Token<FXDTokenId> token = TokenUtils.getNextNonWhiteFwd(m_ts);
             while (token != null){
                 // indent all white rows before token
