@@ -249,18 +249,6 @@ public class CompletionTestBase extends JavaFXTestBase {
         return lineOffset + caretDelta;
     }
 
-    /** Copy-pasted from APISupport. */
-    protected static String slurp(File file) throws IOException {
-        InputStream is = new FileInputStream(file);
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            FileUtil.copy(is, baos);
-            return baos.toString("UTF-8");
-        } finally {
-            is.close();
-        }
-    }
-
     protected void checkCompletion(final String source, final String caretLine, final String goldenFileName) throws Exception {
         File testSource = new File(getWorkDir(), "test/Test.fx");
         testSource.getParentFile().mkdirs();
