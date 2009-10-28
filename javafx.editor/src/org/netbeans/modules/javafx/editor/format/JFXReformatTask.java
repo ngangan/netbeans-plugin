@@ -1237,18 +1237,14 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.LBRACE);
                 List<ObjectLiteralPartTree> literalParts = node.getLiteralParts();
                 if (literalParts != null && !literalParts.isEmpty()) {
-                    // need to increase indent before any spaces
                     int old = indent;
                     indent += indentSize;
-                    // TODO control this from editor settings
-//                    newline();
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), literalParts);
-                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
-//                    newline();
+                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                     indent = old;
                 }
-                accept(JFXTokenId.LBRACE);
+                accept(JFXTokenId.RBRACE);
             }
             
             return true;
@@ -2031,18 +2027,22 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
             List<ExpressionTree> itemList = node.getItemList();
             accept(JFXTokenId.LBRACKET);
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+            int old = indent;
+            indent += indentSize;
+            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             if (itemList != null) {
                 for (Iterator<ExpressionTree> it = itemList.iterator(); it.hasNext();) {
                     ExpressionTree expressionTree = it.next();
                     scan(expressionTree, p);
                     if (it.hasNext()) {
-                        accept(JFXTokenId.COMMA);
-                        spaces(cs.spaceAfterComma() ? 1 : 0);
+                        if (accept(JFXTokenId.COMMA) == JFXTokenId.COMMA && cs.spaceAfterComma()) {
+                            spaces(1, true);
+                        }
                     }
                 }
             }
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
+            indent = old;
             accept(JFXTokenId.RBRACKET);
             return true;
         }
@@ -3026,20 +3026,11 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 first = false;
 
-                boolean isDelimiter = false;
-                if (tokens.moveNext()) {
-                    JFXTokenId id = tokens.token().id();
-                    isDelimiter = (id == JFXTokenId.COMMA || id == JFXTokenId.SEMI);
-                    tokens.movePrevious();
-                }
-                if (isDelimiter) {
+                JFXTokenId id = tokens.token().id();
+                if (id == JFXTokenId.COMMA || id == JFXTokenId.SEMI) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
                     accept(JFXTokenId.COMMA, JFXTokenId.SEMI);
                 }
-                // TODO control this from editor settings
-//                if (it.hasNext()) {
-//                    newline();
-//                }
             }
         }
 
