@@ -1672,6 +1672,9 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitTypeClass(TypeClassTree node, Void p) {
             accept(JFXTokenId.IDENTIFIER);
             // sequence type
+//            if (accept(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET && cs.spaceWithinArrayInitBrackets()) {
+//                space();
+//            }
             accept(JFXTokenId.LBRACKET);
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             accept(JFXTokenId.RBRACKET);
