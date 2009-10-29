@@ -119,6 +119,26 @@ final class HintsUtils {
         return null;
     }
 
+     static MethodSymbol isOverridden(TypeElement typeOverridden, Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
+        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
+            for (MethodSymbol overriddenMethod : overriddenMethodList) {
+                String overrriddenName = overriddenMethod.getSimpleName().toString();
+                if (!method.getSimpleName().toString().equals(overrriddenName)) {
+                    continue;
+                }
+                if (method.getEnclosingElement() != overriddenMethod.getEnclosingElement()) {
+                    continue;
+                }
+                if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                    return overriddenMethod;
+                }
+            }
+        }
+
+        return null;
+    }
+
+
     static MethodSymbol isAlreadyDefined(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
         if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
             for (MethodSymbol overriddenMethod : overriddenMethodList) {

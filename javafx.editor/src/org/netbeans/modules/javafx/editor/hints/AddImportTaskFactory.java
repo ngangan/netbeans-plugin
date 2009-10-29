@@ -110,15 +110,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     return;
                 }
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (cancel.get()) {
-                        break;
-                    }
-
-                    boolean onlyAbstractError = false;
-                    if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
-                        onlyAbstractError = true;
-                    }
-                    if (!onlyAbstractError) {
+                    if (!isValidError(diagnostic.getCode()) || cancel.get()) {
                         continue;
                     }
                     final Collection<String> imports = new HashSet<String>();
@@ -139,8 +131,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     }.scan(compilationInfo.getCompilationUnit(), null);
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
-                    Tree superTree = compilationInfo.getTreeUtilities().parseExpression("", (int) diagnostic.getStartPosition());
-
+                    Tree superTree = compilationInfo.getTreeUtilities().pathFor(diagnostic.getStartPosition()).getLeaf();
                     String potentialFqn = null;
                     if (element != null && element instanceof ClassSymbol) {
                         ClassSymbol classSymbol = (ClassSymbol) element;
@@ -205,6 +196,13 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             private void clear() {
                 optionsCache.clear();
                 errors.clear();
+            }
+
+            private boolean isValidError(String errorCode) {
+                if (errorCode.equals(ERROR_CODE1) || errorCode.equals(ERROR_CODE2)) {
+                    return true;
+                }
+                return false;
             }
         };
     }

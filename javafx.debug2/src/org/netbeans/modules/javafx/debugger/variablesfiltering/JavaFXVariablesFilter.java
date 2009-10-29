@@ -12,6 +12,7 @@ import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.api.debugger.jpda.LocalVariable;
 import org.netbeans.api.debugger.jpda.This;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TreeModel;
 import org.netbeans.spi.viewmodel.TreeModelFilter;
@@ -21,6 +22,7 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TreeModelFilter.class } )
 public class JavaFXVariablesFilter implements TreeModelFilter {
 
     /** Creates new JavaFXVariablesFilter instance */
@@ -75,6 +77,10 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     vc.add( child );
                 }
             }
+            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
+            for( Object o : vvv ) {
+                System.out.println(" - " + o );
+            }
             return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {
             // Root static class
@@ -97,21 +103,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
     }
 
     public int getChildrenCount(TreeModel original, Object node) throws UnknownTypeException {
-        int countVisible = 0;
-
-        // For root
-        if (node.equals( original.getRoot())) {
-            countVisible = original.getChildrenCount( node );
-            Object[] children = original.getChildren( node, 0, countVisible );
-            countVisible = children.length;
-            if( countVisible == 1 && children[0] instanceof JPDAClassType ) {
-                return original.getChildrenCount( children[0] );
-            }
-        } else {
-            countVisible = original.getChildrenCount( node );
-        }
-
-        return countVisible;
+        return Integer.MAX_VALUE;
     }
 
     public boolean isLeaf( TreeModel original, Object node ) throws UnknownTypeException {

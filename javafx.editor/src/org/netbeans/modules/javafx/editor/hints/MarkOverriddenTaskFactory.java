@@ -153,7 +153,6 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                         return;
                     }
                 }
-                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                 for (Element currentClass : classTrees.keySet()) {
                     if (cancel.get()) {
                         clear();
@@ -182,62 +181,68 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                         if (superTree == null) {
                             continue;
                         }
-
-                        String className = null;
                         if (superTree instanceof JFXClassDeclaration) {
-                            className = ((JFXClassDeclaration) superTree).getSimpleName().toString();
+                            JFXClassDeclaration classDeclaration = ((JFXClassDeclaration) superTree);
+                            classDeclaration.getImplements();
+                            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), classDeclaration.getTree());
+                            Element element = compilationInfo.getTrees().getElement(path);
+                            if (element != null && element instanceof JavafxClassSymbol) {
+                                JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
+                                Collection<? extends Element> elements = classSymbol.getEnclosedElements();
+                                recognizeElements(elements, methods, compilationInfo);
+                            }
                         } else {
-                            className = HintsUtils.getClassSimpleName(superTree.toString());
-                        }
-                        if (HintsUtils.checkString(className)) {
-                            continue;
-                        }
-                        Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
-                        if (options == null) {
-                            options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                            optionsCache.put(className, options);
-                        }
-                        if (options == null) {
-                            continue;
-                        }
-                        for (ElementHandle<TypeElement> elementHandle : options) {
-                            TypeElement typeElement = typeElementCash.get(elementHandle);
-                            if (typeElement == null) {
-                                typeElement = elementHandle.resolve(compilationInfo);
-                                typeElementCash.put(elementHandle, typeElement);
-                            }
-                            if (typeElement == null) {
+                            String className = HintsUtils.getClassSimpleName(superTree.toString());
+                            if (HintsUtils.checkString(className)) {
                                 continue;
                             }
-//                            if (!HintsUtils.isClassUsed(typeElement, imports, compilationInfo, classTrees.keySet(), superElement)) {
-//                                continue;
-//                            }
-                            Collection<? extends Element> elements = elementsCash.get(typeElement);
-                            if (elements == null) {
-                                elements = getAllMembers(typeElement, compilationInfo);
-                                elementsCash.put(typeElement, elements);
+                            Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
+                            if (options == null) {
+                                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+                                options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                                optionsCache.put(className, options);
                             }
-                            if (elements == null) {
+                            if (options == null) {
                                 continue;
                             }
-                            //Collection<MethodSymbol> overriddens = new HashSet<MethodSymbol>();
-                            for (Element element : elements) {
-                                if (element instanceof ExecutableElement) {
-                                    MethodSymbol overridden = HintsUtils.isAlreadyDefined(methods, (MethodSymbol) element, compilationInfo);
-                                    if (overridden != null) {
-                                        Tree tree = compilationInfo.getTrees().getTree(overridden);
-                                        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                                        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                                        addedAnotations.add(new OverriddeAnnotation(start, element.getEnclosingElement()));
-                                    }
+                            for (ElementHandle<TypeElement> elementHandle : options) {
+                                TypeElement typeElement = typeElementCash.get(elementHandle);
+                                if (typeElement == null) {
+                                    typeElement = elementHandle.resolve(compilationInfo);
+                                    typeElementCash.put(elementHandle, typeElement);
                                 }
+                                if (typeElement == null) {
+                                    continue;
+                                }
+                                Collection<? extends Element> elements = elementsCash.get(typeElement);
+                                if (elements == null) {
+                                    elements = getAllMembers(typeElement, compilationInfo);
+                                    elementsCash.put(typeElement, elements);
+                                }
+                                if (elements == null) {
+                                    continue;
+                                }
+                                recognizeElements(elements, methods, compilationInfo);
                             }
                         }
-
                     }
                 }
                 updateAnnotationsoverridden(compilationInfo, addedAnotations);
                 clear();
+            }
+
+            private void recognizeElements(Collection<? extends Element> elements, Collection<MethodSymbol> methods, CompilationInfo compilationInfo) {
+                for (Element element : elements) {
+                    if (element instanceof ExecutableElement) {
+                        MethodSymbol overridden = HintsUtils.isAlreadyDefined(methods, (MethodSymbol) element, compilationInfo);
+                        if (overridden != null) {
+                            Tree tree = compilationInfo.getTrees().getTree(overridden);
+                            SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                            int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+                            addedAnotations.add(new OverriddeAnnotation(start, element.getEnclosingElement()));
+                        }
+                    }
+                }
             }
 
             private void clear() {
@@ -271,32 +276,6 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
             return false;
         }
         return true;
-    }
-
-    private MethodSymbol checkIfOveridden(Collection<MethodSymbol> elementsToCheck, MethodSymbol overridden) {
-        //String overrridenName = overridden.getSimpleName().toString();
-//        for (ExecutableElement override : elementsToCheck) {
-////            if (!overridden.getSimpleName().toString().equals(overrridenName)) {
-////                continue;
-////            }
-////            TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overridden);
-////            if (typeOverridden == null) {
-////                continue;
-////            }
-//            //TODO Workaround for java.lang.NullPointerException at com.sun.tools.javac.code.Types$DefaultTypeVisitor.visit(Types.java:3183)
-////            try {
-////                if (compilationInfo.getElements().overrides(override, overridden, typeOverridden)) {
-////                    return override;
-////                }
-////            } catch (Exception npe) {
-////                npe.printStackTrace();
-////            }
-//
-//
-//        }
-        // Work around for a problem with mixin compilationInfo.getElements().overrides(override, overridden, typeOverridden) which does not work with mixin
-        return null;
-
     }
 
     private Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {

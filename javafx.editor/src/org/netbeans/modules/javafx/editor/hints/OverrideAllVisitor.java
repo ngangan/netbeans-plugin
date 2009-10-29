@@ -34,7 +34,7 @@ final class OverrideAllVisitor extends JavaFXTreePathScanner<Void, Void> {
         this.overriddenMethods = overriddenMethods;
         this.imports = imports;
     }
-    
+
     @Override
     public Void visitImport(ImportTree node, Void p) {
         if (node instanceof JFXImport) {
@@ -46,14 +46,15 @@ final class OverrideAllVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
-        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-        if (element != null && element.getEnclosingElement() instanceof JavafxClassSymbol) {
-            if (element instanceof MethodSymbol) {
-                MethodSymbol methodSymbol = (MethodSymbol) element;
-                overriddenMethods.add(methodSymbol);
+        if (node.toString().contains("override")) { //NOI18N
+            Element element = compilationInfo.getTrees().getElement(getCurrentPath());
+            if (element != null && element.getEnclosingElement() instanceof JavafxClassSymbol) {
+                if (element instanceof MethodSymbol) {
+                    MethodSymbol methodSymbol = (MethodSymbol) element;
+                    overriddenMethods.add(methodSymbol);
+                }
             }
         }
-
         return null;
     }
 }

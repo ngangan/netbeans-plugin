@@ -17,7 +17,7 @@ import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDADebugger;
 import org.netbeans.modules.javafx.debugger.Context;
 import org.netbeans.modules.javafx.debugger.breakpoints.JavaFXLineBreakpoint;
-import org.netbeans.spi.debugger.ActionsProvider;
+import org.netbeans.spi.debugger.ActionsProvider.Registration;
 import org.netbeans.spi.debugger.ActionsProviderSupport;
 import org.netbeans.spi.debugger.ContextProvider;
 import org.netbeans.spi.debugger.ui.EditorContextDispatcher;
@@ -28,7 +28,7 @@ import org.openide.filesystems.URLMapper;
  *
  * @author Michal Skvor
  */
-
+@Registration(path="")
 public class JavaFXToggleActionProvider extends ActionsProviderSupport implements PropertyChangeListener {
 
     private JPDADebugger debugger;
@@ -39,8 +39,7 @@ public class JavaFXToggleActionProvider extends ActionsProviderSupport implement
     }
 
     public JavaFXToggleActionProvider( ContextProvider contextProvider ) {
-        debugger = (JPDADebugger) contextProvider.lookupFirst
-                (null, JPDADebugger.class);
+        debugger = contextProvider.lookupFirst(null, JPDADebugger.class);
         debugger.addPropertyChangeListener( JPDADebugger.PROP_STATE, this );
         Context.addPropertyChangeListener( this );
     }

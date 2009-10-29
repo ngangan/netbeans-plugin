@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
 import org.netbeans.spi.debugger.ContextProvider;
+import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelEvent;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.NodeModel;
@@ -21,6 +22,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Michal Skvor
  */
+@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.NodeModel.class } )
 public class JavaFXWatchesNodeModel implements NodeModel {
 
     private static final String ICON_BASE ="org/netbeans/modules/debugger/resources/watchesView/Watch";
@@ -29,6 +31,8 @@ public class JavaFXWatchesNodeModel implements NodeModel {
     private final Map<JavaFXWatch, String> shortDescriptionMap = new HashMap<JavaFXWatch, String>();
     private RequestProcessor evaluationRP;
 
+    public JavaFXWatchesNodeModel() {}
+    
     public JavaFXWatchesNodeModel( ContextProvider lookupProvider ) {
         evaluationRP = lookupProvider.lookupFirst( null, RequestProcessor.class );
     }
