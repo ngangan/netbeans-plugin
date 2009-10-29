@@ -62,17 +62,13 @@ public class JavaFlyTokensTest extends JavaFXTestBase {
     }
     
     @Override
-    protected void setUp() throws java.lang.Exception {
+    protected void setUp() throws Exception {
         // Set-up testing environment
         LexerTestUtilities.setTesting(true);
     }
 
-    public void testDummy() throws Exception {
-    }
-    
-    // XXX: disabled now, cf. issue #175440
-    public void DISABLED_test() throws Exception {
-        File testJComponentFile = new File(getDataDir().getPath().replace("%20", " ") + "/code.fx.txt");
+    public void testFlyweightTokens() throws Exception {
+        File testJComponentFile = new File(getDataDir().getPath().replace("%20", " ") + "/code.fx");
         String text = slurp(testJComponentFile);
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
@@ -84,8 +80,8 @@ public class JavaFlyTokensTest extends JavaFXTestBase {
                 + "\nDistribution: " + LexerTestUtilities.flyweightDistribution(ts)
         );
 
-        assertEquals(9010, LexerTestUtilities.flyweightTokenCount(ts));
-        assertEquals(13277, LexerTestUtilities.flyweightTextLength(ts));
-        assertEquals(13963, ts.tokenCount());
+        assertEquals(5891, LexerTestUtilities.flyweightTokenCount(ts));
+        assertEquals(9261, LexerTestUtilities.flyweightTextLength(ts));
+        assertEquals(32822, ts.tokenCount());
     }
 }

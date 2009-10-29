@@ -61,6 +61,7 @@ import java.util.logging.Logger;
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  */
 public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
+
     private static Logger log = Logger.getLogger(JFXLexer.class.getName());
     private Lexer lexer;
     private TokenFactory<JFXTokenId> tokenFactory;
@@ -125,8 +126,16 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             id = JFXTokenId.DOC_COMMENT;
         }
         assert id != null;
-        return tokenFactory.createToken(id, text != null ? text.length() : 0,
-                lexer.getSharedState().failed ? PartType.START : PartType.COMPLETE);
+        if (id == JFXTokenId.IMPORT) {
+            return tokenFactory.getFlyweightToken(id, "import");
+        }
+        String fixedText = id.getFixedText();
+        return (fixedText != null)
+                ? tokenFactory.getFlyweightToken(id, fixedText)
+                : tokenFactory.createToken(
+                    id,
+                    text != null ? text.length() : 0,
+                    lexer.getSharedState().failed ? PartType.START : PartType.COMPLETE);
     }
 
     private JFXTokenId getId(org.antlr.runtime.Token token) {
