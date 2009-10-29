@@ -87,6 +87,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
         final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
+        final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -98,17 +99,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
-                final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
-                if (file == null) {
-                    throw new IllegalArgumentException();
-                }
-                if (!compilationInfo.isErrors()) {
-                    if (compilationInfo.getDocument() != null) {
-                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
-                    }
-                    clear();
-                    return;
-                }
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (!isValidError(diagnostic.getCode()) || cancel.get()) {
                         continue;

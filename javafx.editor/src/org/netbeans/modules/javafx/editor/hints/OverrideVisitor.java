@@ -28,27 +28,23 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
     private CompilationInfo compilationInfo;
     private Map<Element, Collection<Tree>> classTrees;
     private Map<Element, List<MethodSymbol>> overriddenMethods;
-    private Collection<JFXImport> imports;
     private boolean includeAnon = false;
 
     public OverrideVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
-            Map<Element, List<MethodSymbol>> overriddenMethods,
-            Collection<JFXImport> imports) {
+            Map<Element, List<MethodSymbol>> overriddenMethods) {
 
         this.compilationInfo = compilationInfo;
         this.classTrees = classTrees;
         this.overriddenMethods = overriddenMethods;
-        this.imports = imports;
     }
 
     public OverrideVisitor(CompilationInfo compilationInfo,
             Map<Element, Collection<Tree>> classTrees,
             Map<Element, List<MethodSymbol>> overriddenMethods,
-            Collection<JFXImport> imports,
             boolean incudeAnon) {
 
-        this(compilationInfo, classTrees, overriddenMethods, imports);
+        this(compilationInfo, classTrees, overriddenMethods);
         this.includeAnon = incudeAnon;
     }
 
@@ -72,15 +68,7 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
             classTrees.put(currentClass, extendsList);
     }
 
-    @Override
-    public Void visitImport(ImportTree node, Void p) {
-        if (node instanceof JFXImport) {
-            imports.add((JFXImport) node);
-        }
-
-        return super.visitImport(node, p);
-    }
-
+  
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
@@ -88,7 +76,6 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
             if (element != null) {
                 Element currentClass = element.getEnclosingElement();
                 if (element instanceof MethodSymbol) {
-                    Tree tree = compilationInfo.getTrees().getTree(currentClass);
                     if (overriddenMethods.get(currentClass) == null) {
                         overriddenMethods.put(currentClass, new ArrayList<MethodSymbol>());
                     }

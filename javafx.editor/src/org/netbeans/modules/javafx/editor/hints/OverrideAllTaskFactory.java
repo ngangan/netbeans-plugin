@@ -103,6 +103,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
         final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
         final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
+        final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -157,7 +158,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         visitor.scan(compilationInfo.getCompilationUnit(), null);
                         Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
                         if (options == null) {
-                            ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
                             options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                             optionsCache.put(className, options);
                         }

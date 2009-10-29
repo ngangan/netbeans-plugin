@@ -88,9 +88,6 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
             @Override
             public void run(CompilationInfo compilationInfo) throws Exception {
-                if (file == null) {
-                    throw new IllegalArgumentException("There is no associated fileobject for document."); // NOI18N
-                }
                 final Document document = compilationInfo.getDocument();
                 if (compilationInfo.getDiagnostics() != null && compilationInfo.getDiagnostics().size() > 0) {
                     if (document != null) {
