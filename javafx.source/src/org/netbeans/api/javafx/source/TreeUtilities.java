@@ -54,6 +54,7 @@ import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JFXBreak;
 import com.sun.tools.javafx.tree.JFXContinue;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXLiteral;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -69,10 +70,16 @@ import javax.swing.text.Document;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.SourceVersion;
@@ -84,6 +91,101 @@ import org.netbeans.modules.parsing.api.Source;
  * @author Jan Lahoda, Dusan Balek, Tomas Zezula
  */
 public final class TreeUtilities {
+    private static class PositionCache<T> {
+        final private static ReadWriteLock cacheLock = new ReentrantReadWriteLock();
+        private static class Entry<T> {
+            T value;
+            long start, end;
+
+            public Entry(T value, long start, long end) {
+                this.value = value;
+                this.start = start;
+                this.end = end;
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (obj == null) {
+                    return false;
+                }
+                if (getClass() != obj.getClass()) {
+                    return false;
+                }
+                final Entry other = (Entry) obj;
+                if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
+                    return false;
+                }
+                if (this.start != other.start) {
+                    return false;
+                }
+                if (this.end != other.end) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public int hashCode() {
+                int hash = 3;
+                hash = 89 * hash + (this.value != null ? this.value.hashCode() : 0);
+                hash = 89 * hash + (int) (this.start ^ (this.start >>> 32));
+                hash = 89 * hash + (int) (this.end ^ (this.end >>> 32));
+                return hash;
+            }
+        }
+        final private static Comparator<Entry> comparator = new Comparator<Entry>() {
+
+            public int compare(Entry o1, Entry o2) {
+                if (o1 == null && o2 != null) return -1;
+                if (o1 != null && o2 == null) return 1;
+                if (o1.start == o2.start) return 0;
+                return o1.start < o2.start ? -1 : 1;
+            }
+        };
+
+        private List<Entry> entries = new ArrayList<PositionCache.Entry>();
+
+        public T getValue(long pos) {
+            try {
+                cacheLock.readLock().lock();
+                if (entries.size() == 0) return null;
+                return findValue(pos, 0, entries.size() - 1);
+            } finally {
+                cacheLock.readLock().unlock();
+            }
+        }
+
+        public void addValue(T path, long start, long end) {
+            try {
+                cacheLock.writeLock().lock();
+                entries.add(new Entry(path, start, end));
+                Collections.sort(entries, comparator);
+            } finally {
+                cacheLock.writeLock().unlock();
+            }
+        }
+
+        private T findValue(long pos, int intA, int intB) {
+            if (Math.abs(intB - intA + 1) <= 2) {
+                for(int i=intA;i<=intB;i++) {
+                    Entry<T> e = entries.get(i);
+                    if (e.start == pos) {
+                        return e.value;
+                    }
+                }
+                return null;
+            }
+            int mid = (intA + intB) / 2;
+            Entry<T> e = entries.get(mid);
+            if (e.start < pos) {
+                return findValue(pos, mid, intB);
+            } else if (e.start > pos) {
+                return findValue(pos, intA, mid - 1);
+            } else {
+                return e.value;
+            }
+        }
+    }
 
     public static TreeUtilities create(CompilationInfo info) {
         return new TreeUtilities(info);
@@ -179,7 +281,7 @@ public final class TreeUtilities {
 //            assert assertsEnabled = true;
 //            
 //            if (assertsEnabled) {
-//                TreePath tp = TreePath.getPath(info.getCompilationUnit(), tree);
+//                TreePath tp = TreePath.getValue(info.getCompilationUnit(), tree);
 //                
 //                if (tp == null) {
 //                    Logger.getLogger(TreeUtilities.class.getName()).log(Level.WARNING, "Comment automap requested for Tree not from the root compilation info. Please, make sure to call GeneratorUtilities.importComments before Treeutilities.getComments. Tree: {0}", tree);
@@ -202,7 +304,10 @@ public final class TreeUtilities {
 //        
 //        return Collections.unmodifiableList(comments);
 //    }
-    
+
+    final private PositionCache<JavaFXTreePath> pathCache = new PositionCache();
+    final private PositionCache<TokenSequence<JFXTokenId>> tokenCache = new PositionCache();
+
     public JavaFXTreePath pathFor(long pos) {
         return pathFor(new JavaFXTreePath(parserResultImpl.getCompilationUnit()), pos);
     }
@@ -218,6 +323,9 @@ public final class TreeUtilities {
     public JavaFXTreePath pathFor(JavaFXTreePath path, long pos, SourcePositions sourcePositions) {
         if (parserResultImpl == null || path == null || sourcePositions == null)
             throw new IllegalArgumentException();
+
+        JavaFXTreePath foundPath = pathCache.getValue(pos);
+        if (foundPath != null) return foundPath;
 
         class Result extends Error {
             JavaFXTreePath path;
@@ -271,7 +379,7 @@ public final class TreeUtilities {
             @Override
             public Void scan(Tree tree, Void p) {
                 if (tree != null && 
-                    !treeToStr(tree).equals("\"\"")) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
+                    !isEmptyStringLiteral(tree)) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
                     
@@ -320,14 +428,12 @@ public final class TreeUtilities {
                 return null;
             }
 
-            // workaround for NPE in compiler for visiting "var fun1:(:Object):Integer;" expression
-            // TODO remove it in SoMa
-            private String treeToStr(Tree tree) {
-                try {
-                    return tree.toString();
-                } catch (Exception e) {
+            // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
+            private boolean isEmptyStringLiteral(Tree tree) {
+                if (tree != null) {
+                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals("\"\""));
                 }
-                return "<error>"; // NOI18N
+                return false;
             }
         }
         
@@ -335,6 +441,10 @@ public final class TreeUtilities {
             new PathFinder(pos, sourcePositions).scan(path, null);
         } catch (Result result) {
             path = result.path;
+
+            pathCache.addValue(path,
+                              sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), path.getLeaf()),
+                              sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), path.getLeaf()));
         }
         
         if (path.getLeaf() == path.getCompilationUnit()) {
@@ -442,7 +552,13 @@ public final class TreeUtilities {
         if ((start == -1) || (end == -1)) {
             throw new RuntimeException("RE Cannot determine start and end for: " + treeToString(parserResultImpl, tree)); // NOI18N
         }
-        TokenSequence<JFXTokenId> t = ((TokenHierarchy<?>)parserResultImpl.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+
+        TokenSequence<JFXTokenId> t = tokenCache.getValue(start);
+
+        if (t == null) {
+            t = ((TokenHierarchy<?>)parserResultImpl.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+            tokenCache.addValue(t, start, end);
+        }
         if (t == null) {
             throw new RuntimeException("RE SDid not get a token sequence."); // NOI18N
         }
