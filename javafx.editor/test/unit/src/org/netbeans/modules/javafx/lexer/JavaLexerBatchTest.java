@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.lexer;
 
+import org.netbeans.api.javafx.lexer.JFXStringTokenId;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.PartType;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -65,7 +66,7 @@ public class JavaLexerBatchTest extends NbTestCase {
         LexerTestUtilities.setTesting(true);
     }
 
-    // XXX: disabled now, cf. issue #175442
+    // XXX: disabled now, fails because of JFXC-3602
     public void DISABLED_testComments() {
         String text = "/*ml-comment*//**//***//**\n*javadoc-comment*//* a";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
@@ -78,7 +79,7 @@ public class JavaLexerBatchTest extends NbTestCase {
         assertEquals(PartType.START, ts.token().partType());
     }
     
-    // XXX: disabled now, cf. issue #175442
+    // XXX: disabled now, fails because of JFXC-3601
     public void DISABLED_testIdentifiers() {
         String text = "a ab aB2 2a x\nyZ\r\nz";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
@@ -101,6 +102,7 @@ public class JavaLexerBatchTest extends NbTestCase {
     
     // XXX: disabled now, cf. issue #175442
     public void DISABLED_testStringLiterals() {
+        // text = '"" "a""" "\"" "\\" "\\\"" "\n" "a'
         String text = "\"\" \"a\"\"\" \"\\\"\" \"\\\\\" \"\\\\\\\"\" \"\\n\" \"a";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
@@ -117,54 +119,54 @@ public class JavaLexerBatchTest extends NbTestCase {
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.STRING_LITERAL, "\"\\n\"");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.STRING_LITERAL, "\"a");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.UNKNOWN, "\"a");
         assertEquals(PartType.START, ts.token().partType());
+    }
+
+    // XXX: disabled now, cf. issue JFXC-3601
+    public void DISABLED_testLongWhiteSpace() {
+        String text = "    ";
+        TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
+        TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, "    ");
     }
     
     // XXX: disabled now, cf. issue #175442
-    public void DISABLED_testNumberLiterals() {
-        String text = "0 00 09 1 12 0L 1l 12L 0x1 0xf 0XdE 0Xbcy" + 
-                " 09.5 1.5f 2.5d 6d 7e3 6.1E-7f 0xa.5dp+12d .3";
+    public void testNumberLiterals() {
+        String text = "0 00 09 1 12 0x1 0xf 0XdE 0Xbcy" + 
+                " 09.5 1.5 2.5 7e3 6.1E-7 0xa.5dp .3";
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "0");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "00");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.OCTAL_LITERAL, "00");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "09");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.OCTAL_LITERAL, "09"); // invalid octal
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "1");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "12");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "0L");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.HEX_LITERAL, "0x1");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "1l");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.HEX_LITERAL, "0xf");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "12L");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.HEX_LITERAL, "0XdE");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "0x1");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.HEX_LITERAL, "0Xbcy"); // out of range hex literal
+//        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.IDENTIFIER, "y");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "0xf");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.OCTAL_LITERAL, "09.5"); // invalid octal
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "0XdE");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "1.5");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DECIMAL_LITERAL, "0Xbc");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.IDENTIFIER, "y");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "09.5");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "1.5f");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "2.5d");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "6d");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "2.5");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "7e3");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "6.1E-7f");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "6.1E-7");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, "0xa.5dp+12d");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.HEX_LITERAL, "0xa.5dp");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.FLOATING_POINT_LITERAL, ".3");
     }
@@ -198,7 +200,7 @@ public class JavaLexerBatchTest extends NbTestCase {
     }
 
     // XXX: disabled now, cf. issue #175442
-    public void DISABLED_testKeywords() {
+    public void testKeywords() {
         /*String text = "abstract assert boolean break byte case catch char class const continue " +
             "default do dur double else enum extends final finally float for goto if " +
             "implements import instanceof int interface long native new package " +
@@ -209,14 +211,14 @@ public class JavaLexerBatchTest extends NbTestCase {
             "indexof insert in into inverse last later lazy nodebug on operation " +
             "reverse select sizeof trigger typeof var";*/
         String text = "assert break catch class continue " +
-            "easeboth easein easeout else extends finally for fps if " +
+            "else extends finally for if " +
             "import instanceof new package " +
             "private protected public return super " +
             "this then try while " +
             "null true false " + 
-            "after as attribute before bind delete first foreach from function " +
-            "indexof insert in into inverse last later lazy linear nodebug on operation " +
-            "order reverse select sizeof trigger typeof var";
+            "after as attribute before bind delete first from function " +
+            "indexof insert in into inverse last lazy on " +
+            "reverse sizeof trigger typeof var";
         
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
@@ -395,8 +397,8 @@ public class JavaLexerBatchTest extends NbTestCase {
 //        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.SIZEOF, "sizeof"); 
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
-//        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.TRIGGER, "trigger"); 
-//        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.TRIGGER, "trigger"); 
+        LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.TYPEOF, "typeof"); 
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.VAR, "var"); 
@@ -435,7 +437,7 @@ public class JavaLexerBatchTest extends NbTestCase {
     }
     
     // XXX: disabled now, cf. issue #175442
-    public void DISABLED_testEmbedding() {
+    public void testEmbedding() {
         String text = "ddx \"d\\t\\br\" /** @see X */";
         
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
@@ -449,24 +451,24 @@ public class JavaLexerBatchTest extends NbTestCase {
         assertEquals(4, ts.offset());
         
         TokenSequence<? extends TokenId> es = (TokenSequence<? extends TokenId>)ts.embedded();
+        assertNotNull(es);
         
-//        LexerTestUtilities.assertNextTokenEquals(es, JavaStringTokenId.TEXT, "d");
-//        assertEquals(5, es.offset());
-//        LexerTestUtilities.assertNextTokenEquals(es, JavaStringTokenId.TAB, "\\t");
-//        assertEquals(6, es.offset());
-//        LexerTestUtilities.assertNextTokenEquals(es, JavaStringTokenId.BACKSPACE, "\\b");
-//        assertEquals(8, es.offset());
-//        LexerTestUtilities.assertNextTokenEquals(es, JavaStringTokenId.TEXT, "r");
-//        assertEquals(10, es.offset());
-        
-        assertFalse(es.moveNext());
-        
+        LexerTestUtilities.assertNextTokenEquals(es, JFXStringTokenId.TEXT, "d");
+        assertEquals(5, es.offset());
+        LexerTestUtilities.assertNextTokenEquals(es, JFXStringTokenId.TAB, "\\t");
+        assertEquals(6, es.offset());
+        LexerTestUtilities.assertNextTokenEquals(es, JFXStringTokenId.BACKSPACE, "\\b");
+        assertEquals(8, es.offset());
+        LexerTestUtilities.assertNextTokenEquals(es, JFXStringTokenId.TEXT, "r");
+        assertEquals(10, es.offset());
+                
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.WS, " ");
         assertEquals(12, ts.offset());
         LexerTestUtilities.assertNextTokenEquals(ts, JFXTokenId.DOC_COMMENT, "/** @see X */");
         assertEquals(13, ts.offset());
         
         TokenSequence<? extends TokenId> ds = (TokenSequence<? extends TokenId>)ts.embedded();
+//        assertNotNull(ds);
         
 //        LexerTestUtilities.assertNextTokenEquals(ds, JavadocTokenId.OTHER_TEXT, " ");
 //        assertEquals(16, ds.offset());
@@ -478,8 +480,6 @@ public class JavaLexerBatchTest extends NbTestCase {
 //        assertEquals(22, ds.offset());
 //        LexerTestUtilities.assertNextTokenEquals(ds, JavadocTokenId.OTHER_TEXT, " ");
 //        assertEquals(23, ds.offset());
-        
-        assertFalse(ds.moveNext());
         
         assertFalse(ts.moveNext());
     }
