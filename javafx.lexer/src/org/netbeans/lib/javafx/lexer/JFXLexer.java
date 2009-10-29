@@ -126,9 +126,6 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             id = JFXTokenId.DOC_COMMENT;
         }
         assert id != null;
-        if (id == JFXTokenId.IMPORT) {
-            return tokenFactory.getFlyweightToken(id, "import");
-        }
         String fixedText = id.getFixedText();
         return (fixedText != null)
                 ? tokenFactory.getFlyweightToken(id, fixedText)
