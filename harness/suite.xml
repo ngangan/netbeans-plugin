@@ -85,6 +85,9 @@ made subject to such option by the copyright holder.
                 <fileset dir="${release.dir}"/>
             </path>
             <map from="${release.dir}${file.separator}" to=""/>
+            <filtermapper>
+                <replacestring from=" " to="?"/>
+            </filtermapper>
         </pathconvert>
     </target>
 
