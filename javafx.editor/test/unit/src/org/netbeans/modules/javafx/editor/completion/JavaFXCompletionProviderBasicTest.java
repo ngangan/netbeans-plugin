@@ -62,8 +62,7 @@ public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
         checkCompletion("Model", "var velorex = Car {^id: \"vlrx1234\"", "constructorArgs.pass");
     }
 
-    // XXX: temporarily
-    public void DISABLED_testClassMethods() throws Exception { // #174732
+    public void testClassMethods() throws Exception { // #174732
         checkCompletion("ClassMethods", "timeline.^", "classMethods.pass");
     }
 
