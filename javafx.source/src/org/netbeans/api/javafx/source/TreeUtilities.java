@@ -70,6 +70,7 @@ import javax.swing.text.Document;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -94,13 +95,17 @@ public final class TreeUtilities {
     private static class PositionCache<T> {
         final private static ReadWriteLock cacheLock = new ReentrantReadWriteLock();
         private static class Entry<T> {
-            T value;
+            private SoftReference<T> value;
             long start, end;
 
             public Entry(T value, long start, long end) {
-                this.value = value;
+                this.value = new SoftReference(value);
                 this.start = start;
                 this.end = end;
+            }
+
+            public T getValue() {
+                return value.get();
             }
 
             @Override
@@ -112,7 +117,7 @@ public final class TreeUtilities {
                     return false;
                 }
                 final Entry other = (Entry) obj;
-                if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
+                if (this.value.get() != other.value.get() && (this.value.get() == null || !this.value.get().equals(other.value.get()))) {
                     return false;
                 }
                 if (this.start != other.start) {
@@ -170,7 +175,7 @@ public final class TreeUtilities {
                 for(int i=intA;i<=intB;i++) {
                     Entry<T> e = entries.get(i);
                     if (e.start == pos) {
-                        return e.value;
+                        return e.getValue();
                     }
                 }
                 return null;
@@ -182,7 +187,7 @@ public final class TreeUtilities {
             } else if (e.start > pos) {
                 return findValue(pos, intA, mid - 1);
             } else {
-                return e.value;
+                return e.getValue();
             }
         }
     }
