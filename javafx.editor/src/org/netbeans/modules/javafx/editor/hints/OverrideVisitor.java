@@ -6,11 +6,9 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javafx.tree.JFXImport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;

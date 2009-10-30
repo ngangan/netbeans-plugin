@@ -40,20 +40,18 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -74,47 +72,6 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
 
     public MarkOverriddenTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
-    }
-
-    private void updateAnnotationsoverridden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
-        final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-        final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) == null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
-        final Collection<OverriddeAnnotation> addedAnnotationsCopy = new HashSet<OverriddeAnnotation>(addedAnnotations);
-
-        Runnable update = new Runnable() {
-
-            public void run() {
-                if (document == null) {
-                    return;
-                }
-                if (annotationsToRemoveCopy != null) {
-                    for (Annotation annotation : annotationsToRemoveCopy) {
-                        NbDocument.removeAnnotation(document, annotation);
-                    }
-                }
-                for (OverriddeAnnotation annotation : addedAnnotationsCopy) {
-                    Position position = null;
-                    try {
-                        position = document.createPosition(annotation.getPosition());
-                    } catch (BadLocationException ex) {
-                        ex.printStackTrace();
-                    }
-                    if (document != null && position != null) {
-                        NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
-                    }
-                }
-                annotations.put(document, addedAnnotationsCopy);
-            }
-        };
-        runRunnable(update);
-    }
-
-    private void runRunnable(Runnable task) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            task.run();
-        } else {
-            SwingUtilities.invokeLater(task);
-        }
     }
 
     @Override
@@ -138,67 +95,72 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                     if (overriddenMethods.size() == 0
                             || !isAnnon(classElement)
                             && HintsUtils.checkString(classElement.getSimpleName().toString())) {
-                        updateAnnotationsoverridden(compilationInfo, addedAnotations);
-                        overriddenMethods.remove(classElement);
+                        updateAnnotationsOverridden(compilationInfo, addedAnotations);
                         clear();
                         return;
                     }
                 }
                 for (Element currentClass : classTrees.keySet()) {
-                    if (cancel.get()) {
-                        clear();
-                        return;
-                    }
-                    Collection<Tree> superTypes = classTrees.get(currentClass);
-                    if (superTypes == null) {
+                    if (overriddenMethods.get(currentClass) == null || overriddenMethods.get(currentClass).isEmpty() ) {
                         continue;
                     }
-                    Collection<MethodSymbol> methods = overriddenMethods.get(currentClass);
-                    if (methods == null) {
-                        continue;
-                    }
-                    boolean isCurrentClass = false;
-                    for (MethodSymbol method : methods) {
-                        if (method.owner == currentClass) {
-                            isCurrentClass = true;
-                        }
-                    }
-                    if (!isCurrentClass) {
-                        continue;
-                    }
-                    Tree currentClassTree = compilationInfo.getTrees().getTree(currentClass);
-                    superTypes.add(currentClassTree);
-                    for (Tree superTree : superTypes) {
-                        if (superTree == null) {
-                            continue;
-                        }
-                        if (superTree instanceof JFXClassDeclaration) {
-                            JFXClassDeclaration classDeclaration = ((JFXClassDeclaration) superTree);
-                            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), classDeclaration.getTree());
-                            Element element = compilationInfo.getTrees().getElement(path);
-                            if (element != null && element instanceof JavafxClassSymbol) {
-                                JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
-                                Collection<? extends Element> elements = classSymbol.getEnclosedElements();
-                                recognizeElements(elements, methods, compilationInfo);
+                    ClassSymbol classSymbol = (ClassSymbol) currentClass;
+                    for (Element element : classSymbol.getEnclosedElements()) {
+                        if (element instanceof MethodSymbol) {
+                            MethodSymbol overridden = HintsUtils.isAlreadyDefined(overriddenMethods.get(currentClass), (MethodSymbol) element, compilationInfo);
+                            if (overridden != null) {
+                                Tree tree = compilationInfo.getTrees().getTree(overridden);
+                                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                                int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+                                if (start > 0) {
+                                    addedAnotations.add(new OverriddeAnnotation(start, element.getEnclosingElement()));
+                                }
                             }
                         }
                     }
                 }
-                updateAnnotationsoverridden(compilationInfo, addedAnotations);
+                updateAnnotationsOverridden(compilationInfo, addedAnotations);
                 clear();
             }
 
-            private void recognizeElements(Collection<? extends Element> elements, Collection<MethodSymbol> methods, CompilationInfo compilationInfo) {
-                for (Element element : elements) {
-                    if (element instanceof ExecutableElement) {
-                        MethodSymbol overridden = HintsUtils.isAlreadyDefined(methods, (MethodSymbol) element, compilationInfo);
-                        if (overridden != null) {
-                            Tree tree = compilationInfo.getTrees().getTree(overridden);
-                            SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                            int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                            addedAnotations.add(new OverriddeAnnotation(start, element.getEnclosingElement()));
+            private void updateAnnotationsOverridden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
+                final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
+                final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) == null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
+                final Collection<OverriddeAnnotation> addedAnnotationsCopy = new HashSet<OverriddeAnnotation>(addedAnnotations);
+
+                Runnable update = new Runnable() {
+
+                    public void run() {
+                        if (document == null) {
+                            return;
                         }
+                        if (annotationsToRemoveCopy != null) {
+                            for (Annotation annotation : annotationsToRemoveCopy) {
+                                NbDocument.removeAnnotation(document, annotation);
+                            }
+                        }
+                        for (OverriddeAnnotation annotation : addedAnnotationsCopy) {
+                            Position position = null;
+                            try {
+                                position = document.createPosition(annotation.getPosition());
+                            } catch (BadLocationException ex) {
+                                ex.printStackTrace();
+                            }
+                            if (document != null && position != null) {
+                                NbDocument.addAnnotation(document, position, annotation.getPosition(), annotation);
+                            }
+                        }
+                        annotations.put(document, addedAnnotationsCopy);
                     }
+                };
+                runRunnable(update);
+            }
+
+            private void runRunnable(Runnable task) {
+                if (SwingUtilities.isEventDispatchThread()) {
+                    task.run();
+                } else {
+                    SwingUtilities.invokeLater(task);
                 }
             }
 

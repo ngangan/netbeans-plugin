@@ -40,12 +40,7 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -53,8 +48,9 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.ClassType;
+import com.sun.tools.javac.util.JCDiagnostic;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXImport;
-import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -65,7 +61,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.StyledDocument;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -91,7 +86,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
-    
 
     public OverrideAllTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -115,39 +109,21 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 cancel.set(false);
                 HintsModel modelFix = null;
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (!isValidError(diagnostic.getCode()) || cancel.get()) {
+                    if (!isValidError(diagnostic, compilationInfo) || cancel.get()) {
                         continue;
                     }
-                    JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
-                    Element element = compilationInfo.getTrees().getElement(path);
-                    Tree superTree = compilationInfo.getTreeUtilities().pathFor(diagnostic.getStartPosition()).getLeaf();
-                    String className = null;
-                    if (element != null && element instanceof ClassSymbol) {
-                        ClassSymbol classSymbol = (ClassSymbol) element;
-                        className = classSymbol.getSimpleName().toString();
-                    } else if (superTree instanceof JFXInstanciate) {
-                        final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                        final Tree[] tree = new Tree[1];
-                        JavaFXTreePathScanner<Void, Void> scaner = new JavaFXTreePathScanner<Void, Void>() {
+                    int position = findPosition(compilationInfo, (int) diagnostic.getStartPosition(), (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition()));
+                    if (!(diagnostic instanceof JCDiagnostic) || position < 0) {
+                        continue;
+                    }
 
-                            @Override
-                            public Void visitInstantiate(InstantiateTree node, Void p) {
-                                int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
-                                if (diagnostic.getStartPosition() == position) {
-                                    tree[0] = node;
-                                    return null;
-                                }
-                                return super.visitInstantiate(node, p);
-                            }
-                        };
-                        scaner.scan(compilationInfo.getCompilationUnit(), null);
-                        if (tree[0] != null) {
-                            superTree = tree[0];
-                            className = HintsUtils.getClassSimpleName(superTree.toString());
+                    JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
+                    String className = null;
+                    for (Object arg : jcDiagnostic.getArgs()) {
+                        if (arg instanceof JavafxClassSymbol) {
+                            className = ((JavafxClassSymbol) arg).getSimpleName().toString();
+                            break;
                         }
-                    }
-                    if (findPosition(compilationInfo, superTree) < 0) {
-                        continue;
                     }
                     if (className != null) {
                         final Collection<MethodSymbol> overriddenMethods = new HashSet<MethodSymbol>();
@@ -197,7 +173,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                             if (modelFix == null) {
                                 modelFix = new HintsModel(compilationInfo);
                             }
-                            modelFix.addHint(superTree, abstractMethods);
+                            modelFix.addHint((int) jcDiagnostic.getStartPosition(), (int) jcDiagnostic.getEndPosition(), abstractMethods);
                         }
                     }
                 }
@@ -213,23 +189,41 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         };
     }
 
-    private boolean isValidError(String errorCode) {
-        if (errorCode.equals(ERROR_CODE1) || errorCode.equals(ERROR_CODE2)) {
+    private boolean isValidError(Diagnostic diagnostic, CompilationInfo compilationInfo) {
+        if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
+            for (Diagnostic d : compilationInfo.getDiagnostics()) {
+                if (d != diagnostic && d.getLineNumber() == diagnostic.getLineNumber()) {
+                    return false;
+                }
+            }
             return true;
         }
         return false;
     }
 
-    private int findPosition(CompilationInfo compilationInfo, Tree tree) {
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+    private int findPosition(CompilationInfo compilationInfo, int start, int lenght) {
         Document document = compilationInfo.getDocument();
         try {
-            String text = document.getText(0, document.getLength()).substring(start, document.getLength());
+            String text = document.getText(start, lenght);
+            StringTokenizer st = new StringTokenizer(text);
+            boolean isExtends = false;
+            boolean isClass = false;
+            while(st.hasMoreTokens()) {
+                String token = st.nextToken();
+                if (token.equals("extends")) {
+                    isExtends = true;
+                }
+                if (token.equals("class")) {
+                    isClass = true;
+                }
+            }
+            if (isClass && !isExtends) {
+                return -1;
+            }
             int index = text.indexOf("{"); //NOI18N
             if (index > 0) {
                 return start + index + 1;
-            } else {
+            } else { //
                 return -1;
             }
         } catch (BadLocationException ex) {
@@ -273,7 +267,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 if (methods.toString().length() > 0) {
                     methods.append(space);
                 }
-                final int positon = findPosition(compilationInfo, hint.getTree());
+                final int positon = findPosition(compilationInfo, hint.getStartPosition(), hint.getLength());
                 if (positon < 0) {
                     return null;
                 }
