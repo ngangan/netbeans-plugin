@@ -424,7 +424,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                     if (isDeprecated) {
                         attr.add(ColoringAttributes.DEPRECATED);
                     }
-
+                    
                     identifiers.add(new Result(start, end, ResultTypes.VARIABLE, t, attr)); // identfiers chache
                     break;
                 }
@@ -488,6 +488,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 return super.visitMemberSelect(tree, list);
             }
 
+            boolean handled = false;
             Element element = info.getTrees().getElement(getCurrentPath());
             if (element != null) {
                 SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tu.tokensFor(tree), doc, cancellable);
@@ -498,7 +499,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
                     if (JFXTokenId.IDENTIFIER.equals(t.id())) {
                         start = ts.offset();
-                        JavaFXTreePath subPath = tu.pathFor((int) start);
+                        JavaFXTreePath subPath = tu.pathFor(getCurrentPath(), (int) start);
                         Element subElement = info.getTrees().getElement(subPath);
 
                         if (subElement != null) {
@@ -508,6 +509,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                                 String subElementName = simpleName.toString();
 
                                 if (tokenStr.equals(subElementName)) {
+                                    handled = true;
                                     Set<Modifier> modifiers = element != null ? element.getModifiers() : null;
                                     start = ts.offset();
                                     end = start + t.length();
@@ -535,7 +537,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 }
             }
 
-            return super.visitMemberSelect(tree, list);
+            return handled ? null : super.visitMemberSelect(tree, list);
         }
     }
 
