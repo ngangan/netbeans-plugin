@@ -46,6 +46,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
@@ -99,29 +100,40 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
-                for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (!isValidError(diagnostic.getCode()) || cancel.get()) {
-                        continue;
+                if (!compilationInfo.isErrors()) {
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
+                    return;
+                }
+                Collection<Diagnostic> diagnostics = new ArrayList<Diagnostic>();
+                for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                    if (isValidError(diagnostic)) {
+                        diagnostics.add(diagnostic);
                     }
-                    final Collection<String> imports = new HashSet<String>();
-                    new JavaFXTreePathScanner<Void, Void>() {
+                }
+                if (diagnostics.isEmpty()) {
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
+                    return;
+                }
+                final Collection<String> imports = new HashSet<String>();
+                new JavaFXTreePathScanner<Void, Void>() {
 
-                        @Override
-                        public Void visitImport(ImportTree node, Void p) {
-                            node.getQualifiedIdentifier();
-                            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
-                            Element element = compilationInfo.getTrees().getElement(path);
-                            if (element instanceof ClassSymbol) {
-                                ClassSymbol classSymbol = (ClassSymbol) element;
-                                imports.add(classSymbol.getQualifiedName().toString());
-                            }
-
-                            return super.visitImport(node, p);
+                    @Override
+                    public Void visitImport(ImportTree node, Void p) {
+                        node.getQualifiedIdentifier();
+                        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
+                        Element element = compilationInfo.getTrees().getElement(path);
+                        if (element instanceof ClassSymbol) {
+                            ClassSymbol classSymbol = (ClassSymbol) element;
+                            imports.add(classSymbol.getQualifiedName().toString());
                         }
-                    }.scan(compilationInfo.getCompilationUnit(), null);
+
+                        return super.visitImport(node, p);
+                    }
+                }.scan(compilationInfo.getCompilationUnit(), null);
+                for (final Diagnostic diagnostic : diagnostics) {
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
-                    Tree superTree = compilationInfo.getTreeUtilities().pathFor(diagnostic.getStartPosition()).getLeaf();
+                    Tree superTree = path.getLeaf();
                     String potentialFqn = null;
                     if (element != null && element instanceof ClassSymbol) {
                         ClassSymbol classSymbol = (ClassSymbol) element;
@@ -140,6 +152,17 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                                 }
                                 return super.visitInstantiate(node, p);
                             }
+
+                            @Override
+                            public Void visitVariable(VariableTree node, Void p) {
+                                int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node.getType());
+                                if (diagnostic.getStartPosition() == position) {
+                                    tree[0] = node.getType();
+                                    return null;
+                                }
+                                return super.visitVariable(node, p);
+                            }
+
                         };
                         scaner.scan(compilationInfo.getCompilationUnit(), null);
                         if (tree[0] != null) {
@@ -147,9 +170,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                             potentialFqn = HintsUtils.getClassSimpleName(superTree.toString());
                         }
                     }
-//                    if (findPosition(compilationInfo, superTree) < 0) {
-//                        continue;
-//                    }
                     if (potentialFqn == null || potentialFqn.length() == 0) {
                         return;
                     }
@@ -183,13 +203,17 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                 clear();
             }
 
+
             private void clear() {
                 optionsCache.clear();
                 errors.clear();
             }
 
-            private boolean isValidError(String errorCode) {
-                if (errorCode.equals(ERROR_CODE1) || errorCode.equals(ERROR_CODE2)) {
+            private boolean isValidError(Diagnostic diagnostic) {
+                if (!diagnostic.getMessage(Locale.ENGLISH).contains("cannot find symbol")) {
+                    return false;
+                }
+                if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
                     return true;
                 }
                 return false;

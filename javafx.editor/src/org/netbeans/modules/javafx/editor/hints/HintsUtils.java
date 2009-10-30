@@ -6,7 +6,6 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
@@ -199,16 +198,4 @@ final class HintsUtils {
         return space.toString();
     }
 
-    private static class ParamsComparator implements Comparator<List<VarSymbol>> {
-
-        public int compare(List<VarSymbol> methodList, List<VarSymbol> overriddenMethod) {
-            for (VarSymbol var : methodList) {
-                VarSymbol overriddenVar = overriddenMethod.get(methodList.indexOf(var));
-                if (!var.asType().toString().equals(overriddenVar.asType().toString())) {
-                    return -1;
-                }
-            }
-            return 0;
-        }
-    }
 }
