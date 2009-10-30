@@ -22,6 +22,7 @@ import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,8 +35,12 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.indexing.Context;
@@ -44,6 +49,7 @@ import org.netbeans.modules.parsing.spi.indexing.EmbeddingIndexerFactory;
 import org.netbeans.modules.parsing.spi.indexing.Indexable;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexDocument;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
@@ -428,6 +434,12 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 //            if (!fxresult.getDiagnostics().isEmpty()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
+            JavaFXSource.forFileObject(FileUtil.toFileObject(new File(indexable.getURL().toURI()))).runUserActionTask(new Task<CompilationController>() {
+
+                public void run(CompilationController cc) throws Exception {
+                    FXErrorAnnotator.getInstance().process(cc);
+                }
+            }, true);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Error indexing " + indexable.toString(), e);
             return;

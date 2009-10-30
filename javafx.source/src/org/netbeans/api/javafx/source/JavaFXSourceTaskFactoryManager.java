@@ -66,7 +66,7 @@ final class JavaFXSourceTaskFactoryManager {
     
     /** Creates a new instance of JavaSourceTaskFactoryManager */
     private JavaFXSourceTaskFactoryManager() {
-        final RequestProcessor.Task updateTask = new RequestProcessor("JavaSourceTaskFactoryManager Worker", 1).create(new Runnable() { // NOI18N
+        final RequestProcessor.Task updateTask = new RequestProcessor("JavaFXSourceTaskFactoryManager Worker", 1).create(new Runnable() { // NOI18N
             public void run() {
                 update();
             }
