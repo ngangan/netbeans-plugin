@@ -641,7 +641,9 @@ public class JFXReformatTask implements ReformatTask {
                                 blankLines(cs.getBlankLinesBeforeMethods());
                             }
                             scan(member, p);
-                            blankLines(cs.getBlankLinesAfterMethods());
+                            if (!magicFunc) {
+                                blankLines(cs.getBlankLinesAfterMethods());
+                            }
                             break;
                         case BLOCK_EXPRESSION:
                             if (semiRead && !((BlockExpressionTree) member).isStatic() && ((BlockExpressionTree) member).getStatements().isEmpty()) {
@@ -679,7 +681,9 @@ public class JFXReformatTask implements ReformatTask {
                             blankLines(cs.getBlankLinesAfterClass());
                             break;
                     }
-                    first = false;
+                    if (!magicFunc) {
+                        first = false;
+                    }
                 }
             }
         }
@@ -3106,10 +3110,11 @@ public class JFXReformatTask implements ReformatTask {
             if (mods == null) {
                 return false;
             }
-            final String pattern1 = "synthetic"; // NOI18N
-            final String pattern2 = "script only (default)"; // NOI18N
-            final String modsStr = mods.toString();
-            return modsStr.indexOf(pattern1) == -1 && modsStr.indexOf(pattern2) == -1;
+            final String p1 = "synthetic"; // NOI18N
+            final String p2 = "script only (default)"; // NOI18N
+            final String p3 = "static script only (default)"; // NOI18N
+            final String m = mods.toString().trim();
+            return m.indexOf(p1) == -1 && !m.contentEquals(p2) && !m.contentEquals(p3);
         }
 
         private static class FakeBlock extends JFXBlock {
