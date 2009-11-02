@@ -491,16 +491,20 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitInitDefinition(InitDefinitionTree node, Void p) {
-            return scan(node.getBody(), p);
+            accept(JFXTokenId.INIT);
+            space();
+            scan(node.getBody(), p);
+            return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitPostInitDefinition(InitDefinitionTree node, Void p) {
-            return scan(node.getBody(), p);
+            accept(JFXTokenId.POSTINIT);
+            space();
+            scan(node.getBody(), p);
+            return true;
         }
 
         @Override
