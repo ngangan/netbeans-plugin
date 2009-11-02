@@ -922,7 +922,7 @@ public class JFXReformatTask implements ReformatTask {
                 id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
                         JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
                         JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
-                        JFXTokenId.AT, JFXTokenId.MIXIN);
+                        JFXTokenId.AT, JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
                 if (id == null) {
                     rollback(index, c, d);
                     break;
