@@ -649,6 +649,14 @@ public class JFXReformatTask implements ReformatTask {
                                 blankLines(cs.getBlankLinesAfterMethods());
                             }
                             break;
+                        case INIT_DEFINITION:
+                        case POSTINIT_DEFINITION:
+                            if (!first) {
+                                blankLines(cs.getBlankLinesBeforeMethods());
+                            }
+                            scan(member, p);
+                            blankLines(cs.getBlankLinesAfterMethods());
+                            break;
                         case BLOCK_EXPRESSION:
                             if (semiRead && !((BlockExpressionTree) member).isStatic() && ((BlockExpressionTree) member).getStatements().isEmpty()) {
                                 semiRead = false;
@@ -1139,8 +1147,8 @@ public class JFXReformatTask implements ReformatTask {
                         tokens.moveNext();
                     }
                     accept(JFXTokenId.RBRACE);
+                    indent = old;
                 }
-                indent = old;
             }
             return true;
         }
