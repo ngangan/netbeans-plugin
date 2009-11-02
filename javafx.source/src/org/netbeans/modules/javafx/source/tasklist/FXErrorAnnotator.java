@@ -39,41 +39,41 @@
 
 package org.netbeans.modules.javafx.source.tasklist;
 
+import com.sun.javafx.api.tree.Tree;
 import java.awt.Image;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.lang.model.element.Element;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
-import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
 import org.netbeans.modules.masterfs.providers.AnnotationProvider;
 import org.netbeans.modules.masterfs.providers.InterceptionListener;
-import org.netbeans.modules.parsing.api.Source;
-import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileStatusEvent;
-import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
-import org.openide.util.RequestProcessor;
+import org.openide.util.lookup.ServiceProvider;
 import static org.openide.util.ImageUtilities.assignToolTipToImage;
 import static org.openide.util.ImageUtilities.loadImage;
 import static org.openide.util.ImageUtilities.mergeImages;
@@ -82,15 +82,16 @@ import static org.openide.util.NbBundle.getMessage;
 /**
  *
  * @author answer
+ * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
+@ServiceProvider(service=AnnotationProvider.class)
 public class FXErrorAnnotator extends AnnotationProvider {
+    private static final Logger LOGGER = Logger.getLogger(FXErrorAnnotator.class.getName());
+    private static final boolean ISDEBUG = LOGGER.isLoggable(Level.FINEST);
 
     private static final String ERROR_BADGE_URL = "org/netbeans/modules/javafx/source/resources/icons/error-badge.gif"; // NOI18N
     private static final Image ERROR_BADGE_SINGLE;
     private static final Image ERROR_BADGE_FOLDER;
-
-    /** Prevent never ending update loops */
-    private boolean dontUpdate;
 
     static {
         URL errorBadgeIconURL = FXErrorAnnotator.class.getClassLoader().getResource(ERROR_BADGE_URL);
@@ -100,28 +101,82 @@ public class FXErrorAnnotator extends AnnotationProvider {
         ERROR_BADGE_FOLDER = assignToolTipToImage(loadImage(ERROR_BADGE_URL), errorBadgeFolderTP);
     }
 
+    final private class ErrorCounter {
+        private int count;
+        final FileObject fo;
+        final private ReadWriteLock lock = new ReentrantReadWriteLock();
+
+        public ErrorCounter(FileObject fo) {
+            this.count = 0;
+            this.fo = fo;
+        }
+
+        public void setError(boolean err) {
+            try {
+                lock.writeLock().lock();
+                if (err ^ isError()) {
+                    if (err) {
+                        this.count++;
+                        filesWithModifiedStatus.add(fo);
+                    } else {
+                        if (this.count > 0) {
+                            if (--count == 0) {
+                                filesWithModifiedStatus.add(fo);
+                            }
+                        }
+                    }
+                }
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+
+        public boolean isError() {
+            try {
+                lock.readLock().lock();
+                return this.count > 0;
+            } finally {
+                lock.readLock().unlock();
+            }
+        }
+
+        public String toString() {
+            return fo.getPath() + " : " + this.count + " errors"; // NOI18N
+        }
+    }
+
+    final private ExecutorService processor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "JavaFX Error Annotator Worker Thread"); // NOI18N
+        }
+    });
+
+    final private ReadWriteLock errorMapLock = new ReentrantReadWriteLock();
+    final private Map<FileObject, ErrorCounter> errorMap = new WeakHashMap<FileObject, ErrorCounter>();
+    final private Set<FileObject> filesWithModifiedStatus = new HashSet<FileObject>();
+
     @Override
-    public String annotateName(String name, Set files) {
+    public Action[] actions(Set<? extends FileObject> set) {
         return null;
     }
 
     @Override
-    public Image annotateIcon(Image icon, int iconType, Set<? extends FileObject> files) {
+    public Image annotateIcon(Image image, int iconType, Set<? extends FileObject> files) {
         boolean inError = false;
         boolean singleFile = files.size() == 1;
 
         if (files instanceof NonRecursiveFolder) {
             FileObject folder = ((NonRecursiveFolder) files).getFolder();
-            inError = isInError(folder, false, true);
+            inError = isInError(folder);
             singleFile = false;
         } else {
             for (Object o : files) {
                 if (o instanceof FileObject) {
                     FileObject f = (FileObject) o;
-
                     if (f.isFolder()) {
                         singleFile = false;
-                        if (isInError(f, true, !inError)) {
+                        if (isInError(f)) {
                             inError = true;
                             continue;
                         }
@@ -129,7 +184,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
                             continue;
                     } else {
                         if (f.isData() && "fx".equals(f.getExt())) { // NOI18N
-                            if (isInError(f, true, !inError)) {
+                            if (isInError(f)) {
                                 inError = true;
                             }
                         }
@@ -140,13 +195,9 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
         if (inError) {
             //badge:
-            Image i = mergeImages(icon, singleFile ? ERROR_BADGE_SINGLE : ERROR_BADGE_FOLDER, 0, 8);
-            Iterator<? extends AnnotationProvider> it = Lookup.getDefault().lookupAll(AnnotationProvider.class).iterator();
+            Image i = mergeImages(image, singleFile ? ERROR_BADGE_SINGLE : ERROR_BADGE_FOLDER, 0, 8);
             boolean found = false;
-
-            while (it.hasNext()) {
-                AnnotationProvider p = it.next();
-
+            for(AnnotationProvider p : Lookup.getDefault().lookupAll(AnnotationProvider.class)) {
                 if (found) {
                     Image res = p.annotateIcon(i, iconType, files);
 
@@ -160,17 +211,16 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
             return i;
         }
-
         return null;
     }
 
     @Override
-    public String annotateNameHtml(String name, Set files) {
+    public String annotateName(String string, Set<? extends FileObject> set) {
         return null;
     }
 
     @Override
-    public Action[] actions(Set files) {
+    public String annotateNameHtml(String string, Set<? extends FileObject> set) {
         return null;
     }
 
@@ -179,200 +229,138 @@ public class FXErrorAnnotator extends AnnotationProvider {
         return null;
     }
 
-    public void updateAllInError() {
-        try {
-            File[] roots = File.listRoots();
-            for (File root : roots) {
-                FileObject rootFO = FileUtil.toFileObject(root);
-
-                if (rootFO != null) {
-                    fireFileStatusChanged(new FileStatusEvent(rootFO.getFileSystem(), true, false));
-                }
-            }
-        } catch (FileStateInvalidException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-        }
+    final public static FXErrorAnnotator getInstance() {
+        return Lookup.getDefault().lookup(FXErrorAnnotator.class);
     }
 
-    public synchronized void updateInError(Set<URL> urls)  {
-        if (dontUpdate) {
-            // coming back from moveToSource that we triggered from bellow
+    public void process(final CompilationInfo ci) {
+        processor.submit(new Runnable() {
+
+            public void run() {
+                if (ISDEBUG) {
+                    LOGGER.finest("Processing " + ci.getFileObject().getPath()); // NOI18N
+                }
+                filesWithModifiedStatus.clear();
+                doProcess(ci, ci.isErrors());
+                if (ISDEBUG) {
+                    LOGGER.finest("===== ERROR MAP ====="); // NOI18N
+                    for(ErrorCounter ec : errorMap.values()) {
+                        LOGGER.finest(ec.toString());
+                    }
+                    LOGGER.finest("====================="); // NOI18N
+                }
+                if (!filesWithModifiedStatus.isEmpty()) {
+                    if (ISDEBUG) {
+                        StringBuilder sb = new StringBuilder();
+                        for(FileObject fo : filesWithModifiedStatus) {
+                            sb.append(fo.getName()).append(",");
+                        }
+                        LOGGER.finest(sb.toString());
+                    }
+                    try {
+                        fireFileStatusChanged(new FileStatusEvent(ci.getFileObject().getFileSystem(), filesWithModifiedStatus, true, false));
+                    } catch (FileStateInvalidException ex) {
+                        ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
+                    }
+                }
+            }
+        });
+    }
+
+    private void doProcess(CompilationInfo ci, boolean isError) {
+        FileObject origFo = ci.getFileObject();
+        if (ISDEBUG) {
+            LOGGER.finest("Checking " + origFo); // NOI18N
+        }
+
+        final boolean err = ci.isErrors();
+        boolean storedErr = getErrorCounter(origFo).isError();
+
+        // don't attempt to process if the error status is not changing
+        if (!(storedErr ^ isError)) {
+            if (ISDEBUG) {
+                LOGGER.finest("Not processing. Old err = " + storedErr + ", new err = " + isError); // NOI18N
+            }
             return;
         }
-        Set<FileObject> toRefresh = new HashSet<FileObject>();
-        for (Iterator<FileObject> it = knownFiles2Error.keySet().iterator(); it.hasNext(); ) {
-            FileObject f = it.next();
-            try {
-                if (urls.contains(f.getURL())) {
-                    toRefresh.add(f);
-                    Integer i = knownFiles2Error.get(f);
 
-                    if (i != null) {
-                        knownFiles2Error.put(f, i | INVALID);
+        ErrorCounter errorCnt = getErrorCounter(origFo);
 
-                        enqueue(f);
-                    }
-                }
-            } catch (IOException e) {
-                ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, e);
-            }
+        if (isError ^ errorCnt.isError()) {
+            FileObject top = FileOwnerQuery.getOwner(origFo).getProjectDirectory();
+            setErrorFlag(errorCnt, isError, top);
         }
-    }
 
-    public void fireFileStatusChanged(Set<FileObject> fos) {
-        if (fos.isEmpty())
-            return ;
         try {
-            fireFileStatusChanged(new FileStatusEvent(fos.iterator().next().getFileSystem(), fos, true, false));
-        } catch (FileStateInvalidException ex) {
-            ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-        }
-    }
-
-    public static FXErrorAnnotator getAnnotator() {
-        for (AnnotationProvider ap : Lookup.getDefault().lookupAll(AnnotationProvider.class)) {
-            if (ap.getClass() == FXErrorAnnotator.class) {
-                return (FXErrorAnnotator) ap;
-            }
-        }
-
-        return null;
-    }
-
-    private static final int IN_ERROR_REC = 1;
-    private static final int IN_ERROR_NONREC = 2;
-    private static final int INVALID = 4;
-
-    private Map<FileObject, Integer> knownFiles2Error = new WeakHashMap<FileObject, Integer>();
-
-    private synchronized boolean isInError(FileObject file, boolean recursive, boolean forceValue) {
-        boolean result = false;
-        Integer i = knownFiles2Error.get(file);
-
-        if (i != null) {
-            result = (i & (recursive ? IN_ERROR_REC : IN_ERROR_NONREC)) != 0;
-
-            if ((i & INVALID) == 0)
-                return result;
-        }
-
-        if (!forceValue) {
-            if (i == null) {
-                knownFiles2Error.put(file, null);
-            }
-            return result;
-        }
-
-        enqueue(file);
-        return result;
-    }
-
-    public boolean haveError(FileObject file, boolean recursive) {
-        if (file.isData()) {
-            if (!file.getExt().equals("fx")){ // NOI18N
-                return false;
-            }
-            final Source source = Source.create(file);
-            final boolean isErr[] = {false};
-            try{
-                if (source == null) {
-                    return false;
-                }
-                JavaFXParserResult parserResult = JavaFXParserResult.create(source, null);
-                final CompilationController compilationController = CompilationController.create(parserResult);
-                compilationController.runWhenScanFinished(new CancellableTask<CompilationController>(){
-                    public void cancel() {
-                    }
-
-                    public void run(CompilationController cc) throws Exception {
-                        try {
-                            dontUpdate = true;
-                            if (!cc.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                                isErr[0] = compilationController.isErrors();
-                            }
-                        } finally {
-                            dontUpdate = false;
+            ClassIndex index = ci.getClasspathInfo().getClassIndex();
+            for(Tree t : ci.getCompilationUnit().getTypeDecls()) {
+                Element e = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), t));
+                for(FileObject fo : index.getResources(ElementHandle.create(e),  EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
+                    JavaFXSource.forFileObject(fo).runUserActionTask(new Task<CompilationController>() {
+                        public void run(CompilationController cc) throws Exception {
+                            doProcess(cc, err);
                         }
-                    }
-                });
-            }catch(IOException e){
-                e.printStackTrace();
-            } catch (ParseException e) {
-                Exceptions.printStackTrace(e);
-            }
 
-            return isErr[0];
-        } else {
-            FileObject[] childs = file.getChildren();
-            for(int i = 0;i < childs.length; i++){
-                if (haveError(childs[i], true)){
+                    }, false);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "error compiling javafx source", e); // NOI18N
+        }
+    }
+
+    private void setParentErrorFlag(FileObject fo, boolean isError, FileObject top) {
+        FileObject parent = fo.getParent();
+        ErrorCounter errorCnt = getErrorCounter(parent);
+        setErrorFlag(errorCnt, isError, top);
+    }
+
+    private void setErrorFlag(ErrorCounter errorCnt, boolean isError, FileObject top) {
+        if (isError ^ errorCnt.isError()) {
+            errorCnt.setError(isError);
+            if (errorCnt.fo != top) {
+                setParentErrorFlag(errorCnt.fo, isError, top);
+            }
+        }
+    }
+
+    private boolean isInError(FileObject fo) {
+        try {
+            errorMapLock.readLock().lock();
+            ErrorCounter ec = errorMap.get(fo);
+            if (ec == null) {
+                try {
+                    JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+                    if (jfxs != null) {
+                        jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                            public void run(CompilationController ci) throws Exception {
+                                process(ci);
+                            }
+                        }, true);
+                    }
+                } catch (IOException e) {
                     return true;
                 }
+                return false;
             }
- 
-            return false;
+            return ec.isError();
+        } finally {
+            errorMapLock.readLock().unlock();
         }
     }
 
-    private void enqueue(FileObject file) {
-        if (toProcess == null) {
-            toProcess = new LinkedList<FileObject>();
-            WORKER.schedule(50);
+    private ErrorCounter getErrorCounter(FileObject fo) {
+        try {
+            errorMapLock.writeLock().lock();
+            ErrorCounter ec = errorMap.get(fo);
+            if (ec == null) {
+                ec = new ErrorCounter(fo);
+                errorMap.put(fo, ec);
+            }
+            return ec;
+        } finally {
+            errorMapLock.writeLock().unlock();
         }
-
-        toProcess.add(file);
     }
-
-    private Collection<FileObject> toProcess = null;
-
-    private final RequestProcessor.Task WORKER = new RequestProcessor("ErrorAnnotator worker", 1).create(new Runnable() { // NOI18N
-        public void run() {
-            Collection<FileObject> toProcess;
-
-            synchronized (FXErrorAnnotator.this) {
-                toProcess = FXErrorAnnotator.this.toProcess;
-                FXErrorAnnotator.this.toProcess = null;
-            }
-
-            for (FileObject f : toProcess) {
-                boolean recError = false;
-                boolean nonRecError = false;
-                if (f.isData()) {
-                    recError = nonRecError = haveError(f, true);
-                } else {
-                    boolean handled = false;
-                    Project p = FileOwnerQuery.getOwner(f);
-
-                    if (p != null) {
-                        for (SourceGroup sg : ProjectUtils.getSources(p).getSourceGroups("java")) { // NOI18N
-                            FileObject sgRoot = sg.getRootFolder();
-
-                            if ((FileUtil.isParentOf(f, sgRoot) || f == sgRoot) && haveError(sgRoot, true)) {
-                                recError = true;
-                                nonRecError = false;
-                                handled = true;
-                                break;
-                            }
- 
-                        }
-                    }
-
-                    if (!handled) {
-                        recError = haveError(f, true);
-                        nonRecError = haveError(f, false);
-                    }
- 
-                }
-
-                Integer value = (recError ? IN_ERROR_REC : 0) | (nonRecError ? IN_ERROR_NONREC : 0);
-
-                synchronized (FXErrorAnnotator.this) {
-                    knownFiles2Error.put(f, value);
-                }
-
-                fireFileStatusChanged(Collections.singleton(f));
-            }
-        }
-    });
-
 }

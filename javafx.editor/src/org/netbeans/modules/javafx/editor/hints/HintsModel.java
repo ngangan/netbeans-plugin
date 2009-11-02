@@ -66,8 +66,8 @@ final class HintsModel {
         addHint(null, tree);
     }
 
-    void addHint(Tree tree, Collection<MethodSymbol> methods) {
-        addHint(tree, methods, null, null, null, null);
+    void addHint(int startPosition,int endPosition, Collection<MethodSymbol> methods) {
+        addHint(null, methods, null, null, startPosition, endPosition);
     }
 
     Hint addHint(Collection<Type> thrownExceptions, Tree tree) {
@@ -93,10 +93,10 @@ final class HintsModel {
             return hints.get(tree);
         }
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        if (start == null) {
+        if (start == null && tree != null) {
             start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
         }
-        if (end == null) {
+        if (end == null && tree != null) {
             end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
         }
         int length = end - start;

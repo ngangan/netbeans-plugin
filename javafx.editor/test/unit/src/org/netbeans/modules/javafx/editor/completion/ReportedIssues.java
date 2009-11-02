@@ -40,30 +40,13 @@
  */
 package org.netbeans.modules.javafx.editor.completion;
 
-public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
+public class ReportedIssues extends CompletionTestBase {
 
-    public JavaFXCompletionProviderBasicTest(String testName) {
+    public ReportedIssues(String testName) {
         super(testName);
     }
 
-    public void testPackages() throws Exception {
-        checkCompletion("Model", "package ^javafxapplication2;", "packages.pass");
+    public void testIssue175333() throws Exception {
+        checkCompletion("Iz175333", "ba^", "iz175333.pass");
     }
-
-    public void testOnlyPackageFile() throws Exception {
-        checkCompletion("OnlyPackage", "^package abcd;", "topLevelKeywords.pass");
-    }
-
-    public void testColorRGBParams() throws Exception {
-        checkCompletion("Color", "var c = Color.rgb(^50, 100, 150);", "colorRGBParams.pass");
-    }
-
-    public void testConstructorsArgs() throws Exception {
-        checkCompletion("Model", "var velorex = Car {^id: \"vlrx1234\"", "constructorArgs.pass");
-    }
-
-    public void testClassMethods() throws Exception { // #174732
-        checkCompletion("ClassMethods", "timeline.^", "classMethods.pass");
-    }
-
 }

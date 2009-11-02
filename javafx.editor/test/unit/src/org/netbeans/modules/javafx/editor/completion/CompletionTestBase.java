@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -71,6 +70,7 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Language;
+import org.netbeans.junit.AssertionFileFailedError;
 import org.netbeans.modules.editor.completion.CompletionItemComparator;
 import org.netbeans.modules.java.source.TreeLoader;
 import org.netbeans.modules.java.source.usages.BinaryAnalyser;
@@ -286,8 +286,14 @@ public class CompletionTestBase extends JavaFXTestBase {
         File goldenFile = new File(getDataDir(), "/goldenfiles/org/netbeans/modules/javafx/editor/completion/JavaFXCompletionProviderTest/" + goldenFileName);
         File diffFile = new File(getWorkDir(), getName() + ".diff");
         String message = "The files:\n  " + goldenFile.getAbsolutePath() + "\n  " +
-                output.getAbsolutePath() + "\nshould have the same content.";
-        assertFile(message, output, goldenFile, diffFile);
+                output.getAbsolutePath() + "\nshould have the same content.\n" +
+                "  check diff: " + diffFile.getAbsolutePath();
+        try {
+            assertFile(message, output, goldenFile, diffFile);
+        } catch (AssertionFileFailedError affe) {
+            System.err.println(diffFile.getAbsolutePath() + " content:\n" + slurp(diffFile));
+            throw affe;
+        }
 
         LifecycleManager.getDefault().saveAll();
     }

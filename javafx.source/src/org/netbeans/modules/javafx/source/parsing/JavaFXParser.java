@@ -50,14 +50,11 @@ import com.sun.tools.javafxdoc.Messager;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -69,12 +66,9 @@ import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationPhase;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
 import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.classpath.SourceFileObject;
-import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.api.Task;
@@ -83,9 +77,7 @@ import org.netbeans.modules.parsing.spi.Parser;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.SourceModificationEvent;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileStateInvalidException;
 import org.openide.util.ChangeSupport;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -297,29 +289,6 @@ public final class JavaFXParser extends Parser {
                 return currentPhase;
             }
             currentPhase = CompilationPhase.ANALYZED;
-
-            //update error annotations in projects tree
-
-            Set<URL> urls = new HashSet<URL>();
-
-            try {
-                FileObject f = fileObject();
-                urls.add(f.getURL());
-                Project proj = FileOwnerQuery.getOwner(f);
-                if (proj != null) {
-                    do {
-                        f = f.getParent();
-                        if (f != null) {
-                            urls.add(f.getURL());
-                        } else {
-                            break;
-                        }
-                    } while (proj.getProjectDirectory() != f);
-                }
-            } catch (FileStateInvalidException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            FXErrorAnnotator.getAnnotator().updateInError(urls);
 
             long end = System.currentTimeMillis();
             Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {fileObject(), end-start}); // NOI18N
