@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
@@ -91,7 +92,7 @@ import org.openide.filesystems.FileObject;
  */
 public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
-    private Document document;
+    private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MarkUnusedElementsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -99,18 +100,19 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        this.document = FXSourceUtils.getDocument(file);
-
+        final Document document = FXSourceUtils.getDocument(file);
+       
         return new CancellableTask<CompilationInfo>() {
 
             public void cancel() {
+                cancel.set(true);
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                cancel.set(false);
                 final Map<Element, Tree> varInit = new HashMap<Element, Tree>();
                 final Map<Tree, String> varNames = new HashMap<Tree, String>();
                 final Map<Element, Tree> varToRemove = new HashMap<Element, Tree>();
-
 
                 JavaFXTreePathScanner<Void, Void> varVisitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -118,6 +120,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
                         if (!parentClass
                                 && modifiers.size() == 0
@@ -132,6 +137,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitInstantiate(InstantiateTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         addToRemove(node);
 
                         return super.visitInstantiate(node, v);
@@ -139,6 +147,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitVariable(VariableTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
                         if (element != null && element.getSimpleName() != null) {
@@ -156,12 +167,19 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitIdentifier(IdentifierTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         addToRemove(node);
+
                         return super.visitIdentifier(node, v);
                     }
 
                     @Override
                     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         for (Tree tree : node.getFunctionValue().getParameters()) {
                             addToInit(tree);
                         }
@@ -182,6 +200,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitForExpression(ForExpressionTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         for (Tree tree : node.getInClauses()) {
                             if (tree instanceof JFXForExpressionInClause) {
                                 Tree variable = ((JFXForExpressionInClause) tree).getVariable();
@@ -194,6 +215,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitCatch(CatchTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         addToInit(node.getParameter());
 
                         return super.visitCatch(node, v);
@@ -201,6 +225,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
                     @Override
                     public Void visitMethodInvocation(FunctionInvocationTree node, Void v) {
+                        if (cancel.get()) {
+                            return null;
+                        }
                         addToRemove(node);
 
                         return super.visitMethodInvocation(node, v);
@@ -238,8 +265,10 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         varToRemove.put(element, node);
                     }
                 };
-
                 varVisitor.scan(compilationInfo.getCompilationUnit(), null);
+                if (cancel.get()) {
+                    return;
+                }
                 for (Element element : varInit.keySet()) {
                     Tree tree = varInit.get(element);
                     if (tree instanceof JFXVar) {
@@ -253,6 +282,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     if (varInit.containsKey(element)) {
                         varInit.remove(element);
                     }
+                }
+                if (varInit.isEmpty()) {
+                    return;
                 }
                 SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                 Collection<Position> positions = new HashSet<Position>(varInit.size());
@@ -287,15 +319,15 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     positions.add(new Position((int) start, (int) end));
                 }
                 if (SwingUtilities.isEventDispatchThread()) {
-                    updateEditor(positions).run();
+                    updateEditor(positions, document).run();
                 } else {
-                    SwingUtilities.invokeLater(updateEditor(positions));
+                    SwingUtilities.invokeLater(updateEditor(positions, document));
                 }
             }
         };
     }
 
-    private Runnable updateEditor(final Collection<Position> positions) {
+    private Runnable updateEditor(final Collection<Position> positions, final Document document) {
         return new Runnable() {
 
             public void run() {
