@@ -235,7 +235,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             }
         }
 
-        public void attributeName(String name, int startOff) throws FXDException {
+        public void attributeName(String name, int startOff, boolean isMeta) throws FXDException {
             addTokenData(FXDTokenId.IDENTIFIER_ATTR, startOff, name.length());
         }
 
