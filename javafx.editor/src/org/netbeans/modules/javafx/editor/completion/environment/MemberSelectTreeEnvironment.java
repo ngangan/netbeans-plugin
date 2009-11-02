@@ -151,8 +151,6 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         if (LOGGABLE) log("   el(3) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
                         if (el != null && el instanceof PackageElement) {                                
                             addPackageContent((PackageElement)el, null, null, false);
-                        } else {
-                            addAllTypes(null, false, exp.toString());
                         }
                 }
             } else if (parent.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT && ((UnitTree)parent).getPackageName() == fa) {

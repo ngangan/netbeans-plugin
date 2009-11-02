@@ -73,6 +73,7 @@ import org.netbeans.api.lexer.Language;
 import org.netbeans.junit.AssertionFileFailedError;
 import org.netbeans.modules.editor.completion.CompletionItemComparator;
 import org.netbeans.modules.java.source.TreeLoader;
+import org.netbeans.modules.java.source.indexing.JavaBinaryIndexer;
 import org.netbeans.modules.java.source.usages.BinaryAnalyser;
 import org.netbeans.modules.java.source.usages.ClassIndexImpl;
 import org.netbeans.modules.java.source.usages.ClassIndexManager;
@@ -81,10 +82,13 @@ import org.netbeans.modules.javafx.dataloader.JavaFXDataLoader;
 import org.netbeans.modules.javafx.editor.JavaFXEditorKit;
 import org.netbeans.modules.javafx.platform.JavaFXTestBase;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
+import org.netbeans.modules.parsing.impl.indexing.RepositoryUpdater;
+import org.netbeans.modules.parsing.spi.indexing.BinaryIndexer;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 import org.netbeans.spi.editor.mimelookup.MimeDataProvider;
 import org.netbeans.spi.java.classpath.ClassPathProvider;
+import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.LifecycleManager;
 
@@ -260,7 +264,7 @@ public class CompletionTestBase extends JavaFXTestBase {
         assertNotNull(testSourceFO);
         DataObject testSourceDO = DataObject.find(testSourceFO);
         assertNotNull(testSourceDO);
-        EditorCookie ec = (EditorCookie) testSourceDO.getCookie(EditorCookie.class);
+        EditorCookie ec = testSourceDO.getCookie(EditorCookie.class);
         assertNotNull(ec);
         final Document doc = ec.openDocument();
         assertNotNull(doc);
@@ -311,7 +315,7 @@ public class CompletionTestBase extends JavaFXTestBase {
 
     private static ClassPath createClassPath(String classpath) {
         StringTokenizer tokenizer = new StringTokenizer(classpath, File.pathSeparator);
-        List/*<PathResourceImplementation>*/ list = new ArrayList();
+        List<PathResourceImplementation> list = new ArrayList<PathResourceImplementation>();
         while (tokenizer.hasMoreTokens()) {
             String item = tokenizer.nextToken();
             File f = FileUtil.normalizeFile(new File(item));
