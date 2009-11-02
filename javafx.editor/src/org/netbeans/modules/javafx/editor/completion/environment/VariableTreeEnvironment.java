@@ -39,6 +39,7 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
+import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
@@ -46,6 +47,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 
+import com.sun.tools.javafx.tree.JFXSelect;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
@@ -68,9 +70,8 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
     @Override
     protected void inside(VariableTree t) throws IOException {
         if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset); // NOI18N
-        VariableTree var = t;
         boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
-        Tree type = var.getType();
+        Tree type = t.getType();
         int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos); // NOI18N
         if (offset <= typePos) {
@@ -92,6 +93,11 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             if (last.token().id() == JFXTokenId.BIND) {
                 addKeyword(LAZY_KEYWORD, null, false);
             }
+        }
+        ExpressionTree initializer = t.getInitializer();
+        if (initializer instanceof JFXSelect) {
+            String typeS = ((JFXSelect) initializer).getExpression().toString();
+            addAllTypes(null, false, typeS);
         }
     }
 

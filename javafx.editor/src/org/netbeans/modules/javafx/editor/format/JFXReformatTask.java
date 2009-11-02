@@ -491,16 +491,20 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitInitDefinition(InitDefinitionTree node, Void p) {
-            return scan(node.getBody(), p);
+            accept(JFXTokenId.INIT);
+            space();
+            scan(node.getBody(), p);
+            return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitPostInitDefinition(InitDefinitionTree node, Void p) {
-            return scan(node.getBody(), p);
+            accept(JFXTokenId.POSTINIT);
+            space();
+            scan(node.getBody(), p);
+            return true;
         }
 
         @Override
@@ -641,6 +645,16 @@ public class JFXReformatTask implements ReformatTask {
                                 blankLines(cs.getBlankLinesBeforeMethods());
                             }
                             scan(member, p);
+                            if (!magicFunc) {
+                                blankLines(cs.getBlankLinesAfterMethods());
+                            }
+                            break;
+                        case INIT_DEFINITION:
+                        case POSTINIT_DEFINITION:
+                            if (!first) {
+                                blankLines(cs.getBlankLinesBeforeMethods());
+                            }
+                            scan(member, p);
                             blankLines(cs.getBlankLinesAfterMethods());
                             break;
                         case BLOCK_EXPRESSION:
@@ -679,7 +693,9 @@ public class JFXReformatTask implements ReformatTask {
                             blankLines(cs.getBlankLinesAfterClass());
                             break;
                     }
-                    first = false;
+                    if (!magicFunc) {
+                        first = false;
+                    }
                 }
             }
         }
@@ -906,7 +922,7 @@ public class JFXReformatTask implements ReformatTask {
                 id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
                         JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
                         JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
-                        JFXTokenId.AT, JFXTokenId.MIXIN);
+                        JFXTokenId.AT, JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
                 if (id == null) {
                     rollback(index, c, d);
                     break;
@@ -1131,8 +1147,8 @@ public class JFXReformatTask implements ReformatTask {
                         tokens.moveNext();
                     }
                     accept(JFXTokenId.RBRACE);
+                    indent = old;
                 }
-                indent = old;
             }
             return true;
         }
@@ -3106,10 +3122,11 @@ public class JFXReformatTask implements ReformatTask {
             if (mods == null) {
                 return false;
             }
-            final String pattern1 = "synthetic"; // NOI18N
-            final String pattern2 = "script only (default)"; // NOI18N
-            final String modsStr = mods.toString();
-            return modsStr.indexOf(pattern1) == -1 && modsStr.indexOf(pattern2) == -1;
+            final String p1 = "synthetic"; // NOI18N
+            final String p2 = "script only (default)"; // NOI18N
+            final String p3 = "static script only (default)"; // NOI18N
+            final String m = mods.toString().trim();
+            return m.indexOf(p1) == -1 && !m.contentEquals(p2) && !m.contentEquals(p3);
         }
 
         private static class FakeBlock extends JFXBlock {

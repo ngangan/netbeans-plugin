@@ -111,7 +111,7 @@ public enum JFXTokenId implements TokenId {
     INSERT("keyword", 34, "insert"), // NOI18N
     INSTANCEOF("keyword", 35, "instanceof"), // NOI18N
     INTO("keyword", 36, "into"), // NOI18N
-    INVALIDC("keyword", 134, "invalidc"), // NOI18N
+    INVALIDC("keyword", 134), // NOI18N
     INVERSE("keyword", 37, "inverse"), // NOI18N
     JavaIDDigit("identifier", 129), // NOI18N
     LAST("keyword", 38, "last"), // NOI18N

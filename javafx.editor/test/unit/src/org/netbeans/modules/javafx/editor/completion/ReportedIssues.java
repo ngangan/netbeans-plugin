@@ -49,4 +49,13 @@ public class ReportedIssues extends CompletionTestBase {
     public void testIssue175333() throws Exception {
         checkCompletion("Iz175333", "ba^", "iz175333.pass");
     }
+
+    public void testIssue159678() throws Exception {
+        // XXX: seeems that we need JavaBinaryIndexer to be registered during
+        // test run. Do not know how to do that correctly yet.
+        // checkCompletion("Iz159678", "var color = Color^.", "iz159678beforeDot.pass");
+        checkCompletion("Iz159678", "Color.^", "iz159678afterDot.pass");
+    }
+
 }
+
