@@ -195,7 +195,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                 }
 
                 public void attribute(Object node, String name, String value,
-                        int startOff, int endOff) throws FXDException {
+                        int startOff, int endOff, boolean isMeta) throws FXDException {
                     NodeBuilder deb = (NodeBuilder) node;
                     if ( value == null) {
                         try {
@@ -213,6 +213,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                        }
                     }
                     // TODO parse value. This will allow to handle functions and references
+                    // TODO handle meta separately
                     deb.addAttribute( name, value, startOff, endOff);
                 }
 

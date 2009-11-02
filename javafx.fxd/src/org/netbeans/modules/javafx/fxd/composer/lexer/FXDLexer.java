@@ -334,7 +334,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             }
 
             m_tokenizedLength += len;
-            TokenData<FXDTokenId> tData = new TokenData(id, len, propProvider);
+            TokenData<FXDTokenId> tData = new TokenData<FXDTokenId>(id, len, propProvider);
             m_tokensList.add(tData);
             return tData;
         }

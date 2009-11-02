@@ -19,6 +19,7 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.*;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -186,6 +187,28 @@ final class DocumentElementWrapper {
 
         public synchronized void setReferenceID(int refID) {
             m_refID = refID;
+        }
+
+        // TODO do we need and can support meta? or 
+        public int getMetaNum() {
+            return 0;
+        }
+
+        public Enumeration getMetaKeys() {
+            return new Enumeration() {
+
+                public boolean hasMoreElements() {
+                    return false;
+                }
+
+                public Object nextElement() {
+                    return null;
+                }
+            };
+        }
+
+        public Object getMetaValue(String string) {
+            return null;
         }
     }
 
