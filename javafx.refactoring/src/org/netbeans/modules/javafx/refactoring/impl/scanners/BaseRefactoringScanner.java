@@ -34,7 +34,6 @@ import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
@@ -96,7 +95,7 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
         Element el = getCompilationController().getTrees().getElement(path);
         if (el != null) {
             return el == origElement;
-            }
+        }
         return false;
     }
 }

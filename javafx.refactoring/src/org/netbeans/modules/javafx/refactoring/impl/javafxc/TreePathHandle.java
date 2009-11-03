@@ -111,6 +111,9 @@ final public class TreePathHandle {
 
     static public TreePathHandle create(JavaFXTreePath path, CompilationInfo cc) {
         long[] pos = findPos(path.getLeaf(), cc);
+        if (path.getLeaf().getJavaFXKind() == Tree.JavaFXKind.OBJECT_LITERAL_PART) {
+            return create(pos[0], path, cc);
+        }
         return create(pos[1], path, cc);
     }
 
