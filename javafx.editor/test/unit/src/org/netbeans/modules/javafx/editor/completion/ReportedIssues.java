@@ -57,5 +57,8 @@ public class ReportedIssues extends CompletionTestBase {
         checkCompletion("Iz159678", "Color.^", "iz159678afterDot.pass");
     }
 
+    public void testIssue171484() throws Exception {
+        checkCompletion("Iz171484", "var bbb = a^", "iz171484.pass");
+    }
 }
 

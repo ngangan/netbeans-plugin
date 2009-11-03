@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,7 +34,7 @@
  * 
  * Contributor(s):
  * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.editor.completion.environment;
@@ -59,7 +59,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author David Strupl
  */
 public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<VariableTree> {
@@ -99,6 +98,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             String typeS = ((JFXSelect) initializer).getExpression().toString();
             addAllTypes(null, false, typeS);
         }
+        addLocalMembersAndVars(getSmartType(t));
     }
 
     private TypeMirror getSmartType(VariableTree t) throws IOException {
