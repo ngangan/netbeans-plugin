@@ -40,6 +40,7 @@
  */
 package org.netbeans.modules.javafx.editor.format;
 
+import com.sun.javafx.api.JavafxBindStatus;
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.tools.javafx.tree.*;
@@ -731,7 +732,6 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        // TODO binding
         @Override
         public Boolean visitVariable(VariableTree node, Void p) {
             int old = indent;
@@ -795,7 +795,21 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                 accept(JFXTokenId.EQ);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+
+                final JavafxBindStatus bindStatus = node.getBindStatus();
+                if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
+                    accept(JFXTokenId.BIND);
+                }
+
                 wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, initTree);
+
+                if (bindStatus.isBidiBind()) {
+                    space();
+                    accept(JFXTokenId.WITH);
+                    space();
+                    accept(JFXTokenId.INVERSE);
+                }
             }
 
             OnReplaceTree onReplaceTree = node.getOnReplaceTree();
@@ -836,14 +850,6 @@ public class JFXReformatTask implements ReformatTask {
                         blankLines();
                     }
                 }
-                int index = tokens.index();
-                int c = col;
-                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (accept(JFXTokenId.OVERRIDE) == JFXTokenId.OVERRIDE) {
-                    space();
-                } else {
-                    rollback(index, c, d);
-                }
 
                 accept(JFXTokenId.FUNCTION);
                 space();
@@ -872,9 +878,6 @@ public class JFXReformatTask implements ReformatTask {
                     spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
                     scan(retType, p);
-                    if (indent == old) {
-                        indent += continuationIndentSize;
-                    }
                 }
 
                 indent = old;
@@ -1070,6 +1073,17 @@ public class JFXReformatTask implements ReformatTask {
                     } else {
                         blankLines();
                     }
+
+                    // Missing return statement, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (accept(JFXTokenId.RETURN) != JFXTokenId.RETURN) {
+                        rollback(index, c, d);
+                    } else {
+                        space();
+                    }
+
                     processExpression(stat, p);
                 }
             }
@@ -1795,7 +1809,19 @@ public class JFXReformatTask implements ReformatTask {
             spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
             accept(JFXTokenId.COLON);
             spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+
+            final JavafxBindStatus bindStatus = node.getBindStatus();
+            if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
+                accept(JFXTokenId.BIND);
+                space();
+            }
             scan(node.getExpression(), p);
+            if (bindStatus.isBidiBind()) {
+                space();
+                accept(JFXTokenId.WITH);
+                space();
+                accept(JFXTokenId.INVERSE);
+            }
             return true;
         }
 
