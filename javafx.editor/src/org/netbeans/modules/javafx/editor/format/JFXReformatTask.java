@@ -1769,15 +1769,17 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO
         @Override
         public Boolean visitInterpolateValue(InterpolateValueTree node, Void p) {
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
+            scan(node.getAttribute(), p);
+            space();
+            accept(JFXTokenId.SUCHTHAT); // nice token, LOL
+            space();
+            scan(node.getValue(), p);
+            space();
+            accept(JFXTokenId.TWEEN);
+            space();
+            scan(node.getInterpolation(), p);
             return true;
         }
 
@@ -1869,6 +1871,7 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
+        // remove that workaround after JFXC-3494 fix
         @Override
         public Boolean visitStringExpression(StringExpressionTree node, Void p) {
             do {
@@ -1880,7 +1883,6 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitTimeLiteral(TimeLiteralTree node, Void p) {
             do {
