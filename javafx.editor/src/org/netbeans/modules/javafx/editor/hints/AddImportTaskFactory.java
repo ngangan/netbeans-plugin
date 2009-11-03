@@ -40,13 +40,12 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
@@ -74,10 +73,11 @@ import org.openide.util.NbBundle;
  */
 public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
-    private final static EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-    private final static String HINTS_IDENT = "addimportjavafx"; //NOI18N
-    private final static String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
-    private final static String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
+    private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private static final String HINTS_IDENT = "addimportjavafx"; //NOI18N
+    private static final String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
+    private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
+    private static final String message = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
@@ -104,17 +104,13 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     return;
                 }
-                Collection<Diagnostic> diagnostics = new ArrayList<Diagnostic>();
-                for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (isValidError(diagnostic)) {
-                        diagnostics.add(diagnostic);
-                    }
-                }
+                Collection<Diagnostic> diagnostics = getValidDiagnostics(compilationInfo.getDiagnostics());
+
                 if (diagnostics.isEmpty()) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     return;
                 }
-                final Collection<String> imports = new HashSet<String>();
+                final Collection<ClassSymbol> imports = new HashSet<ClassSymbol>();
                 new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
@@ -124,73 +120,68 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         Element element = compilationInfo.getTrees().getElement(path);
                         if (element instanceof ClassSymbol) {
                             ClassSymbol classSymbol = (ClassSymbol) element;
-                            imports.add(classSymbol.getQualifiedName().toString());
+                            imports.add(classSymbol);
                         }
 
                         return super.visitImport(node, p);
                     }
                 }.scan(compilationInfo.getCompilationUnit(), null);
                 for (final Diagnostic diagnostic : diagnostics) {
+                    if (cancel.get()) {
+                        break;
+                    }
                     JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
                     Tree superTree = path.getLeaf();
-                    String potentialFqn = null;
+                    String potentialClassSimpleName = null;
                     if (element != null && element instanceof ClassSymbol) {
                         ClassSymbol classSymbol = (ClassSymbol) element;
-                        potentialFqn = classSymbol.getSimpleName().toString();
+                        potentialClassSimpleName = classSymbol.getSimpleName().toString();
                     } else if (superTree instanceof JFXInstanciate) {
                         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                         final Tree[] tree = new Tree[1];
                         JavaFXTreePathScanner<Void, Void> scaner = new JavaFXTreePathScanner<Void, Void>() {
 
                             @Override
-                            public Void visitInstantiate(InstantiateTree node, Void p) {
+                            public Void visitIdentifier(IdentifierTree node, Void p) {
                                 int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
                                 if (diagnostic.getStartPosition() == position) {
                                     tree[0] = node;
                                     return null;
                                 }
-                                return super.visitInstantiate(node, p);
+                                return super.visitIdentifier(node, p);
                             }
-
-                            @Override
-                            public Void visitVariable(VariableTree node, Void p) {
-                                int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node.getType());
-                                if (diagnostic.getStartPosition() == position) {
-                                    tree[0] = node.getType();
-                                    return null;
-                                }
-                                return super.visitVariable(node, p);
-                            }
-
                         };
                         scaner.scan(compilationInfo.getCompilationUnit(), null);
                         if (tree[0] != null) {
                             superTree = tree[0];
-                            potentialFqn = HintsUtils.getClassSimpleName(superTree.toString());
+                            potentialClassSimpleName = superTree.toString();
                         }
                     }
-                    if (potentialFqn == null || potentialFqn.length() == 0) {
-                        return;
+                    if (potentialClassSimpleName == null || potentialClassSimpleName.length() == 0) {
+                        continue;
                     }
-                    potentialFqn = HintsUtils.getClassSimpleName(potentialFqn);
-                    Collection<ElementHandle<TypeElement>> options = optionsCache.get(potentialFqn);
+                    if (isImportDefined(potentialClassSimpleName, imports)) {
+                        continue;
+                    }
+                    potentialClassSimpleName = HintsUtils.getClassSimpleName(potentialClassSimpleName);
+                    Collection<ElementHandle<TypeElement>> options = optionsCache.get(potentialClassSimpleName);
                     if (options == null) {
-                        options = classIndex.getDeclaredTypes(potentialFqn, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                        optionsCache.put(potentialFqn, options);
+                        options = classIndex.getDeclaredTypes(potentialClassSimpleName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                        optionsCache.put(potentialClassSimpleName, options);
                     }
                     List<Fix> listFQN = new ArrayList<Fix>();
                     boolean exists = false;
                     for (ElementHandle<TypeElement> elementHandle : options) {
-                        potentialFqn = elementHandle.getQualifiedName();
-                        for (String importFQN : imports) {
-                            if (potentialFqn.equals(importFQN)) {
+                        potentialClassSimpleName = elementHandle.getQualifiedName();
+                        for (ClassSymbol importFQN : imports) {
+                            if (potentialClassSimpleName.equals(importFQN.getQualifiedName().toString())) {
                                 exists = true;
                                 break;
                             }
                         }
                         if (!exists) {
-                            listFQN.add(new FixImport(potentialFqn));
+                            listFQN.add(new FixImport(potentialClassSimpleName));
                         }
                     }
                     if (listFQN.isEmpty()) {
@@ -203,18 +194,38 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                 clear();
             }
 
-
             private void clear() {
                 optionsCache.clear();
                 errors.clear();
             }
 
-            private boolean isValidError(Diagnostic diagnostic) {
-                if (!diagnostic.getMessage(Locale.ENGLISH).contains("cannot find symbol")) {
-                    return false;
+            private Collection<Diagnostic> getValidDiagnostics(Collection<Diagnostic> diagnostics) {
+                Collection<Diagnostic> validDiagnostics = new HashSet<Diagnostic>();
+                for (Diagnostic diagnostic : diagnostics) {
+                    if (!diagnostic.getMessage(Locale.ENGLISH).contains("cannot find symbol")) { //NOI18N
+                        continue;
+                    }
+                    if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
+                        boolean isValid = true;
+                        for (Diagnostic d : diagnostics) {
+                            if (d != diagnostic && d.getLineNumber() == diagnostic.getLineNumber()) {
+                                isValid = false;
+                                break;
+                            }
+                        }
+                        if (isValid) {
+                            validDiagnostics.add(diagnostic);
+                        }
+                    }
                 }
-                if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
-                    return true;
+                return validDiagnostics;
+            }
+
+            private boolean isImportDefined(String className, Collection<ClassSymbol> imports) {
+                for (ClassSymbol importFQN : imports) {
+                    if (importFQN.getSimpleName().toString().equals(className)) {
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -230,12 +241,13 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         }
 
         public String getText() {
-            return NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT") + fqn; //NOI18N
+            return message +fqn;
         }
 
         public ChangeInfo implement() throws Exception {
             JTextComponent target = Utilities.getFocusedComponent();
             Imports.addImport(target, fqn);
+
             return null;
         }
     }
