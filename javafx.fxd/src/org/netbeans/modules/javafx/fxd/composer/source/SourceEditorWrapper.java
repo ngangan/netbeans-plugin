@@ -9,6 +9,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -49,6 +50,8 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
                 }
                 m_editor = (JComponent) c;
             } else {
+                Logger.getLogger(SourceEditorWrapper.class.getName()).warning(
+                        "UNEXPECTED null returned by CloneableEditor.getEditorPane()");
                 JEditorPane p = new JEditorPane();
                 p.setEnabled(false);
                 m_editor = (JComponent) p;
