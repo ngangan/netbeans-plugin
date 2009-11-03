@@ -43,7 +43,7 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafxtv.sdk.win</code-name-base>
+            <code-name-base>javafxtv.sdk.win</code-name-base>
             <suite-component/>
             <module-dependencies/>
             <public-packages/>
