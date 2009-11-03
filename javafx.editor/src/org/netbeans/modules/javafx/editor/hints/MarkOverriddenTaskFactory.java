@@ -93,7 +93,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 for (Element classElement : classesKeys) {
                     if (overriddenMethods.size() == 0
-                            || !isAnnon(classElement)
+                            || !HintsUtils.isAnnon(classElement)
                             && HintsUtils.checkString(classElement.getSimpleName().toString())) {
                         updateAnnotationsOverridden(compilationInfo, addedAnotations);
                         clear();
@@ -173,25 +173,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
         };
     }
 
-    private boolean isAnnon(Element element) {
-        if (!(element instanceof JavafxClassSymbol)) {
-            return false;
-        }
-        JavafxClassSymbol classSymbol = ((JavafxClassSymbol) element);
-        classSymbol.getSuperTypes();
-        if (!classSymbol.isLocal()) {
-            return false;
-        }
-        String name = element.toString();
-        int lastIndex = name.lastIndexOf("$"); //NOI18N
-        if (lastIndex < 0) {
-            return false;
-        }
-        if (!name.substring(lastIndex).contains("anon")) { //NOI18N
-            return false;
-        }
-        return true;
-    }
+  
 
     private static class OverriddeAnnotation extends Annotation {
 
