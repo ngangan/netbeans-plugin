@@ -64,11 +64,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
@@ -101,7 +101,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         final Document document = FXSourceUtils.getDocument(file);
-       
+
         return new CancellableTask<CompilationInfo>() {
 
             public void cancel() {
@@ -150,16 +150,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        Element element = compilationInfo.getTrees().getElement(getCurrentPath());
-                        Collection<Modifier> modifiers = node.getModifiers().getFlags();
-                        if (element != null && element.getSimpleName() != null) {
-                            if (!isPackage(node.getModifiers().toString())) {
-                                if (element.getKind() == ElementKind.LOCAL_VARIABLE
-                                        || modifiers.size() == 0
-                                        || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
-                                    addToInit(node);
-                                }
-                            }
+                        if (checkModifiers(node.getModifiers().toString())) {
+                            addToInit(node);
+
                         }
 
                         return super.visitVariable(node, v);
@@ -193,8 +186,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                                     addToInit(node);
                                 }
                             }
-
                         }
+
                         return super.visitFunctionDefinition(node, v);
                     }
 
@@ -231,6 +224,17 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         addToRemove(node);
 
                         return super.visitMethodInvocation(node, v);
+                    }
+
+                    private boolean checkModifiers(String modifiersString) {
+                        StringTokenizer tokenizer = new StringTokenizer(modifiersString);
+                        while (tokenizer.hasMoreTokens()) {
+                            String token = tokenizer.nextToken();
+                            if (token.contains("public") || token.contains("protected")) {
+                                return false;
+                            }
+                        }
+                        return true;
                     }
 
                     private boolean isPackage(String modifiers) {
