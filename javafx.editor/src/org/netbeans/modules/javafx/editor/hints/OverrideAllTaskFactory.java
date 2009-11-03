@@ -40,7 +40,10 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -67,7 +70,6 @@ import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.editor.Utilities;
-import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -92,10 +94,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
-
-        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-        final Map<ElementHandle<TypeElement>, TypeElement> typeElementCash = new HashMap<ElementHandle<TypeElement>, TypeElement>();
-        final Map<TypeElement, Collection<? extends Element>> elementsCash = new HashMap<TypeElement, Collection<? extends Element>>();
         final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
 
         return new CancellableTask<CompilationInfo>() {
@@ -106,7 +104,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
-                HintsModel modelFix = null;
+                final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (!isValidError(diagnostic, compilationInfo) || cancel.get()) {
                         continue;
@@ -115,75 +113,9 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     if (!(diagnostic instanceof JCDiagnostic) || position < 0) {
                         continue;
                     }
-
-                    JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
-                    String className = null;
-                    for (Object arg : jcDiagnostic.getArgs()) {
-                        if (arg instanceof JavafxClassSymbol) {
-                            className = ((JavafxClassSymbol) arg).getSimpleName().toString();
-                            break;
-                        }
-                    }
-                    if (className != null) {
-                        final Collection<MethodSymbol> overriddenMethods = new HashSet<MethodSymbol>();
-                        final Collection<JFXImport> imports = new HashSet<JFXImport>();
-                        final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
-
-                        JavaFXTreePathScanner<Void, Void> visitor = new OverrideAllVisitor(compilationInfo, overriddenMethods, imports);
-                        visitor.scan(compilationInfo.getCompilationUnit(), null);
-                        Collection<ElementHandle<TypeElement>> options = optionsCache.get(className);
-                        if (options == null) {
-                            options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                            optionsCache.put(className, options);
-                        }
-                        for (ElementHandle<TypeElement> elementHandle : options) {
-                            TypeElement typeElement = typeElementCash.get(elementHandle);
-                            if (typeElement == null) {
-                                typeElement = elementHandle.resolve(compilationInfo);
-                                typeElementCash.put(elementHandle, typeElement);
-                            }
-                            if (typeElement == null) {
-                                continue;
-                            }
-                            Collection<? extends Element> elements = elementsCash.get(typeElement);
-                            if (elements == null) {
-                                elements = elements = getAllMembers(typeElement, compilationInfo);
-                                elementsCash.put(typeElement, elements);
-                            }
-                            for (Element e : elements) {
-                                if (e instanceof MethodSymbol) {
-                                    MethodSymbol method = (MethodSymbol) e;
-                                    for (Modifier modifier : method.getModifiers()) {
-                                        if (modifier != Modifier.ABSTRACT) {
-                                            continue;
-                                        }
-
-                                        MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method, compilationInfo);
-                                        if (overriddenMethod == null) {
-                                            abstractMethods.add(method);
-                                            break;
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                        if (!abstractMethods.isEmpty()) {
-                            if (modelFix == null) {
-                                modelFix = new HintsModel(compilationInfo);
-                            }
-                            modelFix.addHint((int) jcDiagnostic.getStartPosition(), (int) jcDiagnostic.getEndPosition(), abstractMethods);
-                        }
-                    }
+                    errorDescriptions.add(getErrorDescription(compilationInfo.getDocument(), file, compilationInfo, classIndex, diagnostic));
                 }
-                addHintsToController(modelFix, compilationInfo, file);
-                clear();
-            }
-
-            private void clear() {
-                optionsCache.clear();
-                typeElementCash.clear();
-                elementsCash.clear();
+                HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
             }
         };
     }
@@ -207,12 +139,13 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             StringTokenizer st = new StringTokenizer(text);
             boolean isExtends = false;
             boolean isClass = false;
-            while(st.hasMoreTokens()) {
+
+            while (st.hasMoreTokens()) {
                 String token = st.nextToken();
-                if (token.equals("extends")) {
+                if (token.equals("extends")) { //NOI18N
                     isExtends = true;
                 }
-                if (token.equals("class")) {
+                if (token.equals("class")) { //NOI18N
                     isClass = true;
                 }
             }
@@ -222,8 +155,15 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             int index = text.indexOf("{"); //NOI18N
             if (index > 0) {
                 return start + index + 1;
-            } else { //
+            } else if (text.contains("(") || text.contains(")")) { //NOI18N
                 return -1;
+            } else {
+                text = document.getText(start, document.getLength() - start);
+                index = text.indexOf("{"); //NOI18N
+                if (index < 0) {
+                    return -1;
+                }
+                return start + index + 1;
             }
         } catch (BadLocationException ex) {
             ex.printStackTrace();
@@ -232,25 +172,12 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return -1;
     }
 
-    private void addHintsToController(HintsModel model, CompilationInfo compilationInfo, FileObject file) {
-        Document document = compilationInfo.getDocument();
-        if (model != null && model.getHints() != null) {
-            Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
-            for (Hint hint : model.getHints()) {
-                errors.add(getErrorDescription(document, file, hint, compilationInfo));
-            }
-            if (document != null || !errors.isEmpty()) {
-                HintsController.setErrors(document, HINT_IDENT, errors); //NOI18N
-            }
-        } else {
-            if (document != null) {
-                HintsController.setErrors(document, HINT_IDENT, Collections.EMPTY_LIST); //NOI18N
-            }
+    private ErrorDescription getErrorDescription(final Document document,
+            FileObject file,
+            final CompilationInfo compilationInfo,
+            final ClassIndex classIndex,
+            final Diagnostic diagnostic) {
 
-        }
-    }
-
-    private ErrorDescription getErrorDescription(final Document document, FileObject file, final Hint hint, final CompilationInfo compilationInfo) {
         Fix fix = new Fix() {
 
             public String getText() {
@@ -258,15 +185,78 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             }
 
             public ChangeInfo implement() throws Exception {
+                JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
+                String className = null;
+                Collection<MethodSymbol> overriddenMethods = new HashSet<MethodSymbol>();
+                for (Object arg : jcDiagnostic.getArgs()) {
+                    if (arg instanceof JavafxClassSymbol) {
+                        ClassSymbol classSymbol = (JavafxClassSymbol) arg;
+                        if (HintsUtils.isAnnon(classSymbol)) {
+                            String baseString = classSymbol.className().toString();
+                            className = baseString.substring(0, baseString.lastIndexOf("$")); //NOI18N
+                            for (Symbol symbol : classSymbol.getEnclosedElements()) {
+                                if (symbol instanceof MethodSymbol) {
+                                    overriddenMethods.add((MethodSymbol) symbol);
+                                }
+                            }
+                        } else {
+                            className = classSymbol.getSimpleName().toString();
+                        }
+                        break;
+                    }
+                }
+                final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
+                if (className != null) {
+                    final Collection<JFXImport> imports = new HashSet<JFXImport>();
+                    JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
+
+                        @Override
+                        public Void visitImport(ImportTree node, Void p) {
+                            if (node instanceof JFXImport) {
+                                imports.add((JFXImport) node);
+                            }
+
+                            return super.visitImport(node, p);
+                        }
+                    };
+                    visitor.scan(compilationInfo.getCompilationUnit(), null);
+                    Collection<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+                    for (ElementHandle<TypeElement> elementHandle : options) {
+                        TypeElement typeElement = elementHandle.resolve(compilationInfo);
+                        if (typeElement == null) {
+                            continue;
+                        }
+                        Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                        for (Element e : elements) {
+                            if (e instanceof MethodSymbol) {
+                                MethodSymbol method = (MethodSymbol) e;
+                                for (Modifier modifier : method.getModifiers()) {
+                                    if (modifier != Modifier.ABSTRACT) {
+                                        continue;
+                                    }
+                                    MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method, compilationInfo);
+                                    if (overriddenMethod == null) {
+                                        abstractMethods.add(method);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (abstractMethods.isEmpty()) {
+                        return null;
+                    }
+                }
                 final StringBuilder methods = new StringBuilder();
-                final String space = HintsUtils.calculateSpace(hint.getStartPosition(), document);
-                for (MethodSymbol methodSymbol : hint.getMethods()) {
+                final String space = HintsUtils.calculateSpace((int) diagnostic.getStartPosition(), document);
+                for (MethodSymbol methodSymbol : abstractMethods) {
                     methods.append(createMethod(methodSymbol, space));
                 }
                 if (methods.toString().length() > 0) {
                     methods.append(space);
                 }
-                final int positon = findPosition(compilationInfo, hint.getStartPosition(), hint.getLength());
+                int length = (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition());
+                final int positon = findPosition(compilationInfo, (int) diagnostic.getStartPosition(), length);
                 if (positon < 0) {
                     return null;
                 }
@@ -280,7 +270,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                                 return;
                             }
                             Imports.addImport(target, EXCEPTION);
-                            for (MethodSymbol method : hint.getMethods()) {
+                            for (MethodSymbol method : abstractMethods) {
                                 addImport(target, method.asType());
                                 for (VarSymbol var : method.getParameters()) {
                                     scanImport(target, var.asType());
@@ -371,10 +361,10 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 return method.toString();
             }
         };
-        if (hint.getStartPosition() < 0) {
+        if (diagnostic.getStartPosition() < 0) {
             return null;
         }
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, hint.getStartPosition(), hint.getStartPosition());
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());
         return ed;
     }
 
@@ -433,6 +423,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
             System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
         }
+
         return elements;
     }
 }

@@ -123,10 +123,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        Collection<Modifier> modifiers = node.getModifiers().getFlags();
-                        if (!parentClass
-                                && modifiers.size() == 0
-                                || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                        if (!parentClass && !isPublic(node.getModifiers().toString())) {
                             addToInit(node);
                         } else {
                             parentClass = false;
@@ -150,7 +147,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        if (checkModifiers(node.getModifiers().toString())) {
+                        if (!isPublic(node.getModifiers().toString())) {
                             addToInit(node);
 
                         }
@@ -226,15 +223,16 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         return super.visitMethodInvocation(node, v);
                     }
 
-                    private boolean checkModifiers(String modifiersString) {
+                    private boolean isPublic(String modifiersString) {
                         StringTokenizer tokenizer = new StringTokenizer(modifiersString);
                         while (tokenizer.hasMoreTokens()) {
                             String token = tokenizer.nextToken();
                             if (token.contains("public") || token.contains("protected")) {
-                                return false;
+                                return true;
                             }
                         }
-                        return true;
+                        
+                        return false;
                     }
 
                     private boolean isPackage(String modifiers) {

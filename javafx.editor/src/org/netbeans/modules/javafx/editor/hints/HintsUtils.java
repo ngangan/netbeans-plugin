@@ -105,9 +105,6 @@ final class HintsUtils {
                 if (!method.getSimpleName().toString().equals(overrriddenName)) {
                     continue;
                 }
-                if (method.getEnclosingElement() != overriddenMethod.getEnclosingElement()) {
-                    continue;
-                }
                 TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
                 if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
                     return overriddenMethod;
@@ -118,7 +115,7 @@ final class HintsUtils {
         return null;
     }
 
-     static MethodSymbol isOverridden(TypeElement typeOverridden, Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
+    static MethodSymbol isOverridden(TypeElement typeOverridden, Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
         if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
             for (MethodSymbol overriddenMethod : overriddenMethodList) {
                 String overrriddenName = overriddenMethod.getSimpleName().toString();
@@ -136,7 +133,6 @@ final class HintsUtils {
 
         return null;
     }
-
 
     static MethodSymbol isAlreadyDefined(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
         if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
@@ -160,7 +156,6 @@ final class HintsUtils {
         return null;
     }
     //TODO Should be replaced with proper formating ASAP
-
     static String calculateSpace(int startPosition, Document document) {
         String text = null;
         try {
@@ -198,4 +193,24 @@ final class HintsUtils {
         return space.toString();
     }
 
+    static boolean isAnnon(Element element) {
+        if (!(element instanceof JavafxClassSymbol)) {
+            return false;
+        }
+        JavafxClassSymbol classSymbol = ((JavafxClassSymbol) element);
+        classSymbol.getSuperTypes();
+        if (!classSymbol.isLocal()) {
+            return false;
+        }
+        String name = element.toString();
+        int lastIndex = name.lastIndexOf("$"); //NOI18N
+        if (lastIndex < 0) {
+            return false;
+        }
+        if (!name.substring(lastIndex).contains("anon")) { //NOI18N
+            return false;
+        }
+
+        return true;
+    }
 }
