@@ -31,11 +31,14 @@ package org.netbeans.modules.javafx.refactoring.impl.scanners;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -135,4 +138,19 @@ public class FindUsagesScanner extends BaseRefactoringScanner<Void, Set<TreePath
         }
         return super.visitObjectLiteralPart(node, handles);
     }
+
+    @Override
+    public Void visitInstantiate(InstantiateTree node, Set<TreePathHandle> handles) {
+        switch (getElementKind()) {
+            case CLASS: {
+                JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier());
+                if (isSameElement(path)) {
+                    handles.add(TreePathHandle.create(path, getCompilationController()));
+                }
+            }
+        }
+        return super.visitInstantiate(node, handles);
+    }
+
+
 }
