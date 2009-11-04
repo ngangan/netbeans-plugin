@@ -86,13 +86,17 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
- *
  * @author David Strupl, Anton Chechel
  */
 public class JavaFXCompletionEnvironment<T extends Tree> {
 
     private static final Logger logger = Logger.getLogger(JavaFXCompletionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+
+    private static final String[] PSEUDO_VARS = new String[] {
+        "__DIR__", "__FILE__", "__PROFILE__" // NOI18N
+    };
+
     private static int usingFakeSource = 0;
     protected int offset;
     protected String prefix;
@@ -298,6 +302,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 if (LOGGABLE) log("     is instance and we don't want them " + s); // NOI18N
                 continue;
             }
+            // Once source code uses either __FILE__ or __DIR__ pseudo
+            // variables, compiler will generate their definitions in the
+            // current block expression. When the source code does not contain
+            // them they are not generated and since would not be offered by
+            // code completion. Thus we provide pseudo variables explicitly, so
+            // skip them here.
+            if (isPseudoVariable(s)) {
+                continue;
+            }
             String tta = textToAdd;
             if (fields && (member.getKind() == ElementKind.FIELD || member.getKind() == ElementKind.ENUM_CONSTANT)) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
@@ -342,6 +355,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             if (!isStatic && !instance) {
                 if (LOGGABLE) log("     is instance and we don't want them " + s); // NOI18N
+                continue;
+            }
+            // Once source code uses either __FILE__ or __DIR__ pseudo
+            // variables, compiler will generate their definitions in the
+            // current block expression. When the source code does not contain
+            // them they are not generated and since would not be offered by
+            // code completion. Thus we provide pseudo variables explicitly, so
+            // skip them here.
+            if (isPseudoVariable(s)) {
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
@@ -499,7 +521,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 VariableTree varTree = ort.getNewElements();
                 if (varTree != null) {
                     String s1 = varTree.getName().toString();
-                    if (LOGGABLE) log("    adding(4) " + s1 + " with prefix " + prefix); // NOI18N
+                    if (LOGGABLE) log("    adyding(4) " + s1 + " with prefix " + prefix); // NOI18N
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, varTree));
                     if (smart != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(tm, s1, query.anchorOffset, true));
@@ -522,6 +544,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             }
         }
+        addPseudoVariables();
     }
 
     private void addBlockExpressionLocals(BlockExpressionTree bet, JavaFXTreePath tp, TypeMirror smart) {
@@ -550,6 +573,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 return;
             }
             String s = simpleName.toString();
+            // Once source code uses either __FILE__ or __DIR__ pseudo
+            // variables, compiler will generate their definitions in the
+            // current block expression. When the source code does not contain
+            // them they are not generated and since would not be offered by
+            // code completion. Thus we provide pseudo variables explicitly, so
+            // skip them here.
+            if (isPseudoVariable(s)) {
+                return;
+            }
             if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix); // NOI18N
             TypeMirror tm = trees.getTypeMirror(expPath);
             if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
@@ -561,6 +593,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         s, query.anchorOffset, false));
             }
         }
+    }
+
+    private boolean isPseudoVariable(final String s) {
+        return Arrays.binarySearch(PSEUDO_VARS, s) >= 0;
     }
 
     protected void addPackages(String fqnPrefix) {
@@ -1333,6 +1369,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             }
             scope = scope.getEnclosingScope();
+        }
+    }
+
+    private void addPseudoVariables() {
+        for (String pVar : PSEUDO_VARS) {
+            addResult(JavaFXCompletionItem.createPseudoVariable(pVar, query.anchorOffset));
         }
     }
 

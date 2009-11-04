@@ -46,7 +46,6 @@ import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.completion.Completion;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
@@ -113,15 +112,20 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return new PackageItem(pkgFQN, substitutionOffset, isDeprecated);
     }
 
+    public static final JavaFXCompletionItem createPseudoVariable(
+            String varName, int substitutionOffset) {
+        return new PseudoVariableItem(varName, substitutionOffset);
+    }
+
     public static final JavaFXCompletionItem createVariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
         return new VariableItem(element, type, varName, substitutionOffset, textToAdd, smartType);
     }
-    
+
     public static final JavaFXCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
         // TODO extract element from David's treeJavaFXCompletionEnvironment
         return new VariableItem(null, type, varName, substitutionOffset, smartType);
     }
-    
+
     public static final JavaFXCompletionItem createExecutableItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {
         switch (elem.getKind()) {
             case METHOD:
@@ -568,6 +572,19 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }        
     }
 
+    static class PseudoVariableItem extends VariableItem {
+
+        private PseudoVariableItem(String varName, int substitutionOffset) {
+            super(null, "String", varName, substitutionOffset, false);
+        }
+
+        @Override
+        public int getSortPriority() {
+            return 1000;
+        }
+
+    }
+
     static class VariableItem extends JavaFXCompletionItem {
         
         private static final String LOCAL_VARIABLE = "org/netbeans/modules/editor/resources/completion/localVariable.gif"; //NOI18N
@@ -581,12 +598,16 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         private String leftText;
         private String rightText;
         
-        private VariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
+        private VariableItem(ElementHandle element, String typeName, String varName, int substitutionOffset, boolean smartType) {
             super(substitutionOffset);
             this.element = element;
             this.varName = varName;
             this.smartType = smartType;
-            this.typeName = type != null ? type.toString() : null;
+            this.typeName = typeName;
+        }
+
+        private VariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
+            this(element, type != null ? type.toString() : null, varName, substitutionOffset, smartType);
         }
 
         private VariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {

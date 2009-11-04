@@ -40,9 +40,9 @@
  */
 package org.netbeans.modules.javafx.editor.completion;
 
-public class ReportedIssues extends CompletionTestBase {
+public class ReportedIssuesTest extends CompletionTestBase {
 
-    public ReportedIssues(String testName) {
+    public ReportedIssuesTest(String testName) {
         super(testName);
     }
 
