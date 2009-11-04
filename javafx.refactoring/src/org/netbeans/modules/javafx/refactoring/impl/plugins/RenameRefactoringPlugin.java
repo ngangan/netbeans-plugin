@@ -197,7 +197,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
             String msg = kind == ElementKind.PACKAGE?
                 NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidPackage", new Object[]{newName}) :
                 NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidIdentifier", new Object[]{newName}); //NOI18N
-            
+
             fastCheckProblem = createProblem(fastCheckProblem, true, msg);
             return fastCheckProblem;
         }
@@ -251,13 +251,6 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
             }
         }
         return fastCheckProblem;
-//        final String newElementName = refactoring.getNewName();
-//
-//        if (fileName.equals(treePathHandle.getSimpleName())) {
-//            return checkFileNameClash(newElementName, treePathHandle.getFileObject());
-//        }
-//
-//        return null;
     }
 
     public Problem preCheck(CompilationInfo info) {
@@ -476,15 +469,16 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         if (lookup.hasRefernces())
             return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
 
-        JavaFXTreePath temp = tp;
-        while (temp != null && temp.getLeaf().getJavaFXKind() != Tree.JavaFXKind.FUNCTION_DEFINITION) {
-            Scope scope = info.getTrees().getScope(temp);
-            for (Element el:scope.getLocalElements()) {
-                if (el.getSimpleName().toString().equals(newName)) {
-                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
+        Scope scope = null;
+        if (tp != null) {
+            scope = info.getTrees().getScope(tp);
+            if (scope != null) {
+                for (Element el:scope.getLocalElements()) {
+                    if (el.getSimpleName().toString().equals(newName)) {
+                        return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
+                    }
                 }
             }
-            temp = temp.getParentPath();
         }
         return null;
     }
