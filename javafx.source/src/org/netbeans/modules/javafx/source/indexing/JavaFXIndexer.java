@@ -10,6 +10,7 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
@@ -429,6 +430,30 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         }
                     }
                     return super.visitObjectLiteralPart(node, document);
+                }
+
+                @Override
+                public Void visitInstantiate(InstantiateTree node, IndexDocument document) {
+                    Element el = fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
+                    if (el.getKind() == ElementKind.CLASS) {
+                        ElementHandle eh = ElementHandle.create(el);
+                        if (eh == null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Error while processing instantiation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            }
+                            return super.visitInstantiate(node, document);
+                        }
+                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(el));
+                        if (indexVal != null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Indexing type reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                            }
+                            index(document, IndexKey.TYPE_REF, indexVal);
+                        } else {
+                            LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
+                        }
+                    }
+                    return super.visitInstantiate(node, document);
                 }
             };
 //            if (!fxresult.getDiagnostics().isEmpty()) return;
