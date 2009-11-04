@@ -53,7 +53,7 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
     public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
         this.searchHandle = searchHandle;
         this.origHandle = handle;
-        this.origElement = handle.resolve(cc);
+        this.origElement = handle != null ? handle.resolve(cc) : null;
         this.origKind = handle != null ? handle.getKind() : null;
         this.cc = cc;
         this.positions = cc.getTrees().getSourcePositions();
