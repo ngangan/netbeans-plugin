@@ -186,7 +186,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             FXDParser fxdParser = new FXDParser(docReader, new ContentHandler() {
                 /** is last processed element was node or not (then array) */
                 private boolean m_isLastNode = true;
-                /** last processed element - Node or List with Nodes*/
+                /** last processed element - String (Node name)
+                 * or List<String> ( array attribute with nodes == list of node names) */
                 private Object  m_lastElem = null;
 
                 public Object startNode(String typeName, int startOff) {
@@ -274,7 +275,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                             throw new FXDException( ex);
                         }
                     } else {
-                        ((List)array).add(m_lastElem);
+                        ((List<String>)array).add((String)m_lastElem);
                         m_lastElem = null;
                     }
                 }
