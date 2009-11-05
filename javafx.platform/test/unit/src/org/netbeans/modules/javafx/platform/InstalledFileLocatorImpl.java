@@ -46,6 +46,10 @@ public final class InstalledFileLocatorImpl extends InstalledFileLocator {
 
     public @Override File locate(String relativePath, String codeNameBase, boolean localized) {
         if ("javafx-sdk/lib/shared/javafxc.jar".equals(relativePath)) {
+            // Serves for DefaultPlatformImpl#create which uses location of
+            // javafxc.jar for locating JavaFX SDK. DefaultPlatformImpl#create
+            // is subsequently used by JavaFXPlatform.getDefault() which is
+            // utilized in test to setup classpath for test environment.
             String javafxcFile = System.getProperty("xtest.javafxc.jar");
             if (javafxcFile == null) {
                 throw new RuntimeException("xtest.javafxc.jar property has to be set");
