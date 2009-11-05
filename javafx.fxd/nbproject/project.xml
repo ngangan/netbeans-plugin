@@ -191,7 +191,6 @@
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-common.jar</runtime-relative-path>
             </class-path-extension>
-            -->
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-swing.jar</runtime-relative-path>
             </class-path-extension>
@@ -204,6 +203,7 @@
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
             </class-path-extension>
+            -->
         </data>
     </configuration>
 </project>
