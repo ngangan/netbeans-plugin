@@ -9,6 +9,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -39,20 +40,30 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
             assert stc != null;
             m_stc = stc;
             //force the creation of the editor pane
+            m_stc.componentShowing();
             JEditorPane pane = m_stc.getEditorPane();
-            addErrorStatusBarCell( pane);
-            Container c = pane;
-            Container parent;
-            while( (parent=c.getParent()) != m_stc) {
-                c = parent;
+            if (pane != null) {
+                addErrorStatusBarCell(pane);
+                Container c = pane;
+                Container parent;
+                while ((parent = c.getParent()) != m_stc) {
+                    c = parent;
+                }
+                m_editor = (JComponent) c;
+            } else {
+                Logger.getLogger(SourceEditorWrapper.class.getName()).warning(
+                        "UNEXPECTED null returned by CloneableEditor.getEditorPane()");
+                JEditorPane p = new JEditorPane();
+                p.setEnabled(false);
+                m_editor = (JComponent) p;
             }
-            m_editor = (JComponent) c;
-            m_stc.remove( m_editor);
+
+            m_stc.remove(m_editor);
             assert m_editor != null;
-            setLayout( null);
-            setBorder( null);
-            add( m_editor);
-            
+            setLayout(null);
+            setBorder(null);
+            add(m_editor);
+
             InstanceContent ic = new InstanceContent ();
             m_lookup = new AbstractLookup (ic);
             ic.add ( stc.getEditorSupport());
