@@ -44,10 +44,8 @@ import com.sun.javafx.api.JavafxBindStatus;
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.jmx.remote.util.OrderClassLoaders;
 import com.sun.tools.javafx.tree.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -86,6 +84,7 @@ public class JFXReformatTask implements ReformatTask {
     private static final String NEWLINE = "\n"; //NOI18N
     private static final String LCBRACE = "{"; //NOI18N
     private static final String RCBRACE = "}"; //NOI18N
+    private static final String MAGIC_FUNCTION = "javafx$run$"; //NOI18N
 
     private final Context context;
     private CompilationController controller;
@@ -301,13 +300,14 @@ public class JFXReformatTask implements ReformatTask {
             this.sp = sp;
             this.ut = ut;
         }
-        
+
         public int compare(Tree t1, Tree t2) {
             long diff = sp.getStartPosition(ut, t2) - sp.getStartPosition(ut, t1);
-            if (diff == 0) diff = sp.getEndPosition(ut, t1) - sp.getEndPosition(ut, t2);
-            return (int)diff;
+            if (diff == 0) {
+                diff = sp.getEndPosition(ut, t1) - sp.getEndPosition(ut, t2);
+            }
+            return (int) diff;
         }
-            
     }
 
     private static class FilterScanner<R,P> extends JavaFXTreePathScanner<R, P> {
@@ -318,6 +318,7 @@ public class JFXReformatTask implements ReformatTask {
             displaced = new TreeSet<Tree>(new TreePosComparator(ci.getTrees().getSourcePositions(), ci.getCompilationUnit()));
             ci.getCompilationUnit().accept(new JavaFXTreeScanner<Void, Void>() {
                 int state = 0;
+
                 public @Override Void scan(Tree node, Void p) {
                     if (state == 4) {// FUNCTION_DEFINITION -> FUNCTION_VALUE -> BLOCK_EXPRESSION
                         state = 0;
@@ -366,7 +367,9 @@ public class JFXReformatTask implements ReformatTask {
 
                 public @Override Void visitFunctionValue(FunctionValueTree node, Void p) {
                     int oldState = state;
-                    if (state == 2) state = 3;
+                    if (state == 2) {
+                        state = 3;
+                    }
                     super.visitFunctionValue(node, p);
                     state = oldState;
                     return null;
@@ -374,7 +377,9 @@ public class JFXReformatTask implements ReformatTask {
 
                 public @Override Void visitBlockExpression(BlockExpressionTree node, Void p) {
                     int oldState = state;
-                    if (state == 3) state = 4;
+                    if (state == 3) {
+                        state = 4;
+                    }
                     super.visitBlockExpression(node, p);
                     state = oldState;
                     return null;
@@ -403,24 +408,21 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         SortedSet<Tree> getCUTrees(UnitTree node) {
-            TreeSet<Tree> toNotify = (TreeSet<Tree>)displaced.clone();
-            toNotify.add(node.getPackageName());
+            TreeSet<Tree> toNotify = (TreeSet<Tree>) displaced.clone();
+//            toNotify.add(node.getPackageName());
             toNotify.addAll(node.getImports());
             toNotify.addAll(node.getTypeDecls());
-
             return toNotify;
         }
 
         public @Override R visitCompilationUnit(UnitTree node, P p) {
             SortedSet<Tree> toNotify = getCUTrees(node);
-
             return myScan(toNotify, p);
         }
     }
 
-    private static final String MAGIC_FUNCTION = "javafx$run$"; //NOI18N
-
     private static class Pretty extends FilterScanner<Boolean, Void> {
+//    private static class Pretty extends JavaFXTreePathScanner<Boolean, Void> {
 
         private static final String OPERATOR = "operator"; // NOI18N
         private static final String EMPTY = ""; // NOI18N
@@ -455,6 +457,8 @@ public class JFXReformatTask implements ReformatTask {
         private DanglingElseChecker danglingElseChecker = new DanglingElseChecker();
         private int startOffset;
         private int endOffset;
+
+        private SortedSet<Tree> sortedCUTrees;
 
         private Pretty(CompilationInfo info, JavaFXTreePath path, CodeStyle cs, int startOffset, int endOffset, boolean templateEdit) {
             this(info, FXSourceUtils.getText(info), info.getTokenHierarchy().tokenSequence(JFXTokenId.language()),
@@ -583,9 +587,7 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitCompilationUnit(UnitTree node, Void p) {
-            SortedSet<Tree> sub = getCUTrees(node);
             ExpressionTree pkg = node.getPackageName();
-            // iterate over sub
             if (pkg != null) {
                 blankLines(cs.getBlankLinesBeforePackage());
                 accept(JFXTokenId.PACKAGE);
@@ -597,33 +599,56 @@ public class JFXReformatTask implements ReformatTask {
                 indent = old;
                 blankLines(cs.getBlankLinesAfterPackage());
             }
-            List<? extends ImportTree> imports = node.getImports();
-            if (imports != null && !imports.isEmpty()) {
-                blankLines(cs.getBlankLinesBeforeImports());
-                for (ImportTree imp : imports) {
-                    blankLines();
-                    scan(imp, p);
+
+            // imports in javafx could be where ever
+            // TODO remove cs.getBlankLinesBeforeImports() from settings therefore
+            sortedCUTrees = getCUTrees(node);
+            if (sortedCUTrees != null && !sortedCUTrees.isEmpty()) {
+                // TODO process semicolon between members and expressions
+//                boolean semiRead = false;
+                for (Tree tree : sortedCUTrees) {
+                    if (tree instanceof ImportTree) {
+//                        blankLines();
+                        scan(tree, p);
+                    } else if (tree instanceof ClassDeclarationTree) {
+                        blankLines(cs.getBlankLinesBeforeClass());
+                        scan(tree, p);
+                        blankLines(cs.getBlankLinesAfterClass());
+                    } else {
+                        scan(tree, p);
+                    }
                 }
-                blankLines(cs.getBlankLinesAfterImports());
+
             }
-            boolean semiRead = false;
-            for (Tree typeDecl : node.getTypeDecls()) {
-                if (semiRead && typeDecl.getJavaFXKind() == JavaFXKind.EMPTY_STATEMENT) {
-                    continue;
-                }
-                blankLines(cs.getBlankLinesBeforeClass());
-                scan(typeDecl, p);
-                int index = tokens.index();
-                int c = col;
-                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-                    semiRead = true;
-                } else {
-                    rollback(index, c, d);
-                    semiRead = false;
-                }
-                blankLines(cs.getBlankLinesAfterClass());
-            }
+
+//            List<? extends ImportTree> imports = node.getImports();
+//            if (imports != null && !imports.isEmpty()) {
+//                blankLines(cs.getBlankLinesBeforeImports());
+//                for (ImportTree imp : imports) {
+//                    blankLines();
+//                    scan(imp, p);
+//                }
+//                blankLines(cs.getBlankLinesAfterImports());
+//            }
+
+//            boolean semiRead = false;
+//            for (Tree typeDecl : node.getTypeDecls()) {
+//                if (semiRead && typeDecl.getJavaFXKind() == JavaFXKind.EMPTY_STATEMENT) {
+//                    continue;
+//                }
+//                blankLines(cs.getBlankLinesBeforeClass());
+//                scan(typeDecl, p);
+//                int index = tokens.index();
+//                int c = col;
+//                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+//                if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+//                    semiRead = true;
+//                } else {
+//                    rollback(index, c, d);
+//                    semiRead = false;
+//                }
+//                blankLines(cs.getBlankLinesAfterClass());
+//            }
             return true;
         }
 
@@ -758,6 +783,10 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : node.getClassMembers()) {
+                if (sortedCUTrees != null && sortedCUTrees.contains(node)) {
+                    continue;
+                }
+
                 boolean magicFunc = false;
                 if (member instanceof JFXFunctionDefinition) {
                     String name = ((JFXFunctionDefinition) member).getName().toString();
@@ -1537,7 +1566,7 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.RPAREN);
             indent = old;
             CodeStyle.BracesGenerationStyle redundantForBraces = cs.redundantForBraces();
-            if (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > sp.getStartPosition(root, node) || endOffset < sp.getEndPosition(root, node))) {
+            if (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(node) || endOffset < getEndPos(node))) {
                 redundantForBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
             }
             wrapStatement(cs.wrapForStatement(), redundantForBraces, cs.spaceBeforeForLeftBrace() ? 1 : 0, node.getBodyExpression());
