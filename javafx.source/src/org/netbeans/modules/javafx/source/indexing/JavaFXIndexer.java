@@ -435,6 +435,12 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 @Override
                 public Void visitInstantiate(InstantiateTree node, IndexDocument document) {
                     Element el = fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
+                    if (el == null) {
+                        if (DEBUG) {
+                            LOG.log(Level.FINEST, "Error resolving element of {0}", node);
+                        }
+                        return super.visitInstantiate(node, document);
+                    }
                     if (el.getKind() == ElementKind.CLASS) {
                         ElementHandle eh = ElementHandle.create(el);
                         if (eh == null) {
@@ -456,7 +462,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     return super.visitInstantiate(node, document);
                 }
             };
-//            if (!fxresult.getDiagnostics().isEmpty()) return;
+            if (!fxresult.getDiagnostics().isEmpty()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
             JavaFXSource.forFileObject(FileUtil.toFileObject(new File(indexable.getURL().toURI()))).runUserActionTask(new Task<CompilationController>() {
