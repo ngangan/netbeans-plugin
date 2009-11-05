@@ -9,6 +9,7 @@
             <friend-packages>
                 <friend>org.netbeans.modules.javafx.composer.runtime.proxy</friend>
                 <friend>org.netbeans.modules.javafx.composer.design</friend>
+                <friend>org.netbeans.modules.javafx.fxd</friend>
                 <package>com.sun.embeddedswing</package>
                 <subpackages>com.sun.javafx</subpackages>
                 <subpackages>com.sun.media.jmc</subpackages>
