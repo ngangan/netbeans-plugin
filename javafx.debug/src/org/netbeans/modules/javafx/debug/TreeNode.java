@@ -122,7 +122,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         if (dummyPos) {
             return toColorizedHtmlDN("#C0A0A0"); // NOI18N
         }
-        return null;
+        return toColorizedHtmlDN("#006600");
     }
 
     private String toColorizedHtmlDN (final String color) {
