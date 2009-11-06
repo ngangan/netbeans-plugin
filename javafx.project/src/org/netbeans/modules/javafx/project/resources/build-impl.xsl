@@ -379,7 +379,7 @@ is divided into following sections:
     </xsl:comment>
         <target depends="init" name="-javadoc-build">
             <mkdir dir="${{dist.javadoc.dir}}"/>
-            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/javafxdoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true">
+            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/javafxdoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true"  encoding="${{source.encoding}}">
                 <xsl:for-each select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots/javafxproject3:root">
                     <fileset includes="**/*.fx">
                         <xsl:attribute name="dir">
