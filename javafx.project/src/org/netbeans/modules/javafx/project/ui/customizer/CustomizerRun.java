@@ -236,6 +236,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         installCheckBox1 = new javax.swing.JCheckBox();
         jvmLabel = new javax.swing.JLabel();
         jvmText = new javax.swing.JTextField();
+        jRadioButton5 = new javax.swing.JRadioButton();
 
         setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -451,13 +452,13 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         org.openide.awt.Mnemonics.setLocalizedText(jvmLabel, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "LBL_CustomizerRun_JVMArgs")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 0);
         extPanel.add(jvmLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -465,6 +466,21 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 12, 0, 0);
         extPanel.add(jvmText, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton5);
+        jRadioButton5.setActionCommand("Run in &TV Emulator");
+        jRadioButton5.setLabel("Run in TV Emulator");
+        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton5ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        extPanel.add(jRadioButton5, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -599,6 +615,13 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
     }
 }//GEN-LAST:event_deviceComboPopupMenuWillBecomeVisible
     
+private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
+    Map<String, String> m = configs.get(uiProperties.activeConfig);
+    m.put("javafx.profile", "tv"); //NOI18N
+    m.put("execution.target", "cvm"); //NOI18N
+    enableDeviceCombo();
+}//GEN-LAST:event_jRadioButton5ActionPerformed
+
     public void configUpdated() {
         Map<String, String> m = configs.get(uiProperties.activeConfig);
         String run = m.get("execution.target"); //NOI18N
@@ -683,6 +706,7 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JTextField jTextArguments;
     private javax.swing.JTextField jTextFieldMainClass;
     private javax.swing.JLabel jvmLabel;
