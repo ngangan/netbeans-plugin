@@ -92,9 +92,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overriddenMethods, true);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 for (Element classElement : classesKeys) {
-                    if (overriddenMethods.size() == 0
-                            || !HintsUtils.isAnnon(classElement)
-                            && HintsUtils.checkString(classElement.getSimpleName().toString())) {
+                    if (overriddenMethods.isEmpty() || (!HintsUtils.isAnnon(classElement) && HintsUtils.checkString(classElement.getSimpleName().toString()))) {
                         updateAnnotationsOverridden(compilationInfo, addedAnotations);
                         clear();
                         return;

@@ -89,9 +89,9 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
             @Override
             public void run(CompilationInfo compilationInfo) throws Exception {
                 final Document document = compilationInfo.getDocument();
-                if (compilationInfo.getDiagnostics() != null && compilationInfo.getDiagnostics().size() > 0) {
+                if (!compilationInfo.getDiagnostics().isEmpty()) {
                     if (document != null) {
-                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST); //NOI18N
+                        HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     }
                     return;
                 }
@@ -101,10 +101,10 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
                 Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
                 for (Hint hint : model.getHints()) {
-                    errors.add(getErrorDescription(file, hint, compilationInfo)); //NOI18N
+                    errors.add(getErrorDescription(file, hint, compilationInfo));
                 }
                 if (document != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); //NOI18N
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); 
                 }
             }
         };
@@ -153,7 +153,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                                 }
                             }
                         }
-                        if (hint.getExceptions().size() == 0) {
+                        if (hint.getExceptions().isEmpty()) {
                             model.removeHint(hint);
                         } else {
                             model.addCatchTree(hint, node);

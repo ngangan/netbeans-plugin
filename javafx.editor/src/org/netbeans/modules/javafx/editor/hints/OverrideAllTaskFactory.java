@@ -42,7 +42,6 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
@@ -51,8 +50,10 @@ import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.ClassType;
+import com.sun.tools.javac.code.TypeTags;
 import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -65,9 +66,6 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.editor.Utilities;
 import org.netbeans.spi.editor.hints.*;
@@ -81,7 +79,6 @@ import org.openide.util.NbBundle;
 public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
-    private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String TAB = "    "; //NOI18N
     private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
@@ -94,7 +91,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -113,7 +109,8 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     if (!(diagnostic instanceof JCDiagnostic) || position < 0) {
                         continue;
                     }
-                    errorDescriptions.add(getErrorDescription(compilationInfo.getDocument(), file, compilationInfo, classIndex, diagnostic));
+                    ((JCDiagnostic) diagnostic).getArgs();
+                    errorDescriptions.add(getErrorDescription(compilationInfo.getDocument(), file, compilationInfo, diagnostic));
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
             }
@@ -175,7 +172,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private ErrorDescription getErrorDescription(final Document document,
             FileObject file,
             final CompilationInfo compilationInfo,
-            final ClassIndex classIndex,
             final Diagnostic diagnostic) {
 
         Fix fix = new Fix() {
@@ -186,27 +182,15 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
             public ChangeInfo implement() throws Exception {
                 JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
-                String className = null;
-                Collection<MethodSymbol> overriddenMethods = new HashSet<MethodSymbol>();
+                ClassSymbol classSymbol = null;
                 for (Object arg : jcDiagnostic.getArgs()) {
                     if (arg instanceof JavafxClassSymbol) {
-                        ClassSymbol classSymbol = (JavafxClassSymbol) arg;
-                        if (HintsUtils.isAnnon(classSymbol)) {
-                            String baseString = classSymbol.className().toString();
-                            className = baseString.substring(0, baseString.lastIndexOf("$")); //NOI18N
-                            for (Symbol symbol : classSymbol.getEnclosedElements()) {
-                                if (symbol instanceof MethodSymbol) {
-                                    overriddenMethods.add((MethodSymbol) symbol);
-                                }
-                            }
-                        } else {
-                            className = classSymbol.getSimpleName().toString();
-                        }
+                        classSymbol = (JavafxClassSymbol) arg;
                         break;
                     }
                 }
                 final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
-                if (className != null) {
+                if (classSymbol != null) {
                     final Collection<JFXImport> imports = new HashSet<JFXImport>();
                     JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
 
@@ -220,29 +204,18 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         }
                     };
                     visitor.scan(compilationInfo.getCompilationUnit(), null);
-                    Collection<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(className, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                    for (ElementHandle<TypeElement> elementHandle : options) {
-                        TypeElement typeElement = elementHandle.resolve(compilationInfo);
-                        if (typeElement == null) {
-                            continue;
-                        }
-                        Collection<? extends Element> elements = getAllMembers(typeElement, compilationInfo);
+                        Collection<? extends Element> elements = getAllMembers(classSymbol, compilationInfo);
                         for (Element e : elements) {
                             if (e instanceof MethodSymbol) {
                                 MethodSymbol method = (MethodSymbol) e;
                                 for (Modifier modifier : method.getModifiers()) {
-                                    if (modifier != Modifier.ABSTRACT) {
-                                        continue;
-                                    }
-                                    MethodSymbol overriddenMethod = HintsUtils.isOverridden(overriddenMethods, method, compilationInfo);
-                                    if (overriddenMethod == null) {
+                                    if (modifier == Modifier.ABSTRACT) {
                                         abstractMethods.add(method);
                                         break;
                                     }
                                 }
                             }
                         }
-                    }
                     if (abstractMethods.isEmpty()) {
                         return null;
                     }
@@ -299,10 +272,10 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     return;
                 }
                 String importName = type.toString();
-                if (!type.isPrimitive() && !importName.equals("void") && !importName.equals("Void") && importName.contains(".")) { //NOI18N
+                if (!type.isPrimitive() && !importName.equalsIgnoreCase("void") && importName.contains(".")) { //NOI18N
                     importName = removeBetween("()", importName); //NOI18N
                     importName = removeBetween("<>", importName); //NOI18N
-                    Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'?/<>~`,]").matcher(importName); //NOI18N
+                    Matcher symbolMatcher = Pattern.compile("[\\[\\]!@#$%^&*(){}|:'/<>~`,]").matcher(importName); //NOI18N
                     if (symbolMatcher.find()) {
                         importName = symbolMatcher.replaceAll("").trim(); //NOI18N
                     }
@@ -332,7 +305,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
                         while (iterator.hasNext()) {
                             VarSymbol var = iterator.next();
-                            String varType = getTypeString(var.asType());
+                            String varType = getTypeString(var.asType(), compilationInfo.getJavafxTypes());
                             method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
                             if (iterator.hasNext()) {
                                 method.append(", "); //NOI18N
@@ -345,11 +318,11 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 //TODO Work around for methodSymbol.getReturnType() which throws NPE!
                 String returnType = null;
                 try {
-                    returnType = getTypeString(methodSymbol.getReturnType());
+                    returnType = getTypeString(methodSymbol.getReturnType(), compilationInfo.getJavafxTypes());
                 } catch (NullPointerException npe) {
                     npe.printStackTrace();
                 }
-                if (returnType == null || returnType.equals("void")) { //NOI18N
+                if (returnType == null) {
                     returnType = "Void"; //NOI18N
                 } else {
                     returnType = HintsUtils.getClassSimpleName(returnType);
@@ -364,7 +337,8 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         if (diagnostic.getStartPosition() < 0) {
             return null;
         }
-        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());
+        ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
+
         return ed;
     }
 
@@ -375,39 +349,71 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             return name;
         }
         name = name.replace(name.substring(firstIndex, lastIndex + 1), "");
+
         return name;
     }
 
-    private String getTypeString(Type type) {
+    private String getTypeString(Type type, JavafxTypes types) {
         String varType = null;
         if (type.isPrimitive()) {
-            varType = type.tsym.name.toString();
-            if (varType.equals("int")) { //NOI18N
+            if (type.tag == TypeTags.INT) { 
                 varType = Integer.class.getSimpleName();
-            } else if (varType.equals("long") //NOI18N
-                    || varType.equals("byte") //NOI18N
-                    || varType.equals("short") //NOI18N
-                    || varType.equals("float") //NOI18N
-                    || varType.equals("double")) { //NOI18N
+            } else if (type.tag == TypeTags.LONG 
+                    || type.tag == TypeTags.BYTE
+                    || type.tag == TypeTags.SHORT 
+                    || type.tag == TypeTags.FLOAT
+                    || type.tag == TypeTags.DOUBLE) { 
 
                 varType = "Number"; //NOI18N
-            } else if (varType.equals("char")) { //NOI18N
+            } else if (type.tag == TypeTags.CHAR) {
                 varType = Character.class.getSimpleName();
-            } else if (varType.equals("boolean")) { //NOI18N
-                return Boolean.class.getSimpleName();
+            } else if (type.tag == TypeTags.BOOLEAN) { 
+                varType = Boolean.class.getSimpleName();
+            } else {
+                varType = type.tsym.name.toString();
+            }
+
+        } else if (types.isSequence(type)) {
+            String suffix = "[]"; // NOI18N
+            type = types.elementType(type);
+
+            switch (type.tag) {
+                case TypeTags.BOOLEAN:
+                    varType = "Boolean" + suffix; // NOI18N
+                case TypeTags.BYTE:
+                    varType = "Byte" + suffix; // NOI18N
+                case TypeTags.DOUBLE:
+                    varType = "Double" + suffix; // NOI18N
+                case TypeTags.FLOAT:
+                    varType = "Float" + suffix; // NOI18N
+                case TypeTags.INT:
+                    varType = "Integer" + suffix; // NOI18N
+                case TypeTags.LONG:
+                    varType = "Long" + suffix; // NOI18N
+                case TypeTags.CHAR:
+                    varType = "Character" + suffix; // NOI18N
+                case TypeTags.SHORT:
+                    varType = "Short" + suffix; // NOI18N
+                case TypeTags.VOID:
+                    varType = "Void" + suffix; // NOI18N
+                default:
+                    try {
+                        varType = type.toString() + suffix;
+                    } catch (Throwable ex) {
+                        varType = "<unknown>" + suffix; // NOI18N
+                    }
             }
         } else if (type instanceof ClassType) {
             varType = ((ClassType) type).tsym.getQualifiedName().toString();
         } else {
-            varType = type.toString();
+            if (type.tag == TypeTags.ARRAY) {
+                varType = "Object[]"; //NOI18N
+            } else if (type.tag == TypeTags.VOID) {
+                varType = "Void"; //NOI18N
+            } else {
+                varType = "Object"; //NOI18N
+            }
         }
-        if (varType.equals("E") || varType.equals("T")) { //NOI18N
-            varType = "Object"; //NOI18N
-        }
-        if (varType.equals("E[]") || varType.equals("T[]")) { //NOI18N
-            varType = "Object[]"; //NOI18N
-        }
-        varType = removeBetween("<>", varType); //NOI18N
 
         return varType;
     }
