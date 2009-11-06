@@ -71,9 +71,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
 
     public static Node getTree(CompilationInfo info, JavaFXTreePath tree) {
         List<Node> result = new ArrayList<Node>();
-
         new FindChildrenTreeVisitor(info).scan(tree, result);
-
         return result.get(0);
     }
 
@@ -154,14 +152,14 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         return -1;
     }
 
-    private static final class NodeChilren extends Children.Keys {
+    private static final class NodeChilren extends Children.Keys<Node> {
 
         public NodeChilren(List<Node> nodes) {
             setKeys(nodes);
         }
 
-        protected Node[] createNodes(Object key) {
-            return new Node[] {(Node) key};
+        protected Node[] createNodes(Node key) {
+            return new Node[] {key};
         }
 
     }
@@ -859,7 +857,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
                 Element el = info.getTrees().getElement(tp);
 
                 if (el != null) {
-                    below.add(new ElementNode(info, el, Collections.EMPTY_LIST));
+                    below.add(new ElementNode(info, el, Collections.<Node>emptyList()));
                 } else {
                     below.add(new NotFoundElementNode(NbBundle.getMessage(TreeNode.class, "Cannot_Resolve_Element"))); // NOI18N
                 }
