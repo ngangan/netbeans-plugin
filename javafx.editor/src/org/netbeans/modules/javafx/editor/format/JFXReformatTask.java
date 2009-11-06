@@ -302,11 +302,23 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         public int compare(Tree t1, Tree t2) {
-            long diff = sp.getStartPosition(ut, t2) - sp.getStartPosition(ut, t1);
-            if (diff == 0) {
-                diff = sp.getEndPosition(ut, t1) - sp.getEndPosition(ut, t2);
+            long t1p = sp.getStartPosition(ut, t1);
+            long t2p = sp.getStartPosition(ut, t2);
+            if (t1p == t2p) {
+                t1p = sp.getEndPosition(ut, t1);
+                t2p = sp.getEndPosition(ut, t2);
             }
-            return (int) diff;
+            if (t1p == t2p) {
+                t1p = t1.hashCode();
+                t2p = t2.hashCode();
+            }
+            return (t1p < t2p ? -1 : (t1p == t2p ? 0 : 1));
+
+//            long diff = sp.getStartPosition(ut, t2) - sp.getStartPosition(ut, t1);
+//            if (diff == 0) {
+//                diff = sp.getEndPosition(ut, t1) - sp.getEndPosition(ut, t2);
+//            }
+//            return (int) diff;
         }
     }
 
@@ -322,7 +334,7 @@ public class JFXReformatTask implements ReformatTask {
                 public @Override Void scan(Tree node, Void p) {
                     if (state == 4) {// FUNCTION_DEFINITION -> FUNCTION_VALUE -> BLOCK_EXPRESSION
                         state = 0;
-                        displaced.add(node);
+                        addTree(node);
                         super.scan(node, p);
                         state = 4;
                         return null;
@@ -343,7 +355,7 @@ public class JFXReformatTask implements ReformatTask {
 
                 public @Override Void visitVariable(VariableTree node, Void p) {
                     if (state == 1 && node.getModifiers().toString().contains("static")) {
-                        displaced.add(node);
+                        addTree(node);
                     }
                     return super.visitVariable(node, p);
                 }
@@ -357,7 +369,7 @@ public class JFXReformatTask implements ReformatTask {
                         if (magicFunc) {
                             state = 2;
                         } else if (node.getModifiers().toString().contains("static")) {
-                            displaced.add(node);
+                            addTree(node);
                         }
                     }
                     super.visitFunctionDefinition(node, p);
@@ -383,6 +395,33 @@ public class JFXReformatTask implements ReformatTask {
                     super.visitBlockExpression(node, p);
                     state = oldState;
                     return null;
+                }
+
+                private void addTree(Tree tree) {
+                    if (!isSynthetic(tree)) {
+                        displaced.add(tree);
+                    }
+                }
+
+                private boolean isSynthetic(Tree node) {
+                    if (node instanceof BlockExpressionTree) {
+                        JavaFXTreePath pp = getCurrentPath().getParentPath();
+                        if (pp != null && pp instanceof FunctionValueTree) {
+                            pp = pp.getParentPath();
+                            JFXTree tree = (JFXTree) pp.getLeaf();
+                            if (tree instanceof FunctionDefinitionTree) {
+                                return synthetic(tree);
+                            }
+                        }
+                    }
+                    return synthetic((JFXTree) node);
+                }
+
+                private boolean synthetic(JFXTree node) {
+//                    long startPos = sp.getStartPosition(cu, node);
+//                    long endPos = sp.getStartPosition(cu, node);
+//                    return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC || startPos == endPos;
+                    return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC;
                 }
             }, null);
         }
@@ -421,8 +460,8 @@ public class JFXReformatTask implements ReformatTask {
         }
     }
 
-    private static class Pretty extends FilterScanner<Boolean, Void> {
-//    private static class Pretty extends JavaFXTreePathScanner<Boolean, Void> {
+//    private static class Pretty extends FilterScanner<Boolean, Void> {
+    private static class Pretty extends JavaFXTreePathScanner<Boolean, Void> {
 
         private static final String OPERATOR = "operator"; // NOI18N
         private static final String EMPTY = ""; // NOI18N
@@ -467,7 +506,7 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private Pretty(CompilationInfo info, String text, TokenSequence<JFXTokenId> tokens, JavaFXTreePath path, CodeStyle cs, int startOffset, int endOffset) {
-            super(info);
+//            super(info);
             this.doc = info.getDocument();
             this.root = path.getCompilationUnit();
             this.fText = text;
@@ -602,53 +641,52 @@ public class JFXReformatTask implements ReformatTask {
 
             // imports in javafx could be where ever
             // TODO remove cs.getBlankLinesBeforeImports() from settings therefore
-            sortedCUTrees = getCUTrees(node);
-            if (sortedCUTrees != null && !sortedCUTrees.isEmpty()) {
-                // TODO process semicolon between members and expressions
-//                boolean semiRead = false;
-                for (Tree tree : sortedCUTrees) {
-                    if (tree instanceof ImportTree) {
-//                        blankLines();
-                        scan(tree, p);
-                    } else if (tree instanceof ClassDeclarationTree) {
-                        blankLines(cs.getBlankLinesBeforeClass());
-                        scan(tree, p);
-                        blankLines(cs.getBlankLinesAfterClass());
-                    } else {
-                        scan(tree, p);
-                    }
-                }
+//            sortedCUTrees = getCUTrees(node);
+//            if (sortedCUTrees != null && !sortedCUTrees.isEmpty()) {
+//                // TODO process semicolon between members and expressions
+////                boolean semiRead = false;
+//                for (Tree tree : sortedCUTrees) {
+//                    if (tree instanceof ImportTree) {
+////                        blankLines();
+//                        scan(tree, p);
+//                    } else if (tree instanceof ClassDeclarationTree) {
+//                        blankLines(cs.getBlankLinesBeforeClass());
+//                        scan(tree, p);
+//                        blankLines(cs.getBlankLinesAfterClass());
+//                    } else {
+//                        scan(tree, p);
+//                    }
+//                }
+//            }
 
+            List<? extends ImportTree> imports = node.getImports();
+            if (imports != null && !imports.isEmpty()) {
+                blankLines(cs.getBlankLinesBeforeImports());
+                for (ImportTree imp : imports) {
+                    blankLines();
+                    scan(imp, p);
+                }
+                blankLines(cs.getBlankLinesAfterImports());
             }
 
-//            List<? extends ImportTree> imports = node.getImports();
-//            if (imports != null && !imports.isEmpty()) {
-//                blankLines(cs.getBlankLinesBeforeImports());
-//                for (ImportTree imp : imports) {
-//                    blankLines();
-//                    scan(imp, p);
-//                }
-//                blankLines(cs.getBlankLinesAfterImports());
-//            }
-
-//            boolean semiRead = false;
-//            for (Tree typeDecl : node.getTypeDecls()) {
-//                if (semiRead && typeDecl.getJavaFXKind() == JavaFXKind.EMPTY_STATEMENT) {
-//                    continue;
-//                }
-//                blankLines(cs.getBlankLinesBeforeClass());
-//                scan(typeDecl, p);
-//                int index = tokens.index();
-//                int c = col;
-//                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-//                if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-//                    semiRead = true;
-//                } else {
-//                    rollback(index, c, d);
-//                    semiRead = false;
-//                }
-//                blankLines(cs.getBlankLinesAfterClass());
-//            }
+            boolean semiRead = false;
+            for (Tree typeDecl : node.getTypeDecls()) {
+                if (semiRead && typeDecl.getJavaFXKind() == JavaFXKind.EMPTY_STATEMENT) {
+                    continue;
+                }
+                blankLines(cs.getBlankLinesBeforeClass());
+                scan(typeDecl, p);
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                    semiRead = true;
+                } else {
+                    rollback(index, c, d);
+                    semiRead = false;
+                }
+                blankLines(cs.getBlankLinesAfterClass());
+            }
             return true;
         }
 
@@ -783,9 +821,9 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : node.getClassMembers()) {
-                if (sortedCUTrees != null && sortedCUTrees.contains(node)) {
-                    continue;
-                }
+//                if (sortedCUTrees != null && sortedCUTrees.contains(member)) {
+//                    continue;
+//                }
 
                 boolean magicFunc = false;
                 if (member instanceof JFXFunctionDefinition) {
@@ -1224,9 +1262,12 @@ public class JFXReformatTask implements ReformatTask {
 //            boolean isEmpty = true;
             final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
             expressions.addAll(node.getStatements());
-            final ExpressionTree value = node.getValue();
-            if (value != null) {
-                expressions.add(value);
+            // JFXC-3284
+            if (expressions.isEmpty()) {
+                final ExpressionTree value = node.getValue();
+                if (value != null) {
+                    expressions.add(value);
+                }
             }
             for (ExpressionTree stat : expressions) {
                 if (magicFunc || !isSynthetic((JFXTree) node)) {
