@@ -78,6 +78,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private static final String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String message = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
+    private static final Comparator importComparator = new ImportComperator();
+    
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
@@ -147,8 +149,10 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                                 int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
                                 if (diagnostic.getStartPosition() == position) {
                                     tree[0] = node;
+
                                     return null;
                                 }
+
                                 return super.visitIdentifier(node, p);
                             }
                         };
@@ -187,6 +191,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     if (listFQN.isEmpty()) {
                         continue;
                     }
+                    Collections.sort(listFQN, importComparator);
                     ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", listFQN, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
                 }
@@ -218,6 +223,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         }
                     }
                 }
+
                 return validDiagnostics;
             }
 
@@ -227,21 +233,26 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         return true;
                     }
                 }
+
                 return false;
             }
         };
     }
 
-    private class FixImport implements Fix {
+    class FixImport implements Fix {
 
         private String fqn;
 
-        public FixImport(String fqn) {
+        FixImport(String fqn) {
             this.fqn = fqn;
         }
 
+        public String getFQN() {
+            return this.fqn;
+        }
+
         public String getText() {
-            return message +fqn;
+            return message + fqn;
         }
 
         public ChangeInfo implement() throws Exception {
@@ -250,5 +261,19 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
 
             return null;
         }
+
+    }
+
+    private static class ImportComperator implements Comparator<Fix> {
+
+        public int compare(Fix fix1, Fix fix2) {
+            FixImport fixImport = (FixImport) fix1;
+            if (fixImport.getFQN().contains("javafx")) {
+                return -1;
+            }
+            
+            return 1;
+        }
+
     }
 }
