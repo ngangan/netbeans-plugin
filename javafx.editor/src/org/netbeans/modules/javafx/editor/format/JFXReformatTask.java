@@ -45,6 +45,10 @@ import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -56,19 +60,25 @@ import java.util.TreeSet;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.api.java.source.CodeStyle;
-import org.netbeans.api.java.source.CodeStyle.WrapStyle;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
+import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
+import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
+import org.openide.cookies.EditorCookie;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
 
 
 /**
@@ -120,6 +130,57 @@ public class JFXReformatTask implements ReformatTask {
         for (Context.Region region : context.indentRegions()) {
             reformatImpl(region, cs);
         }
+    }
+
+    // to be invoked from formatting settings
+    // TODO optimize it and refactor
+    public static String reformat(final String text, final CodeStyle style) {
+        final StringBuilder sb = new StringBuilder(text);
+        try {
+            final File file = File.createTempFile("format", "tmp"); // NOI18N
+            FileOutputStream os = null;
+            InputStream is = null;
+            try {
+                os = new FileOutputStream(file);
+                is = new ByteArrayInputStream(text.getBytes("UTF-8")); // NOI18N
+                FileUtil.copy(is, os);
+            } finally {
+                if (os != null) {
+                    os.close();
+                }
+                if (is != null) {
+                    is.close();
+                }
+            }
+
+            FileObject fObj = FileUtil.toFileObject(file);
+            DataObject dObj = DataObject.find(fObj);
+            EditorCookie ec = (EditorCookie) dObj.getCookie(EditorCookie.class);
+            Document doc = ec.openDocument();
+            doc.putProperty(Language.class, JFXTokenId.language());
+            doc.putProperty("mimeType", JavaFXParserFactory.MIME_TYPE); // NOI18N
+
+            JavaFXSource src = JavaFXSource.forDocument(doc);
+            src.runUserActionTask(new Task<CompilationController>() {
+                public void run(CompilationController controller) throws Exception {
+                    if (controller != null && !controller.toPhase(JavaFXSource.Phase.PARSED).lessThan(JavaFXSource.Phase.PARSED)) {
+                        TokenSequence<JFXTokenId> tokens = TokenHierarchy.create(text, JFXTokenId.language()).tokenSequence(JFXTokenId.language());
+                        UnitTree tree = controller.getCompilationUnit();
+                        for (Diff diff : Pretty.reformat(controller, text, tokens, new JavaFXTreePath(tree), style)) {
+                            int start = diff.getStartOffset();
+                            int end = diff.getEndOffset();
+                            sb.delete(start, end);
+                            String t = diff.getText();
+                            if (t != null && t.length() > 0) {
+                                sb.insert(start, t);
+                            }
+                        }
+                    }
+                }
+            }, true);
+        } catch (Exception ex) {
+        }
+        return sb.toString();
     }
 
     private void reformatImpl(Context.Region region, CodeStyle cs) throws BadLocationException {
@@ -434,6 +495,10 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
+        public R myScan(Tree tree, P p) {
+            return super.scan(tree, p);
+        }
+
         private R myScan(Iterable<? extends Tree> nodes, P p) {
             R r = null;
             if (nodes != null) {
@@ -561,17 +626,16 @@ public class JFXReformatTask implements ReformatTask {
             return pretty.diffs;
         }
 
-        // unused so far
-//        public static LinkedList<Diff> reformat(CompilationInfo info, String text, TokenSequence<JFXTokenId> tokens, JavaFXTreePath path, CodeStyle cs) {
-//            Pretty pretty = new Pretty(info, text, tokens, path, cs, 0, text.length());
-//            pretty.scan(path, null);
-//            tokens.moveEnd();
-//            tokens.movePrevious();
-//            if (tokens.token().id() != JFXTokenId.WS || tokens.token().text().toString().indexOf(NEWLINE) < 0) {
-//                pretty.diffs.addFirst(new Diff(text.length(), text.length(), NEWLINE));
-//            }
-//            return pretty.diffs;
-//        }
+        public static LinkedList<Diff> reformat(CompilationInfo info, String text, TokenSequence<JFXTokenId> tokens, JavaFXTreePath path, CodeStyle cs) {
+            Pretty pretty = new Pretty(info, text, tokens, path, cs, 0, text.length());
+            pretty.scan(path, null);
+            tokens.moveEnd();
+            tokens.movePrevious();
+            if (tokens.token().id() != JFXTokenId.WS || tokens.token().text().toString().indexOf(NEWLINE) < 0) {
+                pretty.diffs.addFirst(new Diff(text.length(), text.length(), NEWLINE));
+            }
+            return pretty.diffs;
+        }
 
         /// ===
         /// === START OF THE VISITOR IMPLEMENTATION
@@ -616,6 +680,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 if (tokens.offset() <= endPos) {
                     final Boolean scan = super.scan(tree, p);
+//                    final Boolean scan = super.myScan(tree, p);
                     return scan != null ? scan : false;
                 }
                 return true;
@@ -1037,6 +1102,7 @@ public class JFXReformatTask implements ReformatTask {
             JFXFunctionDefinition funcDef = (JFXFunctionDefinition) node;
             boolean magicFunc = MAGIC_FUNCTION.contentEquals(funcDef.getName());
 
+            // TODO if magic func - return, members will ve parsed in visitCU
             if (!magicFunc) {
                 int old = indent;
                 ModifiersTree mods = funcDef.getModifiers();
