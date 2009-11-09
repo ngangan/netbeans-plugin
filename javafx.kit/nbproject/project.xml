@@ -47,26 +47,6 @@ made subject to such option by the copyright holder.
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.debugger.jpda.ant</code-name-base>
-                    <run-dependency>
-                        <specification-version>1.11.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.java.editor</code-name-base>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>2.12</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.java.j2seplatform</code-name-base>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.9</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.netbeans.modules.javafx.bestpractices</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
@@ -111,12 +91,6 @@ made subject to such option by the copyright holder.
                 </dependency>
                 <dependency>
                     <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
-                    <run-dependency>
-                        <specification-version>1.7.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.profiler</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
