@@ -307,6 +307,42 @@ made subject to such option by the copyright holder.
                     </folder>
                 </folder>
             </folder>
+          <folder name="Formatting">
+              <folder name="text">
+                  <folder name="x-java">
+<!--                      <file name="TabsAndIndents.instance">
+                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.ui.FmtTabsIndents.getController"/>
+                          <attr name="position" intvalue="100"/>
+                      </file>
+-->                      <file name="Alignment.instance">
+                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtAlignment.getController"/>
+                          <attr name="position" intvalue="200"/>
+                      </file>
+                      <file name="Braces.instance">
+                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBraces.getController"/>
+                          <attr name="position" intvalue="300"/>
+                      </file>
+                      <file name="Wrapping.instance">
+                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtWrapping.getController"/>
+                          <attr name="position" intvalue="400"/>
+                      </file>
+                      <file name="BlankLines.instance">
+                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines.getController"/>
+                          <attr name="position" intvalue="500"/>
+                      </file>
+                      <file name="Spaces.instance">
+                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtSpaces.getController"/>
+                          <attr name="position" intvalue="600"/>
+                      </file>
+                  </folder>
+              </folder>
+          </folder>
         </folder>
     </folder>
 
