@@ -173,6 +173,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     if (options == null) {
                         options = classIndex.getDeclaredTypes(potentialClassSimpleName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         optionsCache.put(potentialClassSimpleName, options);
+                    } else {
+                        System.out.println("Cash used");
                     }
                     List<Fix> listFQN = new ArrayList<Fix>();
                     boolean exists = false;
@@ -211,19 +213,9 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         continue;
                     }
                     if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
-                        boolean isValid = true;
-                        for (Diagnostic d : diagnostics) {
-                            if (d != diagnostic && d.getLineNumber() == diagnostic.getLineNumber()) {
-                                isValid = false;
-                                break;
-                            }
-                        }
-                        if (isValid) {
-                            validDiagnostics.add(diagnostic);
-                        }
+                        validDiagnostics.add(diagnostic);
                     }
                 }
-
                 return validDiagnostics;
             }
 
@@ -261,7 +253,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
 
             return null;
         }
-
     }
 
     private static class ImportComperator implements Comparator<Fix> {
@@ -271,9 +262,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             if (fixImport.getFQN().contains("javafx")) {
                 return -1;
             }
-            
+
             return 1;
         }
-
     }
 }
