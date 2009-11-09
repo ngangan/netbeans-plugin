@@ -57,6 +57,12 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
     static final String[] TESTS = {
         "testCFFunctions",
+        "testCFFunction",
+        "testCFFunctionBody",
+        "testCFClass",
+        "testCFVariables",
+
+
     };
 
     public static String[] TEMPLATES = {
@@ -91,14 +97,33 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         System.out.println("============  Test Code Formating  =======");
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
 
-        for(String template: TEMPLATES){
-            testCodeFormating(template);
-        }
-
-        System.out.println("Fail Code Formating tests: " + failComponents);
-        assertTrue("Failed Code Formating tests: " + failComponents, pass);
+//        for(String template: TEMPLATES){
+//            testCodeFormating(template);
+//        }
+//
+//        System.out.println("Fail Code Formating tests: " + failComponents);
+//        assertTrue("Failed Code Formating tests: " + failComponents, pass);
 
     }
+
+
+    public void testCFFunction(){
+        testCodeFormating("Function");
+    }
+
+    public void testCFFunctionBody(){
+        testCodeFormating("FunctionBody");
+    }
+
+    public void testCFClass(){
+        testCodeFormating("Class");
+    }
+
+    public void testCFVariables(){
+        testCodeFormating("Variables");
+    }
+
+
 
     public void testCodeFormating(String testName) {
         JavaFXProject project = new JavaFXProject(PROJECT_NAME);
@@ -122,18 +147,21 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         code = code.trim();
         goldenCode = goldenCode.trim();
 
-        System.out.println("--------" + template + "----------");
-        System.out.println("code before\n" + code);
+        System.out.println("------------ Golden --------");
+        System.out.println(goldenCode);
         System.out.println("----------------------------");
 
+
+        System.out.println("--------" + template + "----------");
+        System.out.println(code);
         System.out.println("----------------------------");
-        System.out.println("code golden\n" + goldenCode);
-        System.out.println("----------------------------");
+
 
 
         if(!goldenCode.equals(code)){
             pass = false;
             failComponents+= ", " + template;
+            fail(template + ": Golden file does not match");
         }
 
     }
