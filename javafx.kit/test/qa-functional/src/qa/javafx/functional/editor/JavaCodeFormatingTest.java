@@ -62,6 +62,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         "testCFClass",
         "testCFVariables",
         "testCFObjectLiteral",
+        "testCFDataTypes",
 
 
     };
@@ -126,6 +127,10 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
     public void testCFObjectLiteral(){
         testCodeFormating("ObjectLiteral");
+    }
+
+    public void testCFDataTypes(){
+        testCodeFormating("DataTypes");
     }
 
 
