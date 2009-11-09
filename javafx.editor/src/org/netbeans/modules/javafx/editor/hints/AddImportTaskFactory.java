@@ -173,8 +173,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     if (options == null) {
                         options = classIndex.getDeclaredTypes(potentialClassSimpleName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         optionsCache.put(potentialClassSimpleName, options);
-                    } else {
-                        System.out.println("Cash used");
                     }
                     List<Fix> listFQN = new ArrayList<Fix>();
                     boolean exists = false;
