@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,7 +34,7 @@
  * 
  * Contributor(s):
  * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 package org.netbeans.api.javafx.source;
 
@@ -62,7 +62,6 @@ import org.openide.util.Exceptions;
 import org.openide.util.WeakListeners;
 
 /**
- *
  * @author nenik
  */
 public class ClasspathInfo {
@@ -87,9 +86,7 @@ public class ClasspathInfo {
             //javac requires at least java.lang
             bootPath = JavaFXPlatform.getDefaultFXPlatform().getBootstrapLibraries();
         }
-
         ClasspathInfo instance = new ClasspathInfo(bootPath, compilePath, srcPath);
-        
         return instance;
     }
 
@@ -105,8 +102,12 @@ public class ClasspathInfo {
 
         this.cpListener = new ClassPathListener();
         this.bootPath.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.bootPath));
-    	this.compilePathOrig.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.compilePath));
-    	this.srcPathOrig.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.srcPath));
+        if (compilePathOrig != null) {
+            this.compilePathOrig.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.compilePath));
+        }
+        if (this.srcPathOrig != null) {
+            this.srcPathOrig.addPropertyChangeListener(WeakListeners.propertyChange(this.cpListener, this.srcPath));
+        }
     }
 
     public ClassPath getClassPath(PathKind pathKind) {
