@@ -43,11 +43,11 @@ package org.netbeans.modules.javafx.editor.format;
 
 import java.util.prefs.Preferences;
 import javax.swing.text.Document;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.javafx.editor.format.ui.FmtOptions;
 import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.*;
 import org.netbeans.modules.editor.indent.spi.CodeStylePreferences;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 import org.openide.filesystems.FileObject;
 
 /** 
@@ -97,7 +97,7 @@ public final class CodeStyle {
      * @since 0.39
      */
     public synchronized static CodeStyle getDefault(FileObject file) {
-        Preferences prefs = CodeStylePreferences.get(file, JavaFXParserFactory.MIME_TYPE).getPreferences();
+        Preferences prefs = CodeStylePreferences.get(file, FXSourceUtils.MIME_TYPE).getPreferences();
         return FmtOptions.codeStyleProducer.create(prefs);
     }
 
@@ -113,7 +113,7 @@ public final class CodeStyle {
      * @since 0.39
      */
     public synchronized static CodeStyle getDefault(Document doc) {
-        Preferences prefs = CodeStylePreferences.get(doc, JavaFXParserFactory.MIME_TYPE).getPreferences();
+        Preferences prefs = CodeStylePreferences.get(doc, FXSourceUtils.MIME_TYPE).getPreferences();
         return FmtOptions.codeStyleProducer.create(prefs);
     }
     

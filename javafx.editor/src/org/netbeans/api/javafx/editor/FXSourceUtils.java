@@ -40,6 +40,9 @@ import org.openide.util.NbBundle;
  */
 public final class FXSourceUtils {
 
+    /** Mime-type of FX sources. */
+    public static final String MIME_TYPE = "text/x-fx";
+
     private static final char[] CODE_COMPL_SUBST_BREAKERS = 
         {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', // NOI18N
          '(', ')', '{', '}', '[', ']',                     // NOI18N

@@ -74,7 +74,6 @@ import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
 import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -158,7 +157,7 @@ public class JFXReformatTask implements ReformatTask {
             EditorCookie ec = (EditorCookie) dObj.getCookie(EditorCookie.class);
             Document doc = ec.openDocument();
             doc.putProperty(Language.class, JFXTokenId.language());
-            doc.putProperty("mimeType", JavaFXParserFactory.MIME_TYPE); // NOI18N
+            doc.putProperty("mimeType", FXSourceUtils.MIME_TYPE); // NOI18N
 
             JavaFXSource src = JavaFXSource.forDocument(doc);
             src.runUserActionTask(new Task<CompilationController>() {

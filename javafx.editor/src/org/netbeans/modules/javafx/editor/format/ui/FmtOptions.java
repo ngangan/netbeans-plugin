@@ -53,9 +53,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.editor.settings.SimpleValueNames;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.modules.javafx.editor.format.CodeStyle;
 import org.netbeans.modules.javafx.editor.format.JFXReformatTask;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 import static org.netbeans.modules.javafx.editor.format.CodeStyle.*;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
 import org.netbeans.modules.options.editor.spi.PreviewProvider;
@@ -569,7 +569,7 @@ public class FmtOptions {
                 previewPane.getAccessibleContext().setAccessibleName(NbBundle.getMessage(FmtOptions.class, "AN_Preview")); //NOI18N
                 previewPane.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(FmtOptions.class, "AD_Preview")); //NOI18N
                 previewPane.putClientProperty("HighlightsLayerIncludes", "^org\\.netbeans\\.modules\\.editor\\.lib2\\.highlighting\\.SyntaxHighlighting$"); //NOI18N
-                previewPane.setEditorKit(CloneableEditorSupport.getEditorKit(JavaFXParserFactory.MIME_TYPE));
+                previewPane.setEditorKit(CloneableEditorSupport.getEditorKit(FXSourceUtils.MIME_TYPE));
                 previewPane.setEditable(false);
             }
             return previewPane;
