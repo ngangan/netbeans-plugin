@@ -1374,7 +1374,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     private void addPseudoVariables() {
         for (String pVar : PSEUDO_VARS) {
-            addResult(JavaFXCompletionItem.createPseudoVariable(pVar, query.anchorOffset));
+            if (JavaFXCompletionProvider.startsWith(pVar, getPrefix())) {
+                addResult(JavaFXCompletionItem.createPseudoVariable(pVar, query.anchorOffset));
+            }
         }
     }
 
