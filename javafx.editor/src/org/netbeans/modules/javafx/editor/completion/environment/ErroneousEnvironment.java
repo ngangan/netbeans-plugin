@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,7 +34,7 @@
  * 
  * Contributor(s):
  * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.editor.completion.environment;
@@ -51,7 +51,6 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
- *
  * @author David Strupl
  */
 public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneous> {
@@ -69,7 +68,7 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
         JavaFXTreePath p = JavaFXTreePath.getPath(root, t);
         
         if (t.getErrorTrees().isEmpty()) {
-            fakeIt();
+            tryToSanitizeSource();
             return;
         }
 
@@ -80,19 +79,19 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
             long et = pos.getEndPosition(root, tt);
             if (LOGGABLE) log("   st = " + st + "  et == " + et); // NOI18N
             if (et == offset-1) {
-                fakeIt();
+                tryToSanitizeSource();
             }
         }
     }
 
-    private void fakeIt() {
+    private void tryToSanitizeSource() {
         try {
             Document d = controller.getDocument();
             String start = d.getText(0, offset);
             if (LOGGABLE) log("  start = " + start); // NOI18N
             String end = d.getText(offset, d.getLength()-offset);
             if (LOGGABLE) log("  end = " + end); // NOI18N
-            useFakeSource(start+"x"+end, offset); // NOI18N
+            useSanitizedSource(start+"x"+end, offset); // NOI18N
         } catch (BadLocationException ble) {
             if (LOGGABLE) logger.log(Level.FINER, "ble", ble); // NOI18N
         }

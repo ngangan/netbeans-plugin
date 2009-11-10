@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -97,7 +97,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         "__DIR__", "__FILE__", "__PROFILE__" // NOI18N
     };
 
-    private static int usingFakeSource = 0;
+    private static int usingSanitizedSource = 0;
     protected int offset;
     protected String prefix;
     protected boolean isCamelCasePrefix;
@@ -1533,18 +1533,18 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         return null;
     }
-        /**
-     *
-     * @param source
+
+    /**
+     * XXX
      */
-    protected void useFakeSource(String source, final int pos) {
-        if (LOGGABLE) log("useFakeSource " + source + " pos == " + pos); // NOI18N
-        if (usingFakeSource > 1) {
+    protected void useSanitizedSource(String source, final int pos) {
+        if (LOGGABLE) log("useSanitizedSource" + source + " pos == " + pos); // NOI18N
+        if (usingSanitizedSource > 1) {
             // allow to recurse only twice ;-)
             return;
         }
         try {
-            usingFakeSource++;
+            usingSanitizedSource++;
             FileSystem fs = FileUtil.createMemoryFileSystem();
             final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx"); // NOI18N
             Writer w = new OutputStreamWriter(fo.getOutputStream());
@@ -1555,25 +1555,25 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             JavaFXParserResult parserResult = JavaFXParserResult.create(Source.create(fo), info);
             if (LOGGABLE) log("  JavaFXParserResult obtained " + parserResult); // NOI18N
             CompilationController.create(parserResult).runWhenScanFinished(new Task<CompilationController>() {
-                public void run(CompilationController fakeController) throws Exception {
+                public void run(CompilationController sanitizedController) throws Exception {
                     if (LOGGABLE) log("    scan finished"); // NOI18N
-                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos,true);
+                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(sanitizedController, pos,true);
                     if (LOGGABLE) log("    env == " + env); // NOI18N
-                    if (fakeController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                        if (LOGGABLE) log("    fake failed to analyze -- returning"); // NOI18N
+                    if (sanitizedController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                        if (LOGGABLE) log("    sanitized failed to analyze -- returning"); // NOI18N
                         return;
                     }
-                    if (LOGGABLE) log("    fake analyzed"); // NOI18N
+                    if (LOGGABLE) log("    sanitized analyzed"); // NOI18N
                     if (! env.isTreeBroken()) {
-                        if (LOGGABLE) log("    fake non-broken tree"); // NOI18N
+                        if (LOGGABLE) log("    sanitized non-broken tree"); // NOI18N
                         final Tree leaf = env.getPath().getLeaf();
                         env.inside(leaf);
-                        // try to remove faked entries:
-                        String fakeName = fo.getName();
+                        // try to remove sanitized entries:
+                        String sanitizedName = fo.getName();
                         Set<JavaFXCompletionItem> toRemove = new TreeSet<JavaFXCompletionItem>();
                         for (JavaFXCompletionItem r : query.results) {
                             if (LOGGABLE) log("    checking " + r.getLeftHtmlText()); // NOI18N
-                            if (r.getLeftHtmlText().contains(fakeName)) {
+                            if (r.getLeftHtmlText().contains(sanitizedName)) {
                                 if (LOGGABLE) log("    will remove " + r); // NOI18N
                                 toRemove.add(r);
                             }
@@ -1584,12 +1584,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             });
         } catch (IOException ex) {
             if (LOGGABLE) {
-                logger.log(Level.FINE,"useFakeSource failed: ",ex); // NOI18N
+                logger.log(Level.FINE,"useSanitizedSource failed: ",ex); // NOI18N
             }
         } catch (ParseException e) {
             Exceptions.printStackTrace(e);
         } finally {
-            usingFakeSource--;
+            usingSanitizedSource--;
         }
     }
 

@@ -108,7 +108,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
             if (LOGGABLE) {
                 log("  end = " + end); // NOI18N
             }
-            useFakeSource(start + "\n;" + end, offset); // NOI18N
+            useSanitizedSource(start + "\n;" + end, offset); // NOI18N
             return true;
         } catch (BadLocationException ble) {
             if (LOGGABLE) {
