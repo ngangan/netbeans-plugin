@@ -269,38 +269,38 @@ public class HintsTestBase extends JavaFXTestBase {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
-    protected void checkHint(final AddImportTaskFactory factory, final String source, final String caretLine, final String goldenFileName) throws Exception {
-        File testSource = new File(getWorkDir(), "test/Test.fx");
-        testSource.getParentFile().mkdirs();
-        File sourceFile = new File(getDataDir(), "org/netbeans/modules/javafx/editor/hints/data/" + "AddHints" + ".fx");
-        //String sourceText = slurp(sourceFile);
-        //int caretPos = getCaretOffset(sourceText, caretLine);
-        copyToWorkDir(sourceFile, testSource);
-        FileObject testSourceFO = FileUtil.toFileObject(testSource);
-        assertNotNull(testSourceFO);
-        DataObject testSourceDO = DataObject.find(testSourceFO);
-        assertNotNull(testSourceDO);
-        EditorCookie ec = testSourceDO.getCookie(EditorCookie.class);
-        assertNotNull(ec);
-        final Document doc = ec.openDocument();
-        assertNotNull(doc);
-        doc.putProperty(Language.class, JFXTokenId.language());
-        doc.putProperty("mimeType", "text/x-fx");
-        JavaFXSource s = JavaFXSource.forDocument(doc);
-        final Task task = factory.createTask(testSourceFO);
-        s.runUserActionTask(new Task<CompilationController>() {
-            public void run(CompilationController parameter) throws Exception {
-                for (ClassPath.Entry entry : getBootClassPath().entries()) {
-                    entry.getDefiningClassPath();
-                    Collection<ElementHandle<TypeElement>> options = parameter.getClasspathInfo().getClassIndex().getDeclaredTypes("Node", ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                    System.out.println(options);
-                }
-            }
-        }, true);
-        //s.runUserActionTask(task, true);
-        LifecycleManager.getDefault().saveAll();
-
-    }
+//    protected void checkHint(final AddImportTaskFactory factory, final String source, final String caretLine, final String goldenFileName) throws Exception {
+//        File testSource = new File(getWorkDir(), "test/Test.fx");
+//        testSource.getParentFile().mkdirs();
+//        File sourceFile = new File(getDataDir(), "org/netbeans/modules/javafx/editor/hints/data/" + "AddHints" + ".fx");
+//        //String sourceText = slurp(sourceFile);
+//        //int caretPos = getCaretOffset(sourceText, caretLine);
+//        copyToWorkDir(sourceFile, testSource);
+//        FileObject testSourceFO = FileUtil.toFileObject(testSource);
+//        assertNotNull(testSourceFO);
+//        DataObject testSourceDO = DataObject.find(testSourceFO);
+//        assertNotNull(testSourceDO);
+//        EditorCookie ec = testSourceDO.getCookie(EditorCookie.class);
+//        assertNotNull(ec);
+//        final Document doc = ec.openDocument();
+//        assertNotNull(doc);
+//        doc.putProperty(Language.class, JFXTokenId.language());
+//        doc.putProperty("mimeType", "text/x-fx");
+//        JavaFXSource s = JavaFXSource.forDocument(doc);
+//        final Task task = factory.createTask(testSourceFO);
+//        s.runUserActionTask(new Task<CompilationController>() {
+//            public void run(CompilationController parameter) throws Exception {
+//                for (ClassPath.Entry entry : getBootClassPath().entries()) {
+//                    entry.getDefiningClassPath();
+//                    Collection<ElementHandle<TypeElement>> options = parameter.getClasspathInfo().getClassIndex().getDeclaredTypes("Node", ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+//                    System.out.println(options);
+//                }
+//            }
+//        }, true);
+//        //s.runUserActionTask(task, true);
+//        LifecycleManager.getDefault().saveAll();
+//
+//    }
 
     private void copyToWorkDir(File resource, File toFile) throws IOException {
         InputStream is = new FileInputStream(resource);
