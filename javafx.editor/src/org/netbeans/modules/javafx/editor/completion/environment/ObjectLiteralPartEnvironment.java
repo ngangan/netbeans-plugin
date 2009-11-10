@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,15 +31,16 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ *
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.tools.javafx.tree.JFXErroneous;
 import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
@@ -52,10 +53,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.DeclaredType;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
 
 /**
- *
  * @author David Strupl
  */
 public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JFXObjectLiteralPart> {
@@ -74,21 +76,48 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
             if (e.getKind() == ElementKind.FIELD) {
                 TypeMirror type = e.asType();
                 if (type.getKind() == TypeKind.DECLARED) {
-                    if ("java.lang.String".contentEquals(((TypeElement)((DeclaredType)type).
-                            asElement()).getQualifiedName()))
-                    {
+                    TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
+                    if ("java.lang.String".contentEquals(element.getQualifiedName())) { // NOI18N
                         addResult(JavaFXCompletionItem.createConstantItem(
-                                query.getComponent().getCaretPosition(), "\"\"", 1));
+                                query.getComponent().getCaretPosition(), "\"\"", 1)); // NOI18N
                     }
                 }
             }
+        }
+        if (t.getExpression() instanceof JFXErroneous
+                && tryToSanitizeSource()) {
+            return;
         }
         addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
         addLocalMembersAndVars(getSmartType(t));
         addValueKeywords();
 
     }
-    
+
+    private boolean tryToSanitizeSource() {
+        try {
+            Document d = controller.getDocument();
+            if (!"\n ".equals(d.getText(offset, 2))) { // NOI18N
+                return false;
+            }
+            String start = d.getText(0, offset);
+            if (LOGGABLE) {
+                log("  start = " + start); // NOI18N
+            }
+            String end = d.getText(offset + 2, d.getLength() - offset - 2);
+            if (LOGGABLE) {
+                log("  end = " + end); // NOI18N
+            }
+            useFakeSource(start + "\n;" + end, offset); // NOI18N
+            return true;
+        } catch (BadLocationException ble) {
+            if (LOGGABLE) {
+                logger.log(Level.FINER, "ble", ble); // NOI18N
+            }
+            return false;
+        }
+    }
+
     private TypeMirror getSmartType(JFXObjectLiteralPart t) throws IOException {
         if (t.getExpression() == null) {
             return null;
@@ -100,7 +129,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
         if (LOGGABLE) log("  smart == " + type); // NOI18N
         return type;
     }
-    
+
     private static void log(String s) {
         if (LOGGABLE) {
             logger.fine(s);
