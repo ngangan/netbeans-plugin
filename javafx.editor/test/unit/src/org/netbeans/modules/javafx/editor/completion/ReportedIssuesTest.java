@@ -50,6 +50,13 @@ public class ReportedIssuesTest extends CompletionTestBase {
         checkCompletion("Iz175333", "ba^", "iz175333.pass");
     }
 
+    /* Currently the completion returns what it should for this case, but also
+     * adds some garbage (packages) for some reason, which causes this test to
+     * fail, thus disabled temporarily. */
+    public void DISABLED_testIssue173358() throws Exception {
+        checkCompletion("Iz173358", "print^", "iz173358.pass");
+    }
+
     public void testIssue159678() throws Exception {
         // XXX: seeems that we need JavaBinaryIndexer to be registered during
         // test run. Do not know how to do that correctly yet.
