@@ -5,9 +5,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.Affine2D;
-import com.sun.javafx.sg.PGNode;
+import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -23,11 +21,11 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactor
 import org.netbeans.modules.javafx.fxd.composer.preview.PreviewTopComponent;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
-import com.sun.scenario.scenegraph.JSGPanel;
-import com.sun.scenario.scenegraph.SGNode;
 
 import com.sun.javafx.tools.fxd.loader.Profile;
-import com.sun.scenario.scenegraph.SGGroup;
+import java.util.Collection;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import org.netbeans.modules.javafx.fxd.composer.source.SourceElement;
 
 /**
@@ -79,7 +77,7 @@ public final class FXDComposerController {
 
             final boolean busyCursorOn = !m_busyStates.isEmpty();
             if (m_busyCursorOn != busyCursorOn) {
-                final Component comp = getSGPanel();
+                final Component comp = getScenePanel();
 
                 if ( comp != null) {
                     SwingUtilities.invokeLater( new Runnable() {
@@ -115,13 +113,16 @@ public final class FXDComposerController {
         m_previewTopComponent = previewTopComponent;
     }
                    
-    public JSGPanel getSGPanel() {
-        return m_previewTopComponent.getJSGPane();
+    public Scene getScene() {
+        return m_previewTopComponent.getScene();
     }
-       
-    public SGNode getNode(final String id) {
-        SGNode root = getRootNode();
-        SGNode node = root != null ? root.lookup(id) : null;
+
+    public SwingScenePanel getScenePanel() {
+        return m_previewTopComponent.getScenePanel();
+    }
+
+    public Node getNode(final String id) {
+        Node node = getScene().lookup(id);
         //System.out.println("Lookup for " + id + " -> " + node);
         return node;
     }
@@ -129,16 +130,43 @@ public final class FXDComposerController {
     protected boolean hasPreviewTC() {
         return m_previewTopComponent != null;
     }
-    
-    protected SGNode getRootNode() {
-        JSGPanel panel = getSGPanel();
-        if (panel != null) {
-            return panel.getScene();
-        } else {
-            return null;
-        }        
-    }    
 
+    /*
+    public FXDElement getElementAt( int x, int y) {
+        FXDElement elem = null;
+
+        SGNode root = getRootNode();
+        if (root != null) {
+            List<SGNode> selected = new ArrayList<SGNode>();
+            String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
+
+            Affine2D parentTX = new Affine2D();
+            getScenePanel().getSceneGroup().getTransformMatrix(parentTX);
+
+            Affine2D currTx = new Affine2D();
+            root.getTransformMatrix(currTx);
+
+            parentTX.concatenate(currTx);
+            pick( (SGGroup) root, selected, x, y, idPrefix, null, parentTX);
+
+            String id;
+            int selNum;
+//            System.out.println("*******************************************");
+//            for ( SGNode node : selected) {
+//                System.out.println("\t '" + node.getID() + "' " + node);
+//            }
+            if ( (selNum=selected.size()) > 0 &&
+                 (id=selected.get(selNum-1).getID()) != null &&
+                 id.length() > 0) {
+                elem = new FXDElement(m_dObj, id);
+            }
+        }
+
+        return elem;
+    }
+     */
+
+    /*
     private static void pick( SGGroup parent, List<SGNode> selected, float x, float y, 
             String idPrefix, SGNode significantParent, Affine2D accumTx)
     {
@@ -170,40 +198,25 @@ public final class FXDComposerController {
             }
         }
     }
-    
-    public FXDElement getElementAt( int x, int y) {
-        FXDElement elem = null;
+     */
 
-        SGNode root = getRootNode();
-        if (root != null) {
-            List<SGNode> selected = new ArrayList<SGNode>();
-            String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
-
-            Affine2D parentTX = new Affine2D();
-            getSGPanel().getSceneGroup().getTransformMatrix(parentTX);
-
-            Affine2D currTx = new Affine2D();
-            root.getTransformMatrix(currTx);
-
-            parentTX.concatenate(currTx);
-            pick( (SGGroup) root, selected, x, y, idPrefix, null, parentTX);
-
-            String id;
-            int selNum;
-//            System.out.println("*******************************************");
-//            for ( SGNode node : selected) {
-//                System.out.println("\t '" + node.getID() + "' " + node);
-//            }
-            if ( (selNum=selected.size()) > 0 && 
-                 (id=selected.get(selNum-1).getID()) != null &&
-                 id.length() > 0) {
-                elem = new FXDElement(m_dObj, id);
+    public FXDElement getElementAt(int x, int y) {
+        FXDElement element = null;
+        Collection nodes = getScene().impl_pick(x, y);
+        for (Object node : nodes) {
+            System.out.println("    Node: " + node);
+        }
+        if (!nodes.isEmpty()) {
+            Object[] nodesArray = nodes.toArray();
+            int selNum = nodesArray.length;
+            String id = ((Node) nodesArray[selNum - 1]).get$id();
+            if (id != null && id.length() > 0) {
+                element = new FXDElement(m_dObj, id);
             }
-        } 
-        
-        return elem;
+        }
+        return element;
     }
-    
+
     public void repaint() {
 //        m_imageContainer.setTryPaint();
         if ( m_previewTopComponent != null) {

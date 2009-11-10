@@ -70,7 +70,7 @@ public class ActionController implements ActionLookup {
 //         }
          
          if ( !controller.isBusy()) {
-            boolean isOutsideEvent = event.getSource() != controller.getSGPanel(); 
+            boolean isOutsideEvent = event.getSource() != controller.getScenePanel();
 
             //first let ongoing actions to process the event         
             boolean consumed = false;
@@ -118,7 +118,7 @@ public class ActionController implements ActionLookup {
                     }
                 }  
             }
-            controller.getSGPanel().setCursor(cursor != null ? cursor.getCursor() : null);
+            controller.getScenePanel().setCursor(cursor != null ? cursor.getCursor() : null);
          }
     }
 

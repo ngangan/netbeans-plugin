@@ -52,9 +52,13 @@ import java.awt.LayoutManager;
 import java.awt.Point;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -68,10 +72,13 @@ final class ImageHolder extends JPanel {
     private final JComponent    imagePanel;
     private final AtomicBoolean canPaint ;
     private final JComponent    myErrorComponent;
+    private  final FXZDataObject m_dObj;
     
-    public ImageHolder(JComponent imagePanel) {
+    public ImageHolder(JComponent imagePanel, FXZDataObject dObj) {
         this.imagePanel = imagePanel;
+        this.m_dObj = dObj;
         setLayout( new CenteredLayoutManager());
+        imagePanel.setBorder(BorderFactory.createLineBorder(Color.yellow));
         add(imagePanel);
         setDoubleBuffered(true);
         canPaint = new AtomicBoolean( true );
@@ -132,8 +139,13 @@ final class ImageHolder extends JPanel {
         }
         g.setClip( clip);
          */
-    }   
+    }
 
+    @Override
+    public void paintComponent(java.awt.Graphics g) {
+        super.paintComponent(g);
+        m_dObj.getController().paintActions(g);
+    }
 
     private static void drawCross(Graphics g, int x, int y) {
         g.drawLine( x - CROSS_SIZE, y, x + CROSS_SIZE, y);
@@ -157,6 +169,7 @@ final class ImageHolder extends JPanel {
         public void layoutContainer(Container parent) {
             Dimension d = imagePanel.getPreferredSize();
             System.out.println("Preferred size: " + d);
+            
 //            System.err.println("Panel size: " + d);
 //            com.sun.scenario.scenegraph.JSGPanel sgPanel = (com.sun.scenario.scenegraph.JSGPanel) imagePanel;
 //            com.sun.scenario.scenegraph.fx.FXNode fxNode = (com.sun.scenario.scenegraph.fx.FXNode) sgPanel.getScene();

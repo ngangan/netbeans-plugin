@@ -41,8 +41,8 @@
 package org.netbeans.modules.javafx.fxd.composer.model;
 
 import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.Affine2D;
-import com.sun.scenario.scenegraph.SGNode;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.Exceptions;
@@ -135,23 +135,32 @@ public final class FXDElement {
         }
         return false;
     }
-    
+
+    Bounds2D getBounds() {
+        Node node = getController().getNode(m_id);
+        assert node != null;
+        Bounds b = node.get$boundsInParent();
+        Bounds2D b2d = new Bounds2D(b.get$minX(), b.get$minY(), b.get$maxX(), b.get$maxY());
+        return b2d;
+    }
+    /*
     Bounds2D getBounds() {
         SGNode node = getController().getNode(m_id);
         assert node != null;
         Bounds2D bounds = new Bounds2D();
         Affine2D transform = new Affine2D();
-        getController().getSGPanel().getSceneGroup().getTransformMatrix(transform);
+        getController().getScenePanel().getSceneGroup().getTransformMatrix(transform);
         node.getCompleteBounds(bounds, transform);
         return bounds;
     }
+    */
 
     public boolean isDeleted() {
         return m_isDeleted;
     }
     
     protected void repaint(int x, int y, int w, int h) {
-        m_dObj.getController().getSGPanel().repaint(x, y, w, h);
+        m_dObj.getController().getScenePanel().repaint(x, y, w, h);
     }
     
     public void repaint(double overlap) {
