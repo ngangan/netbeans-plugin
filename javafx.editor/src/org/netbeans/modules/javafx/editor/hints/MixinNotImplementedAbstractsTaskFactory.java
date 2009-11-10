@@ -139,7 +139,13 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                         return;
                     }
                     JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
-                    Element mixinElement = compilationInfo.getTrees().getElement(path);
+                    Element mixinElement = null;
+                    try {
+                        mixinElement = compilationInfo.getTrees().getElement(path);
+                    } catch (NullPointerException npe) {
+                        npe.printStackTrace();
+                        continue;
+                    }
                     if (mixinElement == null || !(mixinElement instanceof JavafxClassSymbol)) {
                         continue;
                     }
