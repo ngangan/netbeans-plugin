@@ -600,10 +600,13 @@ public final class FXSourceUtils {
 
 
     public static Document getDocument(final FileObject file) {
+        if (!file.isValid()) { // deleted
+            return null;
+        }
         DataObject od = null;
         try {
             od = DataObject.find(file);
-        } catch (DataObjectNotFoundException ex) {
+        } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
             return null;
         }
