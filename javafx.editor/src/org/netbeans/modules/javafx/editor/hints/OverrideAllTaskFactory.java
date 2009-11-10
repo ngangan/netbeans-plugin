@@ -67,7 +67,6 @@ import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.Imports;
-import org.netbeans.editor.Utilities;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -238,7 +237,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     public void run() {
                         try {
                             document.insertString(positon, methods.toString(), null);
-                            JTextComponent target = Utilities.getFocusedComponent();
+                            JTextComponent target = HintsUtils.getEditorComponent(document);
                             if (target == null) {
                                 return;
                             }

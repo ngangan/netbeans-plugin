@@ -62,7 +62,6 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
-import org.netbeans.editor.Utilities;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -79,18 +78,26 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String message = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
     private static final Comparator importComparator = new ImportComperator();
-    
+
     private final AtomicBoolean cancel = new AtomicBoolean();
+    private boolean trackErrors = false;
+    private List<ErrorDescription> descriptions = null;
 
     public AddImportTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
+    AddImportTaskFactory(boolean trackErrors) {
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        this.trackErrors = trackErrors;
+        this.descriptions = new ArrayList<ErrorDescription>();
+    }
+
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-        final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
         final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
+        final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -185,7 +192,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                             }
                         }
                         if (!exists) {
-                            listFQN.add(new FixImport(potentialClassSimpleName));
+                            listFQN.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
                         }
                     }
                     if (listFQN.isEmpty()) {
@@ -202,6 +209,9 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             private void clear() {
                 optionsCache.clear();
                 errors.clear();
+                if (trackErrors) {
+                    descriptions = errors;
+                }
             }
 
             private Collection<Diagnostic> getValidDiagnostics(Collection<Diagnostic> diagnostics) {
@@ -214,6 +224,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         validDiagnostics.add(diagnostic);
                     }
                 }
+
                 return validDiagnostics;
             }
 
@@ -229,12 +240,18 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         };
     }
 
-    class FixImport implements Fix {
+    Collection<ErrorDescription> getDescriptions() {
+        return descriptions;
+    }
+
+    private class FixImport implements Fix {
 
         private String fqn;
+        private Document document;
 
-        FixImport(String fqn) {
+        FixImport(String fqn, Document document) {
             this.fqn = fqn;
+            this.document = document;
         }
 
         public String getFQN() {
@@ -246,7 +263,11 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         }
 
         public ChangeInfo implement() throws Exception {
-            JTextComponent target = Utilities.getFocusedComponent();
+            JTextComponent target = HintsUtils.getEditorComponent(document);
+            if (target == null) {
+                return null;
+            }
+            document = null;
             Imports.addImport(target, fqn);
 
             return null;
@@ -257,7 +278,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
 
         public int compare(Fix fix1, Fix fix2) {
             FixImport fixImport = (FixImport) fix1;
-            if (fixImport.getFQN().contains("javafx")) {
+            if (fixImport.getFQN().contains("javafx")) { //NOI18N
                 return -1;
             }
 
