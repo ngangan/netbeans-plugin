@@ -280,12 +280,15 @@ public class Util {
 
 
     public static void waitScanFinished(){
+        System.out.println("*** [wait scan] start ***");
         try{Thread.sleep( 7000 ); }catch(Exception e) {}
         
-        long waitTime = 50;
-        long waitCount = MAX_WAIT_TIME / waitTime;
+        long waitTime = 2000;
+        //long waitCount = MAX_WAIT_TIME / waitTime;
+        System.out.println("*** [wait scan] ");
         
-        for(long time=0; time < waitCount; time++){
+        for(long time=0; time < MAX_WAIT_TIME; time += waitTime){
+            System.out.println("*** [wait scan] time " + time);
             try{Thread.sleep( waitTime ); }catch(Exception e) {}
             
             Object scanning = JProgressBarOperator.findJProgressBar((Container)MainWindowOperator.getDefault().getSource());
