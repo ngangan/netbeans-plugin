@@ -44,6 +44,7 @@ import com.sun.javafx.api.JavafxBindStatus;
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.org.apache.xpath.internal.axes.ReverseAxesWalker;
 import com.sun.tools.javafx.tree.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -507,7 +508,7 @@ public class JFXReformatTask implements ReformatTask {
             Tree topLevelClass = null;
             for (Tree tree : typeDecls) {
                 // assume FXScript has only 1 top level class and it's named as a file (nice FX feature)
-                if (tree instanceof ClassDeclarationTree) {
+                if (tree.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) {
                     topLevelClass = tree;
                     if (!isSynthetic(tree)) {
                         cuTrees.add(tree);
@@ -518,7 +519,7 @@ public class JFXReformatTask implements ReformatTask {
             if (topLevelClass != null) {
                 List<Tree> members = ((ClassDeclarationTree) topLevelClass).getClassMembers();
                 for (Tree member : members) {
-                    if (member instanceof ClassDeclarationTree) {
+                    if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) {
                         cuTrees.add(member);
                     }
                 }
@@ -745,18 +746,33 @@ public class JFXReformatTask implements ReformatTask {
             if (cuTrees != null && !cuTrees.isEmpty()) {
                 // TODO process semicolon between members and expressions
 //                boolean semiRead = false;
-                for (Tree tree : cuTrees) {
-                    if (tree instanceof ImportTree) {
+
+                final Tree[] treeArray = (Tree[]) cuTrees.toArray(new Tree[cuTrees.size()]);
+                final int l = treeArray.length;
+                for (int i = 0; i < l; i++) {
+                    Tree tree = treeArray[i];
+                    JavaFXKind kind = tree.getJavaFXKind();
+                    if (kind == JavaFXKind.IMPORT) {
                         blankLines();
                         scan(tree, p);
-                    } else if (tree instanceof ClassDeclarationTree) {
+                    } else if (kind == JavaFXKind.CLASS_DECLARATION) {
                         blankLines(cs.getBlankLinesBeforeClass());
                         scan(tree, p);
                         blankLines(cs.getBlankLinesAfterClass());
-                    } else {
-//                        scan(tree, p);
-                        blankLines(cs.getBlankLinesAfterClassHeader()); // TODO blank lines before attribute
+                    } else if (kind == JavaFXKind.VARIABLE) {
+                        boolean isFirstAttr = (i == 0) || (i > 0 && treeArray[i - 1].getJavaFXKind() != JavaFXKind.VARIABLE);
+                        boolean lastAttr = (i == l - 1) || (i < l - 2 && treeArray[i + 1].getJavaFXKind() != JavaFXKind.VARIABLE);
+                        if (isFirstAttr) {
+                            blankLines(cs.getBlankLinesBeforeFields());
+                        }
                         processClassMembers(Arrays.asList(new Tree[] {tree}), p);
+                        if (lastAttr) {
+                            blankLines(cs.getBlankLinesAfterFields());
+                        }
+                    } else { // FUNCTION_DEFINITION or ON_REPLACE_INSTANTIATION
+                        blankLines(cs.getBlankLinesBeforeMethods());
+                        processClassMembers(Arrays.asList(new Tree[] {tree}), p);
+                        blankLines(cs.getBlankLinesBeforeMethods());
                     }
                 }
             }
