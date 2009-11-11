@@ -747,64 +747,66 @@ public class JFXReformatTask implements ReformatTask {
 //                boolean semiRead = false;
 
                 final Tree[] treeArray = (Tree[]) cuTrees.toArray(new Tree[cuTrees.size()]);
-                final int l = treeArray.length;
-                for (int i = 0; i < l; i++) {
+                for (int i = 0; i < treeArray.length; i++) {
                     Tree tree = treeArray[i];
                     JavaFXKind kind = tree.getJavaFXKind();
-                    if (kind == JavaFXKind.IMPORT) {
-                        blankLines();
-                        scan(tree, p);
-                    } else if (kind == JavaFXKind.CLASS_DECLARATION) {
-                        blankLines(cs.getBlankLinesBeforeClass());
-                        scan(tree, p);
-                        blankLines(cs.getBlankLinesAfterClass());
-                    } else if (kind == JavaFXKind.VARIABLE) {
-                        boolean isFirstAttr = (i == 0) || (i > 0 && treeArray[i - 1].getJavaFXKind() != JavaFXKind.VARIABLE);
-                        boolean lastAttr = (i == l - 1) || (i < l - 2 && treeArray[i + 1].getJavaFXKind() != JavaFXKind.VARIABLE);
-                        if (isFirstAttr) {
-                            blankLines(cs.getBlankLinesBeforeFields());
-                        }
-                        processClassMembers(Arrays.asList(new Tree[] {tree}), p);
-                        if (lastAttr) {
-                            blankLines(cs.getBlankLinesAfterFields());
-                        }
-                    } else { // FUNCTION_DEFINITION or ON_REPLACE_INSTANTIATION
-                        blankLines(cs.getBlankLinesBeforeMethods());
-                        processClassMembers(Arrays.asList(new Tree[] {tree}), p);
-                        blankLines(cs.getBlankLinesAfterMethods());
+                    switch (kind) {
+                        case IMPORT:
+                            blankLines();
+//                            if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
+//                                blankLines(cs.getBlankLinesBeforeImports());
+//                            }
+                            scan(tree, p);
+                            if (isLastMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(cs.getBlankLinesAfterImports());
+                            }
+                            break;
+                        case CLASS_DECLARATION:
+                            blankLines(cs.getBlankLinesBeforeClass());
+                            scan(tree, p);
+                            blankLines(cs.getBlankLinesAfterClass());
+                            break;
+                        case VARIABLE:
+                            if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(cs.getBlankLinesBeforeFields());
+                            }
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p);
+                            if (isLastMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(cs.getBlankLinesAfterFields());
+                            }
+                            blankLines();
+                            break;
+                        case INIT_DEFINITION:
+                        case POSTINIT_DEFINITION:
+                        case FUNCTION_DEFINITION:
+                        case INSTANTIATE_OBJECT_LITERAL:
+                            blankLines(cs.getBlankLinesBeforeMethods());
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p);
+                            blankLines(cs.getBlankLinesAfterMethods());
+                            break;
+                        default:
+                            if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(1);
+                            }
+                            processClassMembers(Arrays.asList(new Tree[] {tree}), p);
+                            if (isLastMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(1);
+                            }
+                            blankLines();
                     }
                 }
             }
 
-//            List<? extends ImportTree> imports = node.getImports();
-//            if (imports != null && !imports.isEmpty()) {
-//                blankLines(cs.getBlankLinesBeforeImports());
-//                for (ImportTree imp : imports) {
-//                    blankLines();
-//                    scan(imp, p);
-//                }
-//                blankLines(cs.getBlankLinesAfterImports());
-//            }
-//
-//            boolean semiRead = false;
-//            for (Tree typeDecl : node.getTypeDecls()) {
-//                if (semiRead && typeDecl.getJavaFXKind() == JavaFXKind.EMPTY_STATEMENT) {
-//                    continue;
-//                }
-//                blankLines(cs.getBlankLinesBeforeClass());
-//                scan(typeDecl, p);
-//                int index = tokens.index();
-//                int c = col;
-//                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-//                if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-//                    semiRead = true;
-//                } else {
-//                    rollback(index, c, d);
-//                    semiRead = false;
-//                }
-//                blankLines(cs.getBlankLinesAfterClass());
-//            }
             return true;
+        }
+
+        private static boolean isFirstMemberOfSuchKind(int i, final Tree[] treeArray, JavaFXKind kind) {
+            return (i == 0) || (i > 0 && treeArray[i - 1].getJavaFXKind() != kind);
+        }
+
+        private static boolean isLastMemberOfSuchKind(int i, final Tree[] treeArray, JavaFXKind kind) {
+            int l = treeArray.length;
+            return (i == l - 1) || (i < l - 2 && treeArray[i + 1].getJavaFXKind() != kind);
         }
 
         @Override
@@ -968,6 +970,15 @@ public class JFXReformatTask implements ReformatTask {
                                 blankLines(cs.getBlankLinesBeforeMethods());
                             }
                             scan(member, p);
+                            int index = tokens.index();
+                            int c = col;
+                            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                            if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                                semiRead = true;
+                            } else {
+                                rollback(index, c, d);
+                                semiRead = false;
+                            }
                             blankLines(cs.getBlankLinesAfterMethods());
                             break;
                         case BLOCK_EXPRESSION:
@@ -981,9 +992,9 @@ public class JFXReformatTask implements ReformatTask {
                             if (!first) {
                                 blankLines(cs.getBlankLinesBeforeMethods());
                             }
-                            int index = tokens.index();
-                            int c = col;
-                            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                            index = tokens.index();
+                            c = col;
+                            d = diffs.isEmpty() ? null : diffs.getFirst();
                             if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
                                 continue;
                             } else {
@@ -1009,6 +1020,17 @@ public class JFXReformatTask implements ReformatTask {
                             }
                             blankLines(cs.getBlankLinesAfterClass());
                             break;
+                        default:
+                            scan(member, p);
+                            index = tokens.index();
+                            c = col;
+                            d = diffs.isEmpty() ? null : diffs.getFirst();
+                            if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                                semiRead = true;
+                            } else {
+                                rollback(index, c, d);
+                                semiRead = false;
+                            }
                     }
                     if (!magicFunc) {
                         first = false;
