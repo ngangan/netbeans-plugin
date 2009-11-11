@@ -771,7 +771,7 @@ public class JFXReformatTask implements ReformatTask {
                     } else { // FUNCTION_DEFINITION or ON_REPLACE_INSTANTIATION
                         blankLines(cs.getBlankLinesBeforeMethods());
                         processClassMembers(Arrays.asList(new Tree[] {tree}), p);
-                        blankLines(cs.getBlankLinesBeforeMethods());
+                        blankLines(cs.getBlankLinesAfterMethods());
                     }
                 }
             }
@@ -962,14 +962,6 @@ public class JFXReformatTask implements ReformatTask {
                             }
                             break;
                         case FUNCTION_DEFINITION:
-                            if (!first) {
-                                blankLines(cs.getBlankLinesBeforeMethods());
-                            }
-                            scan(member, p);
-                            if (!magicFunc) {
-                                blankLines(cs.getBlankLinesAfterMethods());
-                            }
-                            break;
                         case INIT_DEFINITION:
                         case POSTINIT_DEFINITION:
                             if (!first) {
@@ -1519,7 +1511,7 @@ public class JFXReformatTask implements ReformatTask {
                         }
                         tokens.moveNext();
                     }
-                    accept(JFXTokenId.RBRACE);
+                    JFXTokenId accept = accept(JFXTokenId.RBRACE);
                     indent = old;
                 }
             }
