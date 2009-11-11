@@ -1094,7 +1094,6 @@ public class JFXReformatTask implements ReformatTask {
 
             final Tree type = node.getType();
             if (type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
@@ -1221,7 +1220,6 @@ public class JFXReformatTask implements ReformatTask {
 
             JFXType retType = funcDef.getJFXReturnType();
             if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN && !magicOverridenFunc) {
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
@@ -1935,7 +1933,6 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.RPAREN);
             TypeTree retType = node.getReturnType();
             if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
@@ -2181,7 +2178,6 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitObjectLiteralPart(ObjectLiteralPartTree node, Void p) {
             accept(JFXTokenId.IDENTIFIER);
-            spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
             accept(JFXTokenId.COLON);
             spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
@@ -3272,7 +3268,6 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             int alignIndent = -1;
             for (Iterator<? extends TypeTree> it = trees.iterator(); it.hasNext();) {
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
