@@ -44,7 +44,6 @@ import com.sun.javafx.api.JavafxBindStatus;
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.org.apache.xpath.internal.axes.ReverseAxesWalker;
 import com.sun.tools.javafx.tree.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -939,7 +938,7 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : members) {
-                if (member instanceof ClassDeclarationTree && cuTrees != null && cuTrees.contains(member)) {
+                if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
                     // this class has been already processed in visitCompilationUnit()
                     continue;
                 }
@@ -1740,32 +1739,60 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitForExpression(ForExpressionTree node, Void p) {
-            accept(JFXTokenId.FOR);
-            int old = indent;
-            indent += continuationIndentSize;
-            spaces(cs.spaceBeforeForParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
-            spaces(cs.spaceWithinForParens() ? 1 : 0);
+            Tree parent = getCurrentPath().getParentPath().getLeaf();
+            boolean insideVar = parent.getJavaFXKind() == JavaFXKind.VARIABLE;
 
-            List<? extends ForExpressionInClauseTree> clauses = node.getInClauses();
-            if (clauses != null && !clauses.isEmpty()) {
-                for (Iterator<? extends ForExpressionInClauseTree> it = clauses.iterator(); it.hasNext();) {
-                    scan(it.next(), p);
-                    if (it.hasNext()) {
-                        spaces(cs.spaceBeforeComma() ? 1 : 0);
-                        accept(JFXTokenId.COMMA);
-                        spaces(cs.spaceAfterComma() ? 1 : 0);
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.FOR) == JFXTokenId.FOR) { // FOR_EXPRESSION
+                int old = indent;
+                indent += continuationIndentSize;
+                spaces(cs.spaceBeforeForParen() ? 1 : 0);
+                accept(JFXTokenId.LPAREN);
+                spaces(cs.spaceWithinForParens() ? 1 : 0);
+
+                List<? extends ForExpressionInClauseTree> clauses = node.getInClauses();
+                if (clauses != null && !clauses.isEmpty()) {
+                    for (Iterator<? extends ForExpressionInClauseTree> it = clauses.iterator(); it.hasNext();) {
+                        ForExpressionInClauseTree feict = it.next();
+                        scan(feict, p);
+                        if (it.hasNext()) {
+                            spaces(cs.spaceBeforeComma() ? 1 : 0);
+                            accept(JFXTokenId.COMMA);
+                            spaces(cs.spaceAfterComma() ? 1 : 0);
+                        }
                     }
                 }
+                spaces(cs.spaceWithinForParens() ? 1 : 0);
+                accept(JFXTokenId.RPAREN);
+                indent = old;
+                CodeStyle.BracesGenerationStyle redundantForBraces = cs.redundantForBraces();
+                if (insideVar || (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE &&
+                        (startOffset > getStartPos(node) || endOffset < getEndPos(node)))) {
+                    redundantForBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
+                }
+                WrapStyle wrapStyle = insideVar ? WrapStyle.WRAP_NEVER : cs.wrapForStatement();
+                wrapStatement(wrapStyle, redundantForBraces, cs.spaceBeforeForLeftBrace() ? 1 : 0, node.getBodyExpression());
+            } else { // FOR_EXPRESSION_PREDICATE
+                rollback(index, c, d);
+                ForExpressionInClauseTree feict = node.getInClauses().get(0);
+                scan(feict.getSequenceExpression(), p);
+                spaces(cs.spaceBeforeArrayInitLeftBrace() ? 1 : 0, false);
+                accept(JFXTokenId.LBRACKET);
+                int old = indent;
+                indent += indentSize;
+                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
+                scan(feict.getVariable(), p);
+                spaces(cs.spaceAroundBinaryOps() ? 1 : 0, false);
+                accept(JFXTokenId.PIPE);
+                spaces(cs.spaceAroundBinaryOps() ? 1 : 0, false);
+                scan(feict.getWhereExpression(), p);
+                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
+                indent = old;
+                accept(JFXTokenId.RBRACKET);
             }
-            spaces(cs.spaceWithinForParens() ? 1 : 0);
-            accept(JFXTokenId.RPAREN);
-            indent = old;
-            CodeStyle.BracesGenerationStyle redundantForBraces = cs.redundantForBraces();
-            if (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(node) || endOffset < getEndPos(node))) {
-                redundantForBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
-            }
-            wrapStatement(cs.wrapForStatement(), redundantForBraces, cs.spaceBeforeForLeftBrace() ? 1 : 0, node.getBodyExpression());
+
             return true;
         }
 
@@ -1780,6 +1807,7 @@ public class JFXReformatTask implements ReformatTask {
             if (whereExpression != null) {
                 space();
                 accept(JFXTokenId.WHERE);
+                space();
                 scan(whereExpression, p);
             }
             return true;
@@ -1987,17 +2015,9 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitBinary(BinaryTree node, Void p) {
-            // Parenthised tree could be skipped by parser, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
-            boolean wraped = tokens.token().id() == JFXTokenId.LPAREN;
-            if (wraped) {
-                accept(JFXTokenId.LPAREN);
-            }
             scan(node.getLeftOperand(), p);
             int alignIndent = cs.alignMultilineBinaryOp() ? col : -1;
             wrapOperatorAndTree(cs.wrapBinaryOps(), alignIndent, cs.spaceAroundBinaryOps() ? 1 : 0, node.getRightOperand());
-            if (wraped) {
-                accept(JFXTokenId.RPAREN);
-            }
             return true;
         }
 
@@ -2258,11 +2278,6 @@ public class JFXReformatTask implements ReformatTask {
         // TODO remove that workarounds for JFXC-3528 after switching to SoMa
         @Override
         public Boolean visitLiteral(LiteralTree node, Void p) {
-            // Parenthised tree could be skipped by parser, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
-            boolean wraped = tokens.token().id() == JFXTokenId.LPAREN;
-            if (wraped) {
-                accept(JFXTokenId.LPAREN);
-            }
             // Missing return statement, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
             int index = tokens.index();
             int c = col;
@@ -2276,9 +2291,6 @@ public class JFXReformatTask implements ReformatTask {
                     JFXTokenId.FLOATING_POINT_LITERAL, JFXTokenId.HEX_LITERAL, JFXTokenId.OCTAL_LITERAL,
                     JFXTokenId.STRING_LITERAL, JFXTokenId.QUOTE_LBRACE_STRING_LITERAL,
                     JFXTokenId.RBRACE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
-            if (wraped) {
-                accept(JFXTokenId.RPAREN);
-            }
             return true;
         }
 
