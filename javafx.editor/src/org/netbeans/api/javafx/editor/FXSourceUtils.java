@@ -31,7 +31,6 @@ import java.util.*;
 import javax.swing.text.Document;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.NbBundle;
 
 /**
@@ -600,10 +599,13 @@ public final class FXSourceUtils {
 
 
     public static Document getDocument(final FileObject file) {
+        if (!file.isValid()) { // deleted
+            return null;
+        }
         DataObject od = null;
         try {
             od = DataObject.find(file);
-        } catch (DataObjectNotFoundException ex) {
+        } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
             return null;
         }

@@ -1,4 +1,4 @@
 [usersubs]
-cvs@javafx.netbeans.org=*
-cvs@installer.netbeans.org=installer/*
-cvs@nbi.netbeans.org=nbi/*
+commits@javafx.netbeans.org=*
+commits@installer.netbeans.org=installer/*
+commits@nbi.netbeans.org=nbi/*

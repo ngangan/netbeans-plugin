@@ -56,24 +56,65 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
     final static String ccPath = "editor/codeformating";
 
     static final String[] TESTS = {
-        "testCFFunctions",
+        // === Init  ===
+        "testCreateProject",
+
+        // === Variables ===
+        "testCFVariables",
+        "testCFDataTypes",
+        "testCFVariableTrigger",
+        
         "testCFFunction",
         "testCFFunctionBody",
         "testCFClass",
-        "testCFVariables",
         "testCFObjectLiteral",
-        "testCFDataTypes",
 
 
     };
 
-    public static String[] TEMPLATES = {
-        "Function",
-        "FunctionBody",
-        "Class",
-        "Variables",
 
-    };
+     // === Variables ===
+
+    public void testCFVariables(){
+        testCodeFormating("Variables");
+    }
+
+    public void testCFDataTypes(){
+        testCodeFormating("DataTypes");
+    }
+
+    public void testCFVariableTrigger(){
+        testCodeFormating("Variable_Trigger");
+    }
+
+
+    public void testCFFunction(){
+        testCodeFormating("Function");
+    }
+
+    public void testCFFunctionBody(){
+        testCodeFormating("FunctionBody");
+    }
+
+    public void testCFClass(){
+        testCodeFormating("Class");
+    }
+
+
+    public void testCFObjectLiteral(){
+        testCodeFormating("ObjectLiteral");
+    }
+
+
+
+
+//    public static String[] TEMPLATES = {
+//        "Function",
+//        "FunctionBody",
+//        "Class",
+//        "Variables",
+//
+//    };
     
     public boolean pass = true;
     public String failComponents = "";
@@ -95,7 +136,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         return Util.getSampleText(ccPath + "/" + fileName + "_golden.fx");
     }
 
-    public void testCFFunctions() {
+    public void testCreateProject() {
         System.out.println("============  Test Code Formating  =======");
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
 
@@ -109,29 +150,6 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
     }
 
 
-    public void testCFFunction(){
-        testCodeFormating("Function");
-    }
-
-    public void testCFFunctionBody(){
-        testCodeFormating("FunctionBody");
-    }
-
-    public void testCFClass(){
-        testCodeFormating("Class");
-    }
-
-    public void testCFVariables(){
-        testCodeFormating("Variables");
-    }
-
-    public void testCFObjectLiteral(){
-        testCodeFormating("ObjectLiteral");
-    }
-
-    public void testCFDataTypes(){
-        testCodeFormating("DataTypes");
-    }
 
 
     public void testCodeFormating(String testName) {
@@ -156,6 +174,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         code = code.trim();
         goldenCode = goldenCode.trim();
 
+        System.out.println("[" + template + "]");
         System.out.println("------------ Golden --------");
         System.out.println(goldenCode);
         System.out.println("----------------------------");
