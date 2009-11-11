@@ -86,5 +86,11 @@ public class ReportedIssuesTest extends CompletionTestBase {
     public void DISABLED_testOverrideOverride() throws Exception {
         checkCompletion("Iz171185", "override^", " ", "iz171185_override.pass");
     }
+
+
+    public void testIssue167875() throws Exception {
+        checkCompletion("Iz167875", "data: LineChart.^", " ", "iz167875.pass");
+    }
+
 }
 
