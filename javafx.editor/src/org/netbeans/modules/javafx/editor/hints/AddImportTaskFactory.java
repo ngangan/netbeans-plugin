@@ -52,7 +52,6 @@ import com.sun.tools.javafx.tree.JFXInstanciate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.*;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -299,8 +298,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         public int compare(Fix fix1, Fix fix2) {
             FixImport fixImport1 = (FixImport) fix1;
             String fqnName1 = fixImport1.getFQN();
-            if (fqnName1.contains(".")) {
-                int index = fqnName1.indexOf(".");
+            if (fqnName1.contains(".")) { // NOI18N
+                int index = fqnName1.indexOf("."); //NOI18N
                 String pn = fqnName1.substring(0, index);
                 if (pn.contains("javafx")) { //NOI18N
                     return -1;
