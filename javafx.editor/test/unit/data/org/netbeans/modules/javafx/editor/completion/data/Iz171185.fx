@@ -5,5 +5,5 @@ public class A{
 }
 
 public class C extends A{
-    override var a
+    override
 }

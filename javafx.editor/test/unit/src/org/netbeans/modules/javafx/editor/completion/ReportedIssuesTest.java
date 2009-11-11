@@ -77,7 +77,14 @@ public class ReportedIssuesTest extends CompletionTestBase {
      * More correct test case would be to use just "override var ^".
      */
     public void testIssue171185() throws Exception {
-        checkCompletion("Iz171185", "override var a^", "iz171185.pass");
+        checkCompletion("Iz171185", "override^", " var a", "iz171185.pass");
+    }
+
+    /** There is a bug in modifiers completion that forces repetition
+     * of the last modifier in completion. Separate issue but visible
+     */
+    public void DISABLED_testOverrideOverride() throws Exception {
+        checkCompletion("Iz171185", "override^", " ", "iz171185_override.pass");
     }
 }
 
