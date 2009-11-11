@@ -13,8 +13,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementUtilities;
+import org.netbeans.editor.Utilities;
+import org.netbeans.modules.javafx.editor.JavaFXDocument;
 
 /**
  *
@@ -64,7 +67,7 @@ final class HintsUtils {
                             || compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
                         return overriddenMethod;
                     }
-                } catch (Exception ex) {
+                } catch (NullPointerException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -129,5 +132,20 @@ final class HintsUtils {
         }
 
         return true;
+    }
+
+    static JTextComponent getEditorComponent(Document document) {
+        JTextComponent target = Utilities.getFocusedComponent();
+        if (target != null) {
+            return target;
+        }
+        if (document instanceof JavaFXDocument) {
+            JavaFXDocument d = (JavaFXDocument) document;
+            if (d.getEditor() instanceof JTextComponent) {
+                return (JTextComponent) d.getEditor();
+            }
+        }
+        
+        return null;
     }
 }

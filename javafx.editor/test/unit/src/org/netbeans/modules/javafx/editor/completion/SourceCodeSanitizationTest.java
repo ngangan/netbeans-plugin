@@ -40,36 +40,15 @@
  */
 package org.netbeans.modules.javafx.editor.completion;
 
-public class ReportedIssuesTest extends CompletionTestBase {
+public class SourceCodeSanitizationTest extends CompletionTestBase {
 
-    public ReportedIssuesTest(String testName) {
+    public SourceCodeSanitizationTest(String testName) {
         super(testName);
     }
 
-    public void testIssue175333() throws Exception {
-        checkCompletion("Iz175333", "ba^", "iz175333.pass");
+    public void testObjectLiteralSanitization() throws Exception {
+        checkCompletion("ErrorneousObjectLiteralPart", "fill: Color.^",
+                "errorneousObjectLiteralPart.pass");
     }
 
-    /* Currently the completion returns what it should for this case, but also
-     * adds some garbage (packages) for some reason, which causes this test to
-     * fail, thus disabled temporarily. */
-    public void DISABLED_testIssue173358() throws Exception {
-        checkCompletion("Iz173358", "print^", "iz173358.pass");
-    }
-
-    public void testIssue165374() throws Exception {
-        checkCompletion("Iz165374", "var c = ^", "iz165374.pass");
-    }
-
-    public void testIssue159678() throws Exception {
-        // XXX: seeems that we need JavaBinaryIndexer to be registered during
-        // test run. Do not know how to do that correctly yet.
-        // checkCompletion("Iz159678", "var color = Color^.", "iz159678beforeDot.pass");
-        checkCompletion("Iz159678", "Color.^", "iz159678afterDot.pass");
-    }
-
-    public void testIssue171484() throws Exception {
-        checkCompletion("Iz171484", "var bbb = a^", "iz171484.pass");
-    }
 }
-
