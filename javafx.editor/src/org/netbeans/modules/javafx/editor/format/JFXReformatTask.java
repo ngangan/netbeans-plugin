@@ -1297,6 +1297,7 @@ public class JFXReformatTask implements ReformatTask {
                     case CLASS_DECLARATION:
                     case INSTANTIATE_NEW:
                     case INSTANTIATE_OBJECT_LITERAL:
+                    case ON_REPLACE:
                         bracePlacement = cs.getOtherBracePlacement();
                         if (node.isStatic()) {
                             spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
@@ -2176,27 +2177,28 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.ON);
             space();
             accept(JFXTokenId.REPLACE);
-            space();
             VariableTree oldValue = node.getOldValue();
             if (oldValue != null) {
+                space();
                 scan(oldValue, p);
-                boolean hasInitializer = false;
-                if (tokens.moveNext()) {
-                    hasInitializer = tokens.token().id() == JFXTokenId.EQ;
-                    tokens.movePrevious();
-                }
-                if (hasInitializer) {
-                    spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                    accept(JFXTokenId.EQ);
-                    spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                    int index = tokens.index();
-                    int c = col;
-                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (accept(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
-                        space();
-                    } else {
-                        rollback(index, c, d);
-                    }
+            }
+
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            boolean hasInitializer = accept(JFXTokenId.EQ) == JFXTokenId.EQ;
+            rollback(index, c, d);
+            if (hasInitializer) {
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+                accept(JFXTokenId.EQ);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
+                    space();
+                } else {
+                    rollback(index, c, d);
                 }
             }
             scan(node.getBody(), p);

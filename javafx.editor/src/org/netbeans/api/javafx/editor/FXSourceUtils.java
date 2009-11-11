@@ -31,7 +31,6 @@ import java.util.*;
 import javax.swing.text.Document;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.NbBundle;
 
 /**
