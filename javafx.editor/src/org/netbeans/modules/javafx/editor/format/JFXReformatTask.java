@@ -1093,7 +1093,7 @@ public class JFXReformatTask implements ReformatTask {
             }
 
             final Tree type = node.getType();
-            if (type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+            if (type != null && type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
                 if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
