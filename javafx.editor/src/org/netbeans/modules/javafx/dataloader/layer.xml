@@ -309,7 +309,7 @@ made subject to such option by the copyright holder.
             </folder>
           <folder name="Formatting">
               <folder name="text">
-                  <folder name="x-java">
+                  <folder name="x-fx">
 <!--                      <file name="TabsAndIndents.instance">
                           <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
                           <attr name="instanceCreate" methodvalue="org.netbeans.modules.java.ui.FmtTabsIndents.getController"/>

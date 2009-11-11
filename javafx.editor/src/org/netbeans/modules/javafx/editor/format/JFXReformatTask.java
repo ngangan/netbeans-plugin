@@ -136,7 +136,7 @@ public class JFXReformatTask implements ReformatTask {
     public static String reformat(final String text, final CodeStyle style) {
         final StringBuilder sb = new StringBuilder(text);
         try {
-            final File file = File.createTempFile("format", "tmp"); // NOI18N
+            final File file = FileUtil.normalizeFile( File.createTempFile("format", "tmp")); // NOI18N
             FileOutputStream os = null;
             InputStream is = null;
             try {
