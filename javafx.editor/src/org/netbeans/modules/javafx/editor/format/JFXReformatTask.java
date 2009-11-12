@@ -2427,7 +2427,17 @@ public class JFXReformatTask implements ReformatTask {
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             scan(node.getLower(), p);
             accept(JFXTokenId.DOTDOT);
+            if (node.isExclusive()) {
+                accept(JFXTokenId.LT);
+            }
             scan(node.getUpper(), p);
+            ExpressionTree stepOrNull = node.getStepOrNull();
+            if (stepOrNull != null) {
+                space();
+                accept(JFXTokenId.STEP);
+                space();
+                scan(stepOrNull, p);
+            }
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             accept(JFXTokenId.RBRACKET);
             return true;
