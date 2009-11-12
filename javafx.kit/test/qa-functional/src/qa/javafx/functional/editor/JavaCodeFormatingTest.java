@@ -56,14 +56,22 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
     public static String PROJECT_NAME = "CFTests";
     final static String ccPath = "editor/codeformating";
 
+    final static String variablePath = "variable/";
+
+
     static final String[] TESTS = {
         // === Init  ===
         "testCreateProject",
 
         // === Variables ===
         "testCFVariables",
+        "testCFVariablesSpaces",
+        "testCFVariablesNegativeValue",
+
         "testCFDataTypes",
         "testCFVariableTrigger",
+        "testCFVariablesBinding",
+
 
 
         // === Function ===
@@ -87,6 +95,16 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         testCodeFormating("Variables");
     }
 
+    public void testCFVariablesSpaces(){
+        testCodeFormating(variablePath + "Spaces");
+    }
+
+
+    public void testCFVariablesNegativeValue(){
+        testCodeFormating(variablePath + "NegativeValue");
+    }
+
+
     public void testCFDataTypes(){
         testCodeFormating("DataTypes");
     }
@@ -95,6 +113,11 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         testCodeFormating("Variable_Trigger");
     }
 
+    public void testCFVariablesBinding(){
+        testCodeFormating(variablePath + "Binding");
+    }
+
+     // === Function ===
 
     public void testCFFunction(){
         testCodeFormating("Function");
@@ -179,9 +202,9 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
     void compare(String template, String code, String goldenCode){
 
-        System.out.println("------- normilize code  -------------");
+        //System.out.println("------- normilize code  -------------");
         code = normilizeString(code);
-        System.out.println("------- normilize golden -------------");
+        //System.out.println("------- normilize golden -------------");
         goldenCode = normilizeString(goldenCode);
 
         System.out.println("--------" + template + "----------");
@@ -221,7 +244,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
                 String s = reduceSpaces(tokenizer.nextToken());
                 if(begin && "".equals(s)){
-                    System.out.println("[begin] '" + s + "'");
+                    //System.out.println("[begin] '" + s + "'");
                 }else {
                     begin = false;
                     res +=  s + "\n";
@@ -245,7 +268,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
             if(ind < 0 || (ind == 0 && isSpace(str.charAt(0)))){
                 return "";
             }else{
-                System.out.println("[reduce] " + ind + ": '" + str.substring(0, ind + 1) + "'");
+                //System.out.println("[reduce] " + ind + ": '" + str.substring(0, ind + 1) + "'");
                 return str.substring(0, ind + 1);
             }
 
