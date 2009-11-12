@@ -105,7 +105,7 @@ final class UncaughtExceptionsFix implements Fix {
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    JTextComponent target = getEditorComponent(document);
+                    JTextComponent target = HintsUtils.getEditorComponent(document);
                     Iterator<Type> iterator = hint.getExceptions().iterator();
                     while (iterator.hasNext()) {
                         Imports.addImport(target, iterator.next().toString());
@@ -123,7 +123,7 @@ final class UncaughtExceptionsFix implements Fix {
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    JTextComponent target = getEditorComponent(document);
+                    JTextComponent target = HintsUtils.getEditorComponent(document);
                     if (target == null) {
                         return;
                     }
@@ -133,20 +133,6 @@ final class UncaughtExceptionsFix implements Fix {
                     }
                 }
             });
-        }
-        return null;
-    }
-
-    private JTextComponent getEditorComponent(Document document) {
-        JTextComponent target = Utilities.getFocusedComponent();
-        if (target != null) {
-            return target;
-        }
-        if (document instanceof JavaFXDocument) {
-            JavaFXDocument d = (JavaFXDocument) document;
-            if (d.getEditor() instanceof JTextComponent) {
-                return (JTextComponent) d.getEditor();
-            }
         }
         return null;
     }

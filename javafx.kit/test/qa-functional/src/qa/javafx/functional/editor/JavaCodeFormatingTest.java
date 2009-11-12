@@ -38,6 +38,7 @@
  */
 package qa.javafx.functional.editor;
 
+import java.util.StringTokenizer;
 import qa.javafx.functional.library.JavaFXTestCase;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
@@ -56,16 +57,72 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
     final static String ccPath = "editor/codeformating";
 
     static final String[] TESTS = {
-        "testCFFunctions",
+        // === Init  ===
+        "testCreateProject",
+
+        // === Variables ===
+        "testCFVariables",
+        "testCFDataTypes",
+        "testCFVariableTrigger",
+
+
+        // === Function ===
+
+        "testCFFunction",
+        "testCFFunctionBody",
+
+        // === Class ===
+        "testCFClass",
+
+        // === Object Literal ===
+        "testCFObjectLiteral",
+
+
     };
 
-    public static String[] TEMPLATES = {
-        "Function",
-        "FunctionBody",
-        "Class",
-        "Variables",
 
-    };
+     // === Variables ===
+
+    public void testCFVariables(){
+        testCodeFormating("Variables");
+    }
+
+    public void testCFDataTypes(){
+        testCodeFormating("DataTypes");
+    }
+
+    public void testCFVariableTrigger(){
+        testCodeFormating("Variable_Trigger");
+    }
+
+
+    public void testCFFunction(){
+        testCodeFormating("Function");
+    }
+
+    public void testCFFunctionBody(){
+        testCodeFormating("FunctionBody");
+    }
+
+    public void testCFClass(){
+        testCodeFormating("Class");
+    }
+
+
+    public void testCFObjectLiteral(){
+        testCodeFormating("ObjectLiteral");
+    }
+
+
+
+
+//    public static String[] TEMPLATES = {
+//        "Function",
+//        "FunctionBody",
+//        "Class",
+//        "Variables",
+//
+//    };
     
     public boolean pass = true;
     public String failComponents = "";
@@ -87,18 +144,21 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         return Util.getSampleText(ccPath + "/" + fileName + "_golden.fx");
     }
 
-    public void testCFFunctions() {
+    public void testCreateProject() {
         System.out.println("============  Test Code Formating  =======");
         JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
 
-        for(String template: TEMPLATES){
-            testCodeFormating(template);
-        }
-
-        System.out.println("Fail Code Formating tests: " + failComponents);
-        assertTrue("Failed Code Formating tests: " + failComponents, pass);
+//        for(String template: TEMPLATES){
+//            testCodeFormating(template);
+//        }
+//
+//        System.out.println("Fail Code Formating tests: " + failComponents);
+//        assertTrue("Failed Code Formating tests: " + failComponents, pass);
 
     }
+
+
+
 
     public void testCodeFormating(String testName) {
         JavaFXProject project = new JavaFXProject(PROJECT_NAME);
@@ -119,23 +179,82 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
     void compare(String template, String code, String goldenCode){
 
-        code = code.trim();
-        goldenCode = goldenCode.trim();
+        System.out.println("------- normilize code  -------------");
+        code = normilizeString(code);
+        System.out.println("------- normilize golden -------------");
+        goldenCode = normilizeString(goldenCode);
 
         System.out.println("--------" + template + "----------");
-        System.out.println("code before\n" + code);
+        System.out.println(code);
+        System.out.println("----------------------------");
+        System.out.println("------------ Golden --------");
+        System.out.println(goldenCode);
         System.out.println("----------------------------");
 
-        System.out.println("----------------------------");
-        System.out.println("code golden\n" + goldenCode);
-        System.out.println("----------------------------");
+
+
 
 
         if(!goldenCode.equals(code)){
             pass = false;
             failComponents+= ", " + template;
+            System.out.println("Fail");
+            int size1 = code.length();
+            int size2 = goldenCode.length();
+
+            System.out.println("size: " + size1 + ":" + size2);
+            System.out.println("1) [" + code.charAt(0) + "|" + code.charAt(1) + "|" + code.charAt(size1 - 2) + "|" + code.charAt(size1 - 1) + "]");
+            System.out.println("2) [" + goldenCode.charAt(0) + "|" + goldenCode.charAt(1) + "|" + goldenCode.charAt(size2 - 2) + "|" + goldenCode.charAt(size2 - 1) + "]");
+
+            fail(template + ": Golden file does not match");
         }
 
     }
+
+        public static String normilizeString(String str) {
+            StringTokenizer tokenizer = new StringTokenizer(str, "\n");
+            String res = "";
+
+            boolean begin = true;
+
+            while(tokenizer.hasMoreTokens()){
+
+                String s = reduceSpaces(tokenizer.nextToken());
+                if(begin && "".equals(s)){
+                    System.out.println("[begin] '" + s + "'");
+                }else {
+                    begin = false;
+                    res +=  s + "\n";
+                }
+            }
+            
+            //return res;
+            return reduceSpaces(res);
+
+        }
+
+        public static String reduceSpaces(String str) {
+
+            int ind = str.length() - 1;
+
+
+            while(0 <= ind && isSpace(str.charAt(ind))){
+                ind--;
+            }
+
+            if(ind < 0 || (ind == 0 && isSpace(str.charAt(0)))){
+                return "";
+            }else{
+                System.out.println("[reduce] " + ind + ": '" + str.substring(0, ind + 1) + "'");
+                return str.substring(0, ind + 1);
+            }
+
+        }
+
+        public static boolean  isSpace(char c) {
+            return Character.isSpaceChar(c) || c ==' ' || c =='\t' || c == '\n' || c == '\r';
+        }
+
     
+
 }

@@ -1,0 +1,6 @@
+int a
+int b
+<any> c
+String __DIR__
+String __FILE__
+String __PROFILE__
