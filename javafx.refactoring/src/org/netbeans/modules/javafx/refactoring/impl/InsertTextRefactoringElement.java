@@ -107,7 +107,7 @@ public class InsertTextRefactoringElement extends SimpleRefactoringElementImplem
                 startPosition = NbDocument.findLineOffset(doc, lineNo+1);
             }
         } catch (BadLocationException e) {
-            throw new IOException(e);
+            throw (IOException) (new IOException().initCause(e));
         }
     }
 
