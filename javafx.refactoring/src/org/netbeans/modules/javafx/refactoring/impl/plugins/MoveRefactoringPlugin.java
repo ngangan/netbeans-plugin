@@ -41,12 +41,35 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.ObjectLiteralPartTree;
+import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TypeClassTree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.ArrayList;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.NestingKind;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -58,7 +81,13 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
+import org.netbeans.modules.javafx.refactoring.impl.DeleteTextRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.impl.InsertTextRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveClassBaseScanner;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -67,7 +96,10 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 
 /**
  * Implemented abilities:
@@ -83,14 +115,22 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     private Map packagePostfix = new HashMap();
     final AbstractRefactoring refactoring;
     final boolean isRenameRefactoring;
-    ArrayList<FileObject> filesToMove = new ArrayList<FileObject>();
-    HashMap<FileObject,ElementHandle> classes;
+    private ArrayList<FileObject> filesToMove = new ArrayList<FileObject>();
     /** list of folders grouped by source roots */
-    List<List<FileObject>> foldersToMove = new ArrayList<List<FileObject>>();
-    /** collection of packages that will change its name */
-    Set<String> packages;
-    Map<FileObject, Set<FileObject>> whoReferences = new HashMap<FileObject, Set<FileObject>>();
-    
+    private List<List<FileObject>> foldersToMove = new ArrayList<List<FileObject>>();
+
+    private class ImportParts {
+        final String typeName;
+        final String packageName;
+        final JavaFXTreePath treePath;
+
+        public ImportParts(String typeName, String packageName, JavaFXTreePath treePath) {
+            this.typeName = typeName;
+            this.packageName = packageName;
+            this.treePath = treePath;
+        }
+    }
+
     public MoveRefactoringPlugin(MoveRefactoring move) {
         this.refactoring = move;
         this.isRenameRefactoring = false;
@@ -172,7 +212,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         ));
                     }
                     
-                    //                this.movingToDefaultPackageMap.put(r, Boolean.valueOf(targetF!= null && targetF.equals(classPath.findOwnerRoot(targetF))));
                     pkgName = targetPackageName;
                     
                     if (pkgName == null) {
@@ -180,15 +219,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     } else if (pkgName.length() > 0) {
                         pkgName = pkgName + '.';
                     }
-                    //targetPrefix = pkgName;
-                    
-                    //                JavaClass[] sourceClasses = (JavaClass[]) sourceClassesMap.get(r);
-                    //                String[] names = new String [sourceClasses.length];
-                    //                for (int x = 0; x < names.length; x++) {
-                    //                    names [x] = sourceClasses [x].getName();
-                    //                }
-                    //
-                    //                FileObject movedFile = JavaMetamodel.getManager().getDataObject(r).getPrimaryFile();
                     String fileName = f.getName();
                     if (targetF!=null) {
                         FileObject[] children = targetF.getChildren();
@@ -249,79 +279,253 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         return null;
     }
 
-    private Set<FileObject> getRelevantFiles() {
-        ClassIndex idx = getClassIndex();
-        Set<FileObject> set = new HashSet<FileObject>();
-        for (Map.Entry<FileObject, ElementHandle> entry : classes.entrySet()) {
-            //set.add(SourceUtils.getFile(el, cpInfo));
-            Set<FileObject> files = idx.getResources(entry.getValue(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS),EnumSet.of(ClassIndex.SearchScope.SOURCE));
-            set.addAll(files);
-            whoReferences.put(entry.getKey(), files);
-        }
-        set.addAll(filesToMove);
-        return set;
-    }    
-    
-    private void initClasses() {
-        classes = new HashMap<FileObject,ElementHandle>();
-        for (int i=0;i<filesToMove.size();i++) {
-            final int j = i;
+    private void collectMoveData(final Map<String, String> renameMap, final Set<FileObject> related) {
+        fireProgressListenerStep(filesToMove.size());
+
+        for(final FileObject fo : filesToMove) {
+            final String targetPkg = getTargetPackageName(fo);
+
+            JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
             try {
-                JavaFXSource source = JavaFXSource.forFileObject(filesToMove.get(i));
-                
-                source.runUserActionTask(new Task<CompilationController>() {
-                    
-                    public void run(final CompilationController parameter) throws Exception {
-                        List<? extends Tree> trees= parameter.getCompilationUnit().getTypeDecls();
-                        for (Tree t: trees) {
-                            if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-                                if (((ClassDeclarationTree) t).getSimpleName().toString().equals(filesToMove.get(j).getName())) {
-                                    classes.put(filesToMove.get(j), ElementHandle.create(parameter.getTrees().getElement(JavaFXTreePath.getPath(parameter.getCompilationUnit(), t))));
-                                    return ;
-                                }
+                jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                    public void run(final CompilationController cc) throws Exception {
+                        new JavaFXTreePathScanner<Void, Void>() {
+
+                            @Override
+                            public Void visitCompilationUnit(UnitTree node, Void p) {
+                                ExpressionTree packageNameTree = node.getPackageName();
+                                String packageName = packageNameTree != null ? packageNameTree.toString() : "";
+                                renameMap.put(packageName, targetPkg);
+                                return super.visitCompilationUnit(node, p);
                             }
-                        }
-                              
+
+                            @Override
+                            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                                ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
+                                related.addAll(cc.getClasspathInfo().getClassIndex().getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                                return super.visitClassDeclaration(node, p);
+                            }
+
+
+                        }.scan(cc.getCompilationUnit(), null);
                     }
-                }, true);
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger("global").log(java.util.logging.Level.SEVERE, ex.getMessage(), ex);
-            }
-            
+                }, false);
+            } catch (IOException e) {}
         }
     }
 
-    private void initPackages() {
-        if (foldersToMove.isEmpty()) {
-            packages = Collections.emptySet();
-            return;
-        } else {
-            packages = new HashSet<String>();
-        }
-        
-        for (List<FileObject> folders : foldersToMove) {
-            ClassPath cp = ClassPath.getClassPath(folders.get(0), ClassPath.SOURCE);
-            for (FileObject folder : folders) {
-                String pkgName = cp.getResourceName(folder, '.', false);
-                packages.add(pkgName);
+    private Problem renamePackages(final Map<String, String> renameMap, final RefactoringElementsBag elements) {
+        final Problem[] p = new Problem[1];
+        for(FileObject fo : filesToMove) {
+            JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+
+            try {
+                jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                    public void run(final CompilationController cc) throws Exception {
+                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, renameMap) {
+                            @Override
+                            public Void visitCompilationUnit(UnitTree node, Void p) {
+                                ExpressionTree packageNameTree = node.getPackageName();
+                                String packageName = packageNameTree != null ? packageNameTree.toString() : "";
+                                String targetPkg = renameMap.get(packageName);
+                                if (targetPkg != null) {
+                                    JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), node.getPackageName());
+                                    elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                                }
+                                return super.visitCompilationUnit(node, p);
+                            }
+                        };
+                        scanner.scan(cc.getCompilationUnit(), null);
+                        p[0] = scanner.getProblem();
+                    }
+                }, false);
+            } catch (IOException e) {
+
             }
+            fireProgressListenerStep(filesToMove.size());
         }
+        return p[0];
     }
-    
+
+    private Problem fixImports(final Map<String, String> renameMap, final Set<FileObject> related, final RefactoringElementsBag elements) {
+        final Problem[] problem = new Problem[1];
+
+        for(final FileObject fo : related) {
+            if (filesToMove.contains(fo)) continue;
+            
+            JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+
+            try {
+                final Set<String> imported = new HashSet<String>();
+                final Set<String> toImport = new HashSet<String>();
+                final int[] importLastLine = new int[]{-1};
+                final TransformationContext tContext = new TransformationContext(); // TransformationContext per FileObject
+
+                jfxs.runUserActionTask(new Task<CompilationController>() {
+                    public void run(final CompilationController cc) throws Exception {
+                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, renameMap) {
+                            private String myPkgName = "";
+
+                            private boolean removingImport = false;
+                            private boolean handlingImport = false;
+                            @Override
+                            public Void visitImport(ImportTree node, Void p) {
+                                try {
+                                    handlingImport = true;
+                                    Tree qualidTree = node.getQualifiedIdentifier();
+                                    if (qualidTree != null && qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                        ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
+                                        if (parts.packageName != null) {
+                                            String targetPkg = renameMap.get(parts.packageName);
+                                            if (myPkgName.equals(targetPkg)) {
+                                                imported.add(qualidTree.toString().replace(parts.packageName, targetPkg));
+                                                SourcePositions sp = cc.getTrees().getSourcePositions();
+                                                int start = (int)sp.getStartPosition(cc.getCompilationUnit(), node);
+                                                int end = (int)sp.getEndPosition(cc.getCompilationUnit(), node);
+                                                removingImport = true;
+                                                elements.add(refactoring, DeleteTextRefactoringElement.create(fo, start, end, Lookups.singleton(tContext)));
+                                            } else {
+                                                imported.add(qualidTree.toString().replace(parts.packageName, targetPkg));
+                                            }
+                                        }
+                                    }
+                                    importLastLine[0] = (int)cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
+                                    return super.visitImport(node, p);
+                                } finally {
+                                    removingImport = false;
+                                    handlingImport = false;
+                                }
+                            }
+
+                            @Override
+                            public Void visitTypeClass(TypeClassTree node, Void p) {
+                                ExpressionTree et = node.getClassName();
+                                String usedName = et.toString();
+                                Element e = cc.getTrees().getElement(getCurrentPath());
+                                
+                                String fqn = ((TypeElement)e).getQualifiedName().toString();
+                                if (!fqn.equals(usedName)) {
+                                    ImportParts parts = getImportParts(et);
+                                    String newPkg = renameMap.get(parts.packageName);
+
+                                    if (parts.typeName != null) {
+                                        String importName = parts.typeName;
+                                        if (newPkg != null) {
+                                            importName = parts.typeName.replace(parts.packageName, newPkg);
+                                            if (!isImported(importName)) {
+                                                toImport.add(importName);
+                                            }
+                                        }
+                                    }
+                                }
+                                return super.visitTypeClass(node, p);
+                            }
+
+                            @Override
+                            public Void visitMemberSelect(MemberSelectTree node, Void p) {
+                                if (removingImport) return null;
+
+                                if (handlingImport) {
+                                    ImportParts parts = getImportParts(node);
+
+                                    if (parts.treePath != null) {
+                                        String targetPkg = renameMap.get(parts.packageName);
+                                        if (targetPkg != null) {
+                                            if (parts.typeName == null) {
+                                                imported.add(targetPkg + ".*"); // NOI18N
+                                            } else {
+                                                imported.add(parts.typeName.replace(parts.packageName, targetPkg));
+                                            }
+                                            elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(parts.treePath, cc), targetPkg, parts.packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
+                                        }
+                                    }
+                                    return null;
+                                } else {
+                                    Element e = cc.getTrees().getElement(getCurrentPath());
+                                    ImportParts ip = getImportParts(node);
+                                    String selectText = node.toString();
+                                    if (selectText != null && ip.packageName != null && selectText.startsWith(ip.packageName)) {
+                                        if (e != null && (e.getKind() == ElementKind.PACKAGE || e.getKind() == ElementKind.CLASS)) {
+                                            String oldPkgName = ip.packageName;
+                                            String newPkgName = renameMap.get(oldPkgName);
+                                            if (newPkgName != null) {
+                                                elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(getCurrentPath(), cc), newPkgName, oldPkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
+                                                return null;
+                                            }
+                                        }
+                                    }
+                                }
+                                return super.visitMemberSelect(node, p);
+                            }
+
+                            private ImportParts getImportParts(Tree t) {
+                                JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), t);
+                                if (tp == null) tp = getCurrentPath();
+                                Element e = null;
+                                while ((e = cc.getTrees().getElement(tp)) == null) {
+                                    if (t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                        tp = JavafxcTrees.getPath(getCurrentPath(), ((MemberSelectTree)t).getExpression());
+                                        t = tp.getLeaf();
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                String[] types = new String[2];
+                                while (e != null && e.getKind() != ElementKind.PACKAGE) {
+                                    if (e.getKind() == ElementKind.CLASS && ((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL) {
+                                        types[0] = ((TypeElement)e).getQualifiedName().toString();
+                                    }
+                                    e = e.getEnclosingElement();
+                                }
+                                if (e != null) {
+                                    types[1] = ((PackageElement)e).getQualifiedName().toString();
+                                }
+                                return new ImportParts(types[0], types[1], tp);
+                            }
+                            private boolean isImported(String typeName) {
+                                for(String imp : imported) {
+                                    if (imp.equals(typeName) || (imp.endsWith(".*") && typeName.startsWith(imp.substring(0, imp.length() - 1)))) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        };
+                        scanner.scan(cc.getCompilationUnit(), null);
+                        Problem p = scanner.getProblem();
+                        problem[0] = chainProblems(problem[0], p);
+                        if (problem[0] == null && importLastLine[0] > -1) {
+                            for(String imprt : toImport) {
+                                elements.add(refactoring, InsertTextRefactoringElement.create(fo, importLastLine[0], true, "import " + imprt + ";\n", Lookups.singleton(tContext)));
+                            }
+                        }
+                    }
+                }, false);
+            } catch (IOException e) {
+
+            }
+            fireProgressListenerStep(related.size());
+        }
+        return problem[0];
+    }
+
     public Problem prepare(RefactoringElementsBag elements) {
         fireProgressListenerStart(ProgressEvent.START, -1);
-        initClasses();
-        initPackages();
-        
-        Set<FileObject> a = getRelevantFiles();
-        Problem p = checkProjectDeps(a);
-        fireProgressListenerStep(a.size());
-//        MoveTransformer t;
-//        TransformTask task = new TransformTask(t=new MoveTransformer(this), null);
-//        Problem prob = createAndAddElements(a, task, elements, refactoring);
+
+        Set<FileObject> related = new HashSet<FileObject>();
+        Map<String, String> renameMap = new HashMap<String, String>();
+
+        collectMoveData(renameMap, related);
+
+        Problem p = null;
+        p = chainProblems(p, checkProjectDeps(related));
+        p = chainProblems(p, renamePackages(renameMap, elements));
+        p = chainProblems(p, fixImports(renameMap, related, elements));
+
         fireProgressListenerStop();
-//        return prob != null ? prob : chainProblems(p, t.getProblem());
-        return null;
+        return p;
     }
     
     private static Problem chainProblems(Problem p,Problem p1) {

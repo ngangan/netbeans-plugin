@@ -238,7 +238,6 @@ final public class SourceUtils {
         //workaround for 143542
         Project[] opened = OpenProjects.getDefault().getOpenProjects();
         for (Project pr : opened) {
-            System.err.println(pr);
             if (fo.isFolder()) {
                 for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
                     if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
