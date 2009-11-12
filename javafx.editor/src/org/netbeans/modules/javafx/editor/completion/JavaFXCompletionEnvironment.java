@@ -1131,6 +1131,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(NULL_KEYWORD, null, false);
         addKeyword(NEW_KEYWORD, SPACE, false);
         addKeyword(BIND_KEYWORD, SPACE, false);
+        addKeyword(FUNCTION_KEYWORD, SPACE, false);
     }
 
     protected void addAccessModifiers(Set<Modifier> modifiers) {
