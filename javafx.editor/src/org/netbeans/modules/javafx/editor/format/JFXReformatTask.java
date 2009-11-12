@@ -1719,7 +1719,18 @@ public class JFXReformatTask implements ReformatTask {
             int old = indent;
             indent += continuationIndentSize;
             spaces(cs.spaceBeforeWhileParen() ? 1 : 0);
+            // missing parenthesized work around
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            boolean wrapped = accept(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            if (!wrapped) {
+                rollback(index, c, d);
+            }
             scan(node.getCondition(), p);
+            if (wrapped) {
+                accept(JFXTokenId.RPAREN);
+            }
             indent = old;
             CodeStyle.BracesGenerationStyle redundantWhileBraces = cs.redundantWhileBraces();
             if (redundantWhileBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(node) || endOffset < getEndPos(node))) {
@@ -2021,7 +2032,19 @@ public class JFXReformatTask implements ReformatTask {
             int old = indent;
             indent += continuationIndentSize;
             spaces(cs.spaceBeforeIfParen() ? 1 : 0);
+
+            // missing parenthesized work around
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            boolean wrapped = accept(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            if (!wrapped) {
+                rollback(index, c, d);
+            }
             scan(ifExpr.getCondition(), p);
+            if (wrapped) {
+                accept(JFXTokenId.RPAREN);
+            }
             indent = old;
 
             JFXExpression trueExpr = ifExpr.getTrueExpression();
