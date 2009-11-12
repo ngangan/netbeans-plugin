@@ -45,32 +45,15 @@ import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.io.*;
+import java.util.*;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.lexer.Language;
-import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.api.javafx.source.*;
+import org.netbeans.api.lexer.*;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
@@ -864,17 +847,14 @@ public class JFXReformatTask implements ReformatTask {
                     accept(JFXTokenId.IDENTIFIER);
                 }
 
-                List<? extends ExpressionTree> exts = node.getExtends();
+                List<ExpressionTree> exts = new ArrayList<ExpressionTree>();
+                exts.addAll(node.getExtends());
+                exts.addAll(node.getImplements());
+                exts.addAll(node.getMixins());
                 if (exts != null && !exts.isEmpty()) {
                     wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
-                    wrapList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, exts); // TODO cs.alignMultilineExtends()
+                    wrapExtendsList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, exts); // TODO cs.alignMultilineExtends()
                 }
-                // no implements AFAIK
-//                List<? extends ExpressionTree> impls = node.getImplements();
-//                if (impls != null && !impls.isEmpty()) {
-//                    wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
-//                    wrapList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, impls);
-//                }
                 indent = old;
 
                 CodeStyle.BracePlacement bracePlacement = cs.getClassDeclBracePlacement();
@@ -3123,6 +3103,59 @@ public class JFXReformatTask implements ReformatTask {
             return ret;
         }
 
+        private int wrapExtendsTree(CodeStyle.WrapStyle wrapStyle, int alignIndent, int spacesCnt, Tree tree) {
+            int ret = -1;
+            switch (wrapStyle) {
+                case WRAP_ALWAYS:
+                    int old = indent;
+                    if (alignIndent >= 0) {
+                        indent = alignIndent;
+                    }
+                    newline();
+                    indent = old;
+                    ret = col;
+                    accept(JFXTokenId.IDENTIFIER);
+                    break;
+                case WRAP_IF_LONG:
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    old = indent;
+                    if (alignIndent >= 0) {
+                        indent = alignIndent;
+                    }
+                    spaces(spacesCnt, true);
+                    indent = old;
+                    ret = col;
+                    wrapDepth++;
+                    accept(JFXTokenId.IDENTIFIER);
+                    wrapDepth--;
+                    if (col > rightMargin && (wrapDepth == 0 || c <= rightMargin)) {
+                        rollback(index, c, d);
+                        old = indent;
+                        if (alignIndent >= 0) {
+                            indent = alignIndent;
+                        }
+                        newline();
+                        indent = old;
+                        ret = col;
+                        accept(JFXTokenId.IDENTIFIER);
+                    }
+                    break;
+                case WRAP_NEVER:
+                    old = indent;
+                    if (alignIndent >= 0) {
+                        indent = alignIndent;
+                    }
+                    spaces(spacesCnt, true);
+                    indent = old;
+                    ret = col;
+                    accept(JFXTokenId.IDENTIFIER);
+                    break;
+            }
+            return ret;
+        }
+
         private int wrapOperatorAndTree(CodeStyle.WrapStyle wrapStyle, int alignIndent, int spacesCnt, Tree tree) {
             int ret = -1;
             switch (wrapStyle) {
@@ -3277,6 +3310,40 @@ public class JFXReformatTask implements ReformatTask {
                     }
                 } else {
                     wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, tree);
+                }
+                first = false;
+                if (it.hasNext()) {
+                    spaces(cs.spaceBeforeComma() ? 1 : 0);
+                    accept(JFXTokenId.COMMA);
+                }
+            }
+        }
+
+        private void wrapExtendsList(CodeStyle.WrapStyle wrapStyle, boolean align, boolean prependSpace, List<? extends Tree> trees) {
+            boolean first = true;
+            int alignIndent = -1;
+            for (Iterator<? extends Tree> it = trees.iterator(); it.hasNext();) {
+                Tree tree = it.next();
+                if (tree.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                    scan(tree, null);
+                } else if (first) {
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (prependSpace) {
+                        spaces(1, true);
+                    }
+                    if (align) {
+                        alignIndent = col;
+                    }
+                    accept(JFXTokenId.IDENTIFIER);
+                    if (wrapStyle != CodeStyle.WrapStyle.WRAP_NEVER && col > rightMargin && c > indent && (wrapDepth == 0 || c <= rightMargin)) {
+                        rollback(index, c, d);
+                        newline();
+                        accept(JFXTokenId.IDENTIFIER);
+                    }
+                } else {
+                    wrapExtendsTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, tree);
                 }
                 first = false;
                 if (it.hasNext()) {
