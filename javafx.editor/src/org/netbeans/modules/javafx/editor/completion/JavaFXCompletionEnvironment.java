@@ -332,6 +332,26 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                 }
             }
+
+            boolean classes = true;
+            if (classes && (member.getKind() == ElementKind.CLASS)) {
+                if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    ElementHandle eh = null;
+                    try {
+                        eh = ElementHandle.create(member);
+                    } catch (Exception ex) {
+                        // cannot convert --> ignore
+                    }
+
+                    TypeMirror mtm = member.asType();
+                    DeclaredType mdt = (DeclaredType) mtm;
+                    TypeElement mte = (TypeElement) mdt.asElement();
+
+                    if (eh != null) {
+                        addResult(JavaFXCompletionItem.createTypeItem(s, offset, false, false, false));
+                    }
+                }
+            }
         }
 
         for (Element member : elements.getAllMembers(te)) {
@@ -1111,6 +1131,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(NULL_KEYWORD, null, false);
         addKeyword(NEW_KEYWORD, SPACE, false);
         addKeyword(BIND_KEYWORD, SPACE, false);
+        addKeyword(FUNCTION_KEYWORD, SPACE, false);
     }
 
     protected void addAccessModifiers(Set<Modifier> modifiers) {

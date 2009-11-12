@@ -41,6 +41,18 @@ final class HintsUtils {
         return methodName.trim();
     }
 
+    static String getPackageName(String fqn) {
+        String methodName;
+        if (fqn.contains(".")) { //NOI18N
+            int end = fqn.lastIndexOf("."); //NOI18N
+            methodName = fqn.substring(0, end);
+        } else {
+            methodName = ""; //NOI!8N
+        }
+
+        return methodName.trim();
+    }
+
     static String getClassSimpleName(String fqName) {
         int start = fqName.lastIndexOf(".") + 1; //NOI18N
         if (start > 0) {

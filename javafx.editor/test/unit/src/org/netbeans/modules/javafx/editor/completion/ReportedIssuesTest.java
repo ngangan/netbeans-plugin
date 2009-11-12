@@ -71,5 +71,29 @@ public class ReportedIssuesTest extends CompletionTestBase {
     public void testIssue171484() throws Exception {
         checkCompletion("Iz171484", "var bbb = a^", "iz171484.pass");
     }
+
+    /** This code completion case used to throw NPE. Now it works at least for
+     * a partially written identifier (i.e. when the VariableTree is recognized).
+     * More correct test case would be to use just "override var ^".
+     */
+    public void testIssue171185() throws Exception {
+        checkCompletion("Iz171185", "override^", " var a", "iz171185.pass");
+    }
+
+    /** There is a bug in modifiers completion that forces repetition
+     * of the last modifier in completion. Separate issue but visible
+     */
+    public void DISABLED_testOverrideOverride() throws Exception {
+        checkCompletion("Iz171185", "override^", " ", "iz171185_override.pass");
+    }
+
+    public void testIssue167875() throws Exception {
+        checkCompletion("Iz167875", "data: LineChart.^", " ", "iz167875.pass");
+    }
+
+    public void testIssue150039() throws Exception {
+        checkCompletion("Iz150039", "    func: ^", "iz150039.pass");
+    }
+
 }
 

@@ -93,13 +93,15 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public void filesDirty(Iterable<? extends Indexable> itrbl, Context cntxt) {
-            for(Indexable ixbl : itrbl) {
-                try {
-                    IndexingSupport.getInstance(cntxt).markDirtyDocuments(ixbl);
-                } catch (IOException e) {
-                    LOG.log(Level.WARNING, null, e);
-                }
-            }
+            // temporary workarounding issue in Parsing API (#176687), which
+            // causes endless re-parsing of broken JavaFX sources
+//            for(Indexable ixbl : itrbl) {
+//                try {
+//                    IndexingSupport.getInstance(cntxt).markDirtyDocuments(ixbl);
+//                } catch (IOException e) {
+//                    LOG.log(Level.WARNING, null, e);
+//                }
+//            }
         }
 
         @Override
@@ -462,7 +464,8 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     return super.visitInstantiate(node, document);
                 }
             };
-            if (!fxresult.getDiagnostics().isEmpty()) return;
+
+            // if (fxresult.isErrors()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
             JavaFXSource.forFileObject(FileUtil.toFileObject(new File(indexable.getURL().toURI()))).runUserActionTask(new Task<CompilationController>() {

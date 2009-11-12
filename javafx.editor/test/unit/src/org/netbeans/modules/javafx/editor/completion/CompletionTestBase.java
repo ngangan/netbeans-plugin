@@ -63,6 +63,7 @@ import junit.framework.Assert;
 
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.javafx.editor.TestUtilities;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -254,12 +255,25 @@ public class CompletionTestBase extends JavaFXTestBase {
     }
 
     protected void checkCompletion(final String source, final String caretLine, final String goldenFileName) throws Exception {
+        checkCompletion(source, caretLine, null, goldenFileName);
+    }
+
+    protected void checkCompletion(final String source, final String caretLine, final String insert, final String goldenFileName) throws Exception {
         File testSource = new File(getWorkDir(), "test/Test.fx");
         testSource.getParentFile().mkdirs();
         File sourceFile = new File(getDataDir(), "org/netbeans/modules/javafx/editor/completion/data/" + source + ".fx");
         String sourceText = slurp(sourceFile);
         int caretPos = getCaretOffset(sourceText, caretLine);
-        copyToWorkDir(sourceFile, testSource);
+        if (insert != null) {
+            // insert a code snippet at the caret and move the caret accordingly,
+            // to pretend user typing given text before invoking the code completion
+            StringBuilder sb = new StringBuilder(sourceText);
+            sb.insert(caretPos, insert);
+            caretPos += insert.length();
+            sourceText = sb.toString();
+        }
+        TestUtilities.copyStringToFile(testSource, sourceText);
+
         FileObject testSourceFO = FileUtil.toFileObject(testSource);
         assertNotNull(testSourceFO);
         DataObject testSourceDO = DataObject.find(testSourceFO);
