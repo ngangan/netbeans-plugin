@@ -7,9 +7,6 @@
     </Property>
     <Property name="opaque" type="boolean" value="false"/>
   </Properties>
-  <SyntheticProperties>
-    <SyntheticProperty name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,17,0,0,0,-55"/>
-  </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -27,35 +24,56 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="doWhileBracesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="otherLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="methodDeclLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="whileBracesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" alignment="1" groupAlignment="1" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="bracesPlacementLabel" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jSeparator1" pref="113" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="classDeclLabel" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="ifBracesLabel" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="forBracesLabel" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="otherCombo" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
-                              <Component id="classDeclCombo" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
-                              <Component id="ifBracesCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
-                              <Component id="forBracesCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
-                              <Component id="whileBracesCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="functionDeclLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="whileBracesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="objectLiteralLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="onReplaceLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="classDeclCombo" linkSize="1" alignment="0" min="-2" max="-2" attributes="1"/>
+                                          <Component id="ifBracesCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
+                                          <Component id="forBracesCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
+                                          <Component id="whileBracesCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="functionDeclCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
+                                      <Component id="otherCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
+                                      <Component id="objectLiteralCombo" min="-2" max="-2" attributes="0"/>
+                                      <Component id="onReplaceCombo" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace pref="21" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Component id="bracesGenerationLabel" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="jSeparator2" pref="99" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <Component id="doWhileBracesCombo" linkSize="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="methodDeclCombo" linkSize="1" alignment="1" min="-2" max="-2" attributes="1"/>
                       </Group>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="bracesPlacementLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSeparator1" pref="103" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="classDeclLabel" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
@@ -63,16 +81,7 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="ifBracesLabel" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="forBracesLabel" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="bracesGenerationLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jSeparator2" pref="99" max="32767" attributes="0"/>
+                      <Component id="otherLabel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -81,7 +90,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="bracesPlacementLabel" min="-2" max="-2" attributes="1"/>
@@ -94,27 +103,37 @@
               </Group>
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="methodDeclLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="methodDeclCombo" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="functionDeclLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="functionDeclCombo" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="objectLiteralLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="objectLiteralCombo" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="onReplaceCombo" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="onReplaceLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="otherLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="otherCombo" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="specialElseIfCheckBox" min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+              <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                      <Component id="bracesGenerationLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="bracesGenerationLabel" min="-2" max="-2" attributes="1"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                      <Component id="jSeparator2" min="-2" max="-2" attributes="0"/>
+                      <Component id="jSeparator2" min="-2" pref="2" max="-2" attributes="1"/>
+                      <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="ifBracesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="ifBracesCombo" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -129,12 +148,7 @@
                   <Component id="whileBracesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="whileBracesCombo" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="doWhileBracesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="doWhileBracesCombo" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="23" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -169,17 +183,17 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="methodDeclLabel">
+    <Component class="javax.swing.JLabel" name="functionDeclLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="methodDeclCombo"/>
+          <ComponentRef name="functionDeclCombo"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="LBL_bp_MethodDecl" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JComboBox" name="methodDeclCombo">
+    <Component class="javax.swing.JComboBox" name="functionDeclCombo">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">
@@ -191,8 +205,46 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="methodDeclComboActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="functionDeclComboActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="objectLiteralLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBraces.objectLiteralLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="objectLiteralCombo">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="Item 1"/>
+            <StringItem index="1" value="Item 2"/>
+            <StringItem index="2" value="Item 3"/>
+            <StringItem index="3" value="Item 4"/>
+          </StringArray>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="onReplaceLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBraces.onReplaceLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="onReplaceCombo">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="Item 1"/>
+            <StringItem index="1" value="Item 2"/>
+            <StringItem index="2" value="Item 3"/>
+            <StringItem index="3" value="Item 4"/>
+          </StringArray>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="otherLabel">
       <Properties>
@@ -294,28 +346,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="whileBracesCombo">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="4">
-            <StringItem index="0" value="Item 1"/>
-            <StringItem index="1" value="Item 2"/>
-            <StringItem index="2" value="Item 3"/>
-            <StringItem index="3" value="Item 4"/>
-          </StringArray>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="doWhileBracesLabel">
-      <Properties>
-        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="doWhileBracesCombo"/>
-        </Property>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="LBL_bg_DoWhile" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="doWhileBracesCombo">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">

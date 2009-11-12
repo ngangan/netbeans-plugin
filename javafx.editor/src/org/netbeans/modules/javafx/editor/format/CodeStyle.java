@@ -242,7 +242,7 @@ public final class CodeStyle {
     }
 
     public BracePlacement getMethodDeclBracePlacement() {
-        String placement = preferences.get(methodDeclBracePlacement, getDefaultAsString(methodDeclBracePlacement));
+        String placement = preferences.get(functionDeclBracePlacement, getDefaultAsString(functionDeclBracePlacement));
         return BracePlacement.valueOf(placement);
     }
 
@@ -352,7 +352,7 @@ public final class CodeStyle {
     }
 
     public WrapStyle wrapMethodParams() {
-        String wrap = preferences.get(wrapMethodParams, getDefaultAsString(wrapMethodParams));
+        String wrap = preferences.get(wrapFunctionParams, getDefaultAsString(wrapFunctionParams));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -367,7 +367,7 @@ public final class CodeStyle {
     }
 
     public WrapStyle wrapMethodCallArgs() {
-        String wrap = preferences.get(wrapMethodCallArgs, getDefaultAsString(wrapMethodCallArgs));
+        String wrap = preferences.get(wrapFunctionCallArgs, getDefaultAsString(wrapFunctionCallArgs));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -377,7 +377,7 @@ public final class CodeStyle {
     }
 
     public WrapStyle wrapChainedMethodCalls() {
-        String wrap = preferences.get(wrapChainedMethodCalls, getDefaultAsString(wrapChainedMethodCalls));
+        String wrap = preferences.get(wrapChainedFunctionCalls, getDefaultAsString(wrapChainedFunctionCalls));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -506,11 +506,11 @@ public final class CodeStyle {
     }
 
     public boolean spaceBeforeMethodDeclParen() {
-        return preferences.getBoolean(spaceBeforeMethodDeclParen, getDefaultAsBoolean(spaceBeforeMethodDeclParen));
+        return preferences.getBoolean(spaceBeforeFunctionDeclParen, getDefaultAsBoolean(spaceBeforeFunctionDeclParen));
     }
 
     public boolean spaceBeforeMethodCallParen() {
-        return preferences.getBoolean(spaceBeforeMethodCallParen, getDefaultAsBoolean(spaceBeforeMethodCallParen));
+        return preferences.getBoolean(spaceBeforeFunctionCallParen, getDefaultAsBoolean(spaceBeforeFunctionCallParen));
     }
 
     public boolean spaceBeforeIfParen() {
@@ -550,7 +550,7 @@ public final class CodeStyle {
     }
 
     public boolean spaceAroundTernaryOps() {
-        return preferences.getBoolean(spaceAroundTernaryOps, getDefaultAsBoolean(spaceAroundTernaryOps));
+        return preferences.getBoolean(spaceAroundIfElseOps, getDefaultAsBoolean(spaceAroundIfElseOps));
     }
 
     public boolean spaceAroundAssignOps() {
@@ -562,7 +562,7 @@ public final class CodeStyle {
     }
 
     public boolean spaceBeforeMethodDeclLeftBrace() {
-        return preferences.getBoolean(spaceBeforeMethodDeclLeftBrace, getDefaultAsBoolean(spaceBeforeMethodDeclLeftBrace));
+        return preferences.getBoolean(spaceBeforeFunctionDeclLeftBrace, getDefaultAsBoolean(spaceBeforeFunctionDeclLeftBrace));
     }
 
     public boolean spaceBeforeIfLeftBrace() {
@@ -610,7 +610,7 @@ public final class CodeStyle {
     }
 
     public boolean spaceBeforeArrayInitLeftBrace() {
-        return preferences.getBoolean(spaceBeforeArrayInitLeftBrace, getDefaultAsBoolean(spaceBeforeArrayInitLeftBrace));
+        return preferences.getBoolean(spaceBeforeSequenceInitLeftBrace, getDefaultAsBoolean(spaceBeforeSequenceInitLeftBrace));
     }
 
     public boolean spaceWithinParens() {
@@ -618,11 +618,11 @@ public final class CodeStyle {
     }
 
     public boolean spaceWithinMethodDeclParens() {
-        return preferences.getBoolean(spaceWithinMethodDeclParens, getDefaultAsBoolean(spaceWithinMethodDeclParens));
+        return preferences.getBoolean(spaceWithinFunctionDeclParens, getDefaultAsBoolean(spaceWithinFunctionDeclParens));
     }
 
     public boolean spaceWithinMethodCallParens() {
-        return preferences.getBoolean(spaceWithinMethodCallParens, getDefaultAsBoolean(spaceWithinMethodCallParens));
+        return preferences.getBoolean(spaceWithinFunctionCallParens, getDefaultAsBoolean(spaceWithinFunctionCallParens));
     }
 
     public boolean spaceWithinIfParens() {
@@ -662,7 +662,7 @@ public final class CodeStyle {
     }
 
     public boolean spaceWithinArrayInitBrackets() {
-        return preferences.getBoolean(spaceWithinArrayInitBrackets, getDefaultAsBoolean(spaceWithinArrayInitBrackets));
+        return preferences.getBoolean(spaceWithinSequenceInitBrackets, getDefaultAsBoolean(spaceWithinSequenceInitBrackets));
     }
 
     public boolean spaceBeforeComma() {

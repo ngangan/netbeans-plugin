@@ -62,10 +62,16 @@ public class FmtBlankLines extends javax.swing.JPanel {
         bClassField.putClientProperty(OPTION_ID, blankLinesBeforeClass);
         aClassField.putClientProperty(OPTION_ID, blankLinesAfterClass);
         aClassHeaderField.putClientProperty(OPTION_ID, blankLinesAfterClassHeader);
-        bFieldsField.putClientProperty(OPTION_ID, blankLinesBeforeFields);
-        aFieldsField.putClientProperty(OPTION_ID, blankLinesAfterFields);
-        bMethodsField.putClientProperty(OPTION_ID, blankLinesBeforeMethods );
-        aMethodsField.putClientProperty(OPTION_ID, blankLinesAfterMethods);
+        bAttributeField.putClientProperty(OPTION_ID, blankLinesBeforeFields);
+        aAttributeField.putClientProperty(OPTION_ID, blankLinesAfterFields);
+        bFunctionField.putClientProperty(OPTION_ID, blankLinesBeforeMethods );
+        aFunctionField.putClientProperty(OPTION_ID, blankLinesAfterMethods);
+        bNonClassExpressionField.putClientProperty(OPTION_ID, blankLinesBeforeNonClassExpression);
+        aNonClassExpressionField.putClientProperty(OPTION_ID, blankLinesAfterNonClassExpression);
+        bNonClassAttributeField.putClientProperty(OPTION_ID, blankLinesBeforeNonClassAttribute);
+        aNonClassAttributeField.putClientProperty(OPTION_ID, blankLinesAfterNonClassAttribute);
+        bNonClassFunctionField.putClientProperty(OPTION_ID, blankLinesBeforeNonClassFunction);
+        aNonClassFunctionField.putClientProperty(OPTION_ID, blankLinesAfterNonClassFunction);
         
         bPackageField.addKeyListener(new NumericKeyListener());
         aPackageField.addKeyListener(new NumericKeyListener());
@@ -74,11 +80,17 @@ public class FmtBlankLines extends javax.swing.JPanel {
         bClassField.addKeyListener(new NumericKeyListener());
         aClassField.addKeyListener(new NumericKeyListener());
         aClassHeaderField.addKeyListener(new NumericKeyListener());
-        bFieldsField.addKeyListener(new NumericKeyListener());
-        aFieldsField.addKeyListener(new NumericKeyListener());
-        bMethodsField.addKeyListener(new NumericKeyListener());
-        aMethodsField.addKeyListener(new NumericKeyListener());
-        
+        bAttributeField.addKeyListener(new NumericKeyListener());
+        aAttributeField.addKeyListener(new NumericKeyListener());
+        bFunctionField.addKeyListener(new NumericKeyListener());
+        aFunctionField.addKeyListener(new NumericKeyListener());
+        bNonClassExpressionField.addKeyListener(new NumericKeyListener());
+        aNonClassExpressionField.addKeyListener(new NumericKeyListener());
+        bNonClassAttributeField.addKeyListener(new NumericKeyListener());
+        aNonClassAttributeField.addKeyListener(new NumericKeyListener());
+        bNonClassFunctionField.addKeyListener(new NumericKeyListener());
+        aNonClassFunctionField.addKeyListener(new NumericKeyListener());
+
     }
     
     public static PreferencesCustomizer.Factory getController() {
@@ -108,14 +120,26 @@ public class FmtBlankLines extends javax.swing.JPanel {
         aClassField = new javax.swing.JTextField();
         aClassHeaderLabel = new javax.swing.JLabel();
         aClassHeaderField = new javax.swing.JTextField();
-        bFieldsLabel = new javax.swing.JLabel();
-        bFieldsField = new javax.swing.JTextField();
-        aFieldsLabel = new javax.swing.JLabel();
-        aFieldsField = new javax.swing.JTextField();
-        bMethodsLabel = new javax.swing.JLabel();
-        bMethodsField = new javax.swing.JTextField();
-        aMethodsLabel = new javax.swing.JLabel();
-        aMethodsField = new javax.swing.JTextField();
+        bAttributeLabel = new javax.swing.JLabel();
+        bAttributeField = new javax.swing.JTextField();
+        aAttributeLabel = new javax.swing.JLabel();
+        aAttributeField = new javax.swing.JTextField();
+        bFunctionLabel = new javax.swing.JLabel();
+        bFunctionField = new javax.swing.JTextField();
+        aFunctionLabel = new javax.swing.JLabel();
+        aFunctionField = new javax.swing.JTextField();
+        bNonClassExpressionLabel = new javax.swing.JLabel();
+        bNonClassExpressionField = new javax.swing.JTextField();
+        aNonClassExpressionLabel = new javax.swing.JLabel();
+        aNonClassExpressionField = new javax.swing.JTextField();
+        bNonClassAttributeLabel = new javax.swing.JLabel();
+        bNonClassAttributeField = new javax.swing.JTextField();
+        aNonClassAttributeLabel = new javax.swing.JLabel();
+        aNonClassAttributeField = new javax.swing.JTextField();
+        bNonClassFunctionLabel = new javax.swing.JLabel();
+        bNonClassFunctionField = new javax.swing.JTextField();
+        aNonClassFunctionLabel = new javax.swing.JLabel();
+        aNonClassFunctionField = new javax.swing.JTextField();
 
         setName(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_BlankLines")); // NOI18N
         setOpaque(false);
@@ -155,25 +179,55 @@ public class FmtBlankLines extends javax.swing.JPanel {
 
         aClassHeaderField.setColumns(5);
 
-        bFieldsLabel.setLabelFor(bFieldsField);
-        org.openide.awt.Mnemonics.setLocalizedText(bFieldsLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blBeforeFields")); // NOI18N
+        bAttributeLabel.setLabelFor(bAttributeField);
+        org.openide.awt.Mnemonics.setLocalizedText(bAttributeLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blBeforeFields")); // NOI18N
 
-        bFieldsField.setColumns(5);
+        bAttributeField.setColumns(5);
 
-        aFieldsLabel.setLabelFor(aFieldsField);
-        org.openide.awt.Mnemonics.setLocalizedText(aFieldsLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blAfterFields")); // NOI18N
+        aAttributeLabel.setLabelFor(aAttributeField);
+        org.openide.awt.Mnemonics.setLocalizedText(aAttributeLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blAfterFields")); // NOI18N
 
-        aFieldsField.setColumns(5);
+        aAttributeField.setColumns(5);
 
-        bMethodsLabel.setLabelFor(bMethodsField);
-        org.openide.awt.Mnemonics.setLocalizedText(bMethodsLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blBeforeMethods")); // NOI18N
+        bFunctionLabel.setLabelFor(bFunctionField);
+        org.openide.awt.Mnemonics.setLocalizedText(bFunctionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blBeforeMethods")); // NOI18N
 
-        bMethodsField.setColumns(5);
+        bFunctionField.setColumns(5);
 
-        aMethodsLabel.setLabelFor(aMethodsField);
-        org.openide.awt.Mnemonics.setLocalizedText(aMethodsLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blAfterMethods")); // NOI18N
+        aFunctionLabel.setLabelFor(aFunctionField);
+        org.openide.awt.Mnemonics.setLocalizedText(aFunctionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_blAfterMethods")); // NOI18N
 
-        aMethodsField.setColumns(5);
+        aFunctionField.setColumns(5);
+
+        org.openide.awt.Mnemonics.setLocalizedText(bNonClassExpressionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassExpressionLabel.text")); // NOI18N
+
+        bNonClassExpressionField.setColumns(5);
+        bNonClassExpressionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassExpressionField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(aNonClassExpressionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassExpressionLabel.text")); // NOI18N
+
+        aNonClassExpressionField.setColumns(5);
+        aNonClassExpressionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassExpressionField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(bNonClassAttributeLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassAttributeLabel.text")); // NOI18N
+
+        bNonClassAttributeField.setColumns(5);
+        bNonClassAttributeField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassAttributeField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(aNonClassAttributeLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassAttributeLabel.text")); // NOI18N
+
+        aNonClassAttributeField.setColumns(5);
+        aNonClassAttributeField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassAttributeField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(bNonClassFunctionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassFunctionLabel.text")); // NOI18N
+
+        bNonClassFunctionField.setColumns(5);
+        bNonClassFunctionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassFunctionField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(aNonClassFunctionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassFunctionLabel.text")); // NOI18N
+
+        aNonClassFunctionField.setColumns(5);
+        aNonClassFunctionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassFunctionField.text")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -188,26 +242,38 @@ public class FmtBlankLines extends javax.swing.JPanel {
                     .add(bClassLabel)
                     .add(aClassLabel)
                     .add(aClassHeaderLabel)
-                    .add(bFieldsLabel)
-                    .add(aFieldsLabel)
-                    .add(bMethodsLabel)
-                    .add(aMethodsLabel))
+                    .add(bAttributeLabel)
+                    .add(aAttributeLabel)
+                    .add(bFunctionLabel)
+                    .add(aFunctionLabel)
+                    .add(bNonClassExpressionLabel)
+                    .add(aNonClassExpressionLabel)
+                    .add(bNonClassAttributeLabel)
+                    .add(aNonClassAttributeLabel)
+                    .add(bNonClassFunctionLabel)
+                    .add(aNonClassFunctionLabel))
                 .add(6, 6, 6)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(aMethodsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bMethodsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aFieldsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bFieldsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aClassHeaderField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aClassField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bClassField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aImportsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bImportsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aPackageField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bPackageField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(aNonClassFunctionField, 0, 0, Short.MAX_VALUE)
+                    .add(bNonClassFunctionField, 0, 0, Short.MAX_VALUE)
+                    .add(aNonClassAttributeField, 0, 0, Short.MAX_VALUE)
+                    .add(bNonClassAttributeField, 0, 0, Short.MAX_VALUE)
+                    .add(aNonClassExpressionField, 0, 0, Short.MAX_VALUE)
+                    .add(bNonClassExpressionField, 0, 0, Short.MAX_VALUE)
+                    .add(aFunctionField)
+                    .add(bFunctionField)
+                    .add(aAttributeField)
+                    .add(bAttributeField)
+                    .add(aClassHeaderField)
+                    .add(aClassField)
+                    .add(bClassField)
+                    .add(aImportsField)
+                    .add(bImportsField)
+                    .add(aPackageField)
+                    .add(bPackageField)))
         );
 
-        layout.linkSize(new java.awt.Component[] {aClassField, aClassHeaderField, aFieldsField, aImportsField, aMethodsField, aPackageField, bClassField, bFieldsField, bImportsField, bMethodsField, bPackageField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {aAttributeField, aClassField, aClassHeaderField, aFunctionField, aImportsField, aPackageField, bAttributeField, bClassField, bFunctionField, bImportsField, bPackageField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -241,48 +307,85 @@ public class FmtBlankLines extends javax.swing.JPanel {
                     .add(aClassHeaderLabel))
                 .add(4, 4, 4)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(bFieldsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bFieldsLabel))
+                    .add(bAttributeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(bAttributeLabel))
                 .add(4, 4, 4)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(aFieldsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aFieldsLabel))
+                    .add(aAttributeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(aAttributeLabel))
                 .add(4, 4, 4)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(bMethodsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bMethodsLabel))
+                    .add(bFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(bFunctionLabel))
                 .add(4, 4, 4)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(aMethodsField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(aMethodsLabel)))
+                    .add(aFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(aFunctionLabel))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(bNonClassExpressionLabel)
+                    .add(bNonClassExpressionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(aNonClassExpressionLabel)
+                    .add(aNonClassExpressionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(bNonClassAttributeLabel)
+                    .add(bNonClassAttributeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(aNonClassAttributeLabel)
+                    .add(aNonClassAttributeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(bNonClassFunctionLabel)
+                    .add(bNonClassFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(aNonClassFunctionLabel)
+                    .add(aNonClassFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
-        layout.linkSize(new java.awt.Component[] {aClassField, aClassHeaderField, aFieldsField, aImportsField, aMethodsField, aPackageField, bClassField, bFieldsField, bImportsField, bMethodsField, bPackageField}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {aAttributeField, aClassField, aClassHeaderField, aFunctionField, aImportsField, aPackageField, bAttributeField, bClassField, bFunctionField, bImportsField, bPackageField}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField aAttributeField;
+    private javax.swing.JLabel aAttributeLabel;
     private javax.swing.JTextField aClassField;
     private javax.swing.JTextField aClassHeaderField;
     private javax.swing.JLabel aClassHeaderLabel;
     private javax.swing.JLabel aClassLabel;
-    private javax.swing.JTextField aFieldsField;
-    private javax.swing.JLabel aFieldsLabel;
+    private javax.swing.JTextField aFunctionField;
+    private javax.swing.JLabel aFunctionLabel;
     private javax.swing.JLabel aImports;
     private javax.swing.JTextField aImportsField;
-    private javax.swing.JTextField aMethodsField;
-    private javax.swing.JLabel aMethodsLabel;
+    private javax.swing.JTextField aNonClassAttributeField;
+    private javax.swing.JLabel aNonClassAttributeLabel;
+    private javax.swing.JTextField aNonClassExpressionField;
+    private javax.swing.JLabel aNonClassExpressionLabel;
+    private javax.swing.JTextField aNonClassFunctionField;
+    private javax.swing.JLabel aNonClassFunctionLabel;
     private javax.swing.JTextField aPackageField;
     private javax.swing.JLabel aPackageLabel;
+    private javax.swing.JTextField bAttributeField;
+    private javax.swing.JLabel bAttributeLabel;
     private javax.swing.JTextField bClassField;
     private javax.swing.JLabel bClassLabel;
-    private javax.swing.JTextField bFieldsField;
-    private javax.swing.JLabel bFieldsLabel;
+    private javax.swing.JTextField bFunctionField;
+    private javax.swing.JLabel bFunctionLabel;
     private javax.swing.JTextField bImportsField;
     private javax.swing.JLabel bImportsLabel;
-    private javax.swing.JTextField bMethodsField;
-    private javax.swing.JLabel bMethodsLabel;
+    private javax.swing.JTextField bNonClassAttributeField;
+    private javax.swing.JLabel bNonClassAttributeLabel;
+    private javax.swing.JTextField bNonClassExpressionField;
+    private javax.swing.JLabel bNonClassExpressionLabel;
+    private javax.swing.JTextField bNonClassFunctionField;
+    private javax.swing.JLabel bNonClassFunctionLabel;
     private javax.swing.JTextField bPackageField;
     private javax.swing.JLabel bPackageLabel;
     // End of variables declaration//GEN-END:variables
