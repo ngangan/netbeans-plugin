@@ -38,6 +38,7 @@
  */
 package qa.javafx.functional.editor;
 
+import java.util.StringTokenizer;
 import qa.javafx.functional.library.JavaFXTestCase;
 import qa.javafx.functional.library.project.EditorOperator;
 import qa.javafx.functional.library.project.JavaFXProject;
@@ -63,10 +64,17 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         "testCFVariables",
         "testCFDataTypes",
         "testCFVariableTrigger",
-        
+
+
+        // === Function ===
+
         "testCFFunction",
         "testCFFunctionBody",
+
+        // === Class ===
         "testCFClass",
+
+        // === Object Literal ===
         "testCFObjectLiteral",
 
 
@@ -171,27 +179,82 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
     void compare(String template, String code, String goldenCode){
 
-        code = code.trim();
-        goldenCode = goldenCode.trim();
+        System.out.println("------- normilize code  -------------");
+        code = normilizeString(code);
+        System.out.println("------- normilize golden -------------");
+        goldenCode = normilizeString(goldenCode);
 
-        System.out.println("[" + template + "]");
+        System.out.println("--------" + template + "----------");
+        System.out.println(code);
+        System.out.println("----------------------------");
         System.out.println("------------ Golden --------");
         System.out.println(goldenCode);
         System.out.println("----------------------------");
 
 
-        System.out.println("--------" + template + "----------");
-        System.out.println(code);
-        System.out.println("----------------------------");
 
 
 
         if(!goldenCode.equals(code)){
             pass = false;
             failComponents+= ", " + template;
+            System.out.println("Fail");
+            int size1 = code.length();
+            int size2 = goldenCode.length();
+
+            System.out.println("size: " + size1 + ":" + size2);
+            System.out.println("1) [" + code.charAt(0) + "|" + code.charAt(1) + "|" + code.charAt(size1 - 2) + "|" + code.charAt(size1 - 1) + "]");
+            System.out.println("2) [" + goldenCode.charAt(0) + "|" + goldenCode.charAt(1) + "|" + goldenCode.charAt(size2 - 2) + "|" + goldenCode.charAt(size2 - 1) + "]");
+
             fail(template + ": Golden file does not match");
         }
 
     }
+
+        public static String normilizeString(String str) {
+            StringTokenizer tokenizer = new StringTokenizer(str, "\n");
+            String res = "";
+
+            boolean begin = true;
+
+            while(tokenizer.hasMoreTokens()){
+
+                String s = reduceSpaces(tokenizer.nextToken());
+                if(begin && "".equals(s)){
+                    System.out.println("[begin] '" + s + "'");
+                }else {
+                    begin = false;
+                    res +=  s + "\n";
+                }
+            }
+            
+            //return res;
+            return reduceSpaces(res);
+
+        }
+
+        public static String reduceSpaces(String str) {
+
+            int ind = str.length() - 1;
+
+
+            while(0 <= ind && isSpace(str.charAt(ind))){
+                ind--;
+            }
+
+            if(ind < 0 || (ind == 0 && isSpace(str.charAt(0)))){
+                return "";
+            }else{
+                System.out.println("[reduce] " + ind + ": '" + str.substring(0, ind + 1) + "'");
+                return str.substring(0, ind + 1);
+            }
+
+        }
+
+        public static boolean  isSpace(char c) {
+            return Character.isSpaceChar(c) || c ==' ' || c =='\t' || c == '\n' || c == '\r';
+        }
+
     
+
 }

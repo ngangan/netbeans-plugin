@@ -85,7 +85,11 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
 
                 // use relative path to find the samples folder
                 URI sdk = uri.resolve(samples.pathToSamples());
-                sdkRoot = new File(sdk.toString());
+                if (sdk.isAbsolute()) {
+                    sdkRoot = new File(sdk);
+                } else {
+                    sdkRoot = new File(sdk.toString());
+                }
             } catch (IOException ioe) {
                 LayerGenerationException lge = new LayerGenerationException(ioe.getMessage());
                 lge.initCause(ioe);

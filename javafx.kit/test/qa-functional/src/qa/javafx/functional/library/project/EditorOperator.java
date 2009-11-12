@@ -55,6 +55,8 @@ public class EditorOperator extends org.netbeans.jellytools.EditorOperator {
     public EditorOperator(String name) {
         super(name);
         textComponent = new JTextComponentOperator(this);
+        Util.waitScanFinished();
+
     }
 
     public void setText(){

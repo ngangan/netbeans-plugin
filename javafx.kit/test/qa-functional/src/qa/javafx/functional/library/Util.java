@@ -23,6 +23,7 @@ import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeModel;
+import org.netbeans.junit.ide.ProjectSupport;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ComponentOperator;
@@ -280,8 +281,11 @@ public class Util {
 
 
     public static void waitScanFinished(){
+
         System.out.println("*** [wait scan] start ***");
-        try{Thread.sleep( 7000 ); }catch(Exception e) {}
+        try{Thread.sleep( 3000 ); }catch(Exception e) {}
+        ProjectSupport.waitScanFinished();
+        try{Thread.sleep( 2000 ); }catch(Exception e) {}
         
         long waitTime = 2000;
         //long waitCount = MAX_WAIT_TIME / waitTime;
