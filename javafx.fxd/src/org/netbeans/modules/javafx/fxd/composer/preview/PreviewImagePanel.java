@@ -75,8 +75,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     
     public SwingScenePanel getScenePanel() {
         //return m_scenePanel;
-        SwingScene swingScene = (SwingScene) m_fxScene.$javafx$scene$Scene$impl_peer;
-        return swingScene.scenePanel;
+        return getScenePanel(m_fxScene);
+    }
+    
+    private static SwingScenePanel getScenePanel(Scene scene) {
+        //return m_scenePanel;
+        return ((SwingScene) scene.$javafx$scene$Scene$impl_peer).scenePanel;
     }
 
 //    public JSGPanel getJSGPanel() {
@@ -158,8 +162,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                                             m_fxScene = fxScene;
 
-                                            SwingScene swingScene = (SwingScene) fxScene.$javafx$scene$Scene$impl_peer;
-                                            SwingScenePanel scenePanel = swingScene.scenePanel;
+                                            SwingScenePanel scenePanel = getScenePanel(fxScene);
 
                                             //DialogDisplayer.getDefault().createDialog(new DialogDescriptor(scenePanel, "xxxxxx")).setVisible(true);
                                             // end prototyping

@@ -56,8 +56,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.NbBundle;
 
@@ -169,15 +167,22 @@ final class ImageHolder extends JPanel {
         public void layoutContainer(Container parent) {
             Dimension d = imagePanel.getPreferredSize();
             System.out.println("Preferred size: " + d);
-            
+
 //            System.err.println("Panel size: " + d);
 //            com.sun.scenario.scenegraph.JSGPanel sgPanel = (com.sun.scenario.scenegraph.JSGPanel) imagePanel;
 //            com.sun.scenario.scenegraph.fx.FXNode fxNode = (com.sun.scenario.scenegraph.fx.FXNode) sgPanel.getScene();
 //            Rectangle2D bounds = fxNode.getTransformedBounds();
 //            System.err.println("Bounds: " + bounds);
-//            
+//
 //            d = new Dimension( (int) Math.round(bounds.getWidth()), (int) Math.round(bounds.getHeight()));
-            
+
+
+            /*
+            Bounds b = m_fxScene.impl_getRoot().get$boundsInParent();
+            System.out.println("bounds: " + b);
+            imagePanel.setSize((int)b.get$width(), (int)b.get$height());
+             */
+
             imagePanel.setSize(d);
             imagePanel.setLocation( (parent.getWidth() - imagePanel.getWidth()) / 2,
                     (parent.getHeight() - imagePanel.getHeight()) / 2);
