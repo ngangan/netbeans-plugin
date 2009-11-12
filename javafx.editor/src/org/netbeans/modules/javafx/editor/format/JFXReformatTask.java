@@ -762,6 +762,7 @@ public class JFXReformatTask implements ReformatTask {
                         case INIT_DEFINITION:
                         case POSTINIT_DEFINITION:
                         case FUNCTION_DEFINITION:
+                        case FUNCTION_VALUE:
                         case INSTANTIATE_OBJECT_LITERAL:
                             blankLines(cs.getBlankLinesBeforeMethods());
                             processClassMembers(Arrays.asList(new Tree[]{tree}), p);
@@ -944,6 +945,7 @@ public class JFXReformatTask implements ReformatTask {
                             }
                             break;
                         case FUNCTION_DEFINITION:
+                        case FUNCTION_VALUE:
                         case INIT_DEFINITION:
                         case POSTINIT_DEFINITION:
                             if (!first) {
@@ -1244,15 +1246,35 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO scan functionValue
         @Override
         public Boolean visitFunctionValue(FunctionValueTree node, Void p) {
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
+            accept(JFXTokenId.FUNCTION);
+            space();
+
+            int old = indent;
+            indent += continuationIndentSize;
+            spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+            accept(JFXTokenId.LPAREN);
+            List<? extends VariableTree> params = node.getParameters();
+            if (params != null && !params.isEmpty()) {
+                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
+                wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
+                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0);
+            }
+            accept(JFXTokenId.RPAREN);
+
+            TypeTree retType = node.getType();
+            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+                accept(JFXTokenId.COLON);
+                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                scan(retType, p);
+            }
+            indent = old;
+
+            BlockExpressionTree body = node.getBodyExpression();
+            if (body != null) {
+                scan(body, p);
+            }
             return true;
         }
 
@@ -1311,6 +1333,7 @@ public class JFXReformatTask implements ReformatTask {
                         }
                         break;
                     case FUNCTION_DEFINITION:
+                    case FUNCTION_VALUE:
                         bracePlacement = cs.getMethodDeclBracePlacement();
                         spaceBeforeLeftBrace = cs.spaceBeforeMethodDeclLeftBrace();
                         break;
@@ -2124,14 +2147,11 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitTypeCast(TypeCastTree node, Void p) {
-            accept(JFXTokenId.LPAREN);
-            boolean spaceWithinParens = cs.spaceWithinTypeCastParens();
-            spaces(spaceWithinParens ? 1 : 0);
-            scan(node.getType(), p);
-            spaces(spaceWithinParens ? 1 : 0);
-            accept(JFXTokenId.RPAREN);
-            spaces(cs.spaceAfterTypeCast() ? 1 : 0);
             scan(node.getExpression(), p);
+            space();
+            accept(JFXTokenId.AS);
+            space();
+            scan(node.getType(), p);
             return true;
         }
 
