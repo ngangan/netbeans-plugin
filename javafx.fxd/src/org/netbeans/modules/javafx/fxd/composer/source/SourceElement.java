@@ -30,7 +30,7 @@ public final class SourceElement implements MultiViewElement, Serializable {
     private final     FXZDataObject                   m_dObj;
     private transient SourceEditorWrapper             m_editorWrapper;
     private transient ToolbarWrapper                  m_toolbarWrapper;
-    private transient Map<String, SourceTopComponent> m_sourceTCs = new HashMap<String, SourceTopComponent>();
+    private transient Map<String, SourceTopComponent> m_sourceTCs = null;
     private transient SourceTopComponent              m_currentSourceTC = null;
         
     private static final class ToolbarWrapper extends JPanel {
@@ -87,6 +87,9 @@ public final class SourceElement implements MultiViewElement, Serializable {
     
     private SourceTopComponent getSourceTC() {
         String entryName = m_dObj.getEntryName();
+        if (m_sourceTCs == null){
+            m_sourceTCs = new HashMap<String, SourceTopComponent>();
+        }
         SourceTopComponent stc = m_sourceTCs.get( entryName);
         
         boolean wasCreated = false;
@@ -160,7 +163,9 @@ public final class SourceElement implements MultiViewElement, Serializable {
             m_currentSourceTC.componentClosed();
         }
         synchronized(this) {
-            m_sourceTCs.clear();
+            if (m_sourceTCs != null){
+                m_sourceTCs.clear();
+            }
             m_currentSourceTC = null;
             m_editorWrapper = null;
             m_toolbarWrapper = null;
