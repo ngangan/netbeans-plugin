@@ -2312,6 +2312,7 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitLiteral(LiteralTree node, Void p) {
             // Missing return statement, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
+            // ---
             int index = tokens.index();
             int c = col;
             Diff d = diffs.isEmpty() ? null : diffs.getFirst();
@@ -2320,6 +2321,20 @@ public class JFXReformatTask implements ReformatTask {
             } else {
                 rollback(index, c, d);
             }
+            // ---
+
+            // #176654: probably compiler bug
+            // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token
+            // workaround
+            // ---
+            index = tokens.index();
+            c = col;
+            d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.SUB) != JFXTokenId.SUB) {
+                rollback(index, c, d);
+            }
+            // ---
+
             accept(JFXTokenId.TRUE, JFXTokenId.FALSE, JFXTokenId.NULL, JFXTokenId.DECIMAL_LITERAL,
                     JFXTokenId.FLOATING_POINT_LITERAL, JFXTokenId.HEX_LITERAL, JFXTokenId.OCTAL_LITERAL,
                     JFXTokenId.STRING_LITERAL, JFXTokenId.QUOTE_LBRACE_STRING_LITERAL,
