@@ -464,7 +464,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     return super.visitInstantiate(node, document);
                 }
             };
-            if (!fxresult.getDiagnostics().isEmpty()) return;
+            if (fxresult.isErrors()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
             JavaFXSource.forFileObject(FileUtil.toFileObject(new File(indexable.getURL().toURI()))).runUserActionTask(new Task<CompilationController>() {
