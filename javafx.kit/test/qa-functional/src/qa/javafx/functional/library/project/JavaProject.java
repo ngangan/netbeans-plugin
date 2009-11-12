@@ -49,7 +49,6 @@ import org.netbeans.jellytools.actions.Action;
 import org.netbeans.jellytools.actions.OpenAction;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jellytools.nodes.ProjectRootNode;
-import org.netbeans.junit.ide.ProjectSupport;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
@@ -236,7 +235,7 @@ public class JavaProject extends Project {
 
 
         new JButtonOperator(newProject, "Finish").push();
-        //newProject.waitClosed();
+        newProject.waitClosed();
         
         try {
             Thread.sleep(TIME_WAIT);
@@ -245,7 +244,6 @@ public class JavaProject extends Project {
 
         //Utils.waitScanningClassPath();
         Util.waitScanFinished();
-        ProjectSupport.waitScanFinished();
         
         return new JavaProject(name, type, location, mainClass);
 
