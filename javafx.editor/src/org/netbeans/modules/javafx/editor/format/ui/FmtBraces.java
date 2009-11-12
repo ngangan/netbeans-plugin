@@ -57,13 +57,14 @@ public class FmtBraces extends javax.swing.JPanel {
     public FmtBraces() {
         initComponents();
         classDeclCombo.putClientProperty(OPTION_ID, classDeclBracePlacement);
-        methodDeclCombo.putClientProperty(OPTION_ID, methodDeclBracePlacement);
+        functionDeclCombo.putClientProperty(OPTION_ID, functionDeclBracePlacement);
+        objectLiteralCombo.putClientProperty(OPTION_ID, objectLiteralPlacement);
+        onReplaceCombo.putClientProperty(OPTION_ID, onReplacePlacement);
         otherCombo.putClientProperty(OPTION_ID, otherBracePlacement);
         specialElseIfCheckBox.putClientProperty(OPTION_ID, specialElseIf);
         ifBracesCombo.putClientProperty(OPTION_ID, redundantIfBraces);
         forBracesCombo.putClientProperty(OPTION_ID, redundantForBraces);
         whileBracesCombo.putClientProperty(OPTION_ID, redundantWhileBraces);
-        doWhileBracesCombo.putClientProperty(OPTION_ID, redundantDoWhileBraces);
     }
     
     public static PreferencesCustomizer.Factory getController() {
@@ -74,7 +75,7 @@ public class FmtBraces extends javax.swing.JPanel {
                 new String[] { FmtOptions.wrapAssert, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapAssignOps, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapBinaryOps, WrapStyle.WRAP_ALWAYS.name() },
-                new String[] { FmtOptions.wrapChainedMethodCalls, WrapStyle.WRAP_ALWAYS.name() },
+                new String[] { FmtOptions.wrapChainedFunctionCalls, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapDoWhileStatement, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapEnumConstants, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapExtendsImplementsKeyword, WrapStyle.WRAP_ALWAYS.name() },
@@ -82,9 +83,9 @@ public class FmtBraces extends javax.swing.JPanel {
                 new String[] { FmtOptions.wrapFor, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapForStatement, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapIfStatement, WrapStyle.WRAP_ALWAYS.name() },
-                new String[] { FmtOptions.wrapMethodCallArgs, WrapStyle.WRAP_ALWAYS.name() },
+                new String[] { FmtOptions.wrapFunctionCallArgs, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapAnnotationArgs, WrapStyle.WRAP_ALWAYS.name() },
-                new String[] { FmtOptions.wrapMethodParams, WrapStyle.WRAP_ALWAYS.name() },
+                new String[] { FmtOptions.wrapFunctionParams, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapTernaryOps, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapThrowsList, WrapStyle.WRAP_ALWAYS.name() },
@@ -102,8 +103,12 @@ public class FmtBraces extends javax.swing.JPanel {
         bracesPlacementLabel = new javax.swing.JLabel();
         classDeclLabel = new javax.swing.JLabel();
         classDeclCombo = new javax.swing.JComboBox();
-        methodDeclLabel = new javax.swing.JLabel();
-        methodDeclCombo = new javax.swing.JComboBox();
+        functionDeclLabel = new javax.swing.JLabel();
+        functionDeclCombo = new javax.swing.JComboBox();
+        objectLiteralLabel = new javax.swing.JLabel();
+        objectLiteralCombo = new javax.swing.JComboBox();
+        onReplaceLabel = new javax.swing.JLabel();
+        onReplaceCombo = new javax.swing.JComboBox();
         otherLabel = new javax.swing.JLabel();
         otherCombo = new javax.swing.JComboBox();
         specialElseIfCheckBox = new javax.swing.JCheckBox();
@@ -114,8 +119,6 @@ public class FmtBraces extends javax.swing.JPanel {
         forBracesCombo = new javax.swing.JComboBox();
         whileBracesLabel = new javax.swing.JLabel();
         whileBracesCombo = new javax.swing.JComboBox();
-        doWhileBracesLabel = new javax.swing.JLabel();
-        doWhileBracesCombo = new javax.swing.JComboBox();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
 
@@ -129,15 +132,23 @@ public class FmtBraces extends javax.swing.JPanel {
 
         classDeclCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        methodDeclLabel.setLabelFor(methodDeclCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(methodDeclLabel, org.openide.util.NbBundle.getMessage(FmtBraces.class, "LBL_bp_MethodDecl")); // NOI18N
+        functionDeclLabel.setLabelFor(functionDeclCombo);
+        org.openide.awt.Mnemonics.setLocalizedText(functionDeclLabel, org.openide.util.NbBundle.getMessage(FmtBraces.class, "LBL_bp_MethodDecl")); // NOI18N
 
-        methodDeclCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        methodDeclCombo.addActionListener(new java.awt.event.ActionListener() {
+        functionDeclCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        functionDeclCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                methodDeclComboActionPerformed(evt);
+                functionDeclComboActionPerformed(evt);
             }
         });
+
+        org.openide.awt.Mnemonics.setLocalizedText(objectLiteralLabel, org.openide.util.NbBundle.getMessage(FmtBraces.class, "FmtBraces.objectLiteralLabel.text")); // NOI18N
+
+        objectLiteralCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        org.openide.awt.Mnemonics.setLocalizedText(onReplaceLabel, org.openide.util.NbBundle.getMessage(FmtBraces.class, "FmtBraces.onReplaceLabel.text")); // NOI18N
+
+        onReplaceCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         otherLabel.setLabelFor(otherCombo);
         org.openide.awt.Mnemonics.setLocalizedText(otherLabel, org.openide.util.NbBundle.getMessage(FmtBraces.class, "LBL_bp_Other")); // NOI18N
@@ -166,65 +177,65 @@ public class FmtBraces extends javax.swing.JPanel {
 
         whileBracesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        doWhileBracesLabel.setLabelFor(doWhileBracesCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(doWhileBracesLabel, org.openide.util.NbBundle.getMessage(FmtBraces.class, "LBL_bg_DoWhile")); // NOI18N
-
-        doWhileBracesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(doWhileBracesLabel)
-                            .add(otherLabel)
-                            .add(methodDeclLabel)
-                            .add(whileBracesLabel))
-                        .add(12, 12, 12)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .add(bracesPlacementLabel)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(classDeclLabel))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(ifBracesLabel))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(forBracesLabel))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(layout.createSequentialGroup()
                                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(functionDeclLabel)
+                                        .add(whileBracesLabel)
+                                        .add(objectLiteralLabel)
+                                        .add(onReplaceLabel))
+                                    .add(12, 12, 12)
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(classDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, ifBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, forBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(org.jdesktop.layout.GroupLayout.TRAILING, whileBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                        .add(functionDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                         .add(otherCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(classDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, ifBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, forBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, whileBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                    .add(doWhileBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
-                            .add(methodDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(layout.createSequentialGroup()
-                        .add(bracesPlacementLabel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(classDeclLabel))
+                                        .add(objectLiteralCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                        .add(onReplaceCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 21, Short.MAX_VALUE))
+                                .add(layout.createSequentialGroup()
+                                    .add(bracesGenerationLabel)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                    .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)))))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(specialElseIfCheckBox))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(ifBracesLabel))
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(forBracesLabel))
-                    .add(layout.createSequentialGroup()
-                        .add(bracesGenerationLabel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)))
+                        .add(otherLabel)))
                 .addContainerGap())
         );
 
-        layout.linkSize(new java.awt.Component[] {classDeclCombo, doWhileBracesCombo, forBracesCombo, ifBracesCombo, methodDeclCombo, otherCombo, whileBracesCombo}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {classDeclCombo, forBracesCombo, functionDeclCombo, ifBracesCombo, otherCombo, whileBracesCombo}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(bracesPlacementLabel)
@@ -235,22 +246,30 @@ public class FmtBraces extends javax.swing.JPanel {
                     .add(classDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(6, 6, 6)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(methodDeclLabel)
-                    .add(methodDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(functionDeclLabel)
+                    .add(functionDeclCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(7, 7, 7)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(objectLiteralLabel)
+                    .add(objectLiteralCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(onReplaceCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(onReplaceLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(otherLabel)
                     .add(otherCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(specialElseIfCheckBox)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(31, 31, 31)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
-                        .add(20, 20, 20)
-                        .add(bracesGenerationLabel))
-                    .add(layout.createSequentialGroup()
-                        .add(28, 28, 28)
-                        .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(bracesGenerationLabel)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(23, 23, 23)))
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(ifBracesLabel)
                     .add(ifBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -262,17 +281,13 @@ public class FmtBraces extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(whileBracesLabel)
                     .add(whileBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(doWhileBracesLabel)
-                    .add(doWhileBracesCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void methodDeclComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_methodDeclComboActionPerformed
+    private void functionDeclComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_functionDeclComboActionPerformed
     // TODO add your handling code here:
-}//GEN-LAST:event_methodDeclComboActionPerformed
+}//GEN-LAST:event_functionDeclComboActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -280,16 +295,18 @@ public class FmtBraces extends javax.swing.JPanel {
     private javax.swing.JLabel bracesPlacementLabel;
     private javax.swing.JComboBox classDeclCombo;
     private javax.swing.JLabel classDeclLabel;
-    private javax.swing.JComboBox doWhileBracesCombo;
-    private javax.swing.JLabel doWhileBracesLabel;
     private javax.swing.JComboBox forBracesCombo;
     private javax.swing.JLabel forBracesLabel;
+    private javax.swing.JComboBox functionDeclCombo;
+    private javax.swing.JLabel functionDeclLabel;
     private javax.swing.JComboBox ifBracesCombo;
     private javax.swing.JLabel ifBracesLabel;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JComboBox methodDeclCombo;
-    private javax.swing.JLabel methodDeclLabel;
+    private javax.swing.JComboBox objectLiteralCombo;
+    private javax.swing.JLabel objectLiteralLabel;
+    private javax.swing.JComboBox onReplaceCombo;
+    private javax.swing.JLabel onReplaceLabel;
     private javax.swing.JComboBox otherCombo;
     private javax.swing.JLabel otherLabel;
     private javax.swing.JCheckBox specialElseIfCheckBox;

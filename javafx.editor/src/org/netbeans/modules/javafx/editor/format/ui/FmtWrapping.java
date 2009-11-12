@@ -65,13 +65,13 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         extendsImplementsKeywordCombo.addFocusListener(this);
         extendsImplementsListCombo.putClientProperty(OPTION_ID, wrapExtendsImplementsList);
         extendsImplementsListCombo.addFocusListener(this);
-        methodParamsCombo.putClientProperty(OPTION_ID, wrapMethodParams);
+        methodParamsCombo.putClientProperty(OPTION_ID, wrapFunctionParams);
         methodParamsCombo.addFocusListener(this);
-        methodCallArgsCombo.putClientProperty(OPTION_ID, wrapMethodCallArgs);
+        methodCallArgsCombo.putClientProperty(OPTION_ID, wrapFunctionCallArgs);
         methodCallArgsCombo.addFocusListener(this);
         annotationArgsCombo.putClientProperty(OPTION_ID, wrapAnnotationArgs);
         annotationArgsCombo.addFocusListener(this);
-        chainedMethodCallsCombo.putClientProperty(OPTION_ID, wrapChainedMethodCalls);
+        chainedMethodCallsCombo.putClientProperty(OPTION_ID, wrapChainedFunctionCalls);
         chainedMethodCallsCombo.addFocusListener(this);
         throwsKeywordCombo.putClientProperty(OPTION_ID, wrapThrowsKeyword);
         throwsKeywordCombo.addFocusListener(this);
@@ -257,7 +257,7 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         panel1.add(annotationArgsCombo, gridBagConstraints);
 
         chainedMethodCallsLabel.setLabelFor(chainedMethodCallsCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(chainedMethodCallsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_chainedMethodCalls")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chainedMethodCallsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_chainedFunctionCalls")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
