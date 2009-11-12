@@ -79,12 +79,11 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
                 int start = (int) unused.getStart();
                 int end = Math.min((int) unused.getEnd() + 2  /*SEMI + WS[NL]*/, document.getEndPosition().getOffset());
                 Position sp = document.createPosition(start);
-                Position ep = document.createPosition(end);
                 warnings.add(ErrorDescriptionFactory.createErrorDescription(
                         Severity.WARNING,
                         MessageFormat.format(BUNDLE.getString("Editor.unusedImports.message2user"), unused.getImportName()),   // NOI18N
-                        Collections.<Fix>singletonList(new RemoveImportFix(document, sp, ep)),
-                        document, sp, ep));
+                        Collections.<Fix>singletonList(new RemoveImportFix(document, sp, document.createPosition(end))),
+                        document, sp, document.createPosition((int) unused.getEnd())));
             }
 
             if (canceled.get()) return;
