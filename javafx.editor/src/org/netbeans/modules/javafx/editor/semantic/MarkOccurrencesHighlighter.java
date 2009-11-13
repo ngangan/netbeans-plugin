@@ -76,6 +76,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 
 /**
  *
@@ -376,7 +377,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
                 if (el.getKind() == ElementKind.METHOD) {
                     for (TypeElement superType : superTypes) {
-                        for (ExecutableElement ee : ElementFilter.methodsIn(info.getElements().getAllMembers(superType))) {
+                        for (ExecutableElement ee : ElementFilter.methodsIn(FXSourceUtils.getAllMembers(info.getElements(), superType))) {
                             if (info.getElements().overrides((ExecutableElement) el, ee, thisType) && (superType.getKind().isClass() || !ee.getEnclosingElement().equals(jlObject))) {
                                 Token t = Utilities.getToken(info, document, path);
                                 if (t != null) {

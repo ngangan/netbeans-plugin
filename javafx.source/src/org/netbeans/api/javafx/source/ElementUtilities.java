@@ -41,7 +41,6 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javadoc.Doc;
-import com.sun.source.tree.Scope;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Symbol;
@@ -59,19 +58,20 @@ import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafxdoc.DocEnv;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -248,7 +248,7 @@ public final class ElementUtilities {
                     HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
                     Types types = JavafxTypes.instance(ctx);
                     TypeElement te = (TypeElement) ((DeclaredType) type).asElement();
-                    for (Element member : elements.getAllMembers(te)) {
+                    for (Element member : getAllMembers(elements, te)) {
                         if (acceptor == null || acceptor.accept(member, type)) {
                             CharSequence name = member.getSimpleName();
                             ArrayList<Element> h = hiders.get(name);
@@ -292,7 +292,7 @@ public final class ElementUtilities {
                     }
                     break;
                 case ARRAY:
-                    for (Element member : elements.getAllMembers((TypeElement) ((Type) type).tsym)) {
+                    for (Element member : getAllMembers(elements, (TypeElement) ((Type) type).tsym)) {
                         if (acceptor == null || acceptor.accept(member, type)) {
                             members.add(member);
                         }
@@ -331,7 +331,7 @@ public final class ElementUtilities {
                     }
                 }
                 TypeMirror type = cls.asType();
-                for (Element member : elements.getAllMembers(cls)) {
+                for (Element member : getAllMembers(elements, cls)) {
                     if (acceptor == null || acceptor.accept(member, type)) {
                         CharSequence name = member.getSimpleName();
                         ArrayList<Element> h = hiders.get(name);
@@ -492,6 +492,20 @@ public final class ElementUtilities {
             }
         }
         return false;
+    }
+
+    // JFXC-2154
+    public static java.util.List<? extends Element> getAllMembers(Elements elements, TypeElement type) {
+        java.util.List<? extends Element> allMembers = Collections.<Element>emptyList();
+        if (elements == null || type == null) {
+            return allMembers;
+        }
+        try {
+            allMembers = elements.getAllMembers(type);
+        } catch (Exception e) {
+            Exceptions.printStackTrace(e);
+        }
+        return allMembers;
     }
 
     /**

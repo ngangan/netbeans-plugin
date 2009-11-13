@@ -28,6 +28,7 @@ import javax.lang.model.type.TypeMirror;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
+import javax.lang.model.util.Elements;
 import javax.swing.text.Document;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
@@ -613,6 +614,20 @@ public final class FXSourceUtils {
         EditorCookie ec = od != null ? od.getLookup().lookup(EditorCookie.class) : null;
 
         return ec != null ? ec.getDocument() : null;
+    }
+
+    // JFXC-2154
+    public static java.util.List<? extends Element> getAllMembers(Elements elements, TypeElement type) {
+        java.util.List<? extends Element> allMembers = Collections.<Element>emptyList();
+        if (elements == null || type == null) {
+            return allMembers;
+        }
+        try {
+            allMembers = elements.getAllMembers(type);
+        } catch (Exception e) {
+            Exceptions.printStackTrace(e);
+        }
+        return allMembers;
     }
 
     private static CharSequence getFragment(Element e) {
