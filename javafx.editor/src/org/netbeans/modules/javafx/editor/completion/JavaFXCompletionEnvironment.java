@@ -79,6 +79,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
@@ -354,7 +355,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
 
-        for (Element member : elements.getAllMembers(te)) {
+        for (Element member : FXSourceUtils.getAllMembers(elements, te)) {
             if (LOGGABLE) log("    member2 == " + member + " member2.getKind() " + member.getKind()); // NOI18N
             String s = member.getSimpleName().toString();
             if ("<error>".equals(s)) { // NOI18N

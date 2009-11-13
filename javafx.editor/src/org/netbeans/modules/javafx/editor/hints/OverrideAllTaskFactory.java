@@ -65,6 +65,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.spi.editor.hints.*;
@@ -421,12 +422,9 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
         Collection<? extends Element> elements = null;
         try {
-            elements = compilationInfo.getElements().getAllMembers(typeElement);
+            elements = FXSourceUtils.getAllMembers(compilationInfo.getElements(), typeElement);
         } catch (NullPointerException npe) {
             npe.printStackTrace();
-            System.err.println("* e = " + typeElement); //NOI18N
-            System.err.println("* e.getKind() = " + typeElement.getKind()); //NOI18N
-            System.err.println("* e.asType() = " + typeElement.asType()); //NOI18N
         }
 
         return elements;
