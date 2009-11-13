@@ -1641,9 +1641,9 @@ public class JFXReformatTask implements ReformatTask {
                 if (literalParts != null && !literalParts.isEmpty()) {
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), literalParts);
-                    spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                 }
                 indent = old;
+                spaces(0, true);
                 accept(JFXTokenId.RBRACE);
             }
             
@@ -2377,25 +2377,26 @@ public class JFXReformatTask implements ReformatTask {
             indent += indentSize;
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             if (itemList != null) {
+                boolean first = true;
                 for (Iterator<ExpressionTree> it = itemList.iterator(); it.hasNext();) {
                     ExpressionTree expressionTree = it.next();
+                    if (!first) {
+                        spaces(cs.spaceAfterComma() ? 1 : 0, true);
+                    }
                     scan(expressionTree, p);
                     if (it.hasNext()) {
                         int index = tokens.index();
                         int c = col;
                         Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                        if (accept(JFXTokenId.COMMA) == JFXTokenId.COMMA) {
-                            if (cs.spaceAfterComma()) {
-                                spaces(1, true);
-                            }
-                        } else {
+                        if (accept(JFXTokenId.COMMA) != JFXTokenId.COMMA) {
                             rollback(index, c, d);
                         }
                     }
+                    first = false;
                 }
             }
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             indent = old;
+            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             accept(JFXTokenId.RBRACKET);
             return true;
         }
@@ -3484,9 +3485,7 @@ public class JFXReformatTask implements ReformatTask {
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
                 JFXTokenId accepted = accept(JFXTokenId.COMMA, JFXTokenId.SEMI);
-                if (accepted == JFXTokenId.COMMA || accepted == JFXTokenId.SEMI) {
-                    spaces(cs.spaceBeforeComma() ? 1 : 0);
-                } else {
+                if (accepted != JFXTokenId.COMMA && accepted != JFXTokenId.SEMI) {
                     rollback(index, c, d);
                 }
             }
