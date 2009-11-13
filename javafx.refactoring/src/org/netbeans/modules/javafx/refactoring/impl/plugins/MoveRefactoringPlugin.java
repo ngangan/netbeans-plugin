@@ -279,9 +279,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         return null;
     }
 
-    private void collectMoveData(final Map<String, String> renameMap, final Set<FileObject> related) {
-        fireProgressListenerStep(filesToMove.size());
-
+    private void collectMoveData(final Map<String, String> renameMap, final Set<FileObject> related, final Set<String> movedClasses) {
         for(final FileObject fo : filesToMove) {
             final String targetPkg = getTargetPackageName(fo);
 
@@ -303,6 +301,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             @Override
                             public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
                                 ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
+                                movedClasses.add(eh.getQualifiedName());
                                 related.addAll(cc.getClasspathInfo().getClassIndex().getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
                                 return super.visitClassDeclaration(node, p);
                             }
@@ -315,7 +314,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         }
     }
 
-    private Problem renamePackages(final Map<String, String> renameMap, final RefactoringElementsBag elements) {
+    private Problem renamePackages(final Map<String, String> renameMap, final Set<String> movedClasses, final RefactoringElementsBag elements) {
         final Problem[] p = new Problem[1];
         for(FileObject fo : filesToMove) {
             JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
@@ -324,7 +323,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, renameMap) {
+                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, movedClasses, renameMap) {
                             @Override
                             public Void visitCompilationUnit(UnitTree node, Void p) {
                                 ExpressionTree packageNameTree = node.getPackageName();
@@ -344,12 +343,11 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             } catch (IOException e) {
 
             }
-            fireProgressListenerStep(filesToMove.size());
         }
         return p[0];
     }
 
-    private Problem fixImports(final Map<String, String> renameMap, final Set<FileObject> related, final RefactoringElementsBag elements) {
+    private Problem fixImports(final Map<String, String> renameMap, final Set<FileObject> related, final Set<String> movedClasses, final RefactoringElementsBag elements) {
         final Problem[] problem = new Problem[1];
 
         for(final FileObject fo : related) {
@@ -365,7 +363,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                 jfxs.runUserActionTask(new Task<CompilationController>() {
                     public void run(final CompilationController cc) throws Exception {
-                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, renameMap) {
+                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, movedClasses, renameMap) {
                             private String myPkgName = "";
 
                             private boolean removingImport = false;
@@ -506,24 +504,26 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             } catch (IOException e) {
 
             }
-            fireProgressListenerStep(related.size());
         }
         return problem[0];
     }
 
     public Problem prepare(RefactoringElementsBag elements) {
-        fireProgressListenerStart(ProgressEvent.START, -1);
+        fireProgressListenerStart(ProgressEvent.START, 10);
 
+        Set<String> movedClasses = new HashSet<String>();
         Set<FileObject> related = new HashSet<FileObject>();
         Map<String, String> renameMap = new HashMap<String, String>();
 
-        collectMoveData(renameMap, related);
-
+        collectMoveData(renameMap, related, movedClasses);
+        fireProgressListenerStep(2);
         Problem p = null;
         p = chainProblems(p, checkProjectDeps(related));
-        p = chainProblems(p, renamePackages(renameMap, elements));
-        p = chainProblems(p, fixImports(renameMap, related, elements));
-
+        fireProgressListenerStep(2);
+        p = chainProblems(p, renamePackages(renameMap, movedClasses, elements));
+        fireProgressListenerStep(3);
+        p = chainProblems(p, fixImports(renameMap, related, movedClasses, elements));
+        fireProgressListenerStep(3);
         fireProgressListenerStop();
         return p;
     }
