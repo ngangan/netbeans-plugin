@@ -120,7 +120,7 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
                 l.stringvalue("SystemFileSystem.localizingBundle", "org.netbeans.modules.javafx.sdksamples.Bundle"); // NOI18N
                 l.methodvalue("instantiatingIterator", "org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator", "createIterator"); // NOI18N
                 if (descriptionFile.isFile()) {
-                    l.urlvalue("instantiatingWizardURL", "nbfs:/SystemFileSystem/SDKSamples/" + sampleName + "/description.html"); // NOI18N
+                    l.urlvalue("instantiatingWizardURL", "nbresloc:/SDKSamples/" + sampleName + "/description.html"); // NOI18N
                 }
                 l.boolvalue("template", true); // NOI18N
                 l.write();
