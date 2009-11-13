@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.fxd.composer.misc;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -70,7 +71,8 @@ public abstract class FXDToolbar extends JToolBar {
         }
         GridBagConstraints constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;
-
+        constrains.insets = new Insets(0, 3, 0, 2);
+        
         button.setContentAreaFilled(true);
         button.setBorderPainted(true);
         if (button instanceof JButton) {
@@ -85,6 +87,7 @@ public abstract class FXDToolbar extends JToolBar {
     public static void addCombo( JToolBar toolbar, JComboBox comboBox, int index, boolean isEditable) {
         GridBagConstraints constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;
+        constrains.insets = new Insets(0, 3, 0, 2);
 
         //@inherited fix of issue #69642. Focus shouldn't stay in toolbar
         comboBox.setFocusable(false);
