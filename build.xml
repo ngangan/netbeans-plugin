@@ -128,10 +128,12 @@
         <zipfileset dir="javafx.sdk.lin/release" filemode="755">
           <include name="javafx2/javafx-sdk/bin/*"/>
           <include name="javafx2/javafx-sdk/emulator/bin/*"/>
+          <include name="javafx2/javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.lin/release">
           <exclude name="javafx2/javafx-sdk/bin/*"/>
           <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+          <exclude name="javafx2/javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
       </jar>
       <jar destfile="build/clusters/solaris.jar" compress="true" level="9">
@@ -142,10 +144,12 @@
         <zipfileset dir="javafx.sdk.sol/release" filemode="755">
           <include name="javafx2/javafx-sdk/bin/*"/>
           <include name="javafx2/javafx-sdk/emulator/bin/*"/>
+          <include name="javafx2/javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.sol/release">
           <exclude name="javafx2/javafx-sdk/bin/*"/>
           <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+          <exclude name="javafx2/javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
       </jar>
       <jar destfile="build/clusters/mac.jar" compress="true" level="9">
@@ -156,14 +160,16 @@
         <zipfileset dir="javafx.sdk.mac/release" filemode="755">
           <include name="javafx2/javafx-sdk/bin/*"/>
           <include name="javafx2/javafx-sdk/emulator/bin/*"/>
+          <include name="javafx2/javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.mac/release">
           <exclude name="javafx2/javafx-sdk/bin/*"/>
           <exclude name="javafx2/javafx-sdk/emulator/bin/*"/>
+          <exclude name="javafx2/javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
       </jar>
     </target>
 
-    <target name="full-build" depends="clean,build,nbms,zip-clusters,l10n-kit"/>
+    <target name="full-build" depends="clean,nbms,zip-clusters,l10n-kit"/>
 
 </project>

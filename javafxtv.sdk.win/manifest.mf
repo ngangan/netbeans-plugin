@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-AutoUpdate-Show-In-Client: true
-OpenIDE-Module: org.netbeans.modules.javafxtv.sdk.win
-OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafxtv/sdk/win/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-OpenIDE-Module-Requires: org.openide.modules.os.Windows
-OpenIDE-Module-Provides: javafx.sdk.v1_2,javafx.sdk.v1_1,javafx.sdk
-
