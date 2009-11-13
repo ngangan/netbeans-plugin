@@ -50,6 +50,7 @@ import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -58,6 +59,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.Problem;
@@ -67,7 +69,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
-public class MoveClassBaseScanner<R, P> extends JavaFXTreePathScanner<R, P> {
+public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
     private interface MoveProblemCallback {
         Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature);
     }
@@ -79,7 +81,7 @@ public class MoveClassBaseScanner<R, P> extends JavaFXTreePathScanner<R, P> {
     private Set<String> movedClasses;
     private Map<String, String> renameMap;
 
-    public <R, P> MoveClassBaseScanner(CompilationController cc, Set<String> movedClasses, Map<String, String> renameMap) {
+    public <R, P> MoveProblemCollector(CompilationController cc, Set<String> movedClasses, Map<String, String> renameMap) {
         this.cc = cc;
         this.movedClasses = movedClasses;
         this.renameMap = renameMap;

@@ -42,20 +42,15 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -63,13 +58,9 @@ import java.util.*;
 import java.util.ArrayList;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -87,7 +78,10 @@ import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveClassBaseScanner;
+import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
+import org.netbeans.modules.parsing.api.ParserManager;
+import org.netbeans.modules.parsing.api.indexing.IndexingManager;
+import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -96,7 +90,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
@@ -318,12 +311,11 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         final Problem[] p = new Problem[1];
         for(FileObject fo : filesToMove) {
             JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-
             try {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, movedClasses, renameMap) {
+                        MoveProblemCollector<Void, Void> scanner = new MoveProblemCollector<Void, Void>(cc, movedClasses, renameMap) {
                             @Override
                             public Void visitCompilationUnit(UnitTree node, Void p) {
                                 ExpressionTree packageNameTree = node.getPackageName();
@@ -363,7 +355,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                 jfxs.runUserActionTask(new Task<CompilationController>() {
                     public void run(final CompilationController cc) throws Exception {
-                        MoveClassBaseScanner<Void, Void> scanner = new MoveClassBaseScanner<Void, Void>(cc, movedClasses, renameMap) {
+                        MoveProblemCollector<Void, Void> scanner = new MoveProblemCollector<Void, Void>(cc, movedClasses, renameMap) {
                             private String myPkgName = "";
 
                             private boolean removingImport = false;
@@ -509,7 +501,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
 
     public Problem prepare(RefactoringElementsBag elements) {
-        fireProgressListenerStart(ProgressEvent.START, 10);
+        fireProgressListenerStart(ProgressEvent.START, 20);
 
         Set<String> movedClasses = new HashSet<String>();
         Set<FileObject> related = new HashSet<FileObject>();
@@ -517,13 +509,16 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
         collectMoveData(renameMap, related, movedClasses);
         fireProgressListenerStep(2);
+        IndexingManager.getDefault().refreshAllIndices((FileObject[])filesToMove.toArray(new FileObject[filesToMove.size()]));
+        fireProgressListenerStep(4);
+        IndexingManager.getDefault().refreshAllIndices((FileObject[])related.toArray(new FileObject[related.size()]));
+        fireProgressListenerStep(5);
         Problem p = null;
         p = chainProblems(p, checkProjectDeps(related));
-        fireProgressListenerStep(2);
+        fireProgressListenerStep(3);
         p = chainProblems(p, renamePackages(renameMap, movedClasses, elements));
         fireProgressListenerStep(3);
         p = chainProblems(p, fixImports(renameMap, related, movedClasses, elements));
-        fireProgressListenerStep(3);
         fireProgressListenerStop();
         return p;
     }
