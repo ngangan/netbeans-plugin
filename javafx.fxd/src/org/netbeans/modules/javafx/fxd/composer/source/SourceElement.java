@@ -78,7 +78,12 @@ public final class SourceElement implements MultiViewElement, Serializable {
             m_dim = new Dimension( w, h);
             m_delegate.setSize(w, h);
             super.setBounds(x, y, w, h);
-        }    
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return m_delegate.getPreferredSize();
+        }
     }
     
     SourceElement(final FXZDataObject dObj)  {
