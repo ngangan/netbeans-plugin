@@ -938,93 +938,93 @@ public class JFXReformatTask implements ReformatTask {
                     magicFunc = MAGIC_FUNCTION.contentEquals(name) && isSynthetic((JFXTree) member);
                 }
                 if (magicFunc || !isSynthetic((JFXTree) member)) {
-                    switch (member.getJavaFXKind()) {
-                        case VARIABLE:
-                            boolean bool = tokens.moveNext();
-                            if (bool) {
-                                tokens.movePrevious();
-                                if (!first) {
-                                    blankLines(cs.getBlankLinesBeforeFields());
-                                }
-                                scan(member, p);
-                                if (!isLastInCU) {
-                                    blankLines(cs.getBlankLinesAfterFields());
-                                }
-                            }
-                            break;
-                        case FUNCTION_DEFINITION:
-                        case FUNCTION_VALUE:
-                        case INIT_DEFINITION:
-                        case POSTINIT_DEFINITION:
+                switch (member.getJavaFXKind()) {
+                    case VARIABLE:
+                        boolean bool = tokens.moveNext();
+                        if (bool) {
+                            tokens.movePrevious();
                             if (!first) {
-                                blankLines(cs.getBlankLinesBeforeMethods());
-                            }
-                            scan(member, p);
-                            int index = tokens.index();
-                            int c = col;
-                            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                            if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-                                semiRead = true;
-                            } else {
-                                rollback(index, c, d);
-                                semiRead = false;
-                            }
-                            if (!isLastInCU) {
-                                blankLines(cs.getBlankLinesAfterMethods());
-                            }
-                            break;
-                        case BLOCK_EXPRESSION:
-                            final BlockExpressionTree blockExpTree = (BlockExpressionTree) member;
-                            boolean hasStatements = !(blockExpTree).getStatements().isEmpty();
-                            boolean hasValue = (blockExpTree).getValue() != null;
-                            if (semiRead && !(blockExpTree).isStatic() && !hasStatements && !hasValue) {
-                                semiRead = false;
-                                continue;
-                            }
-                            if (!first) {
-                                blankLines(cs.getBlankLinesBeforeMethods());
-                            }
-                            index = tokens.index();
-                            c = col;
-                            d = diffs.isEmpty() ? null : diffs.getFirst();
-                            if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-                                continue;
-                            } else {
-                                rollback(index, c, d);
+                                blankLines(cs.getBlankLinesBeforeFields());
                             }
                             scan(member, p);
                             if (!isLastInCU) {
-                                blankLines(cs.getBlankLinesAfterMethods());
+                                blankLines(cs.getBlankLinesAfterFields());
                             }
-                            break;
-                        case INSTANTIATE_OBJECT_LITERAL:
-                        case CLASS_DECLARATION:
+                        }
+                        break;
+                    case FUNCTION_DEFINITION:
+                    case FUNCTION_VALUE:
+                    case INIT_DEFINITION:
+                    case POSTINIT_DEFINITION:
                             if (!first) {
-                                blankLines(cs.getBlankLinesBeforeClass());
-                            }
-                            scan(member, p);
-                            index = tokens.index();
-                            c = col;
-                            d = diffs.isEmpty() ? null : diffs.getFirst();
-                            if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-                                semiRead = true;
-                            } else {
-                                rollback(index, c, d);
-                                semiRead = false;
-                            }
+                            blankLines(cs.getBlankLinesBeforeMethods());
+                        }
+                        scan(member, p);
+                        int index = tokens.index();
+                        int c = col;
+                        Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                        if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                            semiRead = true;
+                        } else {
+                            rollback(index, c, d);
+                            semiRead = false;
+                        }
                             if (!isLastInCU) {
-                                blankLines(cs.getBlankLinesAfterClass());
-                            }
-                            break;
-                        default:
-                            scan(member, p);
-                            index = tokens.index();
-                            c = col;
-                            d = diffs.isEmpty() ? null : diffs.getFirst();
-                            if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
-                                semiRead = true;
-                            } else {
-                                rollback(index, c, d);
+                            blankLines(cs.getBlankLinesAfterMethods());
+                        }
+                        break;
+                    case BLOCK_EXPRESSION:
+                        final BlockExpressionTree blockExpTree = (BlockExpressionTree) member;
+                        boolean hasStatements = !(blockExpTree).getStatements().isEmpty();
+                        boolean hasValue = (blockExpTree).getValue() != null;
+                        if (semiRead && !(blockExpTree).isStatic() && !hasStatements && !hasValue) {
+                            semiRead = false;
+                            continue;
+                        }
+                        if (!first) {
+                            blankLines(cs.getBlankLinesBeforeMethods());
+                        }
+                        index = tokens.index();
+                        c = col;
+                        d = diffs.isEmpty() ? null : diffs.getFirst();
+                        if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                            continue;
+                        } else {
+                            rollback(index, c, d);
+                        }
+                        scan(member, p);
+                        if (!isLastInCU) {
+                            blankLines(cs.getBlankLinesAfterMethods());
+                        }
+                        break;
+                    case INSTANTIATE_OBJECT_LITERAL:
+                    case CLASS_DECLARATION:
+                        if (!first) {
+                            blankLines(cs.getBlankLinesBeforeClass());
+                        }
+                        scan(member, p);
+                        index = tokens.index();
+                        c = col;
+                        d = diffs.isEmpty() ? null : diffs.getFirst();
+                        if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                            semiRead = true;
+                        } else {
+                            rollback(index, c, d);
+                            semiRead = false;
+                        }
+                        if (!isLastInCU) {
+                            blankLines(cs.getBlankLinesAfterClass());
+                        }
+                        break;
+                    default:
+                        scan(member, p);
+                        index = tokens.index();
+                        c = col;
+                        d = diffs.isEmpty() ? null : diffs.getFirst();
+                        if (accept(JFXTokenId.SEMI) == JFXTokenId.SEMI) {
+                            semiRead = true;
+                        } else {
+                            rollback(index, c, d);
                                 semiRead = false;
                             }
                     }
@@ -3250,12 +3250,7 @@ public class JFXReformatTask implements ReformatTask {
                     newline();
                     indent = old;
                     ret = col;
-                    if (OPERATOR.equals(tokens.token().id().primaryCategory())) {
-                        col += tokens.token().length();
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        tokens.moveNext();
-                    }
+                    processOperator(spacesCnt);
                     spaces(spacesCnt);
                     scan(tree, null);
                     break;
@@ -3271,12 +3266,7 @@ public class JFXReformatTask implements ReformatTask {
                     indent = old;
                     ret = col;
                     wrapDepth++;
-                    if (OPERATOR.equals(tokens.token().id().primaryCategory())) {
-                        col += tokens.token().length();
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        tokens.moveNext();
-                    }
+                    processOperator(spacesCnt);
                     spaces(spacesCnt);
                     scan(tree, null);
                     wrapDepth--;
@@ -3289,12 +3279,7 @@ public class JFXReformatTask implements ReformatTask {
                         newline();
                         indent = old;
                         ret = col;
-                        if (OPERATOR.equals(tokens.token().id().primaryCategory())) {
-                            col += tokens.token().length();
-                            lastBlankLines = -1;
-                            lastBlankLinesTokenIndex = -1;
-                            tokens.moveNext();
-                        }
+                        processOperator(spacesCnt);
                         spaces(spacesCnt);
                         scan(tree, null);
                     }
@@ -3307,17 +3292,29 @@ public class JFXReformatTask implements ReformatTask {
                     spaces(spacesCnt, true);
                     indent = old;
                     ret = col;
-                    if (OPERATOR.equals(tokens.token().id().primaryCategory())) {
-                        col += tokens.token().length();
-                        lastBlankLines = -1;
-                        lastBlankLinesTokenIndex = -1;
-                        tokens.moveNext();
-                    }
+                    processOperator(spacesCnt);
                     spaces(spacesCnt);
                     scan(tree, null);
                     break;
             }
             return ret;
+        }
+
+        private void processOperator(int spacesCnt) {
+            if (OPERATOR.equals(tokens.token().id().primaryCategory())) {
+                col += tokens.token().length();
+                lastBlankLines = -1;
+                lastBlankLinesTokenIndex = -1;
+                tokens.moveNext();
+            } else {
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                final JFXTokenId accept = accept(JFXTokenId.AND, JFXTokenId.OR);
+                if (accept != JFXTokenId.AND && accept != JFXTokenId.OR) {
+                    rollback(index, c, d);
+                }
+            }
         }
 
         private boolean wrapStatement(CodeStyle.WrapStyle wrapStyle, CodeStyle.BracesGenerationStyle bracesGenerationStyle, int spacesCnt, ExpressionTree tree) {
