@@ -2017,12 +2017,18 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.SIZEOF);
                 space();
                 scan(node.getExpression(), p);
+            } else if (kind == JavaFXKind.INDEXOF) {
+                accept(JFXTokenId.INDEXOF);
+                space();
+                scan(node.getExpression(), p);
+            } else if (kind == JavaFXKind.LOGICAL_COMPLEMENT) {
+                accept(JFXTokenId.NOT);
+                space();
+                scan(node.getExpression(), p);
             } else if (kind == JavaFXKind.REVERSE) {
                 accept(JFXTokenId.REVERSE);
                 space();
                 scan(node.getExpression(), p);
-                // should be accepted in processExpression()
-//                accept(JFXTokenId.SEMI);
             } else if (OPERATOR.equals(id.primaryCategory())) {
                 spaces(cs.spaceAroundUnaryOps() ? 1 : 0);
                 col += tokens.token().length();
@@ -2030,6 +2036,7 @@ public class JFXReformatTask implements ReformatTask {
                 lastBlankLinesTokenIndex = -1;
                 lastBlankLinesDiff = null;
                 tokens.moveNext();
+
                 int index = tokens.index();
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
