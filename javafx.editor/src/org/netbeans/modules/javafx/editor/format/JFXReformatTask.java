@@ -732,32 +732,34 @@ public class JFXReformatTask implements ReformatTask {
                 final Tree[] treeArray = (Tree[]) cuTrees.toArray(new Tree[cuTrees.size()]);
                 for (int i = 0; i < treeArray.length; i++) {
                     Tree tree = treeArray[i];
+                    boolean isLastInCU = i == treeArray.length - 1;
                     JavaFXKind kind = tree.getJavaFXKind();
                     switch (kind) {
                         case IMPORT:
                             blankLines();
-//                            if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
-//                                blankLines(cs.getBlankLinesBeforeImports());
-//                            }
                             scan(tree, p);
-                            if (isLastMemberOfSuchKind(i, treeArray, kind)) {
+                            if (!isLastInCU && isLastMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesAfterImports());
                             }
                             break;
                         case CLASS_DECLARATION:
                             blankLines(cs.getBlankLinesBeforeClass());
                             scan(tree, p);
-                            blankLines(cs.getBlankLinesAfterClass());
+                            if (!isLastInCU) {
+                                blankLines(cs.getBlankLinesAfterClass());
+                            }
                             break;
                         case VARIABLE:
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeFields());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p);
-                            if (isLastMemberOfSuchKind(i, treeArray, kind)) {
-                                blankLines(cs.getBlankLinesAfterFields());
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            if (!isLastInCU) {
+                                if (isLastMemberOfSuchKind(i, treeArray, kind)) {
+                                    blankLines(cs.getBlankLinesAfterFields());
+                                }
+                                blankLines();
                             }
-                            blankLines();
                             break;
                         case INIT_DEFINITION:
                         case POSTINIT_DEFINITION:
@@ -765,18 +767,22 @@ public class JFXReformatTask implements ReformatTask {
                         case FUNCTION_VALUE:
                         case INSTANTIATE_OBJECT_LITERAL:
                             blankLines(cs.getBlankLinesBeforeMethods());
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p);
-                            blankLines(cs.getBlankLinesAfterMethods());
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            if (!isLastInCU) {
+                                blankLines(cs.getBlankLinesAfterMethods());
+                            }
                             break;
                         default:
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(1);
                             }
-                            processClassMembers(Arrays.asList(new Tree[] {tree}), p);
-                            if (isLastMemberOfSuchKind(i, treeArray, kind)) {
-                                blankLines(1);
+                            processClassMembers(Arrays.asList(new Tree[] {tree}), p, isLastInCU);
+                            if (!isLastInCU) {
+                                if (isLastMemberOfSuchKind(i, treeArray, kind)) {
+                                    blankLines(1);
+                                }
+                                blankLines();
                             }
-                            blankLines();
                     }
                 }
             }
@@ -902,7 +908,7 @@ public class JFXReformatTask implements ReformatTask {
                         indent = old;
                     }
                     blankLines(cs.getBlankLinesAfterClassHeader());
-                    processClassMembers(node.getClassMembers(), p);
+                    processClassMembers(node.getClassMembers(), p, false);
                     if (lastBlankLinesTokenIndex < 0) {
                         newline();
                     }
@@ -912,12 +918,12 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.RBRACE);
                 indent = old;
             } else {
-                processClassMembers(node.getClassMembers(), p);
+                processClassMembers(node.getClassMembers(), p, false);
             }
             return true;
         }
 
-        private void processClassMembers(List<Tree> members, Void p) {
+        private void processClassMembers(List<Tree> members, Void p, boolean isLastInCU) {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : members) {
@@ -941,7 +947,9 @@ public class JFXReformatTask implements ReformatTask {
                                     blankLines(cs.getBlankLinesBeforeFields());
                                 }
                                 scan(member, p);
-                                blankLines(cs.getBlankLinesAfterFields());
+                                if (!isLastInCU) {
+                                    blankLines(cs.getBlankLinesAfterFields());
+                                }
                             }
                             break;
                         case FUNCTION_DEFINITION:
@@ -961,7 +969,9 @@ public class JFXReformatTask implements ReformatTask {
                                 rollback(index, c, d);
                                 semiRead = false;
                             }
-                            blankLines(cs.getBlankLinesAfterMethods());
+                            if (!isLastInCU) {
+                                blankLines(cs.getBlankLinesAfterMethods());
+                            }
                             break;
                         case BLOCK_EXPRESSION:
                             final BlockExpressionTree blockExpTree = (BlockExpressionTree) member;
@@ -983,7 +993,9 @@ public class JFXReformatTask implements ReformatTask {
                                 rollback(index, c, d);
                             }
                             scan(member, p);
-                            blankLines(cs.getBlankLinesAfterMethods());
+                            if (!isLastInCU) {
+                                blankLines(cs.getBlankLinesAfterMethods());
+                            }
                             break;
                         case INSTANTIATE_OBJECT_LITERAL:
                         case CLASS_DECLARATION:
@@ -1000,7 +1012,9 @@ public class JFXReformatTask implements ReformatTask {
                                 rollback(index, c, d);
                                 semiRead = false;
                             }
-                            blankLines(cs.getBlankLinesAfterClass());
+                            if (!isLastInCU) {
+                                blankLines(cs.getBlankLinesAfterClass());
+                            }
                             break;
                         default:
                             scan(member, p);
