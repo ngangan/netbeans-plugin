@@ -2139,17 +2139,16 @@ public class JFXReformatTask implements ReformatTask {
                     spaces(cs.spaceBeforeElse() ? 1 : 0);
                 }
                 accept(JFXTokenId.ELSE);
-                // TODO special else if
-//                if (falseExpr.getKind() == Tree.Kind.IF && cs.specialElseIf()) {
-//                    space();
-//                    scan(falseExpr, p);
-//                } else {
+                if (falseExpr.getJavaFXKind() == JavaFXKind.CONDITIONAL_EXPRESSION && cs.specialElseIf()) {
+                    space();
+                    scan(falseExpr, p);
+                } else {
                     redundantIfBraces = cs.redundantIfBraces();
                     if (redundantIfBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(ifExpr) || endOffset < getEndPos(ifExpr))) {
                         redundantIfBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
                     }
                     wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeElseLeftBrace() ? 1 : 0, falseExpr);
-//                }
+                }
                 indent = old;
             }
             return true;
