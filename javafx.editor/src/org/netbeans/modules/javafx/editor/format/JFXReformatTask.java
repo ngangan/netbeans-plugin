@@ -1651,10 +1651,17 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.LBRACE);
                 int old = indent;
                 indent += indentSize;
-                List<ObjectLiteralPartTree> literalParts = node.getLiteralParts();
-                if (literalParts != null && !literalParts.isEmpty()) {
+                
+                TreeSet<Tree> members = new TreeSet<Tree>(new TreePosComparator(sp, root));
+                members.addAll(node.getLiteralParts());
+                ClassDeclarationTree body = node.getClassBody();
+                if (body != null) {
+                    members.addAll(body.getClassMembers());
+                }
+
+                if (!members.isEmpty()) {
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
-                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), literalParts);
+                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
                 }
                 indent = old;
                 spaces(0, true);
@@ -1780,7 +1787,8 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitForExpression(ForExpressionTree node, Void p) {
             Tree parent = getCurrentPath().getParentPath().getLeaf();
-            boolean insideVar = parent.getJavaFXKind() == JavaFXKind.VARIABLE;
+            JavaFXKind kind = parent.getJavaFXKind();
+            boolean insideVar = kind == JavaFXKind.VARIABLE || kind == JavaFXKind.SEQUENCE_EXPLICIT;
 
             int index = tokens.index();
             int c = col;
@@ -2103,7 +2111,7 @@ public class JFXReformatTask implements ReformatTask {
             JavaFXTreePath parentPath = getCurrentPath().getParentPath();
             Tree leaf = parentPath.getLeaf();
             while (leaf.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
-                if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE) {
+                if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE || leaf.getJavaFXKind() == JavaFXKind.SEQUENCE_EXPLICIT) {
                     insideVar = true;
                     break;
                 }
@@ -2211,10 +2219,13 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.SUCHTHAT); // nice token, LOL
             space();
             scan(node.getValue(), p);
-            space();
-            accept(JFXTokenId.TWEEN);
-            space();
-            scan(node.getInterpolation(), p);
+            ExpressionTree interpolation = node.getInterpolation();
+            if (interpolation != null) {
+                space();
+                accept(JFXTokenId.TWEEN);
+                space();
+                scan(interpolation, p);
+            }
             return true;
         }
 
@@ -2290,6 +2301,8 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     rollback(index, c, d);
                 }
+            } else {
+                space();
             }
             scan(node.getBody(), p);
             return true;
@@ -2405,14 +2418,14 @@ public class JFXReformatTask implements ReformatTask {
                         spaces(cs.spaceAfterComma() ? 1 : 0, true);
                     }
                     scan(expressionTree, p);
-                    if (it.hasNext()) {
-                        int index = tokens.index();
-                        int c = col;
-                        Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                        if (accept(JFXTokenId.COMMA) != JFXTokenId.COMMA) {
-                            rollback(index, c, d);
-                        }
+
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (accept(JFXTokenId.COMMA) != JFXTokenId.COMMA) {
+                        rollback(index, c, d);
                     }
+
                     first = false;
                 }
             }
@@ -3317,8 +3330,8 @@ public class JFXReformatTask implements ReformatTask {
                 int index = tokens.index();
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                final JFXTokenId accept = accept(JFXTokenId.AND, JFXTokenId.OR);
-                if (accept != JFXTokenId.AND && accept != JFXTokenId.OR) {
+                final JFXTokenId accept = accept(JFXTokenId.AND, JFXTokenId.OR, JFXTokenId.MOD);
+                if (accept != JFXTokenId.AND && accept != JFXTokenId.OR && accept != JFXTokenId.MOD) {
                     rollback(index, c, d);
                 }
             }
@@ -3399,7 +3412,13 @@ public class JFXReformatTask implements ReformatTask {
                     wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, tree);
                 }
                 first = false;
-                if (it.hasNext()) {
+
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                JFXTokenId accepted = accept(JFXTokenId.COMMA);
+                rollback(index, c, d);
+                if (accepted == JFXTokenId.COMMA) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
                     accept(JFXTokenId.COMMA);
                 }
@@ -3474,11 +3493,11 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, List<? extends ObjectLiteralPartTree> trees) {
+        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, Set<Tree> trees) {
             boolean first = true;
             int alignIndent = -1;
-            for (Iterator<? extends ObjectLiteralPartTree> it = trees.iterator(); it.hasNext();) {
-                ObjectLiteralPartTree part = it.next();
+            for (Iterator<Tree> it = trees.iterator(); it.hasNext();) {
+                Tree part = it.next();
                 if (part.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
                     scan(part, null);
                 } else if (first) {
