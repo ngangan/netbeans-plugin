@@ -2099,6 +2099,16 @@ public class JFXReformatTask implements ReformatTask {
             }
             indent = old;
 
+            index = tokens.index();
+            c = col;
+            d = diffs.isEmpty() ? null : diffs.getFirst();
+            JFXTokenId accepted = accept(JFXTokenId.THEN);
+            rollback(index, c, d);
+            if (accepted == JFXTokenId.THEN) {
+                space();
+                accept(JFXTokenId.THEN);
+            }
+
             JFXExpression trueExpr = ifExpr.getTrueExpression();
             JFXExpression falseExpr = ifExpr.getFalseExpression();
             CodeStyle.BracesGenerationStyle redundantIfBraces = cs.redundantIfBraces();
