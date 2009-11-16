@@ -74,10 +74,10 @@ import org.openide.util.NbBundle;
  */
 public class DocumentationScrollPane extends JScrollPane {
 
-    private static final String BACK = "org/netbeans/modules/java/navigation/resources/back.png"; //NOI18N
-    private static final String FORWARD = "org/netbeans/modules/java/navigation/resources/forward.png"; //NOI18N
-    private static final String GOTO_SOURCE = "org/netbeans/modules/java/navigation/resources/open_source_in_editor.png"; //NOI18N
-    private static final String SHOW_WEB = "org/netbeans/modules/java/navigation/resources/open_in_external_browser.png"; //NOI18N
+    private static final String BACK = "org/netbeans/modules/javafx/navigation/resources/back.png"; //NOI18N
+    private static final String FORWARD = "org/netbeans/modules/javafx/navigation/resources/forward.png"; //NOI18N
+    private static final String GOTO_SOURCE = "org/netbeans/modules/javafx/navigation/resources/open_source_in_editor.png"; //NOI18N
+    private static final String SHOW_WEB = "org/netbeans/modules/javafx/navigation/resources/open_in_external_browser.png"; //NOI18N
 
     private static final String JAVADOC_BACK = "javadoc-back"; //NOI18N
     private static final String JAVADOC_FORWARD = "javadoc-forward"; //NOI18N    

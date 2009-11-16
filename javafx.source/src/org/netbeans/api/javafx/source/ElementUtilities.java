@@ -56,6 +56,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafxdoc.ClassDocImpl;
 import com.sun.tools.javafxdoc.DocEnv;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -199,12 +200,14 @@ public final class ElementUtilities {
         if (element != null) {
             DocEnv env = DocEnv.instance(ctx);
             switch (element.getKind()) {
-                case ANNOTATION_TYPE:
                 case CLASS:
-                case ENUM:
-                case INTERFACE:
-                    return env.getClassDoc((ClassSymbol) element);
-                case ENUM_CONSTANT:
+                    ClassDocImpl classDoc = null;
+                    try {
+                        classDoc = env.getClassDoc((ClassSymbol) element);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return classDoc;
                 case FIELD:
                     return env.getFieldDoc((VarSymbol) element);
                 case METHOD:
