@@ -462,9 +462,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             int len = offset - ts.offset();
             if (LOGGABLE) log("getCompletionEnvironment len = " + len); // NOI18N
             if (len > 0 &&
-                        (ts.token().id() == JFXTokenId.IDENTIFIER ||
-                        (ts.token().id().primaryCategory().startsWith("keyword")) || // NOI18N
-                        ts.token().id().primaryCategory().equals("literal")) && // NOI18N
+                        (ts.token().id() == JFXTokenId.IDENTIFIER) &&
                     ts.token().length() >= len) {
                 //TODO: Use isKeyword(...) when available
                 prefix = ts.token().toString().substring(0, len);
