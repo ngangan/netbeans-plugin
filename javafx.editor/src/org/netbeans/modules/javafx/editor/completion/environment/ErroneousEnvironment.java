@@ -91,7 +91,7 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
             if (LOGGABLE) log("  start = " + start); // NOI18N
             String end = d.getText(offset, d.getLength()-offset);
             if (LOGGABLE) log("  end = " + end); // NOI18N
-            useSanitizedSource(start+"x"+end, offset); // NOI18N
+            useSanitizedSource(start+" x"+end, offset); // NOI18N
         } catch (BadLocationException ble) {
             if (LOGGABLE) logger.log(Level.FINER, "ble", ble); // NOI18N
         }
