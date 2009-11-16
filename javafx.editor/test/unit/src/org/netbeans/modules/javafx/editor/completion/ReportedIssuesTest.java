@@ -95,5 +95,9 @@ public class ReportedIssuesTest extends CompletionTestBase {
         checkCompletion("Iz150039", "    func: ^", "iz150039.pass");
     }
 
+    public void testIssue173838() throws Exception {
+        checkCompletion("Iz173838", "class B extends^", "iz173838.pass");
+    }
+
 }
 
