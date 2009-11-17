@@ -459,22 +459,24 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         LocalVarScanner lookup = new LocalVarScanner(info, newName);
         JavaFXTreePath scopeBlok = tp;
         EnumSet set = EnumSet.of(Tree.JavaFXKind.BLOCK_EXPRESSION, Tree.JavaFXKind.FOR_EXPRESSION_FOR, Tree.JavaFXKind.FUNCTION_DEFINITION);
-        while (!set.contains(scopeBlok.getLeaf().getJavaFXKind())) {
+        while (scopeBlok != null && scopeBlok.getLeaf() != null && !set.contains(scopeBlok.getLeaf().getJavaFXKind())) {
             scopeBlok = scopeBlok.getParentPath();
         }
-        Element var = info.getTrees().getElement(tp);
-        lookup.scan(scopeBlok, var);
+        if (scopeBlok != null) {
+            Element var = info.getTrees().getElement(tp);
+            lookup.scan(scopeBlok, var);
 
-        if (lookup.hasRefernces())
-            return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
+            if (lookup.hasRefernces())
+                return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
 
-        Scope scope = null;
-        if (tp != null) {
-            scope = info.getTrees().getScope(tp);
-            if (scope != null) {
-                for (Element el:scope.getLocalElements()) {
-                    if (el.getSimpleName().toString().equals(newName)) {
-                        return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
+            Scope scope = null;
+            if (tp != null) {
+                scope = info.getTrees().getScope(tp);
+                if (scope != null) {
+                    for (Element el:scope.getLocalElements()) {
+                        if (el.getSimpleName().toString().equals(newName)) {
+                            return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
+                        }
                     }
                 }
             }
