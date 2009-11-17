@@ -140,7 +140,9 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
 
         Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
         Set<FileObject> processingFiles = new HashSet<FileObject>();
-        
+
+        processingFiles.add(cc.getFileObject());
+
         ElementHandle handle = ElementHandle.create(e);
         processingHandles.add(handle);
         collectReferences(handle, processingFiles);
@@ -180,6 +182,8 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
 
         Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
         Set<FileObject> processingFiles = new HashSet<FileObject>();
+
+        processingFiles.add(cc.getFileObject());
 
         if (isSearchFromBaseClass()) {
             e = SourceUtils.getOverridenMethods((ExecutableElement)e, cc).iterator().next();
@@ -221,6 +225,8 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
 
         Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
         Set<FileObject> processingFiles = new HashSet<FileObject>();
+
+        processingFiles.add(cc.getFileObject());
 
         Stack<ElementHandle> stack = new Stack();
         stack.push(ElementHandle.create(e));
