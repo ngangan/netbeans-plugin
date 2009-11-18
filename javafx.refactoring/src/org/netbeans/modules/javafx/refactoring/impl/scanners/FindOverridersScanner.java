@@ -29,13 +29,10 @@
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import java.util.Collection;
 import java.util.Set;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 
 /**
@@ -43,15 +40,8 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
  * @author Jaroslav Bachorik
  */
 public class FindOverridersScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
-    private ExecutableElement methodElement;
-
-    public FindOverridersScanner(TreePathHandle searchHandle, CompilationController cc) {
-        this(searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
-    }
-
-    public FindOverridersScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
-        super(searchHandle, handle, cc);
-        this.methodElement = (ExecutableElement)handle.resolve(cc);
+    public FindOverridersScanner(TreePathHandle searchHandle, ElementHandle eh, CompilationController cc) {
+        super(searchHandle, eh ,cc);
     }
 
     @Override

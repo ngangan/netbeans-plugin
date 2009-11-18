@@ -44,19 +44,29 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
  */
 abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner<R, P>{
     final private TreePathHandle searchHandle;
-    final private ElementHandle origHandle;
     final private Element origElement;
+    final private ElementHandle origHandle;
     final private ElementKind origKind;
     final private CompilationController cc;
     final private SourcePositions positions;
     
-    public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
+    public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle eh, CompilationController cc) {
         this.searchHandle = searchHandle;
-        this.origHandle = handle;
-        this.origElement = handle != null ? handle.resolve(cc) : null;
-        this.origKind = handle != null ? handle.getKind() : null;
+        if (eh != null) {
+            this.origHandle = eh;
+            this.origElement = eh.resolve(cc);
+            this.origKind = eh.getKind();
+        } else {
+            this.origElement = searchHandle.resolveElement(cc);
+            this.origHandle = ElementHandle.create(origElement);
+            this.origKind = origElement != null ? origElement.getKind() : null;
+        }
         this.cc = cc;
         this.positions = cc.getTrees().getSourcePositions();
+    }
+
+    public BaseRefactoringScanner(TreePathHandle searchHandle, CompilationController cc) {
+        this(searchHandle, null, cc);
     }
 
     public BaseRefactoringScanner(CompilationController cc) {

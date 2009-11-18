@@ -30,6 +30,7 @@ package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import java.util.Set;
+import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
@@ -39,12 +40,8 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
  * @author Jaroslav Bachorik
  */
 public class FindSubclassesScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
-    public FindSubclassesScanner(TreePathHandle searchHandle, CompilationController cc) {
-        this(searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
-    }
-
-    public FindSubclassesScanner(TreePathHandle searchHandle, ElementHandle handle, CompilationController cc) {
-        super(searchHandle, handle, cc);
+    public FindSubclassesScanner(TreePathHandle searchHandle, ElementHandle<Element> eh, CompilationController cc) {
+        super(searchHandle, eh, cc);
     }
 
     @Override
