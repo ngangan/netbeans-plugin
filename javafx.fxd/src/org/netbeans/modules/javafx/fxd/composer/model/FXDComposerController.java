@@ -243,6 +243,9 @@ public final class FXDComposerController {
         if ( m_dObj.getDataModel().setZoomRatio(zoomRatio)) {
             m_screenChangeTicker++;
             if ( hasPreviewTC()) {
+//                Node node = getScene().impl_getRoot();
+//                node.set$scaleX(zoomRatio);
+//                node.set$scaleY(zoomRatio);
 //                FXNode scene = (FXNode) getSGPanel().getScene();
 //                scene.setScaleX(zoomRatio);
 //                scene.setScaleY(zoomRatio);

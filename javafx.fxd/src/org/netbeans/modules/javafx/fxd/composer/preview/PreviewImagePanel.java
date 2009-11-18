@@ -5,7 +5,6 @@
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.Affine2D;
 import com.sun.javafx.tk.Toolkit;
 import com.sun.javafx.tk.swing.SwingScene;
 import java.net.URL;
@@ -19,11 +18,9 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.*;
 
 import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
-import com.sun.javafx.tools.fxd.PreviewContext;
 import com.sun.javafx.tools.fxd.PreviewLoader;
 import com.sun.javafx.tools.fxd.container.ContainerEntry;
 import com.sun.javafx.tools.fxd.loader.Profile;
-import com.sun.scenario.scenegraph.SGGroup;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,6 +32,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import javafx.fxd.FXDLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javax.swing.Action;
@@ -175,11 +174,10 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 try {
 
                                                     //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
-                                                    PreviewContext context = new PreviewContext();
-                                                    context.set$profile(profileCopy);
-                                                    context.set$loader(loader);
-                                                    //loader.set$maxProgress(100);
-
+                                                    //PreviewContext context = new PreviewContext();
+                                                    //context.set$profile(profileCopy);
+                                                    //context.set$loader(loader);
+                                                    
                                                     PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
                                                     
                                                     System.out.println("--- STARTED ---");
@@ -196,9 +194,9 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                             loader.stop();
                                                         }
                                                         if (loader.loc$progress() != null) {
-                                                            System.out.println("PERCENT DONE = " + loader.loc$percentDone().get());
+                                                            System.out.println("PERCENT DONE = " + loader.loc$percentDone().getAsFloat());
                                                             // TODO set correct progress value
-                                                            //h.progress(loader.loc$progress().getAsInt());
+                                                            //h.progress(loader.loc$progress().getAsFloat());
                                                         }
                                                     }
                                                     System.out.println("--- FINISHED ---");
@@ -207,6 +205,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                     System.out.println("started = " + loader.loc$started().getAsBoolean());
                                                     System.out.println("stopped = " + loader.loc$stopped().getAsBoolean());
                                                     System.out.println("succeeded = " + loader.loc$succeeded().getAsBoolean());
+                                                    System.out.println("percent = " + loader.loc$percentDone().getAsFloat());
+                                                    System.out.println("progress = " + loader.loc$progress().getAsLong());
 
                                                     node = loader.get$content().get$javafx$fxd$FXDContent$_root();
                                                 } finally {
@@ -249,6 +249,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                     PreviewImagePanel.this.addMouseListener(popupL);
 
                                                     updateZoom();
+                                                    repaint();
                                                 }
                                             });
 
@@ -339,18 +340,15 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         SwingScenePanel scenePanel = getScenePanel();
         if (scenePanel != null){
             float zoom = m_dObj.getDataModel().getZoomRatio();
-            SGGroup node = scenePanel.getSceneGroup();
-            Affine2D at = new Affine2D();
-            at.scale( zoom, zoom);
-            node.setTransformMatrix(at);
+            Node node = m_fxScene.impl_getRoot();
+            node.set$translateX(0);
+            node.set$translateY(0);
+            node.set$scaleX(zoom);
+            node.set$scaleY(zoom);
+            Bounds bounds = node.get$boundsInParent();
+            node.set$translateX( -bounds.get$minX());
+            node.set$translateY( -bounds.get$minY());
 
-            /*
-            int width = (int)(scenePanel.getWidth() * zoom);
-            int height = (int)(scenePanel.getHeight() * zoom);
-            scenePanel.setSize(width, height);
-            scenePanel.setPreferredSize(new Dimension(width, height));
-             * 
-             */
 
             scenePanel.invalidate();
             if (scenePanel.getParent() != null){
