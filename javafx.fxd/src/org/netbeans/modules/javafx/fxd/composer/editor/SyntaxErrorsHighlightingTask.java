@@ -91,7 +91,9 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
                     errors.add(errorDescription);
                 }
             }
-            HintsController.setErrors(document, "simple-java", errors);
+            if(document != null){
+                HintsController.setErrors(document, "simple-java", errors);
+            }
         } catch (BadLocationException ex1) {
             Exceptions.printStackTrace(ex1);
         } catch (org.netbeans.modules.parsing.spi.ParseException ex1) {

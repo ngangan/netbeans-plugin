@@ -61,7 +61,7 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
                     m_toolbar.add( PreviewToolbar.createToolBarSeparator(), 1);
                     m_toolbar.add( Box.createHorizontalStrut(5), 2);
                     m_toolbar.add( FXDToolbar.createLabel("Scene:"), 3);
-                    m_toolbar.add( Box.createHorizontalStrut(2), 4);
+                    m_toolbar.add( Box.createHorizontalStrut(5), 4);
                     FXDToolbar.addCombo(m_toolbar, m_entryCombo, 5, false);
                 }
             }
