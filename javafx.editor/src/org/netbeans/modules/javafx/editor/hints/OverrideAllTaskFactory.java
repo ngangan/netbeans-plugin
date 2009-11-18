@@ -49,8 +49,6 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.ClassType;
-import com.sun.tools.javac.code.TypeTags;
 import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.code.JavafxTypes;
@@ -204,18 +202,18 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         }
                     };
                     visitor.scan(compilationInfo.getCompilationUnit(), null);
-                        Collection<? extends Element> elements = getAllMembers(classSymbol, compilationInfo);
-                        for (Element e : elements) {
-                            if (e instanceof MethodSymbol) {
-                                MethodSymbol method = (MethodSymbol) e;
-                                for (Modifier modifier : method.getModifiers()) {
-                                    if (modifier == Modifier.ABSTRACT) {
-                                        abstractMethods.add(method);
-                                        break;
-                                    }
+                    Collection<? extends Element> elements = getAllMembers(classSymbol, compilationInfo);
+                    for (Element e : elements) {
+                        if (e instanceof MethodSymbol) {
+                            MethodSymbol method = (MethodSymbol) e;
+                            for (Modifier modifier : method.getModifiers()) {
+                                if (modifier == Modifier.ABSTRACT) {
+                                    abstractMethods.add(method);
+                                    break;
                                 }
                             }
                         }
+                    }
                     if (abstractMethods.isEmpty()) {
                         return null;
                     }
@@ -354,69 +352,18 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     }
 
     private String getTypeString(Type type, JavafxTypes types) {
-        String varType = null;
-        if (type.isPrimitive()) {
-            if (type.tag == TypeTags.INT) { 
-                varType = Integer.class.getSimpleName();
-            } else if (type.tag == TypeTags.LONG 
-                    || type.tag == TypeTags.BYTE
-                    || type.tag == TypeTags.SHORT 
-                    || type.tag == TypeTags.FLOAT
-                    || type.tag == TypeTags.DOUBLE) { 
-
-                varType = "Number"; //NOI18N
-            } else if (type.tag == TypeTags.CHAR) {
-                varType = Character.class.getSimpleName();
-            } else if (type.tag == TypeTags.BOOLEAN) { 
-                varType = Boolean.class.getSimpleName();
-            } else {
-                varType = type.tsym.name.toString();
-            }
-
-        } else if (types.isSequence(type)) {
-            String suffix = "[]"; // NOI18N
-            type = types.elementType(type);
-
-            switch (type.tag) {
-                case TypeTags.BOOLEAN:
-                    varType = "Boolean" + suffix; // NOI18N
-                case TypeTags.BYTE:
-                    varType = "Byte" + suffix; // NOI18N
-                case TypeTags.DOUBLE:
-                    varType = "Double" + suffix; // NOI18N
-                case TypeTags.FLOAT:
-                    varType = "Float" + suffix; // NOI18N
-                case TypeTags.INT:
-                    varType = "Integer" + suffix; // NOI18N
-                case TypeTags.LONG:
-                    varType = "Long" + suffix; // NOI18N
-                case TypeTags.CHAR:
-                    varType = "Character" + suffix; // NOI18N
-                case TypeTags.SHORT:
-                    varType = "Short" + suffix; // NOI18N
-                case TypeTags.VOID:
-                    varType = "Void" + suffix; // NOI18N
-                default:
-                    try {
-                        varType = type.toString() + suffix;
-                    } catch (Throwable ex) {
-                        varType = "<unknown>" + suffix; // NOI18N
-                    }
-            }
-        } else if (type instanceof ClassType) {
-            varType = ((ClassType) type).tsym.getQualifiedName().toString();
-        } else {
-            if (type.tag == TypeTags.ARRAY) {
-                varType = "Object[]"; //NOI18N
-            } else if (type.tag == TypeTags.VOID) {
-                varType = "Void"; //NOI18N
-            } else {
-                varType = "Object"; //NOI18N
-            }
+        String typeString =  types.toJavaFXString(type);
+        if (typeString == null) {
+            typeString = ""; //NOI18N
+        } else if (typeString.contains("<")) { //NOI18N
+            typeString = typeString.substring(0, typeString.indexOf("<")); //NOI18N //Removing generics
+        } else if (typeString != null && typeString.equals("void")) { //NOI18N
+            typeString = "Void"; //NOI18N
         }
-
-        return varType;
+        
+        return typeString;
     }
+
 
     //TODO Temporary log for issue 148890
     Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
