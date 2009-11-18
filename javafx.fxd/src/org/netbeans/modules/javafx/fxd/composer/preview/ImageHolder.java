@@ -135,12 +135,11 @@ final class ImageHolder extends JPanel {
         }
         g.setClip( clip);
          */
-    }
-
-    @Override
-    public void paintComponent(java.awt.Graphics g) {
-        super.paintComponent(g);
-        m_dObj.getController().paintActions(g);
+        
+        Graphics gCopy = g.create();
+        gCopy.translate(xOff, yOff);
+        gCopy.setClip(0, 0, w, h);
+        m_dObj.getController().paintActions(gCopy);
     }
 
     private static void drawCross(Graphics g, int x, int y) {

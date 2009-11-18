@@ -6,6 +6,8 @@
 package org.netbeans.modules.javafx.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
@@ -31,6 +33,13 @@ public class ActionController implements ActionLookup {
     public ActionController(FXZDataObject dObj) {
         m_dObj = dObj;
         m_activeActions   = new Stack<ComposerAction>();
+        // test action to check painting
+//        m_activeActions.push(new AbstractComposerAction() {
+//            public void paint(Graphics g) {
+//                g.setColor(Color.blue);
+//                g.drawPolygon(new int[]{10, 100, 110, 20}, new int[]{10, 20, 110, 100}, 4);
+//            }
+//        });
         m_actionFactories = new ArrayList<ComposerActionFactory>();
         
         m_actionFactories.add( m_selectActionFactory=new SelectActionFactory(dObj));
