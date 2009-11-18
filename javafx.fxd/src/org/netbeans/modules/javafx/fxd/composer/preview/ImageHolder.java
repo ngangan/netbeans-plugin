@@ -50,6 +50,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
@@ -76,8 +77,7 @@ final class ImageHolder extends JPanel {
         this.imagePanel = imagePanel;
         this.m_dObj = dObj;
         setLayout( new CenteredLayoutManager());
-        imagePanel.setBorder(BorderFactory.createLineBorder(Color.yellow));
-        add(imagePanel);
+        add(this.imagePanel);
         setDoubleBuffered(true);
         canPaint = new AtomicBoolean( true );
         myErrorComponent = new JLabel( 
@@ -85,7 +85,7 @@ final class ImageHolder extends JPanel {
         myErrorComponent.validate();
         setBackground( Color.WHITE);
     }
-    
+
     public void setTryPaint(){
         if ( !canPaint.getAndSet( true ) ) {
             System.gc();
@@ -166,24 +166,13 @@ final class ImageHolder extends JPanel {
 
         public void layoutContainer(Container parent) {
             Dimension d = imagePanel.getPreferredSize();
-            System.out.println("Preferred size: " + d);
+            //System.out.println("Preferred size: " + d);
 
-//            System.err.println("Panel size: " + d);
-//            com.sun.scenario.scenegraph.JSGPanel sgPanel = (com.sun.scenario.scenegraph.JSGPanel) imagePanel;
-//            com.sun.scenario.scenegraph.fx.FXNode fxNode = (com.sun.scenario.scenegraph.fx.FXNode) sgPanel.getScene();
-//            Rectangle2D bounds = fxNode.getTransformedBounds();
-//            System.err.println("Bounds: " + bounds);
-//
-//            d = new Dimension( (int) Math.round(bounds.getWidth()), (int) Math.round(bounds.getHeight()));
-
-
-            /*
-            Bounds b = m_fxScene.impl_getRoot().get$boundsInParent();
-            System.out.println("bounds: " + b);
-            imagePanel.setSize((int)b.get$width(), (int)b.get$height());
-             */
-
-            imagePanel.setSize(d);
+            float zoom = m_dObj.getDataModel().getZoomRatio();
+            int w = (int)(d.getWidth() * zoom);
+            int h = (int)(d.getHeight() * zoom);
+            
+            imagePanel.setSize(w, h);
             imagePanel.setLocation( (parent.getWidth() - imagePanel.getWidth()) / 2,
                     (parent.getHeight() - imagePanel.getHeight()) / 2);
         }
