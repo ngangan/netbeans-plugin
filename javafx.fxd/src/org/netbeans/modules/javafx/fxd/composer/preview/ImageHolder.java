@@ -50,10 +50,8 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -68,16 +66,16 @@ import org.openide.util.NbBundle;
 final class ImageHolder extends JPanel {
     public static final int CROSS_SIZE = 10;
 
-    private final JComponent    imagePanel;
+    private final JComponent    m_imagePanel;
     private final AtomicBoolean canPaint ;
     private final JComponent    myErrorComponent;
     private  final FXZDataObject m_dObj;
     
     public ImageHolder(JComponent imagePanel, FXZDataObject dObj) {
-        this.imagePanel = imagePanel;
+        this.m_imagePanel = imagePanel;
         this.m_dObj = dObj;
         setLayout( new CenteredLayoutManager());
-        add(this.imagePanel);
+        add(this.m_imagePanel);
         setDoubleBuffered(true);
         canPaint = new AtomicBoolean( true );
         myErrorComponent = new JLabel( 
@@ -91,7 +89,7 @@ final class ImageHolder extends JPanel {
             System.gc();
             remove( myErrorComponent );
             setLayout( new CenteredLayoutManager() );
-            add( imagePanel );
+            add( m_imagePanel );
         }
     }
     
@@ -105,7 +103,7 @@ final class ImageHolder extends JPanel {
                 System.err.println("Out of Memory");
                 e.printStackTrace();
                 canPaint.set( false );
-                remove( imagePanel );
+                remove( m_imagePanel );
                 setLayout( new LabelLayout() );
                 add(  myErrorComponent );
             }
@@ -117,12 +115,12 @@ final class ImageHolder extends JPanel {
 
     private void doPaintChildren( Graphics g ) {
         super.paintChildren(g);
-        int xOff = imagePanel.getX();
-        int yOff = imagePanel.getY();
+        int xOff = m_imagePanel.getX();
+        int yOff = m_imagePanel.getY();
 
         g.setColor(Color.BLACK);
-        int w = imagePanel.getWidth(),
-            h = imagePanel.getHeight();
+        int w = m_imagePanel.getWidth(),
+            h = m_imagePanel.getHeight();
 
         drawCross( g, xOff - 1, yOff -1);
         drawCross( g, xOff - 1, yOff + h + 1);
@@ -152,33 +150,33 @@ final class ImageHolder extends JPanel {
     
     private class CenteredLayoutManager implements LayoutManager {        
         public void addLayoutComponent(String name, Component comp) {
-            assert imagePanel.equals(comp);
+            assert m_imagePanel.equals(comp);
         }
 
         public Dimension preferredLayoutSize(Container parent) {
-            return imagePanel.getPreferredSize();
+            return m_imagePanel.getPreferredSize();
         }
 
         public Dimension minimumLayoutSize(Container parent) {
-            return imagePanel.getPreferredSize();
+            return m_imagePanel.getPreferredSize();
         }
 
 
         public void layoutContainer(Container parent) {
-            Dimension d = imagePanel.getPreferredSize();
+            Dimension d = m_imagePanel.getPreferredSize();
             //System.out.println("Preferred size: " + d);
 
             float zoom = m_dObj.getDataModel().getZoomRatio();
             int w = (int)(d.getWidth() * zoom);
             int h = (int)(d.getHeight() * zoom);
             
-            imagePanel.setSize(w, h);
-            imagePanel.setLocation( (parent.getWidth() - imagePanel.getWidth()) / 2,
-                    (parent.getHeight() - imagePanel.getHeight()) / 2);
+            m_imagePanel.setSize(w, h);
+            m_imagePanel.setLocation( (parent.getWidth() - m_imagePanel.getWidth()) / 2,
+                    (parent.getHeight() - m_imagePanel.getHeight()) / 2);
         }
 
         public void removeLayoutComponent(Component comp) {
-            assert imagePanel.equals(comp);
+            assert m_imagePanel.equals(comp);
         }            
     };
     
