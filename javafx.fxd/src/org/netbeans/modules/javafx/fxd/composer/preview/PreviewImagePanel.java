@@ -6,10 +6,8 @@ package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
 import com.sun.javafx.geom.transform.Affine2D;
+import com.sun.javafx.tk.Toolkit;
 import com.sun.javafx.tk.swing.SwingScene;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
 import java.net.URL;
 
 import org.openide.util.NbBundle;
@@ -21,20 +19,38 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.*;
 
 import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
-import com.sun.javafx.tools.fxd.*;
+import com.sun.javafx.tools.fxd.PreviewContext;
+import com.sun.javafx.tools.fxd.PreviewLoader;
+import com.sun.javafx.tools.fxd.container.ContainerEntry;
 import com.sun.javafx.tools.fxd.loader.Profile;
 import com.sun.scenario.scenegraph.SGGroup;
-import java.util.Date;
-import java.util.logging.Logger;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import javafx.fxd.FXDLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
 import org.openide.awt.MouseUtils;
+import org.openide.util.Cancellable;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
 
@@ -138,51 +154,103 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                     return;
                                 } 
                                 
-                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N            
-                                SwingUtilities.invokeLater( new Runnable() {
+                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N
+
+                                final CancelledTask cancel = new CancelledTask();
+                                final ProgressHandle h = ProgressHandleFactory.createHandle(fxz.getEntryName(), cancel);
+                                h.start();
+                                h.switchToIndeterminate();
+                                //h.progress(0);
+
+                                Thread loadThread = new Thread(){
+
+                                    @Override
                                     public void run() {
                                         try {
-                                            Node node;
+                                            final Node node;
+                                            //final Node nodeOld;
                                             try {
                                                 fModel.readLock();
-                                                PreviewStatistics stats = new PreviewStatistics();
-                                                //System.out.println("Selected entry: " + selectedEntryCopy);
+                                                FXDLoader loader = new FXDLoader();
+                                                try {
 
-                                                node = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, stats);
+                                                    //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
+                                                    PreviewContext context = new PreviewContext();
+                                                    context.set$profile(profileCopy);
+                                                    context.set$loader(loader);
+                                                    //loader.set$maxProgress(100);
+
+                                                    PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
+                                                    
+                                                    System.out.println("--- STARTED ---");
+                                                    System.out.println("done = " + loader.loc$done().getAsBoolean());
+                                                    System.out.println("failed = " + loader.loc$failed().getAsBoolean());
+                                                    System.out.println("started = " + loader.loc$started().getAsBoolean());
+                                                    System.out.println("stopped = " + loader.loc$stopped().getAsBoolean());
+                                                    System.out.println("succeeded = " + loader.loc$succeeded().getAsBoolean());
+
+                                                    while (!loader.loc$done().getAsBoolean()) {
+                                                        Thread.sleep(100);
+                                                        if (cancel.isCancelled()) {
+                                                            System.out.println("STOPPING");
+                                                            loader.stop();
+                                                        }
+                                                        if (loader.loc$progress() != null) {
+                                                            System.out.println("PERCENT DONE = " + loader.loc$percentDone().get());
+                                                            // TODO set correct progress value
+                                                            //h.progress(loader.loc$progress().getAsInt());
+                                                        }
+                                                    }
+                                                    System.out.println("--- FINISHED ---");
+                                                    System.out.println("done = " + loader.loc$done().getAsBoolean());
+                                                    System.out.println("failed = " + loader.loc$failed().getAsBoolean());
+                                                    System.out.println("started = " + loader.loc$started().getAsBoolean());
+                                                    System.out.println("stopped = " + loader.loc$stopped().getAsBoolean());
+                                                    System.out.println("succeeded = " + loader.loc$succeeded().getAsBoolean());
+
+                                                    node = loader.get$content().get$javafx$fxd$FXDContent$_root();
+                                                } finally {
+                                                    h.finish();
+                                                }
                                             } finally {
                                                 fModel.readUnlock();
                                             }
 
-                                            // prototyping
-                                            Scene fxScene = new Scene(true);
-                                            fxScene.addTriggers$();
-                                            fxScene.applyDefaults$();
-                                            fxScene.loc$content.insert(node);
-                                            fxScene.complete$();
+                                            SwingUtilities.invokeLater(new Runnable() {
 
-                                            m_fxScene = fxScene;
+                                                public void run() {
+                                                    // prototyping
+                                                    Scene fxScene = new Scene(true);
+                                                    fxScene.addTriggers$();
+                                                    fxScene.applyDefaults$();
+                                                    //fxScene.loc$content.insert(nodeOld);
+                                                    fxScene.loc$content.insert(node);
+                                                    fxScene.complete$();
+                                                    Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
 
-                                            SwingScenePanel scenePanel = getScenePanel(fxScene);
+                                                    m_fxScene = fxScene;
 
-                                            //DialogDisplayer.getDefault().createDialog(new DialogDescriptor(scenePanel, "xxxxxx")).setVisible(true);
-                                            // end prototyping
+                                                    SwingScenePanel scenePanel = getScenePanel(fxScene);
 
-                                            // TODO: paint actions: m_dObj.getController().paintActions(g);
-                                            // now moved to ImageHolder. should have errors
-                                            removeAll();
+                                                    // end prototyping
 
-                                            add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
+                                                    // TODO: paint actions: m_dObj.getController().paintActions(g);
+                                                    removeAll();
 
-                                            MouseEventCollector mec = new MouseEventCollector();
-                                            scenePanel.addMouseListener(mec);
-                                            scenePanel.addMouseMotionListener(mec);
-                                            scenePanel.addMouseWheelListener(mec);
+                                                    add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
-                                            PopupListener popupL = new PopupListener();
-                                            scenePanel.addMouseListener(popupL);
-                                            PreviewImagePanel.this.addMouseListener(popupL);
+                                                    MouseEventCollector mec = new MouseEventCollector();
+                                                    scenePanel.addMouseListener(mec);
+                                                    scenePanel.addMouseMotionListener(mec);
+                                                    scenePanel.addMouseWheelListener(mec);
 
-                                            updateZoom();
+                                                    PopupListener popupL = new PopupListener();
+                                                    scenePanel.addMouseListener(popupL);
+                                                    PreviewImagePanel.this.addMouseListener(popupL);
+
+                                                    updateZoom();
+                                                }
+                                            });
 
 
                                             /*
@@ -233,10 +301,14 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 e.getLocalizedMessage()));
                                             label.setIcon(null);
                                         } finally {
-                                            System.gc();                                
+                                            System.gc();
                                         }
-                                    }                            
-                                });                            
+                                    }
+
+                                };
+                                loadThread.setName("FXDPreviewLoader-Thread");
+                                loadThread.start();
+
                             }
                         });                    
                     }
@@ -251,7 +323,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             showError( error.getLocalizedMessage());
         }
     }
-    
+
     private void showError( final String msg) {
         removeAll();
         setBackground( m_defaultBackground);
@@ -271,6 +343,14 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             Affine2D at = new Affine2D();
             at.scale( zoom, zoom);
             node.setTransformMatrix(at);
+
+            /*
+            int width = (int)(scenePanel.getWidth() * zoom);
+            int height = (int)(scenePanel.getHeight() * zoom);
+            scenePanel.setSize(width, height);
+            scenePanel.setPreferredSize(new Dimension(width, height));
+             * 
+             */
 
             scenePanel.invalidate();
             if (scenePanel.getParent() != null){
@@ -468,4 +548,18 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     protected PreviewStatusBar getStatusBar() {
         return m_dObj.getController().getPreviewComponent().getStatusBar();
     }
+
+    private static class CancelledTask implements Cancellable {
+
+        private boolean m_cancelled = false;
+
+        public boolean cancel() {
+            return m_cancelled = true;
+        }
+
+        public boolean isCancelled() {
+            return m_cancelled;
+        }
+    }
+
 }
