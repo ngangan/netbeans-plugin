@@ -33,7 +33,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import javafx.fxd.FXDLoader;
 import javafx.geometry.Bounds;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javax.swing.Action;
@@ -42,14 +41,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.openide.awt.MouseUtils;
-import org.openide.util.Cancellable;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
 
@@ -126,8 +122,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_PARSING")); //NOI18N            
 
                 add( label, BorderLayout.CENTER);
-                //m_sgPanel  = null;
-                //m_scenePanel = null;
                 m_fxScene = null;
 
                 Thread th = new Thread() {
@@ -142,7 +136,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         m_selectedEntryCopy = selectedEntryCopy;
 
                         //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
-                        
+
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
                                 if ( fModel.isError()) {
@@ -151,15 +145,9 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                     label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
                                             fModel.getErrorMsg()));
                                     return;
-                                } 
+                                }
                                 
                                 label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N
-
-                                final CancelledTask cancel = new CancelledTask();
-                                final ProgressHandle h = ProgressHandleFactory.createHandle(fxz.getEntryName(), cancel);
-                                h.start();
-                                h.switchToIndeterminate();
-                                //h.progress(0);
 
                                 Thread loadThread = new Thread(){
 
@@ -170,48 +158,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             //final Node nodeOld;
                                             try {
                                                 fModel.readLock();
-                                                FXDLoader loader = new FXDLoader();
-                                                try {
-
-                                                    //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
-                                                    //PreviewContext context = new PreviewContext();
-                                                    //context.set$profile(profileCopy);
-                                                    //context.set$loader(loader);
-                                                    
-                                                    PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
-                                                    
-                                                    System.out.println("--- STARTED ---");
-                                                    System.out.println("done = " + loader.loc$done().getAsBoolean());
-                                                    System.out.println("failed = " + loader.loc$failed().getAsBoolean());
-                                                    System.out.println("started = " + loader.loc$started().getAsBoolean());
-                                                    System.out.println("stopped = " + loader.loc$stopped().getAsBoolean());
-                                                    System.out.println("succeeded = " + loader.loc$succeeded().getAsBoolean());
-
-                                                    while (!loader.loc$done().getAsBoolean()) {
-                                                        Thread.sleep(100);
-                                                        if (cancel.isCancelled()) {
-                                                            System.out.println("STOPPING");
-                                                            loader.stop();
-                                                        }
-                                                        if (loader.loc$progress() != null) {
-                                                            System.out.println("PERCENT DONE = " + loader.loc$percentDone().getAsFloat());
-                                                            // TODO set correct progress value
-                                                            //h.progress(loader.loc$progress().getAsFloat());
-                                                        }
-                                                    }
-                                                    System.out.println("--- FINISHED ---");
-                                                    System.out.println("done = " + loader.loc$done().getAsBoolean());
-                                                    System.out.println("failed = " + loader.loc$failed().getAsBoolean());
-                                                    System.out.println("started = " + loader.loc$started().getAsBoolean());
-                                                    System.out.println("stopped = " + loader.loc$stopped().getAsBoolean());
-                                                    System.out.println("succeeded = " + loader.loc$succeeded().getAsBoolean());
-                                                    System.out.println("percent = " + loader.loc$percentDone().getAsFloat());
-                                                    System.out.println("progress = " + loader.loc$progress().getAsLong());
-
-                                                    node = loader.get$content().get$javafx$fxd$FXDContent$_root();
-                                                } finally {
-                                                    h.finish();
+                                                //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
+                                                FXDLoader loader = PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), null);
+                                                while (!loader.loc$done().getAsBoolean()) {
+                                                    Thread.sleep(100);
                                                 }
+                                                node = loader.get$content().get$javafx$fxd$FXDContent$_root();
                                             } finally {
                                                 fModel.readUnlock();
                                             }
@@ -247,9 +199,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                     PopupListener popupL = new PopupListener();
                                                     scenePanel.addMouseListener(popupL);
                                                     PreviewImagePanel.this.addMouseListener(popupL);
-
+                                                    revalidate();
                                                     updateZoom();
-                                                    repaint();
                                                 }
                                             });
 
@@ -546,18 +497,4 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     protected PreviewStatusBar getStatusBar() {
         return m_dObj.getController().getPreviewComponent().getStatusBar();
     }
-
-    private static class CancelledTask implements Cancellable {
-
-        private boolean m_cancelled = false;
-
-        public boolean cancel() {
-            return m_cancelled = true;
-        }
-
-        public boolean isCancelled() {
-            return m_cancelled;
-        }
-    }
-
 }
