@@ -50,6 +50,9 @@ import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javac.code.Flags;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javafx.code.JavafxFlags;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -181,7 +184,7 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
 
     private Problem checkVisibilty(Element e, MoveProblemCallback callback) {
         if (e == null) return null;
-        if (!e.getModifiers().contains(Modifier.PUBLIC)) {
+        if (isAffected(e)) {
             boolean packageAccess = true;
 
             String feature = e.toString();
@@ -189,7 +192,7 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
             while (e != null && e.getKind() != ElementKind.PACKAGE) {
                 if (targetTypeName == null && e.getKind() == ElementKind.CLASS) {
                     targetTypeName = e.asType().toString();
-                    if (e.getModifiers().contains(Modifier.PROTECTED) && cc.getTypes().isSubtype(e.asType(), currentClass)) {
+                    if (isProtected(e) && cc.getTypes().isSubtype(e.asType(), currentClass)) {
                         packageAccess = false;
                     }
                 }
@@ -202,6 +205,14 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
             }
         }
         return null;
+    }
+
+    private boolean isProtected(Element e) {
+        return (((Symbol)e).flags_field & Flags.PROTECTED) == 0L;
+    }
+
+    private boolean isAffected(Element e) {
+        return (((Symbol)e).flags_field & (JavafxFlags.PACKAGE_ACCESS | Flags.PROTECTED)) != 0L;
     }
 
     private static Problem chainProblems(Problem p,Problem p1) {
