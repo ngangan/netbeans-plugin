@@ -97,7 +97,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-        final ClassIndex classIndex = ClasspathInfo.create(file).getClassIndex();
         final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
 
         return new CancellableTask<CompilationInfo>() {
@@ -122,6 +121,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                 }
                 final Collection<ClassSymbol> imports = new HashSet<ClassSymbol>();
                 final String[] currentPackageName = new String[1];
+                final ClassIndex classIndex = compilationInfo.getClasspathInfo().getClassIndex();
                 new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
