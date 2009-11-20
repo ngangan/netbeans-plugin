@@ -69,6 +69,12 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
   
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
+        try {
+            node.toString();
+        } catch(NullPointerException ex) {
+            ex.printStackTrace();
+            return super.visitFunctionDefinition(node, v);
+        }
         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
             if (element != null) {
