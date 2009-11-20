@@ -99,5 +99,9 @@ public class ReportedIssuesTest extends CompletionTestBase {
         checkCompletion("Iz173838", "class B extends^", "iz173838.pass");
     }
 
+    public void testIssue156041() throws Exception {
+        checkCompletion("Iz156041", "var a = ^", "iz156041.pass");
+    }
+
 }
 
