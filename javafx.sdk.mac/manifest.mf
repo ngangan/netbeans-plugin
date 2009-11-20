@@ -5,3 +5,4 @@ OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/sdk/mac/Bundle.pro
 OpenIDE-Module-Specification-Version: 1.7.1
 OpenIDE-Module-Requires: org.openide.modules.os.MacOSX
 OpenIDE-Module-Provides: javafx.sdk.v1_2,javafx.sdk.v1_1,javafx.sdk
+FeaturesOnDemand-Proxy-Layer: false
