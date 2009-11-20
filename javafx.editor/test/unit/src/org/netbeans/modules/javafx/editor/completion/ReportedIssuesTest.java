@@ -47,18 +47,18 @@ public class ReportedIssuesTest extends CompletionTestBase {
     }
 
     public void testIssue175333() throws Exception {
-        checkCompletion("Iz175333", "ba^", "iz175333.pass");
+        checkCCForIssue(175333, "ba^");
     }
 
     /* Currently the completion returns what it should for this case, but also
      * adds some garbage (packages) for some reason, which causes this test to
      * fail, thus disabled temporarily. */
     public void DISABLED_testIssue173358() throws Exception {
-        checkCompletion("Iz173358", "print^", "iz173358.pass");
+        checkCCForIssue(173358, "print^");
     }
 
     public void testIssue165374() throws Exception {
-        checkCompletion("Iz165374", "var c = ^", "iz165374.pass");
+        checkCCForIssue(165374, "var c = ^");
     }
 
     public void testIssue159678() throws Exception {
@@ -69,7 +69,7 @@ public class ReportedIssuesTest extends CompletionTestBase {
     }
 
     public void testIssue171484() throws Exception {
-        checkCompletion("Iz171484", "var bbb = a^", "iz171484.pass");
+        checkCCForIssue(171484, "var bbb = a^");
     }
 
     /** This code completion case used to throw NPE. Now it works at least for
@@ -77,7 +77,7 @@ public class ReportedIssuesTest extends CompletionTestBase {
      * More correct test case would be to use just "override var ^".
      */
     public void testIssue171185() throws Exception {
-        checkCompletion("Iz171185", "override^", " var a", "iz171185.pass");
+        checkCCForIssue(171185, "override^", " var a");
     }
 
     /** There is a bug in modifiers completion that forces repetition
@@ -88,19 +88,27 @@ public class ReportedIssuesTest extends CompletionTestBase {
     }
 
     public void testIssue167875() throws Exception {
-        checkCompletion("Iz167875", "data: LineChart.^", " ", "iz167875.pass");
+        checkCCForIssue(167875, "data: LineChart.^", " ");
     }
 
     public void testIssue150039() throws Exception {
-        checkCompletion("Iz150039", "    func: ^", "iz150039.pass");
+        checkCCForIssue(150039, "    func: ^");
     }
 
     public void testIssue173838() throws Exception {
-        checkCompletion("Iz173838", "class B extends^", "iz173838.pass");
+        checkCCForIssue(173838, "class B extends^");
     }
 
     public void testIssue156041() throws Exception {
-        checkCompletion("Iz156041", "var a = ^", "iz156041.pass");
+        checkCCForIssue(156041, "var a = ^");
+    }
+
+    private void checkCCForIssue(int issue, String caretLine) throws Exception {
+        checkCCForIssue(issue, caretLine, null);
+    }
+
+    private void checkCCForIssue(int issue, String caretLine, String insert) throws Exception {
+        checkCompletion("Iz" + issue, caretLine, insert, "iz" + issue + ".pass");
     }
 
 }
