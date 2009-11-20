@@ -623,6 +623,7 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <public-packages>
+                <package>org.netbeans.api.javafx.dataloader</package>
                 <package>org.netbeans.api.javafx.editor</package>
             </public-packages>
             <extra-compilation-unit>
