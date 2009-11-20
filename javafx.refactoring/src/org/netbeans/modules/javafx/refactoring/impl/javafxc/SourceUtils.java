@@ -319,8 +319,12 @@ final public class SourceUtils {
                 throw new NullPointerException("#120577: Cannot resolve " + subTypeHandle + "; file: " + file);
             }
             for (ExecutableElement method: ElementFilter.methodsIn(type.getEnclosedElements())) {
-                if (info.getElements().overrides(method, e, type)) {
-                    result.add(method);
+                try {
+                    if (info.getElements().overrides(method, e, type)) {
+                        result.add(method);
+                    }
+                } catch (NullPointerException ex) {
+                    LOG.warning("Error while getting overrides for " + method + ", " + e + ", " + type);
                 }
             }
         }
