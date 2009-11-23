@@ -384,7 +384,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             } catch (IOException e) {
                 //ignore
             }
-            if (!pv.startsWith("javafx-1.2")) this.wiz.putProperty("WizardPanel_errorMessage", NbBundle.getMessage(DetectPanel.class, "WARNING_WrongVersion", pv));    //NOI18N
+            if (!pv.startsWith("javafx-1.3")) this.wiz.putProperty("WizardPanel_errorMessage", NbBundle.getMessage(DetectPanel.class, "WARNING_WrongVersion", pv));    //NOI18N
             setValid(true);            
         }
     }    
