@@ -436,7 +436,9 @@ public final class TreeUtilities {
             // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
             private boolean isEmptyStringLiteral(Tree tree) {
                 if (tree != null) {
-                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals("\"\""));
+//                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals("\"\""));
+                    // see #177301 - it seems that soma compiler now uses an empty string as an empty string literal value rather than ""
+                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals(""));
                 }
                 return false;
             }
