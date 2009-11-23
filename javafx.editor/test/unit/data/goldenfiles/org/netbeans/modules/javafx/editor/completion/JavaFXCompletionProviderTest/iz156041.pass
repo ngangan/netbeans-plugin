@@ -1,4 +1,10 @@
 <any> a
+bind
+false
+function
+new
+null
+true
 A
 Duration
 FX

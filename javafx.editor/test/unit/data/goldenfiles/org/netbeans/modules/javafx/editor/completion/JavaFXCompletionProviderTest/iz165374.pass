@@ -1,6 +1,12 @@
 int a
 int b
 <any> c
+bind
+false
+function
+new
+null
+true
 Duration
 FX
 Object
