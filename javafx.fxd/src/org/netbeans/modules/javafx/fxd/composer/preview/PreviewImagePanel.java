@@ -4,11 +4,9 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import com.sun.javafx.geom.AffineTransform;
 import com.sun.javafx.geom.Bounds2D;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import com.sun.javafx.tk.Toolkit;
+import com.sun.javafx.tk.swing.SwingScene;
 import java.net.URL;
 
 import org.openide.util.NbBundle;
@@ -19,13 +17,30 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.*;
 
+import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
+import com.sun.javafx.tools.fxd.PreviewLoader;
+import com.sun.javafx.tools.fxd.container.ContainerEntry;
+import com.sun.javafx.tools.fxd.loader.Profile;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import javafx.fxd.FXDLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import com.sun.scenario.scenegraph.SGNode;
-import com.sun.scenario.scenegraph.JSGPanel;
-import com.sun.javafx.sg.PGNode;
-
-import com.sun.javafx.tools.fxd.*;
-import com.sun.scenario.scenegraph.SGGroup;
+import javafx.scene.Scene;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
@@ -44,9 +59,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private final FXZDataObject m_dObj;
     private final Action []     m_actions;
     private final Color         m_defaultBackground;
-    private       JSGPanel      m_sgPanel = null;
+    //private       JSGPanel      m_sgPanel = null;
+    //private       SwingScenePanel m_scenePanel = null;
+    private       Scene         m_fxScene = null;
     private       int           m_changeTickerCopy = -1;
-    private       TargetProfile m_previewProfileCopy = null;
+    private       Profile m_previewProfileCopy = null;
     private       String        m_selectedEntryCopy = null;
         
     PreviewImagePanel(final FXZDataObject dObj) {
@@ -62,11 +79,25 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         m_defaultBackground = getBackground();                
         setBackground( Color.WHITE);
     }
-    
-    public JSGPanel getJSGPanel() {
-        return m_sgPanel;
+
+    public Scene getScene(){
+        return m_fxScene;
     }
     
+    public SwingScenePanel getScenePanel() {
+        //return m_scenePanel;
+        return getScenePanel(m_fxScene);
+    }
+    
+    private static SwingScenePanel getScenePanel(Scene scene) {
+        //return m_scenePanel;
+        return ((SwingScene) scene.$javafx$scene$Scene$impl_peer).scenePanel;
+    }
+
+//    public JSGPanel getJSGPanel() {
+//        return m_sgPanel;
+//    }
+
     protected JLabel createWaitPanel() {
         URL url = PreviewImagePanel.class.getClassLoader().getResource("org/netbeans/modules/javafx/fxd/composer/resources/clock.gif"); //NOI18N
         ImageIcon icon = new ImageIcon( url);
@@ -80,7 +111,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         FXZArchive fxzArchive = m_dObj.getDataModel().getFXDContainer(); 
         if (  fxzArchive != null) {
             final int tickerCopy = fxzArchive.getChangeTicker();
-            final TargetProfile profileCopy = m_dObj.getDataModel().getPreviewProfile();
+            final Profile profileCopy = m_dObj.getDataModel().getPreviewProfile();
             final String  selectedEntryCopy = m_dObj.getDataModel().getSelectedEntry();
             if ( tickerCopy != m_changeTickerCopy || 
                  profileCopy != m_previewProfileCopy ||
@@ -91,7 +122,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_PARSING")); //NOI18N            
 
                 add( label, BorderLayout.CENTER);
-                m_sgPanel  = null;
+                m_fxScene = null;
 
                 Thread th = new Thread() {
                     @Override
@@ -105,7 +136,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         m_selectedEntryCopy = selectedEntryCopy;
 
                         //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
-                        
+
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
                                 if ( fModel.isError()) {
@@ -114,27 +145,72 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                     label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
                                             fModel.getErrorMsg()));
                                     return;
-                                } 
+                                }
                                 
-                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N            
-                                SwingUtilities.invokeLater( new Runnable() {
+                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N
+
+                                Thread loadThread = new Thread(){
+
+                                    @Override
                                     public void run() {
                                         try {
-                                            Node node;
+                                            final Node node;
+                                            //final Node nodeOld;
                                             try {
                                                 fModel.readLock();
-                                                PreviewStatistics stats = new PreviewStatistics();
-                                                //System.out.println("Selected entry: " + selectedEntryCopy);
-
-                                                node = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, stats);
+                                                //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
+                                                FXDLoader loader = PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), null);
+                                                while (!loader.loc$done().getAsBoolean()) {
+                                                    Thread.sleep(100);
+                                                }
+                                                node = loader.get$content().get$javafx$fxd$FXDContent$_root();
                                             } finally {
                                                 fModel.readUnlock();
                                             }
+
+                                            SwingUtilities.invokeLater(new Runnable() {
+
+                                                public void run() {
+                                                    // prototyping
+                                                    Scene fxScene = new Scene(true);
+                                                    fxScene.addTriggers$();
+                                                    fxScene.applyDefaults$();
+                                                    //fxScene.loc$content.insert(nodeOld);
+                                                    fxScene.loc$content.insert(node);
+                                                    fxScene.complete$();
+                                                    Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
+
+                                                    m_fxScene = fxScene;
+
+                                                    SwingScenePanel scenePanel = getScenePanel(fxScene);
+
+                                                    // end prototyping
+
+                                                    // TODO: paint actions: m_dObj.getController().paintActions(g);
+                                                    removeAll();
+
+                                                    add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
+
+                                                    MouseEventCollector mec = new MouseEventCollector();
+                                                    scenePanel.addMouseListener(mec);
+                                                    scenePanel.addMouseMotionListener(mec);
+                                                    scenePanel.addMouseWheelListener(mec);
+
+                                                    PopupListener popupL = new PopupListener();
+                                                    scenePanel.addMouseListener(popupL);
+                                                    PreviewImagePanel.this.addMouseListener(popupL);
+                                                    revalidate();
+                                                    updateZoom();
+                                                }
+                                            });
+
+
+                                            /*
                                             //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
                                             //Object   group  = m.invoke(fxNode);
                                             PGNode fxNode = node.impl_getPGNode();
 
-                                            if (fxNode != null) {
+                                             if (fxNode != null) {
                                                 m_sgPanel = new JSGPanel() {
                                                     @Override
                                                     public void paintComponent(java.awt.Graphics g) {
@@ -146,7 +222,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 m_sgPanel.setScene( (SGNode) fxNode);
 
                                                 removeAll();
-                                                add( new ImageHolder(m_sgPanel), BorderLayout.CENTER);
+                                                add( new ImageHolder(m_sgPanel, m_dObj), BorderLayout.CENTER);
 
                                                 MouseEventCollector mec = new MouseEventCollector();
                                                 m_sgPanel.addMouseListener(mec);
@@ -163,6 +239,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_EMPTY_DOCUMENT")); //NOI18N
                                                 label.setIcon(null);
                                             }
+                                            */
                                         } catch( OutOfMemoryError oom) {
                                             oom.printStackTrace();
                                             setBackground( m_defaultBackground);
@@ -176,10 +253,14 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 e.getLocalizedMessage()));
                                             label.setIcon(null);
                                         } finally {
-                                            System.gc();                                
+                                            System.gc();
                                         }
-                                    }                            
-                                });                            
+                                    }
+
+                                };
+                                loadThread.setName("FXDPreviewLoader-Thread");
+                                loadThread.start();
+
                             }
                         });                    
                     }
@@ -194,7 +275,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             showError( error.getLocalizedMessage());
         }
     }
-    
+
     private void showError( final String msg) {
         removeAll();
         setBackground( m_defaultBackground);
@@ -206,7 +287,27 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     private void updateZoom() {
-        if ( m_sgPanel != null) {
+        // TODO: enable zoom. remove SGGroup usage
+        SwingScenePanel scenePanel = getScenePanel();
+        if (scenePanel != null){
+            float zoom = m_dObj.getDataModel().getZoomRatio();
+            Node node = m_fxScene.impl_getRoot();
+            node.set$translateX(0);
+            node.set$translateY(0);
+            node.set$scaleX(zoom);
+            node.set$scaleY(zoom);
+            Bounds bounds = node.get$boundsInParent();
+            node.set$translateX( -bounds.get$minX());
+            node.set$translateY( -bounds.get$minY());
+
+
+            scenePanel.invalidate();
+            if (scenePanel.getParent() != null){
+                scenePanel.getParent().validate();
+            }
+        }
+        /*
+        if ( m_fxScene != null) {
             float zoom = m_dObj.getDataModel().getZoomRatio();
             SGGroup node = m_sgPanel.getSceneGroup();
 //            fxNode.setTranslateX( 0);
@@ -220,20 +321,21 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 //
 //            m_sgPanel.invalidate();
 
-//            AffineTransform at = new AffineTransform();
+//            Affine2D at = new Affine2D();
 //            at.scale( zoom, zoom);
 
 //            at.translate(-bounds.getX(), -bounds.getY());
 //            fxNode.setTransform(at);
-            AffineTransform at = new AffineTransform();
+            Affine2D at = new Affine2D();
             at.scale( zoom, zoom);
             node.setTransformMatrix(at);
 
             m_sgPanel.invalidate();
-            if (m_sgPanel.getParent() != null) {
+            if (m_sgPanel.getParent() != null){
                 m_sgPanel.getParent().validate();
             }
         }
+         */
     }
 
     private Action[] getPopupActions() {
@@ -267,7 +369,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
         public void actionPerformed(ActionEvent e) {
             Bounds2D bounds = new Bounds2D();
-            m_sgPanel.getScene().getCompleteBounds(bounds, null);
+            // TODO enable zoom
+            //m_sgPanel.getScene().getCompleteBounds(bounds, null);
             
             Dimension panelSize = getParent().getSize();
             

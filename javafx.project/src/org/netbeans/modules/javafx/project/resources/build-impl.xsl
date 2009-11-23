@@ -160,6 +160,9 @@ is divided into following sections:
             <condition property="midp.execution.trigger">
                 <equals arg1="${{javafx.profile}}" arg2="mobile"/>
             </condition>
+            <condition property="tv.execution.trigger">
+                <equals arg1="${{javafx.profile}}" arg2="tv"/>
+            </condition>
             <condition property="jnlp.execution.trigger">
                 <and>
                     <equals arg1="${{javafx.profile}}" arg2="desktop"/>
@@ -179,11 +182,13 @@ is divided into following sections:
                          <isset property="jnlp.execution.trigger"/>
                          <isset property="applet.execution.trigger"/>
                          <isset property="midp.execution.trigger"/>
+                         <isset property="tv.execution.trigger"/>
                     </or>
                 </not>
             </condition>
             <property name="run.jvmargs" value=""/>
             <available property="emulator.available" file="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}"/>
+            <available property="tvemulator.available" file="${{platform.fxhome}}/tv/emulator/bin/cvm${{binary.extension}}"/>
         </target>
         <target name="-post-init">
         <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
@@ -282,6 +287,22 @@ is divided into following sections:
                 <arg value="-Xdevice:${{mobile.device}}"/>
             </exec>
         </target>
+        <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
+            <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
+            <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
+            <exec executable="${{platform.fxhome}}/tv/emulator/bin/cvm${{binary.extension}}" failonerror="true">
+                <arg value="-Dprism.verbose=true"/>
+                <arg value="-Dprism.order=es1"/>
+                <arg value="-Djava.library.path=${{platform.fxhome}}/tv/emulator/bin"/>
+                <arg value="-Dsun.boot.library.path=${{platform.fxhome}}/tv/emulator/bin"/>
+                <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.PrismToolkit"/>
+                <arg value="-Djava.security.policy=${{platform.fxhome}}/tv/emulator/lib/security/java_permissive.policy"/>
+                <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar:${{jar.file}}"/>
+                <arg value="com.sun.javafx.runtime.main.Main"/>
+                <arg value="${{main.class}}"/>
+                <arg value="${{run.jvmargs}}"/>
+            </exec>
+        </target>
         <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
             <makeurl property="applet.local.url" file="${{dist.dir}}/${{application.title}}.html"/>
             <condition property="applet.url" value="${{codebase.url}}/${{application.title}}.html" else="${{applet.local.url}}">
@@ -298,7 +319,7 @@ is divided into following sections:
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
         </target>
-        <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run" description="Run an application." name="run"/>
+        <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run,tv-run" description="Run an application." name="run"/>
     <xsl:comment>
                     =================
                     DEBUGGING SECTION
@@ -360,6 +381,9 @@ is divided into following sections:
                 <arg value="-Xdebug"/>
                 <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
             </exec>
+        </target>
+        <target name="-debug-tv-debuggee" if="tv.execution.trigger">
+            <fail message="Current platform does not support tv emulator debugging."/>
         </target>
         <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
             <condition property="javaws.home" value="/usr" else="${{java.home}}">

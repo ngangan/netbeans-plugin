@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
        
+import com.sun.javafx.tools.fxd.FXDReference;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -190,12 +191,12 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                  * or List<String> ( array attribute with nodes == list of node names) */
                 private Object  m_lastElem = null;
 
-                public Object startNode(String typeName, int startOff) {
+                public Object startNode(String typeName, int startOff, boolean isExtension) {
                     return new NodeBuilder(typeName, startOff);
                 }
 
                 public void attribute(Object node, String name, String value,
-                        int startOff, int endOff) throws FXDException {
+                        int startOff, int endOff, boolean isMeta) throws FXDException {
                     NodeBuilder deb = (NodeBuilder) node;
                     if ( value == null) {
                         try {
@@ -212,6 +213,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                            throw new FXDException(e);
                        }
                     }
+                    // TODO parse value. This will allow to handle functions and references
+                    // TODO handle meta separately
                     deb.addAttribute( name, value, startOff, endOff);
                 }
 
@@ -275,7 +278,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                             throw new FXDException( ex);
                         }
                     } else {
-                        ((List<String>)array).add((String)m_lastElem);
+                        ((List)array).add(m_lastElem);
                         m_lastElem = null;
                     }
                 }
@@ -284,6 +287,18 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     m_lastElem = array;
                     m_isLastNode = false;
                 }
+
+                public void parsingStarted(FXDParser parser) {
+                    // do nothing. we do not need parser onstance
+                }
+
+                public FXDReference createReference(String str) throws FXDException {
+                    // TODO: should implement?
+                    // implementation is necessary if we parse attribute or array element value.
+                    // But we use them as they come.
+                    return null;
+                }
+
             });
 
             showStatusText(dObj, " Parsing text..."); // NOI18N

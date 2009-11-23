@@ -28,7 +28,7 @@
 
 package org.netbeans.lib.javafx.lexer;
 
-import com.sun.tools.javac.util.Log;
+import com.sun.tools.mjavac.util.Log;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;

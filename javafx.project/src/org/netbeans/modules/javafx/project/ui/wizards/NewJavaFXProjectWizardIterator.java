@@ -235,6 +235,17 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
             }
         } catch( URISyntaxException e ) { /* Should not happen */ }
 
+        // TV
+        try {
+            if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) { // NOI18N
+                profile = new TreeMap<String, String>();
+                profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_TV" )); //NOI18N
+                profile.put( "javafx.profile", "tv" ); //NOI18N
+                profile.put( "execution.target", "cvm" ); //NOI18N
+                profiles.put( "tv", profile );
+             }
+         } catch( URISyntaxException e ) { /* Should not happen */ }
+
         EditableProperties prj = project.getUpdateHelper().getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );
         EditableProperties prv = project.getUpdateHelper().getProperties( AntProjectHelper.PRIVATE_PROPERTIES_PATH );
         projectProperties.storeRunConfigs( profiles, prj, prv);

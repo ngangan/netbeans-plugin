@@ -41,7 +41,7 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Type;
 import java.util.Iterator;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;

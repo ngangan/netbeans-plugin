@@ -42,8 +42,8 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

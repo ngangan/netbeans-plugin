@@ -5,11 +5,12 @@
 
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import com.sun.scenario.scenegraph.JSGPanel;
+import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
 import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import javafx.scene.Scene;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -84,8 +85,16 @@ public final class PreviewTopComponent extends TopComponent implements Runnable 
         return m_lookup;
     }
     
-    public JSGPanel getJSGPane() {
-        return m_imgPanel.getJSGPanel();
+//    public JSGPanel getJSGPane() {
+//        return m_imgPanel.getJSGPanel();
+//    }
+
+    public SwingScenePanel getScenePanel() {
+        return m_imgPanel.getScenePanel();
+    }
+
+    public Scene getScene() {
+        return m_imgPanel.getScene();
     }
 
     /*
