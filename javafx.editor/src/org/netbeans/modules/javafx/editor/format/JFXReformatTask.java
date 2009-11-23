@@ -956,7 +956,7 @@ public class JFXReformatTask implements ReformatTask {
                     case FUNCTION_VALUE:
                     case INIT_DEFINITION:
                     case POSTINIT_DEFINITION:
-                            if (!first) {
+                        if (!first) {
                             blankLines(cs.getBlankLinesBeforeMethods());
                         }
                         scan(member, p);
@@ -1974,7 +1974,19 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitTypeClass(TypeClassTree node, Void p) {
-            accept(JFXTokenId.IDENTIFIER);
+            // issue #177106: TypeClass before MemberSelect
+            boolean accepted = true;
+            while (accepted) {
+                accept(JFXTokenId.IDENTIFIER, JFXTokenId.STAR, JFXTokenId.THIS, JFXTokenId.SUPER, JFXTokenId.CLASS);
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                accepted = accept(JFXTokenId.DOT) == JFXTokenId.DOT;
+                if (!accepted) {
+                    rollback(index, c, d);
+                }
+            }
+
             // sequence type
             int index = tokens.index();
             int c = col;
