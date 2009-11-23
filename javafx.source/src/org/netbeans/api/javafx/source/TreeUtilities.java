@@ -545,6 +545,14 @@ public final class TreeUtilities {
         return findNameSpan(name, clazz, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
     }
 
+    public long[] findNameSpan(TypeClassTree type) {
+        if (type == null || type.getClassName() == null) return null;
+
+        String name = type.toString();
+
+        return findNameSpan(name, type, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
+    }
+
     /**Returns tokens for a given tree.
      */
     public TokenSequence<JFXTokenId> tokensFor(Tree tree) {

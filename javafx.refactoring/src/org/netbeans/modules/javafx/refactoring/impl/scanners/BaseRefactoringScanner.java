@@ -50,6 +50,12 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
     final private CompilationController cc;
     final private SourcePositions positions;
     
+    /**
+     * 
+     * @param searchHandle A {@linkplain TreePathHandle} instance to rename from (if "eh" not provided it is resolved from "searchHandle")
+     * @param eh If provided (not NULL) this takes precedence over the searchHandle
+     * @param cc {@linkplain CompilationController} instance
+     */
     public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle eh, CompilationController cc) {
         this.searchHandle = searchHandle;
         if (eh != null) {
@@ -68,7 +74,7 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
     public BaseRefactoringScanner(TreePathHandle searchHandle, CompilationController cc) {
         this(searchHandle, null, cc);
     }
-
+    
     public BaseRefactoringScanner(CompilationController cc) {
         this(null, null, cc);
     }

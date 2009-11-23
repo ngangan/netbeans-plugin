@@ -70,6 +70,13 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
         this.origQualName = (kind == ElementKind.CLASS || kind == ElementKind.INTERFACE || kind == ElementKind.OTHER) ? getElementHandle().getQualifiedName() : "";
     }
 
+    public RenameScanner(TreePathHandle tpHandle, ElementHandle searchHandle, CompilationController cc) {
+        super(tpHandle, searchHandle, cc);
+        Element e = searchHandle.resolve(cc);
+        this.origSimpleName = e.getSimpleName().toString();
+        this.origQualName = (searchHandle.getKind() == ElementKind.CLASS || searchHandle.getKind() == ElementKind.INTERFACE || searchHandle.getKind() == ElementKind.OTHER) ? getElementHandle().getQualifiedName() : "";
+    }
+
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, Set<TreePathHandle> p) {
         long[] namePos = getCompilationController().getTreeUtilities().findNameSpan(node);
@@ -114,7 +121,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
             case PARAMETER: {
                 Element e = getCompilationController().getTrees().getElement(getCurrentPath());
 
-                if (getElementKind() == e.getKind()) {
+                if (e != null && getElementKind() == e.getKind()) {
                     if (isSameElement()) {
                         if (node instanceof JFXVarScriptInit) {
                             p.add(TreePathHandle.create(JavaFXTreePath.getPath(getCompilationController().getCompilationUnit(), ((JFXVarScriptInit)node).getVar()), getCompilationController()));
