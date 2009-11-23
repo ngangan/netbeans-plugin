@@ -352,11 +352,10 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     }
 
     private String getTypeString(Type type, JavafxTypes types) {
-        String typeString =  types.toJavaFXString(type);
+        Type sureType = types.erasure(type);
+        String typeString =  types.toJavaFXString(sureType);
         if (typeString == null) {
             typeString = ""; //NOI18N
-        } else if (typeString.contains("<")) { //NOI18N
-            typeString = typeString.substring(0, typeString.indexOf("<")); //NOI18N //Removing generics
         } else if (typeString != null && typeString.equals("void")) { //NOI18N
             typeString = "Void"; //NOI18N
         }
