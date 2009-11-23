@@ -23,6 +23,7 @@ import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeModel;
+import org.netbeans.junit.ide.ProjectSupport;
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ComponentOperator;
@@ -280,12 +281,18 @@ public class Util {
 
 
     public static void waitScanFinished(){
-        try{Thread.sleep( 7000 ); }catch(Exception e) {}
+
+        System.out.println("*** [wait scan] start ***");
+        try{Thread.sleep( 3000 ); }catch(Exception e) {}
+        ProjectSupport.waitScanFinished();
+        try{Thread.sleep( 2000 ); }catch(Exception e) {}
         
-        long waitTime = 50;
-        long waitCount = MAX_WAIT_TIME / waitTime;
+        long waitTime = 2000;
+        //long waitCount = MAX_WAIT_TIME / waitTime;
+        System.out.println("*** [wait scan] ");
         
-        for(long time=0; time < waitCount; time++){
+        for(long time=0; time < MAX_WAIT_TIME; time += waitTime){
+            System.out.println("*** [wait scan] time " + time);
             try{Thread.sleep( waitTime ); }catch(Exception e) {}
             
             Object scanning = JProgressBarOperator.findJProgressBar((Container)MainWindowOperator.getDefault().getSource());

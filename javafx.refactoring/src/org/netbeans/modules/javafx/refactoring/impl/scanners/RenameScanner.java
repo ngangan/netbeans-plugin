@@ -38,9 +38,9 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.TypeSymbol;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXVarScriptInit;
@@ -63,16 +63,18 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
     final private String origSimpleName;
     final private String origQualName;
 
-
     public RenameScanner(TreePathHandle searchHandle, CompilationController cc) {
-        this(searchHandle, ElementHandle.create(searchHandle.resolveElement(cc)), cc);
+        super(searchHandle, cc);
+        this.origSimpleName = searchHandle.getSimpleName();
+        ElementKind kind = getElementKind();
+        this.origQualName = (kind == ElementKind.CLASS || kind == ElementKind.INTERFACE || kind == ElementKind.OTHER) ? getElementHandle().getQualifiedName() : "";
     }
 
-    public RenameScanner(TreePathHandle searchHandle, ElementHandle elementHandle, CompilationController cc) {
-        super(searchHandle, elementHandle, cc);
-        this.origSimpleName = searchHandle.getSimpleName();
-        ElementHandle eh = elementHandle;
-        this.origQualName = (eh.getKind() == ElementKind.CLASS || eh.getKind() == ElementKind.INTERFACE || eh.getKind() == ElementKind.OTHER) ? eh.getQualifiedName() : "";
+    public RenameScanner(TreePathHandle tpHandle, ElementHandle searchHandle, CompilationController cc) {
+        super(tpHandle, searchHandle, cc);
+        Element e = searchHandle.resolve(cc);
+        this.origSimpleName = e.getSimpleName().toString();
+        this.origQualName = (searchHandle.getKind() == ElementKind.CLASS || searchHandle.getKind() == ElementKind.INTERFACE || searchHandle.getKind() == ElementKind.OTHER) ? getElementHandle().getQualifiedName() : "";
     }
 
     @Override
@@ -119,7 +121,7 @@ public class RenameScanner extends BaseRefactoringScanner<Void, Set<TreePathHand
             case PARAMETER: {
                 Element e = getCompilationController().getTrees().getElement(getCurrentPath());
 
-                if (getElementKind() == e.getKind()) {
+                if (e != null && getElementKind() == e.getKind()) {
                     if (isSameElement()) {
                         if (node instanceof JFXVarScriptInit) {
                             p.add(TreePathHandle.create(JavaFXTreePath.getPath(getCompilationController().getCompilationUnit(), ((JFXVarScriptInit)node).getVar()), getCompilationController()));

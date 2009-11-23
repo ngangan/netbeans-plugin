@@ -184,7 +184,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                         }
 
                         c.add(ErrorDescriptionFactory.createErrorDescription(
-                                Severity.ERROR,
+                                d.getKind() == Diagnostic.Kind.ERROR ? Severity.ERROR : Severity.WARNING,
                                 d.getMessage(Locale.getDefault()),
                                 doc,
                                 doc.createPosition(start),

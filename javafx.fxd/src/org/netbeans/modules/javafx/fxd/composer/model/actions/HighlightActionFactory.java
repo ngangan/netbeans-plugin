@@ -64,7 +64,7 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
             assert highlighted != null : "Null object for highlight"; //NOI18N
             assert highlighted.isVisible();
             m_highlighted = highlighted;
-            getController().getSGPanel().setToolTipText(getTooltipText());
+            getController().getScenePanel().setToolTipText(getTooltipText());
             m_highlighted.repaint(FXDElementOutline.SELECTOR_OVERLAP);
         }
 
@@ -100,7 +100,7 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
         @Override
         public void actionCompleted() {
             super.actionCompleted();
-            getController().getSGPanel().setToolTipText(""); //NOI18N
+            getController().getScenePanel().setToolTipText(""); //NOI18N
             m_highlighted.repaint(FXDElementOutline.SELECTOR_OVERLAP);
         }
 

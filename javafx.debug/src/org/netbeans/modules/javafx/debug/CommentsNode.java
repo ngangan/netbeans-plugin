@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -47,14 +47,12 @@ import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
 /**
- *
  * @author Jan Lahoda
  */
 public class CommentsNode extends AbstractNode implements OffsetProvider {
 
-    private List<Comment> comments;
+    private final List<Comment> comments;
 
-    /** Creates a new instance of CommentNode */
     public CommentsNode(String displayName, List<Comment> comments) {
         super(new ChildrenImpl(comments));
         this.comments = comments;
@@ -89,7 +87,7 @@ public class CommentsNode extends AbstractNode implements OffsetProvider {
         return -1;
     }
 
-    private static final class ChildrenImpl extends Children.Keys {
+    private static final class ChildrenImpl extends Children.Keys<Comment> {
 
         private List<Comment> comments;
         
@@ -97,16 +95,18 @@ public class CommentsNode extends AbstractNode implements OffsetProvider {
             this.comments = comments;
         }
         
+        @Override
         public void addNotify() {
             setKeys(comments);
         }
         
+        @Override
         public void removeNotify() {
-            setKeys(Collections.emptyList());
+            setKeys(Collections.<Comment>emptyList());
         }
         
-        protected Node[] createNodes(Object key) {
-            return new Node[] {new CommentNode((Comment) key)};
+        protected Node[] createNodes(Comment key) {
+            return new Node[]{new CommentNode(key)};
         }
         
     }

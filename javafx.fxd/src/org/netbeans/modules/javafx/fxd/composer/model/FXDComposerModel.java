@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
-import com.sun.javafx.tools.fxd.TargetProfile;
+import com.sun.javafx.tools.fxd.loader.Profile;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 
@@ -26,7 +26,7 @@ public class FXDComposerModel {
     private boolean       m_isHighlightOn  = true;
     private boolean       m_showTooltip    = true;
     private float         m_zoomRatio      = 1.0f;
-    private TargetProfile m_previewProfile = TargetProfile.desktop;
+    private Profile m_previewProfile = Profile.desktop;
             
     public FXDComposerModel( FXZDataObject dObj) throws FileNotFoundException, IOException {
         assert dObj != null;
@@ -87,11 +87,11 @@ public class FXDComposerModel {
         }
     }
 
-    public TargetProfile getPreviewProfile() {
+    public Profile getPreviewProfile() {
         return m_previewProfile;
     }
 
-    boolean setPreviewProfile(TargetProfile profile) {
+    boolean setPreviewProfile(Profile profile) {
         if ( profile != m_previewProfile) {
             m_previewProfile = profile;
             return true;

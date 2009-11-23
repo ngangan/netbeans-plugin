@@ -43,10 +43,10 @@ package org.netbeans.api.javafx.source;
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.SyntheticTree.SynthType;
 import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Flags;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.mjavac.code.Flags;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.mjavac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.comp.JavafxAttrContext;
 import com.sun.tools.javafx.comp.JavafxEnv;
@@ -436,7 +436,9 @@ public final class TreeUtilities {
             // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
             private boolean isEmptyStringLiteral(Tree tree) {
                 if (tree != null) {
-                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals("\"\""));
+//                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals("\"\""));
+                    // see #177301 - it seems that soma compiler now uses an empty string as an empty string literal value rather than ""
+                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals(""));
                 }
                 return false;
             }
@@ -541,6 +543,14 @@ public final class TreeUtilities {
         String name = clazz.getSimpleName().toString();
 
         return findNameSpan(name, clazz, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
+    }
+
+    public long[] findNameSpan(TypeClassTree type) {
+        if (type == null || type.getClassName() == null) return null;
+
+        String name = type.toString();
+
+        return findNameSpan(name, type, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
     }
 
     /**Returns tokens for a given tree.

@@ -28,7 +28,9 @@
 
 package org.netbeans.modules.javafx.refactoring.impl;
 
+import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.UnitTree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -251,8 +253,11 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                             findClassName(path, cc);
                             break;
                         }
+                        case COMPILATION_UNIT: {
+                            findPackageStmt(path, cc);
+                            break;
+                        }
                         case MEMBER_SELECT:
-                        case COMPILATION_UNIT:
                         case IDENTIFIER:
                         case TYPE_CLASS:
                         case INSTANTIATE_NEW:
@@ -272,6 +277,11 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
             }
         }, true);
         assert startPosition != -1; // start position *MUST* be resolved
+    }
+
+    private void findPackageStmt(JavaFXTreePath path, CompilationController cc) {
+        ExpressionTree pkgName = ((UnitTree)path.getLeaf()).getPackageName();
+        startPosition = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), pkgName);
     }
 
     private void findClassName(JavaFXTreePath path, CompilationController cc) {

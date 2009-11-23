@@ -41,7 +41,7 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Type;
 import java.util.Iterator;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -50,6 +50,7 @@ import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.editor.Utilities;
+import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.Fix;
@@ -100,11 +101,11 @@ final class UncaughtExceptionsFix implements Fix {
                 public void run() {
                     try {
                         document.remove(hint.getStartPosition() - space.length(), hint.getLength() + space.length());
-                        document.insertString(hint.getStartPosition() - space.length(), block.toString(),  null);
+                        document.insertString(hint.getStartPosition() - space.length(), block.toString(), null);
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    JTextComponent target = Utilities.getFocusedComponent();
+                    JTextComponent target = HintsUtils.getEditorComponent(document);
                     Iterator<Type> iterator = hint.getExceptions().iterator();
                     while (iterator.hasNext()) {
                         Imports.addImport(target, iterator.next().toString());
@@ -115,13 +116,17 @@ final class UncaughtExceptionsFix implements Fix {
             final int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getCatchTree());
             addCatch(iterator, block, exceptionName, space);
             SwingUtilities.invokeLater(new Runnable() {
+
                 public void run() {
                     try {
                         document.insertString(end, block.toString(), null);
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    JTextComponent target = Utilities.getFocusedComponent();
+                    JTextComponent target = HintsUtils.getEditorComponent(document);
+                    if (target == null) {
+                        return;
+                    }
                     Iterator<Type> iterator = hint.getExceptions().iterator();
                     while (iterator.hasNext()) {
                         Imports.addImport(target, iterator.next().toString());
@@ -132,16 +137,15 @@ final class UncaughtExceptionsFix implements Fix {
         return null;
     }
 
-     private void  addCatch(Iterator<Type> iterator, StringBuilder block, String exceptionName, String space) {
+    private void addCatch(Iterator<Type> iterator, StringBuilder block, String exceptionName, String space) {
         while (iterator.hasNext()) {
-                //TODO Unique ex var name
-                block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
-                        .append(space).append(TAB).append(exceptionName).append(".printStackTrace();\n") //NOI18N
-                        .append(space).append("}"); //NOI18N
-                if (!iterator.hasNext()) {
-                    block.append("\n"); //NOI18N
-                }
+            //TODO Unique ex var name
+            block.append(" catch(").append(exceptionName).append(" : ").append(iterator.next().asElement().getSimpleName()).append(") {\n") //NOI18N
+                    .append(space).append(TAB).append(exceptionName).append(".printStackTrace();\n") //NOI18N
+                    .append(space).append("}"); //NOI18N
+            if (!iterator.hasNext()) {
+                block.append("\n"); //NOI18N
             }
+        }
     }
-   
 }

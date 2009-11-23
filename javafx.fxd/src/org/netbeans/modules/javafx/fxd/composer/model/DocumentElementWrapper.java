@@ -5,6 +5,8 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.util.Enumeration;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,6 +19,9 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.*;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -50,6 +55,7 @@ final class DocumentElementWrapper {
     private static class FXDNodeWrapper extends FXDElementWrapper implements FXDObjectElement, Enumeration {
         private final boolean     m_injectID;
         private       Enumeration m_attrEnum = null;
+        protected     int         m_refID = -1;
 
         public FXDNodeWrapper(final DocumentElement de) {
             super(de);
@@ -76,7 +82,7 @@ final class DocumentElementWrapper {
             } else {
                 String strValue = (String) m_de.getAttributes().getAttribute(name);
                 if ( strValue != null) {
-                    return FXDParser.parseValue(strValue);
+                    return parseValue(strValue);
                 } else {
                     if ( m_de.getAttributes().isDefined(name)) {
                         int elemCount = m_de.getElementCount();
@@ -97,6 +103,21 @@ final class DocumentElementWrapper {
                     return null;
                 }
             }
+        }
+
+        private Object parseValue(String strValue){
+            try {
+                // TODO: providing FXDParser will allow to support references
+                return FXDParser.parseValue(strValue, null);
+            } catch (FXDSyntaxErrorException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.INFO, "Exception while parsing \""+strValue+"\" value", ex);
+            } catch (FXDException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.INFO, "Exception while parsing \""+strValue+"\" value", ex);
+            }
+            return strValue;
+
         }
 
         @SuppressWarnings("unchecked")         
@@ -157,6 +178,37 @@ final class DocumentElementWrapper {
                 m_attrEnum = m_de.getAttributes().getAttributeNames();
             }
             return o;
+        }
+
+        public synchronized int getReferenceID() {
+            return m_refID;
+        }
+
+
+        public synchronized void setReferenceID(int refID) {
+            m_refID = refID;
+        }
+
+        // TODO do we need and can support meta? or 
+        public int getMetaNum() {
+            return 0;
+        }
+
+        public Enumeration getMetaKeys() {
+            return new Enumeration() {
+
+                public boolean hasMoreElements() {
+                    return false;
+                }
+
+                public Object nextElement() {
+                    return null;
+                }
+            };
+        }
+
+        public Object getMetaValue(String string) {
+            return null;
         }
     }
 

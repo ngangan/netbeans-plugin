@@ -41,37 +41,38 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javadoc.Doc;
-import com.sun.source.tree.Scope;
-import com.sun.tools.javac.code.Flags;
-import com.sun.tools.javac.code.Source;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javac.code.Symbol.PackageSymbol;
-import com.sun.tools.javac.code.Symbol.VarSymbol;
-import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.ClassType;
-import com.sun.tools.javac.code.Types;
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.Name;
+import com.sun.tools.mjavac.code.Flags;
+import com.sun.tools.mjavac.code.Source;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.PackageSymbol;
+import com.sun.tools.mjavac.code.Symbol.VarSymbol;
+import com.sun.tools.mjavac.code.Symtab;
+import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.mjavac.code.Type.ClassType;
+import com.sun.tools.mjavac.code.Types;
+import com.sun.tools.mjavac.util.Context;
+import com.sun.tools.mjavac.util.Name;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafxdoc.ClassDocImpl;
 import com.sun.tools.javafxdoc.DocEnv;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import org.netbeans.modules.javafx.source.JavadocEnv;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -199,12 +200,14 @@ public final class ElementUtilities {
         if (element != null) {
             DocEnv env = DocEnv.instance(ctx);
             switch (element.getKind()) {
-                case ANNOTATION_TYPE:
                 case CLASS:
-                case ENUM:
-                case INTERFACE:
-                    return env.getClassDoc((ClassSymbol) element);
-                case ENUM_CONSTANT:
+                    ClassDocImpl classDoc = null;
+                    try {
+                        classDoc = env.getClassDoc((ClassSymbol) element);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return classDoc;
                 case FIELD:
                     return env.getFieldDoc((VarSymbol) element);
                 case METHOD:
@@ -248,7 +251,7 @@ public final class ElementUtilities {
                     HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
                     Types types = JavafxTypes.instance(ctx);
                     TypeElement te = (TypeElement) ((DeclaredType) type).asElement();
-                    for (Element member : elements.getAllMembers(te)) {
+                    for (Element member : getAllMembers(elements, te)) {
                         if (acceptor == null || acceptor.accept(member, type)) {
                             CharSequence name = member.getSimpleName();
                             ArrayList<Element> h = hiders.get(name);
@@ -284,7 +287,7 @@ public final class ElementUtilities {
                 case SHORT:
                 case VOID:
                     Type t = Symtab.instance(ctx).classType;
-                    com.sun.tools.javac.util.List<Type> typeargs = Source.instance(ctx).allowGenerics() ? com.sun.tools.javac.util.List.of((Type) type) : com.sun.tools.javac.util.List.<Type>nil();
+                    com.sun.tools.mjavac.util.List<Type> typeargs = Source.instance(ctx).allowGenerics() ? com.sun.tools.mjavac.util.List.of((Type) type) : com.sun.tools.mjavac.util.List.<Type>nil();
                     t = new ClassType(t.getEnclosingType(), typeargs, t.tsym);
                     Element classPseudoMember = new VarSymbol(Flags.STATIC | Flags.PUBLIC | Flags.FINAL, Name.Table.instance(ctx)._class, t, ((Type) type).tsym);
                     if (acceptor == null || acceptor.accept(classPseudoMember, type)) {
@@ -292,7 +295,7 @@ public final class ElementUtilities {
                     }
                     break;
                 case ARRAY:
-                    for (Element member : elements.getAllMembers((TypeElement) ((Type) type).tsym)) {
+                    for (Element member : getAllMembers(elements, (TypeElement) ((Type) type).tsym)) {
                         if (acceptor == null || acceptor.accept(member, type)) {
                             members.add(member);
                         }
@@ -331,7 +334,7 @@ public final class ElementUtilities {
                     }
                 }
                 TypeMirror type = cls.asType();
-                for (Element member : elements.getAllMembers(cls)) {
+                for (Element member : getAllMembers(elements, cls)) {
                     if (acceptor == null || acceptor.accept(member, type)) {
                         CharSequence name = member.getSimpleName();
                         ArrayList<Element> h = hiders.get(name);
@@ -492,6 +495,20 @@ public final class ElementUtilities {
             }
         }
         return false;
+    }
+
+    // JFXC-2154
+    public static java.util.List<? extends Element> getAllMembers(Elements elements, TypeElement type) {
+        java.util.List<? extends Element> allMembers = Collections.<Element>emptyList();
+        if (elements == null || type == null) {
+            return allMembers;
+        }
+        try {
+            allMembers = elements.getAllMembers(type);
+        } catch (Exception e) {
+            Exceptions.printStackTrace(e);
+        }
+        return allMembers;
     }
 
     /**

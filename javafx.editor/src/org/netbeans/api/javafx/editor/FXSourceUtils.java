@@ -1,11 +1,11 @@
 package org.netbeans.api.javafx.editor;
 
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.MethodType;
-import com.sun.tools.javac.code.TypeTags;
-import com.sun.tools.javac.util.List;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
+import com.sun.tools.mjavac.code.Type;
+import com.sun.tools.mjavac.code.Type.MethodType;
+import com.sun.tools.mjavac.code.TypeTags;
+import com.sun.tools.mjavac.util.List;
 import com.sun.tools.javafx.code.FunctionType;
 import com.sun.tools.javafx.code.JavafxTypes;
 import javax.swing.text.BadLocationException;
@@ -28,10 +28,10 @@ import javax.lang.model.type.TypeMirror;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
+import javax.lang.model.util.Elements;
 import javax.swing.text.Document;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.NbBundle;
 
 /**
@@ -39,6 +39,9 @@ import org.openide.util.NbBundle;
  * @author Anton Chechel
  */
 public final class FXSourceUtils {
+
+    /** Mime-type of FX sources. */
+    public static final String MIME_TYPE = "text/x-fx";
 
     private static final char[] CODE_COMPL_SUBST_BREAKERS = 
         {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', // NOI18N
@@ -597,10 +600,13 @@ public final class FXSourceUtils {
 
 
     public static Document getDocument(final FileObject file) {
+        if (!file.isValid()) { // deleted
+            return null;
+        }
         DataObject od = null;
         try {
             od = DataObject.find(file);
-        } catch (DataObjectNotFoundException ex) {
+        } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
             return null;
         }
@@ -608,6 +614,20 @@ public final class FXSourceUtils {
         EditorCookie ec = od != null ? od.getLookup().lookup(EditorCookie.class) : null;
 
         return ec != null ? ec.getDocument() : null;
+    }
+
+    // JFXC-2154
+    public static java.util.List<? extends Element> getAllMembers(Elements elements, TypeElement type) {
+        java.util.List<? extends Element> allMembers = Collections.<Element>emptyList();
+        if (elements == null || type == null) {
+            return allMembers;
+        }
+        try {
+            allMembers = elements.getAllMembers(type);
+        } catch (Exception e) {
+            Exceptions.printStackTrace(e);
+        }
+        return allMembers;
     }
 
     private static CharSequence getFragment(Element e) {

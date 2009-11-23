@@ -332,10 +332,10 @@ public final class FXDElementOutline {
     }
     
     public static float [][] rect2poly( final Bounds2D bounds, float [][] points) {
-        float x = (float) bounds.x1,
-              y = (float) bounds.y1,
-              w = (float) bounds.getWidth(),
-              h = (float) bounds.getHeight();
+        float x = bounds.x1,
+              y = bounds.y1,
+              w = bounds.getWidth(),
+              h = bounds.getHeight();
         if ( points == null) {
             points = new float[4][2];
         } 

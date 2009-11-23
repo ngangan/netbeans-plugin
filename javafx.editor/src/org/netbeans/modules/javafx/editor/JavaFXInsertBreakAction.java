@@ -78,7 +78,7 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
     protected Object beforeBreak(JTextComponent target, BaseDocument doc, Caret caret) {
         int dotPos = caret.getDot();
         try {
-            if (BracketCompletion.posWithinString(doc, dotPos)) {
+            if (posWithinString(doc, dotPos)) {
                 try {
                     doc.insertString(dotPos, "\"  \"", null);                       // NOI18N
                     dotPos += 3;
@@ -101,6 +101,12 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
             e.printStackTrace();
         }
         return this.javadocBlockCompletion(target, doc, dotPos);
+    }
+
+    private static boolean posWithinString(BaseDocument doc, int dotOffset) {
+        TokenSequence<JFXTokenId> ts = BracketCompletion.getTokenSequence(doc, dotOffset);
+        // Check that the ENTER right at begining of string-literal is not treated like "within" the string
+        return (ts.moveNext() && ts.token().id() == JFXTokenId.STRING_LITERAL && ts.offset() != dotOffset);
     }
 
     private StringBuilder createAdditiveString(BaseDocument doc, int baseIndent, String closingString) {

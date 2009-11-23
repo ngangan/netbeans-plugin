@@ -8,7 +8,7 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -69,6 +69,12 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
   
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
+        try {
+            node.toString();
+        } catch(NullPointerException ex) {
+            ex.printStackTrace();
+            return super.visitFunctionDefinition(node, v);
+        }
         if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
             if (element != null) {

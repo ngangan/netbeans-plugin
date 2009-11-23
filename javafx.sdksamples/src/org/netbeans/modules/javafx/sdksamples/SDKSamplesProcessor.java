@@ -85,7 +85,11 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
 
                 // use relative path to find the samples folder
                 URI sdk = uri.resolve(samples.pathToSamples());
-                sdkRoot = new File(sdk.toString());
+                if (sdk.isAbsolute()) {
+                    sdkRoot = new File(sdk);
+                } else {
+                    sdkRoot = new File(sdk.toString());
+                }
             } catch (IOException ioe) {
                 LayerGenerationException lge = new LayerGenerationException(ioe.getMessage());
                 lge.initCause(ioe);
@@ -115,9 +119,9 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
                 l.urlvalue("SystemFileSystem.icon", "nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"); // NOI18N
                 l.stringvalue("SystemFileSystem.localizingBundle", "org.netbeans.modules.javafx.sdksamples.Bundle"); // NOI18N
                 l.methodvalue("instantiatingIterator", "org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator", "createIterator"); // NOI18N
-                if (descriptionFile.isFile()) {
-                    l.urlvalue("instantiatingWizardURL", "nbfs:/SystemFileSystem/SDKSamples/" + sampleName + "/description.html"); // NOI18N
-                }
+//                if (descriptionFile.isFile()) {
+//                    l.urlvalue("instantiatingWizardURL", "nbresloc:/SDKSamples/" + sampleName + "/description.html"); // NOI18N
+//                }
                 l.boolvalue("template", true); // NOI18N
                 l.write();
             }

@@ -3,7 +3,8 @@ org.netbeans.modules.javafx.editor.semantic.JavaFXSourceHighlightingTaskFactory
 org.netbeans.modules.javafx.editor.semantic.UpToDateTaskFactory
 org.netbeans.modules.javafx.editor.semantic.MarkOccurrencesHighlighterFactory
 org.netbeans.modules.javafx.editor.imports.MarkUnusedImportsTaskFactory
-org.netbeans.modules.javafx.editor.task.WrongPackageStatmentTaskFactory
+# Issued 174734 - JavaFX does not enforce physical location of a source file based on the package name
+#org.netbeans.modules.javafx.editor.task.WrongPackageStatmentTaskFactory
 org.netbeans.modules.javafx.editor.hints.UncaughtExceptionsTaskFactory
 org.netbeans.modules.javafx.editor.semantic.MarkUnusedElementsTaskFactory
 org.netbeans.modules.javafx.editor.hints.OverrideAllTaskFactory

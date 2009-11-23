@@ -238,7 +238,6 @@ final public class SourceUtils {
         //workaround for 143542
         Project[] opened = OpenProjects.getDefault().getOpenProjects();
         for (Project pr : opened) {
-            System.err.println(pr);
             if (fo.isFolder()) {
                 for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
                     if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
@@ -320,8 +319,12 @@ final public class SourceUtils {
                 throw new NullPointerException("#120577: Cannot resolve " + subTypeHandle + "; file: " + file);
             }
             for (ExecutableElement method: ElementFilter.methodsIn(type.getEnclosedElements())) {
-                if (info.getElements().overrides(method, e, type)) {
-                    result.add(method);
+                try {
+                    if (info.getElements().overrides(method, e, type)) {
+                        result.add(method);
+                    }
+                } catch (NullPointerException ex) {
+                    LOG.warning("Error while getting overrides for " + method + ", " + e + ", " + type);
                 }
             }
         }

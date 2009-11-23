@@ -4,10 +4,8 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,8 +13,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementUtilities;
+import org.netbeans.editor.Utilities;
+import org.netbeans.modules.javafx.editor.JavaFXDocument;
 
 /**
  *
@@ -40,6 +41,18 @@ final class HintsUtils {
         return methodName.trim();
     }
 
+    static String getPackageName(String fqn) {
+        String methodName;
+        if (fqn.contains(".")) { //NOI18N
+            int end = fqn.lastIndexOf("."); //NOI18N
+            methodName = fqn.substring(0, end);
+        } else {
+            methodName = ""; //NOI!8N
+        }
+
+        return methodName.trim();
+    }
+
     static String getClassSimpleName(String fqName) {
         int start = fqName.lastIndexOf(".") + 1; //NOI18N
         if (start > 0) {
@@ -53,89 +66,8 @@ final class HintsUtils {
         return Pattern.compile("[!@#%^&*(){}\\|:'?/><~`]").matcher(name).find(); //NOI18N
     }
 
-    static boolean isClassUsed(Element foundElement,
-            Collection<JFXImport> imports,
-            CompilationInfo compilationInfo,
-            Collection<Element> allClasses,
-            Element superElement) {
-
-        //Check if there are in the same package
-        if (foundElement instanceof JavafxClassSymbol && superElement instanceof JavafxClassSymbol) {
-            JavafxClassSymbol foundElementClassSymbol = (JavafxClassSymbol) foundElement;
-            JavafxClassSymbol superElementClassSymbol = (JavafxClassSymbol) superElement;
-            if (superElementClassSymbol.getQualifiedName().equals(foundElementClassSymbol.getQualifiedName())) {
-                return true;
-            }
-            //Check is classes are int the same script
-            for (Element elementClass : allClasses) {
-                if (elementClass instanceof JavafxClassSymbol) {
-                    JavafxClassSymbol elementClassSymbol = (JavafxClassSymbol) elementClass;
-                    if (elementClassSymbol.location().equals(foundElementClassSymbol.location())) {
-                        return true;
-                    }
-                }
-
-            }
-            //Check imports
-            for (JFXImport importTree : imports) {
-                if (importTree.toString().contains(".*")) { //NOI18N
-                    String importLocation = importTree.toString().substring(0, importTree.toString().lastIndexOf(".")).replace("import ", ""); //NOI18N
-                    if (foundElementClassSymbol.location().equals(importLocation)) {
-                        return true;
-                    }
-                } else {
-                    JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), importTree.getQualifiedIdentifier());
-                    Element importElement = compilationInfo.getTrees().getElement(path);
-                    if (importElement instanceof JavafxClassSymbol || importElement != null) {
-                        JavafxClassSymbol importElementSymbol = (JavafxClassSymbol) importElement;
-                        if (foundElementClassSymbol.getQualifiedName().toString().equals(importElementSymbol.getQualifiedName().toString())) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    static MethodSymbol isOverridden(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
-        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
-            for (MethodSymbol overriddenMethod : overriddenMethodList) {
-                String overrriddenName = overriddenMethod.getSimpleName().toString();
-                if (!method.getSimpleName().toString().equals(overrriddenName)) {
-                    continue;
-                }
-                TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
-                if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
-                    return overriddenMethod;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    static MethodSymbol isOverridden(TypeElement typeOverridden, Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
-        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
-            for (MethodSymbol overriddenMethod : overriddenMethodList) {
-                String overrriddenName = overriddenMethod.getSimpleName().toString();
-                if (!method.getSimpleName().toString().equals(overrriddenName)) {
-                    continue;
-                }
-                if (method.getEnclosingElement() != overriddenMethod.getEnclosingElement()) {
-                    continue;
-                }
-                if (compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
-                    return overriddenMethod;
-                }
-            }
-        }
-
-        return null;
-    }
-
     static MethodSymbol isAlreadyDefined(Collection<MethodSymbol> overriddenMethodList, MethodSymbol method, CompilationInfo compilationInfo) {
-        if (overriddenMethodList != null && overriddenMethodList.size() != 0) {
+        if (overriddenMethodList != null && !overriddenMethodList.isEmpty()) {
             for (MethodSymbol overriddenMethod : overriddenMethodList) {
                 String overrriddenName = overriddenMethod.getSimpleName().toString();
                 if (!method.getSimpleName().toString().equals(overrriddenName)) {
@@ -143,11 +75,10 @@ final class HintsUtils {
                 }
                 TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
                 try {
-                    if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)
-                            || compilationInfo.getElements().overrides(overriddenMethod, method, typeOverridden)) {
+                    if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)) {
                         return overriddenMethod;
                     }
-                } catch (Exception ex) {
+                } catch (NullPointerException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -212,5 +143,20 @@ final class HintsUtils {
         }
 
         return true;
+    }
+
+    static JTextComponent getEditorComponent(Document document) {
+        JTextComponent target = Utilities.getFocusedComponent();
+        if (target != null) {
+            return target;
+        }
+        if (document instanceof JavaFXDocument) {
+            JavaFXDocument d = (JavaFXDocument) document;
+            if (d.getEditor() instanceof JTextComponent) {
+                return (JTextComponent) d.getEditor();
+            }
+        }
+        
+        return null;
     }
 }

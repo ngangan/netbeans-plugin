@@ -41,7 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
-import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.mjavac.code.Symbol;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;

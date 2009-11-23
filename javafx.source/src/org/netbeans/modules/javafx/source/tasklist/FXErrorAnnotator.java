@@ -325,29 +325,29 @@ public class FXErrorAnnotator extends AnnotationProvider {
     }
 
     private boolean isInError(FileObject fo) {
+        ErrorCounter ec = null;
         try {
             errorMapLock.readLock().lock();
-            ErrorCounter ec = errorMap.get(fo);
-            if (ec == null) {
-                try {
-                    JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                    if (jfxs != null) {
-                        jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                            public void run(CompilationController ci) throws Exception {
-                                process(ci);
-                            }
-                        }, true);
-                    }
-                } catch (IOException e) {
-                    return true;
-                }
-                return false;
-            }
-            return ec.isError();
+            ec = errorMap.get(fo);
         } finally {
             errorMapLock.readLock().unlock();
         }
+        if (ec == null) {
+            try {
+                JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+                if (jfxs != null) {
+                    jfxs.runUserActionTask(new Task<CompilationController>() {
+                        public void run(CompilationController ci) throws Exception {
+                            process(ci);
+                        }
+                    }, true);
+                }
+            } catch (IOException e) {
+                return true;
+            }
+            return false;
+        }
+        return ec.isError();
     }
 
     private ErrorCounter getErrorCounter(FileObject fo) {

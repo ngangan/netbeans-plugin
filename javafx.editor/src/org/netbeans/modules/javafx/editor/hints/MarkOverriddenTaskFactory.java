@@ -43,17 +43,20 @@ package org.netbeans.modules.javafx.editor.hints;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.swing.SwingUtilities;
 import javax.swing.text.*;
+import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.text.Annotation;
@@ -92,28 +95,34 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overriddenMethods, true);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 for (Element classElement : classesKeys) {
-                    if (overriddenMethods.size() == 0
-                            || !HintsUtils.isAnnon(classElement)
-                            && HintsUtils.checkString(classElement.getSimpleName().toString())) {
+                    if (overriddenMethods.isEmpty() || (!HintsUtils.isAnnon(classElement) && HintsUtils.checkString(classElement.getSimpleName().toString()))) {
                         updateAnnotationsOverridden(compilationInfo, addedAnotations);
                         clear();
                         return;
                     }
                 }
+                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                 for (Element currentClass : classTrees.keySet()) {
                     if (overriddenMethods.get(currentClass) == null || overriddenMethods.get(currentClass).isEmpty() ) {
                         continue;
                     }
                     ClassSymbol classSymbol = (ClassSymbol) currentClass;
+                    List<MethodSymbol> methods = new ArrayList<MethodSymbol>(overriddenMethods.get(currentClass));
                     for (Element element : classSymbol.getEnclosedElements()) {
                         if (element instanceof MethodSymbol) {
-                            MethodSymbol overridden = HintsUtils.isAlreadyDefined(overriddenMethods.get(currentClass), (MethodSymbol) element, compilationInfo);
+                            MethodSymbol overridden = HintsUtils.isAlreadyDefined(methods, (MethodSymbol) element, compilationInfo);
                             if (overridden != null) {
+                                methods.remove(overridden);
                                 Tree tree = compilationInfo.getTrees().getTree(overridden);
-                                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                                 int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                                if (start > 0) {
-                                    addedAnotations.add(new OverriddeAnnotation(start, element.getEnclosingElement()));
+                                boolean isInErrorZone = false;
+                                for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                                    if (diagnostic.getStartPosition() <= start && diagnostic.getEndPosition() >= start) {
+                                        isInErrorZone = true;
+                                    }
+                                }
+                                if (start > 0 && !isInErrorZone) {
+                                    addedAnotations.add(new OverriddeAnnotation(start, compilationInfo.getJavafxTypes().toJavaFXString(classSymbol.getSuperclass())));
                                 }
                             }
                         }
@@ -180,12 +189,9 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
         private int positon;
         private String superClassFQN;
 
-        public OverriddeAnnotation(int position, Element element) {
+        public OverriddeAnnotation(int position, String superClassFQN) {
             this.positon = position;
-            if (element instanceof JavafxClassSymbol) {
-                JavafxClassSymbol superClassSymbol = (JavafxClassSymbol) element;
-                superClassFQN = superClassSymbol.getQualifiedName().toString();
-            }
+            this.superClassFQN = superClassFQN;
         }
 
         @Override

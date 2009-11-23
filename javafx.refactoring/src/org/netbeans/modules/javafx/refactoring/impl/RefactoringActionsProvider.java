@@ -131,7 +131,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
-        if (!isRefactoringEnabled()) return false;
+//        if (!isRefactoringEnabled()) return false;
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
@@ -222,7 +222,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canMove(Lookup lkp) {
-        if (!isRefactoringEnabled()) return false;
+//        if (!isRefactoringEnabled()) return false;
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -272,12 +272,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 if (dob instanceof DataFolder) {
                     return drop!=null;
                 }
-                RequestProcessor.getDefault().post(new Runnable() {
-
-                    public void run() {
-                        SourceUtils.isOnSourceClasspath(dob.getPrimaryFile());
-                    }
-                });
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
                     return false;
                 }

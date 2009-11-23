@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -42,9 +42,9 @@ package org.netbeans.modules.javafx.editor.completion;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.tools.javac.code.Scope;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Scope;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;
@@ -79,6 +79,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.javafx.editor.Cancellable;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
@@ -86,14 +87,18 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
- *
  * @author David Strupl, Anton Chechel
  */
 public class JavaFXCompletionEnvironment<T extends Tree> {
 
     private static final Logger logger = Logger.getLogger(JavaFXCompletionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
-    private static int usingFakeSource = 0;
+
+    private static final String[] PSEUDO_VARS = new String[] {
+        "__DIR__", "__FILE__", "__PROFILE__" // NOI18N
+    };
+
+    private static int usingSanitizedSource = 0;
     protected int offset;
     protected String prefix;
     protected boolean isCamelCasePrefix;
@@ -298,6 +303,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 if (LOGGABLE) log("     is instance and we don't want them " + s); // NOI18N
                 continue;
             }
+            // Once source code uses either __FILE__ or __DIR__ pseudo
+            // variables, compiler will generate their definitions in the
+            // current block expression. When the source code does not contain
+            // them they are not generated and since would not be offered by
+            // code completion. Thus we provide pseudo variables explicitly, so
+            // skip them here.
+            if (isPseudoVariable(s)) {
+                continue;
+            }
             String tta = textToAdd;
             if (fields && (member.getKind() == ElementKind.FIELD || member.getKind() == ElementKind.ENUM_CONSTANT)) {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
@@ -319,9 +333,29 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                     }
                 }
             }
+
+            boolean classes = true;
+            if (classes && (member.getKind() == ElementKind.CLASS)) {
+                if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
+                    ElementHandle eh = null;
+                    try {
+                        eh = ElementHandle.create(member);
+                    } catch (Exception ex) {
+                        // cannot convert --> ignore
+                    }
+
+                    TypeMirror mtm = member.asType();
+                    DeclaredType mdt = (DeclaredType) mtm;
+                    TypeElement mte = (TypeElement) mdt.asElement();
+
+                    if (eh != null) {
+                        addResult(JavaFXCompletionItem.createTypeItem(s, offset, false, false, false));
+                    }
+                }
+            }
         }
 
-        for (Element member : elements.getAllMembers(te)) {
+        for (Element member : FXSourceUtils.getAllMembers(elements, te)) {
             if (LOGGABLE) log("    member2 == " + member + " member2.getKind() " + member.getKind()); // NOI18N
             String s = member.getSimpleName().toString();
             if ("<error>".equals(s)) { // NOI18N
@@ -342,6 +376,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
             if (!isStatic && !instance) {
                 if (LOGGABLE) log("     is instance and we don't want them " + s); // NOI18N
+                continue;
+            }
+            // Once source code uses either __FILE__ or __DIR__ pseudo
+            // variables, compiler will generate their definitions in the
+            // current block expression. When the source code does not contain
+            // them they are not generated and since would not be offered by
+            // code completion. Thus we provide pseudo variables explicitly, so
+            // skip them here.
+            if (isPseudoVariable(s)) {
                 continue;
             }
             if (methods && member.getKind() == ElementKind.METHOD) {
@@ -499,7 +542,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 VariableTree varTree = ort.getNewElements();
                 if (varTree != null) {
                     String s1 = varTree.getName().toString();
-                    if (LOGGABLE) log("    adding(4) " + s1 + " with prefix " + prefix); // NOI18N
+                    if (LOGGABLE) log("    adyding(4) " + s1 + " with prefix " + prefix); // NOI18N
                     TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, varTree));
                     if (smart != null && tm.getKind() == smart.getKind()) {
                         addResult(JavaFXCompletionItem.createVariableItem(tm, s1, query.anchorOffset, true));
@@ -522,6 +565,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             }
         }
+        addPseudoVariables();
     }
 
     private void addBlockExpressionLocals(BlockExpressionTree bet, JavaFXTreePath tp, TypeMirror smart) {
@@ -550,6 +594,15 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 return;
             }
             String s = simpleName.toString();
+            // Once source code uses either __FILE__ or __DIR__ pseudo
+            // variables, compiler will generate their definitions in the
+            // current block expression. When the source code does not contain
+            // them they are not generated and since would not be offered by
+            // code completion. Thus we provide pseudo variables explicitly, so
+            // skip them here.
+            if (isPseudoVariable(s)) {
+                return;
+            }
             if (LOGGABLE) log("    adding(1) " + s + " with prefix " + prefix); // NOI18N
             TypeMirror tm = trees.getTypeMirror(expPath);
             if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
@@ -561,6 +614,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                         s, query.anchorOffset, false));
             }
         }
+    }
+
+    private boolean isPseudoVariable(final String s) {
+        return Arrays.binarySearch(PSEUDO_VARS, s) >= 0;
     }
 
     protected void addPackages(String fqnPrefix) {
@@ -606,7 +663,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             continue;
                         }
                         String s = child.getPath().replace('/', '.'); // NOI18N
-                        addResult(JavaFXCompletionItem.createPackageItem(s, query.anchorOffset, false));
+                        if (s.startsWith(fqnPrefix)) {
+                            addResult(JavaFXCompletionItem.createPackageItem(s, query.anchorOffset, false));
+                        }
                     }
                 }
             }
@@ -1075,6 +1134,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addKeyword(NULL_KEYWORD, null, false);
         addKeyword(NEW_KEYWORD, SPACE, false);
         addKeyword(BIND_KEYWORD, SPACE, false);
+        addKeyword(FUNCTION_KEYWORD, SPACE, false);
     }
 
     protected void addAccessModifiers(Set<Modifier> modifiers) {
@@ -1255,7 +1315,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             PackageElement pkge = (PackageElement)e;
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
-        addPackages(""); // NOI18N
+        addPackages(prefix);
         if (query.queryType == JavaFXCompletionProvider.COMPLETION_ALL_QUERY_TYPE) {
             addAllTypes(kinds, insideNew, prefix);
         } else {
@@ -1333,6 +1393,14 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 }
             }
             scope = scope.getEnclosingScope();
+        }
+    }
+
+    private void addPseudoVariables() {
+        for (String pVar : PSEUDO_VARS) {
+            if (JavaFXCompletionProvider.startsWith(pVar, getPrefix())) {
+                addResult(JavaFXCompletionItem.createPseudoVariable(pVar, query.anchorOffset));
+            }
         }
     }
 
@@ -1491,18 +1559,18 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         }
         return null;
     }
-        /**
-     *
-     * @param source
+
+    /**
+     * XXX
      */
-    protected void useFakeSource(String source, final int pos) {
-        if (LOGGABLE) log("useFakeSource " + source + " pos == " + pos); // NOI18N
-        if (usingFakeSource > 1) {
+    protected void useSanitizedSource(String source, final int pos) {
+        if (LOGGABLE) log("useSanitizedSource" + source + " pos == " + pos); // NOI18N
+        if (usingSanitizedSource > 1) {
             // allow to recurse only twice ;-)
             return;
         }
         try {
-            usingFakeSource++;
+            usingSanitizedSource++;
             FileSystem fs = FileUtil.createMemoryFileSystem();
             final FileObject fo = fs.getRoot().createData("tmp" + (new Random().nextLong()) + ".fx"); // NOI18N
             Writer w = new OutputStreamWriter(fo.getOutputStream());
@@ -1513,25 +1581,25 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             JavaFXParserResult parserResult = JavaFXParserResult.create(Source.create(fo), info);
             if (LOGGABLE) log("  JavaFXParserResult obtained " + parserResult); // NOI18N
             CompilationController.create(parserResult).runWhenScanFinished(new Task<CompilationController>() {
-                public void run(CompilationController fakeController) throws Exception {
+                public void run(CompilationController sanitizedController) throws Exception {
                     if (LOGGABLE) log("    scan finished"); // NOI18N
-                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(fakeController, pos,true);
+                    JavaFXCompletionEnvironment env = query.getCompletionEnvironment(sanitizedController, pos,true);
                     if (LOGGABLE) log("    env == " + env); // NOI18N
-                    if (fakeController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                        if (LOGGABLE) log("    fake failed to analyze -- returning"); // NOI18N
+                    if (sanitizedController.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                        if (LOGGABLE) log("    sanitized failed to analyze -- returning"); // NOI18N
                         return;
                     }
-                    if (LOGGABLE) log("    fake analyzed"); // NOI18N
+                    if (LOGGABLE) log("    sanitized analyzed"); // NOI18N
                     if (! env.isTreeBroken()) {
-                        if (LOGGABLE) log("    fake non-broken tree"); // NOI18N
+                        if (LOGGABLE) log("    sanitized non-broken tree"); // NOI18N
                         final Tree leaf = env.getPath().getLeaf();
                         env.inside(leaf);
-                        // try to remove faked entries:
-                        String fakeName = fo.getName();
+                        // try to remove sanitized entries:
+                        String sanitizedName = fo.getName();
                         Set<JavaFXCompletionItem> toRemove = new TreeSet<JavaFXCompletionItem>();
                         for (JavaFXCompletionItem r : query.results) {
                             if (LOGGABLE) log("    checking " + r.getLeftHtmlText()); // NOI18N
-                            if (r.getLeftHtmlText().contains(fakeName)) {
+                            if (r.getLeftHtmlText().contains(sanitizedName)) {
                                 if (LOGGABLE) log("    will remove " + r); // NOI18N
                                 toRemove.add(r);
                             }
@@ -1542,12 +1610,12 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             });
         } catch (IOException ex) {
             if (LOGGABLE) {
-                logger.log(Level.FINE,"useFakeSource failed: ",ex); // NOI18N
+                logger.log(Level.FINE,"useSanitizedSource failed: ",ex); // NOI18N
             }
         } catch (ParseException e) {
             Exceptions.printStackTrace(e);
         } finally {
-            usingFakeSource--;
+            usingSanitizedSource--;
         }
     }
 

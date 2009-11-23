@@ -232,6 +232,17 @@ made subject to such option by the copyright holder.
                 <patternset includes="${release.files}"/>
             </fileset>
         </copy>
+        <chmod perm="755">
+            <fileset dir="${cluster}/javafx-sdk/bin" erroronmissingdir="false" >
+                <include name="*"/>
+            </fileset>
+            <fileset dir="${cluster}/javafx-sdk/emulator/bin" erroronmissingdir="false" >
+                <include name="*"/>
+            </fileset>
+            <fileset dir="${cluster}/javafx-sdk/tv/emulator/bin" erroronmissingdir="false" >
+                <include name="*"/>
+            </fileset>
+        </chmod>
     </target>
 
     <target name="verify-class-linkage" depends="jar,release">

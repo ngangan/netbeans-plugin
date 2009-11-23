@@ -181,7 +181,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                 //ignore
                             } finally {
                                 synchronized (JavaFXPreviewTopComponent.this) {
-                                    pr.destroy();
+                                    if (pr != null) pr.destroy();
                                     pr = null;
                                 }
                             }

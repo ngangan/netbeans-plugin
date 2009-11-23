@@ -55,7 +55,7 @@ public class OverrideAllTaskFactoryTest extends TreeRuleTestBase {
         super(testName);
     }
     
-    public void testDoNothingForVoidReturnType() throws Exception {
+    public void testFirst() throws Exception {
         //performAnalysisTest("test/TestMain.fx", "package test; public class TestMain{} class Test extends AbstractTest{} abstract class AbstractTest { abstract function method();}", 1);
     }
 

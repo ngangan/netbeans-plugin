@@ -178,8 +178,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (element != null && element.getSimpleName() != null) {
                             //TODO Hack for package modifiers which does not provide info about package
                             if (!isPackage(node.getModifiers().toString())) {
-                                if (modifiers.size() == 0
-                                        || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
+                                if (modifiers.isEmpty() || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
                                     addToInit(node);
                                 }
                             }

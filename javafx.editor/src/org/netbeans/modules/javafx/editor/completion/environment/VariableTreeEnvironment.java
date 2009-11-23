@@ -43,7 +43,7 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 
@@ -71,7 +71,14 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset); // NOI18N
         boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
         Tree type = t.getType();
-        int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+        int typePos;
+        // for overiden expressions, getType returns null tree, because
+        // you can't override the type of the variable.
+        if (type == null) {
+            typePos = 0;
+        } else {
+            typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+        }
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos); // NOI18N
         if (offset <= typePos) {
             SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
@@ -99,6 +106,8 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             addAllTypes(null, false, typeS);
         }
         addLocalMembersAndVars(getSmartType(t));
+        addValueKeywords();
+        addLocalAndImportedTypes(null, null, null, false, null);
     }
 
     private TypeMirror getSmartType(VariableTree t) throws IOException {

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,12 +24,12 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
- * Contributor] elects to include this software in this distribution
+ * "[Contributor] elects to include this software in this distribution
  * under the [CDDL or GPL Version 2] license." If you do not indicate a
  * single choice of license, a recipient has the option to distribute
  * your version of this file under either the CDDL, the GPL Version 2 or
@@ -38,27 +38,48 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.completion;
 
-public class ReportedIssues extends CompletionTestBase {
+package org.netbeans.modules.javafx.fxd.composer.editor.format;
 
-    public ReportedIssues(String testName) {
-        super(testName);
+import java.util.List;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import org.netbeans.modules.editor.indent.spi.Context;
+import org.netbeans.modules.editor.indent.spi.ExtraLock;
+import org.netbeans.modules.editor.indent.spi.IndentTask;
+
+/**
+ *
+ * @author Andrey Korostelev
+ */
+public class FXDIndentTask implements IndentTask {
+
+    private final Context context;
+
+    public FXDIndentTask(Context context) {
+        this.context = context;
     }
 
-    public void testIssue175333() throws Exception {
-        checkCompletion("Iz175333", "ba^", "iz175333.pass");
+    public void reindent() throws BadLocationException {
+        Document document = context.document();
+        List<Context.Region> regions = context.indentRegions();
+        if (regions.size() == 0) {
+            indentLine(document, context.startOffset());
+        } else {
+            for (Context.Region region : regions) {
+                indentLine(document, region.getStartOffset());
+            }
+        }
     }
 
-    public void testIssue159678() throws Exception {
-        // XXX: seeems that we need JavaBinaryIndexer to be registered during
-        // test run. Do not know how to do that correctly yet.
-        // checkCompletion("Iz159678", "var color = Color^.", "iz159678beforeDot.pass");
-        checkCompletion("Iz159678", "Color.^", "iz159678afterDot.pass");
+    // todo process case when there are line comment after {[
+    private void indentLine(Document document, int startOffset) throws BadLocationException {
+        int indent = FormatterUtilities.calculateLineIndent(document, startOffset);
+        context.modifyIndent(context.lineStartOffset(startOffset), indent);
     }
 
-    public void testIssue171484() throws Exception {
-        checkCompletion("Iz171484", "var bbb = a^", "iz171484.pass");
+    public ExtraLock indentLock() {
+        return null;
     }
+
 }
-

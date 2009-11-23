@@ -40,6 +40,7 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
             assert stc != null;
             m_stc = stc;
             //force the creation of the editor pane
+            m_stc.componentShowing();
             JEditorPane pane = m_stc.getEditorPane();
             if (pane != null) {
                 addErrorStatusBarCell(pane);
