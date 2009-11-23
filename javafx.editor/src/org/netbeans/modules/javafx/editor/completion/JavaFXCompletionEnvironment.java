@@ -663,7 +663,9 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             continue;
                         }
                         String s = child.getPath().replace('/', '.'); // NOI18N
-                        addResult(JavaFXCompletionItem.createPackageItem(s, query.anchorOffset, false));
+                        if (s.startsWith(fqnPrefix)) {
+                            addResult(JavaFXCompletionItem.createPackageItem(s, query.anchorOffset, false));
+                        }
                     }
                 }
             }
@@ -1313,7 +1315,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             PackageElement pkge = (PackageElement)e;
             addLocalAndImportedTypes(getEnclosedElements(pkge), kinds, baseType, toExclude, insideNew, smart, originalScope, pkge,false);
         }
-        addPackages(""); // NOI18N
+        addPackages(prefix);
         if (query.queryType == JavaFXCompletionProvider.COMPLETION_ALL_QUERY_TYPE) {
             addAllTypes(kinds, insideNew, prefix);
         } else {

@@ -1114,7 +1114,19 @@ public class JFXReformatTask implements ReformatTask {
             if (type != null && type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-                if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
+                if (type instanceof TypeArrayTree) {
+                    index = tokens.index();
+                    c = col;
+                    d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (accept(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
+                        space();
+//                        accept(JFXTokenId.OF);
+                        accept(JFXTokenId.IDENTIFIER); // lexer bug?
+                        space();
+                    } else {
+                        rollback(index, c, d);
+                    }
+                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
                     accept(JFXTokenId.FUNCTION);
                     spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
                 }

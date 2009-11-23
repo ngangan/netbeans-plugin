@@ -106,6 +106,8 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             addAllTypes(null, false, typeS);
         }
         addLocalMembersAndVars(getSmartType(t));
+        addValueKeywords();
+        addLocalAndImportedTypes(null, null, null, false, null);
     }
 
     private TypeMirror getSmartType(VariableTree t) throws IOException {
