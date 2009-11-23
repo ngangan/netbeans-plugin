@@ -42,9 +42,9 @@ package org.netbeans.modules.javafx.editor.completion;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.tools.javac.code.Scope;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Type;
+import com.sun.tools.mjavac.code.Scope;
+import com.sun.tools.mjavac.code.Symbol;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxTypes;

@@ -168,7 +168,7 @@ public final class SourceElement implements MultiViewElement, Serializable {
             m_currentSourceTC.componentClosed();
         }
         synchronized(this) {
-            if (m_sourceTCs != null){
+            if (m_sourceTCs != null) {
                 m_sourceTCs.clear();
             }
             m_currentSourceTC = null;

@@ -3746,7 +3746,7 @@ public class JFXReformatTask implements ReformatTask {
 //            private ExpressionTree stat;
 
             private FakeBlock(ExpressionTree stat) {
-                super(0L, com.sun.tools.javac.util.List.of((JFXExpression) stat), (JFXExpression) stat);
+                super(0L, com.sun.tools.mjavac.util.List.of((JFXExpression) stat), (JFXExpression) stat);
 //                this.stat = stat;
             }
         }

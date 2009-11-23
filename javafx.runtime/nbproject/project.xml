@@ -28,6 +28,10 @@
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/shared/fxdtools.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/fxdloader.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/fxdloader.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-common.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-common.jar</binary-origin>
             </class-path-extension>
@@ -70,6 +74,10 @@
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-runtime.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-j2d.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

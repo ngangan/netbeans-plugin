@@ -18,13 +18,4 @@
     </target>
 
     <target name="netbeans-extra" depends="probe"/>
-
-    <target name="basic-init" depends="harness.basic-init">
-        <mkdir dir="release/modules/ext"/>
-        <copydir src="javafxc" includes="**/*.jar" dest="release/modules/ext"/>
-    </target>
-
-    <target name="clean" depends="projectized-common.clean">
-        <delete dir="release" quiet="true"/>
-    </target>
 </project>

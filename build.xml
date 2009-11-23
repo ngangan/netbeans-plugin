@@ -2,7 +2,7 @@
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="javafx" basedir="." default="zip-clusters">
+<project name="javafx" basedir="." default="full-build">
     <description>Builds the module suite javafx.</description>
     <import file="nbproject/build-impl.xml"/>
 
@@ -173,10 +173,12 @@
         <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx2">
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/emulator/bin/*"/>
+          <include name="javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.lin/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/emulator/bin/*"/>
+          <exclude name="javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
       </jar>
     </target>
@@ -190,10 +192,12 @@
         <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx2">
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/emulator/bin/*"/>
+          <include name="javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.sol/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/emulator/bin/*"/>
+          <exclude name="javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
       </jar>
     </target>
@@ -207,10 +211,12 @@
         <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx2">
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/emulator/bin/*"/>
+          <include name="javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.mac/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/emulator/bin/*"/>
+          <exclude name="javafx-sdk/tv/emulator/bin/*"/>
         </zipfileset>
       </jar>
     </target>
@@ -256,5 +262,7 @@
       </junitreport>
       <echo message="Unit Test Results: ${nbroot}/build/test/results/index.html"/>
     </target>
+
+    <target name="full-build" depends="clean,nbms,zip-clusters,l10n-kit"/>
 
 </project>

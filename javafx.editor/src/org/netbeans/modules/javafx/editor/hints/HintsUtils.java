@@ -4,7 +4,7 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import java.util.*;
 import java.util.regex.Matcher;

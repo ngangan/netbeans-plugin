@@ -40,7 +40,7 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javac.util.Context;
+import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.javafx.api.JavafxcTaskImpl;
 import com.sun.tools.javafx.api.JavafxcTool;
 import com.sun.tools.javafx.api.JavafxcTrees;

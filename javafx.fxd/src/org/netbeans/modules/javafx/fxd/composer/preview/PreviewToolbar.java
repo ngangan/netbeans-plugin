@@ -16,7 +16,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFac
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
-import com.sun.javafx.tools.fxd.TargetProfile;
+import com.sun.javafx.tools.fxd.loader.Profile;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
@@ -165,8 +165,8 @@ public final class PreviewToolbar extends FXDToolbar {
     private JComboBox createProfileCombo() {
         final JComboBox profileComboBox = new JComboBox(
             new Object[] {
-                TargetProfile.desktop,
-                TargetProfile.mobile
+                Profile.desktop,
+                Profile.mobile
             }
         );
 
@@ -174,7 +174,7 @@ public final class PreviewToolbar extends FXDToolbar {
         
         profileComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                TargetProfile profile = (TargetProfile) profileComboBox.getSelectedItem();
+                Profile profile = (Profile) profileComboBox.getSelectedItem();
                 m_dObj.getController().setPreviewProfile(profile);
             }
         });
