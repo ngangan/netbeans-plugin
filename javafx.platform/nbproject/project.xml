@@ -247,18 +247,10 @@ made subject to such option by the copyright holder.
                 <package>org.antlr.runtime.tree</package>
             </public-packages>
             <class-path-extension>
-                <runtime-relative-path>ext/javafxc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/javafxc.jar</binary-origin>
-                <!--
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxc.jar</runtime-relative-path>
-                -->
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/javafxdoc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/javafxdoc.jar</binary-origin>
-                <!--
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxdoc.jar</runtime-relative-path>
-                -->
             </class-path-extension>
             <extra-compilation-unit>
                 <package-root>probesrc</package-root>
