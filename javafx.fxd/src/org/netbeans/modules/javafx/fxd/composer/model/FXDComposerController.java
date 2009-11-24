@@ -41,8 +41,8 @@ public final class FXDComposerController {
     private volatile short            m_screenChangeTicker = 0;
     
     //private       JSGPanel         m_sgPanel      = null;
-    //private       StatusBar        m_statusBar = null;   
-                
+    //private       StatusBar        m_statusBar = null;
+
     public FXDComposerController( FXZDataObject dObj) {
         m_dObj = dObj;
         m_actionController = new ActionController(dObj);
@@ -199,19 +199,22 @@ public final class FXDComposerController {
         }
     }
      */
-
+    
     public FXDElement getElementAt(int x, int y) {
         FXDElement element = null;
         Collection nodes = getScene().impl_pick(x, y);
-        for (Object node : nodes) {
-            System.out.println("    Node: " + node);
-        }
         if (!nodes.isEmpty()) {
-            Object[] nodesArray = nodes.toArray();
-            int selNum = nodesArray.length;
-            String id = ((Node) nodesArray[selNum - 1]).get$id();
-            if (id != null && id.length() > 0) {
-                element = new FXDElement(m_dObj, id);
+            for (Object node : nodes) {
+                if (node instanceof Node) {
+                    Node n = ((Node) node);
+                    String id = ((Node) node).get$id();
+                    if (id != null && id.length() > 0) {
+                        element = new FXDElement(m_dObj, id);
+                        element.setVisible(n.get$visible());
+                        element.setBounds(n.get$boundsInParent());
+                        break;
+                    }
+                }
             }
         }
         return element;
@@ -243,9 +246,6 @@ public final class FXDComposerController {
         if ( m_dObj.getDataModel().setZoomRatio(zoomRatio)) {
             m_screenChangeTicker++;
             if ( hasPreviewTC()) {
-//                Node node = getScene().impl_getRoot();
-//                node.set$scaleX(zoomRatio);
-//                node.set$scaleY(zoomRatio);
 //                FXNode scene = (FXNode) getSGPanel().getScene();
 //                scene.setScaleX(zoomRatio);
 //                scene.setScaleY(zoomRatio);
