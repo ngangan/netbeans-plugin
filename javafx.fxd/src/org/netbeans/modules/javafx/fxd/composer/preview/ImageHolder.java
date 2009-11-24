@@ -135,10 +135,12 @@ final class ImageHolder extends JPanel {
         }
         g.setClip( clip);
          */
-        
+
+        /* create Graphics for drawing actions.
+         * Make it wider and taller then m_imagePanel */
         Graphics gCopy = g.create();
-        gCopy.translate(xOff, yOff);
-        gCopy.setClip(0, 0, w, h);
+        gCopy.translate(xOff - 1, yOff - 1);
+        gCopy.setClip(0, 0, w + 2, h + 2);
         m_dObj.getController().paintActions(gCopy);
     }
 
