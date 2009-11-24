@@ -41,7 +41,12 @@ package org.netbeans.api.javafx.source;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import static org.junit.Assert.*;
 
 /**
@@ -75,6 +80,41 @@ public class TreeUtilitiesTest extends SourceTestBase {
 
                 boolean result = controller.getTreeUtilities().isSynthetic(currentPath);
                 assertFalse(result);
+            }
+        });
+    }
+
+    public void testPathFor() throws Exception {
+        final Map<Integer, Tree.JavaFXKind> kindMap = new HashMap<Integer, Tree.JavaFXKind>();
+        kindMap.put(0, Tree.JavaFXKind.CLASS_DECLARATION);
+        kindMap.put(176, Tree.JavaFXKind.MEMBER_SELECT);
+        kindMap.put(251, Tree.JavaFXKind.CLASS_DECLARATION);
+        kindMap.put(261, Tree.JavaFXKind.CLASS_DECLARATION);
+        kindMap.put(275, Tree.JavaFXKind.IDENTIFIER);
+        kindMap.put(294, Tree.JavaFXKind.FUNCTION_DEFINITION);
+        kindMap.put(320, Tree.JavaFXKind.FUNCTION_DEFINITION);
+        kindMap.put(349, Tree.JavaFXKind.IDENTIFIER);
+        kindMap.put(365, Tree.JavaFXKind.IDENTIFIER);
+        kindMap.put(376, Tree.JavaFXKind.OBJECT_LITERAL_PART);
+        kindMap.put(187, Tree.JavaFXKind.VARIABLE);
+        kindMap.put(225, Tree.JavaFXKind.VARIABLE);
+        kindMap.put(235, Tree.JavaFXKind.IDENTIFIER);
+        kindMap.put(408, Tree.JavaFXKind.OBJECT_LITERAL_PART);
+        kindMap.put(485, Tree.JavaFXKind.IDENTIFIER);
+        kindMap.put(421, Tree.JavaFXKind.IDENTIFIER);
+        
+        System.out.println("pathFor(pos)");
+        FileObject fo = FileUtil.toFileObject(getDataDir());
+        fo = fo.getFileObject("org/netbeans/api/javafx/source/TreeUtilitiesTest.fx");
+        testInsideSourceTask(fo,
+          new Task<CompilationController>() {
+            public void run(CompilationController controller) throws Exception {
+                TreeUtilities tu = controller.getTreeUtilities();
+                for(Map.Entry<Integer, Tree.JavaFXKind> entry : kindMap.entrySet()) {
+                    JavaFXTreePath tp = tu.pathFor(entry.getKey());
+                    assertNotNull(tp);
+                    assertEquals("Wrong path @" + entry.getKey() + " " + tp.getLeaf(), entry.getValue(), tp.getLeaf().getJavaFXKind());
+                }
             }
         });
     }
