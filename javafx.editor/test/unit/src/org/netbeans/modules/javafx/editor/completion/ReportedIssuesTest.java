@@ -88,7 +88,11 @@ public class ReportedIssuesTest extends CompletionTestBase {
     }
 
     public void testIssue167875() throws Exception {
-        checkCCForIssue(167875, "data: LineChart.^", " ");
+        checkCCForIssue(167875, "data: LineChart.^");
+    }
+ 
+    public void testIssue167875B() throws Exception {
+        checkCompletion("Iz167875", "data: LineChart.^", "Series {\nn", "iz167875B.pass");
     }
 
     public void testIssue150039() throws Exception {

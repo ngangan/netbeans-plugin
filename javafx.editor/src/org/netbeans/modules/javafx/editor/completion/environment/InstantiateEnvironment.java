@@ -71,9 +71,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
             if (LOGGABLE) log("  returing nothing because pos < 0"); // NOI18N
             return;
         }
-        String s = it.getIdentifier().toString();
-        if (LOGGABLE) log("  s == " + s); // NOI18N
-        TypeElement te = findTypeElement(s);
+        TypeElement te = (TypeElement)it.getIdentifierSym();
         if (LOGGABLE) log("  te == " + te); // NOI18N
         if (te == null) {
             return;
