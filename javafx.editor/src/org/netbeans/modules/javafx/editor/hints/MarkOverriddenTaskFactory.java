@@ -43,10 +43,10 @@ package org.netbeans.modules.javafx.editor.hints;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -79,7 +79,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        final Map<Element, Collection<Tree>> classTrees = new HashMap<Element, Collection<Tree>>();
+        final Collection<Element> classes = new HashSet<Element>();
         final Map<Element, List<MethodSymbol>> overriddenMethods = new HashMap<Element, List<MethodSymbol>>();
         final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
         final Collection<Element> classesKeys = new HashSet<Element>(overriddenMethods.keySet());
@@ -90,9 +90,10 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 cancel.set(true);
             }
 
+            @SuppressWarnings("element-type-mismatch")
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
-                final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classTrees, overriddenMethods, true);
+                final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classes, overriddenMethods);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 for (Element classElement : classesKeys) {
                     if (overriddenMethods.isEmpty() || (!HintsUtils.isAnnon(classElement) && HintsUtils.checkString(classElement.getSimpleName().toString()))) {
@@ -102,18 +103,26 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                     }
                 }
                 SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                for (Element currentClass : classTrees.keySet()) {
-                    if (overriddenMethods.get(currentClass) == null || overriddenMethods.get(currentClass).isEmpty() ) {
+                for (Element currentClass : classes) {
+                    if (overriddenMethods.get(currentClass) == null || overriddenMethods.get(currentClass).isEmpty()) {
                         continue;
                     }
                     ClassSymbol classSymbol = (ClassSymbol) currentClass;
-                    List<MethodSymbol> methods = new ArrayList<MethodSymbol>(overriddenMethods.get(currentClass));
-                    for (Element element : classSymbol.getEnclosedElements()) {
+                    for (Element element : overriddenMethods.get(currentClass)) {
                         if (element instanceof MethodSymbol) {
-                            MethodSymbol overridden = HintsUtils.isAlreadyDefined(methods, (MethodSymbol) element, compilationInfo);
-                            if (overridden != null) {
-                                methods.remove(overridden);
-                                Tree tree = compilationInfo.getTrees().getTree(overridden);
+                            String fqnString = null;
+                            if (classSymbol.getInterfaces().size() == 1) {
+                                fqnString = classSymbol.getInterfaces().iterator().next().toString();
+                            } else {
+                                for (Type classType : classSymbol.getInterfaces()) {
+                                    fqnString = getOwnerClass(classType.asElement().enclClass(), (MethodSymbol) element);
+                                    if (fqnString != null) {
+                                        break;
+                                    }
+                                }
+                            }
+                            if (fqnString != null) {
+                                Tree tree = compilationInfo.getTrees().getTree(element);
                                 int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
                                 boolean isInErrorZone = false;
                                 for (Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
@@ -122,7 +131,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                                     }
                                 }
                                 if (start > 0 && !isInErrorZone) {
-                                    addedAnotations.add(new OverriddeAnnotation(start, compilationInfo.getJavafxTypes().toJavaFXString(classSymbol.getSuperclass())));
+                                    addedAnotations.add(new OverriddeAnnotation(start, fqnString));
                                 }
                             }
                         }
@@ -130,6 +139,36 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 }
                 updateAnnotationsOverridden(compilationInfo, addedAnotations);
                 clear();
+            }
+
+            private String getOwnerClass(ClassSymbol classSymbol, MethodSymbol methodSymbol) {
+                String fqnType = null;
+                for (Symbol symbol : classSymbol.getEnclosedElements()) {
+                    if (symbol instanceof MethodSymbol) {
+                        MethodSymbol method = (MethodSymbol) symbol;
+                        if (!method.name.toString().equals(methodSymbol.name.toString())) {
+                            continue;
+                        }
+                        if (method.getReturnType() != methodSymbol.getReturnType()) {
+                            continue;
+                        }
+                        if (method.getParameters().size() != methodSymbol.getParameters().size()) {
+                            continue;
+                        }
+
+                        return classSymbol.className();
+                    }
+                }
+
+                if (fqnType != null) {
+                    return fqnType;
+                }
+
+                for (Type classType : classSymbol.getInterfaces()) {
+                    fqnType = getOwnerClass(classType.asElement().enclClass(), methodSymbol);
+                }
+
+                return fqnType;
             }
 
             private void updateAnnotationsOverridden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
@@ -175,14 +214,12 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
 
             private void clear() {
                 addedAnotations.clear();
-                classTrees.clear();
+                classes.clear();
                 overriddenMethods.clear();
                 classesKeys.clear();
             }
         };
     }
-
-  
 
     private static class OverriddeAnnotation extends Annotation {
 

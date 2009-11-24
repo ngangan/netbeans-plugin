@@ -7,11 +7,9 @@ package org.netbeans.modules.javafx.editor.hints;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
@@ -24,49 +22,28 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
 
     private CompilationInfo compilationInfo;
-    private Map<Element, Collection<Tree>> classTrees;
+    private Collection<Element> classes;
     private Map<Element, List<MethodSymbol>> overriddenMethods;
-    private boolean includeAnon = false;
 
-    public OverrideVisitor(CompilationInfo compilationInfo,
-            Map<Element, Collection<Tree>> classTrees,
+    OverrideVisitor(CompilationInfo compilationInfo,
+            Collection<Element> classes,
             Map<Element, List<MethodSymbol>> overriddenMethods) {
 
         this.compilationInfo = compilationInfo;
-        this.classTrees = classTrees;
+        this.classes = classes;
         this.overriddenMethods = overriddenMethods;
-    }
-
-    public OverrideVisitor(CompilationInfo compilationInfo,
-            Map<Element, Collection<Tree>> classTrees,
-            Map<Element, List<MethodSymbol>> overriddenMethods,
-            boolean incudeAnon) {
-
-        this(compilationInfo, classTrees, overriddenMethods);
-        this.includeAnon = incudeAnon;
     }
 
     @Override
     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
         Element currentClass = compilationInfo.getTrees().getElement(getCurrentPath());
-        if (currentClass != null && !currentClass.toString().contains("$anon")) { //NOI18N
-            collectClasses(currentClass, node);
-        } else if (includeAnon) {
-            collectClasses(currentClass, node);
+        if (currentClass != null ) { 
+           classes.add(currentClass);
         }
+
         return super.visitClassDeclaration(node, v);
     }
 
-    private void collectClasses(Element currentClass, ClassDeclarationTree node) {
-        Collection<Tree> extendsList = classTrees.get(currentClass);
-            if (extendsList == null) {
-                extendsList = new HashSet<Tree>();
-            }
-            extendsList.addAll(node.getSupertypeList());
-            classTrees.put(currentClass, extendsList);
-    }
-
-  
     @Override
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
         try {
