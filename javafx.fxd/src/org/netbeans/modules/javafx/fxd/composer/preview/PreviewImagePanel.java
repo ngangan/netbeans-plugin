@@ -5,6 +5,7 @@
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
+import com.sun.javafx.geom.transform.BaseTransform;
 import com.sun.javafx.tk.Toolkit;
 import com.sun.javafx.tk.swing.SwingScene;
 import java.net.URL;
@@ -208,7 +209,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                // prototyping
                 Scene fxScene = new Scene(true);
                 fxScene.addTriggers$();
                 fxScene.applyDefaults$();
@@ -221,11 +221,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                 SwingScenePanel scenePanel = getScenePanel(fxScene);
 
-                // end prototyping
-
-                // TODO: paint actions: m_dObj.getController().paintActions(g);
                 removeAll();
-
                 add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
                 MouseEventCollector mec = new MouseEventCollector();
@@ -235,7 +231,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                 PopupListener popupL = new PopupListener();
                 scenePanel.addMouseListener(popupL);
-                PreviewImagePanel.this.addMouseListener(popupL);
+                addMouseListener(popupL);
+
                 revalidate();
                 updateZoom();
             }
@@ -253,55 +250,26 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     private void updateZoom() {
-        // TODO: enable zoom. remove SGGroup usage
         SwingScenePanel scenePanel = getScenePanel();
         if (scenePanel != null){
             float zoom = m_dObj.getDataModel().getZoomRatio();
             Node node = m_fxScene.impl_getRoot();
-            node.set$translateX(0);
-            node.set$translateY(0);
+
+            Bounds2D bounds = new Bounds2D();
+            node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
+
             node.set$scaleX(zoom);
             node.set$scaleY(zoom);
-            Bounds bounds = node.get$boundsInParent();
-            node.set$translateX( -bounds.get$minX());
-            node.set$translateY( -bounds.get$minY());
-
+            float cx = (bounds.x1 + bounds.x2) / 2;
+            float cy = (bounds.y1 + bounds.y2) / 2;
+            node.set$translateX(cx * zoom - cx);
+            node.set$translateY(cy * zoom - cy);
 
             scenePanel.invalidate();
             if (scenePanel.getParent() != null){
                 scenePanel.getParent().validate();
             }
         }
-        /*
-        if ( m_fxScene != null) {
-            float zoom = m_dObj.getDataModel().getZoomRatio();
-            SGGroup node = m_sgPanel.getSceneGroup();
-//            fxNode.setTranslateX( 0);
-//            fxNode.setTranslateY( 0);
-//            fxNode.setScaleX(zoom);
-//            fxNode.setScaleY(zoom);
-//            Rectangle2D bounds = fxNode.getTransformedBounds();
-//
-//            fxNode.setTranslateX( (float) -bounds.getX());
-//            fxNode.setTranslateY( (float) -bounds.getY());
-//
-//            m_sgPanel.invalidate();
-
-//            Affine2D at = new Affine2D();
-//            at.scale( zoom, zoom);
-
-//            at.translate(-bounds.getX(), -bounds.getY());
-//            fxNode.setTransform(at);
-            Affine2D at = new Affine2D();
-            at.scale( zoom, zoom);
-            node.setTransformMatrix(at);
-
-            m_sgPanel.invalidate();
-            if (m_sgPanel.getParent() != null){
-                m_sgPanel.getParent().validate();
-            }
-        }
-         */
     }
 
     private Action[] getPopupActions() {
