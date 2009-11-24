@@ -227,8 +227,10 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 MouseEventCollector mec = new MouseEventCollector();
                 scenePanel.addMouseListener(mec);
                 scenePanel.addMouseMotionListener(mec);
+                //zooming
                 scenePanel.addMouseWheelListener(mec);
-
+                addMouseWheelListener(mec);
+                // popup
                 PopupListener popupL = new PopupListener();
                 scenePanel.addMouseListener(popupL);
                 addMouseListener(popupL);
