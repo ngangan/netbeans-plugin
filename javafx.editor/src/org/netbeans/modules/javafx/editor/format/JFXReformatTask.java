@@ -1470,6 +1470,8 @@ public class JFXReformatTask implements ReformatTask {
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
                         col = indent;
+                    } else if (parentTree.getJavaFXKind() == JavaFXKind.FUNCTION_DEFINITION || parentTree.getJavaFXKind() == JavaFXKind.INSTANTIATE_OBJECT_LITERAL) {
+                        spaces(1, true);
                     } else {
                         blankLines();
                     }
@@ -1529,7 +1531,11 @@ public class JFXReformatTask implements ReformatTask {
                 lastBlankLinesDiff = null;
             } else {
                 if (!magicFunc) {
-                    blankLines();
+                    if (parentTree.getJavaFXKind() == JavaFXKind.FUNCTION_DEFINITION || parentTree.getJavaFXKind() == JavaFXKind.INSTANTIATE_OBJECT_LITERAL) {
+                        spaces(1, true);
+                    } else {
+                        blankLines();
+                    }
                     indent = halfIndent;
                     Diff diff = diffs.isEmpty() ? null : diffs.getFirst();
                     if (diff != null && diff.end == tokens.offset()) {

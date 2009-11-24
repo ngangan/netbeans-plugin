@@ -106,7 +106,8 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
 
         private String getTooltipText() {
             String text = "";  //NOI18N
-
+            // TODO create informative tooltip text. now m_highlighted.getDocumentElement() always returns null
+            /*
             if (getDataModel().getIsTooltipOn()) {
                 final StringBuilder sb = new StringBuilder();
                     sb.append("<html>&nbsp;");  //NOI18N
@@ -127,7 +128,7 @@ public final class HighlightActionFactory extends AbstractComposerActionFactory 
                 sb.append("</html>"); //NOI18N
                 text = sb.toString();
             }
-
+            */
             return text;    
         }
     }

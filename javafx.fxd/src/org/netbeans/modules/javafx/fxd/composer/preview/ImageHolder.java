@@ -67,9 +67,9 @@ final class ImageHolder extends JPanel {
     public static final int CROSS_SIZE = 10;
 
     private final JComponent    m_imagePanel;
-    private final AtomicBoolean canPaint ;
-    private final JComponent    myErrorComponent;
-    private  final FXZDataObject m_dObj;
+    private final AtomicBoolean m_canPaint ;
+    private final JComponent    m_ErrorComponent;
+    private final FXZDataObject m_dObj;
     
     public ImageHolder(JComponent imagePanel, FXZDataObject dObj) {
         this.m_imagePanel = imagePanel;
@@ -77,17 +77,17 @@ final class ImageHolder extends JPanel {
         setLayout( new CenteredLayoutManager());
         add(this.m_imagePanel);
         setDoubleBuffered(true);
-        canPaint = new AtomicBoolean( true );
-        myErrorComponent = new JLabel( 
+        m_canPaint = new AtomicBoolean( true );
+        m_ErrorComponent = new JLabel(
                 NbBundle.getMessage( ImageHolder.class, "ERR_UnableRender"));  // NOI18N
-        myErrorComponent.validate();
+        m_ErrorComponent.validate();
         setBackground( Color.WHITE);
     }
 
     public void setTryPaint(){
-        if ( !canPaint.getAndSet( true ) ) {
+        if ( !m_canPaint.getAndSet( true ) ) {
             System.gc();
-            remove( myErrorComponent );
+            remove( m_ErrorComponent );
             setLayout( new CenteredLayoutManager() );
             add( m_imagePanel );
         }
@@ -96,21 +96,21 @@ final class ImageHolder extends JPanel {
     @Override
     protected void paintChildren(Graphics g) {
         //TODO Determine what to do with the canPaint stuff
-    //    if (canPaint.get()) {
-            try {
-                doPaintChildren(g);
-            } catch (Throwable e) {
-                System.err.println("Out of Memory");
-                e.printStackTrace();
-                canPaint.set( false );
-                remove( m_imagePanel );
-                setLayout( new LabelLayout() );
-                add(  myErrorComponent );
-            }
- //       }
-      //  else {
-     //       super.paintChildren(g);
-     //   }
+        //    if (canPaint.get()) {
+        try {
+            doPaintChildren(g);
+        } catch (Throwable e) {
+            System.err.println("Out of Memory");
+            e.printStackTrace();
+            m_canPaint.set(false);
+            remove(m_imagePanel);
+            setLayout(new LabelLayout());
+            add(m_ErrorComponent);
+        }
+        //       }
+        //  else {
+        //       super.paintChildren(g);
+        //   }
     }
 
     private void doPaintChildren( Graphics g ) {
@@ -135,10 +135,12 @@ final class ImageHolder extends JPanel {
         }
         g.setClip( clip);
          */
-        
+
+        /* create Graphics for drawing actions.
+         * Make it wider and taller then m_imagePanel */
         Graphics gCopy = g.create();
-        gCopy.translate(xOff, yOff);
-        gCopy.setClip(0, 0, w, h);
+        gCopy.translate(xOff - 1, yOff - 1);
+        gCopy.setClip(0, 0, w + 2, h + 2);
         m_dObj.getController().paintActions(gCopy);
     }
 
@@ -184,11 +186,11 @@ final class ImageHolder extends JPanel {
 
         @Override
         public void layoutContainer(Container parent) {
-            super.layoutContainer( parent );
-            Point point = myErrorComponent.getLocation();
-            myErrorComponent.setLocation( point.x ,
-                    (int)(parent.getHeight() - 
-                            myErrorComponent.getPreferredSize().getHeight()) / 2);
+            super.layoutContainer(parent);
+            Point point = m_ErrorComponent.getLocation();
+            m_ErrorComponent.setLocation(point.x,
+                    (int) (parent.getHeight() -
+                            m_ErrorComponent.getPreferredSize().getHeight()) / 2);
         }
     }
 }

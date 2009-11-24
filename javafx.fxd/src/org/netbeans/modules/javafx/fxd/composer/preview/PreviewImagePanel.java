@@ -5,6 +5,7 @@
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
+import com.sun.javafx.geom.transform.BaseTransform;
 import com.sun.javafx.tk.Toolkit;
 import com.sun.javafx.tk.swing.SwingScene;
 import java.net.URL;
@@ -135,8 +136,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         m_previewProfileCopy = profileCopy;
                         m_selectedEntryCopy = selectedEntryCopy;
 
-                        //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
-
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
                                 if ( fModel.isError()) {
@@ -168,78 +167,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 fModel.readUnlock();
                                             }
 
-                                            SwingUtilities.invokeLater(new Runnable() {
+                                            showImagePanel(node);
 
-                                                public void run() {
-                                                    // prototyping
-                                                    Scene fxScene = new Scene(true);
-                                                    fxScene.addTriggers$();
-                                                    fxScene.applyDefaults$();
-                                                    //fxScene.loc$content.insert(nodeOld);
-                                                    fxScene.loc$content.insert(node);
-                                                    fxScene.complete$();
-                                                    Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
-
-                                                    m_fxScene = fxScene;
-
-                                                    SwingScenePanel scenePanel = getScenePanel(fxScene);
-
-                                                    // end prototyping
-
-                                                    // TODO: paint actions: m_dObj.getController().paintActions(g);
-                                                    removeAll();
-
-                                                    add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
-
-                                                    MouseEventCollector mec = new MouseEventCollector();
-                                                    scenePanel.addMouseListener(mec);
-                                                    scenePanel.addMouseMotionListener(mec);
-                                                    scenePanel.addMouseWheelListener(mec);
-
-                                                    PopupListener popupL = new PopupListener();
-                                                    scenePanel.addMouseListener(popupL);
-                                                    PreviewImagePanel.this.addMouseListener(popupL);
-                                                    revalidate();
-                                                    updateZoom();
-                                                }
-                                            });
-
-
-                                            /*
-                                            //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
-                                            //Object   group  = m.invoke(fxNode);
-                                            PGNode fxNode = node.impl_getPGNode();
-
-                                             if (fxNode != null) {
-                                                m_sgPanel = new JSGPanel() {
-                                                    @Override
-                                                    public void paintComponent(java.awt.Graphics g) {
-                                                        super.paintComponent(g);
-                                                        m_dObj.getController().paintActions(g);
-                                                    }
-                                                };
-                                                m_sgPanel.setBackground(Color.WHITE);
-                                                m_sgPanel.setScene( (SGNode) fxNode);
-
-                                                removeAll();
-                                                add( new ImageHolder(m_sgPanel, m_dObj), BorderLayout.CENTER);
-
-                                                MouseEventCollector mec = new MouseEventCollector();
-                                                m_sgPanel.addMouseListener(mec);
-                                                m_sgPanel.addMouseMotionListener(mec);
-                                                m_sgPanel.addMouseWheelListener(mec);
-
-                                                PopupListener popupL = new PopupListener();
-                                                m_sgPanel.addMouseListener(popupL);
-                                                PreviewImagePanel.this.addMouseListener(popupL);
-
-                                                updateZoom();
-                                            } else {
-                                                setBackground( m_defaultBackground);
-                                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_EMPTY_DOCUMENT")); //NOI18N
-                                                label.setIcon(null);
-                                            }
-                                            */
                                         } catch( OutOfMemoryError oom) {
                                             oom.printStackTrace();
                                             setBackground( m_defaultBackground);
@@ -276,6 +205,42 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
     }
 
+    private void showImagePanel(final Node node) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                Scene fxScene = new Scene(true);
+                fxScene.addTriggers$();
+                fxScene.applyDefaults$();
+                //fxScene.loc$content.insert(nodeOld);
+                fxScene.loc$content.insert(node);
+                fxScene.complete$();
+                Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
+
+                m_fxScene = fxScene;
+
+                SwingScenePanel scenePanel = getScenePanel(fxScene);
+
+                removeAll();
+                add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
+
+                MouseEventCollector mec = new MouseEventCollector();
+                scenePanel.addMouseListener(mec);
+                scenePanel.addMouseMotionListener(mec);
+                //zooming
+                scenePanel.addMouseWheelListener(mec);
+                addMouseWheelListener(mec);
+                // popup
+                PopupListener popupL = new PopupListener();
+                scenePanel.addMouseListener(popupL);
+                addMouseListener(popupL);
+
+                revalidate();
+                updateZoom();
+            }
+        });
+    }
+
     private void showError( final String msg) {
         removeAll();
         setBackground( m_defaultBackground);
@@ -287,55 +252,26 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     private void updateZoom() {
-        // TODO: enable zoom. remove SGGroup usage
         SwingScenePanel scenePanel = getScenePanel();
         if (scenePanel != null){
             float zoom = m_dObj.getDataModel().getZoomRatio();
             Node node = m_fxScene.impl_getRoot();
-            node.set$translateX(0);
-            node.set$translateY(0);
+
+            Bounds2D bounds = new Bounds2D();
+            node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
+
             node.set$scaleX(zoom);
             node.set$scaleY(zoom);
-            Bounds bounds = node.get$boundsInParent();
-            node.set$translateX( -bounds.get$minX());
-            node.set$translateY( -bounds.get$minY());
-
+            float cx = (bounds.x1 + bounds.x2) / 2;
+            float cy = (bounds.y1 + bounds.y2) / 2;
+            node.set$translateX(cx * zoom - cx);
+            node.set$translateY(cy * zoom - cy);
 
             scenePanel.invalidate();
             if (scenePanel.getParent() != null){
                 scenePanel.getParent().validate();
             }
         }
-        /*
-        if ( m_fxScene != null) {
-            float zoom = m_dObj.getDataModel().getZoomRatio();
-            SGGroup node = m_sgPanel.getSceneGroup();
-//            fxNode.setTranslateX( 0);
-//            fxNode.setTranslateY( 0);
-//            fxNode.setScaleX(zoom);
-//            fxNode.setScaleY(zoom);
-//            Rectangle2D bounds = fxNode.getTransformedBounds();
-//
-//            fxNode.setTranslateX( (float) -bounds.getX());
-//            fxNode.setTranslateY( (float) -bounds.getY());
-//
-//            m_sgPanel.invalidate();
-
-//            Affine2D at = new Affine2D();
-//            at.scale( zoom, zoom);
-
-//            at.translate(-bounds.getX(), -bounds.getY());
-//            fxNode.setTransform(at);
-            Affine2D at = new Affine2D();
-            at.scale( zoom, zoom);
-            node.setTransformMatrix(at);
-
-            m_sgPanel.invalidate();
-            if (m_sgPanel.getParent() != null){
-                m_sgPanel.getParent().validate();
-            }
-        }
-         */
     }
 
     private Action[] getPopupActions() {

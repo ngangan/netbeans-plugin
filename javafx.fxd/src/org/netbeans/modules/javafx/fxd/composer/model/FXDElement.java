@@ -56,6 +56,11 @@ public final class FXDElement {
     private final String              m_id;
     private       FXDElementOutline   m_outline   = null;
     private       boolean             m_isDeleted = false;
+
+    // for now store visibility and bounds permanently not to cache javafx.scene.Node.
+    // we can't access it by id
+    private       boolean             m_visible = false;
+    private       Bounds2D            m_bounds = new Bounds2D();
 /*
     private       float               m_translateDx = 0;
     private       float               m_translateDy = 0;
@@ -82,10 +87,15 @@ public final class FXDElement {
         m_id   = id;
 //        SceneManager.log(Level.FINE, "SVGObject created: " + m_elem); //NOI18N        
     }
+
+    public void setVisible(boolean visible){
+        m_visible = visible;
+    }
             
     public boolean isVisible() {
         //TODO use FXDNode to determine this
-        return getController().getNode(m_id) != null;
+        //return getController().getNode(m_id) != null;
+        return m_visible;
     }
     
     public String getName() {
@@ -101,6 +111,9 @@ public final class FXDElement {
         DocumentElement de = null;
         try {
             FXDComposerModel model = m_dObj.getDataModel();
+            //String entry = model.getSelectedEntry();
+            //FXDFileModel fModel = model.getFXDContainer().getFileModel(entry);
+            //de = fModel.getElementById(m_id);
             de = model.getFXDContainer().getFileModel(model.getSelectedEntry()).getElementById(m_id);
         } catch (Exception ex) {
             //TODO Do not swallow it
@@ -136,24 +149,27 @@ public final class FXDElement {
         return false;
     }
 
-    Bounds2D getBounds() {
-        Node node = getController().getNode(m_id);
-        assert node != null;
-        Bounds b = node.get$boundsInParent();
-        Bounds2D b2d = new Bounds2D(b.get$minX(), b.get$minY(), b.get$maxX(), b.get$maxY());
-        return b2d;
+    void setBounds(Bounds2D bounds){
+        assert bounds != null;
+        m_bounds = bounds;
     }
-    /*
-    Bounds2D getBounds() {
-        SGNode node = getController().getNode(m_id);
-        assert node != null;
-        Bounds2D bounds = new Bounds2D();
-        Affine2D transform = new Affine2D();
-        getController().getScenePanel().getSceneGroup().getTransformMatrix(transform);
-        node.getCompleteBounds(bounds, transform);
-        return bounds;
+
+    void setBounds(Bounds bounds){
+        assert bounds != null;
+        m_bounds = new Bounds2D(bounds.get$minX(), bounds.get$minY(),
+                bounds.get$maxX(), bounds.get$maxY());
     }
-    */
+
+    Bounds2D getBounds() {
+
+        float zoom = m_dObj.getDataModel().getZoomRatio();
+        return new Bounds2D(m_bounds.x1 * zoom, m_bounds.y1 * zoom, m_bounds.x2 * zoom, m_bounds.y2 * zoom);
+        //Node node = getController().getNode(m_id);
+        //assert node != null;
+        //Bounds b = node.get$boundsInParent();
+        //Bounds2D b2d = new Bounds2D(b.get$minX(), b.get$minY(), b.get$maxX(), b.get$maxY());
+        //return b2d;
+    }
 
     public boolean isDeleted() {
         return m_isDeleted;
