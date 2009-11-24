@@ -135,8 +135,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         m_previewProfileCopy = profileCopy;
                         m_selectedEntryCopy = selectedEntryCopy;
 
-                        //DocumentModelUtils.dumpElementStructure( fxz.getFileModel().getDocumentModel().getRootElement());
-
                         SwingUtilities.invokeLater( new Runnable() {
                             public void run() {
                                 if ( fModel.isError()) {
@@ -168,78 +166,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                                 fModel.readUnlock();
                                             }
 
-                                            SwingUtilities.invokeLater(new Runnable() {
+                                            showImagePanel(node);
 
-                                                public void run() {
-                                                    // prototyping
-                                                    Scene fxScene = new Scene(true);
-                                                    fxScene.addTriggers$();
-                                                    fxScene.applyDefaults$();
-                                                    //fxScene.loc$content.insert(nodeOld);
-                                                    fxScene.loc$content.insert(node);
-                                                    fxScene.complete$();
-                                                    Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
-
-                                                    m_fxScene = fxScene;
-
-                                                    SwingScenePanel scenePanel = getScenePanel(fxScene);
-
-                                                    // end prototyping
-
-                                                    // TODO: paint actions: m_dObj.getController().paintActions(g);
-                                                    removeAll();
-
-                                                    add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
-
-                                                    MouseEventCollector mec = new MouseEventCollector();
-                                                    scenePanel.addMouseListener(mec);
-                                                    scenePanel.addMouseMotionListener(mec);
-                                                    scenePanel.addMouseWheelListener(mec);
-
-                                                    PopupListener popupL = new PopupListener();
-                                                    scenePanel.addMouseListener(popupL);
-                                                    PreviewImagePanel.this.addMouseListener(popupL);
-                                                    revalidate();
-                                                    updateZoom();
-                                                }
-                                            });
-
-
-                                            /*
-                                            //Method   m      = fxNode.getClass().getDeclaredMethod("getSGGroup");
-                                            //Object   group  = m.invoke(fxNode);
-                                            PGNode fxNode = node.impl_getPGNode();
-
-                                             if (fxNode != null) {
-                                                m_sgPanel = new JSGPanel() {
-                                                    @Override
-                                                    public void paintComponent(java.awt.Graphics g) {
-                                                        super.paintComponent(g);
-                                                        m_dObj.getController().paintActions(g);
-                                                    }
-                                                };
-                                                m_sgPanel.setBackground(Color.WHITE);
-                                                m_sgPanel.setScene( (SGNode) fxNode);
-
-                                                removeAll();
-                                                add( new ImageHolder(m_sgPanel, m_dObj), BorderLayout.CENTER);
-
-                                                MouseEventCollector mec = new MouseEventCollector();
-                                                m_sgPanel.addMouseListener(mec);
-                                                m_sgPanel.addMouseMotionListener(mec);
-                                                m_sgPanel.addMouseWheelListener(mec);
-
-                                                PopupListener popupL = new PopupListener();
-                                                m_sgPanel.addMouseListener(popupL);
-                                                PreviewImagePanel.this.addMouseListener(popupL);
-
-                                                updateZoom();
-                                            } else {
-                                                setBackground( m_defaultBackground);
-                                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_EMPTY_DOCUMENT")); //NOI18N
-                                                label.setIcon(null);
-                                            }
-                                            */
                                         } catch( OutOfMemoryError oom) {
                                             oom.printStackTrace();
                                             setBackground( m_defaultBackground);
@@ -274,6 +202,44 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             Exception error = m_dObj.getDataModel().getFXDContainerLoadError();
             showError( error.getLocalizedMessage());
         }
+    }
+
+    private void showImagePanel(final Node node) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                // prototyping
+                Scene fxScene = new Scene(true);
+                fxScene.addTriggers$();
+                fxScene.applyDefaults$();
+                //fxScene.loc$content.insert(nodeOld);
+                fxScene.loc$content.insert(node);
+                fxScene.complete$();
+                Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
+
+                m_fxScene = fxScene;
+
+                SwingScenePanel scenePanel = getScenePanel(fxScene);
+
+                // end prototyping
+
+                // TODO: paint actions: m_dObj.getController().paintActions(g);
+                removeAll();
+
+                add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
+
+                MouseEventCollector mec = new MouseEventCollector();
+                scenePanel.addMouseListener(mec);
+                scenePanel.addMouseMotionListener(mec);
+                scenePanel.addMouseWheelListener(mec);
+
+                PopupListener popupL = new PopupListener();
+                scenePanel.addMouseListener(popupL);
+                PreviewImagePanel.this.addMouseListener(popupL);
+                revalidate();
+                updateZoom();
+            }
+        });
     }
 
     private void showError( final String msg) {
