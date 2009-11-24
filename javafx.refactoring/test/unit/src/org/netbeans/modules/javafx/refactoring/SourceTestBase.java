@@ -37,7 +37,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.modules.javafx.refactoring;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,6 +60,7 @@ import org.netbeans.api.java.classpath.ClassPath;
 //import org.netbeans.api.java.source.gen.WhitespaceIgnoringDiff;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -142,7 +143,7 @@ public class SourceTestBase extends NbTestCase {
 
         XMLFileSystem system = new XMLFileSystem();
         system.setXmlUrls(new URL[] {
-            SourceTestBase.class.getResource("/org/netbeans/api/javafx/source/resources/layer.xml"),
+            SourceTestBase.class.getResource("/org/netbeans/modules/javafx/refactoring/resources/layer.xml"),
         });
         Repository repository = new Repository(new MultiFileSystem(
                 new FileSystem[] {FileUtil.createMemoryFileSystem(), system}));

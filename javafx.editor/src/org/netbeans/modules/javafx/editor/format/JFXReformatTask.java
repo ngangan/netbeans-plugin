@@ -3502,6 +3502,15 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             int alignIndent = -1;
             for (Iterator<? extends TypeTree> it = trees.iterator(); it.hasNext();) {
+                // issue #176906
+                // accept formal parameter name if exist
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.IDENTIFIER) != JFXTokenId.IDENTIFIER) {
+                    rollback(index, c, d);
+                }
+                
                 accept(JFXTokenId.COLON);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
@@ -3509,9 +3518,9 @@ public class JFXReformatTask implements ReformatTask {
                 if (param.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
                     scan(param, null);
                 } else if (first) {
-                    int index = tokens.index();
-                    int c = col;
-                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    index = tokens.index();
+                    c = col;
+                    d = diffs.isEmpty() ? null : diffs.getFirst();
                     if (align) {
                         alignIndent = col;
                     }

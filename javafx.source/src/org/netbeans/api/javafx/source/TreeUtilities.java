@@ -388,7 +388,9 @@ public final class TreeUtilities {
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
                     
-                    if (start == end) return null; // don't go this way; all subtrees are synthetic although they might not be flagged so
+                    if (start == end && 
+                        tree.getJavaFXKind() != Tree.JavaFXKind.PARENTHESIZED) // this is a workaround for javafxc bug setting PARENTHESIZED positions such as start == end
+                        return null; // don't go this way; all subtrees are synthetic although they might not be flagged so
 
                     super.scan(tree, p);
                     if (start != -1 && start <= pos && end >= pos && tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS) {

@@ -81,9 +81,13 @@ abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner
 
     @Override
     final public R scan(Tree tree, P p) {
-        long start = positions.getStartPosition(getCompilationController().getCompilationUnit(), tree);
-        long end =  positions.getEndPosition(getCompilationController().getCompilationUnit(), tree);
-        if (end == start) return null;
+        if (tree != null) { // unbelievable, but can happen
+            long start = positions.getStartPosition(getCompilationController().getCompilationUnit(), tree);
+            long end =  positions.getEndPosition(getCompilationController().getCompilationUnit(), tree);
+            if (end == start &&
+                tree.getJavaFXKind() != Tree.JavaFXKind.PARENTHESIZED) // this is a workaround for javafxc bug setting PARENTHESIZED positions such as start == end
+                return null;
+        }
         return super.scan(tree, p);
     }
 
