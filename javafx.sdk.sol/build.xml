@@ -15,14 +15,17 @@
         </and>
       </or>
     </condition>
+ 
+    <target name="delete-release-external" depends="basic-init">
+      <delete dir="release" quiet="true"/>
+    </target>    
 
-    <target name="init-release-external" depends="basic-init" if="isSol">
+    <target name="init-release-external" depends="basic-init,delete-release-external" if="isSol">
       <property name="build.config" value="daily"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
       <property name="offline" value="false"/>
   		<get src="${javafx-sdk.sol.url}" dest="external/javafx_sdk-solaris.zip" usetimestamp="true" verbose="true" ignoreerrors="${offline}"/>
-      <delete dir="release" quiet="true"/>
       <unzip src="external/javafx_sdk-solaris.zip" dest="release/javafx-sdk">
         <regexpmapper from="^(javafx-sdk[^/]*/)?(.*)$" to="\2"/>
       </unzip>
