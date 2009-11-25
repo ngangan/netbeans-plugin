@@ -24,6 +24,7 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 
 import com.sun.javafx.tools.fxd.loader.Profile;
 import java.util.Collection;
+import javafx.fxd.FXDNode;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import org.netbeans.modules.javafx.fxd.composer.source.SourceElement;
@@ -201,20 +202,28 @@ public final class FXDComposerController {
      */
     
     public FXDElement getElementAt(int x, int y) {
+        String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
         FXDElement element = null;
         Collection nodes = getScene().impl_pick(x, y);
-        if (!nodes.isEmpty()) {
-            for (Object node : nodes) {
-                if (node instanceof Node) {
-                    Node n = ((Node) node);
-                    String id = ((Node) node).get$id();
-                    if (id != null && id.length() > 0) {
-                        element = new FXDElement(m_dObj, id);
-                        element.setVisible(n.get$visible());
-                        element.setBounds(n.get$boundsInParent());
-                        break;
-                    }
-                }
+        Node node = null;
+        for (Object o : nodes) {
+            if (o instanceof FXDNode){
+                node = (Node)o;
+                break;
+            }
+            if (node == null && o instanceof Node){
+                node = (Node)o;
+            }
+        }
+        if (node != null) {
+            String id = node.get$id();
+//            if (id == null || id.length() == 0) {
+//                // temporary fake id to get working highlighting
+//                id = idPrefix + String.valueOf(Math.random());
+//                node.set$id(id);
+//            }
+            if (id != null && id.length() > 0) {
+                element = new FXDElement(m_dObj, id);
             }
         }
         return element;
