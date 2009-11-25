@@ -386,7 +386,23 @@ is divided into following sections:
             </exec>
         </target>
         <target name="-debug-tv-debuggee" if="tv.execution.trigger">
-            <fail message="Current platform does not support tv emulator debugging."/>
+            <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
+            <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
+            <exec executable="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}" failonerror="true">
+                <arg value="-Xdebug"/>
+                <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
+                <arg value="-Dprism.verbose=false"/>
+                <arg value="-Dprism.order=es2,es1"/>
+                <arg value="-Djava.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
+                <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.TVToolkit"/>
+                <arg value="-Djava.security.policy=${{platform.fxhome}}/lib/security/java_permissive.policy"/>
+                <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar"/>
+                <arg value="-classpath"/>
+                <arg value="${{jar.file}}"/>
+                <arg value="com.sun.javafx.runtime.main.Main"/>
+                <arg value="${{main.class}}"/>
+                <arg value="${{run.jvmargs}}"/>
+            </exec>
         </target>
         <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
             <condition property="javaws.home" value="/usr" else="${{java.home}}">
@@ -397,8 +413,8 @@ is divided into following sections:
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
         </target>
-        <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
-        <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee" if="netbeans.home" name="debug-stepinto"/>
+        <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee,-debug-tv-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
+        <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee,-debug-tv-debuggee" if="netbeans.home" name="debug-stepinto"/>
     <xsl:comment>
                     ===============
                     JAVADOC SECTION
