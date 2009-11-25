@@ -475,9 +475,9 @@ class JavaFXActionProvider implements ActionProvider {
             if (jp == null) return false;
             try {
                 File f = new File(jp.getJavaFXFolder().toURI());
-                if (!new File(f, "emulator/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
+                if (!new File(f, "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
                 if (command.equals(COMMAND_RUN) || command.equals(COMMAND_RUN_SINGLE) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_SINGLE) || command.equals(COMMAND_DEBUG_STEP_INTO)) { //NOI18N
-                    if (!new File(f, "emulator/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
+                    if (!new File(f, "emulator/mobile/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
                 }
             } catch (URISyntaxException e) {
                 return false;

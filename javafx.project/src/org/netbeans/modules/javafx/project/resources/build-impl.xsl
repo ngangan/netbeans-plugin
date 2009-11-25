@@ -187,8 +187,8 @@ is divided into following sections:
                 </not>
             </condition>
             <property name="run.jvmargs" value=""/>
-            <available property="emulator.available" file="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}"/>
-            <available property="tvemulator.available" file="${{platform.fxhome}}/tv/emulator/bin/cvm${{binary.extension}}"/>
+            <available property="emulator.available" file="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}"/>
+            <available property="tvemulator.available" file="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}"/>
         </target>
         <target name="-post-init">
         <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
@@ -281,7 +281,7 @@ is divided into following sections:
             <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
                 <istrue value="${{jad.install}}"/>
             </condition>
-            <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}" failonerror="true">
                 <arg value="${{run.jvmargs}}"/>
                 <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                 <arg value="-Xdevice:${{mobile.device}}"/>
@@ -290,13 +290,13 @@ is divided into following sections:
         <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/tv/emulator/bin/cvm${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}" failonerror="true">
                 <arg value="-Dprism.verbose=true"/>
                 <arg value="-Dprism.order=es1"/>
-                <arg value="-Djava.library.path=${{platform.fxhome}}/tv/emulator/bin"/>
-                <arg value="-Dsun.boot.library.path=${{platform.fxhome}}/tv/emulator/bin"/>
+                <arg value="-Djava.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
+                <arg value="-Dsun.boot.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
                 <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.PrismToolkit"/>
-                <arg value="-Djava.security.policy=${{platform.fxhome}}/tv/emulator/lib/security/java_permissive.policy"/>
+                <arg value="-Djava.security.policy=${{platform.fxhome}}/emulator/tv/lib/security/java_permissive.policy"/>
                 <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar:${{jar.file}}"/>
                 <arg value="com.sun.javafx.runtime.main.Main"/>
                 <arg value="${{main.class}}"/>
@@ -375,7 +375,7 @@ is divided into following sections:
             <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
                 <istrue value="${{jad.install}}"/>
             </condition>
-             <exec executable="${{platform.fxhome}}/emulator/bin/emulator${{binary.extension}}">
+             <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}">
                 <arg value="${{run.jvmargs}}"/>
                 <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                 <arg value="-Xdebug"/>

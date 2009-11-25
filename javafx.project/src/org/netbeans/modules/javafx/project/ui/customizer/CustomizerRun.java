@@ -107,7 +107,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         if (pk != null) {
             JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
             if (jp instanceof JavaFXPlatform) try {
-                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()); //NOI18N
+                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()); //NOI18N
             } catch (URISyntaxException e) {}
         }
         
@@ -586,7 +586,7 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
                         if (jp instanceof JavaFXPlatform) {
                             FileObject fo = jp.findTool("javafxpackager"); //NOI18N
                             if (fo != null) {
-                                File em = new File(FileUtil.toFile(fo).getParentFile().getParentFile(), "emulator/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                                File em = new File(FileUtil.toFile(fo).getParentFile().getParentFile(), "emulator/mobile/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
                                 if (em.isFile()) try {
                                     Properties p = new Properties();
                                     p.load(Runtime.getRuntime().exec(new String[] {em.getAbsolutePath(), "-Xquery"}).getInputStream()); //NOI18N

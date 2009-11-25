@@ -236,10 +236,10 @@ made subject to such option by the copyright holder.
             <fileset dir="${cluster}/javafx-sdk/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
-            <fileset dir="${cluster}/javafx-sdk/emulator/bin" erroronmissingdir="false" >
+            <fileset dir="${cluster}/javafx-sdk/emulator/mobile/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
-            <fileset dir="${cluster}/javafx-sdk/tv/emulator/bin" erroronmissingdir="false" >
+            <fileset dir="${cluster}/javafx-sdk/emulator/tv/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
         </chmod>
