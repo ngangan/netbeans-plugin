@@ -5,6 +5,8 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.tools.fxd.container.doc.DocumentParser;
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -29,16 +30,13 @@ import org.netbeans.modules.javafx.fxd.composer.misc.ByteArrayBuffer;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
-import org.openide.util.Exceptions;
 
 import com.sun.javafx.tools.fxd.FXDRootElement;
 import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
-import com.sun.javafx.tools.fxd.container.misc.ProgressNotifier;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
-import org.openide.cookies.EditorCookie;
 
 /**
  *
@@ -456,23 +454,13 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
     }
 
-    //@Override
-    public FXDRootElement getRoot( final String entryName) {
+    @Override
+    public FXDRootElement getRoot(String entryName, DocumentParser parser) throws IOException, FXDException {
         FXDFileModel model = getFileModel(entryName);
         if (model != null){
             return model.getRootNode();
         }
         return null;
-    }
-
-    //@Override
-    public FXDRootElement getRoot( String entryName, ProgressNotifier notifier) {
-        if ( entryName == null) {
-            entryName = MAIN_CONTENT;
-        }
-
-        notifier.nextPhase(getSize( entryName));
-        return getRoot(entryName);
     }
 
     @Override
