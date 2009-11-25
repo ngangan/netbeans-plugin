@@ -202,7 +202,6 @@ public final class FXDComposerController {
      */
     
     public FXDElement getElementAt(int x, int y) {
-        String idPrefix = FXDFileModel.createIdPrefix(m_dObj.getEntryName());
         FXDElement element = null;
         Collection nodes = getScene().impl_pick(x, y);
         Node node = null;
@@ -217,11 +216,6 @@ public final class FXDComposerController {
         }
         if (node != null) {
             String id = node.get$id();
-//            if (id == null || id.length() == 0) {
-//                // temporary fake id to get working highlighting
-//                id = idPrefix + String.valueOf(Math.random());
-//                node.set$id(id);
-//            }
             if (id != null && id.length() > 0) {
                 element = new FXDElement(m_dObj, id);
             }
