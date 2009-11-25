@@ -58,7 +58,7 @@
         <loadfile srcfile="netbeans.html" property="netbeans.binaries.url">
             <filterchain>
                 <tokenfilter>
-                    <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-]*javase\.zip)&quot;.*" replace="${netbeans.base.url}/\1" flags="im"/>
+                    <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*javase\.zip)&quot;.*" replace="${netbeans.base.url}/\1" flags="im"/>
                 </tokenfilter>
             </filterchain>
         </loadfile>
