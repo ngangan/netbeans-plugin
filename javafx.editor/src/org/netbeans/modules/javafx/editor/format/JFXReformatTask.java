@@ -69,6 +69,7 @@ import org.openide.loaders.DataObject;
  *
  * @see org.netbeans.modules.java.source.save.Reformatter
  * @see http://openjfx.java.sun.com/job/openjfx-compiler-nightly/lastSuccessfulBuild/artifact/dist/doc/reference/JavaFXReference.html
+ * @see http://wikis.sun.com/display/JavaFxCodeConv/Home
  * @author Anton Chechel
  */
 public class JFXReformatTask implements ReformatTask {
@@ -919,6 +920,38 @@ public class JFXReformatTask implements ReformatTask {
                 indent = old;
             } else {
                 processClassMembers(node.getClassMembers(), p, false);
+            }
+            return true;
+        }
+
+        private static boolean isTreeInsideVar(JavaFXTreePath currentPath) {
+            if (currentPath == null) {
+                return false;
+            }
+
+            boolean insideVar = false;
+            JavaFXTreePath parentPath = currentPath.getParentPath();
+            Tree leaf = parentPath.getLeaf();
+            while (leaf.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
+                if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE || leaf.getJavaFXKind() == JavaFXKind.SEQUENCE_EXPLICIT) {
+                    insideVar = true;
+                    break;
+                }
+                parentPath = parentPath.getParentPath();
+                leaf = parentPath.getLeaf();
+            }
+            return insideVar;
+        }
+
+        private static boolean containsOneExpressionOnly(ExpressionTree tree) {
+            if (tree == null) {
+                return true;
+            }
+
+            if (tree.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                BlockExpressionTree bet = (BlockExpressionTree) tree;
+//                boolean hasValue = bet.getValue() != null;
+                return bet.getStatements().size() == 1;
             }
             return true;
         }
@@ -1804,10 +1837,6 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitForExpression(ForExpressionTree node, Void p) {
-            Tree parent = getCurrentPath().getParentPath().getLeaf();
-            JavaFXKind kind = parent.getJavaFXKind();
-            boolean insideVar = kind == JavaFXKind.VARIABLE || kind == JavaFXKind.SEQUENCE_EXPLICIT;
-
             int index = tokens.index();
             int c = col;
             Diff d = diffs.isEmpty() ? null : diffs.getFirst();
@@ -1833,13 +1862,17 @@ public class JFXReformatTask implements ReformatTask {
                 spaces(cs.spaceWithinForParens() ? 1 : 0);
                 accept(JFXTokenId.RPAREN);
                 indent = old;
+
+                ExpressionTree bodyExpression = node.getBodyExpression();
+                boolean insideVar = isTreeInsideVar(getCurrentPath());
+                boolean becoeo = containsOneExpressionOnly(bodyExpression);
                 CodeStyle.BracesGenerationStyle redundantForBraces = cs.redundantForBraces();
-                if (insideVar || (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE &&
+                if (insideVar || becoeo || (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE &&
                         (startOffset > getStartPos(node) || endOffset < getEndPos(node)))) {
                     redundantForBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
                 }
-                WrapStyle wrapStyle = insideVar ? WrapStyle.WRAP_NEVER : cs.wrapForStatement();
-                wrapStatement(wrapStyle, redundantForBraces, cs.spaceBeforeForLeftBrace() ? 1 : 0, node.getBodyExpression());
+                WrapStyle wrapStyle = insideVar || becoeo ? WrapStyle.WRAP_NEVER : cs.wrapForStatement();
+                wrapStatement(wrapStyle, redundantForBraces, cs.spaceBeforeForLeftBrace() ? 1 : 0, bodyExpression);
             } else { // FOR_EXPRESSION_PREDICATE
                 rollback(index, c, d);
                 ForExpressionInClauseTree feict = node.getInClauses().get(0);
@@ -2147,23 +2180,15 @@ public class JFXReformatTask implements ReformatTask {
                 redundantIfBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
             }
 
-            boolean insideVar = false;
-            JavaFXTreePath parentPath = getCurrentPath().getParentPath();
-            Tree leaf = parentPath.getLeaf();
-            while (leaf.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
-                if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE || leaf.getJavaFXKind() == JavaFXKind.SEQUENCE_EXPLICIT) {
-                    insideVar = true;
-                    break;
-                }
-                parentPath = parentPath.getParentPath();
-                leaf = parentPath.getLeaf();
-            }
+            boolean insideVar = isTreeInsideVar(getCurrentPath());
+            boolean tecoeo = containsOneExpressionOnly(trueExpr);
+            boolean fecoeo = containsOneExpressionOnly(falseExpr);
 
             // TODO make cs.wrapIfExpression
-            final WrapStyle wrapIfStatement = insideVar ? WrapStyle.WRAP_NEVER : cs.wrapIfStatement();
+            final WrapStyle wrapIfStatement = insideVar || tecoeo ? WrapStyle.WRAP_NEVER : cs.wrapIfStatement();
             boolean prevblock = wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
             if (falseExpr != null) {
-                if (!insideVar && (cs.placeElseOnNewLine() || !prevblock)) {
+                if (!insideVar && !fecoeo && (cs.placeElseOnNewLine() || !prevblock)) {
                     newline();
                 } else {
                     spaces(cs.spaceBeforeElse() ? 1 : 0);
