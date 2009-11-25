@@ -68,7 +68,7 @@ import org.openide.loaders.DataObject;
  * This code based on org.netbeans.modules.java.source.save.Reformatter written by Dusan Balek.
  *
  * @see org.netbeans.modules.java.source.save.Reformatter
- * @see http://openjfx.java.sun.com/job/openjfx-compiler-nightly/lastSuccessfulBuild/artifact/dist/doc/reference/JavaFXReference.html
+ * @see http://openjfx.java.sun.com/current-build/doc/reference/JavaFXReference.html
  * @see http://wikis.sun.com/display/JavaFxCodeConv/Home
  * @author Anton Chechel
  */
@@ -846,7 +846,7 @@ public class JFXReformatTask implements ReformatTask {
                     }
                 }
 
-                accept(JFXTokenId.CLASS, JFXTokenId.AT);
+                accept(JFXTokenId.CLASS);
                 if (indent == old) {
                     indent += continuationIndentSize;
                 }
@@ -1238,7 +1238,7 @@ public class JFXReformatTask implements ReformatTask {
                     id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
                             JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
                             JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
-                            JFXTokenId.AT, JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
+                            JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
                     if (id == null) {
                         rollback(index, c, d);
                         break;
@@ -1339,7 +1339,6 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitModifiers(ModifiersTree node, Void p) {
-            boolean ret = true;
             JFXTokenId id = null;
             JavaFXTreePath path = getCurrentPath().getParentPath();
             path = path.getParentPath();
@@ -1353,14 +1352,13 @@ public class JFXReformatTask implements ReformatTask {
                 id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
                         JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
                         JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
-                        JFXTokenId.AT, JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
+                        JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
                 if (id == null) {
                     rollback(index, c, d);
                     break;
                 }
-                ret = id != JFXTokenId.AT;
             }
-            return ret;
+            return true;
         }
 
         @Override
@@ -2293,15 +2291,37 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO
         @Override
         public Boolean visitKeyFrameLiteral(KeyFrameLiteralTree node, Void p) {
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
+            accept(JFXTokenId.AT);
+            space();
+            accept(JFXTokenId.LPAREN);
+            scan(node.getStartDuration(), p);
+            accept(JFXTokenId.RPAREN);
+            space();
+
+            accept(JFXTokenId.LBRACE);
+            int old = indent;
+            indent += indentSize;
+
+            TreeSet<Tree> members = new TreeSet<Tree>(new TreePosComparator(sp, root));
+            members.addAll(node.getInterpolationValues());
+            ExpressionTree trigger = node.getTrigger();
+            if (trigger != null) {
+                members.add(trigger);
+            }
+
+            // TODO process trigger keyword?
+            if (!members.isEmpty()) {
+                spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
+                // TODO cs.alignMultipleInterpolationValues
+//                wrapList(cs.wrapMethodCallArgs(), cs.alignMultipleInterpolationValues(), members);
+                wrapLiteralList(cs.wrapMethodCallArgs(), false, members);
+            }
+            indent = old;
+            spaces(0, true);
+            accept(JFXTokenId.RBRACE);
+
             return true;
         }
 
