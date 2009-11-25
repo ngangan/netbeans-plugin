@@ -291,13 +291,16 @@ is divided into following sections:
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
             <exec executable="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}" failonerror="true">
-                <arg value="-Dprism.verbose=true"/>
-                <arg value="-Dprism.order=es1"/>
+                <!--<arg value="-Xdebug"/>-->
+                <!--<arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=y"/>-->
+                <arg value="-Dprism.verbose=false"/>
+                <arg value="-Dprism.order=es2,es1"/>
                 <arg value="-Djava.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
-                <arg value="-Dsun.boot.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
-                <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.PrismToolkit"/>
-                <arg value="-Djava.security.policy=${{platform.fxhome}}/emulator/tv/lib/security/java_permissive.policy"/>
-                <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar:${{jar.file}}"/>
+                <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.TVToolkit"/>
+                <arg value="-Djava.security.policy=${{platform.fxhome}}/lib/security/java_permissive.policy"/>
+                <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar"/>
+                <arg value="-classpath"/>
+                <arg value="${{jar.file}}"/>
                 <arg value="com.sun.javafx.runtime.main.Main"/>
                 <arg value="${{main.class}}"/>
                 <arg value="${{run.jvmargs}}"/>
