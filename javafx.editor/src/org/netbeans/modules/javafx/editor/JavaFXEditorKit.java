@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -57,7 +57,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
-import org.netbeans.editor.ActionFactory.FormatAction;
 import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
 import org.netbeans.modules.javafx.editor.rename.InstantRenameAction;
 import org.openide.util.ImageUtilities;
@@ -99,6 +98,9 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         Action[] javafxActions = new Action[]{
                 new CommentAction("//"),                                        //NOI18N
                 new UncommentAction("//"),                                      //NOI18N
+                new ToggleCommentAction("//"),                                  //NOI18N
+                new org.netbeans.modules.javafx.editor.semantic.GoToMarkOccurrencesAction(false),
+                new org.netbeans.modules.javafx.editor.semantic.GoToMarkOccurrencesAction(true),
                 new ToggleFXPreviewExecution(),
                 new JavaFXDefaultKeyTypedAction(),
                 new JavaFXDeleteCharAction(deletePrevCharAction, false),
@@ -420,7 +422,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                     ABBREV_RESET | MAGIC_POSITION_RESET | UNDO_MERGE_RESET
                             | SAVE_POSITION
             );
-            putValue(TRIMMED_TEXT, LocaleSupport.getString("goto-source-trimmed"));  //NOI18N            
+            putValue(TRIMMED_TEXT, LocaleSupport.getString("goto-source-trimmed"));  //NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
