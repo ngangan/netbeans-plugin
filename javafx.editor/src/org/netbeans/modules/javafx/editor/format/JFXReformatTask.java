@@ -835,7 +835,7 @@ public class JFXReformatTask implements ReformatTask {
             if (!isClassSynthetic) {
                 int old = indent;
                 ModifiersTree mods = node.getModifiers();
-                if (hasModifiers(mods)) {
+                if (ReformatUtils.hasModifiers(mods)) {
                     if (scan(mods, p)) {
                         indent += continuationIndentSize;
                         if (cs.placeNewLineAfterModifiers()) {
@@ -920,38 +920,6 @@ public class JFXReformatTask implements ReformatTask {
                 indent = old;
             } else {
                 processClassMembers(node.getClassMembers(), p, false);
-            }
-            return true;
-        }
-
-        private static boolean isTreeInsideVar(JavaFXTreePath currentPath) {
-            if (currentPath == null) {
-                return false;
-            }
-
-            boolean insideVar = false;
-            JavaFXTreePath parentPath = currentPath.getParentPath();
-            Tree leaf = parentPath.getLeaf();
-            while (leaf.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
-                if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE || leaf.getJavaFXKind() == JavaFXKind.SEQUENCE_EXPLICIT) {
-                    insideVar = true;
-                    break;
-                }
-                parentPath = parentPath.getParentPath();
-                leaf = parentPath.getLeaf();
-            }
-            return insideVar;
-        }
-
-        private static boolean containsOneExpressionOnly(ExpressionTree tree) {
-            if (tree == null) {
-                return true;
-            }
-
-            if (tree.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
-                BlockExpressionTree bet = (BlockExpressionTree) tree;
-//                boolean hasValue = bet.getValue() != null;
-                return bet.getStatements().size() == 1;
             }
             return true;
         }
@@ -1109,7 +1077,7 @@ public class JFXReformatTask implements ReformatTask {
             Tree parent = getCurrentPath().getParentPath().getLeaf();
             boolean insideFor = parent.getJavaFXKind() == JavaFXKind.FOR_EXPRESSION_FOR;
             ModifiersTree mods = node.getModifiers();
-            if (hasModifiers(mods)) {
+            if (ReformatUtils.hasModifiers(mods)) {
                 if (scan(mods, p)) {
                     if (!insideFor) {
                         indent += continuationIndentSize;
@@ -1235,10 +1203,7 @@ public class JFXReformatTask implements ReformatTask {
                     int index = tokens.index();
                     int c = col;
                     Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
-                            JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
-                            JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
-                            JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
+                    id = accept(ReformatUtils.MODIFIER_KEYWORDS);
                     if (id == null) {
                         rollback(index, c, d);
                         break;
@@ -1247,7 +1212,7 @@ public class JFXReformatTask implements ReformatTask {
                 // ---
             } else {
                 ModifiersTree mods = funcDef.getModifiers();
-                if (hasModifiers(mods)) {
+                if (ReformatUtils.hasModifiers(mods)) {
                     if (scan(mods, p)) {
                         indent += continuationIndentSize;
                         if (cs.placeNewLineAfterModifiers()) {
@@ -1349,10 +1314,7 @@ public class JFXReformatTask implements ReformatTask {
                 int index = tokens.index();
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                id = accept(JFXTokenId.PRIVATE, JFXTokenId.PACKAGE, JFXTokenId.PROTECTED,
-                        JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT,
-                        JFXTokenId.STATIC, JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY,
-                        JFXTokenId.MIXIN, JFXTokenId.OVERRIDE);
+                id = accept(ReformatUtils.MODIFIER_KEYWORDS);
                 if (id == null) {
                     rollback(index, c, d);
                     break;
@@ -1862,8 +1824,8 @@ public class JFXReformatTask implements ReformatTask {
                 indent = old;
 
                 ExpressionTree bodyExpression = node.getBodyExpression();
-                boolean insideVar = isTreeInsideVar(getCurrentPath());
-                boolean becoeo = containsOneExpressionOnly(bodyExpression);
+                boolean insideVar = ReformatUtils.isTreeInsideVar(getCurrentPath());
+                boolean becoeo = ReformatUtils.containsOneExpressionOnly(bodyExpression);
                 CodeStyle.BracesGenerationStyle redundantForBraces = cs.redundantForBraces();
                 if (insideVar || becoeo || (redundantForBraces == CodeStyle.BracesGenerationStyle.GENERATE &&
                         (startOffset > getStartPos(node) || endOffset < getEndPos(node)))) {
@@ -2178,9 +2140,9 @@ public class JFXReformatTask implements ReformatTask {
                 redundantIfBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
             }
 
-            boolean insideVar = isTreeInsideVar(getCurrentPath());
-            boolean tecoeo = containsOneExpressionOnly(trueExpr);
-            boolean fecoeo = containsOneExpressionOnly(falseExpr);
+            boolean insideVar = ReformatUtils.isTreeInsideVar(getCurrentPath());
+            boolean tecoeo = ReformatUtils.containsOneExpressionOnly(trueExpr);
+            boolean fecoeo = ReformatUtils.containsOneExpressionOnly(falseExpr);
 
             // TODO make cs.wrapIfExpression
             final WrapStyle wrapIfStatement = insideVar || tecoeo ? WrapStyle.WRAP_NEVER : cs.wrapIfStatement();
@@ -2609,10 +2571,18 @@ public class JFXReformatTask implements ReformatTask {
         /// ===
 
         private JFXTokenId accept(JFXTokenId first, JFXTokenId... rest) {
+            return accept(EnumSet.of(first, rest));
+        }
+
+        private JFXTokenId accept(EnumSet<JFXTokenId> tokenIds) {
             lastBlankLines = -1;
             lastBlankLinesTokenIndex = -1;
             lastBlankLinesDiff = null;
-            EnumSet<JFXTokenId> tokenIds = EnumSet.of(first, rest);
+
+            // JavaFX Non-reserved keywords feature, see v4Parser.g
+            if (tokenIds.contains(JFXTokenId.IDENTIFIER)) {
+                tokenIds.addAll(ReformatUtils.NON_RESERVER_KEYWORDS);
+            }
 
             // javafx lexer generates one token for each WS
             // java - one for all
@@ -3787,19 +3757,6 @@ public class JFXReformatTask implements ReformatTask {
 
         private long getStartPos(Tree node) {
             return sp.getStartPosition(root, node);
-        }
-
-        // TODO check flags when it will work
-        // TODO create issue for compiler
-        private static boolean hasModifiers(ModifiersTree mods) {
-            if (mods == null) {
-                return false;
-            }
-            final String p1 = "synthetic"; // NOI18N
-            final String p2 = "script only (default)"; // NOI18N
-            final String p3 = "static script only (default)"; // NOI18N
-            final String m = mods.toString().trim();
-            return m.indexOf(p1) == -1 && !m.contentEquals(p2) && !m.contentEquals(p3);
         }
 
         private static class FakeBlock extends JFXBlock {
