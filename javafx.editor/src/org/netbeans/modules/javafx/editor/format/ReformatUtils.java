@@ -64,6 +64,15 @@ public final class ReformatUtils {
             JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY, JFXTokenId.MIXIN,
             JFXTokenId.OVERRIDE);
 
+    public static EnumSet<JFXTokenId> NON_STRING_LITERALS = EnumSet.of(JFXTokenId.TRUE,
+            JFXTokenId.FALSE, JFXTokenId.NULL, JFXTokenId.DECIMAL_LITERAL,
+            JFXTokenId.FLOATING_POINT_LITERAL, JFXTokenId.HEX_LITERAL,
+            JFXTokenId.OCTAL_LITERAL);
+
+    public static EnumSet<JFXTokenId> STRING_LITERALS = EnumSet.of(JFXTokenId.STRING_LITERAL,
+            JFXTokenId.QUOTE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
+            JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+
     public static boolean containsOneExpressionOnly(ExpressionTree tree) {
         if (tree == null) {
             return true;

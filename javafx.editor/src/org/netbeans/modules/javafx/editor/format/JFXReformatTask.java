@@ -2368,12 +2368,22 @@ public class JFXReformatTask implements ReformatTask {
         // remove that workaround after JFXC-3494 fix
         @Override
         public Boolean visitStringExpression(StringExpressionTree node, Void p) {
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
+            List<ExpressionTree> partList = node.getPartList();
+            if (partList != null && !partList.isEmpty()) {
+                int old = indent;
+                indent += continuationIndentSize;
+                for (ExpressionTree tree : partList) {
+                    scan(tree, p);
+                }
+                indent = old;
+            } else {
+                do {
+                    col += tokens.token().length();
+                } while (tokens.moveNext() && tokens.offset() < endPos);
+                lastBlankLines = -1;
+                lastBlankLinesTokenIndex = -1;
+                lastBlankLinesDiff = null;
+            }
             return true;
         }
 
@@ -2403,22 +2413,29 @@ public class JFXReformatTask implements ReformatTask {
             }
             // ---
 
-            // #176654: probably compiler bug
-            // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token
-            // workaround
-            // ---
-            index = tokens.index();
-            c = col;
-            d = diffs.isEmpty() ? null : diffs.getFirst();
-            if (accept(JFXTokenId.SUB) != JFXTokenId.SUB) {
-                rollback(index, c, d);
+            JavaFXKind kind = node.getJavaFXKind();
+            if (kind == JavaFXKind.STRING_LITERAL || kind == JavaFXKind.STRING_EXPRESSION) {
+                int old = indent;
+                indent += continuationIndentSize;
+                while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+                    spaces(0, true);
+                }
+                indent = old;
+            } else {
+                // #176654: probably compiler bug
+                // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token
+                // workaround
+                // ---
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.SUB) != JFXTokenId.SUB) {
+                    rollback(index, c, d);
+                }
+                // ---
+                accept(ReformatUtils.NON_STRING_LITERALS);
             }
-            // ---
 
-            accept(JFXTokenId.TRUE, JFXTokenId.FALSE, JFXTokenId.NULL, JFXTokenId.DECIMAL_LITERAL,
-                    JFXTokenId.FLOATING_POINT_LITERAL, JFXTokenId.HEX_LITERAL, JFXTokenId.OCTAL_LITERAL,
-                    JFXTokenId.STRING_LITERAL, JFXTokenId.QUOTE_LBRACE_STRING_LITERAL,
-                    JFXTokenId.RBRACE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
             return true;
         }
 
