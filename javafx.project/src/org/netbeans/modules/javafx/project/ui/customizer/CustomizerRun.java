@@ -629,6 +629,7 @@ private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
         else if (run.equals("jnlp")) jRadioButton2.setSelected(true); //NOI18N
         else if (run.equals("applet")) jRadioButton3.setSelected(true); //NOI18N
         else if (run.equals("midp")) jRadioButton4.setSelected(true); //NOI18N
+        else if (run.equals("cvm")) jRadioButton5.setSelected(true); //NOI18N
         enableDeviceCombo();
     }
 
