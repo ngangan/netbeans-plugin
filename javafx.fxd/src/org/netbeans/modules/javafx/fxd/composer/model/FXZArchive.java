@@ -254,6 +254,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_dObj       = dObj;
         m_entries = new ArrayList<FXZArchiveEntry>();
         //TODO FXZContainerImpl should be probably better as member than super class
+        load();
         try {
             reloadEntries();        
         } finally {
