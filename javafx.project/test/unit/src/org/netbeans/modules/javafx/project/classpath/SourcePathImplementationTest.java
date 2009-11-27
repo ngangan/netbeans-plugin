@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -74,7 +74,7 @@ import org.w3c.dom.NodeList;
  * @author answer
  */
 public class SourcePathImplementationTest extends NbTestCase {
-    
+
     public SourcePathImplementationTest(String testName) {
         super(testName);
     }
@@ -84,7 +84,7 @@ public class SourcePathImplementationTest extends NbTestCase {
     private FileObject sources;
     private ProjectManager pm;
     private AntProjectHelper helper;
-    private JavaFXProject pp; 
+    private JavaFXProject pp;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -94,7 +94,7 @@ public class SourcePathImplementationTest extends NbTestCase {
         scratch = FileUtil.toFileObject(scratchF);
         projdir = scratch.createFolder("proj");
         JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        helper = JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
+        helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         pm = ProjectManager.getDefault();
         pp = pm.findProject(projdir).getLookup().lookup(JavaFXProject.class);
@@ -165,7 +165,7 @@ public class SourcePathImplementationTest extends NbTestCase {
         src1.mkdir();
         File src2 = new File(getWorkDir(), "src2");
         src2.mkdir();
-        AntProjectHelper h = JavaFXProjectGenerator.createProject(new File(getWorkDir(), "prj"), "test", new File[] {src1, src2}, new File[0], null);
+        AntProjectHelper h = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(new File(getWorkDir(), "prj"), "test", new File[] {src1, src2}, new File[0], null);
         Project p = ProjectManager.getDefault().findProject(h.getProjectDirectory());
         FileOwnerQuery.markExternalOwner(src1.toURI(), p, FileOwnerQuery.EXTERNAL_ALGORITHM_TRANSIENT);
         ClassPath cp = ClassPath.getClassPath(FileUtil.toFileObject(src1), ClassPath.SOURCE);
@@ -219,7 +219,7 @@ public class SourcePathImplementationTest extends NbTestCase {
         }
 
         public Set<String> getEvents () {
-            return Collections.unmodifiableSet(this.events); 
+            return Collections.unmodifiableSet(this.events);
         }
 
         public void forbid(String prop) {
@@ -248,12 +248,12 @@ public class SourcePathImplementationTest extends NbTestCase {
         }
         return fo;
     }
-    
+
     public static Object getEvaluatedProperty(Project p, String value) {
         if (value == null) {
             return null;
         }
-        JavaFXProject fxprj = (JavaFXProject) p.getLookup().lookup(JavaFXProject.class); 
+        JavaFXProject fxprj = (JavaFXProject) p.getLookup().lookup(JavaFXProject.class);
         if (fxprj != null) {
             return fxprj.evaluator().evaluate(value);
         } else {
