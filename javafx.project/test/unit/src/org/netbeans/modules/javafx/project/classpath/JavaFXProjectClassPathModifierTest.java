@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -77,17 +77,17 @@ import org.openide.util.Lookup;
  * @author answer
  */
 public class JavaFXProjectClassPathModifierTest extends NbTestCase {
-    
+
     private FileObject scratch;
     private AntProjectHelper helper;
     private PropertyEvaluator eval;
     private FileObject src;
     private Project prj;
-    
+
     public JavaFXProjectClassPathModifierTest(String testName) {
         super(testName);
     }
-    
+
     protected void setUp() throws Exception {
         super.setUp();
         clearWorkDir();
@@ -98,8 +98,8 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         });
         this.scratch = TestUtil.makeScratchDir(this);
         FileObject projdir = scratch.createFolder("proj");  //NOI18N
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N    
-        this.helper = JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
+        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        this.helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
         this.eval = this.helper.getStandardPropertyEvaluator();
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         this.prj = FileOwnerQuery.getOwner(projdir);
@@ -111,13 +111,13 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
-    public void testAddRemoveRoot () throws Exception {        
+
+    public void testAddRemoveRoot () throws Exception {
         final FileObject rootFolder = this.scratch.createFolder("Root");
         final FileObject jarFile = this.scratch.createData("archive","jar");
         FileLock lck = jarFile.lock();
         try {
-            ZipOutputStream jf = new ZipOutputStream (jarFile.getOutputStream(lck));            
+            ZipOutputStream jf = new ZipOutputStream (jarFile.getOutputStream(lck));
             try {
                 jf.putNextEntry(new ZipEntry("Test.properties"));
             }finally {
@@ -141,11 +141,11 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         assertNotNull (cpRoots);
         assertEquals(0,cpRoots.length);
     }
-    
+
     public void testAddRemoveArtifact () throws Exception {
         FileObject projdir = scratch.createFolder("libPrj");  //NOI18N
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N    
-        AntProjectHelper helper = JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"libProj",null,null); //NOI18N        
+        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"libProj",null,null); //NOI18N
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         Project libPrj = FileOwnerQuery.getOwner(projdir);
         assertNotNull (this.prj);
@@ -153,7 +153,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         AntArtifact[] aas = ap.getBuildArtifacts();
         AntArtifact output = null;
         for (int i=0; i<aas.length; i++) {
-            if (JavaProjectConstants.ARTIFACT_TYPE_JAR.equals(aas[i].getType())) { 
+            if (JavaProjectConstants.ARTIFACT_TYPE_JAR.equals(aas[i].getType())) {
                 output = aas[i];
                 break;
             }
@@ -175,7 +175,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         assertNotNull (cpRoots);
         assertEquals(0,cpRoots.length);
     }
-    
+
     public void testAddRemoveLibrary () throws Exception {
         LibraryProvider lp = (LibraryProvider) Lookup.getDefault().lookup(LibraryProvider.class);
         assertNotNull (lp);
@@ -186,7 +186,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         impls[0].setContent("classpath",Collections.singletonList(libRoot.getURL()));
         Library[] libs =LibraryManager.getDefault().getLibraries();
         assertNotNull (libs);
-        assertEquals(1,libs.length);                       
+        assertEquals(1,libs.length);
         ProjectClassPathModifier.addLibraries(libs, this.src, ClassPath.COMPILE);
         String cp = this.eval.getProperty("javac.classpath");
         assertNotNull (cp);
@@ -201,13 +201,13 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         assertNotNull (cpRoots);
         assertEquals(0,cpRoots.length);
     }
-    
+
     public void testClassPathExtenderCompatibility () throws Exception {
         final FileObject rootFolder = this.scratch.createFolder("Root");
         final FileObject jarFile = this.scratch.createData("archive","jar");
         FileLock lck = jarFile.lock();
         try {
-            ZipOutputStream jf = new ZipOutputStream (jarFile.getOutputStream(lck));            
+            ZipOutputStream jf = new ZipOutputStream (jarFile.getOutputStream(lck));
             try {
                 jf.putNextEntry(new ZipEntry("Test.properties"));
             }finally {
@@ -230,12 +230,12 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         assertEquals(rootFolder,this.helper.resolveFileObject(cpRoots[0]));
 //        assertEquals(jarFile,this.helper.resolveFileObject(cpRoots[1]));
     }
-    
-    
+
+
     private static class TestLibraryProvider implements LibraryProvider {
-        
+
         private LibraryImplementation[] libs;
-        
+
         public void removePropertyChangeListener(PropertyChangeListener listener) {
         }
 
@@ -248,20 +248,20 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
             }
             return this.libs;
         }
-        
-    }    
-    
+
+    }
+
     private static class TestLibrary implements LibraryImplementation {
-        
+
         private String name;
         private List cp = Collections.EMPTY_LIST;
         private List src = Collections.EMPTY_LIST;
         private List jdoc = Collections.EMPTY_LIST;
-        
+
         public TestLibrary (String name) {
             this.name = name;
         }
-        
+
         public void setName(String name) {
         }
 
@@ -273,7 +273,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
 
         public List getContent(String volumeType) throws IllegalArgumentException {
             if ("classpath".equals(volumeType)) {
-                return this.cp; 
+                return this.cp;
             }
             else if ("src".equals(volumeType)) {
                 return this.src;
@@ -320,8 +320,8 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         public String getDescription() {
             return null;
         }
-        
+
     }
-    
-    
+
+
 }

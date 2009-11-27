@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -43,7 +43,10 @@ package org.netbeans.modules.javafx.project;
 
 import java.io.File;
 import java.util.ArrayList;
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectManager;
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -52,13 +55,11 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.SpecificationVersion;
 
-
 /**
- *
  * @author answer
  */
 public class CreateJavaFXProjectTest extends NbTestCase {
-    
+
     private static final String[] createdFiles = {
         "build.xml",
         "nbproject/build-impl.xml",
@@ -66,7 +67,7 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         "nbproject/project.properties",
         "src",
     };
-    
+
     private static final String[] createdFilesExtSources = {
         "build.xml",
         "nbproject/build-impl.xml",
@@ -166,35 +167,37 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         "build.classpath",
         "FXBuild.class"
     };
-    
+
     public CreateJavaFXProjectTest(String testName) {
         super(testName);
-        
     }
 
     public static Test suite(){
         TestSuite suite = new TestSuite(CreateJavaFXProjectTest.class);
         return suite;
     }
-            
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        org.openide.util.test.MockLookup.setLayersAndInstances();
         clearWorkDir();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    public void testSanity() throws Exception {
+        File prjDirF = new File(getDataDir(), "fxproject");
+        assertTrue(prjDirF + " is directory", prjDirF.isDirectory());
+        Project project = ProjectManager.getDefault().findProject(FileUtil.toFileObject(prjDirF));
+        assertNotNull("cannot find project in: " + prjDirF, project);
     }
 
-    public void testCreateEmptyProject() throws Exception{ 
+    public void testCreateEmptyProject() throws Exception{
         String name = "TestJavaFXApp";
         JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = JavaFXProjectGenerator.createProject(new File(getWorkDir(), name), name, null, "manifest.mf");
+        AntProjectHelper aph = null; // FIXME (not compilable) JavaFXProjectGenerator.createProject(new File(getWorkDir(), name), name, null, "manifest.mf");
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
-        
+
         FileObject fo = aph.getProjectDirectory();
         for (int i=0; i<createdFiles.length; i++) {
             assertNotNull(createdFiles[i]+" file/folder cannot be found", fo.getFileObject(createdFiles[i]));
@@ -208,20 +211,20 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         assertEquals("Found unexpected property: "+l,createdProperties.length, props.keySet().size());
     }
 
-    public void testCreateEmptyProjectWithMain() throws Exception{ 
+    public void testCreateEmptyProjectWithMain() throws Exception{
         String name = "TestJavaFXApp";
         String mainClass = name.toLowerCase() + ".Main";
         JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
         AntProjectHelper aph = JavaFXProjectGenerator.createProject(new File(getWorkDir(), name), name, mainClass, "manifest.mf");
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
-        
+
         FileObject fo = aph.getProjectDirectory();
         for (int i=0; i<createdFiles.length; i++) {
             assertNotNull(createdFiles[i]+" file/folder cannot be found", fo.getFileObject(createdFiles[i]));
         }
         assertNotNull(fo.getFileObject("src/" + mainClass.replace('.', '/') + ".fx"));//check main class
-        
+
         EditableProperties props = aph.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
         ArrayList l = new ArrayList(props.keySet());
         for (int i=0; i<createdProperties.length; i++) {
@@ -230,8 +233,8 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         }
         assertEquals("Found unexpected property: "+l,createdProperties.length, props.keySet().size());
     }
-    
-    public void testCreateProjectFromSources() throws Exception{ 
+
+    public void testCreateProjectFromSources() throws Exception{
         File root = getWorkDir();
         String name = "TestJavaFXApp";
         File proj = new File (root, name);
@@ -241,14 +244,14 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         File test1 = new File (root, "test1");
         test1.mkdir();
         JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = JavaFXProjectGenerator.createProject(proj, name, new File[]{src1}, new File[]{test1}, "manifest.mf");
+        AntProjectHelper aph = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(proj, name, new File[]{src1}, new File[]{test1}, "manifest.mf");
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
-        
+
         FileObject fo = FileUtil.toFileObject(proj);
         for (int i=0; i<createdFilesExtSources.length; i++) {
             assertNotNull(createdFilesExtSources[i]+" file/folder cannot be found", fo.getFileObject(createdFilesExtSources[i]));
-        } 
+        }
         EditableProperties props = aph.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
         ArrayList l = new ArrayList(props.keySet());
         int extFileRefCount = 0;
@@ -281,5 +284,5 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         }
         assertEquals("Found unexpected property: "+l,createdPropertiesExtSources.length, props.keySet().size() - extFileRefCount);
     }
-    
+
 }
