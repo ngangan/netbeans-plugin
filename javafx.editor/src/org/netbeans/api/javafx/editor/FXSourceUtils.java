@@ -625,7 +625,7 @@ public final class FXSourceUtils {
         try {
             allMembers = elements.getAllMembers(type);
         } catch (Exception e) {
-            Exceptions.printStackTrace(e);
+            e.printStackTrace();
         }
         return allMembers;
     }

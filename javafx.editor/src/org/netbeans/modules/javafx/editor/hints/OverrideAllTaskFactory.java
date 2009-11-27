@@ -41,18 +41,19 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ImportTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafx.tree.JFXImport;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Symbol.VarSymbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.util.JCDiagnostic;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXImport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -63,8 +64,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.ClassIndex;
+import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
@@ -82,6 +84,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
+    private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
     public OverrideAllTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -107,7 +110,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     if (!(diagnostic instanceof JCDiagnostic) || position < 0) {
                         continue;
                     }
-                    ((JCDiagnostic) diagnostic).getArgs();
                     errorDescriptions.add(getErrorDescription(compilationInfo.getDocument(), file, compilationInfo, diagnostic));
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
@@ -168,7 +170,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     }
 
     private ErrorDescription getErrorDescription(final Document document,
-            FileObject file,
+            final FileObject file,
             final CompilationInfo compilationInfo,
             final Diagnostic diagnostic) {
 
@@ -202,13 +204,24 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         }
                     };
                     visitor.scan(compilationInfo.getCompilationUnit(), null);
-                    Collection<? extends Element> elements = getAllMembers(classSymbol, compilationInfo);
+                    Collection<? extends Element> elements = getAllMembers(diagnostic.getPosition(), compilationInfo);
                     for (Element e : elements) {
                         if (e instanceof MethodSymbol) {
                             MethodSymbol method = (MethodSymbol) e;
                             for (Modifier modifier : method.getModifiers()) {
                                 if (modifier == Modifier.ABSTRACT) {
-                                    abstractMethods.add(method);
+                                    boolean methodExists = false;
+                                    for (Element exisitngMethod : classSymbol.getEnclosedElements()) {
+                                        if (!(exisitngMethod instanceof ExecutableElement)) {
+                                            continue;
+                                        }
+                                        if (compilationInfo.getElements().overrides((ExecutableElement) exisitngMethod, (ExecutableElement) method, classSymbol)) {
+                                            methodExists = true;
+                                        }
+                                    }
+                                    if (!methodExists) {
+                                        abstractMethods.add(method);
+                                    }
                                     break;
                                 }
                             }
@@ -353,24 +366,35 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
     private String getTypeString(Type type, JavafxTypes types) {
         Type sureType = types.erasure(type);
-        String typeString =  types.toJavaFXString(sureType);
+        String typeString = types.toJavaFXString(sureType);
         if (typeString == null) {
             typeString = ""; //NOI18N
         } else if (typeString != null && typeString.equals("void")) { //NOI18N
             typeString = "Void"; //NOI18N
         }
-        
+
         return typeString;
     }
 
-
-    //TODO Temporary log for issue 148890
-    Collection<? extends Element> getAllMembers(TypeElement typeElement, CompilationInfo compilationInfo) {
-        Collection<? extends Element> elements = null;
-        try {
-            elements = FXSourceUtils.getAllMembers(compilationInfo.getElements(), typeElement);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+    private Collection<? extends Element> getAllMembers(long position, CompilationInfo compilationInfo) {
+        JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(position);
+        Element element = compilationInfo.getTrees().getElement(path);
+        ClassSymbol classSymbol = null;
+        if (element instanceof ClassSymbol) {
+            classSymbol = (ClassSymbol) element;
+        }
+        if (classSymbol == null) {
+            return Collections.EMPTY_SET;
+        }
+        ClassIndex classIndex = compilationInfo.getClasspathInfo().getClassIndex();
+        Collection<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(classSymbol.getSimpleName().toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+        Collection<? extends Element> elements = Collections.EMPTY_SET;
+        for (ElementHandle<TypeElement> eh : options) {
+            if (!eh.getQualifiedName().toString().equals(classSymbol.getQualifiedName().toString())) {
+                continue;
+            }
+            TypeElement el = eh.resolve(compilationInfo);
+            elements = compilationInfo.getElements().getAllMembers(el);
         }
 
         return elements;
