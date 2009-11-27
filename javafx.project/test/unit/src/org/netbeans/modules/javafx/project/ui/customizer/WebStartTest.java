@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -64,7 +64,7 @@ import org.openide.util.MutexException;
  */
 public class WebStartTest extends NbTestCase {
     protected File dataDir;
-    
+
     public WebStartTest(String testName) {
         super(testName);
     }
@@ -86,8 +86,8 @@ public class WebStartTest extends NbTestCase {
     @Override
     public void tearDown() throws Exception {
     }
-    
-    
+
+
     public void testWebStart() throws Exception {
         String name = "WebStartFXProject";
         String mainClass = name.toLowerCase() + ".Main";
@@ -96,7 +96,7 @@ public class WebStartTest extends NbTestCase {
         assertNotNull(aph);
         //String projectDirectory = aph.getProjectDirectory().getName();
         //System.out.println("ProjectDirectory = " + aph.getProjectDirectory().getName());
-        
+
         JavaFXProject prj = (JavaFXProject) ProjectManager.getDefault().findProject(aph.getProjectDirectory());
         assertNotNull(prj);
         //System.out.println("prj = "+ prj.getProjectDirectory().getNameExt());
@@ -121,7 +121,7 @@ public class WebStartTest extends NbTestCase {
                             is.close();
                         }
                     }
-                    ep.setProperty(WebStartProjectProperties.JNLP_ENABLED, "true");
+                    // FIXME (not compilable): ep.setProperty(WebStartProjectProperties.JNLP_ENABLED, "true");
                     ep.setProperty(WebStartProjectProperties.JNLP_CBASE_URL, "");
                     OutputStream os = null;
                     FileLock lock = null;
@@ -145,17 +145,17 @@ public class WebStartTest extends NbTestCase {
         }
         File testFile = new File(File.separator+prj.getProjectDirectory().getFileObject("nbproject/project.properties").getPath());
         File passFile = new File(dataDir, "project.properties.pass");
-        
+
         assertFile(testFile, passFile, dataDir);
 
-        final ProjectConfigurationProvider configProvider = 
+        final ProjectConfigurationProvider configProvider =
                     prj.getLookup().lookup(ProjectConfigurationProvider.class);
         assertNotNull(configProvider);
-        wsProperties.createConfigurationFiles(configProvider, Boolean.valueOf(wsProperties.getProperty(WebStartProjectProperties.JNLP_ENABLED)).booleanValue());
-        
+        // FIXME (not compilable): wsProperties.createConfigurationFiles(configProvider, Boolean.valueOf(wsProperties.getProperty(WebStartProjectProperties.JNLP_ENABLED)).booleanValue());
+
         testFile = new File(File.separator+prj.getProjectDirectory().getFileObject("nbproject/jnlp-impl.xml").getPath());
         passFile = new File(dataDir, "jnlp-impl.xml.pass");
         assertFile(testFile, passFile, dataDir);
     }
-    
+
 }

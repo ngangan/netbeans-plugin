@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -69,9 +69,9 @@ import org.w3c.dom.NodeList;
  * @author answer
  */
 public class CompiledSourceForBinaryQueryTest extends NbTestCase {
-    
+
     private static final String PROP_BUILD_DIR = "build.dir";   //NOI18N
-    
+
     private FileObject scratch;
     private FileObject projdir;
     private FileObject sources;
@@ -79,7 +79,7 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
     private ProjectManager pm;
     private Project pp;
     AntProjectHelper helper;
-    
+
     public CompiledSourceForBinaryQueryTest(String testName) {
         super(testName);
     }
@@ -109,17 +109,17 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
         File scratchF = new File(getWorkDir(), "scratchDir");
         scratchF.mkdir();
         scratch = FileUtil.toFileObject(scratchF);
-        projdir = scratch.createFolder("proj");        
+        projdir = scratch.createFolder("proj");
         JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        helper = JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null);
+        helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null);
         JavaFXProjectGenerator.setDefaultSourceLevel(null);   //NOI18N
         pm = ProjectManager.getDefault();
         pp = pm.findProject(projdir);
         sources = projdir.getFileObject("src");
         FileObject fo = projdir.createFolder("build");
-        buildClasses = fo.createFolder("classes");        
+        buildClasses = fo.createFolder("classes");
     }
-    
+
     public void testSourceForBinaryQuery() throws Exception {
         this.prepareProject();
         FileObject folder = scratch.createFolder("SomeFolder");
@@ -131,9 +131,9 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
         result = SourceForBinaryQuery.findSourceRoots(buildClasses.getURL());
         assertEquals("Project build folder must have source folder", 1, result.getRoots().length);
         assertEquals("Project build folder must have source folder",sources,result.getRoots()[0]);
-    }               
-    
-    
+    }
+
+
     public void testSourceForBinaryQueryListening () throws Exception {
         this.prepareProject();
         SourceForBinaryQuery.Result result = SourceForBinaryQuery.findSourceRoots(buildClasses.getURL());
@@ -143,7 +143,7 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
         result.addChangeListener(tl);
         EditableProperties props = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
         FileObject sources2 = projdir.createFolder("src2");
-        props.put ("src.dir","src2");        
+        props.put ("src.dir","src2");
         helper.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, props);
         assertTrue (tl.wasEvent());
         assertEquals("Project build folder must have source folder", 1, result.getRoots().length);
@@ -165,22 +165,22 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
     }
 
     private static class TestListener implements ChangeListener {
-        
+
         private boolean gotEvent;
-        
+
         public void stateChanged(ChangeEvent changeEvent) {
             this.gotEvent = true;
-        }      
-        
+        }
+
         public void reset () {
             this.gotEvent = false;
         }
-        
+
         public boolean wasEvent () {
             return this.gotEvent;
         }
     }
-    
+
     private static FileObject addSourceRoot (AntProjectHelper helper, FileObject projdir,
                                             String propName, String folderName) throws Exception {
         Element data = helper.getPrimaryConfigurationData(true);
@@ -201,9 +201,9 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
         }
         return fo;
     }
-    
+
     public static void setLookup(Lookup l) {
         MockLookup.setLookup(l);
     }
-        
+
 }

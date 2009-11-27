@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -73,7 +73,7 @@ import org.openide.util.Lookup;
  * @author answer
  */
 public class BootClassPathImplementationTest extends NbTestCase {
-    
+
     private FileObject scratch;
     private FileObject projdir;
     private FileObject sources;
@@ -83,7 +83,7 @@ public class BootClassPathImplementationTest extends NbTestCase {
     private ProjectManager pm;
     private Project pp;
     private TestPlatformProvider tp;
-    
+
     public BootClassPathImplementationTest(String testName) {
         super(testName);
     }
@@ -91,7 +91,7 @@ public class BootClassPathImplementationTest extends NbTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         clearWorkDir();
-        
+
         scratch = TestUtil.makeScratchDir(this);
         this.defaultPlatformBootRoot = scratch.createFolder("DefaultPlatformBootRoot");
         this.explicitPlatformBootRoot = scratch.createFolder("ExplicitPlatformBootRoot");
@@ -110,13 +110,13 @@ public class BootClassPathImplementationTest extends NbTestCase {
         projdir = null;
         pm = null;
         TestUtil.setLookup(Lookup.EMPTY);
-        
+
         super.tearDown();
     }
 
     private void prepareProject (String platformName) throws IOException {
         projdir = scratch.createFolder("proj");
-        AntProjectHelper helper = JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir), "org.netbeans.modules.java.javafxproject", null, null);
+        AntProjectHelper helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir), "org.netbeans.modules.java.javafxproject", null, null);
         pm = ProjectManager.getDefault();
         pp = pm.findProject(projdir);
         EditableProperties props = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
@@ -125,47 +125,47 @@ public class BootClassPathImplementationTest extends NbTestCase {
         sources = projdir.getFileObject("src");
         tests = projdir.getFileObject("test");
     }
-    
+
     public void testBootClassPathImplementation () throws Exception {
         prepareProject("ExplicitPlatform");
-        
+
         FileObject file = sources.createData("a.java");
         ClassPath bootCP = ClassPath.getClassPath(file, ClassPath.BOOT);
         assertNotNull("Boot ClassPath exists",bootCP);
         FileObject[] roots = bootCP.getRoots();
-        assertEquals("Boot classpath size",1, roots.length);        
+        assertEquals("Boot classpath size",1, roots.length);
         assertEquals("Boot classpath",explicitPlatformBootRoot, roots[0]);
-        
+
         tp.setExplicitPlatformVisible(false);
         bootCP = ClassPath.getClassPath(file, ClassPath.BOOT);
         assertNotNull("Boot ClassPath exists",bootCP);
         roots = bootCP.getRoots();
-        
+
         assertEquals("Boot classpath size",0, roots.length);
-                
+
         tp.setExplicitPlatformVisible(true);
         bootCP = ClassPath.getClassPath(file, ClassPath.BOOT);
         assertNotNull("Boot ClassPath exists",bootCP);
         roots = bootCP.getRoots();
-        assertEquals("Boot classpath size",1, roots.length);        
+        assertEquals("Boot classpath size",1, roots.length);
         assertEquals("Boot classpath",explicitPlatformBootRoot, roots[0]);
-    }        
-    
-    
-    
+    }
+
+
+
     private static class TestPlatformProvider implements JavaPlatformProvider {
-        
+
         private JavaPlatform defaultPlatform;
         private JavaPlatform explicitPlatform;
         private PropertyChangeSupport support;
         private boolean hideExplicitPlatform;
-        
+
         public TestPlatformProvider (ClassPath defaultPlatformBootClassPath, ClassPath explicitPlatformBootClassPath) {
             this.support = new PropertyChangeSupport (this);
             this.defaultPlatform = new TestPlatform ("DefaultPlatform", defaultPlatformBootClassPath);
             this.explicitPlatform = new TestPlatform ("ExplicitPlatform", explicitPlatformBootClassPath);
         }
-        
+
         public void removePropertyChangeListener(PropertyChangeListener listener) {
             this.support.removePropertyChangeListener (listener);
         }
@@ -187,35 +187,35 @@ public class BootClassPathImplementationTest extends NbTestCase {
                 };
             }
         }
-       
-        public JavaPlatform getDefaultPlatform () {            
+
+        public JavaPlatform getDefaultPlatform () {
             return this.defaultPlatform;
         }
-        
+
         public void setExplicitPlatformVisible (boolean value) {
             this.hideExplicitPlatform = !value;
             this.support.firePropertyChange(PROP_INSTALLED_PLATFORMS,null,null);
         }
     }
-    
+
     private static class TestPlatform extends JavaPlatform {
-        
+
         private String systemName;
         private Map properties;
         private ClassPath bootClassPath;
-        
+
         public TestPlatform (String systemName, ClassPath bootCP) {
             this.systemName = systemName;
             this.bootClassPath = bootCP;
             this.properties = Collections.singletonMap("platform.ant.name",this.systemName);
         }
-        
+
         public FileObject findTool(String toolName) {
             return null;
         }
 
         public String getVendor() {
-            return "me";    
+            return "me";
         }
 
         public ClassPath getStandardLibraries() {
@@ -249,6 +249,6 @@ public class BootClassPathImplementationTest extends NbTestCase {
         public ClassPath getBootstrapLibraries() {
             return this.bootClassPath;
         }
-        
+
     }
 }
