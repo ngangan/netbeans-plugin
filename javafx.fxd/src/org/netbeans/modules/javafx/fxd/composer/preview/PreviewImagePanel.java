@@ -153,22 +153,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                     @Override
                                     public void run() {
                                         try {
-                                            /*
-                                            final Node node;
                                             //final Node nodeOld;
-                                            try {
-                                                fModel.readLock();
-                                                //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
-                                                FXDLoader loader = PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), null);
-                                                while (!loader.loc$done().getAsBoolean()) {
-                                                    Thread.sleep(100);
-                                                }
-                                                node = loader.get$content().getRoot$$bound$().get();
-                                            } finally {
-                                                fModel.readUnlock();
-                                            }
-                                            showImagePanel(node);
-                                             */
                                             final Node node;
                                             try {
                                                 fModel.readLock();
