@@ -203,7 +203,9 @@ public final class FXDComposerController {
     
     public FXDElement getElementAt(int x, int y) {
         FXDElement element = null;
-        Collection nodes = getScene().impl_pick(x, y);
+        float zoom = m_dObj.getDataModel().getZoomRatio();
+        Collection nodes = getScene().impl_pick(x / zoom, y / zoom);
+        /* select the first FXDNode. If no FXDNodes, then the first Node */
         Node node = null;
         for (Object o : nodes) {
             if (o instanceof FXDNode){

@@ -158,7 +158,8 @@ public final class FXDElement {
         if (p != null) {
             parentTx = getParentTx(p);
         } else {
-            parentTx = new Affine2D(BaseTransform.IDENTITY_TRANSFORM);
+            float zoom = m_dObj.getDataModel().getZoomRatio();
+            parentTx = new Affine2D(BaseTransform.getScaleInstance(zoom, zoom));
         }
         // local to parent tx
         Affine2D tx = new Affine2D();
