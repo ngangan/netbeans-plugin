@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.fxd.composer.model;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,10 +19,12 @@ import java.util.NoSuchElementException;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.*;
 
+import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
-import java.util.Collections;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -32,6 +35,7 @@ final class DocumentElementWrapper {
 
     private static abstract class FXDElementWrapper implements com.sun.javafx.tools.fxd.FXDElement {
         protected DocumentElement m_de;
+        private FXDParser m_parser;
         
         public FXDElementWrapper( final DocumentElement de) {
             m_de = de;
@@ -39,6 +43,31 @@ final class DocumentElementWrapper {
         
         public void release() {
             m_de = null;
+        }
+
+        private FXDParser getFxdParser() {
+            if (m_parser == null) {
+                try {
+                    m_parser = new FXDParser(new FakeReader(), new FakeContentHandler());
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+            return m_parser;
+        }
+
+        Object parseValue(String strValue) {
+            try {
+                // TODO: providing FXDParser will allow to support references
+                return FXDParser.parseValue(strValue, getFxdParser());
+            } catch (FXDSyntaxErrorException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value", ex);
+            } catch (FXDException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value", ex);
+            }
+            return strValue;
         }
     }
 
@@ -103,21 +132,6 @@ final class DocumentElementWrapper {
                     return null;
                 }
             }
-        }
-
-        private Object parseValue(String strValue){
-            try {
-                // TODO: providing FXDParser will allow to support references
-                return FXDParser.parseValue(strValue, null);
-            } catch (FXDSyntaxErrorException ex) {
-                Logger.getLogger(this.getClass().getName()).
-                        log(Level.INFO, "Exception while parsing \""+strValue+"\" value", ex);
-            } catch (FXDException ex) {
-                Logger.getLogger(this.getClass().getName()).
-                        log(Level.INFO, "Exception while parsing \""+strValue+"\" value", ex);
-            }
-            return strValue;
-
         }
 
         @SuppressWarnings("unchecked")         
@@ -259,7 +273,7 @@ final class DocumentElementWrapper {
             DocumentElement de = m_de.getElement(index);
         
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
-                return de.getName();
+                return parseValue(de.getName());
             } else {
                 return wrap( de, false);
             }
@@ -356,5 +370,48 @@ final class DocumentElementWrapper {
             }
         }
         return false;
+    }
+
+    private static class FakeReader extends Reader {
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            return 0;
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+    }
+
+    private static class FakeContentHandler implements ContentHandler {
+
+        public void parsingStarted(FXDParser fxdp) {
+        }
+
+        public Object startNode(String string, int i, boolean bln) throws FXDException {
+            return null;
+        }
+
+        public Object startNodeArray(int i) throws FXDException {
+            return null;
+        }
+
+        public FXDReference createReference(String string) throws FXDException {
+            // TODO support references?
+            return null;
+        }
+
+        public void attribute(Object o, String string, String string1, int i, int i1, boolean bln) throws FXDException {
+        }
+
+        public void endNode(Object o, int i) throws FXDException {
+        }
+
+        public void arrayElement(Object o, String string, int i, int i1) throws FXDException {
+        }
+
+        public void endNodeArray(Object o, int i) throws FXDException {
+        }
     }
 }
