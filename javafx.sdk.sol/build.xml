@@ -21,7 +21,7 @@
     </target>    
 
     <target name="init-release-external" depends="basic-init,delete-release-external" if="isSol">
-      <property name="build.config" value="daily"/>
+      <property name="build.config" value="promoted"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
       <property name="offline" value="false"/>
