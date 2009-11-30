@@ -50,6 +50,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JComponent;
@@ -139,8 +140,9 @@ final class ImageHolder extends JPanel {
         /* create Graphics for drawing actions.
          * Make it wider and taller then m_imagePanel */
         Graphics gCopy = g.create();
-        gCopy.translate(xOff - 1, yOff - 1);
-        gCopy.setClip(0, 0, w + 2, h + 2);
+        gCopy.translate(xOff, yOff);
+        gCopy.setClip(-5, -5, w + 10, h + 10);
+
         m_dObj.getController().paintActions(gCopy);
     }
 
