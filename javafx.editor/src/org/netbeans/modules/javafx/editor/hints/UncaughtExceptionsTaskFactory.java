@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -88,7 +89,10 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
             @Override
             public void run(CompilationInfo compilationInfo) throws Exception {
-                final Document document = compilationInfo.getDocument();
+                if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
+                    return;
+                }
+                final JavaFXDocument document = (JavaFXDocument) compilationInfo.getDocument();
                 if (!compilationInfo.getDiagnostics().isEmpty()) {
                     if (document != null) {
                         HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
@@ -101,7 +105,9 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
                 Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
                 for (Hint hint : model.getHints()) {
-                    errors.add(getErrorDescription(file, hint, compilationInfo));
+                    if (!document.isPosGuarded(hint.getStartPosition())) {    
+                        errors.add(getErrorDescription(file, hint, compilationInfo));
+                    }
                 }
                 if (document != null) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); 

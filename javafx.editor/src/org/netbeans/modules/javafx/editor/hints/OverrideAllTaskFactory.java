@@ -40,15 +40,12 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXImport;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Symbol.VarSymbol;
@@ -68,6 +65,7 @@ import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -101,9 +99,13 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
+                if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
+                    return;
+                }
+                JavaFXDocument document = (JavaFXDocument) compilationInfo.getDocument();
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (!isValidError(diagnostic, compilationInfo) || cancel.get()) {
+                    if (!isValidError(diagnostic, compilationInfo) || cancel.get() || document.isPosGuarded((int) diagnostic.getPosition())) {
                         continue;
                     }
                     int position = findPosition(compilationInfo, (int) diagnostic.getStartPosition(), (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition()));
@@ -191,19 +193,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 }
                 final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
                 if (classSymbol != null) {
-                    final Collection<JFXImport> imports = new HashSet<JFXImport>();
-                    JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
-
-                        @Override
-                        public Void visitImport(ImportTree node, Void p) {
-                            if (node instanceof JFXImport) {
-                                imports.add((JFXImport) node);
-                            }
-
-                            return super.visitImport(node, p);
-                        }
-                    };
-                    visitor.scan(compilationInfo.getCompilationUnit(), null);
                     Collection<? extends Element> elements = getAllMembers(diagnostic.getPosition(), compilationInfo);
                     for (Element e : elements) {
                         if (e instanceof MethodSymbol) {
@@ -212,7 +201,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                                 if (modifier == Modifier.ABSTRACT) {
                                     boolean methodExists = false;
                                     for (Element exisitngMethod : classSymbol.getEnclosedElements()) {
-                                        if (!(exisitngMethod instanceof ExecutableElement)) {
+                                        if (!(exisitngMethod instanceof ExecutableElement) && !method.getSimpleName().toString().equals(exisitngMethod.getSimpleName().toString())) {
                                             continue;
                                         }
                                         if (compilationInfo.getElements().overrides((ExecutableElement) exisitngMethod, (ExecutableElement) method, classSymbol)) {
