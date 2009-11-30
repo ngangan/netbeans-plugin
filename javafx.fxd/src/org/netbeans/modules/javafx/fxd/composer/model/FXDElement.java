@@ -41,8 +41,11 @@
 package org.netbeans.modules.javafx.fxd.composer.model;
 
 import com.sun.javafx.geom.Bounds2D;
-import javafx.geometry.Bounds;
+import com.sun.javafx.geom.transform.Affine2D;
+import com.sun.javafx.geom.transform.BaseTransform;
+import com.sun.javafx.geom.transform.NoninvertibleTransformException;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.Exceptions;
@@ -57,10 +60,6 @@ public final class FXDElement {
     private       FXDElementOutline   m_outline   = null;
     private       boolean             m_isDeleted = false;
 
-    // for now store visibility and bounds permanently not to cache javafx.scene.Node.
-    // we can't access it by id
-    private       boolean             m_visible = false;
-    private       Bounds2D            m_bounds = new Bounds2D();
 /*
     private       float               m_translateDx = 0;
     private       float               m_translateDy = 0;
@@ -88,14 +87,8 @@ public final class FXDElement {
 //        SceneManager.log(Level.FINE, "SVGObject created: " + m_elem); //NOI18N        
     }
 
-    public void setVisible(boolean visible){
-        m_visible = visible;
-    }
-            
     public boolean isVisible() {
-        //TODO use FXDNode to determine this
-        //return getController().getNode(m_id) != null;
-        return m_visible;
+        return getController().getNode(m_id).get$visible();
     }
     
     public String getName() {
@@ -111,9 +104,6 @@ public final class FXDElement {
         DocumentElement de = null;
         try {
             FXDComposerModel model = m_dObj.getDataModel();
-            //String entry = model.getSelectedEntry();
-            //FXDFileModel fModel = model.getFXDContainer().getFileModel(entry);
-            //de = fModel.getElementById(m_id);
             de = model.getFXDContainer().getFileModel(model.getSelectedEntry()).getElementById(m_id);
         } catch (Exception ex) {
             //TODO Do not swallow it
@@ -149,26 +139,39 @@ public final class FXDElement {
         return false;
     }
 
-    void setBounds(Bounds2D bounds){
-        assert bounds != null;
-        m_bounds = bounds;
-    }
-
-    void setBounds(Bounds bounds){
-        assert bounds != null;
-        m_bounds = new Bounds2D(bounds.get$minX(), bounds.get$minY(),
-                bounds.get$maxX(), bounds.get$maxY());
-    }
-
     Bounds2D getBounds() {
+        Node node = getController().getNode(m_id);
+        assert node != null;
+        return getCompleteNodeBounds(node);
+    }
 
-        float zoom = m_dObj.getDataModel().getZoomRatio();
-        return new Bounds2D(m_bounds.x1 * zoom, m_bounds.y1 * zoom, m_bounds.x2 * zoom, m_bounds.y2 * zoom);
-        //Node node = getController().getNode(m_id);
-        //assert node != null;
-        //Bounds b = node.get$boundsInParent();
-        //Bounds2D b2d = new Bounds2D(b.get$minX(), b.get$minY(), b.get$maxX(), b.get$maxY());
-        //return b2d;
+    private Bounds2D getCompleteNodeBounds(Node node){
+        Bounds2D b = new Bounds2D();
+        Affine2D parentTx = getParentTx(node);
+        return node.getTransformedBounds(b, parentTx);
+    }
+
+    private Affine2D getParentTx(Node node){
+        Parent p = node.get$parent();
+        // parent tx
+        Affine2D parentTx = null;
+        if (p != null) {
+            parentTx = getParentTx(p);
+        } else {
+            float zoom = m_dObj.getDataModel().getZoomRatio();
+            parentTx = new Affine2D(BaseTransform.getScaleInstance(zoom, zoom));
+        }
+        // local to parent tx
+        Affine2D tx = new Affine2D();
+        node.getLocalToParentTransform(tx);
+
+        try{
+            tx.invert();
+        }catch(NoninvertibleTransformException e){
+            e.printStackTrace();
+        }
+        tx.concatenate(parentTx);
+        return parentTx;
     }
 
     public boolean isDeleted() {

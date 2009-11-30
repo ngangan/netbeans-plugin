@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -55,7 +55,7 @@ import org.openide.modules.SpecificationVersion;
  * @author answer
  */
 public class BinaryForSourceQueryImplTest extends NbTestCase {
-    
+
     public BinaryForSourceQueryImplTest(String testName) {
         super(testName);
     }
@@ -76,10 +76,10 @@ public class BinaryForSourceQueryImplTest extends NbTestCase {
         File proj = new File (getWorkDir(), name);
         proj.mkdir();
         JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = JavaFXProjectGenerator.createProject(proj, name, null, null);
+        AntProjectHelper aph = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(proj, name, null, null);
         JavaFXProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
-        
+
         File someOut = new File (getWorkDir(), "SomeFolder");
         someOut.mkdir();
         File someIn = new File (proj, "SomeFolderInProject");
@@ -90,17 +90,17 @@ public class BinaryForSourceQueryImplTest extends NbTestCase {
         build.mkdir();
         File classes = new File (build, "classes");
         classes.mkdir();
-        
+
         BinaryForSourceQuery.Result result = BinaryForSourceQuery.findBinaryRoots(FileUtil.toFileObject(someOut).getURL());
         assertEquals("Non-project folder does not have any source folder", 0, result.getRoots().length);
-        
+
         result = BinaryForSourceQuery.findBinaryRoots(FileUtil.toFileObject(someIn).getURL());
         assertEquals("Project non build folder does not have any source folder", 0, result.getRoots().length);
-        result = BinaryForSourceQuery.findBinaryRoots(FileUtil.toFileObject(sources).getURL());        
+        result = BinaryForSourceQuery.findBinaryRoots(FileUtil.toFileObject(sources).getURL());
         assertEquals("Project build folder must have source folder", 1, result.getRoots().length);
-        assertEquals("Project build folder must have source folder",FileUtil.toFileObject(classes).getURL(),result.getRoots()[0]);        
+        assertEquals("Project build folder must have source folder",FileUtil.toFileObject(classes).getURL(),result.getRoots()[0]);
         assertEquals(BinaryForSourceQueryImpl.R.class, result.getClass());
         BinaryForSourceQuery.Result result2 = BinaryForSourceQuery.findBinaryRoots(FileUtil.toFileObject(sources).getURL());
         assertTrue (result == result2);
-    }    
+    }
 }

@@ -20,7 +20,9 @@ import org.netbeans.modules.javafx.fxd.composer.model.*;
 
 import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
 import com.sun.javafx.tools.fxd.PreviewLoader;
+import com.sun.javafx.tools.fxd.PreviewStatistics;
 import com.sun.javafx.tools.fxd.container.ContainerEntry;
+import com.sun.javafx.tools.fxd.container.misc.ProgressNotifier;
 import com.sun.javafx.tools.fxd.loader.Profile;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -32,8 +34,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import javafx.fxd.FXDLoader;
-import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javax.swing.Action;
@@ -153,22 +153,29 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                     @Override
                                     public void run() {
                                         try {
-                                            final Node node;
                                             //final Node nodeOld;
+                                            final Node node;
                                             try {
                                                 fModel.readLock();
                                                 //nodeOld = PreviewLoader.load( fxz, selectedEntryCopy, profileCopy, new PreviewStatistics());
-                                                FXDLoader loader = PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), null);
-                                                while (!loader.loc$done().getAsBoolean()) {
-                                                    Thread.sleep(100);
+
+                                                PreviewStatistics statistics = new PreviewStatistics();
+                                                PreviewProgressNotifier progress = new PreviewProgressNotifier();
+                                                PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
+                                                progress.setLoader(loader);
+
+                                                PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
+                                                while (loader.getIsDone() == false) {
+                                                    try {
+                                                        Thread.sleep(50);
+                                                    } catch (InterruptedException ex) {
+                                                    }
                                                 }
-                                                node = loader.get$content().get$javafx$fxd$FXDContent$_root();
+                                                node = loader.get$content().getRoot$$bound$().get();
                                             } finally {
                                                 fModel.readUnlock();
                                             }
-
                                             showImagePanel(node);
-
                                         } catch( OutOfMemoryError oom) {
                                             oom.printStackTrace();
                                             setBackground( m_defaultBackground);
@@ -240,6 +247,36 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             }
         });
     }
+
+    private class PreviewProgressNotifier extends ProgressNotifier{
+        private volatile PreviewLoader m_loader;
+
+        protected void setLoader(PreviewLoader loader){
+            assert loader != null;
+            m_loader = loader;
+        }
+
+        @Override
+        protected void notify(int phase, int percentage, int eventNum) {
+            /*
+            System.out.println("    phase=" + phase + " %=" + percentage + " eventNum=" + eventNum);
+            System.out.println("    loader: isDone=" + m_loader.getIsDone() + " isStarted=" + m_loader.getIsStarted() + " isStopped=" + m_loader.getIsStopped() + " isSusscess=" + m_loader.getIsSucceeded() + " isFail=" + m_loader.getIsFailed() + " perc: " + m_loader.getPercentDone());
+            if (phase > 0 && percentage >= 100) {
+                while (m_loader.getIsDone() == false) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
+                System.out.println("    loader: isDone=" + m_loader.getIsDone() + " isStarted=" + m_loader.getIsStarted() + " isStopped=" + m_loader.getIsStopped() + " isSusscess=" + m_loader.getIsSucceeded() + " isFail=" + m_loader.getIsFailed() + " perc: " + m_loader.getPercentDone());
+                Node node = m_loader.get$content().getRoot$$bound$().get();
+                showImagePanel(node);
+            }
+             * 
+             */
+        }
+    };
 
     private void showError( final String msg) {
         removeAll();

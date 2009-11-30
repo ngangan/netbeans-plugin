@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2009 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -64,7 +64,7 @@ public class ProjectPropertiesTest extends NbTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         clearWorkDir();
-        JavaFXProjectGenerator.createProject(getWorkDir(), "test", null, null);
+        // FIXME (not compilable): JavaFXProjectGenerator.createProject(getWorkDir(), "test", null, null);
         p = (JavaFXProject) ProjectManager.getDefault().findProject(FileUtil.toFileObject(getWorkDir()));
         pp = new JavaFXProjectProperties(p, p.getUpdateHelper(), p.evaluator(), null, null);
     }
