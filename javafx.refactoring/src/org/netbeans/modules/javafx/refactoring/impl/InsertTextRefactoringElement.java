@@ -221,14 +221,24 @@ public class InsertTextRefactoringElement extends SimpleRefactoringElementImplem
                             sb.append("[<b>");
                             closingTag = "</b>]";
                         }
-                        sb.append(oldChars[i++]);
+                        if (oldChars[i] == '\n') {
+                            sb.append("<br/>");
+                        } else {
+                            sb.append(oldChars[i]);
+                        }
+                        i++;
                     } else {
                         if (!closingTag.equals("</b>")) {
                             sb.append(closingTag);
                             sb.append("<b>");
                             closingTag = "</b>";
                         }
-                        sb.append(newChars[j++]);
+                        if (newChars[j] == '\n') {
+                            sb.append("<br/>");
+                        } else {
+                            sb.append(newChars[j]);
+                        }
+                        j++;
                     }
                 }
             }
