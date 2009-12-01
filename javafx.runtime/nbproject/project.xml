@@ -79,6 +79,26 @@
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-j2d.jar</binary-origin>
             </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d-jogl.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-j2d-jogl.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d-rsl.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-j2d-rsl.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/prism/decora-prism.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/prism/decora-prism.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-jsw.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-jsw.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-ogl.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-ogl.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>
