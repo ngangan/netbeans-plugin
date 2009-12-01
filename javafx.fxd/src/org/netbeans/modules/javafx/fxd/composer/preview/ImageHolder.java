@@ -69,7 +69,7 @@ final class ImageHolder extends JPanel {
 
     private final JComponent    m_imagePanel;
     private final AtomicBoolean m_canPaint ;
-    private final JComponent    m_ErrorComponent;
+    private final JLabel    m_ErrorComponent;
     private final FXZDataObject m_dObj;
     
     public ImageHolder(JComponent imagePanel, FXZDataObject dObj) {
@@ -96,22 +96,24 @@ final class ImageHolder extends JPanel {
     
     @Override
     protected void paintChildren(Graphics g) {
-        //TODO Determine what to do with the canPaint stuff
-        //    if (canPaint.get()) {
         try {
             doPaintChildren(g);
-        } catch (Throwable e) {
+        } catch (OutOfMemoryError oom) {
             System.err.println("Out of Memory");
-            e.printStackTrace();
+            handlePaintChildrenError(oom, "MSG_CANNOT_SHOW_OOM"); //NOI18N
+        } catch (Exception e) {
+            handlePaintChildrenError(e, "MSG_CANNOT_SHOW"); //NOI18N
+        }
+    }
+
+    private void handlePaintChildrenError(Throwable error, String messageKey){
+            error.printStackTrace();
             m_canPaint.set(false);
             remove(m_imagePanel);
             setLayout(new LabelLayout());
+            m_ErrorComponent.setText(NbBundle.getMessage(PreviewImagePanel.class, 
+                    messageKey, error.getLocalizedMessage()));
             add(m_ErrorComponent);
-        }
-        //       }
-        //  else {
-        //       super.paintChildren(g);
-        //   }
     }
 
     private void doPaintChildren( Graphics g ) {

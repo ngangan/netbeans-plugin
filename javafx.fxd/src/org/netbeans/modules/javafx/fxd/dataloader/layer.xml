@@ -356,8 +356,4 @@ made subject to such option by the copyright holder.
             </file>
         </folder>
     </folder>
-    <folder name="FXDSchemaModel">
-        <attr name="position" intvalue="0"/>
-        <file name="fxd-schema.fxd" url="nbresloc:/com/sun/javafx/tools/fxd/schema/fxd-schema.fxd"/>
-    </folder>
 </filesystem>
