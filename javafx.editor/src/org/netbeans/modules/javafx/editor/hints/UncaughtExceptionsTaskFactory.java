@@ -56,7 +56,6 @@ import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;

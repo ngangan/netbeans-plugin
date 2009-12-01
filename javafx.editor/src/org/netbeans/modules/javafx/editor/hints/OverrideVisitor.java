@@ -45,6 +45,7 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
     }
 
     @Override
+    @SuppressWarnings("element-type-mismatch")
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
         try {
             node.toString();
@@ -61,7 +62,9 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
                         overriddenMethods.put(currentClass, new ArrayList<MethodSymbol>());
                     }
                     List<MethodSymbol> methods = overriddenMethods.get(currentClass);
-                    methods.add((MethodSymbol) element);
+                    if (!methods.contains(element)) {
+                        methods.add((MethodSymbol) element);
+                    }
                     overriddenMethods.put(currentClass, methods);
                 }
             }
