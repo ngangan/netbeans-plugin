@@ -166,6 +166,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     }
                 }
             }
+            
             return super.visitTry(node, model);
         }
     }

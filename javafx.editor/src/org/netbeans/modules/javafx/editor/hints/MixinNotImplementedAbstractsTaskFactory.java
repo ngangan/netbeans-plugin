@@ -108,7 +108,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                             npe.printStackTrace();
                         }
                         mainClassElement[0] = compilationInfo.getTrees().getElement(getCurrentPath());
-
+                        
                         return super.visitClassDeclaration(node, v);
                     }
 
