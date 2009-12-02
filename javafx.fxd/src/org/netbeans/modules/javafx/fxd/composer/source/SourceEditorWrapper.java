@@ -136,7 +136,6 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
         if ( wrapper == null) {
             add( wrapper = new EditorLookupWrapper(tc));
         }
-        tc.componentShowing();
         wrapper.showContent();
         wrapper.invalidate();
         validate();
