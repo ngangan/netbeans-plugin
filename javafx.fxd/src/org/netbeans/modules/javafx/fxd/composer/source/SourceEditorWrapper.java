@@ -10,6 +10,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.logging.Logger;
+import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -136,10 +137,20 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
         if ( wrapper == null) {
             add( wrapper = new EditorLookupWrapper(tc));
         }
+        copyActionMap(tc, this);
+
         wrapper.showContent();
         wrapper.invalidate();
         validate();
         repaint();
+    }
+
+    private void copyActionMap(JComponent source, JComponent target) {
+        ActionMap from = source.getActionMap();
+        ActionMap to = target.getActionMap();
+        for (Object key : from.keys()) {
+            to.put(key, from.get(key));
+        }
     }
 
     @Override
