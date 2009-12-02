@@ -254,11 +254,13 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_dObj       = dObj;
         m_entries = new ArrayList<FXZArchiveEntry>();
         //TODO FXZContainerImpl should be probably better as member than super class
-        load();
         try {
+            load();
             reloadEntries();        
         } finally {
-            m_zip.close();
+            if (m_zip != null){
+                m_zip.close();
+            }
         }
         m_tableListeners = new ArrayList<TableModelListener>();
     }
@@ -286,7 +288,9 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
                     load();
                     reloadEntries();
                 } finally {
-                    m_zip.close();
+                    if (m_zip != null) {
+                        m_zip.close();
+                    }
                 }
             } catch( IOException e) {
                 throw new RuntimeException( "Entry reload failed.", e); // NOI18N
@@ -423,7 +427,9 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         try {
             load();
         } finally {
-            m_zip.close();
+            if (m_zip != null){
+                m_zip.close();
+            }
         }
     }    
                 
