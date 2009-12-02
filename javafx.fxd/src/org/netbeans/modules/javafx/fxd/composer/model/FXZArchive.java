@@ -36,6 +36,8 @@ import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Enumeration;
+import java.util.zip.ZipFile;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 
 /**
@@ -425,6 +427,18 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
         builder.close();
         try {
+            // workaround to make it work with changes in loader, that invoke super's close()
+            // should be fixed on loader's side
+            if (m_file == null){
+                m_file = FileUtil.toFile(m_dObj.getPrimaryFile()).getCanonicalFile();
+
+                if (!m_file.exists()) {
+                    throw new FileNotFoundException("The file " + m_file.getAbsolutePath() + " not found.");
+                }
+                if (!m_file.isFile()) {
+                    throw new IllegalArgumentException(m_file.getAbsolutePath() + " is not a file.");
+                }
+            }
             load();
         } finally {
             if (m_zip != null){
@@ -443,6 +457,12 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         }
         return -1;
     }
+
+    @Override
+    public synchronized void close() {
+        super.close();
+    }
+
 
 //    @Override
 //    public void close() {
