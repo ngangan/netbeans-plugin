@@ -106,6 +106,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
             Hint hint = model.addHint(throwsMap.get(statement), statement);
             model.addCatchTree(hint, catchMap.get(statement));
         }
+
         return super.visitTry(node, model);
     }
 
@@ -129,6 +130,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
             }
             throwsMap.put(statement, throwsList);
         }
+        
         return throwsMap;
     }
 }

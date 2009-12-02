@@ -132,6 +132,7 @@ final class UncaughtExceptionsFix implements Fix {
                 }
             });
         }
+        
         return null;
     }
 
