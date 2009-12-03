@@ -66,4 +66,9 @@ public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
         checkCompletion("ClassMethods", "timeline.^", "classMethods.pass");
     }
 
+    public void testIndexerVsCompletion() throws Exception {
+        indexPlatform();
+        checkCompletion("IndexerVsCompletion", "var c = Col^.", "indexerVsCompletion.pass");
+    }
+
 }

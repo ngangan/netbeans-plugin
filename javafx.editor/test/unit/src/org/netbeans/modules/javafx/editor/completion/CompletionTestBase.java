@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
@@ -59,6 +60,7 @@ import org.netbeans.junit.AssertionFileFailedError;
 import org.netbeans.modules.editor.completion.CompletionItemComparator;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionProvider;
+import org.netbeans.spi.editor.completion.LazyCompletionItem;
 import org.openide.LifecycleManager;
 
 import org.openide.cookies.EditorCookie;
@@ -142,6 +144,9 @@ public class CompletionTestBase extends SourceTestBase {
         File output = new File(getWorkDir(), getName() + ".out");
         Writer out = new FileWriter(output);
         for (Object item : items) {
+            if (item instanceof LazyCompletionItem) {
+                ((LazyCompletionItem) item).accept();
+            }
             String itemString = item.toString();
             if (!(org.openide.util.Utilities.isMac() && itemString.equals("apple"))) { //ignoring 'apple' package
                 out.write(itemString);
