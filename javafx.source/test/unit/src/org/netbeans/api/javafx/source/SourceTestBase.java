@@ -199,6 +199,36 @@ public class SourceTestBase extends NbTestCase {
 //        Utilities.setCaseSensitive(true);
     }
 
+    protected void indexPlatform() throws Exception {
+        final ClassIndexManager mgr  = ClassIndexManager.getDefault();
+        for (ClassPath.Entry entry : getBootClassPath().entries()) {
+            mgr.createUsagesQuery(entry.getURL(), false);
+        }
+        final ClasspathInfo cpInfo = ClasspathInfo.create(getBootClassPath(),
+                ClassPathSupport.createClassPath(new URL[0]), getBootClassPath());
+        assertNotNull(cpInfo);
+        final JavaFXSource js = JavaFXSource.create(cpInfo, Collections.<FileObject>emptyList());
+        assertNotNull(js);
+        for (ClassPath.Entry entry : getBootClassPath().entries()) {
+            final URL url = entry.getURL();
+            String surl = url.toURI().toString();
+            // skip rt jars. Java infrastructure complains about them.
+            if (surl.contains("rt.jar") || surl.contains("rt15.jar")) {
+                continue;
+            }
+            final ClassIndexImpl cii = mgr.createUsagesQuery(url, false);
+            ClassIndexManager.getDefault().writeLock(new ClassIndexManager.ExceptionAction<Void>() {
+
+                public Void run() throws IOException, InterruptedException {
+                    BinaryAnalyser ba = cii.getBinaryAnalyser();
+                    ba.start(url, new AtomicBoolean(false), new AtomicBoolean(false));
+                    ba.finish();
+                    return null;
+                }
+            });
+        }
+    }
+
     @Override
     protected void tearDown() throws Exception {
         this.bootPath = null;
