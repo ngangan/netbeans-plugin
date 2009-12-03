@@ -486,11 +486,18 @@ made subject to such option by the copyright holder.
             <test-dependencies>
                 <test-type>
                     <name>unit</name>
+
+                    <!-- NOTE: Be sure this is the first unit dependency.
+                    Otherwise bunch of tests fail. This means that you need to
+                    tweak this file manually after using NetBeans GUI wizards.
+                    Hopefully this will catch your eyes during before-commit
+                    review. -->
                     <test-dependency>
                         <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
                         <compile-dependency/>
                         <test/>
                     </test-dependency>
+
                     <test-dependency>
                         <code-name-base>org.netbeans.libs.junit4</code-name-base>
                         <compile-dependency/>
