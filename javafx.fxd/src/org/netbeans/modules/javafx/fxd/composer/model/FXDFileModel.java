@@ -127,13 +127,14 @@ public final class FXDFileModel implements DocumentModelStateListener {
 
     synchronized FXDRootElement getRootNode() {
         //TODO Use better construction
-        if (m_docModel != null){
-            return (FXDRootElement) DocumentElementWrapper.wrap(
-                    m_docModel.getRootElement().getElement(0), true);
-        } else {
-            return null;
+        if (m_docModel != null) {
+            DocumentElement elem = m_docModel.getRootElement().getElement(0);
+            if (elem != null) {
+                return (FXDRootElement) DocumentElementWrapper.wrap(elem, true);
+            }
         }
-    }    
+        return null;
+    }
         
     protected DocumentElement findElement( final DocumentElement de, final String id) {
         //TODO Do not use the String id, use number instead and use fact that the sequence is monotonuous
