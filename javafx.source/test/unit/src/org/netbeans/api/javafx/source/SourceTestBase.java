@@ -39,9 +39,12 @@
 
 package org.netbeans.api.javafx.source;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -324,6 +327,18 @@ public class SourceTestBase extends NbTestCase {
         w.write(s);
         w.close();
         os.close();
+    }
+
+    /** Copy-pasted from APISupport. */
+    public static String slurp(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            FileUtil.copy(is, baos);
+            return baos.toString("UTF-8");
+        } finally {
+            is.close();
+        }
     }
 
 }
