@@ -43,11 +43,11 @@ package org.netbeans.modules.javafx.lexer;
 
 import java.io.File;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.SourceTestBase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.lib.lexer.test.LexerTestUtilities;
-import org.netbeans.modules.javafx.platform.JavaFXTestBase;
 
 /**
  * Test how many flyweight tokens gets created over a typical java source
@@ -55,7 +55,7 @@ import org.netbeans.modules.javafx.platform.JavaFXTestBase;
  *
  * @author mmetelka
  */
-public class JavaFlyTokensTest extends JavaFXTestBase {
+public class JavaFlyTokensTest extends SourceTestBase {
     
     public JavaFlyTokensTest(String testName) {
         super(testName);

@@ -39,9 +39,12 @@
 
 package org.netbeans.api.javafx.source;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -57,13 +60,8 @@ import junit.framework.Assert;
 
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
-//import org.netbeans.api.java.source.gen.WhitespaceIgnoringDiff;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.lib.lexer.test.TestLanguageProvider;
@@ -71,10 +69,6 @@ import org.netbeans.modules.java.source.TreeLoader;
 import org.netbeans.modules.java.source.usages.BinaryAnalyser;
 import org.netbeans.modules.java.source.usages.ClassIndexImpl;
 import org.netbeans.modules.java.source.usages.ClassIndexManager;
-//import org.netbeans.modules.java.source.usages.IndexUtil;
-//import org.netbeans.modules.javafx.platform.JavaFXTestBase;
-//import org.netbeans.spi.editor.completion.CompletionItem;
-//import org.netbeans.spi.editor.completion.CompletionProvider;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 import org.netbeans.spi.editor.mimelookup.MimeDataProvider;
 import org.netbeans.spi.java.classpath.ClassPathProvider;
@@ -208,6 +202,36 @@ public class SourceTestBase extends NbTestCase {
 //        Utilities.setCaseSensitive(true);
     }
 
+    protected void indexPlatform() throws Exception {
+        final ClassIndexManager mgr  = ClassIndexManager.getDefault();
+        for (ClassPath.Entry entry : getBootClassPath().entries()) {
+            mgr.createUsagesQuery(entry.getURL(), false);
+        }
+        final ClasspathInfo cpInfo = ClasspathInfo.create(getBootClassPath(),
+                ClassPathSupport.createClassPath(new URL[0]), getBootClassPath());
+        assertNotNull(cpInfo);
+        final JavaFXSource js = JavaFXSource.create(cpInfo, Collections.<FileObject>emptyList());
+        assertNotNull(js);
+        for (ClassPath.Entry entry : getBootClassPath().entries()) {
+            final URL url = entry.getURL();
+            String surl = url.toURI().toString();
+            // skip rt jars. Java infrastructure complains about them.
+            if (surl.contains("rt.jar") || surl.contains("rt15.jar")) {
+                continue;
+            }
+            final ClassIndexImpl cii = mgr.createUsagesQuery(url, false);
+            ClassIndexManager.getDefault().writeLock(new ClassIndexManager.ExceptionAction<Void>() {
+
+                public Void run() throws IOException, InterruptedException {
+                    BinaryAnalyser ba = cii.getBinaryAnalyser();
+                    ba.start(url, new AtomicBoolean(false), new AtomicBoolean(false));
+                    ba.finish();
+                    return null;
+                }
+            });
+        }
+    }
+
     @Override
     protected void tearDown() throws Exception {
         this.bootPath = null;
@@ -271,7 +295,6 @@ public class SourceTestBase extends NbTestCase {
 
     public static void testInsideSourceTask(FileObject fo, final Task<CompilationController> task) throws Exception {
         JavaFXSource src = JavaFXSource.forFileObject(fo);
-        System.err.println("src=" + src);
         DataObject dobj = DataObject.find(fo);
         EditorCookie ec = dobj.getCookie(EditorCookie.class);
         Document doc = ec.openDocument();
@@ -304,6 +327,18 @@ public class SourceTestBase extends NbTestCase {
         w.write(s);
         w.close();
         os.close();
+    }
+
+    /** Copy-pasted from APISupport. */
+    public static String slurp(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            FileUtil.copy(is, baos);
+            return baos.toString("UTF-8");
+        } finally {
+            is.close();
+        }
     }
 
 }
