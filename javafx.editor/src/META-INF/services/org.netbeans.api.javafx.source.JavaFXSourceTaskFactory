@@ -11,5 +11,5 @@ org.netbeans.modules.javafx.editor.hints.OverrideAllTaskFactory
 org.netbeans.modules.javafx.editor.hints.MixinNotImplementedAbstractsTaskFactory
 org.netbeans.modules.javafx.editor.hints.MarkOverriddenTaskFactory
 org.netbeans.modules.javafx.editor.hints.AddImportTaskFactory
-org.netbeans.modules.javafx.editor.hints.CreateNewElementTaskFactory
+#org.netbeans.modules.javafx.editor.hints.CreateNewElementTaskFactory
 #org.netbeans.modules.javafx.preview.JavaFXSourcePreviewTaskFactory
