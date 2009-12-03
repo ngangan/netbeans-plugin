@@ -25,6 +25,9 @@ import org.netbeans.modules.javafx.editor.JavaFXDocument;
  */
 final class HintsUtils {
 
+    static final String TAB = "    "; //NOI18N
+    static final String EXCEPTION_UOE = "java.lang.UnsupportedOperationException"; //NOI18N
+
     private HintsUtils() {
     }
 

@@ -76,8 +76,6 @@ import org.openide.util.NbBundle;
  */
 public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
-    private static final String EXCEPTION = "java.lang.UnsupportedOperationException"; //NOI18N
-    private static final String TAB = "    "; //NOI18N
     private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
@@ -242,7 +240,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                             if (target == null) {
                                 return;
                             }
-                            Imports.addImport(target, EXCEPTION);
+                            Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
                             for (MethodSymbol method : abstractMethods) {
                                 addImport(target, method.asType());
                                 for (VarSymbol var : method.getParameters()) {
@@ -287,7 +285,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
             private String createMethod(MethodSymbol methodSymbol, String space) {
                 StringBuilder method = new StringBuilder();
-                method.append("\n").append(space).append(TAB).append("override "); //NOI18N
+                method.append("\n").append(space).append(HintsUtils.TAB).append("override "); //NOI18N
                 for (Modifier modifier : methodSymbol.getModifiers()) {
                     switch (modifier) {
                         case PUBLIC:
@@ -328,8 +326,8 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     returnType = HintsUtils.getClassSimpleName(returnType);
                 }
                 method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
-                method.append(space).append(TAB).append(TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                method.append(space).append(TAB).append("}\n"); //NOI18N
+                method.append(space).append(HintsUtils.TAB).append(HintsUtils.TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                method.append(space).append(HintsUtils.TAB).append("}\n"); //NOI18N
 
                 return method.toString();
             }
