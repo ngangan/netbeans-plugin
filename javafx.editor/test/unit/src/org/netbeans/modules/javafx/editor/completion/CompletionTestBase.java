@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.editor.completion;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
