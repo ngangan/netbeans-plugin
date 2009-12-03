@@ -57,13 +57,8 @@ import junit.framework.Assert;
 
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
-//import org.netbeans.api.java.source.gen.WhitespaceIgnoringDiff;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.lib.lexer.test.TestLanguageProvider;
@@ -71,10 +66,6 @@ import org.netbeans.modules.java.source.TreeLoader;
 import org.netbeans.modules.java.source.usages.BinaryAnalyser;
 import org.netbeans.modules.java.source.usages.ClassIndexImpl;
 import org.netbeans.modules.java.source.usages.ClassIndexManager;
-//import org.netbeans.modules.java.source.usages.IndexUtil;
-//import org.netbeans.modules.javafx.platform.JavaFXTestBase;
-//import org.netbeans.spi.editor.completion.CompletionItem;
-//import org.netbeans.spi.editor.completion.CompletionProvider;
 import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
 import org.netbeans.spi.editor.mimelookup.MimeDataProvider;
 import org.netbeans.spi.java.classpath.ClassPathProvider;
@@ -271,7 +262,6 @@ public class SourceTestBase extends NbTestCase {
 
     public static void testInsideSourceTask(FileObject fo, final Task<CompilationController> task) throws Exception {
         JavaFXSource src = JavaFXSource.forFileObject(fo);
-        System.err.println("src=" + src);
         DataObject dobj = DataObject.find(fo);
         EditorCookie ec = dobj.getCookie(EditorCookie.class);
         Document doc = ec.openDocument();
