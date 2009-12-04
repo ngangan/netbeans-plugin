@@ -33,7 +33,6 @@ import org.netbeans.modules.javafx.refactoring.impl.plugins.RenamePackagePlugin;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.RenameRefactoringPlugin;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
@@ -59,15 +58,15 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
         Lookup look = refactoring.getRefactoringSource();
         FileObject file = look.lookup(FileObject.class);
         NonRecursiveFolder folder = look.lookup(NonRecursiveFolder.class);
-        TreePathHandle tph = look.lookup(TreePathHandle.class);
+        ElementLocation location = look.lookup(ElementLocation.class);
 
         if (refactoring instanceof WhereUsedQuery) {
-            if (tph == null ) return null;
+            if (location == null ) return null;
             return new WhereUsedQueryPlugin((WhereUsedQuery)refactoring);
         }
 
         if (refactoring instanceof RenameRefactoring) {
-            if (tph !=null || ((file!=null) && SourceUtils.isJavaFXFile(file))) {
+            if (location !=null || ((file!=null) && SourceUtils.isJavaFXFile(file))) {
                 //rename javafx file, class, method etc..
                 return new RenameRefactoringPlugin((RenameRefactoring)refactoring);
             } else if (file!=null && SourceUtils.isOnSourceClasspath(file) && file.isFolder()) {

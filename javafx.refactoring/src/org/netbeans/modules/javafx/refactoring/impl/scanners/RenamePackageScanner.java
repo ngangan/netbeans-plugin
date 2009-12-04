@@ -28,50 +28,91 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
-import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.MemberSelectTree;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import java.util.Set;
-import java.util.regex.Pattern;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.PackageElement;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.refactoring.spi.ProgressProvider;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class RenamePackageScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
+public class RenamePackageScanner extends BaseRefactoringScanner {
     final private static String TYPE_MATCH_PATTERN = "(\\..+)*(\\[\\])*";
-    
-    final private String origQualName;
-    final private ProgressProvider pp;
 
-    public RenamePackageScanner(String origName, ProgressProvider pp, CompilationController cc) {
-        super(cc);
-        this.origQualName = origName;
+    final private ProgressProvider pp;
+    final private CompilationController cc;
+
+    public RenamePackageScanner(ElementLocation location, ProgressProvider pp, CompilationController cc) {
+        super(location, cc);
+        this.cc = cc;
         this.pp = pp;
     }
 
-    @Override
-    public Void visitCompilationUnit(UnitTree node, Set<TreePathHandle> p) {
-        ExpressionTree packageNameTree = node.getPackageName();
-        String packageName = packageNameTree != null ? packageNameTree.toString() : "";
-        if (packageName.equals(origQualName)) {
-            JavaFXTreePath packageNameTp = getCompilationController().getTrees().getPath(node, node.getPackageName());
-            p.add(TreePathHandle.create(packageNameTp, getCompilationController()));
-        }
-        return super.visitCompilationUnit(node, p);
+    public RenamePackageScanner(String pkgName, ProgressProvider pp, CompilationController cc) {
+        this(inferLocation(pkgName, cc), pp, cc);
     }
 
-    @Override
-    public Void visitMemberSelect(MemberSelectTree node, Set<TreePathHandle> p) {
-        if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, node.getExpression().toString())) {
-            p.add(TreePathHandle.create(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()), getCompilationController()));
-            return null;
-        }
-        return super.visitMemberSelect(node, p);
+    private static ElementLocation inferLocation(final String pkgName, final CompilationController cc) {
+        final ElementLocation[] location = new ElementLocation[1];
+        new JavaFXTreePathScanner<Void, Void>() {
+            private boolean guessed = false;
+            @Override
+            public Void scan(Tree tree, Void p) {
+                super.scan(tree, p);
+                if (location[0] == null || guessed) {
+                    if (tree != null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT)) {
+                        checkLocation(tree);
+                    }
+                }
+                return null;
+            }
+
+            private void checkLocation(Tree tree) {
+                Element e = null;
+                JavaFXTreePath path = getCurrentPath() != null ? JavaFXTreePath.getPath(getCurrentPath(), tree) : null;
+                if (path != null) {
+                    e = cc.getTrees().getElement(path);
+                }
+                if (e == null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
+                    e = cc.getElementUtilities().getPackageElement(tree.toString());
+                    if (((PackageElement)e).getQualifiedName().contentEquals(pkgName)) {
+                        location[0] = new ElementLocation(e, (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), tree),cc);
+                        guessed = true;
+                    }
+                } else if (e != null && e.getKind() == ElementKind.PACKAGE) {
+                    if (((PackageElement) e).getQualifiedName().contentEquals(pkgName)) {
+                        location[0] = ElementLocation.forPath(path, cc);
+                    }
+                }
+            }
+        }.scan(cc.getCompilationUnit(), null);
+        return location[0];
     }
+//
+//    @Override
+//    public Void visitCompilationUnit(UnitTree node, Set<ElementLocation> p) {
+//        ExpressionTree packageNameTree = node.getPackageName();
+//        String packageName = packageNameTree != null ? packageNameTree.toString() : "";
+//        if (packageName.equals(origQualName)) {
+//            JavaFXTreePath packageNameTp = cc.getTrees().getPath(node, node.getPackageName());
+//            p.add(ElementLocation.locationFor(packageNameTp, cc));
+//        }
+//        return super.visitCompilationUnit(node, p);
+//    }
+//
+//    @Override
+//    public Void visitMemberSelect(MemberSelectTree node, Set<ElementLocation> p) {
+//        if (Pattern.matches(origQualName + TYPE_MATCH_PATTERN, node.getExpression().toString())) {
+//            p.add(ElementLocation.locationFor(JavafxcTrees.getPath(getCurrentPath(), node.getExpression()), cc));
+//            return null;
+//        }
+//        return super.visitMemberSelect(node, p);
+//    }
 }

@@ -73,15 +73,14 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.javafx.refactoring.impl.DeleteTextRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.InsertTextRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
-import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
-import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -323,7 +322,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 String targetPkg = renameMap.get(packageName);
                                 if (targetPkg != null) {
                                     JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), node.getPackageName());
-                                    elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                                    elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
                                 }
                                 return super.visitCompilationUnit(node, p);
                             }
@@ -339,11 +338,10 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         return p[0];
     }
 
-    private Problem fixImports(final Map<String, String> renameMap, final Set<FileObject> related, final Set<String> movedClasses, final RefactoringElementsBag elements) {
+    private Problem fixImports(final Map<String, String> renameMap, final Collection<FileObject> files, final Set<String> movedClasses, final RefactoringElementsBag elements) {
         final Problem[] problem = new Problem[1];
 
-        for(final FileObject fo : related) {
-            if (filesToMove.contains(fo)) continue;
+        for(final FileObject fo : files) {
             
             JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
 
@@ -351,6 +349,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 final Set<String> imported = new HashSet<String>();
                 final Set<String> toImport = new HashSet<String>();
                 final int[] importLastLine = new int[]{-1};
+                final boolean[] addTail = new boolean[]{false};
                 final TransformationContext tContext = new TransformationContext(); // TransformationContext per FileObject
 
                 jfxs.runUserActionTask(new Task<CompilationController>() {
@@ -368,7 +367,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                     if (qualidTree != null && qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
                                         ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
                                         if (parts.packageName != null) {
-                                            String targetPkg = renameMap.get(parts.packageName);
+                                            String targetPkg = renameMap.isEmpty() ? parts.packageName : renameMap.get(parts.packageName);
                                             if (myPkgName.equals(targetPkg)) {
                                                 imported.add(qualidTree.toString().replace(parts.packageName, targetPkg));
                                                 SourcePositions sp = cc.getTrees().getSourcePositions();
@@ -381,12 +380,22 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                             }
                                         }
                                     }
+                                    addTail[0] = true;
                                     importLastLine[0] = (int)cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
                                     return super.visitImport(node, p);
                                 } finally {
                                     removingImport = false;
                                     handlingImport = false;
                                 }
+                            }
+
+                            @Override
+                            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                                if (importLastLine[0] == -1) {
+                                    addTail[0] = false;
+                                    importLastLine[0] = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
+                                }
+                                return super.visitClassDeclaration(node, p);
                             }
 
                             @Override
@@ -398,7 +407,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 String fqn = ((TypeElement)e).getQualifiedName().toString();
                                 if (!fqn.equals(usedName)) {
                                     ImportParts parts = getImportParts(et);
-                                    String newPkg = renameMap.get(parts.packageName);
+                                    String newPkg = renameMap.isEmpty() ? parts.packageName : renameMap.get(parts.packageName);
 
                                     if (parts.typeName != null) {
                                         String importName = parts.typeName;
@@ -428,7 +437,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                             } else {
                                                 imported.add(parts.typeName.replace(parts.packageName, targetPkg));
                                             }
-                                            elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(parts.treePath, cc), targetPkg, parts.packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
+                                            elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(parts.treePath, cc), targetPkg, parts.packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
                                         }
                                     }
                                     return null;
@@ -441,7 +450,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                             String oldPkgName = ip.packageName;
                                             String newPkgName = renameMap.get(oldPkgName);
                                             if (newPkgName != null) {
-                                                elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(getCurrentPath(), cc), newPkgName, oldPkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
+                                                elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(getCurrentPath(), cc), newPkgName, oldPkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
                                                 return null;
                                             }
                                         }
@@ -488,7 +497,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         problem[0] = chainProblems(problem[0], p);
                         if (problem[0] == null && importLastLine[0] > -1) {
                             for(String imprt : toImport) {
-                                elements.add(refactoring, InsertTextRefactoringElement.create(fo, importLastLine[0], true, "import " + imprt + ";\n", Lookups.singleton(tContext)));
+                                elements.add(refactoring, InsertTextRefactoringElement.create(fo, importLastLine[0], addTail[0], "import " + imprt + ";\n", Lookups.singleton(tContext)));
                             }
                         }
                     }
@@ -517,7 +526,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         p = chainProblems(p, checkProjectDeps(related));
         fireProgressListenerStep(3);
         p = chainProblems(p, renamePackages(renameMap, movedClasses, elements));
-        fireProgressListenerStep(3);
+        fireProgressListenerStep(2);
+        p = chainProblems(p, fixImports(Collections.EMPTY_MAP, filesToMove, movedClasses, elements));
+        fireProgressListenerStep(1);
         p = chainProblems(p, fixImports(renameMap, related, movedClasses, elements));
         fireProgressListenerStop();
         return p;

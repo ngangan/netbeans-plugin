@@ -32,90 +32,85 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXScript;
+import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-abstract public class BaseRefactoringScanner<R, P> extends JavaFXTreePathScanner<R, P>{
-    final private TreePathHandle searchHandle;
+public class BaseRefactoringScanner extends JavaFXTreePathScanner<Void, Set<ElementLocation>> {
+    final private ElementLocation location;
     final private Element origElement;
-    final private ElementHandle origHandle;
-    final private ElementKind origKind;
     final private CompilationController cc;
     final private SourcePositions positions;
     
     /**
      * 
-     * @param searchHandle A {@linkplain TreePathHandle} instance to rename from (if "eh" not provided it is resolved from "searchHandle")
+     * @param location A {@linkplain TreePathHandle} instance to rename from (if "eh" not provided it is resolved from "searchHandle")
      * @param eh If provided (not NULL) this takes precedence over the searchHandle
      * @param cc {@linkplain CompilationController} instance
      */
-    public BaseRefactoringScanner(TreePathHandle searchHandle, ElementHandle eh, CompilationController cc) {
-        this.searchHandle = searchHandle;
-        if (eh != null) {
-            this.origHandle = eh;
-            this.origElement = eh.resolve(cc);
-            this.origKind = eh.getKind();
-        } else {
-            this.origElement = searchHandle.resolveElement(cc);
-            this.origHandle = ElementHandle.create(origElement);
-            this.origKind = origElement != null ? origElement.getKind() : null;
-        }
+    public BaseRefactoringScanner(ElementLocation location, CompilationController cc) {
+        this.location = location;
+        this.origElement = location.getElement(cc);
         this.cc = cc;
         this.positions = cc.getTrees().getSourcePositions();
     }
-
-    public BaseRefactoringScanner(TreePathHandle searchHandle, CompilationController cc) {
-        this(searchHandle, null, cc);
-    }
     
-    public BaseRefactoringScanner(CompilationController cc) {
-        this(null, null, cc);
-    }
 
     @Override
-    final public R scan(Tree tree, P p) {
-        if (tree != null) { // unbelievable, but can happen
-            long start = positions.getStartPosition(getCompilationController().getCompilationUnit(), tree);
-            long end =  positions.getEndPosition(getCompilationController().getCompilationUnit(), tree);
-            if (end == start &&
-                tree.getJavaFXKind() != Tree.JavaFXKind.PARENTHESIZED) // this is a workaround for javafxc bug setting PARENTHESIZED positions such as start == end
-                return null;
+    final public Void scan(Tree tree, Set<ElementLocation> p) {
+        JavaFXTreePath oldPath = getCurrentPath();
+        super.scan(tree, p);
+
+        if (tree != null && (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals("")))) {
+            int start = (int)positions.getStartPosition(getCC().getCompilationUnit(), tree);
+            int end = (int)positions.getEndPosition(getCC().getCompilationUnit(), tree);
+            if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && start != -1 && start != end) {
+                // check for javafx$run$ magic
+                if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
+                    JavaFXTreePath path = (tree != null && oldPath != null) ? JavafxcTrees.getPath(oldPath, tree) : null;
+                    Element scannedElement = path != null ? getCC().getTrees().getElement(path) : null;
+                    if (scannedElement == null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
+                        scannedElement = getCC().getElementUtilities().getPackageElement(tree.toString());
+                        if (ElementHandle.create(origElement).equals(ElementHandle.create(scannedElement))) {
+                            p.add(new ElementLocation(scannedElement, (int)getCC().getTrees().getSourcePositions().getStartPosition(getCC().getCompilationUnit(), tree), getCC()));
+                        }
+                    } else if (origElement == scannedElement && isChecked(path, scannedElement)) {
+                        p.add(ElementLocation.forPath(path, getCC()));
+                    }
+                }
+            }
         }
-        return super.scan(tree, p);
+
+        return null;
     }
 
-    final protected TreePathHandle getTreePathHandle() {
-        return searchHandle;
+    final protected ElementLocation getElementLocation() {
+        return location;
     }
 
-    final protected ElementHandle getElementHandle() {
-        return origHandle;
+    final protected Element getElement() {
+        return origElement;
     }
 
     final protected ElementKind getElementKind() {
-        return origKind;
+        return origElement != null ? origElement.getKind() : ElementKind.OTHER;
     }
 
-    final protected CompilationController getCompilationController() {
+    final protected CompilationController getCC() {
         return cc;
     }
 
-    final protected boolean isSameElement() {
-        return isSameElement(getCurrentPath());
-    }
-
-    final protected boolean isSameElement(JavaFXTreePath path) {
-        Element el = getCompilationController().getTrees().getElement(path);
-        if (el != null) {
-            return el == origElement;
-        }
-        return false;
-    }
+    protected boolean isChecked(JavaFXTreePath path, Element element) {return true;}
 }
