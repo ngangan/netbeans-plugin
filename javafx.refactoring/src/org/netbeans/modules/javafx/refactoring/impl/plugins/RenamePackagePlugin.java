@@ -43,10 +43,15 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -59,6 +64,7 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
@@ -72,7 +78,6 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
@@ -106,6 +111,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         this.isRenameRefactoring = true;
         boolean recurse = true;
         FileObject fo = rename.getRefactoringSource().lookup(FileObject.class);
+        ElementLocation l = rename.getRefactoringSource().lookup(ElementLocation.class);
         if (fo == null) {
             fo = (rename.getRefactoringSource().lookup(NonRecursiveFolder.class)).getFolder();
             recurse = false;
@@ -278,9 +284,12 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         Set<FileObject> set = new HashSet<FileObject>();
         for (Map.Entry<FileObject, ElementHandle> entry : classes.entrySet()) {
             //set.add(SourceUtils.getFile(el, cpInfo));
-            Set<FileObject> files = idx.getResources(entry.getValue(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS),EnumSet.of(ClassIndex.SearchScope.SOURCE));
+            Set<FileObject> files = idx.getResources(entry.getValue(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS, ClassIndex.SearchKind.PACKAGES),EnumSet.of(ClassIndex.SearchScope.SOURCE));
             set.addAll(files);
             whoReferences.put(entry.getKey(), files);
+        }
+        for(String pkgName : packages) {
+            set.addAll(idx.getResources(new ElementHandle(ElementKind.PACKAGE, new String[]{pkgName, null, null}), EnumSet.of(ClassIndex.SearchKind.PACKAGES), EnumSet.allOf(ClassIndex.SearchScope.class)));
         }
         set.addAll(filesToMove);
         return set;
@@ -347,10 +356,10 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
 
                     public void run(CompilationController cc) throws Exception {
                         for (String pkgName : packages) {
-                            Set<TreePathHandle> handles = new HashSet<TreePathHandle>();
-                            new RenamePackageScanner(pkgName, RenamePackagePlugin.this, cc).scan(cc.getCompilationUnit(), handles);
-                            for(TreePathHandle tph : handles) {
-                                elements.add(refactoring, RenameRefactoringElement.create(tph, getTargetPackageName(refactoring.getRefactoringSource().lookup(FileObject.class)), pkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                            Set<ElementLocation> locations = new HashSet<ElementLocation>();
+                            new RenamePackageScanner(pkgName, RenamePackagePlugin.this, cc).scan(cc.getCompilationUnit(), locations);
+                            for(ElementLocation loc : locations) {
+                                elements.add(refactoring, RenameRefactoringElement.create(loc, getTargetPackageName(refactoring.getRefactoringSource().lookup(FileObject.class)), pkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
                             }
                         }
                     }

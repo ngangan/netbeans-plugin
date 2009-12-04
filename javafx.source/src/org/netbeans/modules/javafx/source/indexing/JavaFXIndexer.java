@@ -17,6 +17,7 @@ import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TypeClassTree;
+import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
@@ -126,6 +127,13 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             IndexDocument document = support.createDocument(indexable);
 
             JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
+
+                @Override
+                public Void visitCompilationUnit(UnitTree node, IndexDocument document) {
+                    String indexVal = node.getPackageName().toString();
+                    index(document, IndexKey.PACKAGE_NAME, indexVal);
+                    return super.visitCompilationUnit(node, document);
+                }
 
                 @Override
                 public Void visitImport(ImportTree node, IndexDocument document) {

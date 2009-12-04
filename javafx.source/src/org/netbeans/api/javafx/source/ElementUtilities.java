@@ -41,6 +41,10 @@
 package org.netbeans.api.javafx.source;
 
 import com.sun.javadoc.Doc;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Source;
 import com.sun.tools.mjavac.code.Symbol;
@@ -56,14 +60,21 @@ import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.Name;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import com.sun.tools.javafxdoc.ClassDocImpl;
 import com.sun.tools.javafxdoc.DocEnv;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -79,6 +90,7 @@ import org.openide.util.Exceptions;
  * @author Jan Lahoda, Dusan Balek, Tomas Zezula
  */
 public final class ElementUtilities {
+    final private Map<Integer, SoftReference<Element>> elementCache = new HashMap<Integer, SoftReference<Element>>();
 
     private final Context ctx;
 //    private final ElementsService delegate;
@@ -228,6 +240,61 @@ public final class ElementUtilities {
      */
     public Element elementFor(Doc doc) {
         return (doc instanceof JavadocEnv.ElementHolder) ? ((JavadocEnv.ElementHolder) doc).getElement() : null;
+    }
+
+    public Element elementFor(final  int pos) {
+        synchronized(elementCache) {
+            SoftReference<Element> e = elementCache.get(pos);
+            if (e != null && e.get() != null) {
+                return e.get();
+            }
+        }
+        final SourcePositions positions = parserResultImpl.getTrees().getSourcePositions();
+        final Element[] e = new Element[1];
+        JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
+            private long lastValidSpan = Long.MAX_VALUE;
+            @Override
+            public Void scan(Tree tree, Void p) {
+                super.scan(tree, p);
+                if (tree != null) {
+                    long start = positions.getStartPosition(parserResultImpl.getCompilationUnit(), tree);
+                    long end = positions.getEndPosition(parserResultImpl.getCompilationUnit(), tree);
+
+                    if (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals(""))) {
+                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && start != -1 && start != end && start <= pos && end >=pos) {
+                            // check for javafx$run$ magic
+                            if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
+                                long span = end - start + 1;
+                                if (span < lastValidSpan) {
+                                    e[0] = JavafxTreeInfo.symbolFor((JFXTree)tree);
+                                    if (e[0] != null) {
+                                        lastValidSpan = span;
+                                    } else {
+                                        if (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                            // a bug in javafxc - not resolving package symbols in "package statement"
+                                            e[0] = getPackageElement(tree.toString());
+                                            lastValidSpan = span;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+        };
+        scanner.scan(parserResultImpl.getCompilationUnit(), null);
+        if (e[0] != null) {
+            synchronized(elementCache) {
+                elementCache.put(pos, new SoftReference<Element>(e[0]));
+            }
+        }
+        return e[0];
+    }
+
+    private Name nameFor(String aName) {
+        return Name.fromString(Name.Table.instance(ctx), aName);
     }
 
     /**
@@ -726,4 +793,15 @@ public final class ElementUtilities {
 //                return types.getDeclaredType(getDeclaredType((TypeElement)encl, map, types), e, targs);
 //        return types.getDeclaredType(e, targs);
 //    }
+
+    public Element getPackageElement(String fqn) {
+        Name.Table table = Name.Table.instance(ctx);
+        Symbol owner = null;
+
+        StringTokenizer st = new StringTokenizer(fqn, ".");
+        while(st.hasMoreTokens()) {
+            owner = new PackageSymbol(Name.fromString(table, st.nextToken()), owner);
+        }
+        return owner;
+    }
 }

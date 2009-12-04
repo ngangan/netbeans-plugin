@@ -42,9 +42,11 @@ package org.netbeans.modules.javafx.refactoring.impl.ui;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
@@ -65,28 +67,30 @@ public class WhereUsedQueryUI implements RefactoringUI {
     private WhereUsedQuery query = null;
     private final String name;
     private WhereUsedPanel panel;
-    private final TreePathHandle handle;
+    private final ElementLocation location;
     private ElementKind kind;
     private AbstractRefactoring delegate;
 
-    public WhereUsedQueryUI(TreePathHandle tph, CompilationInfo info) {
-        this.query = new WhereUsedQuery(Lookups.singleton(tph));
+    public WhereUsedQueryUI(ElementLocation location, CompilationInfo info) {
+        this.query = new WhereUsedQuery(Lookups.singleton(location));
         // XXX - Parsing API
 //        ClasspathInfo classpathInfoFor = RetoucheUtils.getClasspathInfoFor(jmiObject);
 //        if (classpathInfoFor != null) {
 //            this.query.getContext().add(classpathInfoFor);
 //        }
-        this.handle = tph;
-        name = tph.getSimpleName();
-        kind = tph.resolveElement(info).getKind();
+        this.location = location;
+//        this.handle = tph;
+        Element e = location.getElement(info);
+        name = e.getSimpleName().toString();
+        kind = e.getKind();
     }
     
-    public WhereUsedQueryUI(TreePathHandle tph, String name, AbstractRefactoring delegate) {
-        this.delegate = delegate;
-        //this.query.getContext().add(info.getClasspathInfo());
-        this.handle = tph;
-        this.name = name;
-    }
+//    public WhereUsedQueryUI(TreePathHandle tph, String name, AbstractRefactoring delegate) {
+//        this.delegate = delegate;
+//        //this.query.getContext().add(info.getClasspathInfo());
+//        this.handle = tph;
+//        this.name = name;
+//    }
     
     public boolean isQuery() {
         return true;
@@ -94,7 +98,7 @@ public class WhereUsedQueryUI implements RefactoringUI {
 
     public CustomRefactoringPanel getPanel(ChangeListener parent) {
         if (panel == null) {
-            panel = new WhereUsedPanel(name, handle, parent);
+            panel = new WhereUsedPanel(name, location, parent);
         }
         return panel;
     }
@@ -122,7 +126,7 @@ public class WhereUsedQueryUI implements RefactoringUI {
 //        } else {
 //            query.setRefactoringSource(Lookups.singleton(handle));
 //        }
-        query.setRefactoringSource(Lookups.singleton(handle));
+        query.setRefactoringSource(Lookups.singleton(location));
 
         query.putValue(WhereUsedQueryConstants.FIND_OVERRIDING_METHODS,panel.isMethodOverriders());
         query.putValue(WhereUsedQuery.FIND_REFERENCES,panel.isMethodFindUsages());

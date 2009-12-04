@@ -28,7 +28,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import org.netbeans.modules.javafx.refactoring.impl.scanners.RenameScanner;
+import org.netbeans.modules.javafx.refactoring.impl.scanners.BaseRefactoringScanner;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -61,10 +61,10 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
@@ -85,7 +85,6 @@ import org.openide.util.lookup.ProxyLookup;
 public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
     private final AtomicBoolean requestCancelled = new AtomicBoolean(false);
 
-    private TreePathHandle treePathHandle = null;
     private String fileName;
     private RenameRefactoring refactoring;
 
@@ -94,11 +93,13 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
     private Collection<ExecutableElement> overriddenByMethods = null; // methods that override the method to be renamed
     private Collection<ExecutableElement> overridesMethods = null; // methods that are overridden by the method to be renamed
 
+    private ElementLocation location = null;
+
     public RenameRefactoringPlugin(RenameRefactoring rename) {
         this.refactoring = rename;
-        TreePathHandle tph = rename.getRefactoringSource().lookup(TreePathHandle.class);
-        if (tph!=null) {
-            treePathHandle = tph;
+        ElementLocation loc = rename.getRefactoringSource().lookup(ElementLocation.class);
+        if (loc!=null) {
+            this.location = loc;
         } else {
             try {
                 getSource().runUserActionTask(new Task<CompilationController>() {
@@ -108,9 +109,10 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                     public void run(CompilationController co) throws Exception {
                         UnitTree cut = co.getCompilationUnit();
                         for (Tree t: cut.getTypeDecls()) {
-                            Element e = co.getTrees().getElement(JavaFXTreePath.getPath(cut, t));
+                            JavaFXTreePath path = JavaFXTreePath.getPath(cut, t);
+                            Element e = co.getTrees().getElement(path);
                             if (e!=null && e.getSimpleName().toString().equals(co.getFileObject().getName())) {
-                                treePathHandle = TreePathHandle.create(JavaFXTreePath.getPath(cut, t), co);
+                                location = ElementLocation.forPath(path, co);
                                 refactoring.getContext().add(co);
                                 break;
                             }
@@ -123,14 +125,14 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 ex.printStackTrace();
             }
         }
-        if (treePathHandle != null) {
-            fileName = treePathHandle.getFileObject().getName();
+        if (location != null) {
+            fileName = location.getSourceFile().getName();
         }
     }
 
     @Override
     protected JavaFXSource prepareSource() {
-        return JavaFXSource.forFileObject(treePathHandle.getFileObject());
+        return JavaFXSource.forFileObject(location.getSourceFile());
     }
 
     public void cancelRequest() {
@@ -142,9 +144,9 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
         final AtomicReference<Problem> problem = new AtomicReference<Problem>();
 
-        switch(treePathHandle.getKind()) {
-            case CLASS_DECLARATION: {
-                TypeElement te = (TypeElement) treePathHandle.resolveElement(info);
+        switch(location.getElement(info).getKind()) {
+            case CLASS: {
+                TypeElement te = (TypeElement) info.getElementUtilities().elementFor(location.getStartPosition());
                 switch(te.getNestingKind()) {
                     case MEMBER: {
                         final TypeElement parent = (TypeElement)te.getEnclosingElement();
@@ -172,8 +174,9 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
     public Problem fastCheckParameters(CompilationInfo info) {
         Problem fastCheckProblem = null;
-        JavaFXTreePath treePath = treePathHandle.resolve(info);
-        Element element = treePathHandle.resolveElement(info);
+        Element element = info.getElementUtilities().elementFor(location.getStartPosition());
+        JavaFXTreePath treePath = info.getTrees().getPath(element);
+
         ElementKind kind = element.getKind();
 
         String newName = refactoring.getNewName();
@@ -207,7 +210,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 Set<FileObject> typeDefFOs = getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
                 FileObject typeDefFO = typeDefFOs.iterator().next();
 
-                String oldFqn = ElementHandle.create(treePathHandle.resolveElement(info)).getQualifiedName();
+                String oldFqn = ElementHandle.create(element).getQualifiedName();
                 int pkgDelimitIndex = oldFqn.lastIndexOf(oldName);
                 String pkgname = oldFqn.substring(0, pkgDelimitIndex > 0 ? pkgDelimitIndex - 1 : 0);
                 String newFqn = pkgname + "." + newName;
@@ -228,7 +231,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                     }
                 }
             }
-            FileObject primFile = treePathHandle.getFileObject();
+            FileObject primFile = location.getSourceFile();
             FileObject folder = primFile.getParent();
             FileObject existing = folder.getFileObject(newName, primFile.getExt());
             if (existing != null && primFile != existing) {
@@ -256,7 +259,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
     public Problem preCheck(CompilationInfo info) {
         Problem preCheckProblem = null;
         fireProgressListenerStart(RenameRefactoring.PRE_CHECK, 4);
-        Element el = treePathHandle.resolveElement(info);
+        Element el = info.getElementUtilities().elementFor(location.getStartPosition());
         preCheckProblem = isSourceElement(el, info);
         if (preCheckProblem != null) return preCheckProblem;
 
@@ -320,20 +323,20 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
     public Problem prepare(final RefactoringElementsBag bag) {
         Lookup l = refactoring.getRefactoringSource();
-        final Set<TreePathHandle> references = new HashSet<TreePathHandle>();
+        final Set<ElementLocation> references = new HashSet<ElementLocation>();
         final Map<FileObject, TransformationContext> contextMap = new HashMap<FileObject, TransformationContext>();
 
-        JavaFXSource jfxs = JavaFXSource.forFileObject(treePathHandle.getFileObject());
+        JavaFXSource jfxs = JavaFXSource.forFileObject(location.getSourceFile());
         try {
             final Set<FileObject> refFos = new HashSet<FileObject>();
-            refFos.add(treePathHandle.getFileObject());
+            refFos.add(location.getSourceFile());
 
             final ElementHandle[] handle = new ElementHandle[1];
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(final CompilationController cc) throws Exception {
                     final ClassIndex ci = cc.getClasspathInfo().getClassIndex();
-                    Element el = treePathHandle.resolveElement(cc);
+                    Element el = cc.getElementUtilities().elementFor(location.getStartPosition());
                     handle[0] = ElementHandle.create(el);
                     switch(el.getKind()) {
                         case CLASS:
@@ -363,6 +366,10 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                             refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
                             break;
                         }
+                        case PACKAGE: {
+                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.PACKAGES), EnumSet.allOf(SearchScope.class)));
+                            break;
+                        }
                     }
                 }
             }, true);
@@ -373,14 +380,14 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, Set<TreePathHandle>> scanner = new RenameScanner(treePathHandle, handle[0], cc);
+                        JavaFXTreePathScanner<Void, Set<ElementLocation>> scanner = new BaseRefactoringScanner(location, cc);
                         scanner.scan(cc.getCompilationUnit(), references);
                     }
                 }, true);
             }
 
-            for(TreePathHandle tph : references) {
-                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(tph, refactoring.getNewName(), treePathHandle.getSimpleName(), new ProxyLookup(l, Lookups.singleton(contextMap.get(tph.getFileObject()))));
+            for(ElementLocation loc : references) {
+                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(loc, refactoring.getNewName(), loc.getElement().getSimpleName().toString(), new ProxyLookup(l, Lookups.singleton(contextMap.get(loc.getSourceFile()))));
                 if (refImpl != null) {
                     bag.add(refactoring, refImpl);
                 } else {

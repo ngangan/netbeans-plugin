@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
@@ -82,15 +83,15 @@ public class MoveClassUI implements RefactoringUI, RefactoringUIBypass {
     }
     
     public MoveClassUI (DataObject javaObject) {
-        this(javaObject, null, null, Collections.<TreePathHandle>emptyList());
+        this(javaObject, null, null, Collections.<ElementLocation>emptyList());
     }
     
-    public MoveClassUI (DataObject javaObject, FileObject targetFolder, PasteType pasteType, Collection<TreePathHandle> handles) {
+    public MoveClassUI (DataObject javaObject, FileObject targetFolder, PasteType pasteType, Collection<ElementLocation> locations) {
         this.disable = targetFolder != null ;
         this.targetFolder = targetFolder;
         this.javaObject = javaObject;
         this.pasteType = pasteType;
-        this.refactoring = new MoveRefactoring(Lookups.fixed(javaObject.getPrimaryFile(), handles.toArray(new Object[handles.size()])));
+        this.refactoring = new MoveRefactoring(Lookups.fixed(javaObject.getPrimaryFile(), locations.toArray(new Object[locations.size()])));
         this.refactoring.getContext().add(SourceUtils.getClasspathInfoFor(javaObject.getPrimaryFile()));
     }
     

@@ -61,7 +61,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.swing.text.BadLocationException;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -74,15 +73,14 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.javafx.refactoring.impl.DeleteTextRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.InsertTextRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
-import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
-import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -324,7 +322,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 String targetPkg = renameMap.get(packageName);
                                 if (targetPkg != null) {
                                     JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), node.getPackageName());
-                                    elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                                    elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
                                 }
                                 return super.visitCompilationUnit(node, p);
                             }
@@ -439,7 +437,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                             } else {
                                                 imported.add(parts.typeName.replace(parts.packageName, targetPkg));
                                             }
-                                            elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(parts.treePath, cc), targetPkg, parts.packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
+                                            elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(parts.treePath, cc), targetPkg, parts.packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
                                         }
                                     }
                                     return null;
@@ -452,7 +450,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                             String oldPkgName = ip.packageName;
                                             String newPkgName = renameMap.get(oldPkgName);
                                             if (newPkgName != null) {
-                                                elements.add(refactoring, RenameRefactoringElement.create(TreePathHandle.create(getCurrentPath(), cc), newPkgName, oldPkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
+                                                elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(getCurrentPath(), cc), newPkgName, oldPkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(tContext))));
                                                 return null;
                                             }
                                         }
