@@ -57,8 +57,13 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 final class PreviewImagePanel extends JPanel implements ActionLookup {
+    private static final String      MSG_CANNOT_SHOW     = "MSG_CANNOT_SHOW"; // NOI18N
+    private static final String      MSG_CANNOT_SHOW_OOM = "MSG_CANNOT_SHOW_OOM"; // NOI18N
+    private static final String      LBL_PARSING         = "LBL_PARSING"; // NOI18N
+    private static final String      LBL_RENDERING       = "LBL_RENDERING"; // NOI18N
+
     private static final float       ZOOM_STEP = (float) 1.1;
-    
+
     private final FXZDataObject m_dObj;
     private final Action []     m_actions;
     private final Color         m_defaultBackground;
@@ -121,12 +126,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                  !FXDComposerUtils.safeEquals( selectedEntryCopy,m_selectedEntryCopy)) {
                 removeAll();
                 setBackground( Color.WHITE);
+
                 final JLabel label = createWaitPanel();
-                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_PARSING")); //NOI18N            
-
+                label.setText( NbBundle.getMessage( PreviewImagePanel.class, LBL_PARSING));
                 add( label, BorderLayout.CENTER);
+                
                 m_fxScene = null;
-
                 Thread th = new Thread() {
                     @Override
                     public void run() {
@@ -138,58 +143,41 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         m_previewProfileCopy = profileCopy;
                         m_selectedEntryCopy = selectedEntryCopy;
 
-                        SwingUtilities.invokeLater( new Runnable() {
-                            public void run() {
-                                if ( fModel.isError()) {
-                                    setBackground( m_defaultBackground);
-                                    label.setIcon(null);
-                                    label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
-                                            fModel.getErrorMsg()));
-                                    return;
-                                }
-                                
-                                label.setText( NbBundle.getMessage( PreviewImagePanel.class, "LBL_RENDERING")); //NOI18N
+                        if (fModel.isError()) {
+                            showError(MSG_CANNOT_SHOW, fModel.getErrorMsg());
+                            return;
+                        } else {
+                            updateLabelMessage(label, LBL_RENDERING, null);
+                        }
+                            try {
+                                fModel.readLock();
+                                PreviewStatistics statistics = new PreviewStatistics();
+                                PreviewProgressNotifier progress = new PreviewProgressNotifier();
+                                PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
+                                progress.setLoader(loader);
 
-                                Thread loadThread = new Thread(){
+                                PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
+                                // PreviewProgressNotifier.notify() will invoke showImagePanel to show the image panel
 
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            try {
-                                                fModel.readLock();
-                                                PreviewStatistics statistics = new PreviewStatistics();
-                                                PreviewProgressNotifier progress = new PreviewProgressNotifier();
-                                                PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
-                                                progress.setLoader(loader);
-
-                                                PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
-                                                // PreviewProgressNotifier.notify() will invoke showImagePanel to show the image panel
-                                            } finally {
-                                                fModel.readUnlock();
-                                            }
-                                        } catch( OutOfMemoryError oom) {
-                                            oom.printStackTrace();
-                                            setBackground( m_defaultBackground);
-                                            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW_OOM", //NOI18N
-                                                oom.getLocalizedMessage()));
-                                            label.setIcon(null);
-                                        } catch( Exception e) {
-                                            e.printStackTrace();
-                                            setBackground( m_defaultBackground);
-                                            label.setText( NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", //NOI18N
-                                                e.getLocalizedMessage()));
-                                            label.setIcon(null);
-                                        } finally {
-                                            System.gc();
-                                        }
+                                // start temporary workaround for http://javafx-jira.kenai.com/browse/RT-6816
+                                while (loader.getIsDone() == false) {
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException ex) {
                                     }
-
-                                };
-                                loadThread.setName("FXDPreviewLoader-Thread");
-                                loadThread.start();
-
+                                }
+                                if (loader.getIsFailed()) {
+                                    Object cause = loader.getCauseOfFailure();
+                                    Object msg = (cause != null && cause instanceof Throwable)
+                                            ? ((Throwable) cause).getLocalizedMessage()
+                                            : cause;
+                                    showError(MSG_CANNOT_SHOW, msg);
+                                }
+                                // end temporary workaround
+                                //System.out.println("    ******************* starter thread loader: isDone=" + loader.getIsDone() + " isStarted=" + loader.getIsStarted() + " isStopped=" + loader.getIsStopped() + " isSusscess=" + loader.getIsSucceeded() + " isFail=" + loader.getIsFailed() + " err: " + loader.getCauseOfFailure());
+                            } finally {
+                                fModel.readUnlock();
                             }
-                        });                    
                     }
                 };
                 th.setName("ModelUpdate-Thread");  //NOI18N
@@ -199,47 +187,66 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             }
         } else {
             Exception error = m_dObj.getDataModel().getFXDContainerLoadError();
-            showError( error.getLocalizedMessage());
+            showError( MSG_CANNOT_SHOW, error.getLocalizedMessage());
         }
+    }
+
+    private void updateLabelMessage(final JLabel label, final String bundleKey, final String msg) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                label.setText(NbBundle.getMessage(PreviewImagePanel.class, bundleKey, msg));
+            }
+        });
     }
 
     private void showImagePanel(final Node node) {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                Scene fxScene = new Scene(true);
-                fxScene.addTriggers$();
-                fxScene.applyDefaults$();
-                fxScene.loc$content.insert(node);
-                fxScene.complete$();
-                Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
+                try {
+                    Scene fxScene = new Scene(true);
+                    fxScene.addTriggers$();
+                    fxScene.applyDefaults$();
+                    fxScene.loc$content.insert(node);
+                    fxScene.complete$();
+                    Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
 
-                m_fxScene = fxScene;
+                    m_fxScene = fxScene;
 
-                final SwingScenePanel scenePanel = getScenePanel(fxScene);
+                    final SwingScenePanel scenePanel = getScenePanel(fxScene);
 
-                removeAll();
-                add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
+                    removeAll();
+                    add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
-                MouseEventCollector mec = new MouseEventCollector();
-                scenePanel.addMouseListener(mec);
-                scenePanel.addMouseMotionListener(mec);
-                //zooming
-                scenePanel.addMouseWheelListener(mec);
-                addMouseWheelListener(mec);
-                // popup
-                PopupListener popupL = new PopupListener();
-                scenePanel.addMouseListener(popupL);
-                addMouseListener(popupL);
+                    MouseEventCollector mec = new MouseEventCollector();
+                    scenePanel.addMouseListener(mec);
+                    scenePanel.addMouseMotionListener(mec);
+                    //zooming
+                    scenePanel.addMouseWheelListener(mec);
+                    addMouseWheelListener(mec);
+                    // popup
+                    PopupListener popupL = new PopupListener();
+                    scenePanel.addMouseListener(popupL);
+                    addMouseListener(popupL);
 
-                revalidate();
-                updateZoom();
+                    revalidate();
+                    updateZoom();
+                } catch (OutOfMemoryError oom) {
+                    oom.printStackTrace();
+                    showError(MSG_CANNOT_SHOW_OOM, oom.getLocalizedMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showError(MSG_CANNOT_SHOW, e.getLocalizedMessage());
+                } finally {
+                    System.gc();
+                }
             }
         });
     }
 
     private class PreviewProgressNotifier extends ProgressNotifier{
-        private volatile PreviewLoader m_loader;
+        private PreviewLoader m_loader;
 
         protected void setLoader(PreviewLoader loader){
             assert loader != null;
@@ -247,34 +254,59 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         @Override
-        protected void notify(int phase, int percentage, int eventNum) {
-            if (percentage >= 100) {
-                new Thread(){
+        public void done() {
+            super.done();
+            //System.out.println("----------- done ---------------- loader: isDone=" + m_loader.getIsDone() + " isStarted=" + m_loader.getIsStarted() + " isStopped=" + m_loader.getIsStopped() + " isSusscess=" + m_loader.getIsSucceeded() + " isFail=" + m_loader.getIsFailed() + " err: " + m_loader.getCauseOfFailure());
+            new Thread() {
 
-                    @Override
-                    public void run() {
-                        while (m_loader.getIsDone() == false) {
-                            try {
-                                Thread.sleep(50);
-                            } catch (InterruptedException ex) {
-                            }
+                @Override
+                public void run() {
+                    //System.out.println("----------start waiting ");
+                    while (m_loader.getIsDone() == false) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException ex) {
                         }
+                    }
+                    //System.out.println("    loader: isDone=" + m_loader.getIsDone() + " isStarted=" + m_loader.getIsStarted() + " isStopped=" + m_loader.getIsStopped() + " isSusscess=" + m_loader.getIsSucceeded() + " isFail=" + m_loader.getIsFailed() + " err: " + m_loader.getCauseOfFailure());
+                    if (m_loader.getIsSucceeded()){
                         Node node = m_loader.get$content().getRoot$$bound$().get();
                         showImagePanel(node);
+                    } else {
+                        showError(MSG_CANNOT_SHOW, m_loader.getCauseOfFailure());
                     }
-                }.start();
-            }
+                }
+            }.start();
+        }
+
+        @Override
+        protected void notify(int phase, int percentage, int eventNum) {
+            // is not useful in current implementation
+            //System.out.println("----------- notify----------------");
         }
     };
 
-    private void showError( final String msg) {
-        removeAll();
-        setBackground( m_defaultBackground);
+    private void showError(final String bundleKey, final Object msg) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            doShowError(bundleKey, msg);
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
 
-        JLabel label = new JLabel( 
-            NbBundle.getMessage( PreviewImagePanel.class, "MSG_CANNOT_SHOW", msg), //NOI18N                                
-            JLabel.CENTER);
-        add( label, BorderLayout.CENTER);
+                public void run() {
+                    doShowError(bundleKey, msg);
+                }
+            });
+        }
+    }
+
+    private void doShowError(final String bundleKey, final Object msg) {
+        removeAll();
+        setBackground(m_defaultBackground);
+
+        JLabel label = new JLabel(
+                NbBundle.getMessage(PreviewImagePanel.class, bundleKey, msg),
+                JLabel.CENTER);
+        add(label, BorderLayout.CENTER);
     }
     
     private void updateZoom() {
