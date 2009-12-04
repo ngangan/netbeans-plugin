@@ -160,10 +160,6 @@ public class FmtOptions {
     public static final String blankLinesAfterMethods = "blankLinesAfterMethods"; //NOI18N
     public static final String blankLinesBeforeNonClassExpression = "blankLinesBeforeNonClassExpression"; //NOI18N
     public static final String blankLinesAfterNonClassExpression = "blankLinesAfterNonClassExpression"; //NOI18N
-    public static final String blankLinesBeforeNonClassAttribute = "blankLinesBeforeNonClassAttribute"; //NOI18N
-    public static final String blankLinesAfterNonClassAttribute = "blankLinesAfterNonClassAttribute"; //NOI18N
-    public static final String blankLinesBeforeNonClassFunction = "blankLinesBeforeNonClassFunction"; //NOI18N
-    public static final String blankLinesAfterNonClassFunction = "blankLinesAfterNonClassFunction"; //NOI18N
     
     public static final String spaceBeforeWhile = "spaceBeforeWhile"; //NOI18N
     public static final String spaceBeforeElse = "spaceBeforeElse"; //NOI18N
@@ -389,7 +385,7 @@ public class FmtOptions {
 
             { blankLinesBeforePackage, "0"}, //NOI18N
             { blankLinesAfterPackage, "1"}, //NOI18N
-            { blankLinesBeforeImports, "1"}, //NOI18N 
+            { blankLinesBeforeImports, "0"}, //NOI18N
             { blankLinesAfterImports, "1"}, //NOI18N
             { blankLinesBeforeClass, "1"}, //NOI18N 
             { blankLinesAfterClass, "0"}, //NOI18N
@@ -397,13 +393,9 @@ public class FmtOptions {
             { blankLinesBeforeFields, "0"}, //NOI18N 
             { blankLinesAfterFields, "0"}, //NOI18N
             { blankLinesBeforeMethods, "1"}, //NOI18N
-            { blankLinesAfterMethods, "0"}, //NOI18N
+            { blankLinesAfterMethods, "1"}, //NOI18N
             { blankLinesBeforeNonClassExpression, "1" }, //NOI18N
             { blankLinesAfterNonClassExpression, "0" }, //NOI18N
-            { blankLinesBeforeNonClassAttribute, "1" }, //NOI18N
-            { blankLinesAfterNonClassAttribute, "0" }, //NOI18N
-            { blankLinesBeforeNonClassFunction, "1" }, //NOI18N
-            { blankLinesAfterNonClassFunction, "0" }, //NOI18N
 
             { spaceBeforeWhile, TRUE}, //NOI18N // XXX
             { spaceBeforeElse, TRUE}, //NOI18N // XXX

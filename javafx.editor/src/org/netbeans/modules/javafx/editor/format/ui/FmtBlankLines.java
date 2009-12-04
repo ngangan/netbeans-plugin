@@ -51,7 +51,6 @@ import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
  */
 public class FmtBlankLines extends javax.swing.JPanel {
     
-    /** Creates new form FmtBlankLines */
     public FmtBlankLines() {
         initComponents();
         
@@ -66,30 +65,18 @@ public class FmtBlankLines extends javax.swing.JPanel {
         aAttributeField.putClientProperty(OPTION_ID, blankLinesAfterFields);
         bFunctionField.putClientProperty(OPTION_ID, blankLinesBeforeMethods );
         aFunctionField.putClientProperty(OPTION_ID, blankLinesAfterMethods);
-        bNonClassExpressionField.putClientProperty(OPTION_ID, blankLinesBeforeNonClassExpression);
-        aNonClassExpressionField.putClientProperty(OPTION_ID, blankLinesAfterNonClassExpression);
-        bNonClassAttributeField.putClientProperty(OPTION_ID, blankLinesBeforeNonClassAttribute);
-        aNonClassAttributeField.putClientProperty(OPTION_ID, blankLinesAfterNonClassAttribute);
-        bNonClassFunctionField.putClientProperty(OPTION_ID, blankLinesBeforeNonClassFunction);
-        aNonClassFunctionField.putClientProperty(OPTION_ID, blankLinesAfterNonClassFunction);
         
-        bPackageField.addKeyListener(new NumericKeyListener());
-        aPackageField.addKeyListener(new NumericKeyListener());
-        bImportsField.addKeyListener(new NumericKeyListener());
-        aImportsField.addKeyListener(new NumericKeyListener());
-        bClassField.addKeyListener(new NumericKeyListener());
-        aClassField.addKeyListener(new NumericKeyListener());
-        aClassHeaderField.addKeyListener(new NumericKeyListener());
-        bAttributeField.addKeyListener(new NumericKeyListener());
-        aAttributeField.addKeyListener(new NumericKeyListener());
-        bFunctionField.addKeyListener(new NumericKeyListener());
-        aFunctionField.addKeyListener(new NumericKeyListener());
-        bNonClassExpressionField.addKeyListener(new NumericKeyListener());
-        aNonClassExpressionField.addKeyListener(new NumericKeyListener());
-        bNonClassAttributeField.addKeyListener(new NumericKeyListener());
-        aNonClassAttributeField.addKeyListener(new NumericKeyListener());
-        bNonClassFunctionField.addKeyListener(new NumericKeyListener());
-        aNonClassFunctionField.addKeyListener(new NumericKeyListener());
+        bPackageField.addKeyListener(NumericKeyListener.getInstance());
+        aPackageField.addKeyListener(NumericKeyListener.getInstance());
+        bImportsField.addKeyListener(NumericKeyListener.getInstance());
+        aImportsField.addKeyListener(NumericKeyListener.getInstance());
+        bClassField.addKeyListener(NumericKeyListener.getInstance());
+        aClassField.addKeyListener(NumericKeyListener.getInstance());
+        aClassHeaderField.addKeyListener(NumericKeyListener.getInstance());
+        bAttributeField.addKeyListener(NumericKeyListener.getInstance());
+        aAttributeField.addKeyListener(NumericKeyListener.getInstance());
+        bFunctionField.addKeyListener(NumericKeyListener.getInstance());
+        aFunctionField.addKeyListener(NumericKeyListener.getInstance());
 
     }
     
@@ -128,18 +115,6 @@ public class FmtBlankLines extends javax.swing.JPanel {
         bFunctionField = new javax.swing.JTextField();
         aFunctionLabel = new javax.swing.JLabel();
         aFunctionField = new javax.swing.JTextField();
-        bNonClassExpressionLabel = new javax.swing.JLabel();
-        bNonClassExpressionField = new javax.swing.JTextField();
-        aNonClassExpressionLabel = new javax.swing.JLabel();
-        aNonClassExpressionField = new javax.swing.JTextField();
-        bNonClassAttributeLabel = new javax.swing.JLabel();
-        bNonClassAttributeField = new javax.swing.JTextField();
-        aNonClassAttributeLabel = new javax.swing.JLabel();
-        aNonClassAttributeField = new javax.swing.JTextField();
-        bNonClassFunctionLabel = new javax.swing.JLabel();
-        bNonClassFunctionField = new javax.swing.JTextField();
-        aNonClassFunctionLabel = new javax.swing.JLabel();
-        aNonClassFunctionField = new javax.swing.JTextField();
 
         setName(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "LBL_BlankLines")); // NOI18N
         setOpaque(false);
@@ -199,36 +174,6 @@ public class FmtBlankLines extends javax.swing.JPanel {
 
         aFunctionField.setColumns(5);
 
-        org.openide.awt.Mnemonics.setLocalizedText(bNonClassExpressionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassExpressionLabel.text")); // NOI18N
-
-        bNonClassExpressionField.setColumns(5);
-        bNonClassExpressionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassExpressionField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(aNonClassExpressionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassExpressionLabel.text")); // NOI18N
-
-        aNonClassExpressionField.setColumns(5);
-        aNonClassExpressionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassExpressionField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(bNonClassAttributeLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassAttributeLabel.text")); // NOI18N
-
-        bNonClassAttributeField.setColumns(5);
-        bNonClassAttributeField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassAttributeField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(aNonClassAttributeLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassAttributeLabel.text")); // NOI18N
-
-        aNonClassAttributeField.setColumns(5);
-        aNonClassAttributeField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassAttributeField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(bNonClassFunctionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassFunctionLabel.text")); // NOI18N
-
-        bNonClassFunctionField.setColumns(5);
-        bNonClassFunctionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.bNonClassFunctionField.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(aNonClassFunctionLabel, org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassFunctionLabel.text")); // NOI18N
-
-        aNonClassFunctionField.setColumns(5);
-        aNonClassFunctionField.setText(org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "FmtBlankLines.aNonClassFunctionField.text")); // NOI18N
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -245,21 +190,9 @@ public class FmtBlankLines extends javax.swing.JPanel {
                     .add(bAttributeLabel)
                     .add(aAttributeLabel)
                     .add(bFunctionLabel)
-                    .add(aFunctionLabel)
-                    .add(bNonClassExpressionLabel)
-                    .add(aNonClassExpressionLabel)
-                    .add(bNonClassAttributeLabel)
-                    .add(aNonClassAttributeLabel)
-                    .add(bNonClassFunctionLabel)
-                    .add(aNonClassFunctionLabel))
-                .add(6, 6, 6)
+                    .add(aFunctionLabel))
+                .add(42, 42, 42)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(aNonClassFunctionField, 0, 0, Short.MAX_VALUE)
-                    .add(bNonClassFunctionField, 0, 0, Short.MAX_VALUE)
-                    .add(aNonClassAttributeField, 0, 0, Short.MAX_VALUE)
-                    .add(bNonClassAttributeField, 0, 0, Short.MAX_VALUE)
-                    .add(aNonClassExpressionField, 0, 0, Short.MAX_VALUE)
-                    .add(bNonClassExpressionField, 0, 0, Short.MAX_VALUE)
                     .add(aFunctionField)
                     .add(bFunctionField)
                     .add(aAttributeField)
@@ -321,31 +254,7 @@ public class FmtBlankLines extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(aFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(aFunctionLabel))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(bNonClassExpressionLabel)
-                    .add(bNonClassExpressionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(aNonClassExpressionLabel)
-                    .add(aNonClassExpressionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(bNonClassAttributeLabel)
-                    .add(bNonClassAttributeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(aNonClassAttributeLabel)
-                    .add(aNonClassAttributeField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(bNonClassFunctionLabel)
-                    .add(bNonClassFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(aNonClassFunctionLabel)
-                    .add(aNonClassFunctionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         layout.linkSize(new java.awt.Component[] {aAttributeField, aClassField, aClassHeaderField, aFunctionField, aImportsField, aPackageField, bAttributeField, bClassField, bFunctionField, bImportsField, bPackageField}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -364,12 +273,6 @@ public class FmtBlankLines extends javax.swing.JPanel {
     private javax.swing.JLabel aFunctionLabel;
     private javax.swing.JLabel aImports;
     private javax.swing.JTextField aImportsField;
-    private javax.swing.JTextField aNonClassAttributeField;
-    private javax.swing.JLabel aNonClassAttributeLabel;
-    private javax.swing.JTextField aNonClassExpressionField;
-    private javax.swing.JLabel aNonClassExpressionLabel;
-    private javax.swing.JTextField aNonClassFunctionField;
-    private javax.swing.JLabel aNonClassFunctionLabel;
     private javax.swing.JTextField aPackageField;
     private javax.swing.JLabel aPackageLabel;
     private javax.swing.JTextField bAttributeField;
@@ -380,12 +283,6 @@ public class FmtBlankLines extends javax.swing.JPanel {
     private javax.swing.JLabel bFunctionLabel;
     private javax.swing.JTextField bImportsField;
     private javax.swing.JLabel bImportsLabel;
-    private javax.swing.JTextField bNonClassAttributeField;
-    private javax.swing.JLabel bNonClassAttributeLabel;
-    private javax.swing.JTextField bNonClassExpressionField;
-    private javax.swing.JLabel bNonClassExpressionLabel;
-    private javax.swing.JTextField bNonClassFunctionField;
-    private javax.swing.JLabel bNonClassFunctionLabel;
     private javax.swing.JTextField bPackageField;
     private javax.swing.JLabel bPackageLabel;
     // End of variables declaration//GEN-END:variables

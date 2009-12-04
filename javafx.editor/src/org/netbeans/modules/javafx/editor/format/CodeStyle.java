@@ -487,6 +487,14 @@ public final class CodeStyle {
         return preferences.getInt(blankLinesAfterMethods, getDefaultAsInt(blankLinesAfterMethods));
     }
 
+    public int getBlankLinesBeforeNonClassExpression() {
+        return preferences.getInt(blankLinesBeforeNonClassExpression, getDefaultAsInt(blankLinesBeforeNonClassExpression));
+    }
+
+    public int getBlankLinesAfterNonClassExpression() {
+        return preferences.getInt(blankLinesAfterNonClassExpression, getDefaultAsInt(blankLinesAfterNonClassExpression));
+    }
+
     // Spaces ------------------------------------------------------------------
     
     public boolean spaceBeforeWhile() {

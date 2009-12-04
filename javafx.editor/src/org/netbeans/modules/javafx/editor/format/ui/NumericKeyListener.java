@@ -43,14 +43,20 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-/**
- *
- * @author tester
- */
-public class NumericKeyListener implements KeyListener {
+public final class NumericKeyListener implements KeyListener {
 
-    public NumericKeyListener() {
+    private static NumericKeyListener instance;
+
+    public synchronized static NumericKeyListener getInstance() {
+        if (instance == null) {
+            instance = new NumericKeyListener();
+        }
+        return instance;
     }
+
+    private NumericKeyListener() {
+    }
+
     public void keyPressed(KeyEvent evt) {
     }
 

@@ -737,7 +737,7 @@ public class JFXReformatTask implements ReformatTask {
                     JavaFXKind kind = tree.getJavaFXKind();
                     switch (kind) {
                         case IMPORT:
-                            blankLines();
+                            blankLines(cs.getBlankLinesBeforeImports());
                             scan(tree, p);
                             if (!isLastInCU && isLastMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesAfterImports());
@@ -765,12 +765,23 @@ public class JFXReformatTask implements ReformatTask {
                         case INIT_DEFINITION:
                         case POSTINIT_DEFINITION:
                         case FUNCTION_DEFINITION:
-                        case FUNCTION_VALUE:
-                        case INSTANTIATE_OBJECT_LITERAL:
-                            blankLines(cs.getBlankLinesBeforeMethods());
+                            if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(cs.getBlankLinesBeforeMethods());
+                            }
                             processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
                             if (!isLastInCU) {
                                 blankLines(cs.getBlankLinesAfterMethods());
+                            }
+                            break;
+                        case METHOD_INVOCATION:
+                        case FUNCTION_VALUE:
+                        case INSTANTIATE_OBJECT_LITERAL:
+                            if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
+                                blankLines(cs.getBlankLinesBeforeNonClassExpression());
+                            }
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            if (!isLastInCU) {
+                                blankLines(cs.getBlankLinesAfterNonClassExpression());
                             }
                             break;
                         default:

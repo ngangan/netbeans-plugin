@@ -7,6 +7,9 @@
     </Property>
     <Property name="opaque" type="boolean" value="false"/>
   </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,15,0,0,0,-69"/>
+  </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -35,21 +38,9 @@
                   <Component id="aAttributeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="bFunctionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="aFunctionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="bNonClassExpressionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="aNonClassExpressionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="bNonClassAttributeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="aNonClassAttributeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="bNonClassFunctionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="aNonClassFunctionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="aNonClassFunctionField" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                  <Component id="bNonClassFunctionField" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                  <Component id="aNonClassAttributeField" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                  <Component id="bNonClassAttributeField" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                  <Component id="aNonClassExpressionField" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-                  <Component id="bNonClassExpressionField" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
                   <Component id="aFunctionField" linkSize="1" alignment="0" max="32767" attributes="1"/>
                   <Component id="bFunctionField" linkSize="1" alignment="0" max="32767" attributes="1"/>
                   <Component id="aAttributeField" linkSize="1" alignment="0" max="32767" attributes="1"/>
@@ -122,37 +113,7 @@
                   <Component id="aFunctionField" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="aFunctionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="bNonClassExpressionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="bNonClassExpressionField" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="aNonClassExpressionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="aNonClassExpressionField" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="bNonClassAttributeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="bNonClassAttributeField" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="aNonClassAttributeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="aNonClassAttributeField" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="bNonClassFunctionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="bNonClassFunctionField" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="aNonClassFunctionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="aNonClassFunctionField" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace pref="93" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -321,96 +282,6 @@
     <Component class="javax.swing.JTextField" name="aFunctionField">
       <Properties>
         <Property name="columns" type="int" value="5"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="bNonClassExpressionLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.bNonClassExpressionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="bNonClassExpressionField">
-      <Properties>
-        <Property name="columns" type="int" value="5"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.bNonClassExpressionField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="aNonClassExpressionLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.aNonClassExpressionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="aNonClassExpressionField">
-      <Properties>
-        <Property name="columns" type="int" value="5"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.aNonClassExpressionField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="bNonClassAttributeLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.bNonClassAttributeLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="bNonClassAttributeField">
-      <Properties>
-        <Property name="columns" type="int" value="5"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.bNonClassAttributeField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="aNonClassAttributeLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.aNonClassAttributeLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="aNonClassAttributeField">
-      <Properties>
-        <Property name="columns" type="int" value="5"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.aNonClassAttributeField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="bNonClassFunctionLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.bNonClassFunctionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="bNonClassFunctionField">
-      <Properties>
-        <Property name="columns" type="int" value="5"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.bNonClassFunctionField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="aNonClassFunctionLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.aNonClassFunctionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="aNonClassFunctionField">
-      <Properties>
-        <Property name="columns" type="int" value="5"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="FmtBlankLines.aNonClassFunctionField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
       </Properties>
     </Component>
   </SubComponents>
