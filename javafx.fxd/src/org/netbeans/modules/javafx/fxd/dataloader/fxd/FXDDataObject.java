@@ -62,7 +62,6 @@ public final class FXDDataObject extends FXDZDataObject {
         cookies.add( m_edSup = new FXDEditorSupport(this, getPrimaryEntry(), cookies));
 
         cookies.add(this);
-        Logger.getLogger(FXDDataObject.class.getName()).warning(">>>>>>>> FXD DO !!!");
     }
 
     public DataEditorSupport getEditorSupport() {
