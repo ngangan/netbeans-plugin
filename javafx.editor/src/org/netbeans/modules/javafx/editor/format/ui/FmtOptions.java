@@ -75,10 +75,7 @@ public class FmtOptions {
     public static final String spacesPerTab = SimpleValueNames.SPACES_PER_TAB;
     public static final String indentSize = SimpleValueNames.INDENT_SHIFT_WIDTH;
     public static final String continuationIndentSize = "continuationIndentSize"; //NOI18N
-    public static final String labelIndent = "labelIndent"; //NOI18N
-    public static final String absoluteLabelIndent = "absoluteLabelIndent"; //NOI18N
     public static final String indentTopLevelClassMembers = "indentTopLevelClassMembers"; //NOI18N
-    public static final String indentCasesFromSwitch = "indentCasesFromSwitch"; //NOI18N
     public static final String rightMargin = SimpleValueNames.TEXT_LIMIT_WIDTH;
     
     public static final String addLeadingStarInComment = "addLeadingStarInComment"; //NOI18N
@@ -312,10 +309,7 @@ public class FmtOptions {
             { spacesPerTab, "4"}, //NOI18N
             { indentSize, "4"}, //NOI18N
             { continuationIndentSize, "8"}, //NOI18N
-            { labelIndent, "0"}, //NOI18N
-            { absoluteLabelIndent, FALSE}, //NOI18N
             { indentTopLevelClassMembers, TRUE}, //NOI18N
-            { indentCasesFromSwitch, TRUE}, //NOI18N
             { rightMargin, "80"}, //NOI18N
             { addLeadingStarInComment, TRUE}, //NOI18N
 
@@ -407,9 +401,6 @@ public class FmtOptions {
             { spaceBeforeForParen, TRUE}, //NOI18N
             { spaceBeforeWhileParen, TRUE}, //NOI18N
             { spaceBeforeCatchParen, TRUE}, //NOI18N
-//            { spaceBeforeSwitchParen, TRUE}, //NOI18N
-//            { spaceBeforeSynchronizedParen, TRUE}, //NOI18N
-//            { spaceBeforeAnnotationParen, FALSE}, //NOI18N
             { spaceAroundUnaryOps, FALSE}, //NOI18N
             { spaceAroundBinaryOps, TRUE}, //NOI18N
             { spaceAroundIfElseOps, TRUE}, //NOI18N
@@ -420,12 +411,9 @@ public class FmtOptions {
             { spaceBeforeElseLeftBrace, TRUE}, //NOI18N
             { spaceBeforeWhileLeftBrace, TRUE}, //NOI18N
             { spaceBeforeForLeftBrace, TRUE}, //NOI18N
-//            { spaceBeforeDoLeftBrace, TRUE}, //NOI18N
-//            { spaceBeforeSwitchLeftBrace, TRUE}, //NOI18N
             { spaceBeforeTryLeftBrace, TRUE}, //NOI18N
             { spaceBeforeCatchLeftBrace, TRUE}, //NOI18N
             { spaceBeforeFinallyLeftBrace, TRUE}, //NOI18N
-//            { spaceBeforeSynchronizedLeftBrace, TRUE}, //NOI18N
             { spaceBeforeStaticInitLeftBrace, TRUE}, //NOI18N
             { spaceBeforeSequenceInitLeftBrace, FALSE}, //NOI18N
             { spaceBeforeClassInitBlockLeftBrace, FALSE}, //NOI18N
@@ -436,11 +424,8 @@ public class FmtOptions {
             { spaceWithinIfParens, FALSE}, //NOI18N
             { spaceWithinForParens, FALSE}, //NOI18N
             { spaceWithinWhileParens, FALSE}, //NOI18N
-//            { spaceWithinSwitchParens, FALSE}, //NOI18N
             { spaceWithinCatchParens, FALSE}, //NOI18N
-//            { spaceWithinSynchronizedParens, FALSE}, //NOI18N
             { spaceWithinTypeCastParens, FALSE}, //NOI18N
-//            { spaceWithinAnnotationParens, FALSE}, //NOI18N
             { spaceWithinBraces, FALSE}, //NOI18N
             { spaceWithinSequenceInitBrackets, FALSE}, //NOI18N
             { spaceBeforeComma, FALSE}, //NOI18N
