@@ -88,6 +88,7 @@ abstract class Adjustment {
         }
 
 
+        @Override
         public String toString() {
             return "AddAdjustment[" + // NOI18N
                     "pos=" + pos + // NOI18N
@@ -115,6 +116,7 @@ abstract class Adjustment {
         }
 
 
+        @Override
         public String toString() {
             return "ReplaceAdjustment[" + // NOI18N
                     "start=" + start + // NOI18N
@@ -138,6 +140,7 @@ abstract class Adjustment {
         }
 
 
+        @Override
         public String toString() {
             return "IndentAdjustment[" + // NOI18N
                     "pos=" + pos + // NOI18N
