@@ -111,6 +111,15 @@ public class ReportedIssuesTest extends CompletionTestBase {
         checkCCForIssue(172046, "var elem = seq[ ^ ];");
     }
 
+    public void testIssue172046B() throws Exception {
+        checkCompletion("Iz172046", "var elem = seq[ ^ ];", "i", "iz172046B.pass");
+    }
+
+    public void testIssue177282() throws Exception {
+        indexPlatform();
+        checkCCForIssue(177282, "var c = Color.^");
+    }
+
     private void checkCCForIssue(int issue, String caretLine) throws Exception {
         checkCCForIssue(issue, caretLine, null);
     }

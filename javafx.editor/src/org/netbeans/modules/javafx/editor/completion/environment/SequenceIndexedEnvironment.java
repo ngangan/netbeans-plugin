@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,45 +31,49 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- *
+ * 
  * Contributor(s):
- *
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * 
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.format.ui;
+package org.netbeans.modules.javafx.editor.completion.environment;
 
-import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
-public final class NumericKeyListener implements KeyListener {
+import com.sun.tools.javafx.tree.JFXSequenceIndexed;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
-    private static NumericKeyListener instance;
+import javax.lang.model.type.TypeMirror;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.lang.model.type.TypeKind;
 
-    public synchronized static NumericKeyListener getInstance() {
-        if (instance == null) {
-            instance = new NumericKeyListener();
+/**
+ *
+ * @author Petr Nejedly
+ */
+public class SequenceIndexedEnvironment extends JavaFXCompletionEnvironment<JFXSequenceIndexed> {
+
+    private static final Logger logger = Logger.getLogger(SequenceIndexedEnvironment.class.getName());
+    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
+
+    @Override
+    protected void inside(JFXSequenceIndexed t) throws IOException {
+        if (LOGGABLE) {
+            logger.fine("inside JFXSequenceIndexed " + t + "  offset == " + offset); // NOI18N
+            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
-        return instance;
+        localResult(getSmartType(t));
+//        addValueKeywords();
     }
 
-    private NumericKeyListener() {
-    }
-
-    public void keyPressed(KeyEvent evt) {
-    }
-
-    public void keyReleased(KeyEvent evt) {
-    }
-
-    public void keyTyped(KeyEvent evt) {
-        if (!Character.isDigit(evt.getKeyChar()) && !Character.isISOControl(evt.getKeyChar())) {
-            evt.consume();
-            Component c = evt.getComponent();
-            if (c != null) {
-                c.getToolkit().beep();
-            }
-        }
+    private TypeMirror getSmartType(JFXSequenceIndexed t) throws IOException {
+        // the target type is Number (int) as an sequence index
+        TypeMirror type = controller.getTypes().getPrimitiveType(TypeKind.INT);
+        return type;
     }
 }

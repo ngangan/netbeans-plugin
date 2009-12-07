@@ -152,22 +152,10 @@ public final class CodeStyle {
         return preferences.getInt(continuationIndentSize, getDefaultAsInt(continuationIndentSize));
     }
 
-    public int getLabelIndent() {
-        return preferences.getInt(labelIndent, getDefaultAsInt(labelIndent));
-    }
-
-    public boolean absoluteLabelIndent() {
-        return preferences.getBoolean(absoluteLabelIndent, getDefaultAsBoolean(absoluteLabelIndent));
-    }
-
     public boolean indentTopLevelClassMembers() {
         return preferences.getBoolean(indentTopLevelClassMembers, getDefaultAsBoolean(indentTopLevelClassMembers));
     }
     
-    public boolean indentCasesFromSwitch() {
-        return preferences.getBoolean(indentCasesFromSwitch, getDefaultAsBoolean(indentCasesFromSwitch));
-    }
-
     public int getRightMargin() {
         return preferences.getInt(rightMargin, getDefaultAsInt(rightMargin));
     }
@@ -485,6 +473,14 @@ public final class CodeStyle {
 
     public int getBlankLinesAfterMethods() {
         return preferences.getInt(blankLinesAfterMethods, getDefaultAsInt(blankLinesAfterMethods));
+    }
+
+    public int getBlankLinesBeforeNonClassExpression() {
+        return preferences.getInt(blankLinesBeforeNonClassExpression, getDefaultAsInt(blankLinesBeforeNonClassExpression));
+    }
+
+    public int getBlankLinesAfterNonClassExpression() {
+        return preferences.getInt(blankLinesAfterNonClassExpression, getDefaultAsInt(blankLinesAfterNonClassExpression));
     }
 
     // Spaces ------------------------------------------------------------------
