@@ -121,7 +121,7 @@ public class JFXReformatTask implements ReformatTask {
     public static String reformat(final String text, final CodeStyle style) {
         final StringBuilder sb = new StringBuilder(text);
         try {
-            final File file = FileUtil.normalizeFile( File.createTempFile("format", ".fx")); // NOI18N
+            final File file = FileUtil.normalizeFile(File.createTempFile("format", ".fx")); // NOI18N
             FileOutputStream os = null;
             InputStream is = null;
             try {
@@ -163,6 +163,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }, true);
         } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return sb.toString();
     }
@@ -183,7 +184,7 @@ public class JFXReformatTask implements ReformatTask {
         if (startOffset >= endOffset) {
             return;
         }
-        JavaFXTreePath path = getCommonPath(startOffset);
+        JavaFXTreePath path = getCommonPath(controller, startOffset);
         if (path == null) {
             return;
         }
@@ -323,7 +324,7 @@ public class JFXReformatTask implements ReformatTask {
         return JavaFXReformatExtraLock.getInstance();
     }
 
-    private JavaFXTreePath getCommonPath(final int offset) {
+    private static JavaFXTreePath getCommonPath(final CompilationController controller, final int offset) {
         JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
         if (offset > 0) {
             if (path.getLeaf() instanceof FunctionValueTree) {
