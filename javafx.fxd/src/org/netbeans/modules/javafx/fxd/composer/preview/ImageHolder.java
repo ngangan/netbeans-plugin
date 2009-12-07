@@ -51,6 +51,7 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JComponent;
@@ -130,20 +131,19 @@ final class ImageHolder extends JPanel {
         drawCross( g, xOff + w + 1, yOff -1);
         drawCross( g, xOff + w + 1, yOff + h + 1);
 
-        /*
-        Rectangle2D clip = new Rectangle2D.Float( xOff, yOff, w, h);
-        Rectangle visible = getVisibleRect();
-        if (visible != null) {
-            clip = visible.createIntersection(clip);
-        }
-        g.setClip( clip);
-         */
-
         /* create Graphics for drawing actions.
          * Make it wider and taller then m_imagePanel */
         Graphics gCopy = g.create();
         gCopy.translate(xOff, yOff);
         gCopy.setClip(-5, -5, w + 10, h + 10);
+
+        Rectangle2D clip = gCopy.getClipBounds();
+        Rectangle visible = getVisibleRect();
+        if (visible != null) {
+            clip = visible.createIntersection(clip);
+        }
+        gCopy.setClip(clip);
+
 
         m_dObj.getController().paintActions(gCopy);
     }
