@@ -138,9 +138,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     case LONG:
                     case SHORT:
                     case VOID:
-                        JavafxcScope sc = controller.getTreeUtilities().getScope(path);
-                        final boolean isStatic = el != null && (el.getKind().isClass() || el.getKind().isInterface());
-                        addMembers(type, true, true, null, sc, true, !isStatic);
+                        addMembers(type, true, true, null, getScope(), true, !isStatic(el));
                         break;
                     default:
                         if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
@@ -160,14 +158,20 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
     }
 
     private void addPossibleMembers(final Element el, final Name qualifiedName) {
-        JavafxcScope sc1 = controller.getTreeUtilities().getScope(path);
         for (ElementHandle<TypeElement> eh : getTypes(qualifiedName.toString(), NameKind.EXACT)) {
             TypeElement ehType = eh.resolve(controller);
             if (ehType != null) {
-                boolean isStatic1 = el != null && (el.getKind().isClass() || el.getKind().isInterface());
-                addMembers(ehType.asType(), true, true, null, sc1, true, !isStatic1);
+                addMembers(ehType.asType(), true, true, null, getScope(), true, !isStatic(el));
             }
         }
+    }
+
+    private JavafxcScope getScope() {
+        return controller.getTreeUtilities().getScope(path);
+    }
+
+    private boolean isStatic(final Element el) {
+        return el != null && (el.getKind().isClass() || el.getKind().isInterface());
     }
 
     private void addPackageContent(final Name qualifiedName) {
