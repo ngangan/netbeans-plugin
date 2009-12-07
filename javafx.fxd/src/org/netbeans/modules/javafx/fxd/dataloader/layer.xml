@@ -222,6 +222,10 @@ made subject to such option by the copyright holder.
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
+                <file name="language.instance">
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
+                    <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
+                </file>
 
                 <!-- indentation and formatting -->
                 <file name="org-netbeans-modules-javafx-fxd-composer-editor-IndentTaskFactory.instance"/>
@@ -229,21 +233,7 @@ made subject to such option by the copyright holder.
                 <!-- syntax Error -->
                 <file name="org-netbeans-modules-javafx-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
                 <file name="org-netbeans-modules-javafx-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
-
-                <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
-                    <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
-                </file>
-                <folder name="FontsColors">
-                    <folder name="NetBeans">
-                        <folder name="Defaults">
-                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
-                            </file>
-                        </folder>
-                    </folder>
-                </folder>
-
+                <!-- code completion -->
                 <folder name="CompletionProviders">
                     <file name="org-netbeans-modules-javafx-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
                 </folder>
@@ -256,6 +246,15 @@ made subject to such option by the copyright holder.
                         <file name="uncomment">
                             <attr name="position" intvalue="20300"/>
                         </file>
+                    </folder>
+                </folder>
+                <folder name="FontsColors">
+                    <folder name="NetBeans">
+                        <folder name="Defaults">
+                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
+                            </file>
+                        </folder>
                     </folder>
                 </folder>
             </folder>
@@ -272,6 +271,10 @@ made subject to such option by the copyright holder.
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
+                <file name="language.instance">
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
+                    <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
+                </file>
 
 
                 <!-- indentation and formatting -->
@@ -280,21 +283,7 @@ made subject to such option by the copyright holder.
                 <!-- syntax Error -->
                 <file name="org-netbeans-modules-javafx-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
                 <file name="org-netbeans-modules-javafx-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
-
-                <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
-                    <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
-                </file>
-                <folder name="FontsColors">
-                    <folder name="NetBeans">
-                        <folder name="Defaults">
-                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
-                            </file>
-                        </folder>
-                    </folder>
-                </folder>
-
+                <!-- code completion -->
                 <folder name="CompletionProviders">
                     <file name="org-netbeans-modules-javafx-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
                 </folder>
@@ -307,6 +296,15 @@ made subject to such option by the copyright holder.
                         <file name="uncomment">
                             <attr name="position" intvalue="20300"/>
                         </file>
+                    </folder>
+                </folder>
+                <folder name="FontsColors">
+                    <folder name="NetBeans">
+                        <folder name="Defaults">
+                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
+                            </file>
+                        </folder>
                     </folder>
                 </folder>
             </folder>
