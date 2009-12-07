@@ -148,6 +148,11 @@ final class ImageHolder extends JPanel {
         m_dObj.getController().paintActions(gCopy);
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return m_imagePanel.getSize();
+    }
+
     private static void drawCross(Graphics g, int x, int y) {
         g.drawLine( x - CROSS_SIZE, y, x + CROSS_SIZE, y);
         g.drawLine( x, y - CROSS_SIZE, x, y + CROSS_SIZE);                
