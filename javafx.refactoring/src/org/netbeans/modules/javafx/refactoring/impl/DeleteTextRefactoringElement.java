@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
@@ -65,6 +66,7 @@ public class DeleteTextRefactoringElement extends SimpleRefactoringElementImplem
     private DataEditorSupport des;
     private GuardedDocument doc;
     private LineCookie lc;
+    private SoftReference<String> newContent = null;
 
     final public static DeleteTextRefactoringElement create(FileObject fo, int start, int end, Lookup context) {
         try {
@@ -105,6 +107,26 @@ public class DeleteTextRefactoringElement extends SimpleRefactoringElementImplem
             return "Deleting";
         }
     }
+
+    @Override
+    protected String getNewFileContent() {
+        if (newContent != null) {
+            String content = newContent.get();
+            if (content != null) {
+                return content;
+            }
+        }
+        StringBuilder content = null;
+        try {
+            content = new StringBuilder(doc.getText(0, doc.getLength()));
+            content.delete(startPosition, endPosition);
+            newContent = new SoftReference<String>(content.toString());
+        } catch (BadLocationException badLocationException) {
+            return null;
+        }
+        return content.toString();
+    }
+
 
     public Lookup getLookup() {
         return context;

@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -60,10 +59,6 @@ import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.FindOverridersScanner;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.FindSubclassesScanner;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.BaseRefactoringScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindUsagesScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;

@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
@@ -66,7 +67,8 @@ public class InsertTextRefactoringElement extends SimpleRefactoringElementImplem
     private DataEditorSupport des;
     private GuardedDocument doc;
     private LineCookie lc;
-
+    private SoftReference<String> newContent = null;
+    
     final public static InsertTextRefactoringElement create(FileObject fo, int start, boolean forceNewLine, String text, Lookup context) {
         try {
             return new InsertTextRefactoringElement(fo, start, forceNewLine, text, context);
@@ -132,6 +134,27 @@ public class InsertTextRefactoringElement extends SimpleRefactoringElementImplem
             return "Inserting";
         }
     }
+
+    @Override
+    protected String getNewFileContent() {
+        if (newContent != null) {
+            String content = newContent.get();
+            if (content != null) {
+                return content;
+            }
+        }
+        StringBuilder content = null;
+        try {
+            content = new StringBuilder(doc.getText(0, doc.getLength()));
+            content.insert(startPosition, text);
+            newContent = new SoftReference<String>(content.toString());
+        } catch (BadLocationException badLocationException) {
+            return null;
+        }
+        return content.toString();
+    }
+
+
 
     public Lookup getLookup() {
         return context;

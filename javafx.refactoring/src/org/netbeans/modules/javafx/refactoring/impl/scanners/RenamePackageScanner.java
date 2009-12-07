@@ -67,7 +67,7 @@ public class RenamePackageScanner extends BaseRefactoringScanner {
             public Void scan(Tree tree, Void p) {
                 super.scan(tree, p);
                 if (location[0] == null || guessed) {
-                    if (tree != null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT)) {
+                    if (tree != null) {
                         checkLocation(tree);
                     }
                 }

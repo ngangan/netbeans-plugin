@@ -48,7 +48,6 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;

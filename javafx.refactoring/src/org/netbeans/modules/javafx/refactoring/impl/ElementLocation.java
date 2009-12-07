@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import java.lang.ref.WeakReference;
 import java.util.EnumSet;
 import javax.lang.model.element.Element;
@@ -33,6 +34,9 @@ final public class ElementLocation {
     public static ElementLocation forPath(JavaFXTreePath tp, CompilationInfo ci) {
         long pos = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), tp.getLeaf());
         Element e = ci.getTrees().getElement(tp);
+        if (e == null && (tp.getLeaf().getJavaFXKind() == JavaFXKind.MEMBER_SELECT || tp.getLeaf().getJavaFXKind() == JavaFXKind.IDENTIFIER) && tp.getParentPath().getLeaf().getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
+            e = ci.getElementUtilities().getPackageElement(tp.getLeaf().toString());
+        }
         return new ElementLocation(e, (int)pos, ci);
     }
 
@@ -79,6 +83,15 @@ final public class ElementLocation {
         return simpleName;
     }
 
+    /**
+     * Returns the currently assigned {@linkplain CompilationInfo} instance
+     * @return May return NULL
+     *
+     */
+    public CompilationInfo getCompilationInfo() {
+        return ciRef.get();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -114,7 +127,7 @@ final public class ElementLocation {
         return element.toString() + " @ " + startPosition + " in " + sourceFile.getPath();
     }
 
-    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS, JFXTokenId.LPAREN, JFXTokenId.DOT, JFXTokenId.SEMI, JFXTokenId.LBRACE, JFXTokenId.LBRACKET);
+    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS, JFXTokenId.LPAREN, JFXTokenId.DOT, JFXTokenId.COMMA, JFXTokenId.SEMI, JFXTokenId.COLON, JFXTokenId.LBRACE, JFXTokenId.LBRACKET);
     private void setPositions(int pos, CompilationInfo ci) {
         String simpleText = element.getSimpleName().toString();
         String elementText = element.toString();

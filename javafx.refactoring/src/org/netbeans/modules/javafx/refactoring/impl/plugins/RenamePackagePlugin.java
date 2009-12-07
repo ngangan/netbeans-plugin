@@ -43,15 +43,11 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
@@ -68,7 +64,6 @@ import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.RenamePackageScanner;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
@@ -479,12 +474,8 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     protected ClasspathInfo getClasspathInfo(AbstractRefactoring refactoring) {
         ClasspathInfo cpInfo = refactoring.getContext().lookup(ClasspathInfo.class);
         if (cpInfo==null) {
-            Collection<? extends TreePathHandle> handles = refactoring.getRefactoringSource().lookupAll(TreePathHandle.class);
-            if (!handles.isEmpty()) {
-                cpInfo = SourceUtils.getClasspathInfoFor(handles.toArray(new TreePathHandle[handles.size()]));
-            } else {
-                cpInfo = SourceUtils.getClasspathInfoFor((FileObject)null);
-            }
+            FileObject targetPkg = refactoring.getRefactoringSource().lookup(FileObject.class);
+            cpInfo = SourceUtils.getClasspathInfoFor(targetPkg);
             refactoring.getContext().add(cpInfo);
         }
         return cpInfo;

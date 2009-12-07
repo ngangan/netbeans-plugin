@@ -262,60 +262,63 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         Element el = info.getElementUtilities().elementFor(location.getStartPosition());
         preCheckProblem = isSourceElement(el, info);
         if (preCheckProblem != null) return preCheckProblem;
-
-        switch (el.getKind()) {
-            case METHOD: {
-                fireProgressListenerStep();
-                fireProgressListenerStep();
-                overriddenByMethods = SourceUtils.getOverridingMethods((ExecutableElement)el, info);
-//                            fireProgressListenerStep();
-                if (el.getModifiers().contains(Modifier.NATIVE)) {
-                    preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", el));
-                }
-                if (!overriddenByMethods.isEmpty()) {
-                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_IsOverridden",
-                            new Object[] {ElementUtilities.enclosingTypeElement(el).getSimpleName().toString()});
-                    preCheckProblem = createProblem(preCheckProblem, false, msg);
-                }
-                for (ExecutableElement e : overriddenByMethods) {
-                    if (e.getModifiers().contains(Modifier.NATIVE)) {
-                        preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", e));
+        if (el != null) {
+            switch (el.getKind()) {
+                case METHOD: {
+                    fireProgressListenerStep();
+                    fireProgressListenerStep();
+                    overriddenByMethods = SourceUtils.getOverridingMethods((ExecutableElement)el, info);
+    //                            fireProgressListenerStep();
+                    if (el.getModifiers().contains(Modifier.NATIVE)) {
+                        preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", el));
                     }
-                }
-                overridesMethods = SourceUtils.getOverridenMethods((ExecutableElement)el, info);
-                fireProgressListenerStep();
-                if (!overridesMethods.isEmpty()) {
-                    boolean fatal = false;
-                    for (ExecutableElement method : overridesMethods) {
-                        if (method.getModifiers().contains(Modifier.NATIVE)) {
-                            preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method));
-                        }
-                        if (SourceUtils.isFromLibrary(method, info.getClasspathInfo())) {
-                            fatal = true;
-                            break;
+                    if (!overriddenByMethods.isEmpty()) {
+                        String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_IsOverridden",
+                                new Object[] {ElementUtilities.enclosingTypeElement(el).getSimpleName().toString()});
+                        preCheckProblem = createProblem(preCheckProblem, false, msg);
+                    }
+                    for (ExecutableElement e : overriddenByMethods) {
+                        if (e.getModifiers().contains(Modifier.NATIVE)) {
+                            preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", e));
                         }
                     }
-                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fatal?"ERR_Overrides_Fatal":"ERR_Overrides");
-                    preCheckProblem = createProblem(preCheckProblem, fatal, msg);
+                    overridesMethods = SourceUtils.getOverridenMethods((ExecutableElement)el, info);
+                    fireProgressListenerStep();
+                    if (!overridesMethods.isEmpty()) {
+                        boolean fatal = false;
+                        for (ExecutableElement method : overridesMethods) {
+                            if (method.getModifiers().contains(Modifier.NATIVE)) {
+                                preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method));
+                            }
+                            if (SourceUtils.isFromLibrary(method, info.getClasspathInfo())) {
+                                fatal = true;
+                                break;
+                            }
+                        }
+                        String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fatal?"ERR_Overrides_Fatal":"ERR_Overrides");
+                        preCheckProblem = createProblem(preCheckProblem, fatal, msg);
+                    }
+                    break;
                 }
-                break;
+                // ===========================================================================================================
+                // The following check is, probably, not necessary as it seems impossible to hide a field member in a subclass
+                // ===========================================================================================================
+    //                        case FIELD:
+    //                        case ENUM_CONSTANT: {
+    //                            fireProgressListenerStep();
+    //                            fireProgressListenerStep();
+    //                            Element hiddenField = hides(el, el.getSimpleName().toString(), info);
+    //                            fireProgressListenerStep();
+    //                            fireProgressListenerStep();
+    //                            if (hiddenField != null) {
+    //                                String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_Hides", new Object[] {ElementUtilities.enclosingTypeElement(hiddenField)});
+    //                                problem[0] = createProblem(problem[0], false, msg);
+    //                            }
+    //                            break;
+    //                        }
             }
-            // ===========================================================================================================
-            // The following check is, probably, not necessary as it seems impossible to hide a field member in a subclass
-            // ===========================================================================================================
-//                        case FIELD:
-//                        case ENUM_CONSTANT: {
-//                            fireProgressListenerStep();
-//                            fireProgressListenerStep();
-//                            Element hiddenField = hides(el, el.getSimpleName().toString(), info);
-//                            fireProgressListenerStep();
-//                            fireProgressListenerStep();
-//                            if (hiddenField != null) {
-//                                String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_Hides", new Object[] {ElementUtilities.enclosingTypeElement(hiddenField)});
-//                                problem[0] = createProblem(problem[0], false, msg);
-//                            }
-//                            break;
-//                        }
+        } else {
+            preCheckProblem = createProblem(preCheckProblem, true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ErroneousSource", info.getFileObject().getPath()));
         }
         fireProgressListenerStop();
         return preCheckProblem;

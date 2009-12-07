@@ -66,7 +66,7 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
         }
 
         if (refactoring instanceof RenameRefactoring) {
-            if (location !=null || ((file!=null) && SourceUtils.isJavaFXFile(file))) {
+            if ((location !=null && location.getStartPosition() != 0) || (location == null && ((file!=null) && SourceUtils.isJavaFXFile(file)))) {
                 //rename javafx file, class, method etc..
                 return new RenameRefactoringPlugin((RenameRefactoring)refactoring);
             } else if (file!=null && SourceUtils.isOnSourceClasspath(file) && file.isFolder()) {
