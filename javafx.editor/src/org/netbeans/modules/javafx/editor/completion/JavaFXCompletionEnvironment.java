@@ -1473,11 +1473,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew, String myPrefix) {
         if (LOGGABLE) log(" addAllTypes "); // NOI18N
-        for (ElementHandle<TypeElement> name :
-            controller.getClasspathInfo().getClassIndex().getDeclaredTypes(
-                myPrefix != null ? myPrefix : EMPTY,
-                NameKind.PREFIX,
-                EnumSet.allOf(SearchScope.class))) {
+        for (ElementHandle<TypeElement> name : getTypes(myPrefix, NameKind.PREFIX)) {
             String[] sigs = name.getSignatures();
             if ((sigs == null) || (sigs.length == 0)) {
                 continue;
@@ -1501,6 +1497,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 addResult(item);
             }
         }
+    }
+
+    protected Set<? extends ElementHandle<TypeElement>> getTypes(final String myPrefix, final NameKind kind) {
+        return controller.getClasspathInfo().getClassIndex().getDeclaredTypes(
+                myPrefix != null ? myPrefix : EMPTY,
+                kind,
+                EnumSet.allOf(SearchScope.class));
     }
 
     protected SafeTokenSequence<JFXTokenId> findLastNonWhitespaceToken(Tree tree, int position) {

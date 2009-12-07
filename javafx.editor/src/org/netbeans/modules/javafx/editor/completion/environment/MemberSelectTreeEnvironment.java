@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -20,7 +20,7 @@
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL
  * or only the GPL Version 2, indicate your decision by adding
  * "[Contributor] elects to include this software in this distribution
@@ -31,41 +31,41 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
- * 
+ *
  * Contributor(s):
- * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ *
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.*;
 import com.sun.tools.javafx.api.JavafxcScope;
-
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import java.io.IOException;
-import java.util.EnumSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.ClassIndex.NameKind;
+import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
 /**
- *
  * @author David Strupl
  */
 public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<MemberSelectTree> {
-    
+
     private static final Logger logger = Logger.getLogger(MemberSelectTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
@@ -140,17 +140,14 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     case VOID:
                         JavafxcScope sc = controller.getTreeUtilities().getScope(path);
                         final boolean isStatic = el != null && (el.getKind().isClass() || el.getKind().isInterface());
-                        addMembers(type, true, true, null,sc, true, !isStatic);
+                        addMembers(type, true, true, null, sc, true, !isStatic);
                         break;
                     default:
                         if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
                         if (type.getKind() == TypeKind.ERROR && el != null && el.getKind().isClass()) {
-                            if (LOGGABLE) log("   will try to find package named " + (((TypeElement)el).getQualifiedName())); // NOI18N
-                            el = controller.getElements().getPackageElement(((TypeElement)el).getQualifiedName());
-                        }
-                        if (LOGGABLE) log("   el(3) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
-                        if (el != null && el instanceof PackageElement) {                                
-                            addPackageContent((PackageElement)el, null, null, false);
+                            Name qualifiedName = ((TypeElement) el).getQualifiedName();
+                            addPackageContent(qualifiedName);
+                            addPossibleMembers(el, qualifiedName);
                         }
                 }
             } else if (parent.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT && ((UnitTree)parent).getPackageName() == fa) {
@@ -162,6 +159,31 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         }
     }
 
+    private void addPossibleMembers(final Element el, final Name qualifiedName) {
+        JavafxcScope sc1 = controller.getTreeUtilities().getScope(path);
+        for (ElementHandle<TypeElement> eh : getTypes(qualifiedName.toString(), NameKind.EXACT)) {
+            TypeElement ehType = eh.resolve(controller);
+            if (ehType != null) {
+                boolean isStatic1 = el != null && (el.getKind().isClass() || el.getKind().isInterface());
+                addMembers(ehType.asType(), true, true, null, sc1, true, !isStatic1);
+            }
+        }
+    }
+
+    private void addPackageContent(final Name qualifiedName) {
+        if (LOGGABLE) {
+            log("   will try to find package named " + (qualifiedName)); // NOI18N
+        }
+        PackageElement packageEl = controller.getElements().getPackageElement(qualifiedName);
+        if (LOGGABLE) {
+            log("   packageEl(3) == " + packageEl + "  packageEl.getKind() == " // NOI18N
+                    + (packageEl != null ? packageEl.getKind() : ""));
+        }
+        if (packageEl != null) {
+            addPackageContent(packageEl, null, null, false);
+        }
+    }
+
     public TypeMirror getSmartType(MemberSelectTree t) throws IOException {
         return null;
         // TODO
@@ -170,7 +192,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
 //        if (type == null) {
 //            return null;
 //        }
-//        
+//
 //        int dim = 0;
 //        while (dim-- > 0) {
 //            if (type.getKind() == TypeKind.ARRAY) {
@@ -179,7 +201,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
 //                return null;
 //            }
 //        }
-//        
+//
 //        return type;
     }
 
