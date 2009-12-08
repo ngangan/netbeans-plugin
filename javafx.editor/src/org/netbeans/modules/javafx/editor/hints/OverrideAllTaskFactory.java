@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -61,9 +60,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.spi.editor.hints.*;
@@ -191,7 +190,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 }
                 final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
                 if (classSymbol != null) {
-                    Collection<? extends Element> elements = getAllMembers(diagnostic.getPosition(), compilationInfo);
+                    Collection<? extends Element> elements = getAllMembers(compilationInfo, classSymbol);
                     for (Element e : elements) {
                         if (e instanceof MethodSymbol) {
                             MethodSymbol method = (MethodSymbol) e;
@@ -363,28 +362,30 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return typeString;
     }
 
-    private Collection<? extends Element> getAllMembers(long position, CompilationInfo compilationInfo) {
-        JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(position);
-        Element element = compilationInfo.getTrees().getElement(path);
-        ClassSymbol classSymbol = null;
-        if (element instanceof ClassSymbol) {
-            classSymbol = (ClassSymbol) element;
-        }
-        if (classSymbol == null) {
-            return Collections.EMPTY_SET;
-        }
-        ClassIndex classIndex = compilationInfo.getClasspathInfo().getClassIndex();
-        Collection<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(classSymbol.getSimpleName().toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-        Collection<? extends Element> elements = Collections.EMPTY_SET;
-        for (ElementHandle<TypeElement> eh : options) {
-            if (!eh.getQualifiedName().toString().equals(classSymbol.getQualifiedName().toString())) {
-                continue;
-            }
-            TypeElement el = eh.resolve(compilationInfo);
-            elements = compilationInfo.getElements().getAllMembers(el);
-        }
+    private Collection<? extends Element> getAllMembers(CompilationInfo compilationInfo, Element element) {
+//        JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(position);
+//        Element element = compilationInfo.getTrees().getElement(path);
+//        ClassSymbol classSymbol = null;
+//        if (element instanceof ClassSymbol) {
+//            classSymbol = (ClassSymbol) element;
+//        }
+//        if (classSymbol == null) {
+//            return Collections.EMPTY_SET;
+//        }
+//        ClassIndex classIndex = compilationInfo.getClasspathInfo().getClassIndex();
+//        Collection<ElementHandle<TypeElement>> options = classIndex.getDeclaredTypes(classSymbol.getSimpleName().toString(), ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
+//        Collection<? extends Element> elements = Collections.EMPTY_SET;
+//        for (ElementHandle<TypeElement> eh : options) {
+//            if (!eh.getQualifiedName().toString().equals(classSymbol.getQualifiedName().toString())) {
+//                continue;
+//            }
+//            TypeElement el = eh.resolve(compilationInfo);
+//            elements = compilationInfo.getElements().getAllMembers(el);
+//        }
 
-        return elements;
+        
+
+        return FXSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) element);
     }
 }
 
