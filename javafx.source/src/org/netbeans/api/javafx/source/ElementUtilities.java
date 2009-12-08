@@ -60,6 +60,7 @@ import com.sun.tools.mjavac.util.Name;
 import com.sun.tools.javafx.api.JavafxcScope;
 import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXOverrideClassVar;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import com.sun.tools.javafxdoc.ClassDocImpl;
@@ -73,7 +74,6 @@ import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -269,9 +269,12 @@ public final class ElementUtilities {
                                     if (e[0] != null) {
                                         lastValidSpan = span;
                                     } else {
-                                        if (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                        if (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER) {
                                             // a bug in javafxc - not resolving package symbols in "package statement"
                                             e[0] = getPackageElement(tree.toString());
+                                            lastValidSpan = span;
+                                        } else if (tree.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
+                                            e[0] = ((JFXOverrideClassVar)tree).sym;
                                             lastValidSpan = span;
                                         }
                                     }

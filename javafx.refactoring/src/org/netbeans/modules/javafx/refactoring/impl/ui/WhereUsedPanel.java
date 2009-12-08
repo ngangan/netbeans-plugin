@@ -105,7 +105,7 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     }
     
     public void initialize() {
-if (initialized) return;
+        if (initialized) return;
         JavaFXSource source = JavaFXSource.forFileObject(location.getSourceFile());
         Project p = FileOwnerQuery.getOwner(location.getSourceFile());
         final JLabel currentProject;

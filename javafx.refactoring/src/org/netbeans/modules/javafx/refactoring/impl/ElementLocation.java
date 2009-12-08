@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.refactoring.impl;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.tools.javafx.tree.JFXOverrideClassVar;
 import java.lang.ref.WeakReference;
 import java.util.EnumSet;
 import javax.lang.model.element.Element;
@@ -34,8 +35,12 @@ final public class ElementLocation {
     public static ElementLocation forPath(JavaFXTreePath tp, CompilationInfo ci) {
         long pos = ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), tp.getLeaf());
         Element e = ci.getTrees().getElement(tp);
-        if (e == null && (tp.getLeaf().getJavaFXKind() == JavaFXKind.MEMBER_SELECT || tp.getLeaf().getJavaFXKind() == JavaFXKind.IDENTIFIER) && tp.getParentPath().getLeaf().getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
-            e = ci.getElementUtilities().getPackageElement(tp.getLeaf().toString());
+        if (e == null) {
+            if ((tp.getLeaf().getJavaFXKind() == JavaFXKind.MEMBER_SELECT || tp.getLeaf().getJavaFXKind() == JavaFXKind.IDENTIFIER) && tp.getParentPath().getLeaf().getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
+                e = ci.getElementUtilities().getPackageElement(tp.getLeaf().toString());
+            } else if (tp.getLeaf().getJavaFXKind() == JavaFXKind.VARIABLE) {
+                e = ((JFXOverrideClassVar)tp.getLeaf()).sym;
+            }
         }
         return new ElementLocation(e, (int)pos, ci);
     }
