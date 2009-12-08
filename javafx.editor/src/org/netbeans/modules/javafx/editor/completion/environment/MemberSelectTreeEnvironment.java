@@ -116,6 +116,9 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             if (LOGGABLE) log("   exp == " + exp); // NOI18N
             JavaFXTreePath expPath = new JavaFXTreePath(path, exp);
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
+            if (type != null && type.getKind() == TypeKind.ERROR) {
+                tryToUseSanitizedSource();
+            }
             Element el = controller.getTrees().getElement(expPath);
             if (LOGGABLE) log("   type == " + type); // NOI18N
             if (type != null) {
