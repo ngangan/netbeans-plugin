@@ -53,8 +53,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.DeclaredType;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
 
 /**
@@ -85,37 +83,13 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
             }
         }
         if (t.getExpression() instanceof JFXErroneous
-                && tryToSanitizeSource()) {
+                && tryToUseSanitizedSource()) {
             return;
         }
         addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
         addLocalMembersAndVars(getSmartType(t));
         addValueKeywords();
 
-    }
-
-    private boolean tryToSanitizeSource() {
-        try {
-            Document d = controller.getDocument();
-            if (!"\n ".equals(d.getText(offset, 2))) { // NOI18N
-                return false;
-            }
-            String start = d.getText(0, offset);
-            if (LOGGABLE) {
-                log("  start = " + start); // NOI18N
-            }
-            String end = d.getText(offset + 2, d.getLength() - offset - 2);
-            if (LOGGABLE) {
-                log("  end = " + end); // NOI18N
-            }
-            useSanitizedSource(start + "\n;" + end, offset); // NOI18N
-            return true;
-        } catch (BadLocationException ble) {
-            if (LOGGABLE) {
-                logger.log(Level.FINER, "ble", ble); // NOI18N
-            }
-            return false;
-        }
     }
 
     private TypeMirror getSmartType(JFXObjectLiteralPart t) throws IOException {
