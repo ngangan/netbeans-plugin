@@ -61,6 +61,15 @@ public class FormatterUtilities {
     static final int MULTILINE_STRING_INDENT_STEPS = 2;
     static final int MULTILINE_COMMENT_INDENT_CHARS = 1;
 
+    /**
+     * tests if given char is lbracket supported by formatter : '[' or '{'
+     * @param c char to test
+     * @return true if char equals to [ or {
+     */
+    public static boolean isLBracket(char c){
+        return ( c == '[' || c == '{' );
+    }
+
     static boolean stringStartsOnPrevLine(Document document, TokenSequence<FXDTokenId> ts,
             int startOffset) throws BadLocationException{
         return isOnTokensLine(document, ts, startOffset, FXDTokenId.STRING_LITERAL, 1);
@@ -117,7 +126,7 @@ public class FormatterUtilities {
         if (stringStartsOnPrevLine(document, ts, startOffset)) {
             return incIndent(document, indent, FormatterUtilities.MULTILINE_STRING_INDENT_STEPS);
         }
-        if (isLastOnPrevLineLBracket(document, ts, startOffset)){
+        if (isPrevTokenLBracket(ts, startOffset)){
             if (!isNextOnLineRBracket(document, ts, startOffset)){
                 indent = incIndent(document, indent);
             }
@@ -127,6 +136,7 @@ public class FormatterUtilities {
         }
         return indent;
     }
+
 
     private static int getPrevLineIndent(Document document, int startOffset)
             throws BadLocationException{
@@ -167,8 +177,7 @@ public class FormatterUtilities {
         return false;
     }
 
-    private static boolean isLastOnPrevLineLBracket(Document document,
-            TokenSequence<FXDTokenId> ts, int startOffset)
+    private static boolean isPrevTokenLBracket(TokenSequence<FXDTokenId> ts, int startOffset)
             throws BadLocationException {
 
         ts.move(startOffset);
@@ -176,7 +185,6 @@ public class FormatterUtilities {
         if(t == null){
             return false;
         }
-        //if (isLBracketToken(t) && ts.offset() >= solOffset){
         if (TokenUtils.isLBracketToken(t)){
             return true;
         }
@@ -194,7 +202,9 @@ public class FormatterUtilities {
     /**
      * finds the first char in backward direction ignoring whitespaces
      * and comments (single- and multi-line)
+     * @param doc 
      * @param ts TokenSequence
+     * @param offset
      * @return next non white token in backward direction
      */
     static int getFirstNonWhiteCharIdxBwd(BaseDocument doc,

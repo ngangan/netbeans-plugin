@@ -320,6 +320,15 @@ public class FXDReformatTask implements ReformatTask {
             if ( rowFirstNonWhite >= m_startOffset){
                 return FormatterUtilities.calculateLineIndent(m_baseDoc, m_startOffset);
             } else {
+                // if char before startOffset is lbracket should start formatting from it
+                int rowStart = Utilities.getRowStart(m_baseDoc, m_startOffset);
+                int prevCharOffset = Utilities.getFirstNonWhiteBwd(m_baseDoc, m_startOffset);
+                if (rowStart < prevCharOffset){
+                    char prevChar = m_baseDoc.getChars(prevCharOffset, 1)[0];
+                    if (FormatterUtilities.isLBracket(prevChar)){
+                        m_startOffset = prevCharOffset;
+                    }
+                }
                 return FormatterUtilities.getCurrentLineIndent(m_baseDoc, m_startOffset);
             }
         }
