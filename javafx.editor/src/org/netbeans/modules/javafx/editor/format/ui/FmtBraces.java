@@ -53,7 +53,6 @@ import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
  */
 public class FmtBraces extends javax.swing.JPanel {
     
-    /** Creates new form FmtAlignmentBraces */
     public FmtBraces() {
         initComponents();
         classDeclCombo.putClientProperty(OPTION_ID, classDeclBracePlacement);

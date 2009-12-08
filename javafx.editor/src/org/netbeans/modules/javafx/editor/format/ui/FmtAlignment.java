@@ -53,7 +53,6 @@ import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
  */
 public class FmtAlignment extends javax.swing.JPanel {
     
-    /** Creates new form FmtAlignment */
     public FmtAlignment() {
         initComponents();
         nlElseCheckBox.putClientProperty(OPTION_ID, placeElseOnNewLine);
@@ -63,13 +62,11 @@ public class FmtAlignment extends javax.swing.JPanel {
         nlModifiersCheckBox.putClientProperty(OPTION_ID, placeNewLineAfterModifiers);
         amFunctionParamsCheckBox.putClientProperty(OPTION_ID, alignMultilineMethodParams);
         amCallArgsCheckBox.putClientProperty(OPTION_ID, alignMultilineCallArgs);
-        amSequenceInitCheckBox1.putClientProperty(OPTION_ID, alignMultilineArrayInit);
         amAssignCheckBox1.putClientProperty(OPTION_ID, alignMultilineAssignment);
         amBinaryOpCheckBox1.putClientProperty(OPTION_ID, alignMultilineBinaryOp);
         amForCheckBox1.putClientProperty(OPTION_ID, alignMultilineFor);
         amExtendsCheckBox1.putClientProperty(OPTION_ID, alignMultilineImplements);
         amParenthesizedCheckBox1.putClientProperty(OPTION_ID, alignMultilineParenthesized);
-        amIfElseExpressionOpCheckBox1.putClientProperty(OPTION_ID, alignMultilineTernaryOp);
     }
     
     public static PreferencesCustomizer.Factory getController() {
@@ -115,9 +112,7 @@ public class FmtAlignment extends javax.swing.JPanel {
         amFunctionParamsCheckBox = new javax.swing.JCheckBox();
         amCallArgsCheckBox = new javax.swing.JCheckBox();
         amExtendsCheckBox1 = new javax.swing.JCheckBox();
-        amSequenceInitCheckBox1 = new javax.swing.JCheckBox();
         amBinaryOpCheckBox1 = new javax.swing.JCheckBox();
-        amIfElseExpressionOpCheckBox1 = new javax.swing.JCheckBox();
         amAssignCheckBox1 = new javax.swing.JCheckBox();
         amForCheckBox1 = new javax.swing.JCheckBox();
         amParenthesizedCheckBox1 = new javax.swing.JCheckBox();
@@ -171,20 +166,10 @@ public class FmtAlignment extends javax.swing.JPanel {
         amExtendsCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
         amExtendsCheckBox1.setOpaque(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(amSequenceInitCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_ArrayInit")); // NOI18N
-        amSequenceInitCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        amSequenceInitCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        amSequenceInitCheckBox1.setOpaque(false);
-
         org.openide.awt.Mnemonics.setLocalizedText(amBinaryOpCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_BinaryOp")); // NOI18N
         amBinaryOpCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         amBinaryOpCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
         amBinaryOpCheckBox1.setOpaque(false);
-
-        org.openide.awt.Mnemonics.setLocalizedText(amIfElseExpressionOpCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_TernaryOp")); // NOI18N
-        amIfElseExpressionOpCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        amIfElseExpressionOpCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        amIfElseExpressionOpCheckBox1.setOpaque(false);
 
         org.openide.awt.Mnemonics.setLocalizedText(amAssignCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_Assign")); // NOI18N
         amAssignCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -226,15 +211,11 @@ public class FmtAlignment extends javax.swing.JPanel {
                         .add(amParenthesizedCheckBox1))
                     .add(14, 14, 14)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(amForCheckBox1)
                         .add(amCallArgsCheckBox)
                         .add(nlModifiersCheckBox)
                         .add(nlFinallyCheckBox)
-                        .add(amExtendsCheckBox1)
-                        .add(amSequenceInitCheckBox1)
-                        .add(amIfElseExpressionOpCheckBox1))))
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(amForCheckBox1))
+                        .add(amExtendsCheckBox1))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -273,15 +254,11 @@ public class FmtAlignment extends javax.swing.JPanel {
                     .add(amBinaryOpCheckBox1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(amSequenceInitCheckBox1)
-                    .add(amAssignCheckBox1))
+                    .add(amAssignCheckBox1)
+                    .add(amForCheckBox1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(amIfElseExpressionOpCheckBox1)
-                    .add(amParenthesizedCheckBox1))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(amForCheckBox1)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .add(amParenthesizedCheckBox1)
+                .addContainerGap(53, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
@@ -293,9 +270,7 @@ public class FmtAlignment extends javax.swing.JPanel {
     private javax.swing.JCheckBox amExtendsCheckBox1;
     private javax.swing.JCheckBox amForCheckBox1;
     private javax.swing.JCheckBox amFunctionParamsCheckBox;
-    private javax.swing.JCheckBox amIfElseExpressionOpCheckBox1;
     private javax.swing.JCheckBox amParenthesizedCheckBox1;
-    private javax.swing.JCheckBox amSequenceInitCheckBox1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel multilineAlignmentLabel;
