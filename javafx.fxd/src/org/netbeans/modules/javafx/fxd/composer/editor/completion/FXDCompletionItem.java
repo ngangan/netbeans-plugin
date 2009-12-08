@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.editor.completion;
 
-import com.sun.javafx.tools.fxd.FXDArrayElement;
 import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
 import com.sun.javafx.tools.fxd.schema.model.Enumeration;

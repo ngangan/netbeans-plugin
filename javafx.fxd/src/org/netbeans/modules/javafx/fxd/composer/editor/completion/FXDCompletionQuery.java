@@ -40,7 +40,6 @@
  */
 package org.netbeans.modules.javafx.fxd.composer.editor.completion;
 
-import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.TokenSequence;
@@ -57,7 +56,6 @@ import org.openide.util.Exceptions;
 import com.sun.javafx.tools.fxd.schema.model.FXDSchema;
 import com.sun.javafx.tools.fxd.schema.model.Function;
 import java.util.logging.Logger;
-import org.netbeans.api.lexer.Token;
 import org.netbeans.modules.javafx.fxd.composer.editor.completion.providers.AbstractCompletionProvider;
 import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaModelProvider;

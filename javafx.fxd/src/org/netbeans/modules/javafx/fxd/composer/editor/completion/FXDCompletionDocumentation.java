@@ -43,10 +43,7 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion;
 
 import java.net.URL;
 import javax.swing.Action;
-import javax.swing.text.BadLocationException;
-import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
-import org.openide.util.Exceptions;
 
 /**
  *
