@@ -28,25 +28,17 @@
 
 package org.netbeans.modules.javafx.refactoring.impl;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.UnitTree;
 import java.io.IOException;
+import java.lang.ref.SoftReference;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Position.Bias;
 import javax.swing.text.StyledDocument;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.editor.Utilities;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
@@ -70,31 +62,33 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     private String oldText;
     private int startPosition = -1;
     private String newName;
-    private TreePathHandle handle;
+    private ElementLocation location;
     private DataEditorSupport des;
     private GuardedDocument doc;
     private LineCookie lc;
 
-    final public static RenameRefactoringElement create(TreePathHandle handle, String newName, String oldName, Lookup context) {
+    private SoftReference<String> newContent = null;
+
+    final public static RenameRefactoringElement create(ElementLocation location, String newName, String oldName, Lookup context) {
         try {
-            return new RenameRefactoringElement(handle, newName, oldName, context);
+            return new RenameRefactoringElement(location, newName, oldName, context);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, null, e);
         }
         return null;
     }
 
-    final public static RenameRefactoringElement create(TreePathHandle handle, String newName, Lookup context) {
+    final public static RenameRefactoringElement create(ElementLocation location, String newName, Lookup context) {
         try {
-            return new RenameRefactoringElement(handle, newName, handle.getSimpleName(), context);
+            return new RenameRefactoringElement(location, newName, location.getElement().getSimpleName().toString(), context);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, null, e);
         }
         return null;
     }
 
-    private RenameRefactoringElement(TreePathHandle handle, String newName, String oldName, Lookup context) throws IOException {
-        this.handle = handle;
+    private RenameRefactoringElement(ElementLocation location, String newName, String oldName, Lookup context) throws IOException {
+        this.location = location;
         this.newName = newName;
         this.oldText = oldName;
         this.context = context;
@@ -116,12 +110,31 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
         }
     }
 
+    @Override
+    protected String getNewFileContent() {
+        if (newContent != null) {
+            String content = newContent.get();
+            if (content != null) {
+                return content;
+            }
+        }
+        StringBuilder content = null;
+        try {
+            content = new StringBuilder(doc.getText(0, doc.getLength()));
+            content.replace(startPosition, startPosition + oldText.length(), newName);
+            newContent = new SoftReference<String>(content.toString());
+        } catch (BadLocationException badLocationException) {
+            return null;
+        }
+        return content.toString();
+    }
+
     public Lookup getLookup() {
         return context;
     }
 
     public FileObject getParentFile() {
-        return handle.getFileObject();
+        return location.getSourceFile();
     }
 
     public PositionBounds getPosition() {
@@ -129,7 +142,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
     }
 
     public String getText() {
-        return "Rename " + elementName();
+        return "Rename element";
     }
 
     public void performChange() {
@@ -151,7 +164,7 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
                                 if (DEBUG) {
                                     StringBuilder sb = new StringBuilder();
                                     extractLine(offset, sb);
-                                    LOGGER.finest("Can not rename due to name mismatch: " + processDiff(oldText, realText));
+                                    LOGGER.finest("Can not rename due to name mismatch: " + processDiff(oldText, realText)); // NOI18N
                                 }
                             }
                         }
@@ -232,100 +245,34 @@ public class RenameRefactoringElement extends SimpleRefactoringElementImplementa
         return offset - lineOff;
     }
 
-    private String elementName() {
-        return handle.getKind().toString().toLowerCase();
-    }
-
     private void init() throws IOException {
-        DataObject dobj = DataObject.find(handle.getFileObject());
+        DataObject dobj = DataObject.find(location.getSourceFile());
         des = (DataEditorSupport)dobj.getCookie(EditorCookie.class);
         doc = (GuardedDocument)des.openDocument();
         lc = dobj.getCookie(LineCookie.class);
-        
-        JavaFXSource jfxs = JavaFXSource.forFileObject(handle.getFileObject());
-        jfxs.runUserActionTask(new Task<CompilationController>() {
 
-            public void run(CompilationController cc) throws Exception {
-                JavaFXTreePath path = handle.resolve(cc);
-                if (path != null) {
-                    switch(path.getLeaf().getJavaFXKind()) {
-                        case CLASS_DECLARATION: {
-                            findClassName(path, cc);
-                            break;
-                        }
-                        case COMPILATION_UNIT: {
-                            findPackageStmt(path, cc);
-                            break;
-                        }
-                        case MEMBER_SELECT:
-                        case IDENTIFIER:
-                        case TYPE_CLASS:
-                        case INSTANTIATE_NEW:
-                        case IMPORT: {
-                            findTypeName(path, cc);
-                            break;
-                        }
-                        case VARIABLE:
-                        case OBJECT_LITERAL_PART:
-                        case METHOD_INVOCATION:
-                        case FUNCTION_DEFINITION: {
-                            findIdentifier(path, cc);
-                            break;
-                        }
+        try {
+        startPosition = location.getStartPosition();
+        int origLine = Utilities.getLineOffset(doc, startPosition);
+        if (oldText.contains(".")) { // an FQN; probably package name
+            int pos = 0;
+            StringTokenizer st = new StringTokenizer(oldText, ".");
+            while (st.hasMoreTokens()) {
+                String part = st.nextToken();
+                if (part.equals(location.getSimpleName())) {
+                    startPosition -= pos;
+                    int newLine = Utilities.getLineOffset(doc, startPosition);
+                    if (origLine != newLine) {
+                        startPosition++; // compensate the error introduced somehwere ...
                     }
+                    break;
                 }
-            }
-        }, true);
-        assert startPosition != -1; // start position *MUST* be resolved
-    }
-
-    private void findPackageStmt(JavaFXTreePath path, CompilationController cc) {
-        ExpressionTree pkgName = ((UnitTree)path.getLeaf()).getPackageName();
-        startPosition = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), pkgName);
-    }
-
-    private void findClassName(JavaFXTreePath path, CompilationController cc) {
-        TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
-        tokens.moveStart();
-        boolean foundClass = false;
-        while(tokens.moveNext()) {
-            final Token<JFXTokenId> currentToken = tokens.token();
-            String text = currentToken.text().toString();
-            if (currentToken.id() == JFXTokenId.CLASS) {
-                foundClass = true;
-                continue;
-            }
-            if (foundClass && currentToken.id() == JFXTokenId.IDENTIFIER && text.equals(oldText)) {
-                startPosition = currentToken.offset(cc.getTokenHierarchy());
-                break;
+                pos += part.length() + 1;
             }
         }
-    }
-
-    private void findTypeName(JavaFXTreePath path, CompilationController cc) {
-        String typeName = path.getLeaf().toString();
-
-        TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
-        tokens.moveStart();
-        while(tokens.moveNext()) {
-            final Token<JFXTokenId> currentToken = tokens.token();
-            String text = currentToken.text().toString();
-            if (typeName.equals(oldText) || typeName.startsWith(oldText + ".") || text.equals(oldText)) {
-                startPosition = currentToken.offset(cc.getTokenHierarchy());
-                break;
-            }
-        }
-    }
-
-    private void findIdentifier(JavaFXTreePath path, CompilationController cc) {
-        TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
-        tokens.moveStart();
-        while(tokens.moveNext()) {
-            final Token<JFXTokenId> currentToken = tokens.token();
-            if (currentToken.id() == JFXTokenId.IDENTIFIER && currentToken.text().toString().equals(oldText)) {
-                startPosition = currentToken.offset(cc.getTokenHierarchy());
-                break;
-            }
+        } catch (BadLocationException e) {
+            IOException ioe = (IOException)new IOException().initCause(e);
+            throw ioe;
         }
     }
 }

@@ -28,129 +28,176 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
+import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
-import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXIdent;
+import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
+import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
+import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
+import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class FindUsagesScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
-    private String targetSimpleName;
-    private String targetQualName;
+public class FindUsagesScanner extends BaseRefactoringScanner {
+    private FileObject definingFO = null;
+    private boolean isImport = false;
 
-    public FindUsagesScanner(TreePathHandle handle, CompilationController cc) {
-        this(handle, ElementHandle.create(handle.resolveElement(cc)), cc);
-    }
-
-    public FindUsagesScanner(TreePathHandle handle, ElementHandle elementHandle, CompilationController cc) {
-        super(handle, elementHandle, cc);
-        this.targetSimpleName = handle.getSimpleName();
-        this.targetQualName = (elementHandle.getKind() == ElementKind.CLASS || elementHandle.getKind() == ElementKind.INTERFACE || elementHandle.getKind() == ElementKind.OTHER) ? elementHandle.getQualifiedName() : "";
-    }
-
-    @Override
-    public Void visitMethodInvocation(FunctionInvocationTree node, Set<TreePathHandle> handles) {
-        if (getElementKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, handles);
-
-        if (isSameElement()) {
-            handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-        }
-
-        return super.visitMethodInvocation(node, handles);
-    }
-
-
-    @Override
-    public Void visitMemberSelect(MemberSelectTree node, Set<TreePathHandle> handles) {
-        if (!node.getIdentifier().contentEquals(targetSimpleName)) return super.visitMemberSelect(node, handles);
-        if (getElementKind() == ElementKind.CLASS || getElementKind() == ElementKind.INTERFACE) {
-            Element e = getCompilationController().getTrees().getElement(getCurrentPath());
-            if (e.getKind() == getElementKind()) {
-                if (((TypeElement)e).getQualifiedName().contentEquals(targetQualName)) {
-                    handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                }
+    public FindUsagesScanner(ElementLocation location, CompilationController cc) {
+        super(location, cc);
+        Element owner = ((Symbol)getElement()).owner;
+        if (owner != null && owner.getKind() == ElementKind.CLASS) {
+            Set<FileObject> fo = cc.getClasspathInfo().getClassIndex().getResources(ElementHandle.create(owner), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+            if (fo.size() > 0) {
+                definingFO = fo.iterator().next();
             }
+        }
+    }
+
+    @Override
+    protected boolean isChecked(JavaFXTreePath path, Element element) {
+        if (isImport(path)) return false;
+        
+        ElementKind kind = getElementKind();
+        JavaFXKind tKind = path.getLeaf().getJavaFXKind();
+        if (kind == ElementKind.CLASS || kind == ElementKind.INTERFACE) {
+            return tKind != JavaFXKind.CLASS_DECLARATION;
+        } else if (kind == ElementKind.METHOD) {
+            return tKind == JavaFXKind.METHOD_INVOCATION;
         } else {
-            ExpressionTree expression = node.getExpression();
-            if (expression instanceof JFXIdent) {
-                Type type = ((JFXIdent)expression).type;
-                if (type == null) return super.visitMemberSelect(node, handles);
-                TypeSymbol ts = type.asElement();
-                if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, handles);
-                for(Symbol sy : ts.getEnclosedElements()) {
-                    if (sy.getKind() == ElementKind.FIELD) {
-                        if (getElementHandle() != null && getElementHandle().equals(ElementHandle.create(sy))) {
-                            handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                            return null;
-                        }
-                    }
-                }
+            if (getCC().getFileObject().equals(definingFO)) {
+                return !path.getLeaf().equals(getCC().getTrees().getPath(element).getLeaf());
             }
         }
-        return super.visitMemberSelect(node, handles);
+        return true;
     }
 
     @Override
-    public Void visitIdentifier(IdentifierTree node, Set<TreePathHandle> handles) {
-        switch (getElementKind()) {
-            case FIELD:
-            case PARAMETER:
-            case LOCAL_VARIABLE:
-            case CLASS:
-            case INTERFACE: {
-                if (isSameElement()) {
-                    handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                }
-                break;
-            }
+    public Void visitImport(ImportTree node, Set<ElementLocation> p) {
+        try {
+            isImport = true;
+            return super.visitImport(node, p);
+        } finally {
+            isImport = false;
         }
-        return super.visitIdentifier(node, handles);
     }
 
-    @Override
-    public Void visitObjectLiteralPart(ObjectLiteralPartTree node, Set<TreePathHandle> handles) {
-        switch (getElementKind()) {
-            case FIELD:
-            case PARAMETER:
-            case LOCAL_VARIABLE: {
-                if (isSameElement()) {
-                    handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                }
-            }
-        }
-        return super.visitObjectLiteralPart(node, handles);
+    private boolean isImport(JavaFXTreePath path) {
+        return isImport;
+//        Tree node = path.getLeaf();
+//        while (node != null) {
+//            path = path.getParentPath();
+//            if (path == null) break;
+//            node = path.getLeaf();
+//            if (node != null && node.getJavaFXKind() == JavaFXKind.IMPORT) return true;
+//        }
+//        return false;
     }
 
-    @Override
-    public Void visitInstantiate(InstantiateTree node, Set<TreePathHandle> handles) {
-        switch (getElementKind()) {
-            case CLASS: {
-                JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier());
-                if (isSameElement(path)) {
-                    handles.add(TreePathHandle.create(path, getCompilationController()));
-                }
-            }
-        }
-        return super.visitInstantiate(node, handles);
-    }
-
+//    public FindUsagesScanner(ElementLocation location, CompilationController cc) {
+//        this(location, ElementHandle.create(location.getElement(cc)), cc);
+//    }
+//
+//    public FindUsagesScanner(ElementLocation location, CompilationController cc) {
+//        super(location, cc);
+//        this.targetSimpleName = location.getElement(cc).getSimpleName().toString();
+//        this.targetQualName = (elementHandle.getKind() == ElementKind.CLASS || elementHandle.getKind() == ElementKind.INTERFACE || elementHandle.getKind() == ElementKind.OTHER) ? elementHandle.getQualifiedName() : "";
+//    }
+//
+//    @Override
+//    public Void visitMethodInvocation(FunctionInvocationTree node, Set<ElementLocation> handles) {
+//        if (getElementKind() != ElementKind.METHOD) return super.visitMethodInvocation(node, handles);
+//
+//        if (isSameElement()) {
+//            handles.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//        }
+//
+//        return super.visitMethodInvocation(node, handles);
+//    }
+//
+//
+//    @Override
+//    public Void visitMemberSelect(MemberSelectTree node, Set<ElementLocation> handles) {
+//        if (!node.getIdentifier().contentEquals(targetSimpleName)) return super.visitMemberSelect(node, handles);
+//        if (getElementKind() == ElementKind.CLASS || getElementKind() == ElementKind.INTERFACE) {
+//            Element e = getCC().getTrees().getElement(getCurrentPath());
+//            if (e.getKind() == getElementKind()) {
+//                if (((TypeElement)e).getQualifiedName().contentEquals(targetQualName)) {
+//                    handles.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//                }
+//            }
+//        } else {
+//            ExpressionTree expression = node.getExpression();
+//            if (expression instanceof JFXIdent) {
+//                Type type = ((JFXIdent)expression).type;
+//                if (type == null) return super.visitMemberSelect(node, handles);
+//                TypeSymbol ts = type.asElement();
+//                if (ts.getKind() != ElementKind.CLASS) return super.visitMemberSelect(node, handles);
+//                for(Symbol sy : ts.getEnclosedElements()) {
+//                    if (sy.getKind() == ElementKind.FIELD) {
+//                        if (getElementHandle() != null && getElementHandle().equals(ElementHandle.create(sy))) {
+//                            handles.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//                            return null;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return super.visitMemberSelect(node, handles);
+//    }
+//
+//    @Override
+//    public Void visitIdentifier(IdentifierTree node, Set<ElementLocation> handles) {
+//        switch (getElementKind()) {
+//            case FIELD:
+//            case PARAMETER:
+//            case LOCAL_VARIABLE:
+//            case CLASS:
+//            case INTERFACE: {
+//                if (isSameElement()) {
+//                    handles.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//                }
+//                break;
+//            }
+//        }
+//        return super.visitIdentifier(node, handles);
+//    }
+//
+//    @Override
+//    public Void visitObjectLiteralPart(ObjectLiteralPartTree node, Set<ElementLocation> handles) {
+//        switch (getElementKind()) {
+//            case FIELD:
+//            case PARAMETER:
+//            case LOCAL_VARIABLE: {
+//                if (isSameElement()) {
+//                    handles.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//                }
+//            }
+//        }
+//        return super.visitObjectLiteralPart(node, handles);
+//    }
+//
+//    @Override
+//    public Void visitInstantiate(InstantiateTree node, Set<ElementLocation> handles) {
+//        switch (getElementKind()) {
+//            case CLASS: {
+//                JavaFXTreePath path = JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier());
+//                if (isSameElement(path)) {
+//                    handles.add(ElementLocation.locationFor(path, getCC()));
+//                }
+//            }
+//        }
+//        return super.visitInstantiate(node, handles);
+//    }
+//
 
 }

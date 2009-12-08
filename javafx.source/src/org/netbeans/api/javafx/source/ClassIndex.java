@@ -179,7 +179,8 @@ final public class ClassIndex {
          * The returned class contains references to the element type
          */
         TYPE_REFERENCES,
-        TYPE_DEFS
+        TYPE_DEFS,
+        PACKAGES
     };
 
     final private Set<FileObject> indexerSrcRoots = new HashSet<FileObject>();
@@ -396,6 +397,14 @@ final public class ClassIndex {
                             result.addAll(JavaFXSourceUtils.getClasses(ir.getFile(), handle));
                         }
                     }
+                    case PACKAGES: {
+                        String indexingVal = IndexingUtilities.getIndexValue(handle);
+                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
+                            for (String value : ir.getValues(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
+                                result.add(IndexingUtilities.getLocationHandle(value));
+                            }
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
@@ -471,6 +480,11 @@ final public class ClassIndex {
                             result.add(ir.getFile());
                         }
                         break;
+                    }
+                    case PACKAGES: {
+                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
+                            result.add(ir.getFile());
+                        }
                     }
                 }
             }

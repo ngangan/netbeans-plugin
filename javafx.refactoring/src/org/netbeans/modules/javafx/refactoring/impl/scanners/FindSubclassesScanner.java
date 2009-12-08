@@ -28,34 +28,41 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import java.util.Set;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class FindSubclassesScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
-    public FindSubclassesScanner(TreePathHandle searchHandle, ElementHandle<Element> eh, CompilationController cc) {
-        super(searchHandle, eh, cc);
+public class FindSubclassesScanner extends BaseRefactoringScanner {
+
+    public FindSubclassesScanner(ElementLocation location, CompilationController cc) {
+        super(location, cc);
     }
 
     @Override
-    public Void visitClassDeclaration(ClassDeclarationTree node, Set<TreePathHandle> handles) {
-        switch (getElementKind()) {
-            case CLASS:
-            case INTERFACE: {
-                if (isSameElement()) {
-//                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
-//                if (targetName.equals(te.getQualifiedName().toString())) {
-                    handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-                }
-            }
-        }
-        return super.visitClassDeclaration(node, handles);
+    protected boolean isChecked(JavaFXTreePath path, Element element) {
+        return path.getLeaf().getJavaFXKind() == JavaFXKind.CLASS_DECLARATION;
     }
+
+
+//    @Override
+//    public Void visitClassDeclaration(ClassDeclarationTree node, Set<ElementLocation> locations) {
+//        switch (getElementKind()) {
+//            case CLASS:
+//            case INTERFACE: {
+//                if (isSameElement()) {
+////                TypeElement te = (TypeElement)getCompilationController().getTrees().getElement(getCurrentPath());
+////                if (targetName.equals(te.getQualifiedName().toString())) {
+//                    locations.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//                }
+//            }
+//        }
+//        return super.visitClassDeclaration(node, locations);
+//    }
 }
