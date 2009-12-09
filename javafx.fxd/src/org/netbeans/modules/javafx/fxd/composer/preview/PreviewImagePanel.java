@@ -91,7 +91,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     public Scene getScene(){
         return m_fxScene;
     }
-    
+
+    public Node getSceneRoot() {
+        return getScene().impl_getRoot();
+    }
+
     public SwingScenePanel getScenePanel() {
         //return m_scenePanel;
         return getScenePanel(m_fxScene);
@@ -313,7 +317,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         SwingScenePanel scenePanel = getScenePanel();
         if (scenePanel != null){
             float zoom = m_dObj.getDataModel().getZoomRatio();
-            Node node = m_fxScene.impl_getRoot();
+            Node node = getSceneRoot();
 
             Bounds2D bounds = new Bounds2D();
             node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
@@ -362,10 +366,10 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void actionPerformed(ActionEvent e) {
+            Node node = getSceneRoot();
             Bounds2D bounds = new Bounds2D();
-            // TODO enable zoom
-            //m_sgPanel.getScene().getCompleteBounds(bounds, null);
-            
+            node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
+
             Dimension panelSize = getParent().getSize();
             
             double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / bounds.getWidth();
