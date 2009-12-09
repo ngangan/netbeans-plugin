@@ -14,7 +14,6 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.code.Type.ClassType;
 import com.sun.tools.mjavac.util.JCDiagnostic;
@@ -38,8 +37,6 @@ import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
-import org.netbeans.modules.javafx.editor.format.CodeStyle;
-import org.netbeans.modules.javafx.editor.format.JFXReformatTask;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -136,7 +133,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                         JavaFXTreePath parentPath = getCurrentPath().getParentPath();
                         if (parentPath != null && parentPath.getParentPath() != null) {
                             String functionName = parentPath.getParentPath().getLeaf().toString();
-                            if (functionName.contains("_$UNUSED$_$ARGS$_")) {
+                            if (functionName.contains("_$UNUSED$_$ARGS$_")) { //NOI18N
                                 isInsideMainFunction[0] = true;
                             }
                         }
@@ -157,7 +154,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         } else {
             fixes.add(new CreateElementFix(fixType, diagnostic, document, compilationInfo, false));
         }
-        ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "DUAPAADASFDSF", fixes, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
+        ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Create missing elements", fixes, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
         return errorDescription;
     }
@@ -196,7 +193,6 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
             ClassType classType = (ClassType) args[5];
             int position = -1;
             if (fixType.equals(FUNCTION_VALUE)) {
-                code.append(FUNCTION_VALUE).append(" ").append(diagnostic.getArgs()[1]).append("(");//NOI18N
                 final Map<String, Type> typesMap = new HashMap<String, Type>();
                 final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
 
@@ -232,10 +228,15 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                     }
                     Imports.addImport(target, typeFQN.toString());
                 }
+                Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
                 position = getPositonAtEnd(classType.tsym, compilationInfo, document);
+                String space = HintsUtils.calculateSpace(position, document);
+                code.append("\n").append(space).append(FUNCTION_VALUE).append(" ").append(diagnostic.getArgs()[1]).append("(");//NOI18N
                 code.append("){\n"); //NOI18N)
-                code.append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                code.append("}\n"); //NOI18N
+                code.append(space).append(HintsUtils.TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+                code.append(space).append("}\n"); //NOI18N
+                //code = new StringBuffer(JFXReformatTask.reformat(code.toString(), CodeStyle.getDefault(document)));
+                
             } else if (fixType.equals(CLASS_VALUE)) {
                 code.append(CLASS_VALUE).append(" ").append(diagnostic.getArgs()[5]).append(" {"); //NOI18N
                 code.append("}"); //NOI18N
@@ -244,13 +245,14 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                 code.append("var ").append(diagnostic.getArgs()[1]).append(";\n"); //NOI18N
                 if (localPosition) {
                     position = getLocalPostion(compilationInfo, diagnostic);
+                } else {
+                    position = getPositonAtStart(classType.tsym, compilationInfo, diagnostic);
                 }
-//                else {
-//                    position = getPositonAtStart(classType.tsym, compilationInfo, diagnostic);
-//                }
             }
-            Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
-            document.insertString(position, JFXReformatTask.reformat(code.toString(), CodeStyle.getDefault(document)), null);
+            if (position < 0) {
+                return null;
+            }
+            document.insertString(position, code.toString(), null);
 
             return null;
         }
@@ -268,7 +270,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         compilationInfo.getTrees().getElement(path);
         int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
         if (tree instanceof JFXBlock) {
-            position ++;
+            position++;
         }
         if (diagnostic.getPosition() < position) {
             return (int) diagnostic.getPosition();
@@ -276,15 +278,21 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         return position;
     }
 
-    private static int getPositonAtEnd(Element element, CompilationInfo compilationInfo, JavaFXDocument document) {
+    private static int getPositonAtEnd(final Element element, final CompilationInfo compilationInfo, JavaFXDocument document) {
+
         Tree enclosingTree = compilationInfo.getTrees().getTree(element);
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int position = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-        if (document.isPosGuarded(position)) {
-            position = -1;
+        final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), enclosingTree);
+        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), enclosingTree);
+
+        if (HintsUtils.isAnnon(element)) {
+            start = findPosition(compilationInfo, start, end - start, element);
+        }
+        if (document.isPosGuarded(start)) {
+            start = -1;
         }
 
-        return position;
+        return start;
     }
 //
 //    private static int getEnclosingPositionInside(final CompilationInfo compilationInfo, final Diagnostic diagnostic) {
@@ -310,74 +318,77 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
 //        return lp[0] -1 ;
 //    }
 //
-//    private static int getEnclosingPositionBefore(final CompilationInfo compilationInfo, Element element, int errorPosition) {
-//        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-//        for (Element e : element.getEnclosedElements()) {
-//            Tree tree = compilationInfo.getTrees().getTree(e);
-//            if (tree != null) {
-//                int startTree = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-//                int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
-//                if (startTree <= errorPosition && endTree >= errorPosition) {
-//                    return startTree -1 ;
-//                }
-//            }
-//        }
+
+    private static int getEnclosingPositionBefore(final CompilationInfo compilationInfo, Element element, int errorPosition) {
+        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+        for (Element e : element.getEnclosedElements()) {
+            Tree tree = compilationInfo.getTrees().getTree(e);
+            if (tree != null) {
+                int startTree = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
+                int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
+                if (startTree <= errorPosition && endTree >= errorPosition) {
+                    return startTree - 1;
+                }
+            }
+        }
+
+        return -1;
+    }
 //
-//        return -1;
-//    }
+
+    private static int getPositonAtStart(Element element, CompilationInfo compilationInfo, Diagnostic diagnostic) {
+        Tree enclosingTree = compilationInfo.getTrees().getTree(element);
+
+        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), enclosingTree);
+        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), enclosingTree);
+        int position = findPosition(compilationInfo, start, end - start, element);
+        if (position < 0 && enclosingTree instanceof JFXClassDeclaration) {
+            position = getEnclosingPositionBefore(compilationInfo, element, (int) diagnostic.getPosition());
+        }
+
+        return position;
+    }
 //
-//    private static int getPositonAtStart(Element element, CompilationInfo compilationInfo, Diagnostic diagnostic) {
-//        Tree enclosingTree = compilationInfo.getTrees().getTree(element);
-//
-//        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-//        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-//        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-//        int position = findPosition(compilationInfo, start, end - start, element);
-//        if (position < 0 && enclosingTree instanceof JFXClassDeclaration) {
-//            position = getEnclosingPositionBefore(compilationInfo, element, (int) diagnostic.getPosition());
-//        }
-//
-//        return position;
-//    }
-//
-//    private static int findPosition(CompilationInfo compilationInfo, int start, int lenght, Element element) {
-//        Document document = compilationInfo.getDocument();
-//        try {
-//            String text = document.getText(start, lenght);
-//            StringTokenizer st = new StringTokenizer(text);
-//            boolean isExtends = false;
-//            boolean isClass = false;
-//
-//            while (st.hasMoreTokens()) {
-//                String token = st.nextToken();
-//                if (token.equals("extends")) { //NOI18N
-//                    isExtends = true;
-//                }
-//                if (token.equals("class")) { //NOI18N
-//                    isClass = true;
-//                }
-//            }
-//            boolean isAnon = HintsUtils.isAnnon(element);
-//            if (!isAnon && !isClass && !isExtends) {
-//                return -1;
-//            }
-//            int index = text.indexOf("{"); //NOI18N
-//            if (index > 0) {
-//                return start + index + 1;
-//            } else if (text.contains("(") || text.contains(")")) { //NOI18N
-//                return -1;
-//            } else {
-//                text = document.getText(start, document.getLength() - start);
-//                index = text.indexOf("{"); //NOI18N
-//                if (index < 0) {
-//                    return -1;
-//                }
-//                return start + index + 1;
-//            }
-//        } catch (BadLocationException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        return -1;
-//    }
+
+    private static int findPosition(CompilationInfo compilationInfo, int start, int lenght, Element element) {
+        Document document = compilationInfo.getDocument();
+        try {
+            String text = document.getText(start, lenght);
+            StringTokenizer st = new StringTokenizer(text);
+            boolean isExtends = false;
+            boolean isClass = false;
+
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken();
+                if (token.equals("extends")) { //NOI18N
+                    isExtends = true;
+                }
+                if (token.equals("class")) { //NOI18N
+                    isClass = true;
+                }
+            }
+            boolean isAnon = HintsUtils.isAnnon(element);
+            if (!isAnon && !isClass && !isExtends) {
+                return -1;
+            }
+            int index = text.indexOf("{"); //NOI18N
+            if (index > 0) {
+                return start + index + 1;
+            } else if (text.contains("(") || text.contains(")")) { //NOI18N
+                return -1;
+            } else {
+                text = document.getText(start, document.getLength() - start);
+                index = text.indexOf("{"); //NOI18N
+                if (index < 0) {
+                    return -1;
+                }
+                return start + index + 1;
+            }
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+
+        return -1;
+    }
 }

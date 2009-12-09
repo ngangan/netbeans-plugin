@@ -81,7 +81,6 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
         final Collection<Element> classes = new HashSet<Element>();
         final Map<Element, List<MethodSymbol>> overriddenMethods = new HashMap<Element, List<MethodSymbol>>();
         final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
-        final Collection<Element> classesKeys = new HashSet<Element>(overriddenMethods.keySet());
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -89,18 +88,11 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 cancel.set(true);
             }
 
-            @SuppressWarnings("element-type-mismatch")
+            @SuppressWarnings("element-type-mismatch") //NOI18N
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
                 final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, classes, overriddenMethods);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
-                for (Element classElement : classesKeys) {
-                    if (overriddenMethods.isEmpty() || (!HintsUtils.isAnnon(classElement) && HintsUtils.checkString(classElement.getSimpleName().toString()))) {
-                        updateAnnotationsOverridden(compilationInfo, addedAnotations);
-                        clear();
-                        return;
-                    }
-                }
                 SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                 for (Element currentClass : classes) {
                     if (overriddenMethods.get(currentClass) == null || overriddenMethods.get(currentClass).isEmpty()) {
@@ -215,7 +207,6 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 addedAnotations.clear();
                 classes.clear();
                 overriddenMethods.clear();
-                classesKeys.clear();
             }
         };
     }
