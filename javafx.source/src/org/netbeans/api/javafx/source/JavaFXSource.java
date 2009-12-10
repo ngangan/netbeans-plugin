@@ -80,8 +80,8 @@ import org.netbeans.modules.parsing.api.Source;
  */
 public final class JavaFXSource {
 
-    //Already logged warning about running in AWT
-    private static final Set<StackTraceElement> warnedAboutRunInEQ = new HashSet<StackTraceElement>();
+    // Already logged warning about running in AWT
+    private static final Set<StackTraceElement> WARNED_ABOUT_RUN_IN_EQ = new HashSet<StackTraceElement>();
 
     static {
         JavaFXSourceTaskFactoryManager.register();
@@ -235,8 +235,8 @@ public final class JavaFXSource {
         boolean a = false;
         assert a = true;
         if (a && javax.swing.SwingUtilities.isEventDispatchThread()) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[1];
-            if (stackTraceElement != null && warnedAboutRunInEQ.add(stackTraceElement)) {
+            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+            if (stackTraceElement != null && WARNED_ABOUT_RUN_IN_EQ.add(stackTraceElement)) {
                 LOGGER.warning("ParserManager.parse called in AWT event thread by: " + stackTraceElement); // NOI18N
                 LOGGER.warning("  - thread dump follows:"); // NOI18N
                 if (LOGGER.isLoggable(Level.WARNING)) {
