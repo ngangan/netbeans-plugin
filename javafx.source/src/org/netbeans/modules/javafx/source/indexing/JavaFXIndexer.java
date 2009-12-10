@@ -15,7 +15,9 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
+import com.sun.javafx.api.tree.OnReplaceTree;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.TriggerTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
@@ -23,7 +25,10 @@ import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -62,7 +67,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
 
     final public static String NAME = "fx";
-    final public static int VERSION = 1;
+    final public static int VERSION = 2;
 
     public enum IndexKey {
         PACKAGE_NAME,
@@ -127,6 +132,42 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             IndexDocument document = support.createDocument(indexable);
 
             JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
+
+//                @Override
+//                public Void scan(Tree tree, IndexDocument document) {
+//                    JavaFXTreePath oldPath = getCurrentPath();
+//                    super.scan(tree, document);
+//
+//                    ElementHandle eh = null;
+//                    if (tree != null && (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals("")))) {
+//                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS) {
+//                            // check for javafx$run$ magic
+//                            if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
+//                                JavaFXTreePath path = (tree != null && oldPath != null) ? JavafxcTrees.getPath(oldPath, tree) : null;
+//                                Element scannedElement = path != null ? fxresult.getTrees().getElement(path) : null;
+//                                if (scannedElement == null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
+//                                    scannedElement = fxresult.getElementUtilities().getPackageElement(tree.toString());
+//                                }
+//                                eh = ElementHandle.create(scannedElement);
+//                            }
+//                        }
+//                    }
+//                    if (eh != null) {
+//                        String indexVal = IndexingUtilities.getIndexValue(eh);
+//                        switch (eh.getKind()) {
+//                            case PACKAGE: {
+//                                index(document, IndexKey.PACKAGE_NAME, indexVal);
+//                                break;
+//                            }
+//                            case INTERFACE:
+//                            case CLASS: {
+//                                if (tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+//                                    index(document, IndexKey.CLASS_FQN)
+//                            }
+//                        }
+//                    }
+//                    return null;
+//                }
 
                 @Override
                 public Void visitCompilationUnit(UnitTree node, IndexDocument document) {
@@ -310,18 +351,29 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                             LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
                         }
                         index(document, IndexKey.FUNCTION_INV, indexVal);
-                        indexVal = e.asType() != null ? e.asType().toString() : null;
+                        indexVal = e.getEnclosingElement() != null ? IndexingUtilities.getIndexValue(ElementHandle.create(e.getEnclosingElement())) : null;
                         if (indexVal != null) {
                             if (DEBUG) {
-                                LOG.log(Level.FINEST, "Indexing function inv type reference {0}\n", new String[]{indexVal});
+                                LOG.log(Level.FINEST, "Indexing function inv owner type reference {0}\n", new String[]{indexVal});
                             }
                             index(document, IndexKey.TYPE_REF, indexVal);
                         } else {
-                            LOG.log(Level.FINE, "Can not determine function inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                            LOG.log(Level.FINE, "Can not determine function owner inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                        }
+                        indexVal = e.asType() != null ? e.asType().toString() : null;
+                        if (indexVal != null) {
+                            if (DEBUG) {
+                                LOG.log(Level.FINEST, "Indexing function inv return type reference {0}\n", new String[]{indexVal});
+                            }
+                            index(document, IndexKey.TYPE_REF, indexVal);
+                        } else {
+                            LOG.log(Level.FINE, "Can not determine function inv return type for: {0}", node != null ? node.getJavaFXKind() : "null");
                         }
                     }
                     return super.visitMethodInvocation(node, document);
                 }
+
+                
 
                 @Override
                 public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
@@ -388,7 +440,16 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                                             }
                                             return super.visitMemberSelect(node, document);
                                         }
-                                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
+                                        String indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(ts));
+                                        if (indexVal != null) {
+                                            if (DEBUG) {
+                                                LOG.log(Level.FINEST, "Indexing type reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                            }
+                                            index(document, IndexKey.TYPE_REF, indexVal);
+                                        } else {
+                                            LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node.getExpression());
+                                        }
+                                        indexVal = IndexingUtilities.getIndexValue(ElementHandle.create(sy));
                                         if (indexVal != null) {
                                             if (DEBUG) {
                                                 LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
@@ -474,12 +535,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             // if (fxresult.isErrors()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
-            JavaFXSource.forFileObject(FileUtil.toFileObject(new File(indexable.getURL().toURI()))).runUserActionTask(new Task<CompilationController>() {
-
-                public void run(CompilationController cc) throws Exception {
-                    FXErrorAnnotator.getInstance().process(cc);
-                }
-            }, true);
+            FXErrorAnnotator.getInstance().process(FileUtil.toFileObject(new File(indexable.getURL().toURI())));
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Error indexing " + indexable.toString(), e);
             return;
