@@ -6,6 +6,9 @@ package org.netbeans.modules.javafx.fxd.composer.source;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
@@ -28,11 +31,12 @@ public final class SourceElement implements MultiViewElement, Serializable {
     private static final long serialVersionUID = 2L;
         
     private final     FXZDataObject                   m_dObj;
+    private           String                          m_entryCached;
     private transient SourceEditorWrapper             m_editorWrapper;
     private transient ToolbarWrapper                  m_toolbarWrapper;
     private transient Map<String, SourceTopComponent> m_sourceTCs = null;
     private transient SourceTopComponent              m_currentSourceTC = null;
-        
+
     private static final class ToolbarWrapper extends JPanel {
         private JToolBar  m_delegate = null;
         private Dimension m_dim      = null;
@@ -215,5 +219,15 @@ public final class SourceElement implements MultiViewElement, Serializable {
             "ID_FXZ_CLOSING", // NOI18N
             MultiViewFactory.NOOP_CLOSE_ACTION,
             MultiViewFactory.NOOP_CLOSE_ACTION);
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        m_entryCached = m_dObj.getEntryName();
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        m_dObj.setCachedEntry(m_entryCached);
     }
 }

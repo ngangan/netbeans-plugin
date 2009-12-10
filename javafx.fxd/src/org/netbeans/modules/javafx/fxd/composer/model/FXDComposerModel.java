@@ -22,14 +22,15 @@ public class FXDComposerModel {
     private transient Exception   m_fxzArchiveException = null;
     
     /** persistent properties */
-    private String        m_selectedEntry  = FXDContainer.MAIN_CONTENT;
+    private String        m_selectedEntry  = null;
     private boolean       m_isHighlightOn  = true;
     private boolean       m_showTooltip    = true;
     private float         m_zoomRatio      = 1.0f;
     private Profile m_previewProfile = Profile.desktop;
             
-    public FXDComposerModel( FXZDataObject dObj) throws FileNotFoundException, IOException {
+    public FXDComposerModel( FXZDataObject dObj, String cachedEntry) throws FileNotFoundException, IOException {
         assert dObj != null;
+        m_selectedEntry = cachedEntry != null ? cachedEntry : FXDContainer.MAIN_CONTENT;
         try {
             m_fxzArchive = new FXZArchive(dObj);
         } catch( Exception e) {

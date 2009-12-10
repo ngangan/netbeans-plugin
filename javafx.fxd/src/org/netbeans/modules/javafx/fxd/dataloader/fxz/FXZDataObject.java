@@ -101,6 +101,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public static final int    ARCHIVE_VIEW_INDEX = 2;
     
     InstanceContent                                          m_ic;
+    private           String                                 m_entryCached = null;
     private transient volatile Lookup                        m_lookup;
     private transient          FXZEditorSupport              m_edSup = null;
     private transient          Map<String, FXZEditorSupport> m_supports = new HashMap<String,FXZEditorSupport>();
@@ -348,7 +349,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
             setDefaultView(index);
         }
     }
-    
+
     public synchronized String getEntryName() {
         if ( m_model == null) {
             return FXDContainer.MAIN_CONTENT;
@@ -356,11 +357,24 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
             return m_model.getSelectedEntry();
         }
     }
+
+    /**
+     * is used to set cached entry selection value.
+     * It will be used as default selected entry value in FXDComposerModel.
+     * Only first invocation with not null value will really work. The rest are ignored.
+     * @param cachedEntry entry value to set as selected
+     */
+    public synchronized void setCachedEntry(String cachedEntry){
+        if (m_entryCached == null){
+            m_entryCached = cachedEntry;
+        }
+    }
+    
     public synchronized FXDComposerModel getDataModel() {
         if (m_model == null) {
             try {
                 //System.err.println("Creating the DataModel");
-                m_model = new FXDComposerModel(this);
+                m_model = new FXDComposerModel(this, m_entryCached);
                 //SceneManager.log(Level.INFO, "SceneManager created for " + getPrimaryFile().getPath()); //NOI18N
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
