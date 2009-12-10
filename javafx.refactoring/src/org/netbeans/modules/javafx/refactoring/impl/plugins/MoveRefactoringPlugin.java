@@ -358,24 +358,37 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                             private boolean removingImport = false;
                             private boolean handlingImport = false;
+
+                            @Override
+                            public Void visitCompilationUnit(UnitTree node, Void p) {
+                                myPkgName = node.getPackageName().toString();
+                                return super.visitCompilationUnit(node, p);
+                            }
+
                             @Override
                             public Void visitImport(ImportTree node, Void p) {
                                 try {
                                     handlingImport = true;
                                     Tree qualidTree = node.getQualifiedIdentifier();
-                                    if (qualidTree != null && qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                    if (qualidTree != null && (qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || qualidTree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
                                         ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
+                                        System.err.println("!!! Import: " + parts.packageName + "." + parts.typeName);
                                         if (parts.packageName != null) {
-                                            String targetPkg = renameMap.isEmpty() ? parts.packageName : renameMap.get(parts.packageName);
-                                            if (myPkgName.equals(targetPkg)) {
-                                                imported.add(qualidTree.toString().replace(parts.packageName, targetPkg));
+                                            String otherTargetPkg = renameMap.get(parts.packageName);
+                                            if (otherTargetPkg == null) otherTargetPkg = parts.packageName;
+                                            String myTargetPkg = renameMap.get(myPkgName);
+                                            if (myTargetPkg == null) myTargetPkg = myPkgName;
+                                            System.err.println("!!! MyPkg: " + myPkgName + " -> " + myTargetPkg);
+                                            System.err.println("!!! Target: " + otherTargetPkg);
+                                            if (myTargetPkg.equals(otherTargetPkg)) {
+                                                imported.add(qualidTree.toString().replace(parts.packageName, otherTargetPkg));
                                                 SourcePositions sp = cc.getTrees().getSourcePositions();
                                                 int start = (int)sp.getStartPosition(cc.getCompilationUnit(), node);
                                                 int end = (int)sp.getEndPosition(cc.getCompilationUnit(), node);
                                                 removingImport = true;
                                                 elements.add(refactoring, DeleteTextRefactoringElement.create(fo, start, end, Lookups.singleton(tContext)));
                                             } else {
-                                                imported.add(qualidTree.toString().replace(parts.packageName, targetPkg));
+                                                imported.add(qualidTree.toString().replace(parts.packageName, otherTargetPkg));
                                             }
                                         }
                                     }
@@ -423,6 +436,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                             @Override
                             public Void visitMemberSelect(MemberSelectTree node, Void p) {
+                                System.err.println("handling import = " + handlingImport);
                                 if (removingImport) return null;
 
                                 if (handlingImport) {
@@ -471,11 +485,18 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                     }
                                 }
                                 String[] types = new String[2];
-                                while (e != null && e.getKind() != ElementKind.PACKAGE) {
+                                while (e != null && tp != null && e.getKind() != ElementKind.PACKAGE) {
                                     if (e.getKind() == ElementKind.CLASS && ((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL) {
                                         types[0] = ((TypeElement)e).getQualifiedName().toString();
                                     }
                                     e = e.getEnclosingElement();
+                                    if (t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                        tp = JavafxcTrees.getPath(getCurrentPath(), ((MemberSelectTree)t).getExpression());
+                                        t = tp.getLeaf();
+                                    } else {
+                                        tp = null;
+                                        t = null;
+                                    }
                                 }
                                 if (e != null) {
                                     types[1] = ((PackageElement)e).getQualifiedName().toString();
@@ -526,7 +547,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         fireProgressListenerStep(3);
         p = chainProblems(p, renamePackages(renameMap, movedClasses, elements));
         fireProgressListenerStep(2);
-        p = chainProblems(p, fixImports(Collections.EMPTY_MAP, filesToMove, movedClasses, elements));
+        p = chainProblems(p, fixImports(renameMap, filesToMove, movedClasses, elements));
         fireProgressListenerStep(1);
         p = chainProblems(p, fixImports(renameMap, related, movedClasses, elements));
         fireProgressListenerStop();
@@ -627,25 +648,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         }
         return result;
     }        
-
-    final private Object indexLock = new Object();
-    // @GuardedBy indexLock
-    volatile private ClassIndex index = null;
-
-    private ClassIndex getClassIndex() {
-        if (index == null) {
-            synchronized(indexLock) {
-                FileObject fo = null;
-                if (!filesToMove.isEmpty()) {
-                    fo = filesToMove.get(0);
-                } else if (!foldersToMove.isEmpty() && !foldersToMove.get(0).isEmpty()) {
-                    fo = foldersToMove.get(0).get(0);
-                }
-                index = ClassIndex.forClasspathInfo(SourceUtils.getClasspathInfoFor(fo));
-            }
-        }
-        return index;
-    }
 
     public void cancelRequest() {
         // do nothing

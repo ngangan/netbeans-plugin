@@ -15,9 +15,7 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
-import com.sun.javafx.api.tree.OnReplaceTree;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TriggerTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
@@ -25,10 +23,7 @@ import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -42,11 +37,8 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.netbeans.modules.parsing.spi.Parser.Result;
@@ -132,46 +124,9 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             IndexDocument document = support.createDocument(indexable);
 
             JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
-
-//                @Override
-//                public Void scan(Tree tree, IndexDocument document) {
-//                    JavaFXTreePath oldPath = getCurrentPath();
-//                    super.scan(tree, document);
-//
-//                    ElementHandle eh = null;
-//                    if (tree != null && (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals("")))) {
-//                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS) {
-//                            // check for javafx$run$ magic
-//                            if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
-//                                JavaFXTreePath path = (tree != null && oldPath != null) ? JavafxcTrees.getPath(oldPath, tree) : null;
-//                                Element scannedElement = path != null ? fxresult.getTrees().getElement(path) : null;
-//                                if (scannedElement == null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
-//                                    scannedElement = fxresult.getElementUtilities().getPackageElement(tree.toString());
-//                                }
-//                                eh = ElementHandle.create(scannedElement);
-//                            }
-//                        }
-//                    }
-//                    if (eh != null) {
-//                        String indexVal = IndexingUtilities.getIndexValue(eh);
-//                        switch (eh.getKind()) {
-//                            case PACKAGE: {
-//                                index(document, IndexKey.PACKAGE_NAME, indexVal);
-//                                break;
-//                            }
-//                            case INTERFACE:
-//                            case CLASS: {
-//                                if (tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-//                                    index(document, IndexKey.CLASS_FQN)
-//                            }
-//                        }
-//                    }
-//                    return null;
-//                }
-
                 @Override
                 public Void visitCompilationUnit(UnitTree node, IndexDocument document) {
-                    String indexVal = node.getPackageName().toString();
+                    String indexVal = node.getPackageName() != null ? node.getPackageName().toString() : "<default>"; // NOI18N
                     index(document, IndexKey.PACKAGE_NAME, indexVal);
                     return super.visitCompilationUnit(node, document);
                 }
