@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -38,56 +38,25 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+package org.netbeans.modules.javafx.fxd.dataloader;
 
-package org.netbeans.modules.javafx.fxd.composer.editor.completion;
-
-import java.net.URL;
-import javax.swing.Action;
-import org.netbeans.spi.editor.completion.CompletionDocumentation;
+import java.nio.charset.Charset;
+import org.netbeans.spi.queries.FileEncodingQueryImplementation;
+import org.openide.filesystems.FileObject;
 
 /**
  *
- * @author avk
+ * @author Andrew Korostelev
  */
-public class FXDCompletionDocumentation implements CompletionDocumentation{
+public class FXDFileEncodingQueryImplementation extends FileEncodingQueryImplementation {
 
-    private FXDCompletionItem m_item;
-    private StringBuilder sb;
+    private final static Charset UTF_8 = Charset.forName("UTF-8");         // NOI18N
 
-    public FXDCompletionDocumentation(FXDCompletionItem item) {
-        m_item = item;
+    /** Creates a new instance of JavaFXProjectEncodingQueryImpl */
+    public FXDFileEncodingQueryImplementation() {
     }
 
-    public String getText() {
-        sb = new StringBuilder("Information about " + m_item.getDisplayText());
-
-        String descr = getSchemaElementDescription();
-        if (descr != null){
-            sb.append("<p>");
-            sb.append(descr);
-        }
-        return sb.toString();
+    public Charset getEncoding(FileObject file) {
+        return UTF_8;
     }
-
-    private String getSchemaElementDescription(){
-        if(m_item.getSchemaElement() != null ){
-            if ( m_item.getSchemaElement().description != null ){
-                return m_item.getSchemaElement().description;
-            }
-        }
-        return null;
-    }
-
-    public URL getURL() {
-        return null;
-    }
-
-    public CompletionDocumentation resolveLink(String arg0) {
-        return null;
-    }
-
-    public Action getGotoSourceAction() {
-        return null;
-    }
-
 }

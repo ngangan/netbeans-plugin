@@ -242,6 +242,10 @@ public class FXDReformatTask implements ReformatTask {
         private void fixSpaces(int start, int end, int allowed) throws BadLocationException {
             if (start + allowed != end) {
                 int startRowOffset = IndentUtils.lineStartOffset(m_baseDoc, start);
+                if (start == startRowOffset){
+                    // prev non white char is line break treated as comma.
+                    return;
+                }
                 int endRowOffset = IndentUtils.lineStartOffset(m_baseDoc, end);
                 if (startRowOffset == endRowOffset) {
                     if (start + allowed < end) {
@@ -320,7 +324,7 @@ public class FXDReformatTask implements ReformatTask {
             if ( rowFirstNonWhite >= m_startOffset){
                 return FormatterUtilities.calculateLineIndent(m_baseDoc, m_startOffset);
             } else {
-                // if char before startOffset is lbracket should start formatting from it
+                // update m_startOffset if prev char is lbracket
                 int rowStart = Utilities.getRowStart(m_baseDoc, m_startOffset);
                 int prevCharOffset = Utilities.getFirstNonWhiteBwd(m_baseDoc, m_startOffset);
                 if (rowStart < prevCharOffset){
