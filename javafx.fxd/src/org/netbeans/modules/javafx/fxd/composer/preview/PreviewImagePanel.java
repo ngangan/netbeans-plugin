@@ -366,14 +366,15 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         }
 
         public void actionPerformed(ActionEvent e) {
-            Node node = getSceneRoot();
-            Bounds2D bounds = new Bounds2D();
-            node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
-
-            Dimension panelSize = getParent().getSize();
+            float zoom = m_dObj.getDataModel().getZoomRatio();
             
-            double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / bounds.getWidth();
-            double yRatio = (panelSize.getHeight() - 2 * ImageHolder.CROSS_SIZE) / bounds.getHeight();
+            Dimension panelSize = getParent().getSize();
+            Dimension sceneSize = getScenePanel().getSize();
+
+            double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / 
+                    (sceneSize.getWidth() / zoom);
+            double yRatio = (panelSize.getHeight() - 2 * ImageHolder.CROSS_SIZE) / 
+                    (sceneSize.getHeight() / zoom);
             
             m_dObj.getController().setZoomRatio((float) Math.min( xRatio, yRatio));
         }
