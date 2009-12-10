@@ -7,6 +7,9 @@
     </Property>
     <Property name="opaque" type="boolean" value="false"/>
   </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,4,0,0,1,18"/>
+  </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -46,18 +49,13 @@
                   </Group>
                   <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="amForCheckBox1" min="-2" max="-2" attributes="0"/>
                       <Component id="amCallArgsCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="nlModifiersCheckBox" min="-2" max="-2" attributes="0"/>
                       <Component id="nlFinallyCheckBox" min="-2" max="-2" attributes="0"/>
                       <Component id="amExtendsCheckBox1" min="-2" max="-2" attributes="0"/>
-                      <Component id="amSequenceInitCheckBox1" min="-2" max="-2" attributes="0"/>
-                      <Component id="amIfElseExpressionOpCheckBox1" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="amForCheckBox1" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -108,17 +106,12 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="amSequenceInitCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="amAssignCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="amForCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="amIfElseExpressionOpCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="amParenthesizedCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="amForCheckBox1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="32" max="32767" attributes="0"/>
+              <Component id="amParenthesizedCheckBox1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="53" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -266,42 +259,10 @@
         <Property name="opaque" type="boolean" value="false"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="amSequenceInitCheckBox1">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="LBL_am_ArrayInit" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-            <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-          </Border>
-        </Property>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[0, 0, 0, 0]"/>
-        </Property>
-        <Property name="opaque" type="boolean" value="false"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JCheckBox" name="amBinaryOpCheckBox1">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="LBL_am_BinaryOp" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-            <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-          </Border>
-        </Property>
-        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-          <Insets value="[0, 0, 0, 0]"/>
-        </Property>
-        <Property name="opaque" type="boolean" value="false"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="amIfElseExpressionOpCheckBox1">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="org/netbeans/modules/javafx/editor/format/ui/Bundle.properties" key="LBL_am_TernaryOp" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">

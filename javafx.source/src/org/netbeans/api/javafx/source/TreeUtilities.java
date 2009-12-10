@@ -48,13 +48,17 @@ import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.tree.JCTree;
 import com.sun.tools.javafx.api.JavafxcScope;
+import com.sun.tools.javafx.code.JavafxFlags;
 import com.sun.tools.javafx.comp.JavafxAttrContext;
 import com.sun.tools.javafx.comp.JavafxEnv;
 import com.sun.tools.javafx.comp.JavafxResolve;
 import com.sun.tools.javafx.tree.JFXBreak;
+import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXContinue;
+import com.sun.tools.javafx.tree.JFXExpression;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXLiteral;
+import com.sun.tools.javafx.tree.JFXModifiers;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxPretty;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -243,6 +247,9 @@ public final class TreeUtilities {
             //check for synthetic constructor:
             return (((JFXFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
         }
+        if (leaf.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+            return (((JFXClassDeclaration)leaf).mods.flags & Flags.SYNTHETIC) != 0L; // anonymous inner classes in SOMA
+        }
 
         SourcePositions sp = parserResultImpl.getTrees().getSourcePositions();
         return sp.getStartPosition(cut, leaf) == sp.getEndPosition(cut, leaf);
@@ -387,9 +394,10 @@ public final class TreeUtilities {
                     !isEmptyStringLiteral(tree)) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
-                    
-                    if (start == end && 
-                        tree.getJavaFXKind() != Tree.JavaFXKind.PARENTHESIZED) // this is a workaround for javafxc bug setting PARENTHESIZED positions such as start == end
+
+                    if (start == end &&
+                        tree.getJavaFXKind() != Tree.JavaFXKind.PARENTHESIZED && // this is a workaround for javafxc bug setting PARENTHESIZED positions such as start == end
+                        (!(tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION && (((JFXClassDeclaration)tree).mods.flags & Flags.SYNTHETIC) != 0L))) // anonymous inner class is synthetic, start==end but we must follow it anyway
                         return null; // don't go this way; all subtrees are synthetic although they might not be flagged so
 
                     super.scan(tree, p);
@@ -414,6 +422,15 @@ public final class TreeUtilities {
                             if (parentPath != null) {
                                 Tree parent = parentPath.getLeaf();
                                 if (parent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(parentPath)) {
+                                    isSynteticMainBlock = true;
+                                }
+                            }
+                        }
+                        if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER) { // The name of a synthetic anonymous inner class; must never be used for resolving path from position!!!
+                            JavaFXTreePath parentPath = tp.getParentPath();
+                            if (parentPath != null) {
+                                Tree parent = parentPath.getLeaf();
+                                if (parent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION && isSynthetic(tp.getCompilationUnit(), parent)) {
                                     isSynteticMainBlock = true;
                                 }
                             }

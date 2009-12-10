@@ -120,6 +120,14 @@ public class ReportedIssuesTest extends CompletionTestBase {
         checkCCForIssue(177282, "var c = Color.^");
     }
 
+    public void testIssue171897() throws Exception {
+        checkCCForIssue(171897, "var width = Screen.primary.^");
+    }
+
+    public void testIssue178366() throws Exception {
+        checkCCForIssue(178366, "var width = Screen.primary.bounds.^");
+    }
+
     private void checkCCForIssue(int issue, String caretLine) throws Exception {
         checkCCForIssue(issue, caretLine, null);
     }

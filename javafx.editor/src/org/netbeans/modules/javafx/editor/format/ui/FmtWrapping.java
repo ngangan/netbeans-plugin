@@ -55,7 +55,6 @@ import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
  */
 public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
     
-    /** Creates new form FmtWrapping */
     public FmtWrapping() {
         initComponents();
         

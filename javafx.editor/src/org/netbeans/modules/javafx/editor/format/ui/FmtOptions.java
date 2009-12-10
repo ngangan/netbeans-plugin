@@ -113,10 +113,8 @@ public class FmtOptions {
     public static final String alignMultilineThrows = "alignMultilineThrows"; //NOI18N
     public static final String alignMultilineParenthesized = "alignMultilineParenthesized"; //NOI18N
     public static final String alignMultilineBinaryOp = "alignMultilineBinaryOp"; //NOI18N
-    public static final String alignMultilineTernaryOp = "alignMultilineTernaryOp"; //NOI18N
     public static final String alignMultilineAssignment = "alignMultilineAssignment"; //NOI18N
     public static final String alignMultilineFor = "alignMultilineFor"; //NOI18N
-    public static final String alignMultilineArrayInit = "alignMultilineArrayInit"; //NOI18N
     public static final String placeElseOnNewLine = "placeElseOnNewLine"; //NOI18N
     public static final String placeWhileOnNewLine = "placeWhileOnNewLine"; //NOI18N
     public static final String placeCatchOnNewLine = "placeCatchOnNewLine"; //NOI18N
@@ -346,10 +344,8 @@ public class FmtOptions {
             { alignMultilineThrows, FALSE}, //NOI18N
             { alignMultilineParenthesized, FALSE}, //NOI18N
             { alignMultilineBinaryOp, FALSE}, //NOI18N
-            { alignMultilineTernaryOp, FALSE}, //NOI18N
             { alignMultilineAssignment, FALSE}, //NOI18N
             { alignMultilineFor, FALSE}, //NOI18N
-            { alignMultilineArrayInit, FALSE}, //NOI18N
             { placeElseOnNewLine, FALSE}, //NOI18N 
             { placeWhileOnNewLine, FALSE}, //NOI18N
             { placeCatchOnNewLine, FALSE}, //NOI18N 

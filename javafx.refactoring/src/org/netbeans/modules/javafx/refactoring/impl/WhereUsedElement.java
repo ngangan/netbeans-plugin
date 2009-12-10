@@ -53,7 +53,6 @@ import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -77,52 +76,54 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     private DataEditorSupport des;
     private GuardedDocument doc;
 
-    private final TreePathHandle handle;
+    private final ElementLocation location;
     private final Lookup context;
 
-    private WhereUsedElement(TreePathHandle handle, Lookup context) throws IOException {
-        this.handle = handle;
+    private WhereUsedElement(ElementLocation location, Lookup context) throws IOException {
+        this.location = location;
         this.context = context;
         init();
     }
 
     private void init() throws IOException {
-        DataObject dobj = DataObject.find(handle.getFileObject());
+        DataObject dobj = DataObject.find(location.getSourceFile());
         des = (DataEditorSupport)dobj.getCookie(EditorCookie.class);
         doc = (GuardedDocument)des.getDocument();
         if (doc == null) {
             doc = (GuardedDocument)des.openDocument();
         }
 
-        JavaFXSource jfxs = JavaFXSource.forFileObject(handle.getFileObject());
-        jfxs.runUserActionTask(new Task<CompilationController>() {
-
-            public void run(CompilationController cc) throws Exception {
-                JavaFXTreePath path = handle.resolve(cc);
-                if (path != null) {
-                    TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
-                    tokens.moveStart();
-                    int firstPos = -1, lastPos = -1;
-                    while (tokens.moveNext()) {
-                        Token<JFXTokenId> token = tokens.token();
-                        int pos = token.offset(cc.getTokenHierarchy());
-                        if (firstPos == -1) {
-                            firstPos = pos;
-                        }
-                        lastPos = pos + token.length();
-                        if (handle.getSimpleName().equals(token.text().toString())) {
-                            startPosition = pos;
-                            endPosition = startPosition + token.length();
-                            break;
-                        }
-                    }
-                    if (startPosition == -1) {
-                        startPosition = firstPos;
-                        endPosition = lastPos;
-                    }
-                }
-            }
-        }, true);
+        startPosition = location.getStartPosition();
+        endPosition = location.getEndPosition();
+//        JavaFXSource jfxs = JavaFXSource.forFileObject(location.getSourceFile());
+//        jfxs.runUserActionTask(new Task<CompilationController>() {
+//
+//            public void run(CompilationController cc) throws Exception {
+//                JavaFXTreePath path = location.getPath(cc);
+//                if (path != null) {
+//                    TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
+//                    tokens.moveStart();
+//                    int firstPos = -1, lastPos = -1;
+//                    while (tokens.moveNext()) {
+//                        Token<JFXTokenId> token = tokens.token();
+//                        int pos = token.offset(cc.getTokenHierarchy());
+//                        if (firstPos == -1) {
+//                            firstPos = pos;
+//                        }
+//                        lastPos = pos + token.length();
+//                        if (location.getElement(cc).getSimpleName().contentEquals(token.text().toString())) {
+//                            startPosition = pos;
+//                            endPosition = startPosition + token.length();
+//                            break;
+//                        }
+//                    }
+//                    if (startPosition == -1) {
+//                        startPosition = firstPos;
+//                        endPosition = lastPos;
+//                    }
+//                }
+//            }
+//        }, true);
         try {
             doc.readLock();
             if (startPosition != -1) {
@@ -142,7 +143,7 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                 displayText = SourceUtils.getHtml(doc.getText(sta, en - sta + 1), startPosition - sta);
                 bounds = new PositionBounds(des.createPositionRef(startPosition, Bias.Forward), des.createPositionRef(endPosition, Bias.Forward));
             } else {
-                throw new IOException("*** Can not resolve: " + handle); // NOI18N
+                throw new IOException("*** Can not resolve: " + location); // NOI18N
             }
         } catch (BadLocationException e) {
             IOException ioe = new IOException(e.getLocalizedMessage());
@@ -173,12 +174,12 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     }
 
     public FileObject getParentFile() {
-        return handle.getFileObject();
+        return location.getSourceFile();
     }
 
-    public static WhereUsedElement create(TreePathHandle handle, Lookup context) {
+    public static WhereUsedElement create(ElementLocation location, Lookup context) {
         try {
-            return new WhereUsedElement(handle, context);
+            return new WhereUsedElement(location, context);
         } catch (IOException e) {
 
         }

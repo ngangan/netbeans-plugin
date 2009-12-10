@@ -40,10 +40,7 @@
  */
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import com.sun.javafx.api.tree.JavaFXTreeScanner;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -58,12 +55,10 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.FindOverridersScanner;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.FindSubclassesScanner;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.FindUsagesScanner;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
@@ -84,7 +79,7 @@ import org.openide.util.lookup.Lookups;
  */
 public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     private final WhereUsedQuery refactoring;
-    private final TreePathHandle searchHandle;
+    private final ElementLocation location;
 //    private Set<IndexedClass> subclasses;
     private final String targetName;
 
@@ -93,8 +88,8 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     /** Creates a new instance of WhereUsedQuery */
     public WhereUsedQueryPlugin(WhereUsedQuery refactoring) {
         this.refactoring = refactoring;
-        this.searchHandle = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
-        targetName = searchHandle.getSimpleName();
+        this.location = refactoring.getRefactoringSource().lookup(ElementLocation.class);
+        targetName = location.getElement().getSimpleName().toString();
     }
 
     public void cancelRequest() {
@@ -103,7 +98,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     
     @Override
     public Problem preCheck(CompilationInfo cc) {
-        if (!searchHandle.getFileObject().isValid()) {
+        if (!location.getSourceFile().isValid()) {
             return new Problem(true, NbBundle.getMessage(WhereUsedQueryPlugin.class, "DSC_ElNotAvail")); // NOI18N
         }
         
@@ -113,20 +108,20 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     //@Override
     public Problem prepare(final RefactoringElementsBag elements) {
         try {
-            final Set<TreePathHandle> usageHandles = new HashSet<TreePathHandle>();
+            final Set<ElementLocation> usageLocations = new HashSet<ElementLocation>();
 
             getSource().runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
-                    Element e = searchHandle.resolveElement(cc);
-                    collectUsages(e, cc, usageHandles);
-                    collectOverridingMethods(e, cc, usageHandles);
-                    collectSubclasses(e, cc, usageHandles);
+                    Element e = location.getElement(cc);
+                    collectUsages(e, cc, usageLocations);
+                    collectOverridingMethods(e, cc, usageLocations);
+                    collectSubclasses(e, cc, usageLocations);
                 }
             }, true);
-            Lookup lkp = Lookups.singleton(searchHandle);
-            for(TreePathHandle handle : usageHandles) {
-                elements.add(refactoring, WhereUsedElement.create(handle, lkp));
+            Lookup lkp = Lookups.singleton(location);
+            for(ElementLocation location : usageLocations) {
+                elements.add(refactoring, WhereUsedElement.create(location, lkp));
             }
         } catch (IOException ex) {
             return new Problem(true, ex.getLocalizedMessage());
@@ -135,7 +130,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
         return null;
     }
 
-    private void collectUsages(Element e, CompilationController cc, final Set<TreePathHandle> handles) {
+    private void collectUsages(Element e, CompilationController cc, final Set<ElementLocation> locations) {
         if (!isFindUsages()) return;
 
         Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
@@ -165,7 +160,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
                         jfxs.runUserActionTask(new Task<CompilationController>() {
 
                                 public void run(CompilationController cc) throws Exception {
-                         new FindUsagesScanner(searchHandle, eh, cc).scan(cc.getCompilationUnit(), handles);
+                         new FindUsagesScanner(location, cc).scan(cc.getCompilationUnit(), locations);
                                 }
                             }, true);
                     } catch (IOException ex) {
@@ -176,7 +171,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
         }
     }
 
-    private void collectOverridingMethods(Element e, CompilationController cc, final Set<TreePathHandle> handles) {
+    private void collectOverridingMethods(Element e, CompilationController cc, final Set<ElementLocation> locations) {
         if (!isFindOverridingMethods()) return;
         if (e.getKind() != ElementKind.METHOD) return;
 
@@ -207,11 +202,10 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
                 for(final ElementHandle eh : processingHandles) {
                     try {
                         jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                                public void run(CompilationController cc) throws Exception {
-                         new FindOverridersScanner(searchHandle, eh, cc).scan(cc.getCompilationUnit(), handles);
-                                }
-                            }, true);
+                            public void run(CompilationController cc) throws Exception {
+                                new FindUsagesScanner(location, cc).scan(cc.getCompilationUnit(), locations);
+                            }
+                        }, true);
                     } catch (IOException ex) {
 
                     }
@@ -220,7 +214,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
         }
     }
 
-    private void collectSubclasses(Element e, CompilationController cc, final Set<TreePathHandle> handles) {
+    private void collectSubclasses(Element e, CompilationController cc, final Set<ElementLocation> handles) {
         if (!isFindDirectSubclassesOnly() && !isFindSubclasses()) return;
 
         Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
@@ -251,7 +245,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
                         jfxs.runUserActionTask(new Task<CompilationController>() {
 
                                 public void run(CompilationController cc) throws Exception {
-                         new FindSubclassesScanner(searchHandle, eh, cc).scan(cc.getCompilationUnit(), handles);
+                         new FindUsagesScanner(location, cc).scan(cc.getCompilationUnit(), handles);
                                 }
                             }, true);
                     } catch (IOException ex) {
@@ -266,7 +260,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
         if (targetName == null) {
             return new Problem(true, "Cannot determine target name. Please file a bug with detailed information on how to reproduce (preferably including the current source file and the cursor position)");
         }
-        if (searchHandle.getKind() == JavaFXKind.METHOD_INVOCATION || searchHandle.getKind() == JavaFXKind.FUNCTION_DEFINITION) {
+        if (location.getElement(cc).getKind() == ElementKind.METHOD) {
             return checkParametersForMethod(isFindOverridingMethods(), isFindUsages());
         } 
         return null;
@@ -278,7 +272,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
 
     @Override
     protected JavaFXSource prepareSource() {
-        return JavaFXSource.forFileObject(searchHandle.getFileObject());
+        return JavaFXSource.forFileObject(location.getSourceFile());
     }
 
     private void collectReferences(ElementHandle handle, Set<FileObject> references) {

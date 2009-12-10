@@ -24,6 +24,7 @@ final public class IndexingUtilities {
     @SuppressWarnings(value="unchecked")
     public static String getIndexValue(ElementHandle<? extends Element> eeh) {
         switch (eeh.getKind()) {
+            case PACKAGE:
             case CLASS: {
                 return eeh.getSignatures()[0].replace("$", ".");
             }

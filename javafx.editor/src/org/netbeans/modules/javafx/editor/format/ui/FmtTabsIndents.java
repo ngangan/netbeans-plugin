@@ -52,7 +52,6 @@ import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
  */
 public class FmtTabsIndents extends javax.swing.JPanel {
    
-    /** Creates new form FmtTabsIndents */
     public FmtTabsIndents() {
         initComponents();
         
@@ -84,7 +83,6 @@ public class FmtTabsIndents extends javax.swing.JPanel {
                 new String[] { FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapThrowsList, WrapStyle.WRAP_ALWAYS.name() },
                 new String[] { FmtOptions.wrapWhileStatement, WrapStyle.WRAP_ALWAYS.name() },
-                new String[] { FmtOptions.alignMultilineArrayInit, Boolean.FALSE.toString() },
                 new String[] { FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString() },
                 new String[] { FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString() },
                 new String[] { FmtOptions.alignMultilineCallArgs, Boolean.FALSE.toString() },
@@ -92,7 +90,6 @@ public class FmtTabsIndents extends javax.swing.JPanel {
                 new String[] { FmtOptions.alignMultilineImplements, Boolean.FALSE.toString() },
                 new String[] { FmtOptions.alignMultilineMethodParams, Boolean.FALSE.toString() },
                 new String[] { FmtOptions.alignMultilineParenthesized, Boolean.FALSE.toString() },
-                new String[] { FmtOptions.alignMultilineTernaryOp, Boolean.FALSE.toString() },
                 new String[] { FmtOptions.alignMultilineThrows, Boolean.FALSE.toString() }
                 );
     }

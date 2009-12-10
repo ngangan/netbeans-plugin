@@ -291,20 +291,12 @@ public final class CodeStyle {
         return preferences.getBoolean(alignMultilineBinaryOp, getDefaultAsBoolean(alignMultilineBinaryOp));
     }
 
-    public boolean alignMultilineTernaryOp() {
-        return preferences.getBoolean(alignMultilineTernaryOp, getDefaultAsBoolean(alignMultilineTernaryOp));
-    }
-
     public boolean alignMultilineAssignment() {
         return preferences.getBoolean(alignMultilineAssignment, getDefaultAsBoolean(alignMultilineAssignment));
     }
 
     public boolean alignMultilineFor() {
         return preferences.getBoolean(alignMultilineFor, getDefaultAsBoolean(alignMultilineFor));
-    }
-
-    public boolean alignMultilineArrayInit() {
-        return preferences.getBoolean(alignMultilineArrayInit, getDefaultAsBoolean(alignMultilineArrayInit));
     }
 
     public boolean placeElseOnNewLine() {

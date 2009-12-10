@@ -28,29 +28,35 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.scanners;
 
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import java.util.Set;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class FindOverridersScanner extends BaseRefactoringScanner<Void, Set<TreePathHandle>> {
-    public FindOverridersScanner(TreePathHandle searchHandle, ElementHandle eh, CompilationController cc) {
-        super(searchHandle, eh ,cc);
+public class FindOverridersScanner extends BaseRefactoringScanner {
+    public FindOverridersScanner(ElementLocation location, CompilationController cc) {
+        super(location,cc);
     }
 
     @Override
-    public Void visitFunctionDefinition(FunctionDefinitionTree node, Set<TreePathHandle> handles) {
-        if (getElementKind() == ElementKind.METHOD) {
-            if (isSameElement()) {
-                handles.add(TreePathHandle.create(getCurrentPath(), getCompilationController()));
-            }
-        }
-        return super.visitFunctionDefinition(node, handles);
+    protected boolean isChecked(JavaFXTreePath path, Element element) {
+        return element.getKind() == ElementKind.METHOD;
     }
+//
+//
+//
+//    @Override
+//    public Void visitFunctionDefinition(FunctionDefinitionTree node, Set<ElementLocation> handles) {
+//        if (getElementKind() == ElementKind.METHOD) {
+//            if (isSameElement()) {
+//                handles.add(ElementLocation.locationFor(getCurrentPath(), getCC()));
+//            }
+//        }
+//        return super.visitFunctionDefinition(node, handles);
+//    }
 }

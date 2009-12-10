@@ -116,6 +116,9 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
             if (LOGGABLE) log("   exp == " + exp); // NOI18N
             JavaFXTreePath expPath = new JavaFXTreePath(path, exp);
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
+            if (type != null && type.getKind() == TypeKind.ERROR) {
+                tryToUseSanitizedSource();
+            }
             Element el = controller.getTrees().getElement(expPath);
             if (LOGGABLE) log("   type == " + type); // NOI18N
             if (type != null) {
@@ -178,13 +181,22 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         if (LOGGABLE) {
             log("   will try to find package named " + (qualifiedName)); // NOI18N
         }
-        PackageElement packageEl = controller.getElements().getPackageElement(qualifiedName);
-        if (LOGGABLE) {
-            log("   packageEl(3) == " + packageEl + "  packageEl.getKind() == " // NOI18N
-                    + (packageEl != null ? packageEl.getKind() : ""));
-        }
-        if (packageEl != null) {
-            addPackageContent(packageEl, null, null, false);
+        try {
+            PackageElement packageEl = controller.getElements().getPackageElement(qualifiedName);
+            if (LOGGABLE) {
+                log("   packageEl(3) == " + packageEl + "  packageEl.getKind() == " // NOI18N
+                        + (packageEl != null ? packageEl.getKind() : ""));
+            }
+            if (packageEl != null) {
+                addPackageContent(packageEl, null, null, false);
+            }
+        } catch (ClassCastException cce) {
+            // XXX: compiler throws CCE in some cases, cf. 178366.
+            // TBD: Why exactly?
+            log("    cce = " + cce);
+            if (LOGGABLE) {
+                cce.printStackTrace();
+            }
         }
     }
 

@@ -71,8 +71,8 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.javafx.refactoring.RefactoringModule;
+import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.TreePathHandle;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 import org.openide.awt.Mnemonics;
 import org.openide.util.NbBundle;
@@ -85,14 +85,13 @@ import org.openide.util.NbBundle;
 public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     private static final int MAX_NAME = 50;
     
-    private final transient TreePathHandle handle;
-    private  TreePathHandle newElement;
+    private final transient ElementLocation location;
     private final transient ChangeListener parent;
     
     /** Creates new form WhereUsedPanel */
-    public WhereUsedPanel(String name, TreePathHandle e, ChangeListener parent) {
+    public WhereUsedPanel(String name, ElementLocation l, ChangeListener parent) {
         setName(NbBundle.getMessage(WhereUsedPanel.class,"LBL_WhereUsed")); // NOI18N
-        this.handle = e;
+        this.location = l;
         this.parent = parent;
         initComponents();
     }
@@ -106,13 +105,13 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     }
     
     public void initialize() {
-if (initialized) return;
-        JavaFXSource source = JavaFXSource.forFileObject(handle.getFileObject());
-        Project p = FileOwnerQuery.getOwner(handle.getFileObject());
+        if (initialized) return;
+        JavaFXSource source = JavaFXSource.forFileObject(location.getSourceFile());
+        Project p = FileOwnerQuery.getOwner(location.getSourceFile());
         final JLabel currentProject;
         final JLabel allProjects;
         if (p!=null) {
-            ProjectInformation pi = ProjectUtils.getInformation(FileOwnerQuery.getOwner(handle.getFileObject()));
+            ProjectInformation pi = ProjectUtils.getInformation(FileOwnerQuery.getOwner(location.getSourceFile()));
             currentProject = new JLabel(pi.getDisplayName(), pi.getIcon(), SwingConstants.LEFT);
             allProjects = new JLabel(NbBundle.getMessage(WhereUsedPanel.class,"LBL_AllProjects"), pi.getIcon(), SwingConstants.LEFT);
         } else {
@@ -125,7 +124,7 @@ if (initialized) return;
                 final String labelText;
                 Set<Modifier> modif = new HashSet<Modifier>();
 
-                final Element element = WhereUsedPanel.this.handle.resolveElement(info);
+                final Element element = info.getElementUtilities().elementFor(location.getStartPosition());
                 if (element.getKind() == ElementKind.METHOD) {
                     ExecutableElement method = (ExecutableElement) element;
                     modif = method.getModifiers();
@@ -142,7 +141,6 @@ if (initialized) return;
                             methodDeclaringSuperClass = getSimpleName((el).getEnclosingElement())
                         }
                         );
-                        newElement = TreePathHandle.create(handle.getSrcPos(), el, info);
 
 //                        TreePathHandle tph = TreePathHandle.create(element, info);
 //                        Element el1 = tph.resolveElement(info);
@@ -374,11 +372,11 @@ if (initialized) return;
                 .addContainerGap()
                 .add(scopeLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(scope, 0, 277, Short.MAX_VALUE)
+                .add(scope, 0, 281, Short.MAX_VALUE)
                 .addContainerGap())
         );
         scopePanelLayout.setVerticalGroup(
-            scopePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            scopePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
             .add(scopeLabel)
             .add(scope, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, Short.MAX_VALUE)
         );

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,7 +34,7 @@
  * 
  * Contributor(s):
  * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
 package org.netbeans.api.javafx.source;
@@ -72,7 +72,6 @@ import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.Exceptions;
 import org.netbeans.modules.parsing.api.Source;
 
-
 /**
  * A class representing JavaFX source.
  * 
@@ -81,8 +80,8 @@ import org.netbeans.modules.parsing.api.Source;
  */
 public final class JavaFXSource {
 
-    //Already logged warning about running in AWT
-    private static final Set<StackTraceElement> warnedAboutRunInEQ = new HashSet<StackTraceElement>();
+    // Already logged warning about running in AWT
+    private static final Set<StackTraceElement> WARNED_ABOUT_RUN_IN_EQ = new HashSet<StackTraceElement>();
 
     static {
         JavaFXSourceTaskFactoryManager.register();
@@ -236,9 +235,13 @@ public final class JavaFXSource {
         boolean a = false;
         assert a = true;
         if (a && javax.swing.SwingUtilities.isEventDispatchThread()) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[1];
-            if (stackTraceElement != null && warnedAboutRunInEQ.add(stackTraceElement)) {
+            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+            if (stackTraceElement != null && WARNED_ABOUT_RUN_IN_EQ.add(stackTraceElement)) {
                 LOGGER.warning("ParserManager.parse called in AWT event thread by: " + stackTraceElement); // NOI18N
+                LOGGER.warning("  - thread dump follows:"); // NOI18N
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    Thread.dumpStack();
+                }
             }
         }
 

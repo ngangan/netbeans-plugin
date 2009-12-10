@@ -78,6 +78,8 @@ import java.io.Writer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.editor.SafeTokenSequence;
@@ -1561,6 +1563,26 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             }
         }
         return null;
+    }
+
+    protected boolean tryToUseSanitizedSource() {
+        try {
+            Document d = controller.getDocument();
+            if (!"\n".equals(d.getText(offset, 1))) { // NOI18N
+                return false;
+            }
+            String start = d.getText(0, offset);
+            if (LOGGABLE) { log("  start = " + start); } // NOI18N
+            String end = d.getText(offset + 1, d.getLength() - offset - 1);
+            if (LOGGABLE) { log("  end = " + end); } // NOI18N
+            useSanitizedSource(start + "\n;" + end, offset); // NOI18N
+            return true;
+        } catch (BadLocationException ble) {
+            if (LOGGABLE) {
+                logger.log(Level.FINER, "ble", ble); // NOI18N
+            }
+            return false;
+        }
     }
 
     /**

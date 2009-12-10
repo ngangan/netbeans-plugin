@@ -68,7 +68,7 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
         JavaFXTreePath p = JavaFXTreePath.getPath(root, t);
         
         if (t.getErrorTrees().isEmpty()) {
-            tryToSanitizeSource();
+            useSanitizedSource();
             return;
         }
 
@@ -79,12 +79,12 @@ public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneo
             long et = pos.getEndPosition(root, tt);
             if (LOGGABLE) log("   st = " + st + "  et == " + et); // NOI18N
             if (et == offset-1) {
-                tryToSanitizeSource();
+                useSanitizedSource();
             }
         }
     }
 
-    private void tryToSanitizeSource() {
+    private void useSanitizedSource() {
         try {
             Document d = controller.getDocument();
             String start = d.getText(0, offset);

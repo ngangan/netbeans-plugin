@@ -233,10 +233,9 @@ public class FXErrorAnnotator extends AnnotationProvider {
         return Lookup.getDefault().lookup(FXErrorAnnotator.class);
     }
 
-    public void process(final CompilationInfo ci) {
+    public void process(final FileObject fo) {
         processor.submit(new Runnable() {
-
-            public void run() {
+            private void process(CompilationInfo ci) {
                 if (ISDEBUG) {
                     LOGGER.finest("Processing " + ci.getFileObject().getPath()); // NOI18N
                 }
@@ -260,6 +259,21 @@ public class FXErrorAnnotator extends AnnotationProvider {
                     try {
                         fireFileStatusChanged(new FileStatusEvent(ci.getFileObject().getFileSystem(), filesWithModifiedStatus, true, false));
                     } catch (FileStateInvalidException ex) {
+                        ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
+                    }
+                }
+            }
+            public void run() {
+                JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+                if (jfxs != null) {
+                    try {
+                        jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                            public void run(CompilationController ci) throws Exception {
+                                process(ci);
+                            }
+                        }, true);
+                    } catch (IOException ex) {
                         ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
                     }
                 }
@@ -333,18 +347,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
             errorMapLock.readLock().unlock();
         }
         if (ec == null) {
-            try {
-                JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                if (jfxs != null) {
-                    jfxs.runUserActionTask(new Task<CompilationController>() {
-                        public void run(CompilationController ci) throws Exception {
-                            process(ci);
-                        }
-                    }, true);
-                }
-            } catch (IOException e) {
-                return true;
-            }
+            process(fo);
             return false;
         }
         return ec.isError();

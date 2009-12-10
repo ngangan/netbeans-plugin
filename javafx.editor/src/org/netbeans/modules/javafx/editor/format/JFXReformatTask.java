@@ -1957,29 +1957,51 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO check it
         @Override
         public Boolean visitTypeAny(TypeAnyTree node, Void p) {
-            return super.visitTypeAny(node, p);
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
         }
 
-        // whether this been invoked at all?
         @Override
         public Boolean visitTypeArray(TypeArrayTree node, Void p) {
-            boolean ret = scan(node.getElementType(), p);
             int index = tokens.index();
             int c = col;
             Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
+                space();
+                accept(JFXTokenId.IDENTIFIER); // non-reserved keyword "of"?
+                space();
+            } else {
+                rollback(index, c, d);
+            }
+
+            boolean ret = scan(node.getElementType(), p);
+            index = tokens.index();
+            c = col;
+            d = diffs.isEmpty() ? null : diffs.getFirst();
             JFXTokenId id = accept(JFXTokenId.LBRACKET, JFXTokenId.IDENTIFIER);
             if (id != JFXTokenId.IDENTIFIER) {
                 accept(JFXTokenId.RBRACKET);
                 return ret;
             }
+
             rollback(index, c, d);
             spaces(1, false);
             accept(JFXTokenId.IDENTIFIER);
-            accept(JFXTokenId.LBRACKET);
-            accept(JFXTokenId.RBRACKET);
+            index = tokens.index();
+            c = col;
+            d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
+                accept(JFXTokenId.RBRACKET);
+            } else {
+                rollback(index, c, d);
+            }
             return false;
         }
 
@@ -2384,8 +2406,12 @@ public class JFXReformatTask implements ReformatTask {
             if (partList != null && !partList.isEmpty()) {
                 int old = indent;
                 indent += continuationIndentSize;
-                for (ExpressionTree tree : partList) {
+                for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
+                    ExpressionTree tree = it.next();
                     scan(tree, p);
+                    if (it.hasNext()) {
+                        spaces(0, true);
+                    }
                 }
                 indent = old;
             } else {
@@ -2427,12 +2453,7 @@ public class JFXReformatTask implements ReformatTask {
 
             JavaFXKind kind = node.getJavaFXKind();
             if (kind == JavaFXKind.STRING_LITERAL || kind == JavaFXKind.STRING_EXPRESSION) {
-                int old = indent;
-                indent += continuationIndentSize;
-                while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
-                    spaces(0, true);
-                }
-                indent = old;
+                accept(ReformatUtils.STRING_LITERALS);
             } else {
                 // #176654: probably compiler bug
                 // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token

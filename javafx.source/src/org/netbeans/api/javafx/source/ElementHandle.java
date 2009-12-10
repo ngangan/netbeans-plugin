@@ -39,10 +39,6 @@
 
 package org.netbeans.api.javafx.source;
 
-import com.sun.javafx.api.tree.JavaFXTreeScanner;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symtab;
 import com.sun.tools.mjavac.jvm.Target;
@@ -98,19 +94,13 @@ public class ElementHandle<T extends Element> {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
 
     private ElementKind kind;
-    private ElementHandle scope;
     private String[] signatures;
 
     public ElementHandle(final ElementKind kind, String[] signatures) {
-        this(kind, signatures, null);
-    }
-
-    private ElementHandle(final ElementKind kind, String[] signatures, ElementHandle scope) {
         assert kind != null;
         assert signatures != null;
         this.kind = kind;
         this.signatures = signatures;
-        this.scope = scope;
     }
 
     /**
@@ -259,39 +249,6 @@ public class ElementHandle<T extends Element> {
                 }
                 break;
             }
-            case PARAMETER:
-            case LOCAL_VARIABLE: {
-                assert signatures.length == 3;
-                assert scope != null;
-
-                Element scopeElement = scope.resolveImpl(ci);
-                Tree scopeTree = ci.getTrees().getTree(scopeElement);
-                final Object[] resolved = new Object[1];
-                new JavaFXTreeScanner() {
-
-                @Override
-                public Object visitTypeClass(TypeClassTree node, Object p) {
-                    return super.visitTypeClass(node, p);
-                }
-
-                @Override
-                public Object visitVariable(VariableTree node, Object p) {
-                    Element e = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), node));
-                    if (e != null) {
-                        String[] sigs = createFieldDescriptor((VariableElement)e);
-                        if (Arrays.equals(sigs, signatures)) {
-                            resolved[0] = e;
-                            return null;
-                        }
-                    }
-                    return super.visitVariable(node, p);
-                }
-
-
-                }.scan(scopeTree, null);
-                return (T)resolved[0];
-
-            }
 /*            case TYPE_PARAMETER:
             {
                 if (signatures.length == 2) {
@@ -352,7 +309,6 @@ public class ElementHandle<T extends Element> {
         assert element != null;
         ElementKind kind = element.getKind();
         String[] signatures = null;
-        ElementHandle scope = null;
         try {
             switch (kind) {
                 case PACKAGE:
@@ -373,13 +329,6 @@ public class ElementHandle<T extends Element> {
                     assert element instanceof ExecutableElement;
                     signatures = createExecutableDescriptor((ExecutableElement)element);
                     break;
-                case PARAMETER:
-                case LOCAL_VARIABLE: {
-                    assert element instanceof VariableElement;
-                    signatures = createFieldDescriptor((VariableElement)element);
-                    scope = calculateScope(element);
-                    break;
-                }
                 case FIELD:
                 case ENUM_CONSTANT:
                     assert element instanceof VariableElement;
@@ -414,19 +363,7 @@ public class ElementHandle<T extends Element> {
                 LOG.log(Level.FINEST, null, e);
             }
         }
-        return signatures != null ? new ElementHandle<T> (kind, signatures, scope) : null;
-    }
-
-    private static ElementHandle calculateScope(Element e) {
-        if (e.getKind() != ElementKind.LOCAL_VARIABLE && e.getKind() != ElementKind.PARAMETER) return null;
-        
-        Element enclosing = e.getEnclosingElement();
-        
-        while (enclosing != null && (enclosing.getKind() == ElementKind.LOCAL_VARIABLE || enclosing.getKind() == ElementKind.PARAMETER ||
-                enclosing.getSimpleName().contentEquals("javafx$run$") || ((Symbol)enclosing).type == null)) {
-            enclosing = enclosing.getEnclosingElement();
-        }
-        return enclosing != null ? ElementHandle.create(enclosing) : null;
+        return signatures != null ? new ElementHandle<T> (kind, signatures) : null;
     }
 
     private static String encodeClassNameOrArray(TypeElement td) {

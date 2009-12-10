@@ -29,7 +29,12 @@
 package org.netbeans.modules.javafx.refactoring.impl.javafxc;
 
 import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -287,24 +292,6 @@ final public class SourceUtils {
         }
         return ClassPath.getClassPath(result, ClassPath.SOURCE).findOwnerRoot(result);
     }
-    
-    public static ElementKind getElementKind(final TreePathHandle tph) {
-        try {
-            final JavaFXSource source = JavaFXSource.forFileObject(tph.getFileObject());
-            final AtomicReference<ElementKind> kind = new AtomicReference<ElementKind>();
-            assert source!=null:"JavaSource.forFileObject(" + tph.getFileObject().getPath() + ") \n returned null";
-            source.runUserActionTask(new Task<CompilationController>() {
-
-                public void run(CompilationController cc) throws Exception {
-                    Element e = tph.resolveElement(cc);
-                    kind.set(e.getKind());
-                }
-            }, true);
-            return kind.get();
-        } catch (IOException ex) {
-            throw (RuntimeException) new RuntimeException().initCause(ex);
-        }
-    }
 
     public static Collection<ExecutableElement> getOverridingMethods(ExecutableElement e, CompilationInfo info) {
         Collection<ExecutableElement> result = new ArrayList();
@@ -439,31 +426,6 @@ final public class SourceUtils {
         return null;
     }
 
-    public static FileObject getFileObject(final TreePathHandle handle) {
-        try {
-            JavaFXSource source = JavaFXSource.forFileObject(handle.getFileObject());
-            assert source!=null:"JavaSource.forFileObject(" + handle.getFileObject().getPath() + ") \n returned null";
-            final FileObject[] result = new FileObject[1];
-
-            source.runUserActionTask(new Task<CompilationController>() {
-
-                public void run(CompilationController cc) throws Exception {
-                    Element e = handle.resolveElement(cc);
-                    if (e == null) {
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Can not resolve tree-path handle: ", handle);
-                        }
-                        throw new IOException("Can not resolve TreePathHandle");
-                    }
-                    result[0] = getFile(e, cc.getClasspathInfo());
-                }
-            }, true);
-            return result[0];
-        } catch (IOException ex) {
-            throw (RuntimeException) new RuntimeException().initCause(ex);
-        }
-    }
-
     public static ClasspathInfo getClasspathInfoFor(FileObject ... files) {
         return getClasspathInfoFor(true, files);
     }
@@ -535,20 +497,6 @@ final public class SourceUtils {
         }
         ClasspathInfo cpInfo = ClasspathInfo.create(boot, compile, rcp);
         return cpInfo;
-    }
-
-    public static ClasspathInfo getClasspathInfoFor(TreePathHandle ... handles) {
-        FileObject[] result = new FileObject[handles.length];
-        int i=0;
-        for (TreePathHandle handle:handles) {
-            FileObject fo = getFileObject(handle);
-            if (i==0 && fo==null) {
-                result = new FileObject[handles.length+1];
-                result[i++] = handle.getFileObject();
-            }
-            result[i++] = fo;
-        }
-        return getClasspathInfoFor(result);
     }
 
     /**
@@ -685,19 +633,28 @@ final public class SourceUtils {
         }
     }
 
-    public static String getQualifiedName(final TreePathHandle tph) {
-        Collection<ElementHandle<TypeElement>> mainClasses = JavaFXSourceUtils.getMainClasses(tph.getFileObject());
-        if (mainClasses != null && !mainClasses.isEmpty()) {
-            return mainClasses.iterator().next().getQualifiedName();
-        }
-        return "";
-    }
+    /**
+     * Workaround for JFXC-3787
+     * @param e
+     * @return
+     */
+    public static JavaFXTreePath getPath(final Element e, CompilationInfo ci) {
+        final JavaFXTreePath[] result = new JavaFXTreePath[1];
+        new JavaFXTreePathScanner<Void, Void>() {
 
-    public static boolean typeExist(TreePathHandle tph, String fqn) {
-        for(ElementHandle<TypeElement> typeHandle : JavaFXSourceUtils.getClasses(tph.getFileObject())) {
-            if (typeHandle.getQualifiedName().equals(fqn)) return true;
-        }
-        return false;
+            @Override
+            public Void scan(Tree tree, Void p) {
+                if (result[0] != null) return null;
+                Element el = JavafxTreeInfo.symbolFor((JFXTree)tree);
+                if (e.equals(el)) {
+                    result[0] = JavaFXTreePath.getPath(getCurrentPath(), tree);
+                    return null;
+                }
+                return super.scan(tree, p);
+            }
+
+        }.scan(ci.getCompilationUnit(), null);
+        return result[0];
     }
 
     private static String getString(String key) {
