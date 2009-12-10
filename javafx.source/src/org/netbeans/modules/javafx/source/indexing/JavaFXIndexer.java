@@ -535,12 +535,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             // if (fxresult.isErrors()) return;
             visitor.scan(fxresult.getCompilationUnit(), document);
             support.addDocument(document);
-            JavaFXSource.forFileObject(FileUtil.toFileObject(new File(indexable.getURL().toURI()))).runUserActionTask(new Task<CompilationController>() {
-
-                public void run(CompilationController cc) throws Exception {
-                    FXErrorAnnotator.getInstance().process(cc);
-                }
-            }, true);
+            FXErrorAnnotator.getInstance().process(FileUtil.toFileObject(new File(indexable.getURL().toURI())));
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Error indexing " + indexable.toString(), e);
             return;
