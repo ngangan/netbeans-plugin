@@ -91,6 +91,15 @@ public class DeleteTextRefactoringElement extends SimpleRefactoringElementImplem
         des = (DataEditorSupport)dobj.getCookie(EditorCookie.class);
         doc = (GuardedDocument)des.openDocument();
         lc = dobj.getCookie(LineCookie.class);
+
+        try {
+            char chr = doc.getChars(endPosition, 1)[0];
+            while (Character.isWhitespace(chr) || chr == ';') {
+                chr = doc.getChars(++endPosition, 1)[0];
+            }
+        } catch (BadLocationException e) {
+            LOGGER.log(Level.SEVERE, null, e);
+        }
     }
 
     public String getDisplayText() {
@@ -103,7 +112,7 @@ public class DeleteTextRefactoringElement extends SimpleRefactoringElementImplem
 
             return processDiff(newLine.toString(), origLine.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, null, e);
             return "Deleting";
         }
     }
@@ -121,7 +130,8 @@ public class DeleteTextRefactoringElement extends SimpleRefactoringElementImplem
             content = new StringBuilder(doc.getText(0, doc.getLength()));
             content.delete(startPosition, endPosition);
             newContent = new SoftReference<String>(content.toString());
-        } catch (BadLocationException badLocationException) {
+        } catch (BadLocationException e) {
+            LOGGER.log(Level.SEVERE, null, e);
             return null;
         }
         return content.toString();
