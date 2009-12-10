@@ -36,8 +36,7 @@ import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
 import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Enumeration;
-import java.util.zip.ZipFile;
+import java.nio.charset.Charset;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 
 /**
@@ -45,6 +44,7 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
  * @author Pavel Benes
  */
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
+    private final static Charset UTF_8       = Charset.forName("UTF-8");         // NOI18N
     private final    FXZDataObject             m_dObj;
     // controls the access to the FXDFileModel object
     private final    Object                    m_lock = new Object();
@@ -417,7 +417,7 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
             if ( (sup=m_dObj.getEditorSupport( entry.m_name, false)) != null) {
                 BaseDocument doc = (BaseDocument) sup.getDocument();
-                Writer writer = new OutputStreamWriter( out);
+                Writer writer = new OutputStreamWriter( out, UTF_8);
                 doc.write( writer, 0, doc.getLength());                
                 writer.flush();
             } else {

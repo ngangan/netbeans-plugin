@@ -218,6 +218,7 @@ made subject to such option by the copyright holder.
                     <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
                     <attr name="beaninfo" boolvalue="false"/>
                 </file>
+                <file name="org-netbeans-modules-javafx-fxd-dataloader-FXDFileEncodingQueryImplementation.instance" />
 
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
@@ -267,6 +268,7 @@ made subject to such option by the copyright holder.
                     <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
                     <attr name="beaninfo" boolvalue="false"/>
                 </file>
+                <file name="org-netbeans-modules-javafx-fxd-dataloader-FXDFileEncodingQueryImplementation.instance" />
                 
                 <folder name="DocumentModel">
                     <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
