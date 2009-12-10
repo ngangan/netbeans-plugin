@@ -50,7 +50,7 @@ import org.openide.filesystems.FileObject;
  */
 public class FXDFileEncodingQueryImplementation extends FileEncodingQueryImplementation {
 
-    private final static Charset UTF_8 = Charset.forName("UTF-8");         // NOI18N
+    public final static Charset UTF_8 = Charset.forName("UTF-8");         // NOI18N
 
     /** Creates a new instance of JavaFXProjectEncodingQueryImpl */
     public FXDFileEncodingQueryImplementation() {
