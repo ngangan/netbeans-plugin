@@ -37,6 +37,7 @@ import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import org.netbeans.modules.javafx.fxd.dataloader.FXDFileEncodingQueryImplementation;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 
 /**
@@ -44,7 +45,7 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
  * @author Pavel Benes
  */
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
-    private final static Charset UTF_8       = Charset.forName("UTF-8");         // NOI18N
+    private final static Charset UTF_8       = FXDFileEncodingQueryImplementation.UTF_8;
     private final    FXZDataObject             m_dObj;
     // controls the access to the FXDFileModel object
     private final    Object                    m_lock = new Object();
