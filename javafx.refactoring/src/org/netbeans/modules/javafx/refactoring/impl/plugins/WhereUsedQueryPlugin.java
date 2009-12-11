@@ -217,6 +217,8 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     private void collectSubclasses(Element e, CompilationController cc, final Set<ElementLocation> handles) {
         if (!isFindDirectSubclassesOnly() && !isFindSubclasses()) return;
 
+        if (e.getKind() != ElementKind.CLASS && e.getKind() != ElementKind.INTERFACE) return;
+
         Set<ElementHandle> processingHandles = new HashSet<ElementHandle>();
         Set<FileObject> processingFiles = new HashSet<FileObject>();
 
@@ -276,6 +278,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     }
 
     private void collectReferences(ElementHandle handle, Set<FileObject> references) {
+        if (handle == null) return;
         switch (handle.getKind()) {
             case CLASS: {
                 references.addAll(getClassIndex().getResources(handle, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
@@ -293,6 +296,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     }
 
     private void collectImplementors(ElementHandle handle, Set<FileObject> implementors) {
+        if (handle == null) return;
         switch (handle.getKind()) {
             case CLASS: {
                 implementors.addAll(getClassIndex().getResources(handle, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
