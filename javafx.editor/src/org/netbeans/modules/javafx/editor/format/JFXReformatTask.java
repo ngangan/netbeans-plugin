@@ -1985,24 +1985,12 @@ public class JFXReformatTask implements ReformatTask {
             index = tokens.index();
             c = col;
             d = diffs.isEmpty() ? null : diffs.getFirst();
-            JFXTokenId id = accept(JFXTokenId.LBRACKET, JFXTokenId.IDENTIFIER);
-            if (id != JFXTokenId.IDENTIFIER) {
-                accept(JFXTokenId.RBRACKET);
-                return ret;
-            }
-
-            rollback(index, c, d);
-            spaces(1, false);
-            accept(JFXTokenId.IDENTIFIER);
-            index = tokens.index();
-            c = col;
-            d = diffs.isEmpty() ? null : diffs.getFirst();
             if (accept(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
                 accept(JFXTokenId.RBRACKET);
             } else {
                 rollback(index, c, d);
             }
-            return false;
+            return ret;
         }
 
         @Override
