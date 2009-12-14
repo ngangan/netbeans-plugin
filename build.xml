@@ -172,13 +172,13 @@
         </zipfileset>
         <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx2">
           <include name="javafx-sdk/bin/*"/>
-          <include name="javafx-sdk/emulator/bin/*"/>
-          <include name="javafx-sdk/tv/emulator/bin/*"/>
+          <include name="javafx-sdk/emulator/mobile/bin/*"/>
+          <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.lin/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
-          <exclude name="javafx-sdk/emulator/bin/*"/>
-          <exclude name="javafx-sdk/tv/emulator/bin/*"/>
+          <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
+          <exclude name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
       </jar>
     </target>
@@ -191,13 +191,13 @@
         </zipfileset>
         <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx2">
           <include name="javafx-sdk/bin/*"/>
-          <include name="javafx-sdk/emulator/bin/*"/>
-          <include name="javafx-sdk/tv/emulator/bin/*"/>
+          <include name="javafx-sdk/emulator/mobile/bin/*"/>
+          <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.sol/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
-          <exclude name="javafx-sdk/emulator/bin/*"/>
-          <exclude name="javafx-sdk/tv/emulator/bin/*"/>
+          <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
+          <exclude name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
       </jar>
     </target>
@@ -210,13 +210,15 @@
         </zipfileset>
         <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx2">
           <include name="javafx-sdk/bin/*"/>
-          <include name="javafx-sdk/emulator/bin/*"/>
-          <include name="javafx-sdk/tv/emulator/bin/*"/>
+          <include name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
+          <include name="javafx-sdk/emulator/mobile/bin/*"/>
+          <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.mac/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
-          <exclude name="javafx-sdk/emulator/bin/*"/>
-          <exclude name="javafx-sdk/tv/emulator/bin/*"/>
+          <exclude name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
+          <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
+          <exclude name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
       </jar>
     </target>

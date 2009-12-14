@@ -236,6 +236,9 @@ made subject to such option by the copyright holder.
             <fileset dir="${cluster}/javafx-sdk/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
+            <fileset dir="${cluster}/javafx-sdk/lib/desktop" erroronmissingdir="false" >
+                <include name="jmcServerDaemon"/>
+            </fileset>
             <fileset dir="${cluster}/javafx-sdk/emulator/mobile/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
