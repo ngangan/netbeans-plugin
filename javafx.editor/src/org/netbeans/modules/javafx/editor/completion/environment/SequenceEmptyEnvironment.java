@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2008-2009 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -34,7 +34,7 @@
  * 
  * Contributor(s):
  * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.editor.completion.environment;
@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author David Strupl
  */
 public class SequenceEmptyEnvironment extends JavaFXCompletionEnvironment<JFXSequenceEmpty> {
@@ -63,9 +62,12 @@ public class SequenceEmptyEnvironment extends JavaFXCompletionEnvironment<JFXSeq
 
     @Override
     protected void inside(JFXSequenceEmpty t) throws IOException {
-        if (LOGGABLE) log("inside JFXSequenceEmpty " + t + "  offset == " + offset); // NOI18N
-        SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
-        if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
+        if (LOGGABLE) {
+            log("inside JFXSequenceEmpty " + t + "  offset == " + offset); // NOI18N
+            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(
+                    (int) sourcePositions.getStartPosition(root, t), offset);
+            log("    last(1) == " + (last == null ? "null" : last.token().id()));  // NOI18N
+        }
         localResult(getSmartType(t));
         addValueKeywords();
     }
