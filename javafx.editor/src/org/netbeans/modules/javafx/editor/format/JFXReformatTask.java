@@ -2404,8 +2404,6 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitStringExpression(StringExpressionTree node, Void p) {
             List<ExpressionTree> partList = node.getPartList();
             if (partList != null && !partList.isEmpty()) {
-                int old = indent;
-                indent += continuationIndentSize;
                 for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
                     ExpressionTree tree = it.next();
                     scan(tree, p);
@@ -2413,7 +2411,6 @@ public class JFXReformatTask implements ReformatTask {
                         spaces(0, true);
                     }
                 }
-                indent = old;
             } else {
                 do {
                     col += tokens.token().length();
@@ -2453,7 +2450,13 @@ public class JFXReformatTask implements ReformatTask {
 
             JavaFXKind kind = node.getJavaFXKind();
             if (kind == JavaFXKind.STRING_LITERAL || kind == JavaFXKind.STRING_EXPRESSION) {
-                accept(ReformatUtils.STRING_LITERALS);
+//                accept(ReformatUtils.STRING_LITERALS);
+                int old = indent;
+                indent += continuationIndentSize;
+                while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+                    spaces(0, true);
+                }
+                indent = old;
             } else {
                 // #176654: probably compiler bug
                 // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token
