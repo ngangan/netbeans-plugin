@@ -362,10 +362,18 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                             break;
                         }
                         case FIELD: {
+                            ElementHandle typeHandle = ElementHandle.create(el.getEnclosingElement());
+                            if (typeHandle != null) {
+                                refFos.addAll(ci.getResources(typeHandle, EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            }
                             refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
                             break;
                         }
                         case METHOD: {
+                            ElementHandle typeHandle = ElementHandle.create(el.getEnclosingElement());
+                            if (typeHandle != null) {
+                                refFos.addAll(ci.getResources(typeHandle, EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)));
+                            }
                             refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
                             break;
                         }
