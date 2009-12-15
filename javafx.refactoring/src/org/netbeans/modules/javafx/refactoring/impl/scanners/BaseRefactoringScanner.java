@@ -32,14 +32,14 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXScript;
+import com.sun.tools.javafx.tree.JFXOverrideClassVar;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
@@ -84,6 +84,11 @@ public class BaseRefactoringScanner extends JavaFXTreePathScanner<Void, Set<Elem
                     if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
                         JavaFXTreePath path = (tree != null && oldPath != null) ? JavafxcTrees.getPath(oldPath, tree) : null;
                         Element scannedElement = path != null ? getCC().getTrees().getElement(path) : null;
+                        // #JFXC-3789 workaround
+                        if (scannedElement == null && tree instanceof JFXOverrideClassVar) {
+                            scannedElement = ((JFXOverrideClassVar)tree).sym;
+                        }
+                        // ###
                         if (scannedElement == null && (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
                             scannedElement = getCC().getElementUtilities().getPackageElement(tree.toString());
                             if (origHandle != null && origHandle.equals(ElementHandle.create(scannedElement))) {
