@@ -14,11 +14,13 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.code.Type.ClassType;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,12 +29,17 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
 import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
@@ -44,6 +51,9 @@ import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataFolder;
+import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -236,10 +246,41 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                 code.append(space).append(HintsUtils.TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
                 code.append(space).append("}\n"); //NOI18N
                 //code = new StringBuffer(JFXReformatTask.reformat(code.toString(), CodeStyle.getDefault(document)));
-                
+
             } else if (fixType.equals(CLASS_VALUE)) {
                 code.append(CLASS_VALUE).append(" ").append(diagnostic.getArgs()[5]).append(" {"); //NOI18N
                 code.append("}"); //NOI18N
+                ClassPath cp = compilationInfo.getClasspathInfo().getClassPath(PathKind.SOURCE);
+                FileObject root = cp.findOwnerRoot(compilationInfo.getFileObject());
+
+                if (root == null) { //File not part of any project
+                    return null;
+                }
+
+                TypeElement outer = ElementUtilities.enclosingTypeElement(classType.asElement());
+                ClassSymbol classSymbol = (ClassSymbol) classType.asElement();
+
+                PackageElement packageElement = classSymbol.packge();
+
+                FileObject pack = FileUtil.createFolder(compilationInfo.getFileObject(), packageElement.toString()); // NOI18N
+//                FileObject classTemplate/*???*/ = FileUtil.getConfigFile(template(kind));
+//                DataObject classTemplateDO = DataObject.find(classTemplate);
+//                DataObject od = classTemplateDO.createFromTemplate(DataFolder.findFolder(pack), simpleName);
+//                FileObject target = od.getPrimaryFile();
+
+//                JavaSource.forFileObject(target).runModificationTask(new Task<WorkingCopy>() {
+//
+//                    public void run(WorkingCopy parameter) throws Exception {
+//                        parameter.toPhase(Phase.RESOLVED);
+//
+//                        ClassTree source = (ClassTree) parameter.getCompilationUnit().getTypeDecls().get(0);
+//                        ClassTree nue = createConstructor(parameter, TreePath.getPath(parameter.getCompilationUnit(), source));
+//
+//                        parameter.rewrite(source, nue);
+//                    }
+//                }).commit();
+
+                // return new ChangeInfo(target, null, null);
             } else if (fixType.equals(VAR_VALUE)) {
                 code.append(HintsUtils.TAB).append("\n");
                 code.append("var ").append(diagnostic.getArgs()[1]).append(";\n"); //NOI18N
