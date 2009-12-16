@@ -68,36 +68,24 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         methodParamsCombo.addFocusListener(this);
         methodCallArgsCombo.putClientProperty(OPTION_ID, wrapFunctionCallArgs);
         methodCallArgsCombo.addFocusListener(this);
-        annotationArgsCombo.putClientProperty(OPTION_ID, wrapAnnotationArgs);
-        annotationArgsCombo.addFocusListener(this);
         chainedMethodCallsCombo.putClientProperty(OPTION_ID, wrapChainedFunctionCalls);
         chainedMethodCallsCombo.addFocusListener(this);
         throwsKeywordCombo.putClientProperty(OPTION_ID, wrapThrowsKeyword);
         throwsKeywordCombo.addFocusListener(this);
         throwsListCombo.putClientProperty(OPTION_ID, wrapThrowsList);
         throwsListCombo.addFocusListener(this);
-        arrayInitCombo.putClientProperty(OPTION_ID, wrapArrayInit);
-        arrayInitCombo.addFocusListener(this);
+        sequenceInitCombo.putClientProperty(OPTION_ID, wrapSequenceInit);
+        sequenceInitCombo.addFocusListener(this);
         forCombo.putClientProperty(OPTION_ID, wrapFor);
         forCombo.addFocusListener(this);
         forStatementCombo.putClientProperty(OPTION_ID, wrapForStatement );
         forStatementCombo.addFocusListener(this);
-        ifStatementCombo.putClientProperty(OPTION_ID, wrapIfStatement);
+        ifStatementCombo.putClientProperty(OPTION_ID, wrapIfExpression);
         ifStatementCombo.addFocusListener(this);
         whileStatementComboBox.putClientProperty(OPTION_ID, wrapWhileStatement);
         whileStatementComboBox.addFocusListener(this);
-        doWhileStatementCombo.putClientProperty(OPTION_ID, wrapDoWhileStatement);
-        doWhileStatementCombo.addFocusListener(this);
-        assertCombo.putClientProperty(OPTION_ID, wrapAssert);
-        assertCombo.addFocusListener(this);
-        enumConstantsCombo.putClientProperty(OPTION_ID, wrapEnumConstants);
-        enumConstantsCombo.addFocusListener(this);
-        annotationsCombo.putClientProperty(OPTION_ID, wrapAnnotations);
-        annotationsCombo.addFocusListener(this);
         binaryOpsCombo.putClientProperty(OPTION_ID, wrapBinaryOps);
         binaryOpsCombo.addFocusListener(this);
-        ternaryOpsCombo.putClientProperty(OPTION_ID, wrapTernaryOps);
-        ternaryOpsCombo.addFocusListener(this);
         assignOpsCombo.putClientProperty(OPTION_ID, wrapAssignOps);
         assignOpsCombo.addFocusListener(this);
     }
@@ -139,8 +127,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         methodParamsCombo = new javax.swing.JComboBox();
         methodCallArgsLabel = new javax.swing.JLabel();
         methodCallArgsCombo = new javax.swing.JComboBox();
-        annotationArgsLabel = new javax.swing.JLabel();
-        annotationArgsCombo = new javax.swing.JComboBox();
         chainedMethodCallsLabel = new javax.swing.JLabel();
         chainedMethodCallsCombo = new javax.swing.JComboBox();
         throwsKeywordLabel = new javax.swing.JLabel();
@@ -148,7 +134,7 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         throwsListLabel = new javax.swing.JLabel();
         throwsListCombo = new javax.swing.JComboBox();
         arrayInitLabel = new javax.swing.JLabel();
-        arrayInitCombo = new javax.swing.JComboBox();
+        sequenceInitCombo = new javax.swing.JComboBox();
         forLabel = new javax.swing.JLabel();
         forCombo = new javax.swing.JComboBox();
         forStatementLabel = new javax.swing.JLabel();
@@ -157,18 +143,8 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         ifStatementCombo = new javax.swing.JComboBox();
         whileStatementLabel = new javax.swing.JLabel();
         whileStatementComboBox = new javax.swing.JComboBox();
-        doWhileStatementLabel = new javax.swing.JLabel();
-        doWhileStatementCombo = new javax.swing.JComboBox();
-        assertLabel = new javax.swing.JLabel();
-        assertCombo = new javax.swing.JComboBox();
-        enumConstantsLabel = new javax.swing.JLabel();
-        enumConstantsCombo = new javax.swing.JComboBox();
-        annotationsLabel = new javax.swing.JLabel();
-        annotationsCombo = new javax.swing.JComboBox();
         binaryOpsLabel = new javax.swing.JLabel();
         binaryOpsCombo = new javax.swing.JComboBox();
-        ternaryOpsLabel = new javax.swing.JLabel();
-        ternaryOpsCombo = new javax.swing.JComboBox();
         assignOpsLabel = new javax.swing.JLabel();
         assignOpsCombo = new javax.swing.JComboBox();
         spacerPanel1 = new javax.swing.JPanel();
@@ -241,20 +217,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
         panel1.add(methodCallArgsCombo, gridBagConstraints);
 
-        annotationArgsLabel.setLabelFor(annotationArgsCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(annotationArgsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_annotationArgs")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(annotationArgsLabel, gridBagConstraints);
-
-        annotationArgsCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(annotationArgsCombo, gridBagConstraints);
-
         chainedMethodCallsLabel.setLabelFor(chainedMethodCallsCombo);
         org.openide.awt.Mnemonics.setLocalizedText(chainedMethodCallsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_chainedFunctionCalls")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -297,19 +259,19 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
         panel1.add(throwsListCombo, gridBagConstraints);
 
-        arrayInitLabel.setLabelFor(arrayInitCombo);
+        arrayInitLabel.setLabelFor(sequenceInitCombo);
         org.openide.awt.Mnemonics.setLocalizedText(arrayInitLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_arrayInit")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
         panel1.add(arrayInitLabel, gridBagConstraints);
 
-        arrayInitCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        sequenceInitCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(arrayInitCombo, gridBagConstraints);
+        panel1.add(sequenceInitCombo, gridBagConstraints);
 
         forLabel.setLabelFor(forCombo);
         org.openide.awt.Mnemonics.setLocalizedText(forLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_for")); // NOI18N
@@ -368,62 +330,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
         panel1.add(whileStatementComboBox, gridBagConstraints);
 
-        doWhileStatementLabel.setLabelFor(doWhileStatementCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(doWhileStatementLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_doWhileStatement")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(doWhileStatementLabel, gridBagConstraints);
-
-        doWhileStatementCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(doWhileStatementCombo, gridBagConstraints);
-
-        assertLabel.setLabelFor(assertCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(assertLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_assert")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(assertLabel, gridBagConstraints);
-
-        assertCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(assertCombo, gridBagConstraints);
-
-        enumConstantsLabel.setLabelFor(enumConstantsCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(enumConstantsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_enumConstants")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(enumConstantsLabel, gridBagConstraints);
-
-        enumConstantsCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(enumConstantsCombo, gridBagConstraints);
-
-        annotationsLabel.setLabelFor(annotationsCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(annotationsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_annotations")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(annotationsLabel, gridBagConstraints);
-
-        annotationsCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(annotationsCombo, gridBagConstraints);
-
         binaryOpsLabel.setLabelFor(binaryOpsCombo);
         org.openide.awt.Mnemonics.setLocalizedText(binaryOpsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_binaryOps")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -437,20 +343,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
         panel1.add(binaryOpsCombo, gridBagConstraints);
-
-        ternaryOpsLabel.setLabelFor(ternaryOpsCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(ternaryOpsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_ternaryOps")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(ternaryOpsLabel, gridBagConstraints);
-
-        ternaryOpsCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(ternaryOpsCombo, gridBagConstraints);
 
         assignOpsLabel.setLabelFor(assignOpsCombo);
         org.openide.awt.Mnemonics.setLocalizedText(assignOpsLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_assignOps")); // NOI18N
@@ -480,24 +372,13 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
     }// </editor-fold>//GEN-END:initComponents
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox annotationArgsCombo;
-    private javax.swing.JLabel annotationArgsLabel;
-    private javax.swing.JComboBox annotationsCombo;
-    private javax.swing.JLabel annotationsLabel;
-    private javax.swing.JComboBox arrayInitCombo;
     private javax.swing.JLabel arrayInitLabel;
-    private javax.swing.JComboBox assertCombo;
-    private javax.swing.JLabel assertLabel;
     private javax.swing.JComboBox assignOpsCombo;
     private javax.swing.JLabel assignOpsLabel;
     private javax.swing.JComboBox binaryOpsCombo;
     private javax.swing.JLabel binaryOpsLabel;
     private javax.swing.JComboBox chainedMethodCallsCombo;
     private javax.swing.JLabel chainedMethodCallsLabel;
-    private javax.swing.JComboBox doWhileStatementCombo;
-    private javax.swing.JLabel doWhileStatementLabel;
-    private javax.swing.JComboBox enumConstantsCombo;
-    private javax.swing.JLabel enumConstantsLabel;
     private javax.swing.JComboBox extendsImplementsKeywordCombo;
     private javax.swing.JComboBox extendsImplementsListCombo;
     private javax.swing.JLabel extendsImplementsListLabel;
@@ -514,9 +395,8 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
     private javax.swing.JLabel methodParamsLabel;
     private javax.swing.JPanel panel1;
     private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JComboBox sequenceInitCombo;
     private javax.swing.JPanel spacerPanel1;
-    private javax.swing.JComboBox ternaryOpsCombo;
-    private javax.swing.JLabel ternaryOpsLabel;
     private javax.swing.JComboBox throwsKeywordCombo;
     private javax.swing.JLabel throwsKeywordLabel;
     private javax.swing.JComboBox throwsListCombo;
