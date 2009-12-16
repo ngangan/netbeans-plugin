@@ -1681,7 +1681,10 @@ public class JFXReformatTask implements ReformatTask {
                 if (body != null) {
                     members.addAll(body.getClassMembers());
                 }
-
+                List<VariableTree> localVariables = node.getLocalVariables();
+                if (localVariables != null && !localVariables.isEmpty()) {
+                    members.addAll(localVariables);
+                }
                 if (!members.isEmpty()) {
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
