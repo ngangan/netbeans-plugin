@@ -2438,12 +2438,22 @@ public class JFXReformatTask implements ReformatTask {
 
             JavaFXKind kind = node.getJavaFXKind();
             if (kind == JavaFXKind.STRING_LITERAL || kind == JavaFXKind.STRING_EXPRESSION) {
-//                accept(ReformatUtils.STRING_LITERALS);
                 int old = indent;
                 indent += continuationIndentSize;
-                while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+
+                accept(ReformatUtils.STRING_LITERALS); // accept first
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
                     spaces(0, true);
+                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+                        spaces(0, true);
+                    }
+                } else {
+                    rollback(index, c, d);
                 }
+
                 indent = old;
             } else {
                 // #176654: probably compiler bug
