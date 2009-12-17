@@ -179,6 +179,29 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                 }
                                 // end temporary workaround
                                 //System.out.println("    ******************* starter thread loader: isDone=" + loader.getIsDone() + " isStarted=" + loader.getIsStarted() + " isStopped=" + loader.getIsStopped() + " isSusscess=" + loader.getIsSucceeded() + " isFail=" + loader.getIsFailed() + " err: " + loader.getCauseOfFailure());
+                                /* TODO: 
+The progress support has been refactored. The class ProgressNotifier has been replaced with ProgressHandler. The source in fxdcomposer should be updated in this way:
+
+                               PreviewStatistics statistics = new PreviewStatistics();
+                                ProgressHandler ph = new ProgressHandler();
+                                ph.setCallback( new ProgressHandler.Callback() {
+                                    public void onProgress(float percentage, int phase, int phasePercentage, int eventNum) {
+                                        //update progress
+                                    }
+
+                                    public void onDone(Throwable error) {
+                                        //in case error == null than load was completed successfully
+                                        //otherwise it failed
+                                    }
+                                });
+                                PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, ph);
+
+                                PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
+
+The fxdloader was updated in a way that new version should not break compilation of FXDComposer. However it will not work correctly and must be updated after this fix will be propagated in a promoted build of JavaFX SDK.
+[ Show » ]
+Pavel Benes added a comment - Dec, 15 2009 01:59 PM The progress support has been refactored. The class ProgressNotifier has been replaced with ProgressHandler. The source in fxdcomposer should be updated in this way:                                PreviewStatistics statistics = new PreviewStatistics();                                 ProgressHandler ph = new ProgressHandler();                                 ph.setCallback( new ProgressHandler.Callback() {                                     public void onProgress(float percentage, int phase, int phasePercentage, int eventNum) {                                         //update progress                                     }                                     public void onDone(Throwable error) {                                         //in case error == null than load was completed successfully                                         //otherwise it failed                                     }                                 });                                 PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, ph);                                 PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader); The fxdloader was updated in a way that new version should not break compilation of FXDComposer. However it will not work correctly and must be updated after this fix will be propagated in a promoted build of JavaFX SDK.
+                                 */
                             } finally {
                                 fModel.readUnlock();
                             }

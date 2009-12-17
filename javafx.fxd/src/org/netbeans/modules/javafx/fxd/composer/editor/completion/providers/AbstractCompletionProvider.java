@@ -51,17 +51,16 @@ import com.sun.javafx.tools.fxd.schema.model.Type;
 import com.sun.javafx.tools.fxd.schema.model.Value;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.DocToFXDSchemaMapper;
 import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
 import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionQuery;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**
@@ -148,23 +147,22 @@ public abstract class AbstractCompletionProvider {
             DocumentElement el, final int caretOffset) {
         final String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
         final int startOffset = el.getStartOffset();
-        // collect element and enum names
-        final List<String> matched = new ArrayList<String>();
-        Set<String> names = DocToFXDSchemaMapper.DOCUMENT_ID_TO_FX_ID.keySet();
-        for (String key : names) {
-            if (key.startsWith(nameStart)) {
-                matched.add(getSchemaIdByName(key));
-            }
-        }
-        // collect schema elements with matching ids
         //LOG.warning("---- FIND COMPLETION FOR : "+nameStart);
         FXDCompletionQuery.getFXDSchema().visit(new SchemaVisitor() {
 
             public void visitSchemaElement(AbstractSchemaElement ae) {
-                if (matched.contains(ae.id) || ae.id.startsWith(nameStart)) {
-                    //resultSet.addItem(new FXDCompletionItem(ae, caretOffset));
+                // collect schema elements with matching ids || element and enum names
+                if (ae.id.startsWith(nameStart) || nameStartsWith(ae.id, nameStart)) {
                     resultSet.addItem(new FXDCompletionItem(ae, startOffset));
                 }
+            }
+
+            private boolean nameStartsWith(String id, String nameStart) {
+                int idx = id.lastIndexOf('-');
+                if (idx > -1) {
+                    return id.substring(idx).startsWith(nameStart);
+                }
+                return false;
             }
         });
     }
@@ -372,7 +370,7 @@ public abstract class AbstractCompletionProvider {
     }
 
     private String getSchemaIdByName(String elementName) {
-        final String id = DocToFXDSchemaMapper.getFXDSchemaId(elementName);
+        final String id = FXDSchemaHelper.getFXDSchemaId(elementName);
         LOG.warning(">>>> element name = " + elementName + " id = " + id);
         return id;
     }
