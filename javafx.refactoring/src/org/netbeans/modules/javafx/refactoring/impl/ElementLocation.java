@@ -132,11 +132,9 @@ final public class ElementLocation {
         return element.toString() + " @ " + startPosition + " in " + sourceFile.getPath();
     }
 
-    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS, JFXTokenId.LPAREN, JFXTokenId.DOT, JFXTokenId.COMMA, JFXTokenId.SEMI, JFXTokenId.COLON, JFXTokenId.LBRACE, JFXTokenId.LBRACKET);
+    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS, JFXTokenId.LPAREN, JFXTokenId.RPAREN, JFXTokenId.DOT, JFXTokenId.COMMA, JFXTokenId.SEMI, JFXTokenId.COLON, JFXTokenId.LBRACE, JFXTokenId.RBRACE, JFXTokenId.LBRACKET, JFXTokenId.RBRACKET);
     private void setPositions(int pos, CompilationInfo ci) {
         String simpleText = element.getSimpleName().toString();
-        String elementText = element.toString();
-        int textDiff = elementText.length() - simpleText.length();
 
         TokenSequence<JFXTokenId> tokens = ci.getTokenHierarchy().tokenSequence();
         tokens.moveStart();
@@ -167,69 +165,4 @@ final public class ElementLocation {
             }
         }
     }
-
-//    private JavaFXTreePath pathFor(final int pos, final CompilationInfo ci) {
-//        final JavaFXTreePath[] path = new JavaFXTreePath[1];
-//        final SourcePositions positions = ci.getTrees().getSourcePositions();
-//
-//        JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
-//            private long lastValidSpan = Long.MAX_VALUE;
-//            @Override
-//            public Void scan(Tree tree, Void p) {
-//                JavaFXTreePath oldPath = getCurrentPath();
-//                super.scan(tree, p);
-//                JavaFXTreePath newPath = (tree != null && oldPath != null) ? JavafxcTrees.getPath(oldPath, tree) : null;
-//                if (tree != null) {
-//                    long start = positions.getStartPosition(ci.getCompilationUnit(), tree);
-//                    long end = positions.getEndPosition(ci.getCompilationUnit(), tree);
-//
-//                    if (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals(""))) {
-//                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && start != -1 && start != end && start <= pos && end >=pos) {
-//                            // check for javafx$run$ magic
-//                            if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
-//                                long span = end - start + 1;
-//                                if (span < lastValidSpan) {
-//                                    if (kindPath.equals(new KindPath(newPath))) {
-//                                        path[0] = newPath;
-//                                        lastValidSpan = span;
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                return null;
-//            }
-//        };
-//        scanner.scan(ci.getCompilationUnit(), null);
-//        return path[0];
-//    }
-//
-//    private static class KindPath {
-//        private ArrayList<Tree.JavaFXKind> kindPath = new ArrayList();
-//
-//        KindPath(JavaFXTreePath treePath) {
-//            while (treePath != null) {
-//                kindPath.add(treePath.getLeaf().getJavaFXKind());
-//                treePath = treePath.getParentPath();
-//            }
-//        }
-//
-//        @Override
-//        public int hashCode() {
-//            return kindPath.hashCode();
-//        }
-//
-//        @Override
-//        public boolean equals(Object object) {
-//            if (object instanceof KindPath) {
-//                return kindPath.equals(((KindPath) object).kindPath);
-//            }
-//            return false;
-//        }
-//
-//        public ArrayList<Tree.JavaFXKind> getList() {
-//            return kindPath;
-//        }
-//    }
 }
