@@ -50,7 +50,7 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 
 /**
- *
+ * Creates FXD Schema Model
  * @author Andrey Korostelev
  */
 public class FXDSchemaModelProvider {
