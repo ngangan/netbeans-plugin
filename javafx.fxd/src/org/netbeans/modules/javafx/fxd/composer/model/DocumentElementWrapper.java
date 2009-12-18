@@ -24,6 +24,7 @@ import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
 import org.openide.util.Exceptions;
 
 /**
@@ -329,20 +330,6 @@ final class DocumentElementWrapper {
         }
     }
 
-    private static final String [] DEFAULT_IMPORTS = {
-        "javafx.scene.image.",
-        "javafx.scene.transform.",
-        "javafx.geometry.",
-        "javafx.scene.",
-        "javafx.scene.paint.",
-        "javafx.scene.effect.light.",
-        "javafx.scene.shape.",
-        "javafx.scene.text.",
-        "javafx.scene.effect.",
-        "javafx.fxd.",
-        ""
-    };
-
     private static Map<String,Boolean> CLASSES_WITH_ID = new HashMap<String, Boolean>();
 
     public static boolean isIDSupported( String typeName) {
@@ -355,7 +342,7 @@ final class DocumentElementWrapper {
     }
 
     private static boolean isIDSupportedImpl( String typeName) {
-        for ( String importStr : DEFAULT_IMPORTS) {
+        for ( String importStr : FXDSchemaHelper.getDefaultImports()) {
             String className = importStr.concat(typeName);
             try {
                 Class clazz = Class.forName(className);

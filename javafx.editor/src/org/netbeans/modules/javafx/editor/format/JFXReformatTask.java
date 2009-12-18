@@ -1681,7 +1681,10 @@ public class JFXReformatTask implements ReformatTask {
                 if (body != null) {
                     members.addAll(body.getClassMembers());
                 }
-
+                List<VariableTree> localVariables = node.getLocalVariables();
+                if (localVariables != null && !localVariables.isEmpty()) {
+                    members.addAll(localVariables);
+                }
                 if (!members.isEmpty()) {
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
@@ -2167,7 +2170,7 @@ public class JFXReformatTask implements ReformatTask {
             boolean fecoeo = ReformatUtils.containsOneExpressionOnly(falseExpr);
 
             // TODO make cs.wrapIfExpression
-            final WrapStyle wrapIfStatement = insideVar || tecoeo ? WrapStyle.WRAP_NEVER : cs.wrapIfStatement();
+            final WrapStyle wrapIfStatement = insideVar || tecoeo ? WrapStyle.WRAP_NEVER : cs.wrapIfexpression();
             boolean prevblock = wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
             if (falseExpr != null) {
                 if (!insideVar && !fecoeo && (cs.placeElseOnNewLine() || !prevblock)) {
@@ -2438,12 +2441,22 @@ public class JFXReformatTask implements ReformatTask {
 
             JavaFXKind kind = node.getJavaFXKind();
             if (kind == JavaFXKind.STRING_LITERAL || kind == JavaFXKind.STRING_EXPRESSION) {
-//                accept(ReformatUtils.STRING_LITERALS);
                 int old = indent;
                 indent += continuationIndentSize;
-                while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+
+                accept(ReformatUtils.STRING_LITERALS); // accept first
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
                     spaces(0, true);
+                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+                        spaces(0, true);
+                    }
+                } else {
+                    rollback(index, c, d);
                 }
+
                 indent = old;
             } else {
                 // #176654: probably compiler bug

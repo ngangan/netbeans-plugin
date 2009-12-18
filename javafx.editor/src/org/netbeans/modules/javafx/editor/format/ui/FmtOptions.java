@@ -127,19 +127,13 @@ public class FmtOptions {
     public static final String wrapThrowsKeyword = "wrapThrowsKeyword"; //NOI18N
     public static final String wrapThrowsList = "wrapThrowsList"; //NOI18N
     public static final String wrapFunctionCallArgs = "wrapFunctionCallArgs"; //NOI18N
-    public static final String wrapAnnotationArgs = "wrapAnnotationArgs"; //NOI18N
     public static final String wrapChainedFunctionCalls = "wrapChainedFunctionCalls"; //NOI18N
-    public static final String wrapArrayInit = "wrapArrayInit"; //NOI18N
+    public static final String wrapSequenceInit = "wrapSequenceInit"; //NOI18N
     public static final String wrapFor = "wrapFor"; //NOI18N
     public static final String wrapForStatement = "wrapForStatement"; //NOI18N
-    public static final String wrapIfStatement = "wrapIfStatement"; //NOI18N
+    public static final String wrapIfExpression = "wrapIfExpression"; //NOI18N
     public static final String wrapWhileStatement = "wrapWhileStatement"; //NOI18N
-    public static final String wrapDoWhileStatement = "wrapDoWhileStatement"; //NOI18N
-    public static final String wrapAssert = "wrapAssert"; //NOI18N
-    public static final String wrapEnumConstants = "wrapEnumConstants"; //NOI18N
-    public static final String wrapAnnotations = "wrapAnnotations"; //NOI18N
     public static final String wrapBinaryOps = "wrapBinaryOps"; //NOI18N
-    public static final String wrapTernaryOps = "wrapTernaryOps"; //NOI18N
     public static final String wrapAssignOps = "wrapAssignOps"; //NOI18N
     
     public static final String blankLinesBeforePackage = "blankLinesBeforePackage"; //NOI18N
@@ -358,19 +352,13 @@ public class FmtOptions {
             { wrapThrowsKeyword, WRAP_NEVER}, //NOI18N
             { wrapThrowsList, WRAP_NEVER}, //NOI18N
             { wrapFunctionCallArgs, WRAP_NEVER}, //NOI18N
-            { wrapAnnotationArgs, WRAP_NEVER}, //NOI18N
             { wrapChainedFunctionCalls, WRAP_NEVER}, //NOI18N
-            { wrapArrayInit, WRAP_NEVER}, //NOI18N
+            { wrapSequenceInit, WRAP_NEVER}, //NOI18N
             { wrapFor, WRAP_NEVER}, //NOI18N
             { wrapForStatement, WRAP_ALWAYS}, //NOI18N
-            { wrapIfStatement, WRAP_ALWAYS}, //NOI18N
+            { wrapIfExpression, WRAP_ALWAYS}, //NOI18N
             { wrapWhileStatement, WRAP_ALWAYS}, //NOI18N
-            { wrapDoWhileStatement, WRAP_ALWAYS}, //NOI18N
-            { wrapAssert, WRAP_NEVER}, //NOI18N
-            { wrapEnumConstants, WRAP_NEVER}, //NOI18N
-            { wrapAnnotations, WRAP_ALWAYS}, //NOI18N
             { wrapBinaryOps, WRAP_NEVER}, //NOI18N
-            { wrapTernaryOps, WRAP_NEVER}, //NOI18N
             { wrapAssignOps, WRAP_NEVER}, //NOI18N
 
             { blankLinesBeforePackage, "0"}, //NOI18N
