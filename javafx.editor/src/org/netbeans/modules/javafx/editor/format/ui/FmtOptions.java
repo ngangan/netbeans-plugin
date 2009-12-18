@@ -163,7 +163,6 @@ public class FmtOptions {
     public static final String spaceBeforeSwitchParen = "spaceBeforeSwitchParen"; //NOI18N
     public static final String spaceBeforeSynchronizedParen = "spaceBeforeSynchronizedParen"; //NOI18N
     public static final String spaceBeforeAnnotationParen = "spaceBeforeAnnotationParen"; //NOI18N
-    public static final String spaceBeforeObjectLiteral = "spaceBeforeObjectLiteral"; //NOI18N
     public static final String spaceAroundUnaryOps = "spaceAroundUnaryOps"; //NOI18N
     public static final String spaceAroundBinaryOps = "spaceAroundBinaryOps"; //NOI18N
     public static final String spaceAroundIfElseOps = "spaceAroundIfElseOps"; //NOI18N
@@ -183,7 +182,7 @@ public class FmtOptions {
     public static final String spaceBeforeSynchronizedLeftBrace = "spaceBeforeSynchronizedLeftBrace"; //NOI18N
     public static final String spaceBeforeStaticInitLeftBrace = "spaceBeforeStaticInitLeftBrace"; //NOI18N
     public static final String spaceBeforeSequenceInitLeftBrace = "spaceBeforeSequenceInitLeftBrace"; //NOI18N
-    public static final String spaceBeforeClassInitBlockLeftBrace = "spaceBeforeClassInitBlockLeftBrace"; //NOI18N
+    public static final String spaceBeforeInitBlockLeftBrace = "spaceBeforeClassInitBlockLeftBrace"; //NOI18N
     public static final String spaceBeforePostInitBlockLeftBrace = "spaceBeforePostInitBlockLeftBrace"; //NOI18N
     public static final String spaceWithinParens = "spaceWithinParens"; //NOI18N
     public static final String spaceWithinFunctionDeclParens = "spaceWithinFunctionDeclParens"; //NOI18N
@@ -194,7 +193,6 @@ public class FmtOptions {
     public static final String spaceWithinSwitchParens = "spaceWithinSwitchParens"; //NOI18N
     public static final String spaceWithinCatchParens = "spaceWithinCatchParens"; //NOI18N
     public static final String spaceWithinSynchronizedParens = "spaceWithinSynchronizedParens"; //NOI18N
-    public static final String spaceWithinTypeCastParens = "spaceWithinTypeCastParens"; //NOI18N
     public static final String spaceWithinAnnotationParens = "spaceWithinAnnotationParens"; //NOI18N
     public static final String spaceWithinBraces = "spaceWithinBraces"; //NOI18N
     public static final String spaceWithinSequenceInitBrackets = "spaceWithinArrayInitBrackets"; //NOI18N
@@ -391,6 +389,7 @@ public class FmtOptions {
             { spaceAroundAssignOps, TRUE}, //NOI18N
             { spaceBeforeClassDeclLeftBrace, TRUE}, //NOI18N
             { spaceBeforeFunctionDeclLeftBrace, TRUE}, //NOI18N
+            { spaceBeforeObjectLiteralDeclLeftBrace, TRUE}, //NOI18N
             { spaceBeforeIfLeftBrace, TRUE}, //NOI18N
             { spaceBeforeElseLeftBrace, TRUE}, //NOI18N
             { spaceBeforeWhileLeftBrace, TRUE}, //NOI18N
@@ -400,8 +399,8 @@ public class FmtOptions {
             { spaceBeforeFinallyLeftBrace, TRUE}, //NOI18N
             { spaceBeforeStaticInitLeftBrace, TRUE}, //NOI18N
             { spaceBeforeSequenceInitLeftBrace, FALSE}, //NOI18N
-            { spaceBeforeClassInitBlockLeftBrace, FALSE}, //NOI18N
-            { spaceBeforePostInitBlockLeftBrace, FALSE}, //NOI18N
+            { spaceBeforeInitBlockLeftBrace, TRUE}, //NOI18N
+            { spaceBeforePostInitBlockLeftBrace, TRUE}, //NOI18N
             { spaceWithinParens, FALSE}, //NOI18N
             { spaceWithinFunctionDeclParens, FALSE}, //NOI18N
             { spaceWithinFunctionCallParens, FALSE}, //NOI18N
@@ -409,7 +408,6 @@ public class FmtOptions {
             { spaceWithinForParens, FALSE}, //NOI18N
             { spaceWithinWhileParens, FALSE}, //NOI18N
             { spaceWithinCatchParens, FALSE}, //NOI18N
-            { spaceWithinTypeCastParens, FALSE}, //NOI18N
             { spaceWithinBraces, FALSE}, //NOI18N
             { spaceWithinSequenceInitBrackets, FALSE}, //NOI18N
             { spaceBeforeComma, FALSE}, //NOI18N

@@ -815,7 +815,7 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitInitDefinition(InitDefinitionTree node, Void p) {
             accept(JFXTokenId.INIT);
-            space();
+//            space();
             scan(node.getBody(), p);
             return true;
         }
@@ -823,7 +823,7 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitPostInitDefinition(InitDefinitionTree node, Void p) {
             accept(JFXTokenId.POSTINIT);
-            space();
+//            space();
             scan(node.getBody(), p);
             return true;
         }
@@ -1356,12 +1356,23 @@ public class JFXReformatTask implements ReformatTask {
                 switch (parentTree.getJavaFXKind()) {
                     case CLASS_DECLARATION:
                     case INSTANTIATE_NEW:
-                    case INSTANTIATE_OBJECT_LITERAL:
                     case ON_REPLACE:
-                        bracePlacement = cs.getOtherBracePlacement();
+                        bracePlacement = cs.getClassDeclBracePlacement();
                         if (node.isStatic()) {
                             spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
                         }
+                        break;
+                    case INIT_DEFINITION:
+                        bracePlacement = cs.getMethodDeclBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeInitBlockLeftBrace();
+                        break;
+                    case POSTINIT_DEFINITION:
+                        bracePlacement = cs.getMethodDeclBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforePostInitBlockLeftBrace();
+                        break;
+                    case INSTANTIATE_OBJECT_LITERAL:
+                        bracePlacement = cs.getClassDeclBracePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeObjectLiteralDeclLeftBrace();
                         break;
                     case FUNCTION_DEFINITION:
                     case FUNCTION_VALUE:
@@ -1794,11 +1805,14 @@ public class JFXReformatTask implements ReformatTask {
             int c = col;
             Diff d = diffs.isEmpty() ? null : diffs.getFirst();
             boolean wrapped = accept(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
-            if (!wrapped) {
+            if (wrapped) {
+                spaces(cs.spaceWithinWhileParens() ? 1 : 0, true);
+            } else {
                 rollback(index, c, d);
             }
             scan(node.getCondition(), p);
             if (wrapped) {
+                spaces(cs.spaceWithinWhileParens() ? 1 : 0);
                 accept(JFXTokenId.RPAREN);
             }
             indent = old;
@@ -1820,7 +1834,7 @@ public class JFXReformatTask implements ReformatTask {
                 indent += continuationIndentSize;
                 spaces(cs.spaceBeforeForParen() ? 1 : 0);
                 accept(JFXTokenId.LPAREN);
-                spaces(cs.spaceWithinForParens() ? 1 : 0);
+                spaces(cs.spaceWithinForParens() ? 1 : 0, true);
 
                 List<? extends ForExpressionInClauseTree> clauses = node.getInClauses();
                 if (clauses != null && !clauses.isEmpty()) {
@@ -2138,11 +2152,14 @@ public class JFXReformatTask implements ReformatTask {
             int c = col;
             Diff d = diffs.isEmpty() ? null : diffs.getFirst();
             boolean wrapped = accept(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
-            if (!wrapped) {
+            if (wrapped) {
+                spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
+            } else {
                 rollback(index, c, d);
             }
             scan(ifExpr.getCondition(), p);
             if (wrapped) {
+                spaces(cs.spaceWithinMethodCallParens() ? 1 : 0);
                 accept(JFXTokenId.RPAREN);
             }
             indent = old;

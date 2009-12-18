@@ -227,11 +227,7 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
                 new Item(spaceBeforeIfParen),
                 new Item(spaceBeforeForParen),
                 new Item(spaceBeforeWhileParen),
-                new Item(spaceBeforeCatchParen),
-//                new Item(spaceBeforeSwitchParen),
-//                new Item(spaceBeforeSynchronizedParen),
-//                new Item(spaceBeforeAnnotationParen),
-                new Item(spaceBeforeObjectLiteral)),
+                new Item(spaceBeforeCatchParen)),
     
             new Item("AroundOperators",                         // NOI18N
                 new Item(spaceAroundUnaryOps),
@@ -247,15 +243,10 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
                 new Item(spaceBeforeElseLeftBrace),
                 new Item(spaceBeforeWhileLeftBrace),
                 new Item(spaceBeforeForLeftBrace),
-//                new Item(spaceBeforeDoLeftBrace),
-//                new Item(spaceBeforeSwitchLeftBrace),
                 new Item(spaceBeforeTryLeftBrace),
                 new Item(spaceBeforeCatchLeftBrace),
                 new Item(spaceBeforeFinallyLeftBrace),
-//                new Item(spaceBeforeSynchronizedLeftBrace),
-//                new Item(spaceBeforeStaticInitLeftBrace),
-//                new Item(spaceBeforeArrayInitLeftBrace),
-                new Item(spaceBeforeClassInitBlockLeftBrace),
+                new Item(spaceBeforeInitBlockLeftBrace),
                 new Item(spaceBeforePostInitBlockLeftBrace)),
 
             new Item("WithinParentheses",                       // NOI18N
@@ -265,11 +256,7 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
                 new Item(spaceWithinIfParens),
                 new Item(spaceWithinForParens),
                 new Item(spaceWithinWhileParens),
-//                new Item(spaceWithinSwitchParens),
                 new Item(spaceWithinCatchParens),
-//                new Item(spaceWithinSynchronizedParens),
-                new Item(spaceWithinTypeCastParens),
-//                new Item(spaceWithinAnnotationParens),
                 new Item(spaceWithinBraces),
                 new Item(spaceWithinSequenceInitBrackets)),
                     

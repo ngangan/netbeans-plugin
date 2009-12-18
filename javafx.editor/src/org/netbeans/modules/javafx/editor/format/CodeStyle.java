@@ -523,6 +523,18 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeFunctionDeclLeftBrace, getDefaultAsBoolean(spaceBeforeFunctionDeclLeftBrace));
     }
 
+    public boolean spaceBeforeInitBlockLeftBrace() {
+        return preferences.getBoolean(spaceBeforeInitBlockLeftBrace, getDefaultAsBoolean(spaceBeforeInitBlockLeftBrace));
+    }
+
+    public boolean spaceBeforePostInitBlockLeftBrace() {
+        return preferences.getBoolean(spaceBeforePostInitBlockLeftBrace, getDefaultAsBoolean(spaceBeforePostInitBlockLeftBrace));
+    }
+
+    public boolean spaceBeforeObjectLiteralDeclLeftBrace() {
+        return preferences.getBoolean(spaceBeforeObjectLiteralDeclLeftBrace, getDefaultAsBoolean(spaceBeforeObjectLiteralDeclLeftBrace));
+    }
+
     public boolean spaceBeforeIfLeftBrace() {
         return preferences.getBoolean(spaceBeforeIfLeftBrace, getDefaultAsBoolean(spaceBeforeIfLeftBrace));
     }
@@ -605,10 +617,6 @@ public final class CodeStyle {
 
     public boolean spaceWithinSynchronizedParens() {
         return preferences.getBoolean(spaceWithinSynchronizedParens, getDefaultAsBoolean(spaceWithinSynchronizedParens));
-    }
-
-    public boolean spaceWithinTypeCastParens() {
-        return preferences.getBoolean(spaceWithinTypeCastParens, getDefaultAsBoolean(spaceWithinTypeCastParens));
     }
 
     public boolean spaceWithinAnnotationParens() {
