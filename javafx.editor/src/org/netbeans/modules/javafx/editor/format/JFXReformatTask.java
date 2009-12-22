@@ -1685,6 +1685,7 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.LBRACE);
                 int old = indent;
                 indent += indentSize;
+                spaces(cs.spaceWithinBraces() ? 1 : 0, true);
                 
                 TreeSet<Tree> members = new TreeSet<Tree>(new TreePosComparator(sp, root));
                 members.addAll(node.getLiteralParts());
@@ -1701,7 +1702,7 @@ public class JFXReformatTask implements ReformatTask {
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
                 }
                 indent = old;
-                spaces(0, true);
+                spaces(cs.spaceWithinBraces() && !members.isEmpty() ? 1 : 0, true);
                 accept(JFXTokenId.RBRACE);
             }
             

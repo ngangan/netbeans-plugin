@@ -607,20 +607,8 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceWithinWhileParens, getDefaultAsBoolean(spaceWithinWhileParens));
     }
 
-    public boolean spaceWithinSwitchParens() {
-        return preferences.getBoolean(spaceWithinSwitchParens, getDefaultAsBoolean(spaceWithinSwitchParens));
-    }
-
     public boolean spaceWithinCatchParens() {
         return preferences.getBoolean(spaceWithinCatchParens, getDefaultAsBoolean(spaceWithinCatchParens));
-    }
-
-    public boolean spaceWithinSynchronizedParens() {
-        return preferences.getBoolean(spaceWithinSynchronizedParens, getDefaultAsBoolean(spaceWithinSynchronizedParens));
-    }
-
-    public boolean spaceWithinAnnotationParens() {
-        return preferences.getBoolean(spaceWithinAnnotationParens, getDefaultAsBoolean(spaceWithinAnnotationParens));
     }
 
     public boolean spaceWithinBraces() {
@@ -671,10 +659,6 @@ public final class CodeStyle {
 
     public int countForUsingStarImport() {
         return preferences.getInt(countForUsingStarImport, getDefaultAsInt(countForUsingStarImport));
-    }
-
-    public int countForUsingStaticStarImport() {
-        return preferences.getInt(countForUsingStaticStarImport, getDefaultAsInt(countForUsingStaticStarImport));
     }
 
     public String[] getPackagesForStarImport() {
