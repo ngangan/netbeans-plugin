@@ -99,6 +99,7 @@ import org.openide.windows.TopComponent;
 public class FXDNavigatorContent extends JPanel implements SelectActionFactory.SelectionListener, PropertyChangeListener {
     public static final String ATTRIBUTES_FILTER = "attrs"; //NOI18N
     public static final String ID_FILTER         = "id";    //NOI18N
+    public static final String SELECTED_ENTRY_NAME_PROP = "entry_name"; //NOI18N
     
     //private static final boolean DEBUG = false;
     private static FXDNavigatorContent s_navigatorContentInstance = null;
@@ -167,6 +168,8 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                         entryName = peerDO.getEntryName();
                         //check if the editor for the DO has an opened pane
                         editorOpened = ec.getOpenedPanes() != null && ec.getOpenedPanes().length > 0;
+                        // put entry
+                        bdoc.putProperty(SELECTED_ENTRY_NAME_PROP, entryName);
                     }
 
                 }catch(UserQuestionException uqe) {
