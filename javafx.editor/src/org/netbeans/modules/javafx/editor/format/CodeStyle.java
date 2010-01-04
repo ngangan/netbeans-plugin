@@ -351,18 +351,13 @@ public final class CodeStyle {
         return WrapStyle.valueOf(wrap);
     }
 
-    public WrapStyle wrapAnnotationArgs() {
-        String wrap = preferences.get(wrapAnnotationArgs, getDefaultAsString(wrapAnnotationArgs));
-        return WrapStyle.valueOf(wrap);
-    }
-
     public WrapStyle wrapChainedMethodCalls() {
         String wrap = preferences.get(wrapChainedFunctionCalls, getDefaultAsString(wrapChainedFunctionCalls));
         return WrapStyle.valueOf(wrap);
     }
 
-    public WrapStyle wrapArrayInit() {
-        String wrap = preferences.get(wrapArrayInit, getDefaultAsString(wrapArrayInit));
+    public WrapStyle wrapSequenceInit() {
+        String wrap = preferences.get(wrapSequenceInit, getDefaultAsString(wrapSequenceInit));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -376,8 +371,8 @@ public final class CodeStyle {
         return WrapStyle.valueOf(wrap);
     }
 
-    public WrapStyle wrapIfStatement() {
-        String wrap = preferences.get(wrapIfStatement, getDefaultAsString(wrapIfStatement));
+    public WrapStyle wrapIfexpression() {
+        String wrap = preferences.get(wrapIfExpression, getDefaultAsString(wrapIfExpression));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -386,33 +381,8 @@ public final class CodeStyle {
         return WrapStyle.valueOf(wrap);
     }
 
-    public WrapStyle wrapDoWhileStatement() {
-        String wrap = preferences.get(wrapDoWhileStatement, getDefaultAsString(wrapDoWhileStatement));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapAssert() {
-        String wrap = preferences.get(wrapAssert, getDefaultAsString(wrapAssert));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapEnumConstants() {
-        String wrap = preferences.get(wrapEnumConstants, getDefaultAsString(wrapEnumConstants));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapAnnotations() {
-        String wrap = preferences.get(wrapAnnotations, getDefaultAsString(wrapAnnotations));
-        return WrapStyle.valueOf(wrap);
-    }
-
     public WrapStyle wrapBinaryOps() {
         String wrap = preferences.get(wrapBinaryOps, getDefaultAsString(wrapBinaryOps));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapTernaryOps() {
-        String wrap = preferences.get(wrapTernaryOps, getDefaultAsString(wrapTernaryOps));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -553,6 +523,18 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeFunctionDeclLeftBrace, getDefaultAsBoolean(spaceBeforeFunctionDeclLeftBrace));
     }
 
+    public boolean spaceBeforeInitBlockLeftBrace() {
+        return preferences.getBoolean(spaceBeforeInitBlockLeftBrace, getDefaultAsBoolean(spaceBeforeInitBlockLeftBrace));
+    }
+
+    public boolean spaceBeforePostInitBlockLeftBrace() {
+        return preferences.getBoolean(spaceBeforePostInitBlockLeftBrace, getDefaultAsBoolean(spaceBeforePostInitBlockLeftBrace));
+    }
+
+    public boolean spaceBeforeObjectLiteralDeclLeftBrace() {
+        return preferences.getBoolean(spaceBeforeObjectLiteralDeclLeftBrace, getDefaultAsBoolean(spaceBeforeObjectLiteralDeclLeftBrace));
+    }
+
     public boolean spaceBeforeIfLeftBrace() {
         return preferences.getBoolean(spaceBeforeIfLeftBrace, getDefaultAsBoolean(spaceBeforeIfLeftBrace));
     }
@@ -635,10 +617,6 @@ public final class CodeStyle {
 
     public boolean spaceWithinSynchronizedParens() {
         return preferences.getBoolean(spaceWithinSynchronizedParens, getDefaultAsBoolean(spaceWithinSynchronizedParens));
-    }
-
-    public boolean spaceWithinTypeCastParens() {
-        return preferences.getBoolean(spaceWithinTypeCastParens, getDefaultAsBoolean(spaceWithinTypeCastParens));
     }
 
     public boolean spaceWithinAnnotationParens() {

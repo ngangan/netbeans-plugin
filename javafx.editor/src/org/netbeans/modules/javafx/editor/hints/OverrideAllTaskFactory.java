@@ -62,7 +62,6 @@ import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.spi.editor.hints.*;
@@ -78,8 +77,9 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
+    private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
-    private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    //private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
 
     public OverrideAllTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -268,6 +268,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 if (type == null) {
                     return;
                 }
+                type = erasureType(type, compilationInfo.getJavafxTypes());
                 String importName = type.toString();
                 if (!type.isPrimitive() && !importName.equalsIgnoreCase("void") && importName.contains(".")) { //NOI18N
                     importName = removeBetween("()", importName); //NOI18N
@@ -303,7 +304,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                         while (iterator.hasNext()) {
                             VarSymbol var = iterator.next();
                             String varType = getTypeString(var.asType(), compilationInfo.getJavafxTypes());
-                            method.append(var.getSimpleName()).append(" : ").append(HintsUtils.getClassSimpleName(varType)); //NOI18N
+                            method.append(var.getSimpleName()).append(" : ").append(varType); //NOI18N
                             if (iterator.hasNext()) {
                                 method.append(", "); //NOI18N
                             }
@@ -321,8 +322,6 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 }
                 if (returnType == null) {
                     returnType = "Void"; //NOI18N
-                } else {
-                    returnType = HintsUtils.getClassSimpleName(returnType);
                 }
                 method.append(")").append(" : ").append(returnType).append(" { \n"); //NOI18N
                 method.append(space).append(HintsUtils.TAB).append(HintsUtils.TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
@@ -350,9 +349,22 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return name;
     }
 
+    private Type erasureType(Type type, JavafxTypes types) {
+        if (types.isSequence(type)) {
+            return type;
+        }
+
+        return types.erasure(type);
+    }
+
     private String getTypeString(Type type, JavafxTypes types) {
-        Type sureType = types.erasure(type);
-        String typeString = types.toJavaFXString(sureType);
+        type = erasureType(type, types);
+        String typeString = types.toJavaFXString(type);
+        if (types.isArray(type)) {
+            typeString = getNativeArrayClassSimpleName(typeString);
+        } else {
+            typeString = HintsUtils.getClassSimpleName(typeString);
+        }
         if (typeString == null) {
             typeString = ""; //NOI18N
         } else if (typeString != null && typeString.equals("void")) { //NOI18N
@@ -383,9 +395,19 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 //            elements = compilationInfo.getElements().getAllMembers(el);
 //        }
 
-        
-
         return FXSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) element);
+    }
+    
+    private static String getNativeArrayClassSimpleName(String fqName) {
+        int start = fqName.lastIndexOf(".") + 1; //NOI18N
+        if (start > 0) {
+            fqName = fqName.substring(start);
+        }
+        if (!fqName.contains(NATIVE_STRING)) {
+            fqName = NATIVE_STRING + fqName;
+        }
+
+        return fqName.trim();
     }
 }
 
