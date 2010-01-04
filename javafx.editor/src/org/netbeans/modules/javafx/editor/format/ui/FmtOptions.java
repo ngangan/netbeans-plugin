@@ -190,10 +190,7 @@ public class FmtOptions {
     public static final String spaceWithinIfParens = "spaceWithinIfParens"; //NOI18N
     public static final String spaceWithinForParens = "spaceWithinForParens"; //NOI18N
     public static final String spaceWithinWhileParens = "spaceWithinWhileParens"; //NOI18N
-    public static final String spaceWithinSwitchParens = "spaceWithinSwitchParens"; //NOI18N
     public static final String spaceWithinCatchParens = "spaceWithinCatchParens"; //NOI18N
-    public static final String spaceWithinSynchronizedParens = "spaceWithinSynchronizedParens"; //NOI18N
-    public static final String spaceWithinAnnotationParens = "spaceWithinAnnotationParens"; //NOI18N
     public static final String spaceWithinBraces = "spaceWithinBraces"; //NOI18N
     public static final String spaceWithinSequenceInitBrackets = "spaceWithinArrayInitBrackets"; //NOI18N
     public static final String spaceBeforeComma = "spaceBeforeComma"; //NOI18N
@@ -207,7 +204,6 @@ public class FmtOptions {
     public static final String useSingleClassImport = "useSingleClassImport"; //NOI18N
     public static final String useFQNs = "useFQNs"; //NOI18N
     public static final String countForUsingStarImport = "countForUsingStarImport"; //NOI18N
-    public static final String countForUsingStaticStarImport = "countForUsingStaticStarImport"; //NOI18N
     public static final String packagesForStarImport = "packagesForStarImport"; //NOI18N
     public static final String importsOrder = "importsOrder"; //NOI18N
     
@@ -408,7 +404,7 @@ public class FmtOptions {
             { spaceWithinForParens, FALSE}, //NOI18N
             { spaceWithinWhileParens, FALSE}, //NOI18N
             { spaceWithinCatchParens, FALSE}, //NOI18N
-            { spaceWithinBraces, FALSE}, //NOI18N
+            { spaceWithinBraces, TRUE}, //NOI18N
             { spaceWithinSequenceInitBrackets, FALSE}, //NOI18N
             { spaceBeforeComma, FALSE}, //NOI18N
             { spaceAfterComma, TRUE}, //NOI18N
@@ -421,7 +417,6 @@ public class FmtOptions {
             { useSingleClassImport, TRUE}, //NOI18N
             { useFQNs, FALSE}, //NOI18N
             { countForUsingStarImport, "5"}, //NOI18N
-            { countForUsingStaticStarImport, "3"}, //NOI18N // XXX
             { packagesForStarImport, ""}, //NOI18N // XXX
             { importsOrder, ""}, //NOI18N // XXX
         };

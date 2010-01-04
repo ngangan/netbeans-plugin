@@ -1139,9 +1139,9 @@ public class JFXReformatTask implements ReformatTask {
                     } else {
                         rollback(index, c, d);
                     }
-                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
-                    accept(JFXTokenId.FUNCTION);
-                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+//                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
+//                    accept(JFXTokenId.FUNCTION);
+//                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
                 }
                 scan(type, p);
             }
@@ -1685,6 +1685,7 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.LBRACE);
                 int old = indent;
                 indent += indentSize;
+                spaces(cs.spaceWithinBraces() ? 1 : 0, true);
                 
                 TreeSet<Tree> members = new TreeSet<Tree>(new TreePosComparator(sp, root));
                 members.addAll(node.getLiteralParts());
@@ -1701,7 +1702,7 @@ public class JFXReformatTask implements ReformatTask {
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
                 }
                 indent = old;
-                spaces(0, true);
+                spaces(cs.spaceWithinBraces() && !members.isEmpty() ? 1 : 0, true);
                 accept(JFXTokenId.RBRACE);
             }
             
@@ -2042,11 +2043,18 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitTypeFunctional(TypeFunctionalTree node, Void p) {
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.FUNCTION) == JFXTokenId.FUNCTION) {
+                spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+            } else {
+                rollback(index, c, d);
+            }
             accept(JFXTokenId.LPAREN);
             List<? extends TypeTree> params = node.getParameters();
             if (params != null && !params.isEmpty()) {
-                // TODO introduce cs.spaceWithingFunctionalType
-//                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
+                spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0, true);
                 wrapFunctionalParamList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), params);
                 spaces(cs.spaceWithinMethodDeclParens() ? 1 : 0);
             }
