@@ -43,8 +43,11 @@ import com.sun.javafx.api.tree.Tree;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -59,6 +62,7 @@ import javax.lang.model.element.Element;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.javafx.source.ClassIndex;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -235,12 +239,12 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
     public void process(final FileObject fo) {
         processor.submit(new Runnable() {
-            private void process(CompilationInfo ci) {
+            private void process() {
                 if (ISDEBUG) {
-                    LOGGER.finest("Processing " + ci.getFileObject().getPath()); // NOI18N
+                    LOGGER.finest("Processing " + fo.getPath()); // NOI18N
                 }
                 filesWithModifiedStatus.clear();
-                doProcess(ci, ci.isErrors());
+                doProcess(fo);
                 if (ISDEBUG) {
                     LOGGER.finest("===== ERROR MAP ====="); // NOI18N
                     for(ErrorCounter ec : errorMap.values()) {
@@ -257,69 +261,68 @@ public class FXErrorAnnotator extends AnnotationProvider {
                         LOGGER.finest(sb.toString());
                     }
                     try {
-                        fireFileStatusChanged(new FileStatusEvent(ci.getFileObject().getFileSystem(), filesWithModifiedStatus, true, false));
+                        fireFileStatusChanged(new FileStatusEvent(fo.getFileSystem(), filesWithModifiedStatus, true, false));
                     } catch (FileStateInvalidException ex) {
                         ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
                     }
                 }
             }
             public void run() {
-                JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                if (jfxs != null) {
-                    try {
-                        jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                            public void run(CompilationController ci) throws Exception {
-                                process(ci);
-                            }
-                        }, true);
-                    } catch (IOException ex) {
-                        ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-                    }
-                }
+                process();
             }
         });
     }
 
-    private void doProcess(CompilationInfo ci, boolean isError) {
-        FileObject origFo = ci.getFileObject();
-        if (ISDEBUG) {
-            LOGGER.finest("Checking " + origFo); // NOI18N
-        }
+    private void doProcess(FileObject origFo) {
+        List<FileObject> toProcess = new ArrayList<FileObject>();
+        Set<FileObject> processedFiles = new HashSet<FileObject>();
 
-        final boolean err = ci.isErrors();
-        boolean storedErr = getErrorCounter(origFo).isError();
+        toProcess.add(origFo);
+        
+        while (!toProcess.isEmpty()) {
+            final FileObject processing = toProcess.remove(0);
 
-        // don't attempt to process if the error status is not changing
-        if (!(storedErr ^ isError)) {
+            processedFiles.add(processing);
+
             if (ISDEBUG) {
-                LOGGER.finest("Not processing. Old err = " + storedErr + ", new err = " + isError); // NOI18N
+                LOGGER.finest("Checking " + processing); // NOI18N
             }
-            return;
-        }
 
-        ErrorCounter errorCnt = getErrorCounter(origFo);
 
-        if (isError ^ errorCnt.isError()) {
-            FileObject top = FileOwnerQuery.getOwner(origFo).getProjectDirectory();
-            setErrorFlag(errorCnt, isError, top);
-        }
+            final ErrorCounter errorCnt = getErrorCounter(processing);
 
-        try {
-            ClassIndex index = ci.getClasspathInfo().getClassIndex();
-            for(Tree t : ci.getCompilationUnit().getTypeDecls()) {
-                Element e = ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), t));
-                for(FileObject fo : index.getResources(ElementHandle.create(e),  EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
-                    JavaFXSource.forFileObject(fo).runUserActionTask(new Task<CompilationController>() {
-                        public void run(CompilationController cc) throws Exception {
-                            doProcess(cc, err);
+            try {
+                final Set<ElementHandle> handles = new HashSet<ElementHandle>();
+
+                JavaFXSource.forFileObject(processing).runUserActionTask(new Task<CompilationController>() {
+                    public void run(CompilationController ci) throws Exception {
+                        // don't attempt to process if the error status is not changing
+                        if (!(errorCnt.isError() ^ ci.isErrors())) {
+                            if (ISDEBUG) {
+                                LOGGER.finest("Not processing. Old err = " + errorCnt.isError() + ", new err = " + ci.isErrors()); // NOI18N
+                            }
+                            return;
                         }
+                        FileObject top = FileOwnerQuery.getOwner(processing).getProjectDirectory();
+                        setErrorFlag(errorCnt, ci.isErrors(), top);
 
-                    }, false);
+                        for(Tree t : ci.getCompilationUnit().getTypeDecls()) {
+                            handles.add(ElementHandle.create(ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), t))));
+                        }
+                    }
+                }, false);
+
+                ClassIndex index = ClasspathInfo.create(processing).getClassIndex();
+                for(ElementHandle eh : handles) {
+                    for(final FileObject fo : index.getResources(eh,  EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
+                        if (!processedFiles.contains(fo)) {
+                            toProcess.add(fo);
+                        }
+                    }
                 }
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "error compiling javafx source", e); // NOI18N
             }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "error compiling javafx source", e); // NOI18N
         }
     }
 
