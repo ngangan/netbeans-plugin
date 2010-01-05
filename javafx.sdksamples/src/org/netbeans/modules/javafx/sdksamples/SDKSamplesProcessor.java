@@ -93,7 +93,7 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
                 } else {
                     sdkRoot = new File(sdk.toString());
                 }
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
                 String message = ioe.getMessage() + "uri: " + uri + ", sdk: " + sdk;
                 LayerGenerationException lge = new LayerGenerationException(message);
                 lge.initCause(ioe);
