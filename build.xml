@@ -212,12 +212,16 @@
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
           <include name="javafx-sdk/emulator/mobile/bin/*"/>
+          <include name="javafx-sdk/emulator/mobile/runtimes/cldc-hi-javafx/bin/runMidlet"/>
+          <include name="javafx-sdk/emulator/mobile/device-manager.app/Contents/MacOS/JavaApplicationStub"/>
           <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
         <zipfileset dir="javafx.sdk.mac/release" prefix="javafx2">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
           <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
+          <exclude name="javafx-sdk/emulator/mobile/runtimes/cldc-hi-javafx/bin/runMidlet"/>
+          <exclude name="javafx-sdk/emulator/mobile/device-manager.app/Contents/MacOS/JavaApplicationStub"/>
           <exclude name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
       </jar>

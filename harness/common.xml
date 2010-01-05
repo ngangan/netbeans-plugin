@@ -242,6 +242,12 @@ made subject to such option by the copyright holder.
             <fileset dir="${cluster}/javafx-sdk/emulator/mobile/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
+            <fileset dir="${cluster}/javafx-sdk/emulator/mobile/runtimes/cldc-hi-javafx/bin" erroronmissingdir="false" >
+                <include name="runMidlet"/>
+            </fileset>
+            <fileset dir="${cluster}/javafx-sdk/emulator/mobile/device-manager.app/Contents/MacOS" erroronmissingdir="false" >
+                <include name="JavaApplicationStub"/>
+            </fileset>
             <fileset dir="${cluster}/javafx-sdk/emulator/tv/bin" erroronmissingdir="false" >
                 <include name="*"/>
             </fileset>
