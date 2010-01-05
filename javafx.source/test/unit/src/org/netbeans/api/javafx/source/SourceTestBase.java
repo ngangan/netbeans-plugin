@@ -329,8 +329,17 @@ public class SourceTestBase extends NbTestCase {
         os.close();
     }
 
+    /**
+     * @param relPath path relative to the file within the
+     *        {@link #getDataDir() data} directory
+     * @return content fo the file
+     */
+    public String slurpDataFile(final String relPath) throws IOException {
+        return slurp(new File(getDataDir().getPath().replace("%20", " "), relPath));
+    }
+
     /** Copy-pasted from APISupport. */
-    public static String slurp(File file) throws IOException {
+    public String slurp(File file) throws IOException {
         InputStream is = new FileInputStream(file);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

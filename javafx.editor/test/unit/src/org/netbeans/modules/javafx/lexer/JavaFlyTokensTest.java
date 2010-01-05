@@ -68,8 +68,7 @@ public class JavaFlyTokensTest extends SourceTestBase {
     }
 
     public void testFlyweightTokens() throws Exception {
-        File testJComponentFile = new File(getDataDir().getPath().replace("%20", " ") + "/code.fx");
-        String text = slurp(testJComponentFile);
+        String text = slurpDataFile("code.fx");
         TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
         

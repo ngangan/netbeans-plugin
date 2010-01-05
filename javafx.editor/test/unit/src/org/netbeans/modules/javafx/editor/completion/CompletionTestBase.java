@@ -111,8 +111,7 @@ public class CompletionTestBase extends SourceTestBase {
     protected void checkCompletion(final String source, final String caretLine, final String insert, final String goldenFileName) throws Exception {
         File testSource = new File(getWorkDir(), "test/Test.fx");
         testSource.getParentFile().mkdirs();
-        File sourceFile = new File(getDataDir(), "org/netbeans/modules/javafx/editor/completion/data/" + source + ".fx");
-        String sourceText = slurp(sourceFile);
+        String sourceText = slurpDataFile("org/netbeans/modules/javafx/editor/completion/data/" + source + ".fx");
         int caretPos = getCaretOffset(sourceText, caretLine);
         if (insert != null) {
             // insert a code snippet at the caret and move the caret accordingly,
