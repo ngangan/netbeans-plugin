@@ -135,6 +135,8 @@ public class Install {
 		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "mobile" + File.separatorChar + "bin", "preverify");
 		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "mobile" + File.separatorChar + "bin", "emulator");
 		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "tv" + File.separatorChar + "bin", "cvm");
+		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "mobile" + File.separatorChar + "runtimes" + File.separatorChar + "cldc-hi-javafx" + File.separatorChar + "bin", "runMidlet");
+		setPermission(targetDir + File.separatorChar + "emulator" + File.separatorChar + "mobile" + File.separatorChar + "device-manager.app" + File.separatorChar + "Contents" + File.separatorChar + "MacOS", "JavaApplicationStub");
     }
 
     private static void setPermission(String folder, String file) throws IOException {
