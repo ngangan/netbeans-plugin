@@ -75,23 +75,27 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
 
             LayerBuilder.File wizzard = layer(e).folder("Templates/Project/Samples/JavaFX");
             File sdkRoot = null;
+
+            URI uri = null;
+            URI sdk = null;
             try {
                 // the annotation is attached to a package
                 String pkg = e.asType().toString();
 
                 // path to the annotated source file
-                URI uri = processingEnv.getFiler().getResource(StandardLocation.SOURCE_PATH,
+                uri = processingEnv.getFiler().getResource(StandardLocation.SOURCE_PATH,
                     pkg, "package-info.java").toUri(); // NOI18N
 
                 // use relative path to find the samples folder
-                URI sdk = uri.resolve(samples.pathToSamples());
+                sdk = uri.resolve(samples.pathToSamples());
                 if (sdk.isAbsolute()) {
                     sdkRoot = new File(sdk);
                 } else {
                     sdkRoot = new File(sdk.toString());
                 }
             } catch (IOException ioe) {
-                LayerGenerationException lge = new LayerGenerationException(ioe.getMessage());
+                String message = ioe.getMessage() + "uri: " + uri + ", sdk: " + sdk;
+                LayerGenerationException lge = new LayerGenerationException(message);
                 lge.initCause(ioe);
                 throw lge;
             }
