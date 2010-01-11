@@ -65,11 +65,14 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
@@ -150,7 +153,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             if (!SourceUtils.isElementInOpenProject(file)) {
                 preCheckProblem = JavaFXRefactoringPlugin.createProblem(preCheckProblem, true, NbBundle.getMessage(
                         MoveRefactoringPlugin.class,
-                        "ERR_ProjectNotOpened",
+                        "ERR_ProjectNotOpened", // NOI18N
                         FileUtil.getFileDisplayName(file)));
             }
         }
@@ -170,14 +173,14 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             if (f!=null) {
                 String newName = ((RenameRefactoring) refactoring).getNewName();
                 if (!SourceUtils.isValidPackageName(newName)) {
-                    String msg = new MessageFormat(NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidPackage")).format(
+                    String msg = new MessageFormat(NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidPackage")).format( // NOI18N
                             new Object[] {newName}
                     );
                     return new Problem(true, msg);
                 }
                 
                 if (f.getParent().getFileObject(newName, f.getExt())!=null) {
-                    String msg = new MessageFormat(NbBundle.getMessage(RenameRefactoringPlugin.class,"ERR_PackageExists")).format(
+                    String msg = new MessageFormat(NbBundle.getMessage(RenameRefactoringPlugin.class,"ERR_PackageExists")).format( // NOI18N
                             new Object[] {newName}
                     );
                     return new Problem(true, msg);
@@ -212,7 +215,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     if (pkgName == null) {
                         pkgName = ""; // NOI18N
                     } else if (pkgName.length() > 0) {
-                        pkgName = pkgName + '.';
+                        pkgName = pkgName + '.'; // NOI18N
                     }
                     String fileName = f.getName();
                     if (targetF!=null) {
@@ -262,7 +265,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 assert targetProject!=null;
                                 String sourceName = ProjectUtils.getInformation(sourceProject).getDisplayName();
                                 String targetName = ProjectUtils.getInformation(targetProject).getDisplayName();
-                                return JavaFXRefactoringPlugin.createProblem(null, false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_MissingProjectDeps", sourceName, targetName));
+                                return JavaFXRefactoringPlugin.createProblem(null, false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_MissingProjectDeps", sourceName, targetName)); // NOI18N
                             }
                         }
                     }
@@ -321,13 +324,74 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             @Override
                             public Void visitCompilationUnit(UnitTree node, Void p) {
                                 ExpressionTree packageNameTree = node.getPackageName();
-                                String packageName = packageNameTree != null ? packageNameTree.toString() : "";
+                                String packageName = packageNameTree != null ? packageNameTree.toString() : ""; // NOI18N
                                 String targetPkg = renameMap.get(packageName);
                                 if (targetPkg != null) {
-                                    JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), node.getPackageName());
-                                    elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                                    if (targetPkg.equals(packageName)) return null; // the same package
+
+                                    if (targetPkg.length() > 0) { // non-default target package
+                                        if (packageName.length() > 0) { // from non-default package
+                                            JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), node.getPackageName());
+                                            elements.add(refactoring, RenameRefactoringElement.create(ElementLocation.forPath(tp, cc), targetPkg, packageName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                                        } else {
+                                            moveFromDefault(targetPkg);
+                                        }
+                                    } else { // default target package
+                                        moveToDefault(packageNameTree);
+                                    }
                                 }
                                 return super.visitCompilationUnit(node, p);
+                            }
+
+                            private void moveToDefault(ExpressionTree packageNameTree) {
+                                // default package
+                                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                                // set position to the first character of the package name
+                                int startPos = (int) cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), packageNameTree);
+                                ts.move(startPos);
+                                // search the "package" keyword (backwards)
+                                ts.movePrevious();
+                                Token<JFXTokenId> t = ts.token();
+                                while (t.id() != JFXTokenId.PACKAGE && ts.movePrevious()) {
+                                    t = ts.token();
+                                    startPos -= t.length();
+                                }
+                                if (t.id() == JFXTokenId.PACKAGE && ts.movePrevious()) {
+                                    t = ts.token();
+                                    while (t.id() == JFXTokenId.WS && ts.movePrevious()) {
+                                        startPos -= t.length();
+                                        t = ts.token();
+                                    }
+                                    // set position to the last character of the package name
+                                    int endPos = (int) cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), packageNameTree);
+                                    ts.move(endPos);
+                                    ts.moveNext();
+                                    t = ts.token();
+                                    while (t.id() != JFXTokenId.SEMI && ts.moveNext()) {
+                                        endPos += t.length();
+                                        t = ts.token();
+                                    }
+                                    elements.add(refactoring, DeleteTextRefactoringElement.create(cc.getFileObject(), startPos, endPos, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+                                }
+                            }
+
+                            private void moveFromDefault(String targetPkg) {
+                                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                                // skip comments; possibly license and other headers
+                                int startPos = 0;
+                                ts.moveStart();
+                                ts.moveNext();
+                                Token<JFXTokenId> t = ts.token();
+                                while (t.id() == JFXTokenId.COMMENT && ts.moveNext()) {
+                                    startPos += t.length();
+                                    t = ts.token();
+                                }
+                                boolean appendCRLF = false;
+                                if (ts.moveNext()) {
+                                    t = ts.token();
+                                    appendCRLF = !t.text().toString().equals("\n"); // NOI18N
+                                }
+                                elements.add(refactoring, InsertTextRefactoringElement.create(cc.getFileObject(), startPos, true, "package " + targetPkg + ";" + (appendCRLF ? "\n" : ""), new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext())))); // NOI18N
                             }
                         };
                         scanner.scan(cc.getCompilationUnit(), null);
@@ -358,14 +422,14 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 jfxs.runUserActionTask(new Task<CompilationController>() {
                     public void run(final CompilationController cc) throws Exception {
                         MoveProblemCollector<Void, Void> scanner = new MoveProblemCollector<Void, Void>(cc, movedClasses, renameMap) {
-                            private String myPkgName = "";
+                            private String myPkgName = ""; // NOI18N
 
                             private boolean removingImport = false;
                             private boolean handlingImport = false;
 
                             @Override
                             public Void visitCompilationUnit(UnitTree node, Void p) {
-                                myPkgName = node.getPackageName().toString();
+                                myPkgName = node.getPackageName() != null ? node.getPackageName().toString() : "";
                                 return super.visitCompilationUnit(node, p);
                             }
 
@@ -377,7 +441,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                     if (qualidTree != null && (qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || qualidTree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
                                         ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
                                         if (DEBUG) {
-                                            LOG.finest("Import: " + parts.packageName + "." + parts.typeName);
+                                            LOG.finest("Import: " + parts.packageName + "." + parts.typeName); // NOI18N
                                         }
                                         if (parts.packageName != null) {
                                             String otherTargetPkg = renameMap.get(parts.packageName);
@@ -385,8 +449,8 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                             String myTargetPkg = renameMap.get(myPkgName);
                                             if (myTargetPkg == null) myTargetPkg = myPkgName;
                                             if (DEBUG) {
-                                                LOG.finest("MyPkg: " + myPkgName + " -> " + myTargetPkg);
-                                                LOG.finest("Target: " + otherTargetPkg);
+                                                LOG.finest("MyPkg: " + myPkgName + " -> " + myTargetPkg); // NOI18N
+                                                LOG.finest("Target: " + otherTargetPkg); // NOI18N
                                             }
                                             if (myTargetPkg.equals(otherTargetPkg)) {
                                                 imported.add(qualidTree.toString().replace(parts.packageName, otherTargetPkg));
@@ -449,7 +513,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             @Override
                             public Void visitMemberSelect(MemberSelectTree node, Void p) {
                                 if (DEBUG)  {
-                                    LOG.finest("handling import = " + handlingImport);
+                                    LOG.finest("handling import = " + handlingImport); // NOI18N
                                 }
                                 if (removingImport) return null;
 
@@ -519,7 +583,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             }
                             private boolean isImported(String typeName) {
                                 for(String imp : imported) {
-                                    if (imp.equals(typeName) || (imp.endsWith(".*") && typeName.startsWith(imp.substring(0, imp.length() - 1)))) {
+                                    if (imp.equals(typeName) || (imp.endsWith(".*") && typeName.startsWith(imp.substring(0, imp.length() - 1)))) { // NOI18N
                                         return true;
                                     }
                                 }
@@ -532,10 +596,10 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         if (problem[0] == null && importLastLine[0] > -1) {
                             for(String imprt : toImport) {
                                 if (DEBUG) {
-                                    LOG.finest("adding import \"" + imprt + "\"(" + renameMap.get(imprt) + ")");
+                                    LOG.finest("adding import \"" + imprt + "\"(" + renameMap.get(imprt) + ")"); // NOI18N
                                 }
                                 imprt = renameMap.containsKey(imprt) ? renameMap.get(imprt) : imprt;
-                                elements.add(refactoring, InsertTextRefactoringElement.create(fo, importLastLine[0], addTail[0], "import " + imprt + ";\n", Lookups.singleton(tContext)));
+                                elements.add(refactoring, InsertTextRefactoringElement.create(fo, importLastLine[0], addTail[0], "import " + imprt + ";\n", Lookups.singleton(tContext))); // NOI18N
                             }
                         }
                     }
@@ -604,8 +668,8 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 FileObject folder = refactoring.getRefactoringSource().lookup(FileObject.class);
                 ClassPath cp = ClassPath.getClassPath(folder, ClassPath.SOURCE);
                 FileObject root = cp.findOwnerRoot(folder);
-                String prefix = FileUtil.getRelativePath(root, folder.getParent()).replace('/','.');
-                String postfix = FileUtil.getRelativePath(folder, fo.isFolder() ? fo : fo.getParent()).replace('/', '.');
+                String prefix = FileUtil.getRelativePath(root, folder.getParent()).replace('/','.'); // NOI18N
+                String postfix = FileUtil.getRelativePath(folder, fo.isFolder() ? fo : fo.getParent()).replace('/', '.'); // NOI18N
                 String t = concat(prefix, getNewPackageName(), postfix);
                 return t;
             }
@@ -628,14 +692,14 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         for (Iterator i = fileObjects.iterator(); i.hasNext(); ) {
             FileObject fo = (FileObject) i.next();
             if (SourceUtils.isJavaFXFile(fo)) {
-                packagePostfix.put(fo, postfix.replace('/', '.'));
+                packagePostfix.put(fo, postfix.replace('/', '.')); // NOI18N
                 filesToMove.add(fo);
             } else if (!(fo.isFolder())) {
-                packagePostfix.put(fo, postfix.replace('/', '.'));
+                packagePostfix.put(fo, postfix.replace('/', '.')); // NOI18N
             } else if (VisibilityQuery.getDefault().isVisible(fo)) {
                 //o instanceof DataFolder
                 //CVS folders are ignored
-                boolean addDot = !"".equals(postfix);
+                boolean addDot = !"".equals(postfix); // NOI18N
                 Collection col = new ArrayList();
                 for (FileObject fo2: fo.getChildren()) {
                     if (!fo2.isFolder() || (fo2.isFolder() && recursively)) 
@@ -656,12 +720,12 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
  
     private String concat(String s1, String s2, String s3) {
-        String result = "";
-        if (s1 != null && !"".equals(s1)) {
+        String result = ""; // NOI18N
+        if (s1 != null && !"".equals(s1)) { // NOI18N
             result += s1 + "."; // NOI18N
         }
         result +=s2;
-        if (s3 != null && !"".equals(s3)) {
+        if (s3 != null && !"".equals(s3)) { // NOI18N
             result += ("".equals(result)? "" : ".") + s3; // NOI18N
         }
         return result;
