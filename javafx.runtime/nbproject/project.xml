@@ -6,10 +6,7 @@
             <code-name-base>org.netbeans.modules.javafx.runtime</code-name-base>
             <suite-component/>
             <module-dependencies/>
-            <friend-packages>
-                <friend>org.netbeans.modules.javafx.composer.runtime.proxy</friend>
-                <friend>org.netbeans.modules.javafx.composer.design</friend>
-                <friend>org.netbeans.modules.javafx.fxd</friend>
+            <public-packages>
                 <package>com.sun.embeddedswing</package>
                 <subpackages>com.sun.javafx</subpackages>
                 <subpackages>com.sun.media.jmc</subpackages>
@@ -18,7 +15,7 @@
                 <subpackages>com.sun.scenario</subpackages>
                 <subpackages>com.sun.stylesheet</subpackages>
                 <subpackages>javafx</subpackages>
-            </friend-packages>
+            </public-packages>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxrt.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/shared/javafxrt.jar</binary-origin>
