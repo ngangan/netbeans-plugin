@@ -56,6 +56,8 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
@@ -102,7 +104,9 @@ import org.openide.util.lookup.ProxyLookup;
  * </ul>
  */
 public class MoveRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin  {
-
+    final private Logger LOG = Logger.getLogger(MoveRefactoringPlugin.class.getName());
+    final private boolean DEBUG = LOG.isLoggable(Level.FINEST);
+    
     private Map packagePostfix = new HashMap();
     final AbstractRefactoring refactoring;
     final boolean isRenameRefactoring;
@@ -372,14 +376,18 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                     Tree qualidTree = node.getQualifiedIdentifier();
                                     if (qualidTree != null && (qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || qualidTree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
                                         ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
-                                        System.err.println("!!! Import: " + parts.packageName + "." + parts.typeName);
+                                        if (DEBUG) {
+                                            LOG.finest("Import: " + parts.packageName + "." + parts.typeName);
+                                        }
                                         if (parts.packageName != null) {
                                             String otherTargetPkg = renameMap.get(parts.packageName);
                                             if (otherTargetPkg == null) otherTargetPkg = parts.packageName;
                                             String myTargetPkg = renameMap.get(myPkgName);
                                             if (myTargetPkg == null) myTargetPkg = myPkgName;
-                                            System.err.println("!!! MyPkg: " + myPkgName + " -> " + myTargetPkg);
-                                            System.err.println("!!! Target: " + otherTargetPkg);
+                                            if (DEBUG) {
+                                                LOG.finest("MyPkg: " + myPkgName + " -> " + myTargetPkg);
+                                                LOG.finest("Target: " + otherTargetPkg);
+                                            }
                                             if (myTargetPkg.equals(otherTargetPkg)) {
                                                 imported.add(qualidTree.toString().replace(parts.packageName, otherTargetPkg));
                                                 SourcePositions sp = cc.getTrees().getSourcePositions();
@@ -424,7 +432,11 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                     if (parts.typeName != null) {
                                         String importName = parts.typeName;
                                         if (newPkg != null) {
-                                            importName = parts.typeName.replace(parts.packageName, newPkg);
+                                            if (movedClasses.contains(parts.typeName)) {
+                                                importName = parts.typeName.replace(parts.packageName, newPkg);
+                                            } else {
+                                                importName = parts.typeName;
+                                            }
                                             if (!isImported(importName)) {
                                                 toImport.add(importName);
                                             }
@@ -436,7 +448,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                             @Override
                             public Void visitMemberSelect(MemberSelectTree node, Void p) {
-                                System.err.println("handling import = " + handlingImport);
+                                if (DEBUG)  {
+                                    LOG.finest("handling import = " + handlingImport);
+                                }
                                 if (removingImport) return null;
 
                                 if (handlingImport) {
@@ -517,6 +531,10 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         problem[0] = chainProblems(problem[0], p);
                         if (problem[0] == null && importLastLine[0] > -1) {
                             for(String imprt : toImport) {
+                                if (DEBUG) {
+                                    LOG.finest("adding import \"" + imprt + "\"(" + renameMap.get(imprt) + ")");
+                                }
+                                imprt = renameMap.containsKey(imprt) ? renameMap.get(imprt) : imprt;
                                 elements.add(refactoring, InsertTextRefactoringElement.create(fo, importLastLine[0], addTail[0], "import " + imprt + ";\n", Lookups.singleton(tContext)));
                             }
                         }
